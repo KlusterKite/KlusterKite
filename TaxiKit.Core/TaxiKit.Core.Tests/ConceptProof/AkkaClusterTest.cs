@@ -1,16 +1,21 @@
-﻿namespace TaxiKit.Core.Tests.ConceptProof
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="AkkaClusterTest.cs" company="">
+//
+// </copyright>
+// <summary>
+//   Akka cluster capability testing
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace TaxiKit.Core.Tests.ConceptProof
 {
-    using System;
     using System.Configuration;
-    using System.IO;
-    using System.Reactive.Linq;
-    using System.Text;
-    using System.Threading;
+
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.Configuration.Hocon;
 
-    using Serilog;
+    using TaxiKit.Core.TestKit;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -20,12 +25,16 @@
     /// <summary>
     /// Akka cluster capability testing
     /// </summary>
-    public class AkkaClusterTest
+    public class AkkaClusterTest : TestWithSerilog
     {
-        public AkkaClusterTest(ITestOutputHelper output)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AkkaClusterTest"/> class.
+        /// </summary>
+        /// <param name="output">
+        /// The Xunit output.
+        /// </param>
+        public AkkaClusterTest(ITestOutputHelper output) : base(output)
         {
-            var loggerConfig = new LoggerConfiguration().WriteTo.TextWriter(new OutputWriter(output));
-            Logger = loggerConfig.CreateLogger();
         }
 
         /// <summary>
@@ -50,41 +59,6 @@
             }
 
             // Thread.Sleep(TimeSpan.FromSeconds(1));
-        }
-
-        protected class OutputWriter : TextWriter
-        {
-            private readonly ITestOutputHelper output;
-
-            private readonly StringBuilder line;
-
-            public OutputWriter(ITestOutputHelper output)
-            {
-                this.output = output;
-                this.line = new StringBuilder();
-            }
-
-            public override void Write(char[] buffer)
-            {
-                var str = new string(buffer);
-                if (!str.EndsWith(this.NewLine))
-                {
-                    this.line.Append(str);
-                    return;
-                }
-
-                this.line.Append(str.Substring(0, str.Length - this.NewLine.Length));
-                this.output.WriteLine(this.line.ToString());
-                this.line.Clear();
-            }
-
-            public override void WriteLine()
-            {
-                this.output.WriteLine(this.line.ToString());
-                this.line.Clear();
-            }
-
-            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }

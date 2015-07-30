@@ -131,6 +131,10 @@
     <Content Include="licenses\protoc-license.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TaxiKit.Core.TestKit\TaxiKit.Core.TestKit.csproj">
+      <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
+      <Name>TaxiKit.Core.TestKit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TaxiKit.Core\TaxiKit.Core.csproj">
       <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
       <Name>TaxiKit.Core</Name>
