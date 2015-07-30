@@ -54,37 +54,37 @@
 
         protected class OutputWriter : TextWriter
         {
-            private ITestOutputHelper output;
+            private readonly ITestOutputHelper output;
+
+            private readonly StringBuilder line;
 
             public OutputWriter(ITestOutputHelper output)
             {
                 this.output = output;
+                this.line = new StringBuilder();
             }
 
-            private string buffer = string.Empty;
-
-            public override void Write(string value)
+            public override void Write(char[] buffer)
             {
-                this.buffer += value;
-                if (value.Contains("\n"))
+                var str = new string(buffer);
+                if (!str.EndsWith(this.NewLine))
                 {
-                    this.output.WriteLine(buffer.Replace("\n", string.Empty));
-                    this.buffer = string.Empty;
+                    this.line.Append(str);
+                    return;
                 }
+
+                this.line.Append(str.Substring(0, str.Length - this.NewLine.Length));
+                this.output.WriteLine(this.line.ToString());
+                this.line.Clear();
             }
 
-            public override void WriteLine(string value)
+            public override void WriteLine()
             {
-                this.output.WriteLine(value);
+                this.output.WriteLine(this.line.ToString());
+                this.line.Clear();
             }
 
-            public override Encoding Encoding
-            {
-                get
-                {
-                    return Encoding.UTF8;
-                }
-            }
+            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }
