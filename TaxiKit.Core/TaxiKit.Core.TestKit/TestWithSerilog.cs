@@ -27,7 +27,9 @@ namespace TaxiKit.Core.TestKit
         /// </param>
         protected TestWithSerilog(ITestOutputHelper output)
         {
-            var loggerConfig = new LoggerConfiguration().WriteTo.TextWriter(new XunitOutputWriter(output));
+            var loggerConfig = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .WriteTo.TextWriter(new XunitOutputWriter(output));
             Logger = loggerConfig.CreateLogger();
         }
     }
