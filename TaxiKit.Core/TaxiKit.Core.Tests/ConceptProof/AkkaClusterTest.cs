@@ -14,6 +14,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
     using System.Collections.Immutable;
     using System.Configuration;
     using System.Linq;
+    using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -144,7 +145,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "role1" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551" });
 
-            //sys1.ActorOf(Props.Create(() => new LogActor()), "log");
+            sys1.ActorOf(Props.Create(() => new LogActor()), "log");
 
             var sys2 = StartSystem(
                 2552,
@@ -154,7 +155,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "role1" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
-            //sys2.ActorOf(Props.Create(() => new LogActor()), "log");
+            sys2.ActorOf(Props.Create(() => new LogActor()), "log");
 
             var sys3 = StartSystem(
                 0,
@@ -193,20 +194,118 @@ namespace TaxiKit.Core.Tests.ConceptProof
 
             var sys2Router = sys2.ActorOf(
                     Props.Empty.WithRouter(new ClusterRouterGroup(new ConsistentHashingGroup("/user/log"),
-                        new ClusterRouterGroupSettings(4, false, "role2", ImmutableHashSet.Create("/user/log")))), "logRouter");
+                        new ClusterRouterGroupSettings(100, false, "role2", ImmutableHashSet.Create("/user/log")))), "logRouter");
 
             Log.Information(sys2Router.Path.ToString());
 
-            for (int i = 0; i < 30; i++)
+            var recieves = new Dictionary<int, int>();
+            int messagesLost = 0;
+
+            var keysCol = 100;
+            SendClusterMessages(sys2Router, keysCol);
+            SendClusterMessages(sys2Router, keysCol);
+
+            sys4.Shutdown();
+            sys4.AwaitTermination();
+            systems.Remove(sys4);
+            SendClusterMessages(sys2Router, keysCol);
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            SendClusterMessages(sys2Router, keysCol);
+
+            systemUpWaitHandles.Clear();
+            sys4 = StartSystem(
+                            0,
+                            baseConfig,
+                            systems,
+                            systemUpWaitHandles,
+                            new[] { "role2" },
+                            new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
+
+            sys4.ActorOf(Props.Create(() => new LogActor()), "log");
+
+            foreach (var systemUpWaitHandle in systemUpWaitHandles)
             {
-                sys2Router.Tell(new ConsistentHashableEnvelope($"Hello {i}", i));
+                Assert.True(systemUpWaitHandle.WaitOne(TimeSpan.FromSeconds(10)), "Cluster failed to be built");
             }
 
-            Thread.Sleep(TimeSpan.FromSeconds(1));
+            SendClusterMessages(sys2Router, keysCol * 2);
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            SendClusterMessages(sys2Router, keysCol * 3);
+
+            // Thread.Sleep(TimeSpan.FromSeconds(2));
 
             foreach (var system in systems)
             {
                 system.Shutdown();
+            }
+
+            foreach (var system in systems)
+            {
+                system.AwaitTermination();
+            }
+        }
+
+        private static void SendClusterMessages(IActorRef sys2Router, int keysCol)
+        {
+            Log.Information("------------------------");
+            Log.Information("Starting sending cluster messages");
+
+            var routees = sys2Router.Ask<Routees>(new GetRoutees()).Result;
+            Log.Information($"Routees before start: {routees.Members.Count()}");
+            foreach (var member in routees.Members)
+            {
+                member.Send("I am routee before start", ActorRefs.NoSender);
+            }
+
+            var recieves = new Dictionary<int, int>();
+            int messagesLost = 0;
+
+            var tasks = Enumerable.Range(0, 1000).Select(
+                i => Task.Run(
+                    async () =>
+                        {
+                            try
+                            {
+                                var port =
+                                    await sys2Router.Ask<int>(
+                                        new ConsistentHashableEnvelope(
+                                            new LogActor.PingMessage { Message = $"Hello {i} {i % keysCol}" },
+                                            i % keysCol),
+                                        TimeSpan.FromMilliseconds(1000));
+
+                                lock (recieves)
+                                {
+                                    if (!recieves.ContainsKey(port))
+                                    {
+                                        recieves[port] = 0;
+                                    }
+
+                                    recieves[port]++;
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                Interlocked.Add(ref messagesLost, 1);
+                            }
+                        }));
+
+            Task.WaitAll(tasks.ToArray());
+
+            if (messagesLost > 0)
+            {
+                Log.Error("{messagesLost} messages was lost", messagesLost);
+            }
+
+            foreach (var key in recieves.Keys)
+            {
+                Log.Information("{Port} recieved {Count} messages", key, recieves[key]);
+            }
+
+            routees = sys2Router.Ask<Routees>(new GetRoutees()).Result;
+            Log.Information($"Routees after stop: {routees.Members.Count()}");
+            foreach (var member in routees.Members)
+            {
+                member.Send("I am routee after stop", ActorRefs.NoSender);
             }
         }
 
@@ -358,11 +457,23 @@ namespace TaxiKit.Core.Tests.ConceptProof
             public LogActor()
             {
                 this.Receive<string>(m => this.Log(m));
+                this.Receive<PingMessage>(m => this.Log(m));
             }
 
             private void Log(string message)
             {
                 Context.GetLogger().Info("LOG {Port}: {StringMessage}", this.cluster.SelfAddress.Port, message);
+            }
+
+            private void Log(PingMessage message)
+            {
+                // Context.GetLogger().Info("LOG {Port}: {StringMessage}", this.cluster.SelfAddress.Port, message.Message);
+                this.Sender.Tell(this.cluster.SelfAddress.Port);
+            }
+
+            public class PingMessage
+            {
+                public string Message { get; set; }
             }
         }
     }
