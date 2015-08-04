@@ -76,6 +76,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
 
             StartSystem(
                 2551,
+                "seed1",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -83,6 +84,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551" });
             StartSystem(
                 2552,
+                "seed2",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -90,6 +92,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
             StartSystem(
                 0,
+                "worker1",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -97,6 +100,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
             StartSystem(
                 0,
+                "worker2",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -130,7 +134,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                         ConfigurationFactory.ParseString(
                             "akka.loggers = [\"Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog\"]"))
                     .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 30s"));
+                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 5s"));
 
             var systems = new List<ActorSystem>();
             var systemUpWaitHandles = new List<EventWaitHandle>();
@@ -139,6 +143,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
 
             var sys1 = StartSystem(
                 2551,
+                "seed1",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -149,6 +154,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
 
             var sys2 = StartSystem(
                 2552,
+                "seed2",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -159,6 +165,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
 
             var sys3 = StartSystem(
                 0,
+                "worker1",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -169,6 +176,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
 
             var sys4 = StartSystem(
                 0,
+                "worker2",
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
@@ -196,25 +204,31 @@ namespace TaxiKit.Core.Tests.ConceptProof
                     Props.Empty.WithRouter(new ClusterRouterGroup(new ConsistentHashingGroup("/user/log"),
                         new ClusterRouterGroupSettings(100, false, "role2", ImmutableHashSet.Create("/user/log")))), "logRouter");
 
-            Log.Information(sys2Router.Path.ToString());
+            var sys1Router = sys1.ActorOf(Props.Empty.WithRouter(new ClusterRouterGroup(new ConsistentHashingGroup("/user/log"),
+                        new ClusterRouterGroupSettings(100, false, "role2", ImmutableHashSet.Create("/user/log")))), "logRouter");
 
-            var recieves = new Dictionary<int, int>();
-            int messagesLost = 0;
+            Log.Information(sys2Router.Path.ToString());
 
             var keysCol = 100;
             SendClusterMessages(sys2Router, keysCol);
             SendClusterMessages(sys2Router, keysCol);
 
+            SendClusterMessages(sys1Router, keysCol);
+            SendClusterMessages(sys1Router, keysCol);
+
             sys4.Shutdown();
             sys4.AwaitTermination();
             systems.Remove(sys4);
             SendClusterMessages(sys2Router, keysCol);
+            SendClusterMessages(sys1Router, keysCol);
             Thread.Sleep(TimeSpan.FromSeconds(5));
             SendClusterMessages(sys2Router, keysCol);
+            SendClusterMessages(sys1Router, keysCol);
 
             systemUpWaitHandles.Clear();
             sys4 = StartSystem(
                             0,
+                            "worker2-new",
                             baseConfig,
                             systems,
                             systemUpWaitHandles,
@@ -229,7 +243,15 @@ namespace TaxiKit.Core.Tests.ConceptProof
             }
 
             SendClusterMessages(sys2Router, keysCol * 2);
-            Thread.Sleep(TimeSpan.FromSeconds(5));
+            Thread.Sleep(TimeSpan.FromSeconds(10));
+            SendClusterMessages(sys2Router, keysCol * 3);
+
+            sys3.Shutdown();
+            sys3.AwaitTermination();
+            systems.Remove(sys3);
+
+            SendClusterMessages(sys2Router, keysCol * 2);
+            Thread.Sleep(TimeSpan.FromSeconds(10));
             SendClusterMessages(sys2Router, keysCol * 3);
 
             // Thread.Sleep(TimeSpan.FromSeconds(2));
@@ -313,6 +335,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
         /// Actor test system start
         /// </summary>
         /// <param name="port">Network port</param>
+        /// <param name="uid">Идентификатор ноды</param>
         /// <param name="baseConfig">Base configuration description</param>
         /// <param name="systems">Complet cluster node list (will add new system to it)</param>
         /// <param name="systemUpWaitHandles">List of wait handles for clusters initialization waiting</param>
@@ -320,6 +343,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
         /// <param name="seedNodes">Seed nodes addresses list</param>
         private static ActorSystem StartSystem(
             int port,
+            string uid,
             Config baseConfig,
             List<ActorSystem> systems,
             List<EventWaitHandle> systemUpWaitHandles,
@@ -333,6 +357,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
             var config =
                 ConfigurationFactory.Empty.WithFallback(
                     ConfigurationFactory.ParseString("akka.remote.helios.tcp.hostname = 127.0.0.1"))
+                    .WithFallback(ConfigurationFactory.ParseString($"akka.cluster.uid = \"{uid}\""))
                     .WithFallback(ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + port))
                     .WithFallback(
                         ConfigurationFactory.ParseString(
@@ -395,6 +420,9 @@ namespace TaxiKit.Core.Tests.ConceptProof
                     this.Self,
                     ClusterEvent.InitialStateAsEvents,
                     new[] { typeof(ClusterEvent.IMemberEvent), typeof(ClusterEvent.UnreachableMember) });
+
+                this.cluster.RegisterOnMemberUp(() =>
+                    { Context.GetLogger().Info("{Address}: I am up", this.cluster.SelfAddress.Port); });
             }
 
             private void OnMemberDown()
