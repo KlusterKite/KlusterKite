@@ -41,6 +41,7 @@ namespace TaxiKit.Core.Service
             var section = (AkkaConfigurationSection)ConfigurationManager.GetSection("akka");
             var config = section.AkkaConfig;
             var actorSystem = ActorSystem.Create("TaxiKit", config);
+
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
         }

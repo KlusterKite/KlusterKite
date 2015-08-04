@@ -12,6 +12,8 @@ namespace TaxiKit.Core.Service
     using Akka.Actor;
     using Castle.Windsor;
 
+    using TaxiKit.Core.Cluster;
+
     /// <summary>
     /// Main application class
     /// </summary>
@@ -40,6 +42,8 @@ namespace TaxiKit.Core.Service
         {
             ActorSystem = actorSystem;
             IsReady = true;
+
+            actorSystem.ActorOf(Props.Create(() => new ClusterLoggingActor()));
         }
 
         /// <summary>

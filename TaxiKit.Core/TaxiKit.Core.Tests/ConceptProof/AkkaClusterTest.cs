@@ -357,7 +357,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
             var config =
                 ConfigurationFactory.Empty.WithFallback(
                     ConfigurationFactory.ParseString("akka.remote.helios.tcp.hostname = 127.0.0.1"))
-                    .WithFallback(ConfigurationFactory.ParseString($"akka.cluster.uid = \"{uid}\""))
+                    //.WithFallback(ConfigurationFactory.ParseString($"akka.cluster.uid = \"{uid}\""))
                     .WithFallback(ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + port))
                     .WithFallback(
                         ConfigurationFactory.ParseString(

@@ -37,6 +37,12 @@ namespace TaxiKit.Core.Cluster
             Context.GetLogger().Debug(
                 "{Type}: Cluster log up",
                 this.GetType().Name);
+
+            this.cluster.RegisterOnMemberUp(
+                () =>
+                    {
+                        Context.GetLogger().Debug("{Type}: Cluster connection is up", this.GetType().Name);
+                    });
         }
 
         /// <summary>
