@@ -150,7 +150,9 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "role1" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551" });
 
-            sys1.ActorOf(Props.Create(() => new LogActor()), "log");
+            var loggerProps = Props.Create(() => new LogActor());
+
+            var logger = sys1.ActorOf(loggerProps, "log");
 
             var sys2 = StartSystem(
                 2552,
@@ -161,7 +163,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "role1" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
-            sys2.ActorOf(Props.Create(() => new LogActor()), "log");
+            sys2.ActorOf(loggerProps, "log");
 
             var sys3 = StartSystem(
                 0,
@@ -172,7 +174,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "role2" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
-            sys3.ActorOf(Props.Create(() => new LogActor()), "log");
+            sys3.ActorOf(loggerProps, "log");
 
             var sys4 = StartSystem(
                 0,
@@ -183,7 +185,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 new[] { "role2" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
-            sys4.ActorOf(Props.Create(() => new LogActor()), "log");
+            sys4.ActorOf(loggerProps, "log");
 
             foreach (var systemUpWaitHandle in systemUpWaitHandles)
             {
@@ -197,9 +199,19 @@ namespace TaxiKit.Core.Tests.ConceptProof
             sys3.ActorSelection("/user/log").Tell("Hello World");
             sys4.ActorSelection("/user/log").Tell("Hello World");
 
+            sys1.ActorSelection("/user/log").Tell(logger);
+            sys2.ActorSelection("/user/log").Tell(logger);
+            sys1.ActorSelection("akka.tcp://ClusterSystem@127.0.0.1:2552/user/log").Tell(logger);
+
+            sys1.ActorSelection("/user/log").Tell(loggerProps);
+            sys1.ActorSelection("akka.tcp://ClusterSystem@127.0.0.1:2552/user/log").Tell(loggerProps);
+
             sys3.ActorSelection("akka.tcp://ClusterSystem@127.0.0.1:2551/user/log").Tell("Hello World remote");
             sys4.ActorSelection("akka.tcp://ClusterSystem@127.0.0.1:2551/user/log").Tell("Hello World remote");
 
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+
+            /*
             var sys2Router = sys2.ActorOf(
                     Props.Empty.WithRouter(new ClusterRouterGroup(new ConsistentHashingGroup("/user/log"),
                         new ClusterRouterGroupSettings(100, false, "role2", ImmutableHashSet.Create("/user/log")))), "logRouter");
@@ -235,7 +247,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
                             new[] { "role2" },
                             new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
-            sys4.ActorOf(Props.Create(() => new LogActor()), "log");
+            sys4.ActorOf(loggerProps, "log");
 
             foreach (var systemUpWaitHandle in systemUpWaitHandles)
             {
@@ -255,7 +267,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
             SendClusterMessages(sys2Router, keysCol * 3);
 
             // Thread.Sleep(TimeSpan.FromSeconds(2));
-
+            */
             foreach (var system in systems)
             {
                 system.Shutdown();
@@ -486,11 +498,17 @@ namespace TaxiKit.Core.Tests.ConceptProof
             {
                 this.Receive<string>(m => this.Log(m));
                 this.Receive<PingMessage>(m => this.Log(m));
+                this.Receive<object>(m => this.Log(m));
             }
 
             private void Log(string message)
             {
                 Context.GetLogger().Info("LOG {Port}: {StringMessage}", this.cluster.SelfAddress.Port, message);
+            }
+
+            private void Log(object message)
+            {
+                Context.GetLogger().Info("LOG {Port}: object {StringMessage}", this.cluster.SelfAddress.Port, message.GetType().Name);
             }
 
             private void Log(PingMessage message)
