@@ -139,7 +139,7 @@
   <ItemGroup>
     <Compile Include="ConceptProof\AkkaClusterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestUtils\ActorSystemTest.cs" />
+    <Compile Include="TestUtils\CoreTestKitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="akka.config">

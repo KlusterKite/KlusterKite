@@ -23,15 +23,15 @@ namespace TaxiKit.Core.Tests.TestUtils
     /// <summary>
     /// TaxiKit TestKit tests
     /// </summary>
-    public class ActorSystemTest : BaseActorTest
+    public class CoreTestKitTests : BaseActorTest
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActorSystemTest"/> class.
+        /// Initializes a new instance of the <see cref="CoreTestKitTests"/> class.
         /// </summary>
         /// <param name="output">
         /// The output.
         /// </param>
-        public ActorSystemTest(ITestOutputHelper output)
+        public CoreTestKitTests(ITestOutputHelper output)
                     : base(output)
         {
         }
