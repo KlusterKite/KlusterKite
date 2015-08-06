@@ -55,6 +55,14 @@
       <HintPath>..\..\packages\Akka.Remote.1.0.3\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Akka.TestKit">
+      <HintPath>..\..\packages\Akka.TestKit.1.0.3\lib\net45\Akka.TestKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.TestKit.Xunit2">
+      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.0.3\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Castle.Core">
       <HintPath>..\..\packages\Castle.Core.3.3.0\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
@@ -96,6 +104,7 @@
       <HintPath>..\..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -117,21 +126,39 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseActorTest.cs" />
+    <Compile Include="CallingThreadDispatcher.cs" />
+    <Compile Include="CallingThreadDispatcherConfigurator.cs" />
+    <Compile Include="Configuration.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Configuration.resx</DependentUpon>
+    </Compile>
+    <Compile Include="IMessageWithPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestActorForwarder.cs" />
+    <Compile Include="TestMailbox.cs" />
+    <Compile Include="TestMessage.cs" />
     <Compile Include="TestWithSerilog.cs" />
+    <Compile Include="TimeMachineScheduler.cs" />
     <Compile Include="XunitOutputWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="protos\google\protobuf\csharp_options.proto" />
-    <None Include="protos\google\protobuf\descriptor.proto" />
-    <None Include="protos\tutorial\addressbook.proto" />
+    <None Include="Resources\akka.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CHANGES.txt" />
-    <Content Include="licenses\license.txt" />
-    <Content Include="licenses\protoc-license.txt" />
+    <ProjectReference Include="..\TaxiKit.Core\TaxiKit.Core.csproj">
+      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
+      <Name>TaxiKit.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

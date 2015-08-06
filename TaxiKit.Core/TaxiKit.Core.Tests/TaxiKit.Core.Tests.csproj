@@ -139,6 +139,7 @@
   <ItemGroup>
     <Compile Include="ConceptProof\AkkaClusterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestUtils\ActorSystemTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="akka.config">
@@ -146,14 +147,6 @@
     </None>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="protos\google\protobuf\csharp_options.proto" />
-    <None Include="protos\google\protobuf\descriptor.proto" />
-    <None Include="protos\tutorial\addressbook.proto" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="CHANGES.txt" />
-    <Content Include="licenses\license.txt" />
-    <Content Include="licenses\protoc-license.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TaxiKit.Core.TestKit\TaxiKit.Core.TestKit.csproj">

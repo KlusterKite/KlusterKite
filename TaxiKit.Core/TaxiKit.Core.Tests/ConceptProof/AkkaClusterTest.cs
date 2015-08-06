@@ -55,7 +55,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
         /// <summary>
         /// Experimenting with akka cluster initialization
         /// </summary>
-        [Fact]
+        // [Fact]
         public void SimpleClusterTest()
         {
             var baseConfig =
@@ -123,7 +123,7 @@ namespace TaxiKit.Core.Tests.ConceptProof
         /// <summary>
         /// Experimenting with akka cluster initialization
         /// </summary>
-        [Fact]
+        // [Fact]
         public void MessageRoutingTest()
         {
             var baseConfig =
