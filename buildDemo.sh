@@ -1,4 +1,7 @@
-!#/bin/bash
+#!/bin/bash
+echo "Stopping"
+killall mono
+
 echo "Building"
 xbuild /noconsolelogger /p:TargetFrameworkVersion="v4.5" TaxiKit.Core/TaxiKit.Core.sln
 
