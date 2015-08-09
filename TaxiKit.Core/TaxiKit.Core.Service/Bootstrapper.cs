@@ -13,6 +13,7 @@ namespace TaxiKit.Core.Service
 
     using Akka.Actor;
     using Akka.Configuration.Hocon;
+    using Akka.DI.CastleWindsor;
 
     using Castle.Facilities.TypedFactory;
     using Castle.MicroKernel.Registration;
@@ -44,13 +45,14 @@ namespace TaxiKit.Core.Service
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(ConfigurationManager.ConnectionStrings["redis"].ConnectionString);
             container.Register(
                 Component
-                .For<IDatabase>()
-                .UsingFactoryMethod(() => redis.GetDatabase()).LifestyleScoped());
+                .For<IConnectionMultiplexer>()
+                .Instance(redis).LifestyleSingleton());
 
             // starting akka system
             var section = (AkkaConfigurationSection)ConfigurationManager.GetSection("akka");
             var config = section.AkkaConfig;
             var actorSystem = ActorSystem.Create("TaxiKit", config);
+            var propsResolver = new WindsorDependencyResolver(container, actorSystem);
 
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));

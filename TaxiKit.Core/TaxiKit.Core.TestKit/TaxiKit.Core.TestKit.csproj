@@ -152,6 +152,7 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="IMessageWithPath.cs" />
+    <Compile Include="Moq\RedisConnectionMoq.cs" />
     <Compile Include="Moq\RedisMoq.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestActorForwarder.cs" />

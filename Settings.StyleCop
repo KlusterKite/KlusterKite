@@ -5,6 +5,7 @@
       <Value>akka</Value>
       <Value>Xunit</Value>
       <Value>serilog</Value>
+      <Value>redis</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>
