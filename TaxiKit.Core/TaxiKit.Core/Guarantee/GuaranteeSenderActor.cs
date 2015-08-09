@@ -35,11 +35,6 @@ namespace TaxiKit.Core.Guarantee
         public const string Workers = "workers";
 
         /// <summary>
-        /// Path relative to cluster node root system, that should handle requests
-        /// </summary>
-        private readonly string receiverPath;
-
-        /// <summary>
         /// The redis connection.
         /// </summary>
         private readonly IConnectionMultiplexer redisConnection;
@@ -64,7 +59,7 @@ namespace TaxiKit.Core.Guarantee
         {
             this.redisConnection = redisConnection;
             this.receiver = Context.ActorOf(Props.Empty.WithRouter(FromConfig.Instance), ClusterReceiver);
-            this.workers = Context.ActorOf(Props.Create(() => new Worker(this.receiverPath, this.redisConnection)).WithRouter(FromConfig.Instance), Workers);
+            this.workers = Context.ActorOf(Props.Create(() => new Worker(this.receiver, this.redisConnection)).WithRouter(FromConfig.Instance), Workers);
         }
 
         /// <summary>

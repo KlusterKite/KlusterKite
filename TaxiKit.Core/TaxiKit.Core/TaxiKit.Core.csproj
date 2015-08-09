@@ -131,7 +131,7 @@
   <ItemGroup>
     <Compile Include="Cluster\ClusterLoggingActor.cs" />
     <Compile Include="Guarantee\GuaranteeEnvelope.cs" />
-    <Compile Include="Guarantee\GuaranteeRecieverActor.cs" />
+    <Compile Include="Guarantee\GuaranteeRecieverBaseActor.cs" />
     <Compile Include="Guarantee\GuaranteeSenderActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\DateTimeWrapper.cs" />
