@@ -3,16 +3,17 @@
 //   All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace TaxiKit.Core.TestKit
 {
     using System;
-    using System.Collections.Generic;
     using System.Configuration;
     using System.Linq.Expressions;
 
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.Configuration.Hocon;
+    using Akka.Logger.Serilog;
     using Akka.TestKit;
     using Akka.TestKit.Xunit2;
 
@@ -22,8 +23,6 @@ namespace TaxiKit.Core.TestKit
 
     using Xunit;
     using Xunit.Abstractions;
-    using static Serilog.Log;
-    using CallingThreadDispatcher = TaxiKit.Core.TestKit.CallingThreadDispatcher;
 
     /// <summary>
     /// <seealso cref="TestKit"/> extension class
@@ -33,10 +32,13 @@ namespace TaxiKit.Core.TestKit
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseActorTest"/> class.
         /// </summary>
+        /// <param name="output">
+        /// The output.
+        /// </param>
         public BaseActorTest(ITestOutputHelper output)
             : base(CreateTestActorSystem(output))
         {
-            var f = new Akka.Logger.Serilog.SerilogLogMessageFormatter();
+            // var f = new SerilogLogMessageFormatter();
         }
 
         /// <summary>
@@ -72,7 +74,7 @@ namespace TaxiKit.Core.TestKit
         public virtual void Cleanup()
         {
             DateTimeWrapper.NowGetter = null;
-            Core.TestKit.CallingThreadDispatcher.ConcurrentMode = false;
+            CallingThreadDispatcher.ConcurrentMode = false;
             this.Shutdown();
         }
 
@@ -83,7 +85,8 @@ namespace TaxiKit.Core.TestKit
         {
             DateTimeWrapper.NowGetter = () => TimeMachineScheduler.GetCurrentLocation().DateTime;
             TimeMachineScheduler.Reset();
-            Core.TestKit.CallingThreadDispatcher.ConcurrentMode = false;
+            CallingThreadDispatcher.ConcurrentMode = false;
+
             // RootActors.Start(this.GetRootActors(), this.Sys, null);
         }
 
@@ -114,7 +117,7 @@ namespace TaxiKit.Core.TestKit
         /// that was sent to the specified address on specified time
         /// </summary>
         /// <param name="path">
-        ///  specified address
+        /// specified address
         /// </param>
         /// <param name="timeout">
         /// Timespan when message should arrive
@@ -177,7 +180,7 @@ namespace TaxiKit.Core.TestKit
         /// that was sent on specified time
         /// </summary>
         /// <param name="timeout">
-        ///  Timespan when message should arrive
+        /// Timespan when message should arrive
         /// </param>
         /// <typeparam name="T">
         /// The original message type
@@ -200,13 +203,17 @@ namespace TaxiKit.Core.TestKit
         /// <summary>
         /// Creating actor system for test
         /// </summary>
-        /// <param name="output">Xunit output</param>
-        /// <returns>actor system for test</returns>
+        /// <param name="output">
+        /// Xunit output
+        /// </param>
+        /// <returns>
+        /// actor system for test
+        /// </returns>
         private static ActorSystem CreateTestActorSystem(ITestOutputHelper output)
         {
             var loggerConfig =
                 new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(output));
-            Logger = loggerConfig.CreateLogger();
+            Serilog.Log.Logger = loggerConfig.CreateLogger();
             var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
             var config = (section?.AkkaConfig ?? ConfigurationFactory.Empty)
                 .WithFallback(ConfigurationFactory.ParseString(Configuration.AkkaConfig));
