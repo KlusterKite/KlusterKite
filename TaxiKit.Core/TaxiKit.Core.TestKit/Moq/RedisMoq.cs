@@ -18,6 +18,7 @@ namespace TaxiKit.Core.TestKit.Moq
 
     /// <summary>
     /// Redis interaction moq
+    /// http://www.tomdupont.net/2013/10/unit-testing-and-dependancy-injection.html - here is the main idea of moq in tests
     /// </summary>
     public class RedisMoq : IDatabase
     {
