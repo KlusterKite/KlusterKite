@@ -38,7 +38,7 @@ namespace TaxiKit.Core.TestKit
         public BaseActorTest(ITestOutputHelper output)
             : base(CreateTestActorSystem(output))
         {
-            // var f = new SerilogLogMessageFormatter();
+            this.Initialize();
         }
 
         /// <summary>
@@ -75,7 +75,6 @@ namespace TaxiKit.Core.TestKit
         {
             DateTimeWrapper.NowGetter = null;
             CallingThreadDispatcher.ConcurrentMode = false;
-            this.Shutdown();
         }
 
         /// <summary>
