@@ -214,7 +214,7 @@ namespace TaxiKit.Core.TestKit
                 new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(output));
             Serilog.Log.Logger = loggerConfig.CreateLogger();
             var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
-            var config = (section?.AkkaConfig ?? ConfigurationFactory.Empty)
+            var config = (section != null ? section.AkkaConfig : ConfigurationFactory.Empty)
                 .WithFallback(ConfigurationFactory.ParseString(Configuration.AkkaConfig));
 
             return ActorSystem.Create("test", config);
