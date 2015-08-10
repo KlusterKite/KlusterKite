@@ -64,7 +64,7 @@ namespace TaxiKit.Core.TestKit {
         ///   Looks up a localized string similar to             {
         ///              TaxiKit : {
         ///                test-dispatcher {
-        ///                    type : &quot;TaxiKit.Core.TestKit.CallingThreadDispatcherConfigurator, TaxiKit.Core.TestKit
+        ///                    type : &quot;TaxiKit.Core.TestKit.CallingThreadDispatcherConfigurator, TaxiKit.Core.TestKit&quot;
         ///                    throughput : 100
         ///                    throughput-deadline-time : 0ms
         ///                }
@@ -74,7 +74,7 @@ namespace TaxiKit.Core.TestKit {
         ///                stdout-loglevel : DEBUG
         ///                loggers : [&quot;Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog&quot;]
         ///                log-config-on-start : off
-        ///      [rest of string was truncated]&quot;;.
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AkkaConfig {
             get {
