@@ -8,6 +8,7 @@ namespace TaxiKit.Core.Guarantee
     using System;
 
     using Akka.Actor;
+    using Akka.Event;
     using Akka.Routing;
     using Akka.Util.Internal;
 
@@ -27,6 +28,21 @@ namespace TaxiKit.Core.Guarantee
         /// Name of child actor, that contains workers for message processing
         /// </summary>
         private const string Workers = "workers";
+
+        /// <summary>
+        /// The delivery timeout.
+        /// </summary>
+        private readonly TimeSpan deliveryTimeout;
+
+        /// <summary>
+        /// Maximum number of attempts to deliver message to cluster
+        /// </summary>
+        private readonly int maxAttempts;
+
+        /// <summary>
+        /// The time period between sequential attempts to deliver same message.
+        /// </summary>
+        private readonly TimeSpan nextAttemptWait;
 
         /// <summary>
         /// Access to child actor for distributing messages
@@ -54,9 +70,9 @@ namespace TaxiKit.Core.Guarantee
             var config =
                 Context.System.AsInstanceOf<ExtendedActorSystem>().Provider.Deployer.Lookup(this.Self.Path).Config;
 
-            var maxAttempts = config.GetInt("maxAttempts", -1);
-            var deliveryTimeout = config.GetTimeSpan("deliveryTimeout", TimeSpan.FromMilliseconds(200));
-            var nextAttemptWait = config.GetTimeSpan("nextAttemptWait", TimeSpan.FromMilliseconds(500));
+            this.maxAttempts = config.GetInt("maxAttempts", -1);
+            this.deliveryTimeout = config.GetTimeSpan("deliveryTimeout", TimeSpan.FromMilliseconds(200));
+            this.nextAttemptWait = config.GetTimeSpan("nextAttemptWait", TimeSpan.FromMilliseconds(500));
 
             this.redisConnection = redisConnection;
             this.receiver = Context.ActorOf(Props.Empty.WithRouter(FromConfig.Instance), ClusterReceiver);
@@ -65,13 +81,29 @@ namespace TaxiKit.Core.Guarantee
                     Props.Create(
                         () =>
                         new Worker(
+                            this.Self,
                             this.receiver,
                             this.redisConnection,
-                            maxAttempts,
-                            deliveryTimeout,
-                            nextAttemptWait)).WithRouter(FromConfig.Instance),
+                            this.maxAttempts,
+                            this.deliveryTimeout,
+                            this.nextAttemptWait)).WithRouter(new ConsistentHashingPool(5)),
                     Workers);
         }
+
+        /// <summary>
+        /// Gets the delivery timeout.
+        /// </summary>
+        public TimeSpan DeliveryTimeout => this.deliveryTimeout;
+
+        /// <summary>
+        /// Gets the maximum number of attempts to deliver message to cluster
+        /// </summary>
+        public int MaxAttempts => this.maxAttempts;
+
+        /// <summary>
+        /// Gets the time period between sequential attempts to deliver same message.
+        /// </summary>
+        public TimeSpan NextAttemptWait => this.nextAttemptWait;
 
         /// <summary>
         /// Forwarding all incoming messages to worker actors
@@ -93,6 +125,11 @@ namespace TaxiKit.Core.Guarantee
             /// The delivery timeout.
             /// </summary>
             private readonly TimeSpan deliveryTimeout;
+
+            /// <summary>
+            /// The main sender actor reference
+            /// </summary>
+            private readonly IActorRef mainSender;
 
             /// <summary>
             /// Maximum number of attempts to deliver message to cluster
@@ -117,6 +154,9 @@ namespace TaxiKit.Core.Guarantee
             /// <summary>
             /// Initializes a new instance of the <see cref="Worker"/> class.
             /// </summary>
+            /// <param name="mainSender">
+            /// The main sender actor reference
+            /// </param>
             /// <param name="receiver">
             /// The receiver.
             /// </param>
@@ -132,8 +172,9 @@ namespace TaxiKit.Core.Guarantee
             /// <param name="nextAttemptWait">
             /// The time period between sequential attempts to deliver same message.
             /// </param>
-            public Worker(IActorRef receiver, IConnectionMultiplexer redisConnection, int maxAttempts, TimeSpan deliveryTimeout, TimeSpan nextAttemptWait)
+            public Worker(IActorRef mainSender, IActorRef receiver, IConnectionMultiplexer redisConnection, int maxAttempts, TimeSpan deliveryTimeout, TimeSpan nextAttemptWait)
             {
+                this.mainSender = mainSender;
                 this.receiver = receiver;
                 this.redisConnection = redisConnection;
                 this.maxAttempts = maxAttempts;
@@ -142,6 +183,12 @@ namespace TaxiKit.Core.Guarantee
 
                 this.Receive<GuaranteeEnvelope>(e => this.OnResendMesage(e));
                 this.Receive<object>(m => this.CreateEnvelope(m));
+            }
+
+            protected override bool AroundReceive(Receive receive, object message)
+            {
+                Context.GetLogger().Info("recieved {messageType}", message.GetType().Name);
+                return base.AroundReceive(receive, message);
             }
 
             /// <summary>
@@ -180,15 +227,15 @@ namespace TaxiKit.Core.Guarantee
                 }
                 catch (Exception)
                 {
-                    if (this.maxAttempts <= 0 || this.maxAttempts >= envelope.CuurentAttemptCount)
+                    if (this.maxAttempts <= 0 || this.maxAttempts >= envelope.CurentAttemptCount)
                     {
                         if (this.nextAttemptWait >= TimeSpan.Zero)
                         {
-                            Context.System.Scheduler.ScheduleTellOnce(this.nextAttemptWait, this.receiver, envelope.MakeNewAttempt(), ActorRefs.NoSender);
+                            Context.System.Scheduler.ScheduleTellOnce(this.nextAttemptWait, this.mainSender, envelope.MakeNewAttempt(), ActorRefs.NoSender);
                         }
                         else
                         {
-                            this.Self.Tell(envelope.MakeNewAttempt(), ActorRefs.NoSender);
+                            this.mainSender.Tell(envelope.MakeNewAttempt(), ActorRefs.NoSender);
                         }
                     }
                 }

@@ -22,7 +22,7 @@ namespace TaxiKit.Core.Guarantee
         /// <summary>
         /// Key format for storing serialized messages in redis
         /// </summary>
-        internal const string RedisKeyFormat = "Network:GuaranteeMessage:{0}";
+        public const string RedisKeyFormat = "Network:GuaranteeMessage:{0}";
 
         /// <summary>
         /// Key for correct distribution among <seealso cref="ConsistentHashingGroup"/>
@@ -50,7 +50,7 @@ namespace TaxiKit.Core.Guarantee
         /// <summary>
         /// Gets or sets number of attempts made to deliver message to cluster node
         /// </summary>
-        public int CuurentAttemptCount { get; private set; } = 1;
+        public int CurentAttemptCount { get; private set; } = 1;
 
         /// <summary>
         /// Original message object
@@ -68,7 +68,7 @@ namespace TaxiKit.Core.Guarantee
         public IActorRef Sender { get; set; }
 
         /// <summary>
-        /// Creates message clone with <seealso cref="CuurentAttemptCount"/> incremented by 1
+        /// Creates message clone with <seealso cref="CurentAttemptCount"/> incremented by 1
         /// </summary>
         /// <returns>The clone of current message</returns>
         public GuaranteeEnvelope MakeNewAttempt()
@@ -78,7 +78,7 @@ namespace TaxiKit.Core.Guarantee
                 MessageId = this.MessageId,
                 Sender = this.Sender,
                 Message = this.Message,
-                CuurentAttemptCount = this.CuurentAttemptCount + 1
+                CurentAttemptCount = this.CurentAttemptCount + 1
             };
         }
     }

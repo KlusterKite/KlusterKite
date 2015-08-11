@@ -6,6 +6,7 @@
 namespace TaxiKit.Core.TestKit.Moq
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
@@ -14,10 +15,25 @@ namespace TaxiKit.Core.TestKit.Moq
 
     /// <summary>
     ///     Redis interaction moq
-    ///     http://www.tomdupont.net/2013/10/unit-testing-and-dependancy-injection.html - here is the main idea of moq in tests
     /// </summary>
     public class RedisMoq : IDatabase
     {
+        /// <summary>
+        /// moq redis storage
+        /// </summary>
+        private ConcurrentDictionary<string, object> storage;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisMoq"/> class.
+        /// </summary>
+        /// <param name="storage">
+        /// The storage.
+        /// </param>
+        public RedisMoq(ConcurrentDictionary<string, object> storage)
+        {
+            this.storage = storage;
+        }
+
         /// <summary>
         /// Gets the database.
         /// </summary>
@@ -6139,7 +6155,9 @@ namespace TaxiKit.Core.TestKit.Moq
             When when = When.Always,
             CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            string stringKey = key;
+            this.storage[stringKey] = (string)value;
+            return true;
         }
 
         /// <summary>

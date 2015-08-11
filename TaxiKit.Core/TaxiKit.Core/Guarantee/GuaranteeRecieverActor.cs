@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GuaranteeRecieverBaseActor.cs" company="TaxiKit">
+// <copyright file="GuaranteeRecieverActor.cs" company="TaxiKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -9,8 +9,6 @@
 
 namespace TaxiKit.Core.Guarantee
 {
-    using System.Threading.Tasks;
-
     using Akka.Actor;
 
     using StackExchange.Redis;
@@ -18,7 +16,7 @@ namespace TaxiKit.Core.Guarantee
     /// <summary>
     /// This actor receives messages <seealso cref="GuaranteeSenderActor"/>, decompose them and forwards to original receiver
     /// </summary>
-    public abstract class GuaranteeRecieverBaseActor : ReceiveActor
+    public class GuaranteeRecieverActor : ReceiveActor
     {
         /// <summary>
         /// Connection to redis database
@@ -26,12 +24,12 @@ namespace TaxiKit.Core.Guarantee
         private IConnectionMultiplexer redisConnection;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GuaranteeRecieverBaseActor"/> class.
+        /// Initializes a new instance of the <see cref="GuaranteeRecieverActor"/> class.
         /// </summary>
         /// <param name="redisConnection">
         /// The redis connection.
         /// </param>
-        protected GuaranteeRecieverBaseActor(IConnectionMultiplexer redisConnection)
+        protected GuaranteeRecieverActor(IConnectionMultiplexer redisConnection)
         {
             this.redisConnection = redisConnection;
             this.Receive<GuaranteeEnvelope>(message => this.OnGuaranteeEnvelope(message));

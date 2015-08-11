@@ -10,6 +10,7 @@
 namespace TaxiKit.Core.TestKit.Moq
 {
     using System;
+    using System.Collections.Concurrent;
     using System.IO;
     using System.Net;
     using System.Threading.Tasks;
@@ -21,6 +22,22 @@ namespace TaxiKit.Core.TestKit.Moq
     /// </summary>
     public class RedisConnectionMoq : IConnectionMultiplexer
     {
+        /// <summary>
+        /// moq redis storage
+        /// </summary>
+        private ConcurrentDictionary<string, object> storage;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisConnectionMoq"/> class.
+        /// </summary>
+        /// <param name="storage">
+        /// The moq storage. Provide it if you want to check stored data.
+        /// </param>
+        public RedisConnectionMoq(ConcurrentDictionary<string, object> storage = null)
+        {
+            this.storage = storage ?? new ConcurrentDictionary<string, object>();
+        }
+
         /// <summary>
         /// The configuration changed.
         /// </summary>
@@ -307,6 +324,11 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public IDatabase GetDatabase(int db = -1, object asyncState = null)
         {
+            if (db == -1)
+            {
+                return new RedisMoq(this.storage);
+            }
+
             throw new NotImplementedException();
         }
 

@@ -3,7 +3,6 @@
 //   All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TaxiKit.Core.TestKit
 {
     using System;
@@ -13,9 +12,13 @@ namespace TaxiKit.Core.TestKit
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.Configuration.Hocon;
-    using Akka.Logger.Serilog;
+    using Akka.DI.CastleWindsor;
+    using Akka.DI.Core;
     using Akka.TestKit;
     using Akka.TestKit.Xunit2;
+
+    using Castle.MicroKernel.Registration;
+    using Castle.Windsor;
 
     using Serilog;
 
@@ -35,14 +38,23 @@ namespace TaxiKit.Core.TestKit
         /// <param name="output">
         /// The output.
         /// </param>
-        public BaseActorTest(ITestOutputHelper output)
-            : base(CreateTestActorSystem(output))
+        /// <param name="config">
+        /// Custom test akka configuration
+        /// </param>
+        public BaseActorTest(ITestOutputHelper output, Config config = null) : base(CreateTestActorSystem(output, config))
         {
             this.Initialize();
+            this.WindsorContainer = new WindsorContainer();
+            this.Sys.AddDependencyResolver(new WindsorDependencyResolver(this.WindsorContainer, this.Sys));
         }
 
         /// <summary>
-        /// Create a new actor as child of <see cref="Sys"/> and returns it as <see cref="TestActorRef{TActor}"/>
+        /// The Windsor container
+        /// </summary>
+        protected IWindsorContainer WindsorContainer { get; }
+
+        /// <summary>
+        /// Create a new actor as child of <see cref="ActorSystem"/> and returns it as <see cref="TestActorRef{TActor}"/>
         /// to enable access to the underlying actor instance via <see cref="TestActorRefBase{TActor}.UnderlyingActor"/>.
         /// Uses an expression that calls the constructor of <typeparamref name="TActor"/>.
         /// <example>
@@ -78,15 +90,14 @@ namespace TaxiKit.Core.TestKit
         }
 
         /// <summary>
-        /// Actor system initialization
+        /// releasing resources
         /// </summary>
-        public virtual void Initialize()
+        /// <param name="disposing">
+        /// </param>
+        protected override void Dispose(bool disposing)
         {
-            DateTimeWrapper.NowGetter = () => TimeMachineScheduler.GetCurrentLocation().DateTime;
-            TimeMachineScheduler.Reset();
-            CallingThreadDispatcher.ConcurrentMode = false;
-
-            // RootActors.Start(this.GetRootActors(), this.Sys, null);
+            base.Dispose(disposing);
+            this.Cleanup();
         }
 
         /// <summary>
@@ -200,24 +211,49 @@ namespace TaxiKit.Core.TestKit
         }
 
         /// <summary>
+        /// Register dependency injection component
+        /// </summary>
+        /// <typeparam name="T">Type of component</typeparam>
+        /// <param name="generator">Component generation factory</param>
+        protected void WinsorBind<T>(Func<T> generator)
+        {
+            this.WindsorContainer.Register(Component.For(typeof(T)).UsingFactoryMethod(generator).LifestyleTransient());
+        }
+
+        /// <summary>
         /// Creating actor system for test
         /// </summary>
         /// <param name="output">
         /// Xunit output
         /// </param>
+        /// <param name="initConfiguration">
+        /// Custom test akka configuration
+        /// </param>
         /// <returns>
         /// actor system for test
         /// </returns>
-        private static ActorSystem CreateTestActorSystem(ITestOutputHelper output)
+        private static ActorSystem CreateTestActorSystem(ITestOutputHelper output, Config initConfiguration)
         {
             var loggerConfig =
                 new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(output));
             Serilog.Log.Logger = loggerConfig.CreateLogger();
             var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
-            var config = (section != null ? section.AkkaConfig : ConfigurationFactory.Empty)
+            var config = (initConfiguration ?? ConfigurationFactory.Empty)
+                .WithFallback(section != null ? section.AkkaConfig : ConfigurationFactory.Empty)
                 .WithFallback(ConfigurationFactory.ParseString(Configuration.AkkaConfig));
-
             return ActorSystem.Create("test", config);
+        }
+
+        /// <summary>
+        /// Actor system initialization
+        /// </summary>
+        private void Initialize()
+        {
+            DateTimeWrapper.NowGetter = () => TimeMachineScheduler.GetCurrentLocation().DateTime;
+            TimeMachineScheduler.Reset();
+            CallingThreadDispatcher.ConcurrentMode = false;
+
+            // RootActors.Start(this.GetRootActors(), this.Sys, null);
         }
 
         /*

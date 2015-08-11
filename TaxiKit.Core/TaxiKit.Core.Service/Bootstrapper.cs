@@ -14,6 +14,7 @@ namespace TaxiKit.Core.Service
     using Akka.Actor;
     using Akka.Configuration.Hocon;
     using Akka.DI.CastleWindsor;
+    using Akka.DI.Core;
 
     using Castle.Facilities.TypedFactory;
     using Castle.MicroKernel.Registration;
@@ -52,7 +53,7 @@ namespace TaxiKit.Core.Service
             var section = (AkkaConfigurationSection)ConfigurationManager.GetSection("akka");
             var config = section.AkkaConfig;
             var actorSystem = ActorSystem.Create("TaxiKit", config);
-            var propsResolver = new WindsorDependencyResolver(container, actorSystem);
+            actorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, actorSystem));
 
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
