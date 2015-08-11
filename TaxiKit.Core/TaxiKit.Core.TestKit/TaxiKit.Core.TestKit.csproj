@@ -173,7 +173,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="Resources\akka.hocon" />
+    <None Include="Resources\akka.hocon">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TaxiKit.Core\TaxiKit.Core.csproj">
