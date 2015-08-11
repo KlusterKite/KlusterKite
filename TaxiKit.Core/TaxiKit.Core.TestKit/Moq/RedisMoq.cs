@@ -5933,7 +5933,18 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public RedisValue StringGetSet(RedisKey key, RedisValue value, CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object result;
+                if (!this.storage.TryGetValue(key, out result))
+                {
+                    result = null;
+                }
+
+                this.storage[key] = (string)value;
+
+                return (string)result;
+            }
         }
 
         /// <summary>
@@ -6155,9 +6166,12 @@ namespace TaxiKit.Core.TestKit.Moq
             When when = When.Always,
             CommandFlags flags = CommandFlags.None)
         {
-            string stringKey = key;
-            this.storage[stringKey] = (string)value;
-            return true;
+            lock (this.storage)
+            {
+                string stringKey = key;
+                this.storage[stringKey] = (string)value;
+                return true;
+            }
         }
 
         /// <summary>
