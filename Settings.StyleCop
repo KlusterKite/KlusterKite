@@ -3,6 +3,7 @@
     <StringProperty Name="Culture">en-US</StringProperty>
     <CollectionProperty Name="RecognizedWords">
       <Value>akka</Value>
+      <Value>hocon</Value>
       <Value>Xunit</Value>
       <Value>serilog</Value>
       <Value>redis</Value>
