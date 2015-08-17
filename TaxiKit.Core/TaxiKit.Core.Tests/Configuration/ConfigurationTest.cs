@@ -2,24 +2,13 @@
 // <copyright file="ConfigurationTest.cs" company="TaxiKit">
 //   All rights reserved
 // </copyright>
-// <summary>
-//   Global configuration test
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TaxiKit.Core.Tests.Configuration
 {
-    using System;
     using System.Linq;
 
-    using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-
-    using Serilog;
-
-    using TaxiKit.Core.Guarantee;
     using TaxiKit.Core.TestKit;
 
     using Xunit;
@@ -103,10 +92,6 @@ namespace TaxiKit.Core.Tests.Configuration
         [Fact]
         public void NameSpaceActorTest()
         {
-            this.WindsorContainer.Register(Classes.FromAssemblyContaining<NameSpaceActor>().Pick().LifestyleTransient());
-            this.WindsorContainer.Register(Classes.FromAssemblyContaining<TestActorForwarder>().Pick().LifestyleTransient());
-            this.WindsorContainer.Register(Component.For<IActorRef>().Instance(this.TestActor).Named("testActor"));
-
             this.Sys.StartNameSpaceActorsFromConfiguration();
             this.Sys.ActorSelection("/user/testNameSpace/forwarder").Tell("Hello world");
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/testNameSpace/forwarder"));

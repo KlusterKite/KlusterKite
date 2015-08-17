@@ -66,8 +66,6 @@ namespace TaxiKit.Core.Tests.Guarantee
         public void GuaranteeReceiverInitializationTest()
         {
             var redis = new ConcurrentDictionary<string, object>();
-            this.WindsorContainer.Register(
-                Component.For<GuaranteeRecieverActor>().Named("GuaranteeRecieverActor").LifestyleTransient());
             this.WinsorBind<IConnectionMultiplexer>(() => new RedisConnectionMoq(redis));
 
             var actor = this.ActorOfAsTestActorRef<GuaranteeRecieverActor>(
@@ -84,8 +82,6 @@ namespace TaxiKit.Core.Tests.Guarantee
         public void GuaranteeReceiverNormalTest()
         {
             var redis = new ConcurrentDictionary<string, object>();
-            this.WindsorContainer.Register(
-                Component.For<GuaranteeRecieverActor>().Named("GuaranteeRecieverActor").LifestyleTransient());
             this.WinsorBind<IConnectionMultiplexer>(() => new RedisConnectionMoq(redis));
 
             var actor =
@@ -115,8 +111,6 @@ namespace TaxiKit.Core.Tests.Guarantee
         public void GuaranteeReceiverRepeatedMessageTest()
         {
             var redis = new ConcurrentDictionary<string, object>();
-            this.WindsorContainer.Register(
-                Component.For<GuaranteeRecieverActor>().Named("GuaranteeRecieverActor").LifestyleTransient());
             this.WinsorBind<IConnectionMultiplexer>(() => new RedisConnectionMoq(redis));
 
             var actor =

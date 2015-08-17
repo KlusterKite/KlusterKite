@@ -3,19 +3,17 @@
 //   All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace TaxiKit.Core.TestKit
 {
     using System;
-    using System.Configuration;
     using System.Linq.Expressions;
 
     using Akka.Actor;
     using Akka.Configuration;
-    using Akka.Configuration.Hocon;
     using Akka.DI.CastleWindsor;
     using Akka.DI.Core;
     using Akka.TestKit;
-    using Akka.TestKit.Xunit2;
 
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
@@ -30,7 +28,7 @@ namespace TaxiKit.Core.TestKit
     /// <summary>
     /// <seealso cref="TestKit"/> extension class
     /// </summary>
-    public class BaseActorTest : TestKit
+    public abstract class BaseActorTest : HackedBaseActorTest
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseActorTest"/> class.
@@ -41,17 +39,10 @@ namespace TaxiKit.Core.TestKit
         /// <param name="config">
         /// Custom test akka configuration
         /// </param>
-        public BaseActorTest(ITestOutputHelper output, Config config = null) : base(CreateTestActorSystem(output, config))
+        protected BaseActorTest(ITestOutputHelper output, Config config = null) : base(CreateTestActorSystem(output, config))
         {
             this.Initialize();
-            this.WindsorContainer = new WindsorContainer();
-            this.Sys.AddDependencyResolver(new WindsorDependencyResolver(this.WindsorContainer, this.Sys));
         }
-
-        /// <summary>
-        /// The Windsor container
-        /// </summary>
-        protected IWindsorContainer WindsorContainer { get; }
 
         /// <summary>
         /// Create a new actor as child of <see cref="ActorSystem"/> and returns it as <see cref="TestActorRef{TActor}"/>
@@ -213,8 +204,12 @@ namespace TaxiKit.Core.TestKit
         /// <summary>
         /// Register dependency injection component
         /// </summary>
-        /// <typeparam name="T">Type of component</typeparam>
-        /// <param name="generator">Component generation factory</param>
+        /// <typeparam name="T">
+        /// Type of component
+        /// </typeparam>
+        /// <param name="generator">
+        /// Component generation factory
+        /// </param>
         protected void WinsorBind<T>(Func<T> generator)
         {
             this.WindsorContainer.Register(Component.For(typeof(T)).UsingFactoryMethod(generator).LifestyleTransient());
@@ -232,16 +227,25 @@ namespace TaxiKit.Core.TestKit
         /// <returns>
         /// actor system for test
         /// </returns>
-        private static ActorSystem CreateTestActorSystem(ITestOutputHelper output, Config initConfiguration)
+        private static TestDescription CreateTestActorSystem(ITestOutputHelper output, Config initConfiguration)
         {
             var loggerConfig =
                 new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(output));
             Serilog.Log.Logger = loggerConfig.CreateLogger();
-            var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
+
+            var container = new WindsorContainer();
+            container.RegisterWindsorInstallers();
+
             var config = (initConfiguration ?? ConfigurationFactory.Empty)
-                .WithFallback(section != null ? section.AkkaConfig : ConfigurationFactory.Empty)
-                .WithFallback(ConfigurationFactory.ParseString(Configuration.AkkaConfig));
-            return ActorSystem.Create("test", config);
+                .WithFallback(BaseInstaller.GetStackedConfig(container));
+
+            var testActorSystem = ActorSystem.Create("test", config);
+            testActorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, testActorSystem));
+            return new TestDescription
+            {
+                System = testActorSystem,
+                Container = container
+            };
         }
 
         /// <summary>
@@ -252,25 +256,6 @@ namespace TaxiKit.Core.TestKit
             DateTimeWrapper.NowGetter = () => TimeMachineScheduler.GetCurrentLocation().DateTime;
             TimeMachineScheduler.Reset();
             CallingThreadDispatcher.ConcurrentMode = false;
-
-            // RootActors.Start(this.GetRootActors(), this.Sys, null);
         }
-
-        /*
-        /// <summary>
-        /// Формирует список адресов по каторым расставляем тестовые акторы
-        /// </summary>
-        /// <returns>список адресов</returns>
-        public virtual List<RootActors.RootActorDescription> GetRootActors()
-        {
-            var rootActors = RootActors.GetRootActors();
-            foreach (var rootActor in rootActors)
-            {
-                rootActor.Props = Props.Create(() => new TestActorForwarder(this.TestActor));
-            }
-
-            return rootActors;
-        }
-        */
     }
 }
