@@ -42,8 +42,6 @@ namespace TaxiKit.Core.Service
         {
             ActorSystem = actorSystem;
             IsReady = true;
-
-            actorSystem.ActorOf(Props.Create(() => new ClusterLoggingActor()));
         }
 
         /// <summary>

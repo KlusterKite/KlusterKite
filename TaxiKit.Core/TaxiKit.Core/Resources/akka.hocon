@@ -1,0 +1,29 @@
+﻿{
+    akka : {
+      
+      stdout-loglevel : INFO
+      loggers : ["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
+      log-config-on-start : on
+      loglevel : INFO
+
+      actor : {
+        provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"
+        default-dispatcher {
+          type = TaskDispatcher
+        }
+
+      }
+
+      reote : {
+        helios.tcp : {
+          hostname = 127.0.0.1
+          port = 0
+        }
+      }
+
+      cluster: {
+        auto-down-unreachable-after = 15s
+        seed-nodes = []
+      }
+    }
+}

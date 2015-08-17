@@ -11,24 +11,18 @@ namespace TaxiKit.Core.Tests.ConceptProof
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.Configuration;
     using System.Linq;
-    using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Cluster;
-    using Akka.Cluster.Routing;
     using Akka.Configuration;
-    using Akka.Configuration.Hocon;
     using Akka.Event;
     using Akka.Routing;
 
     using Serilog;
 
-    using TaxiKit.Core.Cluster;
     using TaxiKit.Core.TestKit;
 
     using Xunit;
@@ -50,74 +44,6 @@ namespace TaxiKit.Core.Tests.ConceptProof
         public AkkaClusterTest(ITestOutputHelper output)
             : base(output)
         {
-        }
-
-        /// <summary>
-        /// Experimenting with akka cluster initialization
-        /// </summary>
-        // [Fact]
-        public void SimpleClusterTest()
-        {
-            var baseConfig =
-                ConfigurationFactory.Empty.WithFallback(
-                    ConfigurationFactory.ParseString(
-                        "akka.actor.provider = \"Akka.Cluster.ClusterActorRefProvider, Akka.Cluster\""))
-                    .WithFallback(
-                        ConfigurationFactory.ParseString(
-                            "akka.loggers = [\"Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog\"]"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.roles = [\"xunit\"]"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 30s"));
-
-            var systems = new List<ActorSystem>();
-            var systemUpWaitHandles = new List<EventWaitHandle>();
-
-            DateTimeOffset now = DateTimeOffset.Now;
-
-            StartSystem(
-                2551,
-                "seed1",
-                baseConfig,
-                systems,
-                systemUpWaitHandles,
-                new[] { "xunit" },
-                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551" });
-            StartSystem(
-                2552,
-                "seed2",
-                baseConfig,
-                systems,
-                systemUpWaitHandles,
-                new[] { "xunit" },
-                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
-            StartSystem(
-                0,
-                "worker1",
-                baseConfig,
-                systems,
-                systemUpWaitHandles,
-                new[] { "xunit" },
-                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
-            StartSystem(
-                0,
-                "worker2",
-                baseConfig,
-                systems,
-                systemUpWaitHandles,
-                new[] { "xunit" },
-                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
-
-            foreach (var systemUpWaitHandle in systemUpWaitHandles)
-            {
-                Assert.True(systemUpWaitHandle.WaitOne(TimeSpan.FromSeconds(10)), "Cluster failed to be built");
-            }
-
-            Log.Information("Cluster is UP and waiting ({Ms} for start)", (DateTimeOffset.Now - now).TotalMilliseconds);
-
-            foreach (var system in systems)
-            {
-                system.Shutdown();
-            }
         }
 
         /// <summary>
@@ -279,6 +205,74 @@ namespace TaxiKit.Core.Tests.ConceptProof
             }
         }
 
+        /// <summary>
+        /// Experimenting with akka cluster initialization
+        /// </summary>
+        // [Fact]
+        public void SimpleClusterTest()
+        {
+            var baseConfig =
+                ConfigurationFactory.Empty.WithFallback(
+                    ConfigurationFactory.ParseString(
+                        "akka.actor.provider = \"Akka.Cluster.ClusterActorRefProvider, Akka.Cluster\""))
+                    .WithFallback(
+                        ConfigurationFactory.ParseString(
+                            "akka.loggers = [\"Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog\"]"))
+                    .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
+                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.roles = [\"xunit\"]"))
+                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 30s"));
+
+            var systems = new List<ActorSystem>();
+            var systemUpWaitHandles = new List<EventWaitHandle>();
+
+            DateTimeOffset now = DateTimeOffset.Now;
+
+            StartSystem(
+                2551,
+                "seed1",
+                baseConfig,
+                systems,
+                systemUpWaitHandles,
+                new[] { "xunit" },
+                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551" });
+            StartSystem(
+                2552,
+                "seed2",
+                baseConfig,
+                systems,
+                systemUpWaitHandles,
+                new[] { "xunit" },
+                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
+            StartSystem(
+                0,
+                "worker1",
+                baseConfig,
+                systems,
+                systemUpWaitHandles,
+                new[] { "xunit" },
+                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
+            StartSystem(
+                0,
+                "worker2",
+                baseConfig,
+                systems,
+                systemUpWaitHandles,
+                new[] { "xunit" },
+                new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
+
+            foreach (var systemUpWaitHandle in systemUpWaitHandles)
+            {
+                Assert.True(systemUpWaitHandle.WaitOne(TimeSpan.FromSeconds(10)), "Cluster failed to be built");
+            }
+
+            Log.Information("Cluster is UP and waiting ({Ms} for start)", (DateTimeOffset.Now - now).TotalMilliseconds);
+
+            foreach (var system in systems)
+            {
+                system.Shutdown();
+            }
+        }
+
         private static void SendClusterMessages(IActorRef sys2Router, int keysCol)
         {
             Log.Information("------------------------");
@@ -395,6 +389,8 @@ namespace TaxiKit.Core.Tests.ConceptProof
         /// </summary>
         private class ClusterWaitActor : ReceiveActor
         {
+            private readonly EventWaitHandle nodesUp;
+
             /// <summary>
             /// The cluster.
             /// </summary>
@@ -410,8 +406,6 @@ namespace TaxiKit.Core.Tests.ConceptProof
             /// </summary>
             private int membersCount = 0;
 
-            private readonly EventWaitHandle nodesUp;
-
             public ClusterWaitActor(int expectedNodesCount, EventWaitHandle nodesUp)
             {
                 this.expectedNodesCount = expectedNodesCount;
@@ -420,6 +414,14 @@ namespace TaxiKit.Core.Tests.ConceptProof
                 this.Receive<ClusterEvent.MemberUp>(m => this.OnMemberUp());
                 this.Receive<ClusterEvent.UnreachableMember>(m => this.OnMemberDown());
                 this.Receive<ClusterEvent.MemberRemoved>(m => this.OnMemberDown());
+            }
+
+            /// <summary>
+            /// Re-subscribe on restart
+            /// </summary>
+            protected override void PostStop()
+            {
+                this.cluster.Unsubscribe(this.Self);
             }
 
             /// <summary>
@@ -462,14 +464,6 @@ namespace TaxiKit.Core.Tests.ConceptProof
                     this.nodesUp.Set();
                 }
             }
-
-            /// <summary>
-            /// Re-subscribe on restart
-            /// </summary>
-            protected override void PostStop()
-            {
-                this.cluster.Unsubscribe(this.Self);
-            }
         }
 
         /// <summary>
@@ -482,6 +476,13 @@ namespace TaxiKit.Core.Tests.ConceptProof
             /// </summary>
             private Akka.Cluster.Cluster cluster;
 
+            public LogActor()
+            {
+                this.Receive<string>(m => this.Log(m));
+                this.Receive<PingMessage>(m => this.Log(m));
+                this.Receive<object>(m => this.Log(m));
+            }
+
             /// <summary>
             /// User overridable callback.
             ///                 <p/>
@@ -492,13 +493,6 @@ namespace TaxiKit.Core.Tests.ConceptProof
             protected override void PreStart()
             {
                 this.cluster = Cluster.Get(Context.System);
-            }
-
-            public LogActor()
-            {
-                this.Receive<string>(m => this.Log(m));
-                this.Receive<PingMessage>(m => this.Log(m));
-                this.Receive<object>(m => this.Log(m));
             }
 
             private void Log(string message)

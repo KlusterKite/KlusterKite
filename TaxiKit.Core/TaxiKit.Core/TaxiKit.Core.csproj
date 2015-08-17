@@ -133,6 +133,11 @@
     <Compile Include="ActorSystemUtils.cs" />
     <Compile Include="BaseInstaller.cs" />
     <Compile Include="Cluster\ClusterLoggingActor.cs" />
+    <Compile Include="Configuration.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Configuration.resx</DependentUpon>
+    </Compile>
     <Compile Include="Guarantee\GuaranteeEnvelope.cs" />
     <Compile Include="Guarantee\GuaranteeRecieverActor.cs" />
     <Compile Include="Guarantee\GuaranteeSenderActor.cs" />
@@ -144,8 +149,14 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Resources\akka.hocon" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

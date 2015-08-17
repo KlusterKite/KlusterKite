@@ -72,6 +72,17 @@ namespace TaxiKit.Core
                 return config;
             }
 
+            var rolesList =
+                list.SelectMany(i => i.GetRoles())
+                    .Distinct()
+                    .Where(r => !string.IsNullOrWhiteSpace(r))
+                    .Select(r => $"\"{ r.Replace("\"", "\\\"") }\"").ToList();
+
+            if (rolesList.Any())
+            {
+                config = config.WithFallback(ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
+            }
+
             return list.OrderByDescending(i => i.AkkaConfigLoadPriority)
                 .Aggregate(config, (current, installer) => current.WithFallback(installer.GetAkkaConfig()));
         }
@@ -102,6 +113,15 @@ namespace TaxiKit.Core
         /// </summary>
         /// <returns>Akka configuration</returns>
         protected abstract Config GetAkkaConfig();
+
+        /// <summary>
+        /// Gets list of roles, that would be assign to cluster node with this plugin installed.
+        /// </summary>
+        /// <returns>The list of roles</returns>
+        protected IEnumerable<string> GetRoles()
+        {
+            return new string[0];
+        }
 
         /// <summary>
         /// Registering DI components

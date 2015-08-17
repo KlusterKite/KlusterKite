@@ -49,11 +49,13 @@ namespace TaxiKit.Core.Service
                 .For<IConnectionMultiplexer>()
                 .Instance(redis).LifestyleSingleton());
 
+            container.RegisterWindsorInstallers();
+
             // starting akka system
-            var section = (AkkaConfigurationSection)ConfigurationManager.GetSection("akka");
-            var config = section.AkkaConfig;
+            var config = BaseInstaller.GetStackedConfig(container);
             var actorSystem = ActorSystem.Create("TaxiKit", config);
             actorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, actorSystem));
+            actorSystem.StartNameSpaceActorsFromConfiguration();
 
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));

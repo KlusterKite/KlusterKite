@@ -31,7 +31,7 @@ namespace TaxiKit.Core
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
 
         /// <summary>
         /// Registering DI components
