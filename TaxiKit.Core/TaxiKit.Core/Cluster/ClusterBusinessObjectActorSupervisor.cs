@@ -91,7 +91,7 @@ namespace TaxiKit.Core.Cluster
 
         private void OnRoleLeaderChanged(ClusterEvent.RoleLeaderChanged message)
         {
-            this.IsLeader = message.Leader == this.Self.Path.Root.Address;
+            this.IsLeader = message.Leader == this.CurrentCluster.SelfAddress;
             this.RoleLeader = message.Leader;
 
             /*
