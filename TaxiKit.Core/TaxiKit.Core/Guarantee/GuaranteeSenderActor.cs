@@ -12,11 +12,14 @@ namespace TaxiKit.Core.Guarantee
     using Akka.Routing;
     using Akka.Util.Internal;
 
+    using JetBrains.Annotations;
+
     using StackExchange.Redis;
 
     /// <summary>
     /// This actor will froward messages to cluster router actor and verify that other node will receive it
     /// </summary>
+    [UsedImplicitly]
     public class GuaranteeSenderActor : UntypedActor
     {
         /// <summary>
