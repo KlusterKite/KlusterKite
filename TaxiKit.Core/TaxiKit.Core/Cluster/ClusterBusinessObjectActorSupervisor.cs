@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.DI.Core;
@@ -11,12 +12,15 @@
 
     using Castle.Components.DictionaryAdapter;
 
-    using Redlock.CSharp;
+    using JetBrains.Annotations;
+
     using StackExchange.Redis;
+
+    using TaxiKit.Core.Utils;
 
     public interface IMessageToBusinessObjectActor
     {
-        string Id { get; set; }
+        string Id { get; }
     }
 
     /// <summary>
@@ -25,13 +29,14 @@
     /// <typeparam name="T">Type of child actors</typeparam>
     /// <remarks>
     /// All actor implementation should be located on same path in every role node.
-    /// All child actors are initialized with <seealso cref="ActorSystem.DI"/>
+    /// All child actors are initialized with dependency injection
     /// </remarks>
     public abstract class ClusterBusinessObjectActorSupervisor<T> : ReceiveActor where T : ActorBase
     {
         /// <summary>
         /// Prefix to store all data in redis.
         /// </summary>
+        [UsedImplicitly]
         protected readonly string RedisPrefix;
 
         /// <summary>
@@ -42,12 +47,14 @@
         /// <summary>
         /// Loacal contact book to have addresses for every child actor
         /// </summary>
-        private readonly Dictionary<string, IActorRef> children = new Dictionary<string, IActorRef>();
+        private readonly Dictionary<string, FullChildRef> children = new Dictionary<string, FullChildRef>();
 
         /// <summary>
         /// Timeout to create child, before second attmept will be made
         /// </summary>
         private readonly TimeSpan createChildTimeout;
+
+        private readonly Dictionary<IActorRef, string> localChildren = new Dictionary<IActorRef, string>();
 
         /// <summary>
         /// Temprorary storage for message, that are coming, while child is creating
@@ -60,39 +67,39 @@
         /// </summary>
         private readonly IConnectionMultiplexer redisConnection;
 
-        /// <summary>
-        /// Timeout while working with distributed lock
-        /// </summary>
-        private TimeSpan lockTimeout = TimeSpan.FromSeconds(5);
-
-        public ClusterBusinessObjectActorSupervisor(IConnectionMultiplexer redisConnection)
+        protected ClusterBusinessObjectActorSupervisor(IConnectionMultiplexer redisConnection)
         {
             var config =
                 Context.System.AsInstanceOf<ExtendedActorSystem>().Provider.Deployer.Lookup(this.Self.Path).Config;
-
             this.createChildTimeout = config.GetTimeSpan("createChildTimeout", TimeSpan.FromSeconds(5), false);
 
             this.redisConnection = redisConnection;
-            this.CurrentCluster = Cluster.Get(Context.System);
             this.RedisPrefix = $"{string.Join(":", this.Self.Path.Elements)}:Mngmt";
+            this.CurrentCluster = Cluster.Get(Context.System);
 
-            Context.System.EventStream.Subscribe(this.Self, typeof(DeadLetter));
-
+            // ReSharper disable ConvertClosureToMethodGroup
             this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberUp(m));
             this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberDown(m));
             this.Receive<ClusterEvent.RoleLeaderChanged>(m => m.Role == this.ClusterRole, m => this.OnRoleLeaderChanged(m));
             this.Receive<CreateChildCommand>(m => this.CreateLocalChild(m));
             this.Receive<ChildCreated>(m => this.RegisterChildRef(m));
+            this.Receive<ChildRemoved>(m => this.RemoveChildRef(m));
             this.Receive<IMessageToBusinessObjectActor>(m => this.ForwardMessageToChild(m));
+            this.Receive<Terminated>(m => this.OnChildTerminated(m));
             this.Receive<DeadLetter>(m => this.OnDeadLetter(m));
+            this.Receive<ResetChildren>(m => this.OnResetChildren());
+
+            // ReSharper restore ConvertClosureToMethodGroup
 
             this.CurrentCluster.Subscribe(this.Self,
                 ClusterEvent.InitialStateAsEvents,
                 new[] { typeof(ClusterEvent.IMemberEvent), typeof(ClusterEvent.RoleLeaderChanged) });
+            Context.System.EventStream.Subscribe(this.Self, typeof(DeadLetter));
 
             this.CurrentCluster.RegisterOnMemberUp(
                 () =>
                     {
+                        // todo: do something after cluster initialization
                     });
         }
 
@@ -104,28 +111,49 @@
         /// <summary>
         /// Gets the currents cluster.
         /// </summary>
+        [UsedImplicitly]
         protected Cluster CurrentCluster { get; }
 
         /// <summary>
         /// Gets value, indicating that current node is role leader for now
         /// </summary>
+        [UsedImplicitly]
         protected bool IsLeader { get; private set; }
 
         /// <summary>
         /// Gets address of role leader node
         /// </summary>
+        [UsedImplicitly]
         protected ICanTell RoleLeader { get; private set; }
 
         /// <summary>
         /// Sends message to all registered supervisors. Even to myself.
         /// </summary>
         /// <param name="message">The message to send</param>
+        [UsedImplicitly]
         protected void BroadcastSupervisorMessage(object message)
         {
             foreach (var activeNode in this.activeNodes.Select(n => n.Value))
             {
                 activeNode.Tell(message, this.Self);
             }
+        }
+
+        /// <summary>
+        /// Creates link to brother supervisor with known node address
+        /// </summary>
+        /// <param name="nodeAddress">The node address</param>
+        /// <returns>The link to supervisor actor</returns>
+        /// <remarks>
+        /// Can be overriden in test purposes
+        /// </remarks>
+        [UsedImplicitly]
+        protected virtual ICanTell CreateSupervisorICanTell(Address nodeAddress)
+        {
+            return Context.System.ActorSelection(
+                this.Self.Path.Address.WithHost(nodeAddress.Host)
+                    .WithPort(nodeAddress.Port)
+                    .WithProtocol(nodeAddress.Protocol).ToString());
         }
 
         protected override void PostRestart(Exception reason)
@@ -173,20 +201,30 @@
         {
             var child = Context.ActorOf(Context.System.DI().Props<T>(), message.Id);
             child.Tell(new SetObjectId { Id = message.Id });
-            this.BroadcastSupervisorMessage(new ChildCreated { Id = message.Id, ChildRef = child });
-        }
+            this.localChildren[child] = message.Id;
 
-        /// <summary>
-        /// Creates link to brother supervisor with known node address
-        /// </summary>
-        /// <param name="nodeAddress">The node address</param>
-        /// <returns>The link to supervisor actor</returns>
-        private ICanTell CreateSupervisorICanTell(Address nodeAddress)
-        {
-            return Context.System.ActorSelection(
-                this.Self.Path.Address.WithHost(nodeAddress.Host)
-                    .WithPort(nodeAddress.Port)
-                    .WithProtocol(nodeAddress.Protocol).ToString());
+            var db = this.redisConnection.GetDatabase();
+            var keyName = this.GetChildAddressKeyName(message.Id);
+            string oldChildAddressString = db.StringGetSet(keyName, child.SerializeToAkkaString(Context.System));
+            if (!string.IsNullOrWhiteSpace(oldChildAddressString))
+            {
+                try
+                {
+                    var oldRef = oldChildAddressString.DeserializeFromAkkaString<IActorRef>(Context.System);
+                    oldRef.Tell(PoisonPill.Instance);
+                }
+                catch (Exception exception)
+                {
+                    // ReSharper disable once FormatStringProblem
+                    Context.GetLogger()
+                        .Error(exception, "{Type}: error while retrieving old child address", this.GetType().Name);
+                }
+            }
+
+            db.HashSet(this.GetSupervisorHashKeyName(this.CurrentCluster.SelfUniqueAddress.Uid), new[] { new HashEntry(GetSafeChildId(message.Id), message.Id) });
+            Context.Watch(child);
+            this.BroadcastSupervisorMessage(new ChildCreated { Id = message.Id, ChildRef = child, NodeUid = this.CurrentCluster.SelfUniqueAddress.Uid });
+            // todo: duplicate stop may cause false child removal message
         }
 
         /// <summary>
@@ -195,10 +233,10 @@
         /// <param name="message">Message to child actor</param>
         private void ForwardMessageToChild(IMessageToBusinessObjectActor message)
         {
-            IActorRef child;
+            FullChildRef child;
             if (this.children.TryGetValue(message.Id, out child))
             {
-                child.Forward(message);
+                child.Child.Forward(message);
             }
             else
             {
@@ -241,9 +279,34 @@
             }
         }
 
+        private string GetChildAddressKeyName(string childId)
+        {
+            return $"{this.RedisPrefix}:{GetSafeChildId(childId)}:ChildAddress";
+        }
+
         private string GetChildCreationLockName(string childId)
         {
-            return $"{this.RedisPrefix}:CreationLock:{GetSafeChildId(childId)}";
+            return $"{this.RedisPrefix}:{GetSafeChildId(childId)}:CreationLock";
+        }
+
+        private string GetSupervisorHashKeyName(int uid)
+        {
+            return $"{this.RedisPrefix}:Supervisor:{uid}:Children";
+        }
+
+        private void OnChildTerminated(Terminated terminated)
+        {
+            string childId;
+            if (this.localChildren.TryGetValue(terminated.ActorRef, out childId))
+            {
+                this.localChildren.Remove(terminated.ActorRef);
+                this.children.Remove(childId);
+                var db = this.redisConnection.GetDatabase();
+                db.HashDelete(
+                    this.GetSupervisorHashKeyName(this.CurrentCluster.SelfUniqueAddress.Uid),
+                    GetSafeChildId(childId));
+                this.BroadcastSupervisorMessage(new ChildRemoved { Id = childId, NodeUid = this.CurrentCluster.SelfUniqueAddress.Uid });
+            }
         }
 
         private void OnDeadLetter(DeadLetter deadLetter)
@@ -292,7 +355,12 @@
             this.activeNodes.Remove(message.Member.Address);
             if (this.IsLeader)
             {
-                // TODO: restore lost actors
+                var db = this.redisConnection.GetDatabase();
+                var hash = db.HashScan(this.GetSupervisorHashKeyName(message.Member.UniqueAddress.Uid));
+                foreach (var hashEntry in hash)
+                {
+                    this.ForwardMessageToChild(new RestoreObject { Id = hashEntry.Value });
+                }
             }
         }
 
@@ -302,7 +370,22 @@
         /// <param name="message">Member status change notification</param>
         private void OnMemberUp(ClusterEvent.MemberUp message)
         {
-            this.activeNodes[message.Member.Address] = this.CreateSupervisorICanTell(message.Member.Address);
+            var node = this.CreateSupervisorICanTell(message.Member.Address);
+            this.activeNodes[message.Member.Address] = node;
+            if (this.IsLeader)
+            {
+                node.Tell(new ResetChildren(), this.Self);
+            }
+        }
+
+        private void OnResetChildren()
+        {
+            foreach (var localChild in this.localChildren)
+            {
+                localChild.Key.Tell(PoisonPill.Instance);
+            }
+
+            this.localChildren.Clear();
         }
 
         /// <summary>
@@ -331,7 +414,12 @@
         /// <param name="childCreated">The child created data</param>
         private void RegisterChildRef(ChildCreated childCreated)
         {
-            this.children[childCreated.Id] = childCreated.ChildRef;
+            this.children[childCreated.Id] = new FullChildRef
+            {
+                Child = childCreated.ChildRef,
+                NodeUid = childCreated.NodeUid
+            };
+
             List<Tuple<IMessageToBusinessObjectActor, IActorRef>> messagesList;
             if (this.messageToChildOnCreateQueue.TryGetValue(childCreated.Id, out messagesList))
             {
@@ -341,25 +429,87 @@
                     childCreated.ChildRef.Tell(message.Item1, message.Item2);
                 }
             }
+
+            if (this.IsLeader)
+            {
+                // removing child creation lock
+                var db = this.redisConnection.GetDatabase();
+                var childCreationLockName = this.GetChildCreationLockName(childCreated.Id);
+                db.KeyDelete(childCreationLockName);
+            }
         }
 
+        private void RemoveChildRef(ChildRemoved message)
+        {
+            FullChildRef childRef;
+            if (this.children.TryGetValue(message.Id, out childRef) && childRef.NodeUid == message.NodeUid)
+            {
+                this.children.Remove(message.Id);
+            }
+        }
+
+        /// <summary>
+        /// The command, that is sent to child actor to initialize it with id.
+        /// </summary>
+        [UsedImplicitly]
+        public class RestoreObject : IMessageToBusinessObjectActor
+        {
+            [UsedImplicitly]
+            public string Id { get; set; }
+        }
+
+        /// <summary>
+        /// The command, that is sent to child actor to initialize it with id.
+        /// </summary>
+        [UsedImplicitly]
         public class SetObjectId
         {
+            [UsedImplicitly]
             public string Id { get; set; }
         }
 
         /// <summary>
         /// Notification, that new child actor spawned
         /// </summary>
+        [UsedImplicitly]
         protected class ChildCreated
         {
             public IActorRef ChildRef { get; set; }
             public string Id { get; set; }
+            public int NodeUid { get; set; }
         }
 
+        /// <summary>
+        /// The command, that is sent to node supervisor in order to notifiy that child was removed from cluster
+        /// </summary>
+        [UsedImplicitly]
+        protected class ChildRemoved
+        {
+            public string Id { get; set; }
+            public int NodeUid { get; set; }
+        }
+
+        /// <summary>
+        /// The command, that is sent to node supervisor in order to create child actor
+        /// </summary>
+        [UsedImplicitly]
         protected class CreateChildCommand
         {
             public string Id { get; set; }
+        }
+
+        protected class FullChildRef
+        {
+            public IActorRef Child { get; set; }
+            public int NodeUid { get; set; }
+        }
+
+        /// <summary>
+        /// Command to all newly joined nodes to flush all data
+        /// </summary>
+        [UsedImplicitly]
+        protected class ResetChildren
+        {
         }
     }
 }

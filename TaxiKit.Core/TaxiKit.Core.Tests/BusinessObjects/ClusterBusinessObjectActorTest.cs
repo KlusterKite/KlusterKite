@@ -208,7 +208,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 this.cluster.RegisterOnMemberUp(
                     () =>
                         {
-                            Context.GetLogger().Info("{Address}: I am up", this.cluster.SelfAddress.Port);
+                            Context.GetLogger().Info("{Address}: I am up", this.cluster.SelfUniqueAddress.Uid);
                             this.nodesUp.Set();
                         });
             }
@@ -224,7 +224,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                     Context.GetLogger(new SerilogLogMessageFormatter())
                         .Info(
                             "{Address}: Cluster leader changed to {leader}",
-                            this.cluster.SelfAddress.Port,
+                            this.cluster.SelfUniqueAddress.Uid,
                             leaderChanged.Leader.Port);
                 }
                 else if (roleLeaderChanged != null)
@@ -232,7 +232,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                     Context.GetLogger(new SerilogLogMessageFormatter())
                         .Info(
                             "{Address}: Role {role} leader changed to {leader}",
-                            this.cluster.SelfAddress.Port,
+                            this.cluster.SelfUniqueAddress.Uid,
                             roleLeaderChanged.Role,
                             roleLeaderChanged.Leader.Port);
                 }
@@ -241,7 +241,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                     Context.GetLogger(new SerilogLogMessageFormatter())
                         .Info(
                             "{Address}: memberUp  {member}",
-                            this.cluster.SelfAddress.Port,
+                            this.cluster.SelfUniqueAddress.Uid,
                             memberUp.Member.Address.Port);
                 }
                 else
@@ -249,7 +249,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                     Context.GetLogger(new SerilogLogMessageFormatter())
                         .Info(
                             "{Address}: Cluster changed with {message}",
-                            this.cluster.SelfAddress.Port,
+                            this.cluster.SelfUniqueAddress.Uid,
                             message);
                 }
 
