@@ -14,6 +14,8 @@ namespace TaxiKit.Core.Tests.BusinessObjects
     using Akka.Event;
     using Akka.Logger.Serilog;
 
+    using StackExchange.Redis;
+
     using TaxiKit.Core.Cluster;
     using TaxiKit.Core.TestKit;
     using TaxiKit.Core.Tests.ConceptProof;
@@ -138,13 +140,22 @@ namespace TaxiKit.Core.Tests.BusinessObjects
         /// <summary>
         /// Test message to BO actor
         /// </summary>
-        public class LogMessage : IMessageToBusinessObjectActor<string>
+        public class LogMessage : IMessageToBusinessObjectActor
         {
             public string Id { get; set; }
         }
 
-        public class TestSuperVisor : ClusterBusinessObjectActorSupervisor<string>
+        public class TestObjectActor : ReceiveActor
         {
+        }
+
+        public class TestSuperVisor : ClusterBusinessObjectActorSupervisor<TestObjectActor>
+        {
+            public TestSuperVisor(IConnectionMultiplexer redisConnection)
+                            : base(redisConnection)
+            {
+            }
+
             /// <summary>
             /// Cluster node role name, that handles such objects.
             /// </summary>
