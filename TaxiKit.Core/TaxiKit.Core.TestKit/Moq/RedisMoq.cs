@@ -8,6 +8,7 @@ namespace TaxiKit.Core.TestKit.Moq
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
 
@@ -758,7 +759,22 @@ namespace TaxiKit.Core.TestKit.Moq
             int pageOffset = 0,
             CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                if (this.storage.TryGetValue(key, out val))
+                {
+                    var hash = val as Dictionary<string, string>;
+                    if (!(val is Dictionary<string, string>))
+                    {
+                        throw new InvalidOperationException("Theris already other data and it is not a hash");
+                    }
+
+                    return hash.Select(p => new HashEntry(p.Key, p.Value));
+                }
+
+                return new HashEntry[0];
+            }
         }
 
         /// <summary>
@@ -780,10 +796,10 @@ namespace TaxiKit.Core.TestKit.Moq
             lock (this.storage)
             {
                 object val;
-                var hash = new Dictionary<string, object>();
+                var hash = new Dictionary<string, string>();
                 if (this.storage.TryGetValue(key, out val))
                 {
-                    hash = val as Dictionary<string, object>;
+                    hash = val as Dictionary<string, string>;
                     if (hash == null)
                     {
                         throw new InvalidOperationException("Theris already other data and it is not a hash");

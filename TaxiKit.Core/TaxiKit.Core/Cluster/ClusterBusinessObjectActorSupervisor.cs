@@ -6,6 +6,7 @@
 
     using Akka.Actor;
     using Akka.Cluster;
+    using Akka.Configuration;
     using Akka.DI.Core;
     using Akka.Event;
     using Akka.Util.Internal;
@@ -31,18 +32,18 @@
     /// All actor implementation should be located on same path in every role node.
     /// All child actors are initialized with dependency injection
     /// </remarks>
-    public abstract class ClusterBusinessObjectActorSupervisor<T> : ReceiveActor where T : ActorBase
+    public abstract class ClusterBusinessObjectActorSupervisor<T> : ReceiveActor, IWithUnboundedStash where T : ActorBase
     {
         /// <summary>
         /// Prefix to store all data in redis.
         /// </summary>
         [UsedImplicitly]
-        protected readonly string RedisPrefix;
+        public readonly string RedisPrefix;
 
         /// <summary>
         /// List of all active role nodes
         /// </summary>
-        private readonly Dictionary<Address, ICanTell> activeNodes = new Dictionary<Address, ICanTell>();
+        private readonly Dictionary<UniqueAddress, ICanTell> activeNodes = new Dictionary<UniqueAddress, ICanTell>();
 
         /// <summary>
         /// Loacal contact book to have addresses for every child actor
@@ -69,8 +70,8 @@
 
         protected ClusterBusinessObjectActorSupervisor(IConnectionMultiplexer redisConnection)
         {
-            var config =
-                Context.System.AsInstanceOf<ExtendedActorSystem>().Provider.Deployer.Lookup(this.Self.Path).Config;
+            var lookup = Context.System.AsInstanceOf<ExtendedActorSystem>().Provider.Deployer.Lookup(this.Self.Path);
+            var config = lookup != null ? lookup.Config : ConfigurationFactory.Empty;
             this.createChildTimeout = config.GetTimeSpan("createChildTimeout", TimeSpan.FromSeconds(5), false);
 
             this.redisConnection = redisConnection;
@@ -102,6 +103,8 @@
                         // todo: do something after cluster initialization
                     });
         }
+
+        public IStash Stash { get; set; }
 
         /// <summary>
         /// Cluster node role name, that handles such objects.
@@ -157,6 +160,19 @@
         {
             base.PostRestart(reason);
             // todo: need to restart all child actors on this node
+        }
+
+        /// <summary>
+        /// Selects one of the registered cluster nodes (among <see cref="activeNodes"/>) to create child node
+        /// </summary>
+        /// <param name="id">Identification string of object</param>
+        /// <returns>The reference to supervisor to place a new child</returns>
+        protected virtual ICanTell SelectNodeToPlaceChild(string id)
+        {
+            var rnd = new Random();
+            var memberNum = rnd.Next(0, this.activeNodes.Count);
+            var nodeToCreate = this.activeNodes.Skip(memberNum).First().Value;
+            return nodeToCreate;
         }
 
         /// <summary>
@@ -258,9 +274,7 @@
                         this.messageToChildOnCreateQueue[message.Id].Add(new Tuple<IMessageToBusinessObjectActor, IActorRef>(message, this.Sender));
 
                         // For now, I'll just take random cluster member, but It could be more complex algorithm
-                        var rnd = new Random();
-                        var memberNum = rnd.Next(0, this.activeNodes.Count);
-                        var nodeToCreate = this.activeNodes.Skip(memberNum).First().Value;
+                        var nodeToCreate = this.SelectNodeToPlaceChild(message.Id);
                         nodeToCreate.Tell(new CreateChildCommand { Id = message.Id }, this.Self);
                     }
                     else
@@ -349,14 +363,15 @@
         /// <param name="message">Member status change notification</param>
         private void OnMemberDown(ClusterEvent.MemberRemoved message)
         {
-            this.activeNodes.Remove(message.Member.Address);
+            this.activeNodes.Remove(message.Member.UniqueAddress);
             if (this.IsLeader)
             {
                 var db = this.redisConnection.GetDatabase();
                 var hash = db.HashScan(this.GetSupervisorHashKeyName(message.Member.UniqueAddress.Uid));
                 foreach (var hashEntry in hash)
                 {
-                    this.ForwardMessageToChild(new RestoreObject { Id = hashEntry.Value });
+                    this.children.Remove(hashEntry.Name);
+                    this.ForwardMessageToChild(new RestoreObject { Id = hashEntry.Name });
                 }
             }
         }
@@ -368,7 +383,7 @@
         private void OnMemberUp(ClusterEvent.MemberUp message)
         {
             var node = this.CreateSupervisorICanTell(message.Member.Address);
-            this.activeNodes[message.Member.Address] = node;
+            this.activeNodes[message.Member.UniqueAddress] = node;
             if (this.IsLeader)
             {
                 node.Tell(new ResetChildren(), this.Self);
@@ -446,6 +461,50 @@
         }
 
         /// <summary>
+        /// Notification, that new child actor spawned
+        /// </summary>
+        [UsedImplicitly]
+        public class ChildCreated
+        {
+            public IActorRef ChildRef { get; set; }
+            public string Id { get; set; }
+            public int NodeUid { get; set; }
+        }
+
+        /// <summary>
+        /// The command, that is sent to node supervisor in order to notifiy that child was removed from cluster
+        /// </summary>
+        [UsedImplicitly]
+        public class ChildRemoved
+        {
+            public string Id { get; set; }
+            public int NodeUid { get; set; }
+        }
+
+        /// <summary>
+        /// The command, that is sent to node supervisor in order to create child actor
+        /// </summary>
+        [UsedImplicitly]
+        public class CreateChildCommand
+        {
+            public string Id { get; set; }
+        }
+
+        public class FullChildRef
+        {
+            public IActorRef Child { get; set; }
+            public int NodeUid { get; set; }
+        }
+
+        /// <summary>
+        /// Command to all newly joined nodes to flush all data
+        /// </summary>
+        [UsedImplicitly]
+        public class ResetChildren
+        {
+        }
+
+        /// <summary>
         /// The command, that is sent to child actor to initialize it with id.
         /// </summary>
         [UsedImplicitly]
@@ -463,50 +522,6 @@
         {
             [UsedImplicitly]
             public string Id { get; set; }
-        }
-
-        /// <summary>
-        /// Notification, that new child actor spawned
-        /// </summary>
-        [UsedImplicitly]
-        protected class ChildCreated
-        {
-            public IActorRef ChildRef { get; set; }
-            public string Id { get; set; }
-            public int NodeUid { get; set; }
-        }
-
-        /// <summary>
-        /// The command, that is sent to node supervisor in order to notifiy that child was removed from cluster
-        /// </summary>
-        [UsedImplicitly]
-        protected class ChildRemoved
-        {
-            public string Id { get; set; }
-            public int NodeUid { get; set; }
-        }
-
-        /// <summary>
-        /// The command, that is sent to node supervisor in order to create child actor
-        /// </summary>
-        [UsedImplicitly]
-        protected class CreateChildCommand
-        {
-            public string Id { get; set; }
-        }
-
-        protected class FullChildRef
-        {
-            public IActorRef Child { get; set; }
-            public int NodeUid { get; set; }
-        }
-
-        /// <summary>
-        /// Command to all newly joined nodes to flush all data
-        /// </summary>
-        [UsedImplicitly]
-        protected class ResetChildren
-        {
         }
     }
 }

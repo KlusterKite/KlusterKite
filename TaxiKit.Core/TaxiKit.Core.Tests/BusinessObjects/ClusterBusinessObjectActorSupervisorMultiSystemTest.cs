@@ -6,18 +6,27 @@ using System.Threading.Tasks;
 
 namespace TaxiKit.Core.Tests.BusinessObjects
 {
+    using System.Collections.Concurrent;
     using System.Threading;
 
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
+    using Akka.DI.CastleWindsor;
+    using Akka.DI.Core;
     using Akka.Event;
     using Akka.Logger.Serilog;
+
+    using Castle.MicroKernel.Registration;
+    using Castle.Windsor;
+
+    using JetBrains.Annotations;
 
     using StackExchange.Redis;
 
     using TaxiKit.Core.Cluster;
     using TaxiKit.Core.TestKit;
+    using TaxiKit.Core.TestKit.Moq;
     using TaxiKit.Core.Tests.ConceptProof;
 
     using Xunit;
@@ -30,9 +39,21 @@ namespace TaxiKit.Core.Tests.BusinessObjects
     /// </summary>
     public class ClusterBusinessObjectActorSupervisorMultiSystemTest : TestWithSerilog
     {
+        private WindsorContainer container;
+
         public ClusterBusinessObjectActorSupervisorMultiSystemTest(ITestOutputHelper output)
                     : base(output)
         {
+            this.container = new WindsorContainer();
+            this.container.RegisterWindsorInstallers();
+
+            var redis = new ConcurrentDictionary<string, object>();
+
+            this.container.Register(Component.For<IConnectionMultiplexer>().Instance(new RedisConnectionMoq(redis)));
+            this.container.Register(Component.For<TestNetSupervisorActor>().LifestyleTransient());
+            this.container.Register(Component.For<TestObjectActor>().LifestyleTransient());
+            this.container.Register(Component.For<ITestOutputHelper>().Instance(output));
+            this.container.Register(Component.For<IActorRef>().Instance(ActorRefs.Nobody).Named("testActor"));
         }
 
         /// <summary>
@@ -55,7 +76,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
             var systemUpWaitHandles = new List<EventWaitHandle>();
             var systems = new List<ActorSystem>();
 
-            var sys1 = StartSystem(
+            var sys1 = this.StartSystem(
                 2551,
                 baseConfig,
                 systems,
@@ -63,7 +84,9 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 new[] { "role1" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551" });
 
-            var sys2 = StartSystem(
+            var s1 = sys1.ActorOf(sys1.DI().Props<TestNetSupervisorActor>(), "sup");
+
+            var sys2 = this.StartSystem(
                 2552,
                 baseConfig,
                 systems,
@@ -71,7 +94,9 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 new[] { "role1", "role2" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
-            var sys3 = StartSystem(
+            var s2 = sys2.ActorOf(sys1.DI().Props<TestNetSupervisorActor>(), "sup");
+
+            var sys3 = this.StartSystem(
                 0,
                 baseConfig,
                 systems,
@@ -79,12 +104,21 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 new[] { "role1", "role2" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
+            var s3 = sys3.ActorOf(sys1.DI().Props<TestNetSupervisorActor>(), "sup");
+
             foreach (var systemUpWaitHandle in systemUpWaitHandles)
             {
                 Assert.True(systemUpWaitHandle.WaitOne(TimeSpan.FromSeconds(10)), "Cluster failed to be built");
             }
 
             Logger.Information("***************************** STARTED ***********************");
+
+            foreach (var index in Enumerable.Range(0, 5))
+            {
+                // s1.Tell(new EchoMessage { Id = (index % 20).ToString(), Text = index.ToString() });
+            }
+
+            Thread.Sleep(TimeSpan.FromMilliseconds(1000));
 
             sys2.Shutdown();
             sys2.AwaitTermination();
@@ -101,7 +135,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
         /// <param name="systemUpWaitHandles">List of wait handles for clusters initialization waiting</param>
         /// <param name="roles">Node roles list</param>
         /// <param name="seedNodes">Seed nodes addresses list</param>
-        private static ActorSystem StartSystem(
+        private ActorSystem StartSystem(
             int port,
             Config baseConfig,
             List<ActorSystem> systems,
@@ -128,6 +162,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
 
             // create an Akka system
             ActorSystem system = ActorSystem.Create("ClusterSystem", config);
+            system.AddDependencyResolver(new WindsorDependencyResolver(this.container, system));
             systems.Add(system);
             Logger.Information("node {0} is up", port);
             var waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
@@ -256,5 +291,16 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 return false;
             }
         }
+    }
+
+    [UsedImplicitly]
+    public class TestNetSupervisorActor : ClusterBusinessObjectActorSupervisor<TestObjectActor>
+    {
+        public TestNetSupervisorActor(IConnectionMultiplexer redisConnection)
+            : base(redisConnection)
+        {
+        }
+
+        protected override string ClusterRole => "test";
     }
 }
