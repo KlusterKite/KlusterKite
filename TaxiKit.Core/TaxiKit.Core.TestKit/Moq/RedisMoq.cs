@@ -777,7 +777,26 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public void HashSet(RedisKey key, HashEntry[] hashFields, CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                var hash = new Dictionary<string, object>();
+                if (this.storage.TryGetValue(key, out val))
+                {
+                    hash = val as Dictionary<string, object>;
+                    if (hash == null)
+                    {
+                        throw new InvalidOperationException("Theris already other data and it is not a hash");
+                    }
+                }
+
+                foreach (var hashEntry in hashFields)
+                {
+                    hash[hashEntry.Name] = hashEntry.Value;
+                }
+
+                this.storage[key] = hash;
+            }
         }
 
         /// <summary>
@@ -1247,7 +1266,11 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public bool KeyDelete(RedisKey key, CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                return this.storage.TryRemove(key, out val);
+            }
         }
 
         /// <summary>

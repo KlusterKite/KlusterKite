@@ -28,9 +28,9 @@ namespace TaxiKit.Core.Tests.BusinessObjects
     /// <summary>
     /// Testing <seealso cref="ClusterBusinessObjectActorSupervisor{T}"/>
     /// </summary>
-    public class ClusterBusinessObjectActorSupervisorTest : TestWithSerilog
+    public class ClusterBusinessObjectActorSupervisorMultiSystemTest : TestWithSerilog
     {
-        public ClusterBusinessObjectActorSupervisorTest(ITestOutputHelper output)
+        public ClusterBusinessObjectActorSupervisorMultiSystemTest(ITestOutputHelper output)
                     : base(output)
         {
         }

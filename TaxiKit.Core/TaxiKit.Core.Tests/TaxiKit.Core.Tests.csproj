@@ -165,7 +165,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusinessObjects\ClusterBusinessObjectActorTest.cs" />
+    <Compile Include="BusinessObjects\ClusterBusinessObjectActorSupervisorMultiSystemTest.cs" />
+    <Compile Include="BusinessObjects\ClusterBusinessObjectActorSupervisorTest.cs" />
     <Compile Include="ConceptProof\AkkaClusterTest.cs" />
     <Compile Include="Configuration\ConfigurationTest.cs" />
     <Compile Include="Guarantee\GuaranteeReciverTest.cs" />

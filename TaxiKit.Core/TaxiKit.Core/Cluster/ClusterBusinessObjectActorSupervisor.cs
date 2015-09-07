@@ -150,10 +150,7 @@
         [UsedImplicitly]
         protected virtual ICanTell CreateSupervisorICanTell(Address nodeAddress)
         {
-            return Context.System.ActorSelection(
-                this.Self.Path.Address.WithHost(nodeAddress.Host)
-                    .WithPort(nodeAddress.Port)
-                    .WithProtocol(nodeAddress.Protocol).ToString());
+            return Context.System.ActorSelection($"{nodeAddress}/{string.Join("/", this.Self.Path.Elements)}");
         }
 
         protected override void PostRestart(Exception reason)
