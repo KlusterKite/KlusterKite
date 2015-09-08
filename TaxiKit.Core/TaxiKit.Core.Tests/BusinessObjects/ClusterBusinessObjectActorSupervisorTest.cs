@@ -33,12 +33,15 @@ namespace TaxiKit.Core.Tests.BusinessObjects
 
     public class ClusterBusinessObjectActorSupervisorTest : BaseActorTest
     {
+        private readonly ConcurrentBag<EchoMessage> recievedEchoMessages = new ConcurrentBag<EchoMessage>();
+
         public ClusterBusinessObjectActorSupervisorTest(ITestOutputHelper output)
             : base(output, GetConfig())
         {
             this.WindsorContainer.Register(Component.For<TestSupervisorActor>().LifestyleTransient());
             this.WindsorContainer.Register(Component.For<TestObjectActor>().LifestyleTransient());
             this.WindsorContainer.Register(Component.For<ITestOutputHelper>().Instance(output));
+            this.WindsorContainer.Register(Component.For<ConcurrentBag<EchoMessage>>().Instance(this.recievedEchoMessages));
         }
 
         public static Config GetConfig()
@@ -266,13 +269,17 @@ namespace TaxiKit.Core.Tests.BusinessObjects
     public class TestObjectActor : ReceiveActor, IWithUnboundedStash
     {
         private readonly ITestOutputHelper output;
+
+        private readonly ConcurrentBag<EchoMessage> recievedEchoMessages;
+
         private readonly IActorRef testActor;
         private string id;
 
-        public TestObjectActor(IActorRef testActor, ITestOutputHelper output)
+        public TestObjectActor(IActorRef testActor, ITestOutputHelper output, ConcurrentBag<EchoMessage> recievedEchoMessages)
         {
             this.testActor = testActor;
             this.output = output;
+            this.recievedEchoMessages = recievedEchoMessages;
             this.Receive<ClusterBusinessObjectActorSupervisor<TestObjectActor>.SetObjectId>(m => this.SetCurrentId(m));
             this.Receive<object>(m => this.StashMessage(m));
         }
@@ -283,6 +290,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
         {
             var echoMessage = new EchoMessage { Id = this.id, Text = message.Text, FromObjectActor = true };
             Context.GetLogger().Info($"{Cluster.Get(Context.System).SelfUniqueAddress.Uid}: {echoMessage}");
+            this.recievedEchoMessages.Add(echoMessage);
             this.testActor.Tell(echoMessage);
         }
 

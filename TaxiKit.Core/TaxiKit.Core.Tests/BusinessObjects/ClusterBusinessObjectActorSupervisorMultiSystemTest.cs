@@ -39,6 +39,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
     /// </summary>
     public class ClusterBusinessObjectActorSupervisorMultiSystemTest : TestWithSerilog
     {
+        private readonly ConcurrentBag<EchoMessage> recievedEchoMessages = new ConcurrentBag<EchoMessage>();
         private WindsorContainer container;
 
         public ClusterBusinessObjectActorSupervisorMultiSystemTest(ITestOutputHelper output)
@@ -54,6 +55,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
             this.container.Register(Component.For<TestObjectActor>().LifestyleTransient());
             this.container.Register(Component.For<ITestOutputHelper>().Instance(output));
             this.container.Register(Component.For<IActorRef>().Instance(ActorRefs.Nobody).Named("testActor"));
+            this.container.Register(Component.For<ConcurrentBag<EchoMessage>>().Instance(this.recievedEchoMessages));
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
-                new[] { "role1" },
+                new[] { "role1", "test" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551" });
 
             var s1 = sys1.ActorOf(sys1.DI().Props<TestNetSupervisorActor>(), "sup");
@@ -91,7 +93,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
-                new[] { "role1", "role2" },
+                new[] { "role1", "test" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
             var s2 = sys2.ActorOf(sys1.DI().Props<TestNetSupervisorActor>(), "sup");
@@ -101,7 +103,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                 baseConfig,
                 systems,
                 systemUpWaitHandles,
-                new[] { "role1", "role2" },
+                new[] { "role1", "test" },
                 new[] { "akka.tcp://ClusterSystem@127.0.0.1:2551", "akka.tcp://ClusterSystem@127.0.0.1:2552" });
 
             var s3 = sys3.ActorOf(sys1.DI().Props<TestNetSupervisorActor>(), "sup");
@@ -113,12 +115,14 @@ namespace TaxiKit.Core.Tests.BusinessObjects
 
             Logger.Information("***************************** STARTED ***********************");
 
-            foreach (var index in Enumerable.Range(0, 5))
+            int messagesCount = 10;
+            foreach (var index in Enumerable.Range(0, messagesCount))
             {
-                // s1.Tell(new EchoMessage { Id = (index % 20).ToString(), Text = index.ToString() });
+                s1.Tell(new EchoMessage { Id = (index % 20).ToString(), Text = index.ToString() });
             }
 
-            Thread.Sleep(TimeSpan.FromMilliseconds(1000));
+            Thread.Sleep(TimeSpan.FromMilliseconds(500));
+            Assert.Equal(messagesCount, this.recievedEchoMessages.Count);
 
             sys2.Shutdown();
             sys2.AwaitTermination();
@@ -170,31 +174,6 @@ namespace TaxiKit.Core.Tests.BusinessObjects
             systemUpWaitHandles.Add(waitHandle);
 
             return system;
-        }
-
-        /// <summary>
-        /// Test message to BO actor
-        /// </summary>
-        public class LogMessage : IMessageToBusinessObjectActor
-        {
-            public string Id { get; set; }
-        }
-
-        public class TestObjectActor : ReceiveActor
-        {
-        }
-
-        public class TestSuperVisor : ClusterBusinessObjectActorSupervisor<TestObjectActor>
-        {
-            public TestSuperVisor(IConnectionMultiplexer redisConnection)
-                            : base(redisConnection)
-            {
-            }
-
-            /// <summary>
-            /// Cluster node role name, that handles such objects.
-            /// </summary>
-            protected override string ClusterRole => "bo";
         }
 
         /// <summary>

@@ -40,6 +40,9 @@
         [UsedImplicitly]
         public readonly string RedisPrefix;
 
+        [UsedImplicitly]
+        protected static readonly Random Rnd = new Random();
+
         /// <summary>
         /// List of all active role nodes
         /// </summary>
@@ -78,30 +81,12 @@
             this.RedisPrefix = $"{string.Join(":", this.Self.Path.Elements)}:Mngmt";
             this.CurrentCluster = Cluster.Get(Context.System);
 
-            // ReSharper disable ConvertClosureToMethodGroup
-            this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberUp(m));
-            this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberDown(m));
-            this.Receive<ClusterEvent.RoleLeaderChanged>(m => m.Role == this.ClusterRole, m => this.OnRoleLeaderChanged(m));
-            this.Receive<CreateChildCommand>(m => this.CreateLocalChild(m));
-            this.Receive<ChildCreated>(m => this.RegisterChildRef(m));
-            this.Receive<ChildRemoved>(m => this.RemoveChildRef(m));
-            this.Receive<IMessageToBusinessObjectActor>(m => this.ForwardMessageToChild(m));
-            this.Receive<Terminated>(m => this.OnChildTerminated(m));
-            this.Receive<DeadLetter>(m => this.OnDeadLetter(m));
-            this.Receive<ResetChildren>(m => this.OnResetChildren());
-
-            // ReSharper restore ConvertClosureToMethodGroup
+            this.UnClusteredMessageProccess();
 
             this.CurrentCluster.Subscribe(this.Self,
                 ClusterEvent.InitialStateAsEvents,
                 new[] { typeof(ClusterEvent.IMemberEvent), typeof(ClusterEvent.RoleLeaderChanged) });
             Context.System.EventStream.Subscribe(this.Self, typeof(DeadLetter));
-
-            this.CurrentCluster.RegisterOnMemberUp(
-                () =>
-                    {
-                        // todo: do something after cluster initialization
-                    });
         }
 
         public IStash Stash { get; set; }
@@ -169,8 +154,7 @@
         /// <returns>The reference to supervisor to place a new child</returns>
         protected virtual ICanTell SelectNodeToPlaceChild(string id)
         {
-            var rnd = new Random();
-            var memberNum = rnd.Next(0, this.activeNodes.Count);
+            var memberNum = Rnd.Next(0, this.activeNodes.Count);
             var nodeToCreate = this.activeNodes.Skip(memberNum).First().Value;
             return nodeToCreate;
         }
@@ -204,6 +188,25 @@
                 throw new ArgumentException(@"Id should be not empty or null", nameof(id));
             }
             return id.Replace('/', '-').Replace(':', '-');
+        }
+
+        /// <summary>
+        /// Rules to proccess mesages in fully formed cluster
+        /// </summary>
+        private void ClusteredMessageProccess()
+        {
+            // ReSharper disable ConvertClosureToMethodGroup
+            this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberUp(m));
+            this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberDown(m));
+            this.Receive<ClusterEvent.RoleLeaderChanged>(m => m.Role == this.ClusterRole, m => this.OnRoleLeaderChanged(m));
+            this.Receive<CreateChildCommand>(m => this.CreateLocalChild(m));
+            this.Receive<ChildCreated>(m => this.RegisterChildRef(m));
+            this.Receive<ChildRemoved>(m => this.RemoveChildRef(m));
+            this.Receive<IMessageToBusinessObjectActor>(m => this.ForwardMessageToChild(m));
+            this.Receive<Terminated>(m => this.OnChildTerminated(m));
+            this.Receive<DeadLetter>(m => this.OnDeadLetter(m));
+            this.Receive<ResetChildren>(m => this.OnResetChildren());
+            // ReSharper restore ConvertClosureToMethodGroup
         }
 
         /// <summary>
@@ -406,17 +409,39 @@
         /// <param name="message">The leader position change notification</param>
         private void OnRoleLeaderChanged(ClusterEvent.RoleLeaderChanged message)
         {
-            bool wasLeader = this.IsLeader;
-            this.IsLeader = message.Leader == this.CurrentCluster.SelfAddress;
-            this.RoleLeader = this.CreateSupervisorICanTell(message.Leader);
+            if (message.Leader == null)
+            {
+                if (this.RoleLeader == null)
+                {
+                    return;
+                }
 
-            if (this.IsLeader)
-            {
-                this.OnLeaderPositionAcquired();
+                this.OnResetChildren();
+                this.IsLeader = false;
+                this.children.Clear();
+                this.activeNodes.Clear();
+                this.Become(this.UnClusteredMessageProccess);
             }
-            else if (wasLeader)
+            else
             {
-                this.OnLeaderPositionLost();
+                // just joined th cluster
+                if (this.RoleLeader == null)
+                {
+                    this.Become(this.ClusteredMessageProccess);
+                }
+
+                bool wasLeader = this.IsLeader;
+                this.IsLeader = message.Leader == this.CurrentCluster.SelfAddress;
+                this.RoleLeader = this.CreateSupervisorICanTell(message.Leader);
+
+                if (this.IsLeader)
+                {
+                    this.OnLeaderPositionAcquired();
+                }
+                else if (wasLeader)
+                {
+                    this.OnLeaderPositionLost();
+                }
             }
         }
 
@@ -458,6 +483,19 @@
             {
                 this.children.Remove(message.Id);
             }
+        }
+
+        /// <summary>
+        /// Rules to proccess messages before cluster completes it's forming
+        /// </summary>
+        private void UnClusteredMessageProccess()
+        {
+            // ReSharper disable ConvertClosureToMethodGroup
+            this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberUp(m));
+            this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberDown(m));
+            this.Receive<ClusterEvent.RoleLeaderChanged>(m => m.Role == this.ClusterRole, m => this.OnRoleLeaderChanged(m));
+            this.Receive<object>(m => this.Stash.Stash());
+            // ReSharper restore ConvertClosureToMethodGroup
         }
 
         /// <summary>
