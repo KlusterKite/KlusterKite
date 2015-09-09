@@ -262,7 +262,7 @@
                 new ChildCreated
                 {
                     Id = message.Id,
-                    ChildRef = child,
+                    NodeAddress = this.CurrentCluster.SelfUniqueAddress,
                     NodeUid = this.CurrentCluster.SelfUniqueAddress.Uid
                 });
             // todo: duplicate stop may cause false child removal message
@@ -286,9 +286,9 @@
             {
                 localChild.Tell(message, sender);
             }
-            if (this.children.TryGetValue(message.Id, out child))
+            else if (this.children.TryGetValue(message.Id, out child) && this.activeNodes.ContainsKey(child.NodeAddress))
             {
-                this.senders.Tell(new EnvelopeToSender { Message = message, Receiver = child.Child, Sender = sender });
+                this.senders.Tell(new EnvelopeToSender { Message = message, Receiver = this.activeNodes[child.NodeAddress], Sender = sender });
             }
             else
             {
@@ -488,9 +488,15 @@
         /// <param name="childCreated">The child created data</param>
         private void RegisterChildRef(ChildCreated childCreated)
         {
+            ICanTell node;
+            if (!this.activeNodes.TryGetValue(childCreated.NodeAddress, out node))
+            {
+                return;
+            }
+
             this.children[childCreated.Id] = new FullChildRef
             {
-                Child = childCreated.ChildRef,
+                NodeAddress = childCreated.NodeAddress,
                 NodeUid = childCreated.NodeUid
             };
 
@@ -500,7 +506,7 @@
                 this.messageToChildOnCreateQueue.Remove(childCreated.Id);
                 foreach (var message in messagesList)
                 {
-                    childCreated.ChildRef.Tell(message.Item1, message.Item2);
+                    node.Tell(message.Item1, message.Item2);
                 }
             }
 
@@ -543,10 +549,8 @@
         [UsedImplicitly]
         public class ChildCreated
         {
-            public IActorRef ChildRef { get; set; }
-
             public string Id { get; set; }
-
+            public UniqueAddress NodeAddress { get; set; }
             public int NodeUid { get; set; }
         }
 
@@ -587,7 +591,7 @@
 
         public class FullChildRef
         {
-            public IActorRef Child { get; set; }
+            public UniqueAddress NodeAddress { get; set; }
 
             public int NodeUid { get; set; }
         }
@@ -629,19 +633,20 @@
                 this.Receive<EnvelopeToSender>(m => this.SendEnvelope(m));
             }
 
-            private void SendEnvelope(EnvelopeToSender envelopeToObject)
+            private async Task SendEnvelope(EnvelopeToSender envelope)
             {
                 try
                 {
-                    envelopeToObject.Receiver.Ask(new EnvelopeToReceiver
+                    await envelope.Receiver.Ask(new EnvelopeToReceiver
                     {
-                        Message = envelopeToObject.Message,
-                        Sender = envelopeToObject.Sender
+                        Message = envelope.Message,
+                        Sender = envelope.Sender
                     }, this.sendTimeOut);
                 }
                 catch (Exception)
                 {
-                    Context.System.Scheduler.ScheduleTellOnce(this.nextAttmeptPause, this.supervisor, envelopeToObject.Message, this.Self);
+                    Context.System.Scheduler.ScheduleTellOnce(this.nextAttmeptPause, this.supervisor, envelope.Message, this.Self);
+                    Context.GetLogger().Info("Message send failed, resending {message}...", envelope.Message.ToString());
                 }
             }
         }

@@ -78,7 +78,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                         /sup {
                             createChildTimeout = 1s
                             sendTimeOut = 200ms
-                            nextAttmeptPause = 5s
+                            nextAttmeptPause = 1s
                             sendersCount = 20
                         }
                     }"));

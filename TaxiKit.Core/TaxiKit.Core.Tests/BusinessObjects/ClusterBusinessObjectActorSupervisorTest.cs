@@ -107,7 +107,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
             superVisor.Tell(
                 new ClusterBusinessObjectActorSupervisor<TestObjectActor>.ChildCreated
                 {
-                    ChildRef = this.TestActor,
+                    NodeAddress = secondNodeAddress,
                     Id = "1",
                     NodeUid = 1
                 });
