@@ -3,12 +3,15 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
     using Akka.DI.Core;
     using Akka.Event;
+    using Akka.Routing;
     using Akka.Util.Internal;
 
     using Castle.Components.DictionaryAdapter;
@@ -31,8 +34,11 @@
     /// <remarks>
     /// All actor implementation should be located on same path in every role node.
     /// All child actors are initialized with dependency injection
+    ///
+    /// In case of network problems, messages to object can make dubles
     /// </remarks>
-    public abstract class ClusterBusinessObjectActorSupervisor<T> : ReceiveActor, IWithUnboundedStash where T : ActorBase
+    public abstract class ClusterBusinessObjectActorSupervisor<T> : ReceiveActor, IWithUnboundedStash
+        where T : ActorBase
     {
         /// <summary>
         /// Prefix to store all data in redis.
@@ -41,7 +47,7 @@
         public readonly string RedisPrefix;
 
         [UsedImplicitly]
-        protected static readonly Random Rnd = new Random();
+        protected readonly Random Rnd = new Random();
 
         /// <summary>
         /// List of all active role nodes
@@ -59,17 +65,21 @@
         private readonly TimeSpan createChildTimeout;
 
         private readonly Dictionary<IActorRef, string> localChildren = new Dictionary<IActorRef, string>();
+        private readonly Dictionary<string, IActorRef> localChildrenById = new Dictionary<string, IActorRef>();
 
         /// <summary>
         /// Temprorary storage for message, that are coming, while child is creating
         /// </summary>
-        private readonly Dictionary<string, List<Tuple<IMessageToBusinessObjectActor, IActorRef>>> messageToChildOnCreateQueue
-            = new Dictionary<string, List<Tuple<IMessageToBusinessObjectActor, IActorRef>>>();
+        private readonly Dictionary<string, List<Tuple<IMessageToBusinessObjectActor, IActorRef>>>
+            messageToChildOnCreateQueue =
+                new Dictionary<string, List<Tuple<IMessageToBusinessObjectActor, IActorRef>>>();
 
         /// <summary>
         /// REDIS connection object
         /// </summary>
         private readonly IConnectionMultiplexer redisConnection;
+
+        private readonly IActorRef senders;
 
         protected ClusterBusinessObjectActorSupervisor(IConnectionMultiplexer redisConnection)
         {
@@ -77,16 +87,20 @@
             var config = lookup != null ? lookup.Config : ConfigurationFactory.Empty;
             this.createChildTimeout = config.GetTimeSpan("createChildTimeout", TimeSpan.FromSeconds(5), false);
 
+            var sendersCount = config.GetInt("sendersCount", 20);
+
+            this.senders = Context.ActorOf(Context.System.DI().Props<SenderWorker>().WithRouter(new ConsistentHashingPool(sendersCount)), "senders");
+
             this.redisConnection = redisConnection;
             this.RedisPrefix = $"{string.Join(":", this.Self.Path.Elements)}:Mngmt";
             this.CurrentCluster = Cluster.Get(Context.System);
 
             this.UnClusteredMessageProccess();
 
-            this.CurrentCluster.Subscribe(this.Self,
+            this.CurrentCluster.Subscribe(
+                this.Self,
                 ClusterEvent.InitialStateAsEvents,
                 new[] { typeof(ClusterEvent.IMemberEvent), typeof(ClusterEvent.RoleLeaderChanged) });
-            Context.System.EventStream.Subscribe(this.Self, typeof(DeadLetter));
         }
 
         public IStash Stash { get; set; }
@@ -198,13 +212,15 @@
             // ReSharper disable ConvertClosureToMethodGroup
             this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberUp(m));
             this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberDown(m));
-            this.Receive<ClusterEvent.RoleLeaderChanged>(m => m.Role == this.ClusterRole, m => this.OnRoleLeaderChanged(m));
+            this.Receive<ClusterEvent.RoleLeaderChanged>(
+                m => m.Role == this.ClusterRole,
+                m => this.OnRoleLeaderChanged(m));
             this.Receive<CreateChildCommand>(m => this.CreateLocalChild(m));
             this.Receive<ChildCreated>(m => this.RegisterChildRef(m));
             this.Receive<ChildRemoved>(m => this.RemoveChildRef(m));
+            this.Receive<EnvelopeToReceiver>(m => this.OnEnvelopeToReceiver(m));
             this.Receive<IMessageToBusinessObjectActor>(m => this.ForwardMessageToChild(m));
             this.Receive<Terminated>(m => this.OnChildTerminated(m));
-            this.Receive<DeadLetter>(m => this.OnDeadLetter(m));
             this.Receive<ResetChildren>(m => this.OnResetChildren());
             // ReSharper restore ConvertClosureToMethodGroup
         }
@@ -218,6 +234,7 @@
             var child = Context.ActorOf(Context.System.DI().Props<T>(), message.Id);
             child.Tell(new SetObjectId { Id = message.Id });
             this.localChildren[child] = message.Id;
+            this.localChildrenById[message.Id] = child;
 
             var db = this.redisConnection.GetDatabase();
             var keyName = this.GetChildAddressKeyName(message.Id);
@@ -237,9 +254,17 @@
                 }
             }
 
-            db.HashSet(this.GetSupervisorHashKeyName(this.CurrentCluster.SelfUniqueAddress.Uid), new[] { new HashEntry(GetSafeChildId(message.Id), message.Id) });
+            db.HashSet(
+                this.GetSupervisorHashKeyName(this.CurrentCluster.SelfUniqueAddress.Uid),
+                new[] { new HashEntry(GetSafeChildId(message.Id), message.Id) });
             Context.Watch(child);
-            this.BroadcastSupervisorMessage(new ChildCreated { Id = message.Id, ChildRef = child, NodeUid = this.CurrentCluster.SelfUniqueAddress.Uid });
+            this.BroadcastSupervisorMessage(
+                new ChildCreated
+                {
+                    Id = message.Id,
+                    ChildRef = child,
+                    NodeUid = this.CurrentCluster.SelfUniqueAddress.Uid
+                });
             // todo: duplicate stop may cause false child removal message
         }
 
@@ -247,12 +272,23 @@
         /// Forwarding message to object actor. If actor is not exists, it will be created.
         /// </summary>
         /// <param name="message">Message to child actor</param>
-        private void ForwardMessageToChild(IMessageToBusinessObjectActor message)
+        /// <param name="sender">Override of original message sender</param>
+        private void ForwardMessageToChild(IMessageToBusinessObjectActor message, IActorRef sender = null)
         {
+            if (sender == null)
+            {
+                sender = this.Sender;
+            }
+
             FullChildRef child;
+            IActorRef localChild;
+            if (this.localChildrenById.TryGetValue(message.Id, out localChild))
+            {
+                localChild.Tell(message, sender);
+            }
             if (this.children.TryGetValue(message.Id, out child))
             {
-                child.Child.Forward(message);
+                this.senders.Tell(new EnvelopeToSender { Message = message, Receiver = child.Child, Sender = sender });
             }
             else
             {
@@ -271,10 +307,12 @@
                     {
                         if (!this.messageToChildOnCreateQueue.ContainsKey(message.Id))
                         {
-                            this.messageToChildOnCreateQueue[message.Id] = new EditableList<Tuple<IMessageToBusinessObjectActor, IActorRef>>();
+                            this.messageToChildOnCreateQueue[message.Id] =
+                                new EditableList<Tuple<IMessageToBusinessObjectActor, IActorRef>>();
                         }
 
-                        this.messageToChildOnCreateQueue[message.Id].Add(new Tuple<IMessageToBusinessObjectActor, IActorRef>(message, this.Sender));
+                        this.messageToChildOnCreateQueue[message.Id].Add(
+                            new Tuple<IMessageToBusinessObjectActor, IActorRef>(message, sender));
 
                         // For now, I'll just take random cluster member, but It could be more complex algorithm
                         var nodeToCreate = this.SelectNodeToPlaceChild(message.Id);
@@ -283,12 +321,16 @@
                     else
                     {
                         // could not manage to acquire lock, so I should wait until it will be released to try one more time
-                        Context.System.Scheduler.ScheduleTellOnce(this.createChildTimeout, this.Self, message, this.Sender);
+                        Context.System.Scheduler.ScheduleTellOnce(
+                            this.createChildTimeout,
+                            this.Self,
+                            message,
+                            sender);
                     }
                 }
                 else
                 {
-                    this.RoleLeader.Tell(message, this.Sender);
+                    this.senders.Tell(new EnvelopeToSender { Message = message, Receiver = this.RoleLeader, Sender = sender });
                 }
             }
         }
@@ -314,28 +356,21 @@
             if (this.localChildren.TryGetValue(terminated.ActorRef, out childId))
             {
                 this.localChildren.Remove(terminated.ActorRef);
+                this.localChildrenById.Remove(childId);
                 this.children.Remove(childId);
                 var db = this.redisConnection.GetDatabase();
                 db.HashDelete(
                     this.GetSupervisorHashKeyName(this.CurrentCluster.SelfUniqueAddress.Uid),
                     GetSafeChildId(childId));
-                this.BroadcastSupervisorMessage(new ChildRemoved { Id = childId, NodeUid = this.CurrentCluster.SelfUniqueAddress.Uid });
+                this.BroadcastSupervisorMessage(
+                    new ChildRemoved { Id = childId, NodeUid = this.CurrentCluster.SelfUniqueAddress.Uid });
             }
         }
 
-        private void OnDeadLetter(DeadLetter deadLetter)
+        private void OnEnvelopeToReceiver(EnvelopeToReceiver envelopeToReceiver)
         {
-            if (!Equals(deadLetter.Sender, this.Self))
-            {
-                return;
-            }
-
-            var messageToObject = deadLetter.Message as IMessageToBusinessObjectActor;
-
-            if (messageToObject != null)
-            {
-                // todo: something strange happened. We need to resend this message properly
-            }
+            this.Sender.Tell(true);
+            this.ForwardMessageToChild(envelopeToReceiver.Message, envelopeToReceiver.Sender);
         }
 
         /// <summary>
@@ -401,6 +436,7 @@
             }
 
             this.localChildren.Clear();
+            this.localChildrenById.Clear();
         }
 
         /// <summary>
@@ -428,6 +464,7 @@
                 if (this.RoleLeader == null)
                 {
                     this.Become(this.ClusteredMessageProccess);
+                    this.Stash.UnstashAll();
                 }
 
                 bool wasLeader = this.IsLeader;
@@ -493,7 +530,9 @@
             // ReSharper disable ConvertClosureToMethodGroup
             this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberUp(m));
             this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnMemberDown(m));
-            this.Receive<ClusterEvent.RoleLeaderChanged>(m => m.Role == this.ClusterRole, m => this.OnRoleLeaderChanged(m));
+            this.Receive<ClusterEvent.RoleLeaderChanged>(
+                m => m.Role == this.ClusterRole,
+                m => this.OnRoleLeaderChanged(m));
             this.Receive<object>(m => this.Stash.Stash());
             // ReSharper restore ConvertClosureToMethodGroup
         }
@@ -505,7 +544,9 @@
         public class ChildCreated
         {
             public IActorRef ChildRef { get; set; }
+
             public string Id { get; set; }
+
             public int NodeUid { get; set; }
         }
 
@@ -516,6 +557,7 @@
         public class ChildRemoved
         {
             public string Id { get; set; }
+
             public int NodeUid { get; set; }
         }
 
@@ -528,9 +570,25 @@
             public string Id { get; set; }
         }
 
+        public class EnvelopeToReceiver
+        {
+            public IMessageToBusinessObjectActor Message { get; set; }
+            public IActorRef Sender { get; set; }
+        }
+
+        public class EnvelopeToSender : IConsistentHashable
+        {
+            public object ConsistentHashKey => this.Message == null ? null : this.Message.Id;
+
+            public IMessageToBusinessObjectActor Message { get; set; }
+            public ICanTell Receiver { get; set; }
+            public IActorRef Sender { get; set; }
+        }
+
         public class FullChildRef
         {
             public IActorRef Child { get; set; }
+
             public int NodeUid { get; set; }
         }
 
@@ -550,6 +608,42 @@
         {
             [UsedImplicitly]
             public string Id { get; set; }
+        }
+
+        /// <summary>
+        /// Worker to send messages and verify there receive
+        /// </summary>
+        public class SenderWorker : ReceiveActor
+        {
+            private readonly TimeSpan nextAttmeptPause;
+            private readonly TimeSpan sendTimeOut;
+            private readonly ICanTell supervisor;
+
+            public SenderWorker()
+            {
+                var lookup = Context.System.AsInstanceOf<ExtendedActorSystem>().Provider.Deployer.Lookup(this.Self.Path.Parent.Parent);
+                var config = lookup != null ? lookup.Config : ConfigurationFactory.Empty;
+                this.sendTimeOut = config.GetTimeSpan("sendTimeOut", TimeSpan.FromSeconds(1), false);
+                this.nextAttmeptPause = config.GetTimeSpan("nextAttmeptPause", TimeSpan.FromSeconds(3), false);
+                this.supervisor = Context.ActorSelection(this.Self.Path.Parent.Parent);
+                this.Receive<EnvelopeToSender>(m => this.SendEnvelope(m));
+            }
+
+            private void SendEnvelope(EnvelopeToSender envelopeToObject)
+            {
+                try
+                {
+                    envelopeToObject.Receiver.Ask(new EnvelopeToReceiver
+                    {
+                        Message = envelopeToObject.Message,
+                        Sender = envelopeToObject.Sender
+                    }, this.sendTimeOut);
+                }
+                catch (Exception)
+                {
+                    Context.System.Scheduler.ScheduleTellOnce(this.nextAttmeptPause, this.supervisor, envelopeToObject.Message, this.Self);
+                }
+            }
         }
 
         /// <summary>

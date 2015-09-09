@@ -6208,8 +6208,31 @@ namespace TaxiKit.Core.TestKit.Moq
             lock (this.storage)
             {
                 string stringKey = key;
-                this.storage[stringKey] = (string)value;
-                return true;
+                switch (when)
+                {
+                    case When.Always:
+                        this.storage[stringKey] = (string)value;
+                        return true;
+
+                    case When.Exists:
+                        if (this.storage.ContainsKey(stringKey))
+                        {
+                            this.storage[stringKey] = (string)value;
+                            return true;
+                        }
+                        return false;
+
+                    case When.NotExists:
+                        if (!this.storage.ContainsKey(stringKey))
+                        {
+                            this.storage[stringKey] = (string)value;
+                            return true;
+                        }
+                        return false;
+
+                    default:
+                        throw new ArgumentException(nameof(when));
+                }
             }
         }
 

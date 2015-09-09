@@ -73,7 +73,15 @@ namespace TaxiKit.Core.Tests.BusinessObjects
                             "akka.loggers = [\"Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog\"]"))
                     .WithFallback(ConfigurationFactory.ParseString("min-nr-of-members = 2"))
                     .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 1s"));
+                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 1s"))
+                    .WithFallback(ConfigurationFactory.ParseString(@" akka.actor.deployment {
+                        /sup {
+                            createChildTimeout = 1s
+                            sendTimeOut = 200ms
+                            nextAttmeptPause = 5s
+                            sendersCount = 20
+                        }
+                    }"));
 
             var systemUpWaitHandles = new List<EventWaitHandle>();
             var systems = new List<ActorSystem>();
@@ -115,19 +123,27 @@ namespace TaxiKit.Core.Tests.BusinessObjects
 
             Logger.Information("***************************** STARTED ***********************");
 
-            int messagesCount = 10;
+            int messagesCount = 100;
             foreach (var index in Enumerable.Range(0, messagesCount))
             {
                 s1.Tell(new EchoMessage { Id = (index % 20).ToString(), Text = index.ToString() });
             }
 
-            Thread.Sleep(TimeSpan.FromMilliseconds(500));
+            Thread.Sleep(TimeSpan.FromMilliseconds(1500));
+
             Assert.Equal(messagesCount, this.recievedEchoMessages.Count);
 
             sys2.Shutdown();
             sys2.AwaitTermination();
 
-            Thread.Sleep(TimeSpan.FromMilliseconds(1000 * 10));
+            foreach (var index in Enumerable.Range(0, messagesCount))
+            {
+                s1.Tell(new EchoMessage { Id = (index % 20).ToString(), Text = index.ToString() });
+            }
+
+            Thread.Sleep(TimeSpan.FromMilliseconds(15000));
+
+            Assert.Equal(messagesCount * 2, this.recievedEchoMessages.Count);
         }
 
         /// <summary>

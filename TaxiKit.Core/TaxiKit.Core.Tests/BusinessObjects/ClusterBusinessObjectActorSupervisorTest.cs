@@ -16,6 +16,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
     using Akka.Configuration;
     using Akka.DI.Core;
     using Akka.Event;
+    using Akka.Util.Internal;
 
     using Castle.MicroKernel.Registration;
 
@@ -155,9 +156,9 @@ namespace TaxiKit.Core.Tests.BusinessObjects
 
             var echoMessage = new EchoMessage { Id = "1", Text = "Hello 1-1" };
             superVisor.Tell(echoMessage);
-            var response = this.ExpectMsg<EchoMessage>();
-            Assert.Equal(echoMessage, response);
-            Assert.False(response.FromObjectActor);
+            var response = this.ExpectMsg<ClusterBusinessObjectActorSupervisor<TestObjectActor>.EnvelopeToReceiver>();
+            Assert.Equal(echoMessage, (EchoMessage)response.Message);
+            Assert.False(response.Message.AsInstanceOf<EchoMessage>().FromObjectActor);
         }
 
         [Fact]
