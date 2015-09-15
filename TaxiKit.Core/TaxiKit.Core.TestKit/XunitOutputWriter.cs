@@ -10,15 +10,16 @@ namespace TaxiKit.Core.TestKit
     /// </summary>
     public class XunitOutputWriter : TextWriter
     {
-        private readonly ITestOutputHelper output;
-
         private readonly StringBuilder line;
+        private readonly ITestOutputHelper output;
 
         public XunitOutputWriter(ITestOutputHelper output)
         {
             this.output = output;
             this.line = new StringBuilder();
         }
+
+        public override Encoding Encoding => Encoding.UTF8;
 
         public override void Write(char[] buffer)
         {
@@ -39,7 +40,5 @@ namespace TaxiKit.Core.TestKit
             this.output.WriteLine(this.line.ToString());
             this.line.Clear();
         }
-
-        public override Encoding Encoding => Encoding.UTF8;
     }
 }

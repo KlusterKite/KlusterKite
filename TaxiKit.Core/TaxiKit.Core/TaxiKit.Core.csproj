@@ -136,8 +136,18 @@
   <ItemGroup>
     <Compile Include="ActorSystemUtils.cs" />
     <Compile Include="BaseInstaller.cs" />
+    <Compile Include="Cluster\BaseBusinessObjectReceiveActor.cs" />
     <Compile Include="Cluster\ClusterBusinessObjectActorSupervisor.cs" />
     <Compile Include="Cluster\ClusterLoggingActor.cs" />
+    <Compile Include="Cluster\Messages\ChildCreated.cs" />
+    <Compile Include="Cluster\Messages\ChildRemoved.cs" />
+    <Compile Include="Cluster\Messages\CreateChildCommand.cs" />
+    <Compile Include="Cluster\Messages\EnvelopeToReceiver.cs" />
+    <Compile Include="Cluster\Messages\EnvelopeToSender.cs" />
+    <Compile Include="Cluster\Messages\IMessageToBusinessObjectActor.cs" />
+    <Compile Include="Cluster\Messages\ResetChildren.cs" />
+    <Compile Include="Cluster\Messages\RestoreObject.cs" />
+    <Compile Include="Cluster\Messages\SetObjectId.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

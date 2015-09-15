@@ -17,8 +17,6 @@ namespace TaxiKit.Core.Tests.Guarantee
     using Akka.DI.Core;
     using Akka.TestKit;
 
-    using Castle.MicroKernel.Registration;
-
     using StackExchange.Redis;
 
     using TaxiKit.Core.Guarantee;

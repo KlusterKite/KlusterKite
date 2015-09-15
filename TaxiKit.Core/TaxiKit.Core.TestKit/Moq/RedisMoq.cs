@@ -266,7 +266,11 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public bool HashDelete(RedisKey key, RedisValue hashField, CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                return this.storage.TryRemove(key, out val);
+            }
         }
 
         /// <summary>
