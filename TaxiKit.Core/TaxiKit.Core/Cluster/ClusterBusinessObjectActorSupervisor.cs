@@ -79,6 +79,8 @@ namespace TaxiKit.Core.Cluster
 
         private IActorRef senders;
 
+        private Address tempLeaderAddress;
+
         protected ClusterBusinessObjectActorSupervisor(IConnectionMultiplexer redisConnection)
         {
             var lookup = Context.System.AsInstanceOf<ExtendedActorSystem>().Provider.Deployer.Lookup(this.Self.Path);
@@ -88,6 +90,7 @@ namespace TaxiKit.Core.Cluster
             this.redisConnection = redisConnection;
             this.RedisPrefix = $"{string.Join(":", this.Self.Path.Elements)}:Mngmt";
             this.CurrentCluster = Cluster.Get(Context.System);
+            this.IsFormerLeaderDown = true;
         }
 
         /// <summary>
@@ -99,6 +102,19 @@ namespace TaxiKit.Core.Cluster
         /// Gets value, indicating that all init data after start or restart was recieved and successfully proccessed
         /// </summary>
         public bool IsDataInitizlized { get; private set; }
+
+        /// <summary>
+        /// Gets value, indicating that current role leader is down
+        /// </summary>
+        public bool IsFormerLeaderDown { get; private set; }
+
+        /// <summary>
+        /// Gets address of role leader node
+        /// </summary>
+        [UsedImplicitly]
+        protected ICanTell RoleLeader => this.RoleLeaderAddress != null
+            ? this.CreateSupervisorICanTell(this.RoleLeaderAddress.Address)
+            : null;
 
         /// <summary>
         /// Gets or sets the stash. This will be automatically populated by the framework AFTER the constructor has been run.
@@ -130,7 +146,7 @@ namespace TaxiKit.Core.Cluster
         /// Gets address of role leader node
         /// </summary>
         [UsedImplicitly]
-        protected ICanTell RoleLeader { get; private set; }
+        protected UniqueAddress RoleLeaderAddress { get; private set; }
 
         /// <summary>
         /// Sends message to all registered supervisors. Even to myself.
@@ -152,7 +168,7 @@ namespace TaxiKit.Core.Cluster
         {
             // ReSharper disable ConvertClosureToMethodGroup
             this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnClusterMemberUp(m.Member));
-            this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnClusterMemberDown(m));
+            this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnClusterMemberDown(m.Member.UniqueAddress));
             this.Receive<ClusterEvent.RoleLeaderChanged>(
                 m => m.Role == this.ClusterRole,
                 m => this.OnClusterRoleLeaderChanged(m.Leader));
@@ -181,6 +197,8 @@ namespace TaxiKit.Core.Cluster
         protected virtual void ClusterLost()
         {
             this.OnResetChildren();
+            this.RoleLeaderAddress = null;
+            this.IsFormerLeaderDown = true;
             this.IsLeader = false;
             this.children.Clear();
             this.activeNodes.Clear();
@@ -369,14 +387,19 @@ namespace TaxiKit.Core.Cluster
         /// <summary>
         /// Registers lost role member
         /// </summary>
-        /// <param name="message">Member status change notification</param>
-        protected virtual void OnClusterMemberDown(ClusterEvent.MemberRemoved message, bool isClusterInit = false)
+        /// <param name="memberAddress">The address of member that is currently lost to cluster</param>
+        protected virtual void OnClusterMemberDown(UniqueAddress memberAddress)
         {
-            this.activeNodes.Remove(message.Member.UniqueAddress);
+            this.activeNodes.Remove(memberAddress);
+            if (this.RoleLeaderAddress == memberAddress)
+            {
+                this.IsFormerLeaderDown = true;
+            }
+
             if (this.IsLeader)
             {
                 var db = this.redisConnection.GetDatabase();
-                var hash = db.HashScan(this.GetSupervisorHashKeyName(message.Member.UniqueAddress.Uid));
+                var hash = db.HashScan(this.GetSupervisorHashKeyName(memberAddress.Uid));
                 foreach (var hashEntry in hash)
                 {
                     this.children.Remove(hashEntry.Name);
@@ -394,6 +417,11 @@ namespace TaxiKit.Core.Cluster
         {
             var node = this.CreateSupervisorICanTell(member.Address);
             this.activeNodes[member.UniqueAddress] = node;
+
+            if (this.tempLeaderAddress != null && this.tempLeaderAddress == member.Address)
+            {
+                this.OnClusterRoleLeaderChanged(member.Address);
+            }
 
             if (isClusterInit)
             {
@@ -423,7 +451,7 @@ namespace TaxiKit.Core.Cluster
         {
             if (leaderAddress == null)
             {
-                if (this.RoleLeader == null)
+                if (this.RoleLeaderAddress == null)
                 {
                     return;
                 }
@@ -432,24 +460,38 @@ namespace TaxiKit.Core.Cluster
             }
             else
             {
+                var leaderUniqueAddress = this.activeNodes.Keys.FirstOrDefault(a => a.Address == leaderAddress);
+                if (leaderUniqueAddress == null)
+                {
+                    this.tempLeaderAddress = leaderAddress;
+                    this.IsClusterInitizlized = false;
+                    this.Become(this.UnClusteredMessageProccess);
+                    return;
+                }
+
+                this.tempLeaderAddress = null;
+
                 // just joined the cluster
-                if (this.RoleLeader == null)
+                if (this.RoleLeaderAddress == null)
                 {
                     this.ClusterJoined();
                 }
 
                 bool wasLeader = this.IsLeader;
+                var formerLeaderAddress = this.RoleLeaderAddress;
                 this.IsLeader = leaderAddress == this.CurrentCluster.SelfAddress;
-                this.RoleLeader = this.CreateSupervisorICanTell(leaderAddress);
+                this.RoleLeaderAddress = leaderUniqueAddress;
 
                 if (this.IsLeader)
                 {
-                    this.OnLeaderPositionAcquired();
+                    this.OnLeaderPositionAcquired(formerLeaderAddress);
                 }
                 else if (wasLeader)
                 {
                     this.OnLeaderPositionLost();
                 }
+
+                this.IsFormerLeaderDown = false;
             }
         }
 
@@ -494,9 +536,12 @@ namespace TaxiKit.Core.Cluster
         /// <summary>
         /// Proccessing event of becoming role leader
         /// </summary>
-        protected virtual void OnLeaderPositionAcquired()
+        protected virtual void OnLeaderPositionAcquired(UniqueAddress formerLeaderAddress)
         {
-            // todo: check if some actors should be created
+            if (this.IsFormerLeaderDown && formerLeaderAddress != null)
+            {
+                this.OnClusterMemberDown(formerLeaderAddress);
+            }
         }
 
         /// <summary>
@@ -647,7 +692,7 @@ namespace TaxiKit.Core.Cluster
             this.Receive<InitializationData>(m => this.OnInitializationDataReceived(m));
             this.Receive<ClusterEvent.CurrentClusterState>(m => this.OnClusterState(m));
             this.Receive<ClusterEvent.MemberUp>(m => m.Member.HasRole(this.ClusterRole), m => this.OnClusterMemberUp(m.Member));
-            this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnClusterMemberDown(m));
+            this.Receive<ClusterEvent.MemberRemoved>(m => m.Member.HasRole(this.ClusterRole), m => this.OnClusterMemberDown(m.Member.UniqueAddress));
             this.Receive<ClusterEvent.RoleLeaderChanged>(
                 m => m.Role == this.ClusterRole,
                 m => this.OnClusterRoleLeaderChanged(m.Leader));

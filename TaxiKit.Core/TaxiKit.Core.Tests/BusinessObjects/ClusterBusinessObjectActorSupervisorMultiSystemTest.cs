@@ -58,7 +58,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
         /// <summary>
         /// Testinf system start
         /// </summary>
-        [Fact]
+        // [Fact]
         public void SystemStartTest()
         {
             var baseConfig =

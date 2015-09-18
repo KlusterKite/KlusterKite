@@ -253,6 +253,67 @@ namespace TaxiKit.Core.Tests.BusinessObjects
         }
 
         [Fact]
+        public void ClusterDownTest()
+        {
+            var redis = new ConcurrentDictionary<string, object>();
+            this.WinsorBind<IConnectionMultiplexer>(() => new RedisConnectionMoq(redis));
+
+            var superVisor = this.ActorOfAsTestActorRef<TestSupervisorActor>(this.Sys.DI().Props<TestSupervisorActor>());
+
+            this.SetAutoPilot(new DelegateAutoPilot(
+                delegate (IActorRef sender, object message)
+                {
+                    if (message is EnvelopeToReceiver)
+                    {
+                        sender.Tell(true);
+                    }
+
+                    return AutoPilot.KeepRunning;
+                }));
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(
+                    Member.Create(
+                        Cluster.Get(this.Sys).SelfUniqueAddress,
+                        MemberStatus.Up,
+                        ImmutableHashSet.Create("test"))));
+            var address = new UniqueAddress(
+                Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
+                1);
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(
+                    Member.Create(
+                        address,
+                        MemberStatus.Up,
+                        ImmutableHashSet.Create("test"))));
+
+            superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", address.Address));
+            superVisor.Tell(new ResetChildren());
+            superVisor.Tell(new ChildCreated { Id = "Id", NodeAddress = address });
+
+            var echoMessage = new EchoMessage { Id = "1", Text = "Hello 1-1" };
+            superVisor.Tell(echoMessage);
+            var response = this.ExpectMsg<EnvelopeToReceiver>();
+            Assert.Equal(echoMessage, (EchoMessage)response.Message);
+            Assert.False(response.Message.AsInstanceOf<EchoMessage>().FromObjectActor);
+
+            superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", null));
+            echoMessage = new EchoMessage { Id = "1", Text = "Hello 1-2" };
+            superVisor.Tell(echoMessage);
+            this.ExpectNoMsg();
+            superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", address.Address));
+            this.ExpectNoMsg();
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(
+                    Member.Create(
+                        address,
+                        MemberStatus.Up,
+                        ImmutableHashSet.Create("test"))));
+            this.ExpectMsg<EnvelopeToReceiver>();
+        }
+
+        [Fact]
         public void CreateChildLockBlockedTest()
         {
             var redis = new ConcurrentDictionary<string, object>();
@@ -302,6 +363,149 @@ namespace TaxiKit.Core.Tests.BusinessObjects
             response = this.ExpectMsg<EchoMessage>();
             Assert.Equal(echoMessage, response);
             Assert.True(response.FromObjectActor);
+        }
+
+        [Fact]
+        public void ForeignNodeDownTest()
+        {
+            var redis = new ConcurrentDictionary<string, object>();
+            this.WinsorBind<IConnectionMultiplexer>(() => new RedisConnectionMoq(redis));
+
+            var superVisor = this.ActorOfAsTestActorRef<TestSupervisorActor>(
+                this.Sys.DI().Props<TestSupervisorActor>(),
+                "supervisor");
+
+            this.SetAutoPilot(
+                new DelegateAutoPilot(
+                    delegate (IActorRef sender, object message)
+                        {
+                            if (message is EnvelopeToReceiver)
+                            {
+                                sender.Tell(true);
+                            }
+
+                            return AutoPilot.KeepRunning;
+                        }));
+
+            var address =
+                new UniqueAddress(
+                    Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
+                    1);
+
+            var address2 =
+                new UniqueAddress(
+                    Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
+                    2);
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(
+                    Member.Create(
+                        Cluster.Get(this.Sys).SelfUniqueAddress,
+                        MemberStatus.Up,
+                        ImmutableHashSet.Create("test"))));
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(Member.Create(address, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(Member.Create(address2, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+
+            superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", address.Address));
+            superVisor.Tell(new ResetChildren());
+            superVisor.Tell(new ChildCreated { Id = "1", NodeAddress = address });
+
+            var echoMessage = new EchoMessage { Id = "1", Text = "Hello 1-1" };
+            superVisor.Tell(echoMessage);
+
+            this.ExpectMsg<EnvelopeToReceiver>();
+
+            redis["user:supervisor:Mngmt:1:ChildAddress"] = ActorRefs.Nobody.SerializeToAkkaString(this.Sys);
+            redis["user:supervisor:Mngmt:Supervisor:1:Children"] = new Dictionary<string, string> { { "1", "1" } };
+
+            superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
+            superVisor.Tell(
+                new ClusterEvent.MemberRemoved(
+                    Member.Create(address, MemberStatus.Removed, ImmutableHashSet.Create("test")),
+                    MemberStatus.Up));
+            var created = this.ExpectMsg<string>();
+            Assert.Equal("Created 1", created);
+            Assert.Equal("1", this.ExpectMsg<ChildCreated>().Id);
+
+            echoMessage = new EchoMessage { Id = "1", Text = "Hello 1-2" };
+            superVisor.Tell(echoMessage);
+            this.ExpectMsg<EchoMessage>();
+        }
+
+        [Fact]
+        public void ForeignNodeDownTest2()
+        {
+            var redis = new ConcurrentDictionary<string, object>();
+            this.WinsorBind<IConnectionMultiplexer>(() => new RedisConnectionMoq(redis));
+
+            var superVisor = this.ActorOfAsTestActorRef<TestSupervisorActor>(
+                this.Sys.DI().Props<TestSupervisorActor>(),
+                "supervisor");
+
+            this.SetAutoPilot(
+                new DelegateAutoPilot(
+                    delegate (IActorRef sender, object message)
+                    {
+                        if (message is EnvelopeToReceiver)
+                        {
+                            sender.Tell(true);
+                        }
+
+                        return AutoPilot.KeepRunning;
+                    }));
+
+            var address =
+                new UniqueAddress(
+                    Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
+                    1);
+
+            var address2 =
+                new UniqueAddress(
+                    Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
+                    2);
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(
+                    Member.Create(
+                        Cluster.Get(this.Sys).SelfUniqueAddress,
+                        MemberStatus.Up,
+                        ImmutableHashSet.Create("test"))));
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(Member.Create(address, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+
+            superVisor.Tell(
+                new ClusterEvent.MemberUp(Member.Create(address2, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+
+            superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", address.Address));
+            superVisor.Tell(new ResetChildren());
+            superVisor.Tell(new ChildCreated { Id = "1", NodeAddress = address });
+
+            var echoMessage = new EchoMessage { Id = "1", Text = "Hello 1-1" };
+            superVisor.Tell(echoMessage);
+
+            this.ExpectMsg<EnvelopeToReceiver>();
+
+            redis["user:supervisor:Mngmt:1:ChildAddress"] = ActorRefs.Nobody.SerializeToAkkaString(this.Sys);
+            redis["user:supervisor:Mngmt:Supervisor:1:Children"] = new Dictionary<string, string> { { "1", "1" } };
+
+            superVisor.Tell(
+                new ClusterEvent.MemberRemoved(
+                    Member.Create(address, MemberStatus.Removed, ImmutableHashSet.Create("test")),
+                    MemberStatus.Up));
+            superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
+
+            var created = this.ExpectMsg<string>();
+            Assert.Equal("Created 1", created);
+            Assert.Equal("1", this.ExpectMsg<ChildCreated>().Id);
+
+            echoMessage = new EchoMessage { Id = "1", Text = "Hello 1-2" };
+            superVisor.Tell(echoMessage);
+            this.ExpectMsg<EchoMessage>();
         }
 
         [Fact]
@@ -538,7 +742,7 @@ namespace TaxiKit.Core.Tests.BusinessObjects
             var redis = new ConcurrentDictionary<string, object>();
             this.WinsorBind<IConnectionMultiplexer>(() => new RedisConnectionMoq(redis));
 
-            var superVisor = this.ActorOfAsTestActorRef<TestSupervisorActor>(this.Sys.DI().Props<TestSupervisorActor>());
+            var superVisor = this.ActorOfAsTestActorRef<TestSupervisorActor>(this.Sys.DI().Props<TestSupervisorActor>(), "supervisor");
 
             superVisor.Tell(
                 new ClusterEvent.MemberUp(
