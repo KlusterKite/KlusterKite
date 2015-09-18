@@ -8,6 +8,7 @@ namespace TaxiKit.Core.TestKit.Moq
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
 
@@ -265,7 +266,11 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public bool HashDelete(RedisKey key, RedisValue hashField, CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                return this.storage.TryRemove(key, out val);
+            }
         }
 
         /// <summary>
@@ -758,7 +763,22 @@ namespace TaxiKit.Core.TestKit.Moq
             int pageOffset = 0,
             CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                if (this.storage.TryGetValue(key, out val))
+                {
+                    var hash = val as Dictionary<string, string>;
+                    if (!(val is Dictionary<string, string>))
+                    {
+                        throw new InvalidOperationException("Theris already other data and it is not a hash");
+                    }
+
+                    return hash.Select(p => new HashEntry(p.Key, p.Value));
+                }
+
+                return new HashEntry[0];
+            }
         }
 
         /// <summary>
@@ -777,7 +797,26 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public void HashSet(RedisKey key, HashEntry[] hashFields, CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                var hash = new Dictionary<string, string>();
+                if (this.storage.TryGetValue(key, out val))
+                {
+                    hash = val as Dictionary<string, string>;
+                    if (hash == null)
+                    {
+                        throw new InvalidOperationException("Theris already other data and it is not a hash");
+                    }
+                }
+
+                foreach (var hashEntry in hashFields)
+                {
+                    hash[hashEntry.Name] = hashEntry.Value;
+                }
+
+                this.storage[key] = hash;
+            }
         }
 
         /// <summary>
@@ -1247,7 +1286,11 @@ namespace TaxiKit.Core.TestKit.Moq
         /// </exception>
         public bool KeyDelete(RedisKey key, CommandFlags flags = CommandFlags.None)
         {
-            throw new NotImplementedException();
+            lock (this.storage)
+            {
+                object val;
+                return this.storage.TryRemove(key, out val);
+            }
         }
 
         /// <summary>
@@ -6169,8 +6212,31 @@ namespace TaxiKit.Core.TestKit.Moq
             lock (this.storage)
             {
                 string stringKey = key;
-                this.storage[stringKey] = (string)value;
-                return true;
+                switch (when)
+                {
+                    case When.Always:
+                        this.storage[stringKey] = (string)value;
+                        return true;
+
+                    case When.Exists:
+                        if (this.storage.ContainsKey(stringKey))
+                        {
+                            this.storage[stringKey] = (string)value;
+                            return true;
+                        }
+                        return false;
+
+                    case When.NotExists:
+                        if (!this.storage.ContainsKey(stringKey))
+                        {
+                            this.storage[stringKey] = (string)value;
+                            return true;
+                        }
+                        return false;
+
+                    default:
+                        throw new ArgumentException(nameof(when));
+                }
             }
         }
 

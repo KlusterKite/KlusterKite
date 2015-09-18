@@ -12,7 +12,6 @@ namespace TaxiKit.Core.Service
     using System.Configuration;
 
     using Akka.Actor;
-    using Akka.Configuration.Hocon;
     using Akka.DI.CastleWindsor;
     using Akka.DI.Core;
 

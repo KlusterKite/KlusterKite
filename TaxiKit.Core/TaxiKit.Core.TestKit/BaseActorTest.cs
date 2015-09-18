@@ -72,6 +72,17 @@ namespace TaxiKit.Core.TestKit
         }
 
         /// <summary>
+        /// Create a new actor as child of <see cref="P:Akka.TestKit.TestKitBase.Sys"/> and returns it as <see cref="T:Akka.TestKit.TestActorRef`1"/>
+        ///             to enable access to the underlying actor instance via <see cref="P:Akka.TestKit.TestActorRefBase`1.UnderlyingActor"/>.
+        ///
+        /// </summary>
+        /// <typeparam name="TActor">The type of the actor. It must have a parameterless public constructor</typeparam><param name="props">The <see cref="T:Akka.Actor.Props"/> object</param><param name="name">Optional: The name.</param>
+        public new TestActorRef<TActor> ActorOfAsTestActorRef<TActor>(Props props, string name = null) where TActor : ActorBase
+        {
+            return new TestActorRef<TActor>(this.Sys, props.WithDispatcher("TaxiKit.test-dispatcher"), (IActorRef)null, name);
+        }
+
+        /// <summary>
         /// Cleanup after test run
         /// </summary>
         public virtual void Cleanup()

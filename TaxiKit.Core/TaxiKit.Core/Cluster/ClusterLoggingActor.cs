@@ -24,36 +24,6 @@ namespace TaxiKit.Core.Cluster
         private Akka.Cluster.Cluster cluster;
 
         /// <summary>
-        /// Need to subscribe to cluster changes
-        /// </summary>
-        protected override void PreStart()
-        {
-            this.cluster = Akka.Cluster.Cluster.Get(Context.System);
-            this.cluster.Subscribe(
-                this.Self,
-                ClusterEvent.InitialStateAsEvents,
-                new[] { typeof(ClusterEvent.IMemberEvent), typeof(ClusterEvent.IReachabilityEvent), typeof(ClusterEvent.IClusterDomainEvent) });
-
-            Context.GetLogger().Debug(
-                "{Type}: Cluster log up",
-                this.GetType().Name);
-
-            this.cluster.RegisterOnMemberUp(
-                () =>
-                    {
-                        Context.GetLogger().Debug("{Type}: Cluster connection is up", this.GetType().Name);
-                    });
-        }
-
-        /// <summary>
-        /// Re-subscribe on restart
-        /// </summary>
-        protected override void PostStop()
-        {
-            this.cluster.Unsubscribe(this.Self);
-        }
-
-        /// <summary>
         /// Processing cluster event
         /// </summary>
         /// <param name="message">The message.</param>
@@ -86,6 +56,36 @@ namespace TaxiKit.Core.Cluster
                     this.GetType().Name,
                     message.GetType().Name);
             }
+        }
+
+        /// <summary>
+        /// Re-subscribe on restart
+        /// </summary>
+        protected override void PostStop()
+        {
+            this.cluster.Unsubscribe(this.Self);
+        }
+
+        /// <summary>
+        /// Need to subscribe to cluster changes
+        /// </summary>
+        protected override void PreStart()
+        {
+            this.cluster = Akka.Cluster.Cluster.Get(Context.System);
+            this.cluster.Subscribe(
+                this.Self,
+                ClusterEvent.InitialStateAsEvents,
+                new[] { typeof(ClusterEvent.IClusterDomainEvent) });
+
+            Context.GetLogger().Debug(
+                "{Type}: Cluster log up",
+                this.GetType().Name);
+
+            this.cluster.RegisterOnMemberUp(
+                () =>
+                    {
+                        Context.GetLogger().Debug("{Type}: Cluster connection is up", this.GetType().Name);
+                    });
         }
     }
 }

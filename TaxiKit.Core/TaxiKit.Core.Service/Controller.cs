@@ -11,8 +11,6 @@ namespace TaxiKit.Core.Service
 
     using Akka.Actor;
     using Akka.Event;
-
-    using Castle.MicroKernel;
     using Castle.Windsor;
 
     /// <summary>

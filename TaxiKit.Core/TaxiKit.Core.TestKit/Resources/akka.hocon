@@ -42,18 +42,16 @@
                   }
 
                   deployment {
-                    "*" {
-                            dispatcher = TaxiKit.test-dispatcher
+                    "/*" {
+                       dispatcher = TaxiKit.test-dispatcher
                     }
 
-                    "/*" {
-                            dispatcher = TaxiKit.test-dispatcher
-                    }
                     "/*/*" {
-                            dispatcher = TaxiKit.test-dispatcher
+                       dispatcher = TaxiKit.test-dispatcher
                     }
+
                      "/*/*/*" {
-                            dispatcher = TaxiKit.test-dispatcher
+                        dispatcher = TaxiKit.test-dispatcher
                     }
                   }
 

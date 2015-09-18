@@ -80,6 +80,10 @@
       <HintPath>..\..\packages\Helios.1.4.1\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>..\..\packages\JetBrains.Annotations.9.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -87,12 +91,12 @@
     </Reference>
     <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.1.5.9\lib\net45\Serilog.dll</HintPath>
+      <HintPath>..\..\packages\Serilog.1.5.10\lib\net45\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.1.5.9\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <HintPath>..\..\packages\Serilog.1.5.10\lib\net45\Serilog.FullNetFx.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="StackExchange.Redis">
@@ -132,7 +136,18 @@
   <ItemGroup>
     <Compile Include="ActorSystemUtils.cs" />
     <Compile Include="BaseInstaller.cs" />
+    <Compile Include="Cluster\BaseBusinessObjectReceiveActor.cs" />
+    <Compile Include="Cluster\ClusterBusinessObjectActorSupervisor.cs" />
     <Compile Include="Cluster\ClusterLoggingActor.cs" />
+    <Compile Include="Cluster\Messages\ChildCreated.cs" />
+    <Compile Include="Cluster\Messages\ChildRemoved.cs" />
+    <Compile Include="Cluster\Messages\CreateChildCommand.cs" />
+    <Compile Include="Cluster\Messages\EnvelopeToReceiver.cs" />
+    <Compile Include="Cluster\Messages\EnvelopeToSender.cs" />
+    <Compile Include="Cluster\Messages\IMessageToBusinessObjectActor.cs" />
+    <Compile Include="Cluster\Messages\ResetChildren.cs" />
+    <Compile Include="Cluster\Messages\RestoreObject.cs" />
+    <Compile Include="Cluster\Messages\SetObjectId.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -143,6 +158,7 @@
     <Compile Include="Guarantee\GuaranteeSenderActor.cs" />
     <Compile Include="NameSpaceActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\AkkaUtils.cs" />
     <Compile Include="Utils\DateTimeWrapper.cs" />
     <Compile Include="Installer.cs" />
   </ItemGroup>

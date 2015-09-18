@@ -498,6 +498,41 @@ namespace TaxiKit.Core.TestKit.Moq
             throw new NotImplementedException();
         }
 
+        public virtual void OnConfigurationChanged(EndPointEventArgs e)
+        {
+            this.ConfigurationChanged?.Invoke(this, e);
+        }
+
+        public virtual void OnConfigurationChangedBroadcast(EndPointEventArgs e)
+        {
+            this.ConfigurationChangedBroadcast?.Invoke(this, e);
+        }
+
+        public virtual void OnConnectionFailed(ConnectionFailedEventArgs e)
+        {
+            this.ConnectionFailed?.Invoke(this, e);
+        }
+
+        public virtual void OnConnectionRestored(ConnectionFailedEventArgs e)
+        {
+            this.ConnectionRestored?.Invoke(this, e);
+        }
+
+        public virtual void OnErrorMessage(RedisErrorEventArgs e)
+        {
+            this.ErrorMessage?.Invoke(this, e);
+        }
+
+        public virtual void OnHashSlotMoved(HashSlotMovedEventArgs e)
+        {
+            this.HashSlotMoved?.Invoke(this, e);
+        }
+
+        public virtual void OnInternalError(InternalErrorEventArgs e)
+        {
+            this.InternalError?.Invoke(this, e);
+        }
+
         /// <summary>
         /// The publish reconfigure.
         /// </summary>

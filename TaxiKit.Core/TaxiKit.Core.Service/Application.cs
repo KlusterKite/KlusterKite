@@ -12,8 +12,6 @@ namespace TaxiKit.Core.Service
     using Akka.Actor;
     using Castle.Windsor;
 
-    using TaxiKit.Core.Cluster;
-
     /// <summary>
     /// Main application class
     /// </summary>

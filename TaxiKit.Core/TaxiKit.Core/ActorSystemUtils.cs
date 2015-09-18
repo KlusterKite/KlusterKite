@@ -16,8 +16,6 @@ namespace TaxiKit.Core
 
     using Akka.Actor;
     using Akka.DI.Core;
-
-    using Castle.Facilities.TypedFactory;
     using Castle.Windsor;
     using Castle.Windsor.Installer;
 
