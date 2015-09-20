@@ -53,6 +53,26 @@ namespace ClusterKit.Core
         protected abstract decimal AkkaConfigLoadPriority { get; }
 
         /// <summary>
+        /// Gets the list of all registered installers
+        /// </summary>
+        /// <param name="container">
+        /// The windsor container.
+        /// </param>
+        /// <returns>
+        /// the list of all registered installers
+        /// </returns>
+        public static IList<BaseInstaller> GetRegisteredBaseInstallers(IWindsorContainer container)
+        {
+            List<BaseInstaller> list;
+            if (!RegisteredInstallers.TryGetValue(container, out list))
+            {
+                return new List<BaseInstaller>();
+            }
+
+            return list;
+        }
+
+        /// <summary>
         /// Generates overall akka config from all registered modules (with respect to external provided configuration file)
         /// </summary>
         /// <param name="container">
@@ -88,6 +108,26 @@ namespace ClusterKit.Core
         }
 
         /// <summary>
+        /// Runs all registered installers <seealso cref="PostStart"/>
+        /// </summary>
+        /// <param name="container">
+        /// The windsor container.
+        /// </param>
+        public static void RunPostStart(IWindsorContainer container)
+        {
+            List<BaseInstaller> list;
+            if (!RegisteredInstallers.TryGetValue(container, out list))
+            {
+                return;
+            }
+
+            foreach (var installer in list.OrderBy(l => l.AkkaConfigLoadPriority))
+            {
+                installer.PostStart();
+            }
+        }
+
+        /// <summary>
         /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
         /// </summary>
         /// <param name="container">The container.</param>
@@ -118,9 +158,17 @@ namespace ClusterKit.Core
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
         /// </summary>
         /// <returns>The list of roles</returns>
-        protected IEnumerable<string> GetRoles()
+        protected virtual IEnumerable<string> GetRoles()
         {
             return new string[0];
+        }
+
+        /// <summary>
+        /// This method will be run after service start.
+        /// Methods are run in <seealso cref="AkkaConfigLoadPriority"/> order.
+        /// </summary>
+        protected virtual void PostStart()
+        {
         }
 
         /// <summary>

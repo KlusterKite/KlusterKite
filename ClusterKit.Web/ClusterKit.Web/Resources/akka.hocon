@@ -1,0 +1,11 @@
+ {
+ 	ClusterKit {
+ 		Web {
+ 			OwinBindAddress = "Http://*:8080"
+ 		}
+ 	}
+
+ 	akka.actor.deployment {
+ 		
+ 	}
+ }

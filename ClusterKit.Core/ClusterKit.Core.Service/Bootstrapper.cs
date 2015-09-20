@@ -22,6 +22,8 @@ namespace ClusterKit.Core.Service
 
     using CommonServiceLocator.WindsorAdapter;
 
+    using JetBrains.Annotations;
+
     using Microsoft.Practices.ServiceLocation;
 
     using StackExchange.Redis;
@@ -29,6 +31,7 @@ namespace ClusterKit.Core.Service
     /// <summary>
     /// Dependency injection configuration
     /// </summary>
+    [UsedImplicitly]
     public class Bootstrapper
     {
         /// <summary>
@@ -40,6 +43,7 @@ namespace ClusterKit.Core.Service
             container.AddFacility<TypedFactoryFacility>();
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
             container.Register(Component.For<Controller>().LifestyleTransient());
+            container.Register(Component.For<IWindsorContainer>().Instance(container));
 
             // registering redis connection
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(ConfigurationManager.ConnectionStrings["redis"].ConnectionString);
@@ -58,6 +62,7 @@ namespace ClusterKit.Core.Service
 
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
+            BaseInstaller.RunPostStart(container);
         }
     }
 }
