@@ -84,6 +84,8 @@
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
             this.currentContainer = container;
+            container.Register(
+                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
         }
     }
 }

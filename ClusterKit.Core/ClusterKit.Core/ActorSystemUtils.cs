@@ -46,6 +46,7 @@ namespace ClusterKit.Core
                 {
                     container.Install(FromAssembly.Instance(assembly));
                 }
+                // ReSharper disable once EmptyGeneralCatchClause
                 catch (Exception)
                 {
                 }

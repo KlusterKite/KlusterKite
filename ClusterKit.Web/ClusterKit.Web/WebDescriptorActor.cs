@@ -34,7 +34,7 @@
         }
 
         /// <summary>
-        /// Proccesses the request
+        /// Processes the request
         /// </summary>
         private void OnRequest()
         {
