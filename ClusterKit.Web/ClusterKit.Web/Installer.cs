@@ -36,6 +36,15 @@
         protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
 
         /// <summary>
+        /// Reads owin bind url from configuration
+        /// </summary>
+        /// <param name="config">The akka config</param>
+        public static string GetOwinBindUrl(Config config)
+        {
+            return config.GetString("ClusterKit.Web.OwinBindAddress", "http://*:80");
+        }
+
+        /// <summary>
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
@@ -71,7 +80,7 @@
 
             // 3. Помечаем приложение, как запущенное и начинаем принимать web-запросы
             var system = ServiceLocator.Current.GetInstance<ActorSystem>();
-            var bindUrl = system.Settings.Config.GetString("ClusterKit.Web.OwinBindAddress", "http://*:80");
+            var bindUrl = GetOwinBindUrl(system.Settings.Config);
             Log.Information("Starting web server on {Url}", bindUrl);
             WebApp.Start<Startup>(bindUrl);
         }

@@ -7,6 +7,7 @@
       <Value>Xunit</Value>
       <Value>serilog</Value>
       <Value>redis</Value>
+      <Value>Owin</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

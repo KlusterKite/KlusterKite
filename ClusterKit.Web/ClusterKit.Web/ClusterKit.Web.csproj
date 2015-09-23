@@ -165,6 +165,8 @@
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="WebDescriptorActor.cs" />
+    <Compile Include="WindsorDependencyResolver.cs" />
+    <Compile Include="WindsorDependencyScope.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj">

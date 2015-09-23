@@ -1,0 +1,23 @@
+ {
+	ClusterKit {
+	 		Web {
+	 			Nginx {
+	 				// PathToConfig = "[PathToConfig]"
+	 				ServicesHost {
+	 					default: localhost
+	 				}
+	 			}
+	 		}
+	 	}
+
+ 	akka.actor.deployment {
+ 		 /Web.Nginx {
+            IsNameSpace = true
+        }
+
+        /WebWeb.Nginx/Configurator {
+            type = "ClusterKit.Web.NginxConfigurator.ConfiguratorActor, ClusterKit.Web.NginxConfigurator"
+        }
+
+ 	}
+ }
