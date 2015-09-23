@@ -25,7 +25,7 @@
         {
             var config = Context.System.Settings.Config;
             var services = config.GetConfig("ClusterKit.Web.Services");
-            foreach (var pair in config.AsEnumerable())
+            foreach (var pair in services.AsEnumerable())
             {
                 this.definedServices[pair.Key] = services.GetString(pair.Key, "default");
             }

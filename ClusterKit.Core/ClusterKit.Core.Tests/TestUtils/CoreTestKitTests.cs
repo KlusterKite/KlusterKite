@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ActorSystemTest.cs" company="ClusterKit">
+// <copyright file="CoreTestKitTests.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -23,7 +23,7 @@ namespace ClusterKit.Core.Tests.TestUtils
     /// <summary>
     /// ClusterKit TestKit tests
     /// </summary>
-    public class CoreTestKitTests : BaseActorTest
+    public class CoreTestKitTests : BaseActorTest<TestConfigurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreTestKitTests"/> class.
@@ -64,7 +64,7 @@ namespace ClusterKit.Core.Tests.TestUtils
         }
 
         /// <summary>
-        /// Single threading and <seealso cref="BaseActorTest.ExpectNoTestMsg"/> test
+        /// Single threading and <seealso cref="BaseActorTest{TConfigurator}.ExpectNoTestMsg"/> test
         /// </summary>
         [Fact]
         public void ExpectNoMsgTest()

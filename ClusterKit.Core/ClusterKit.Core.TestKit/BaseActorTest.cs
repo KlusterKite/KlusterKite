@@ -7,31 +7,32 @@
 namespace ClusterKit.Core.TestKit
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
 
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.DI.CastleWindsor;
     using Akka.DI.Core;
     using Akka.TestKit;
-
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
-
-    using Serilog;
-
     using ClusterKit.Core.Utils;
-
+    using Serilog;
     using Xunit;
     using Xunit.Abstractions;
 
     /// <summary>
     /// <seealso cref="TestKit"/> extension class
     /// </summary>
-    public abstract class BaseActorTest : HackedBaseActorTest
+    /// <typeparam name="TConfigurator">
+    /// Class, that descrives test configuration
+    /// </typeparam>
+    public abstract class BaseActorTest<TConfigurator> : HackedBaseActorTest where TConfigurator : TestConfigurator, new()
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseActorTest"/> class.
+        /// Initializes a new instance of the <see cref="BaseActorTest{TConfigurator}"/> class.
         /// </summary>
         /// <param name="output">
         /// The output.
@@ -39,7 +40,7 @@ namespace ClusterKit.Core.TestKit
         /// <param name="config">
         /// Custom test akka configuration
         /// </param>
-        protected BaseActorTest(ITestOutputHelper output, Config config = null) : base(CreateTestActorSystem(output, config))
+        protected BaseActorTest(ITestOutputHelper output) : base(CreateTestActorSystem(output))
         {
             this.Initialize();
         }
@@ -232,23 +233,24 @@ namespace ClusterKit.Core.TestKit
         /// <param name="output">
         /// Xunit output
         /// </param>
-        /// <param name="initConfiguration">
-        /// Custom test akka configuration
-        /// </param>
         /// <returns>
         /// actor system for test
         /// </returns>
-        private static TestDescription CreateTestActorSystem(ITestOutputHelper output, Config initConfiguration)
+        private static TestDescription CreateTestActorSystem(ITestOutputHelper output)
         {
             var loggerConfig =
                 new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(output));
             Serilog.Log.Logger = loggerConfig.CreateLogger();
 
             var container = new WindsorContainer();
-            container.RegisterWindsorInstallers();
 
-            var config = (initConfiguration ?? ConfigurationFactory.Empty)
-                .WithFallback(BaseInstaller.GetStackedConfig(container));
+            var configurator = new TConfigurator();
+            foreach (var pluginInstaller in configurator.GetPluginInstallers())
+            {
+                container.Install(pluginInstaller);
+            }
+
+            var config = configurator.GetAkkaConfig(container);
 
             var testActorSystem = ActorSystem.Create("test", config);
             testActorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, testActorSystem));

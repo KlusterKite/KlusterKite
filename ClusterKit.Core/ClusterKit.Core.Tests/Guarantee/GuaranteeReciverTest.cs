@@ -13,20 +13,18 @@ namespace ClusterKit.Core.Tests.Guarantee
     using System.Collections.Concurrent;
     using Akka.Configuration;
     using Akka.DI.Core;
-
-    using StackExchange.Redis;
-
+    using Castle.Windsor;
     using ClusterKit.Core.Guarantee;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Core.TestKit.Moq;
-
+    using StackExchange.Redis;
     using Xunit;
     using Xunit.Abstractions;
 
     /// <summary>
     /// Testing <seealso cref="GuaranteeRecieverActor"/> test
     /// </summary>
-    public class GuaranteeReciverTest : BaseActorTest
+    public class GuaranteeReciverTest : BaseActorTest<GuaranteeReciverTest.Configurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GuaranteeReciverTest"/> class.
@@ -35,24 +33,8 @@ namespace ClusterKit.Core.Tests.Guarantee
         /// The output.
         /// </param>
         public GuaranteeReciverTest(ITestOutputHelper output)
-            : base(output, GetGuaranteeSenderConfig())
+            : base(output)
         {
-        }
-
-        /// <summary>
-        /// Generates <seealso cref="GuaranteeSenderActor"/> initialization config
-        /// </summary>
-        /// <returns>The initialization config</returns>
-        public static Config GetGuaranteeSenderConfig()
-        {
-            return ConfigurationFactory.ParseString(@"{
-            akka.actor.deployment {
-                    /testreceiver {
-                        endReciever = ""/user/test""
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-                 }
-            }");
         }
 
         /// <summary>
@@ -127,6 +109,33 @@ namespace ClusterKit.Core.Tests.Guarantee
             Assert.False(this.ExpectMsg<bool>());
             this.ExpectNoMsg();
             Assert.Equal(string.Empty, redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)]);
+        }
+
+        /// <summary>
+        /// The current test configuration
+        /// </summary>
+        public class Configurator : TestConfigurator
+        {
+            /// <summary>
+            /// Gets the akka system config
+            /// </summary>
+            /// <param name="windsorContainer">
+            /// The windsor Container.
+            /// </param>
+            /// <returns>
+            /// The config
+            /// </returns>
+            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            {
+                return ConfigurationFactory.ParseString(@"{
+                 akka.actor.deployment {
+                    /testreceiver {
+                        endReciever = ""/user/test""
+                        dispatcher = ClusterKit.test-dispatcher
+                    }
+                 }
+            }").WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
         }
     }
 }

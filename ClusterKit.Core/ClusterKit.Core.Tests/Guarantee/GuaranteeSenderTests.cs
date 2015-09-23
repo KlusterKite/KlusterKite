@@ -11,25 +11,22 @@ namespace ClusterKit.Core.Tests.Guarantee
 {
     using System;
     using System.Collections.Concurrent;
-
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.DI.Core;
     using Akka.TestKit;
-
-    using StackExchange.Redis;
-
+    using Castle.Windsor;
     using ClusterKit.Core.Guarantee;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Core.TestKit.Moq;
-
+    using StackExchange.Redis;
     using Xunit;
     using Xunit.Abstractions;
 
     /// <summary>
     /// Testing <seealso cref="GuaranteeSenderActor"/>
     /// </summary>
-    public class GuaranteeSenderTests : BaseActorTest
+    public class GuaranteeSenderTests : BaseActorTest<GuaranteeSenderTests.Configurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GuaranteeSenderTests"/> class.
@@ -38,39 +35,8 @@ namespace ClusterKit.Core.Tests.Guarantee
         /// The output.
         /// </param>
         public GuaranteeSenderTests(ITestOutputHelper output)
-            : base(output, GetGuaranteeSenderConfig())
+            : base(output)
         {
-        }
-
-        /// <summary>
-        /// Generates <seealso cref="GuaranteeSenderActor"/> initialization config
-        /// </summary>
-        /// <returns>The initialization config</returns>
-        public static Config GetGuaranteeSenderConfig()
-        {
-            return ConfigurationFactory.ParseString(@"{
-            akka.actor.deployment {
-                    /testsender {
-                        maxAttempts = 5
-                        deliveryTimeout = 10ms
-                        nextAttemptWait = 100ms
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-                    /testsender/workers {
-                        router = round-robin-pool
-                        nr-of-instances = 5
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-                    ""/testsender/workers/*"" {
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-                    /testsender/receiver {
-                        router = random-group
-                        routees.paths = [""/user/testReceiver""]
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-                }
-            }");
         }
 
         /// <summary>
@@ -165,6 +131,48 @@ namespace ClusterKit.Core.Tests.Guarantee
             var rec = this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver");
             Assert.Equal("Hello world", rec.Message);
             Assert.True(redis.ContainsKey(string.Format(GuaranteeEnvelope.RedisKeyFormat, rec.MessageId)));
+        }
+
+        /// <summary>
+        /// The current test configuration
+        /// </summary>
+        public class Configurator : TestConfigurator
+        {
+            /// <summary>
+            /// Gets the akka system config
+            /// </summary>
+            /// <param name="windsorContainer">
+            /// The windsor Container.
+            /// </param>
+            /// <returns>
+            /// The config
+            /// </returns>
+            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            {
+                return ConfigurationFactory.ParseString(@"{
+                akka.actor.deployment {
+                    /testsender {
+                        maxAttempts = 5
+                        deliveryTimeout = 10ms
+                        nextAttemptWait = 100ms
+                        dispatcher = ClusterKit.test-dispatcher
+                    }
+                    /testsender/workers {
+                        router = round-robin-pool
+                        nr-of-instances = 5
+                        dispatcher = ClusterKit.test-dispatcher
+                    }
+                    ""/testsender/workers/*"" {
+                        dispatcher = ClusterKit.test-dispatcher
+                    }
+                    /testsender/receiver {
+                        router = random-group
+                        routees.paths = [""/user/testReceiver""]
+                        dispatcher = ClusterKit.test-dispatcher
+                    }
+                }
+            }").WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
         }
     }
 }

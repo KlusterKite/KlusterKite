@@ -10,12 +10,15 @@
 namespace ClusterKit.Web.Tests
 {
     using System;
-    using System.Runtime.Remoting;
+    using System.Collections.Generic;
 
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.DI.Core;
 
+    using Castle.Windsor;
+
+    using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
 
     using Xunit;
@@ -24,7 +27,7 @@ namespace ClusterKit.Web.Tests
     /// <summary>
     /// Tests the <seealso cref="WebDescriptorActor"/>
     /// </summary>
-    public class WebDescriptorTest : BaseActorTest
+    public class WebDescriptorTest : BaseActorTest<WebDescriptorTest.Configurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="WebDescriptorTest"/> class.
@@ -33,7 +36,7 @@ namespace ClusterKit.Web.Tests
         /// The Xunit output.
         /// </param>
         public WebDescriptorTest(ITestOutputHelper output)
-                    : base(output, GetConfig())
+            : base(output)
         {
         }
 
@@ -62,23 +65,46 @@ namespace ClusterKit.Web.Tests
         }
 
         /// <summary>
-        /// Generates test akka configuration
+        /// The test configurator
         /// </summary>
-        /// <returns>test akka configuration</returns>
-        private static Config GetConfig()
+        public class Configurator : TestConfigurator
         {
-            return ConfigurationFactory.ParseString(@"{
-                ClusterKit {
- 		            Web {
- 			            OwinBindAddress = ""Http://*:8080""
-                        Services {
-                           firstServiceRoot = defaultHost
-                           secondServiceRoot/secondServiceBranch = defaultHost
-                           thirdServiceRoot = otherHost
+            /// <summary>
+            /// Gets the akka system config
+            /// </summary>
+            /// <param name="windsorContainer">
+            /// The windsor Container.
+            /// </param>
+            /// <returns>
+            /// The config
+            /// </returns>
+            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            {
+                return ConfigurationFactory.ParseString(@"
+                {
+                    ClusterKit {
+ 		                Web {
+ 			                OwinBindAddress = ""Http://*:8080""
+                            Services {
+                               firstServiceRoot = defaultHost
+                               secondServiceRoot/secondServiceBranch = defaultHost
+                               thirdServiceRoot = otherHost
+                            }
                         }
                     }
-                }
-            }");
+                }").WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
+
+            /// <summary>
+            /// Gets list of all used plugin installers
+            /// </summary>
+            /// <returns>The list of installers</returns>
+            public override List<BaseInstaller> GetPluginInstallers()
+            {
+                var installers = base.GetPluginInstallers();
+                installers.Add(new Web.Installer());
+                return installers;
+            }
         }
     }
 }

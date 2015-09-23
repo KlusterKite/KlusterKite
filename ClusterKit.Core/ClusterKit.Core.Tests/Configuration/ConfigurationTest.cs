@@ -9,6 +9,8 @@ namespace ClusterKit.Core.Tests.Configuration
 
     using Akka.Configuration;
 
+    using Castle.Windsor;
+
     using ClusterKit.Core.TestKit;
 
     using Xunit;
@@ -17,7 +19,7 @@ namespace ClusterKit.Core.Tests.Configuration
     /// <summary>
     /// Global configuration test
     /// </summary>
-    public class ConfigurationTest : BaseActorTest
+    public class ConfigurationTest : BaseActorTest<ConfigurationTest.Configurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationTest"/> class.
@@ -26,32 +28,8 @@ namespace ClusterKit.Core.Tests.Configuration
         /// The output.
         /// </param>
         public ConfigurationTest(ITestOutputHelper output)
-            : base(output, GetConfig())
+            : base(output)
         {
-        }
-
-        /// <summary>
-        /// Generates test akka configuration
-        /// </summary>
-        /// <returns>test akka configuration</returns>
-        public static Config GetConfig()
-        {
-            return ConfigurationFactory.ParseString(@"{
-                akka.actor.deployment {
-                    /testNameSpace {
-                        IsNameSpace = true
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-
-                    /somethingElse {
-                    }
-
-                    /testNameSpace/forwarder {
-                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-                 }
-            }");
         }
 
         /// <summary>
@@ -95,6 +73,41 @@ namespace ClusterKit.Core.Tests.Configuration
             this.Sys.StartNameSpaceActorsFromConfiguration();
             this.Sys.ActorSelection("/user/testNameSpace/forwarder").Tell("Hello world");
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/testNameSpace/forwarder"));
+        }
+
+        /// <summary>
+        /// The current test configuration
+        /// </summary>
+        public class Configurator : TestConfigurator
+        {
+            /// <summary>
+            /// Gets the akka system config
+            /// </summary>
+            /// <param name="windsorContainer">
+            /// The windsor Container.
+            /// </param>
+            /// <returns>
+            /// The config
+            /// </returns>
+            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            {
+                return ConfigurationFactory.ParseString(@"{
+                akka.actor.deployment {
+                    /testNameSpace {
+                        IsNameSpace = true
+                        dispatcher = ClusterKit.test-dispatcher
+                    }
+
+                    /somethingElse {
+                    }
+
+                    /testNameSpace/forwarder {
+                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        dispatcher = ClusterKit.test-dispatcher
+                    }
+                 }
+            }").WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
         }
     }
 }

@@ -6,7 +6,6 @@ namespace ClusterKit.Core.Tests.BusinessObjects
     using System.Collections.Concurrent;
     using System.Collections.Immutable;
     using System.Threading;
-
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
@@ -14,65 +13,29 @@ namespace ClusterKit.Core.Tests.BusinessObjects
     using Akka.Event;
     using Akka.TestKit;
     using Akka.Util.Internal;
-
     using Castle.MicroKernel.Registration;
-
-    using JetBrains.Annotations;
-
-    using StackExchange.Redis;
-
+    using Castle.Windsor;
     using ClusterKit.Core.Cluster;
     using ClusterKit.Core.Cluster.Messages;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Core.TestKit.Moq;
     using ClusterKit.Core.Utils;
-
+    using JetBrains.Annotations;
+    using StackExchange.Redis;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class ClusterBusinessObjectActorSupervisorTest : BaseActorTest
+    public class ClusterBusinessObjectActorSupervisorTest : BaseActorTest<ClusterBusinessObjectActorSupervisorTest.Configurator>
     {
         private readonly ConcurrentBag<EchoMessage> recievedEchoMessages = new ConcurrentBag<EchoMessage>();
 
         public ClusterBusinessObjectActorSupervisorTest(ITestOutputHelper output)
-            : base(output, GetConfig())
+                    : base(output)
         {
             this.WindsorContainer.Register(Component.For<TestSupervisorActor>().LifestyleTransient());
             this.WindsorContainer.Register(Component.For<TestObjectActor>().LifestyleTransient());
             this.WindsorContainer.Register(Component.For<ITestOutputHelper>().Instance(output));
             this.WindsorContainer.Register(Component.For<ConcurrentBag<EchoMessage>>().Instance(this.recievedEchoMessages));
-        }
-
-        public static Config GetConfig()
-        {
-            return ConfigurationFactory.Empty
-                .WithFallback(
-                    ConfigurationFactory.ParseString("akka.remote.helios.tcp.hostname = 127.0.0.1"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.remote.helios.tcp.port = 0"))
-                    .WithFallback(
-                        ConfigurationFactory.ParseString(
-                            $"akka.cluster.roles = [\"test\"]"))
-                    .WithFallback(
-                        ConfigurationFactory.ParseString(
-                            $"akka.cluster.seed-nodes = []"))
-                .WithFallback(
-                    ConfigurationFactory.ParseString(
-                        "akka.actor.provider = \"Akka.Cluster.ClusterActorRefProvider, Akka.Cluster\""))
-                    .WithFallback(
-                        ConfigurationFactory.ParseString(
-                            "akka.loggers = [\"Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog\"]"))
-                    .WithFallback(ConfigurationFactory.ParseString("min-nr-of-members = 1"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
-                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 1s"))
-                    .WithFallback(ConfigurationFactory.ParseString(@" akka.actor.deployment {
-                        /supervisor {
-                            createChildTimeout = 1s
-                            sendTimeOut = 100ms
-                            nextAttmeptPause = 1s
-                            sendersCount = 1
-                            dispatcher = ClusterKit.test-dispatcher
-                        }
-                    }"));
         }
 
         [Fact]
@@ -790,6 +753,53 @@ namespace ClusterKit.Core.Tests.BusinessObjects
             Assert.Equal(echoMessage, response);
             Assert.True(response.FromObjectActor);
         }
+
+        /// <summary>
+        /// The current test configuration
+        /// </summary>
+        public class Configurator : TestConfigurator
+        {
+            /// <summary>
+            /// Gets the akka system config
+            /// </summary>
+            /// <param name="windsorContainer">
+            /// The windsor Container.
+            /// </param>
+            /// <returns>
+            /// The config
+            /// </returns>
+            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            {
+                return ConfigurationFactory.Empty
+                .WithFallback(
+                    ConfigurationFactory.ParseString("akka.remote.helios.tcp.hostname = 127.0.0.1"))
+                    .WithFallback(ConfigurationFactory.ParseString("akka.remote.helios.tcp.port = 0"))
+                    .WithFallback(
+                        ConfigurationFactory.ParseString(
+                            "akka.cluster.roles = [\"test\"]"))
+                    .WithFallback(
+                        ConfigurationFactory.ParseString(
+                            "akka.cluster.seed-nodes = []"))
+                .WithFallback(
+                    ConfigurationFactory.ParseString(
+                        "akka.actor.provider = \"Akka.Cluster.ClusterActorRefProvider, Akka.Cluster\""))
+                    .WithFallback(
+                        ConfigurationFactory.ParseString(
+                            "akka.loggers = [\"Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog\"]"))
+                    .WithFallback(ConfigurationFactory.ParseString("min-nr-of-members = 1"))
+                    .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
+                    .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 1s"))
+                    .WithFallback(ConfigurationFactory.ParseString(@" akka.actor.deployment {
+                        /supervisor {
+                            createChildTimeout = 1s
+                            sendTimeOut = 100ms
+                            nextAttmeptPause = 1s
+                            sendersCount = 1
+                            dispatcher = ClusterKit.test-dispatcher
+                        }
+                    }")).WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
+        }
     }
 
     public class EchoMessage : IMessageToBusinessObjectActor
@@ -822,7 +832,7 @@ namespace ClusterKit.Core.Tests.BusinessObjects
             {
                 return false;
             }
-            return Equals((EchoMessage)obj);
+            return this.Equals((EchoMessage)obj);
         }
 
         public override int GetHashCode()
