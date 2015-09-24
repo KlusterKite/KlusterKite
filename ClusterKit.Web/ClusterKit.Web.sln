@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Tests", "Clu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.NginxConfigurator", "ClusterKit.Web.NginxConfigurator\ClusterKit.Web.NginxConfigurator.csproj", "{81CB9B1A-25B1-46A8-8806-0BCF5595386E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Client", "ClusterKit.Web.Client\ClusterKit.Web.Client.csproj", "{8E543EA4-65DE-475F-8045-C094CDE58E29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{81CB9B1A-25B1-46A8-8806-0BCF5595386E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81CB9B1A-25B1-46A8-8806-0BCF5595386E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81CB9B1A-25B1-46A8-8806-0BCF5595386E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E543EA4-65DE-475F-8045-C094CDE58E29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E543EA4-65DE-475F-8045-C094CDE58E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E543EA4-65DE-475F-8045-C094CDE58E29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E543EA4-65DE-475F-8045-C094CDE58E29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

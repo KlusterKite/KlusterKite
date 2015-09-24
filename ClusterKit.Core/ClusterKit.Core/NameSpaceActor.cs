@@ -13,9 +13,12 @@ namespace ClusterKit.Core
     using Akka.DI.Core;
     using Akka.Event;
 
+    using JetBrains.Annotations;
+
     /// <summary>
-    /// Actor to provide namespace in actors tree. Usaly used only once in library
+    /// Actor to provide namespace in actors tree. Usually used only once in library
     /// </summary>
+    [UsedImplicitly]
     public class NameSpaceActor : UntypedActor
     {
         /// <summary>
@@ -61,6 +64,14 @@ namespace ClusterKit.Core
                         type.Name,
                         path.Last());
                     Context.ActorOf(Context.System.DI().Props(type), path.Last());
+                }
+                else
+                {
+                    Context.GetLogger().Error(
+                        "{Type}: {ClassTypeString} was not found for actor {PathString}",
+                        this.GetType().Name,
+                        childTypeName,
+                        key);
                 }
             }
         }

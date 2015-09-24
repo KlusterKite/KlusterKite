@@ -16,6 +16,9 @@ namespace ClusterKit.Web
 
     using Akka.Actor;
 
+    using ClusterKit.Web.Client;
+    using ClusterKit.Web.Client.Messages;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -65,35 +68,6 @@ namespace ClusterKit.Web
         {
             var clone = this.definedServices.ToDictionary(p => p.Key, p => p.Value);
             this.Sender.Tell(new WebDescriptionResponse { ServiceNames = clone, ListeningPort = this.listeningPort });
-        }
-
-        /// <summary>
-        /// Request message, to get description of this node
-        /// </summary>
-        [UsedImplicitly]
-        public class WebDescriptionRequest
-        {
-        }
-
-        /// <summary>
-        /// The message, that is sent as response to <seealso cref="WebDescriptionRequest"/>
-        /// </summary>
-        [UsedImplicitly]
-        public class WebDescriptionResponse
-        {
-            /// <summary>
-            /// Gets or sets the port, where web service is listening connections
-            /// </summary>
-            public int ListeningPort { get; set; }
-
-            /// <summary>
-            /// Gets or sets the the list of services.
-            /// </summary>
-            /// <remarks>
-            /// It doesn't supposed (but is not prohibited) that this should be public service hostname.
-            /// It's just used to distinguish services with identical url paths to be correctly published on frontend web servers.
-            /// </remarks>
-            public Dictionary<string, string> ServiceNames { get; set; }
         }
     }
 }

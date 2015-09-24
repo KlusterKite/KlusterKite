@@ -173,6 +173,10 @@
       <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
       <Name>ClusterKit.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
+      <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>
+      <Name>ClusterKit.Web.Client</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

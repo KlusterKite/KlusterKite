@@ -13,6 +13,7 @@ namespace ClusterKit.Web.Tests
     using System.Collections.Generic;
 
     using Akka.Actor;
+    using Akka.Cluster;
     using Akka.Configuration;
     using Akka.DI.Core;
 
@@ -20,6 +21,8 @@ namespace ClusterKit.Web.Tests
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
+    using ClusterKit.Web.Client;
+    using ClusterKit.Web.Client.Messages;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -41,18 +44,21 @@ namespace ClusterKit.Web.Tests
         }
 
         /// <summary>
-        /// Test actor for correct <seealso cref="WebDescriptorActor.WebDescriptionResponse"/>
+        /// Test actor for correct <seealso cref="WebDescriptionResponse"/>
         /// </summary>
         [Fact]
         public void ResponseTest()
         {
+            /*
             var testDescriptor =
                 this.ActorOfAsTestActorRef<WebDescriptorActor>(this.Sys.DI().Props<WebDescriptorActor>());
+            */
+            this.Sys.StartNameSpaceActorsFromConfiguration();
 
             var response =
-                testDescriptor.Ask<WebDescriptorActor.WebDescriptionResponse>(
-                    new WebDescriptorActor.WebDescriptionRequest(),
-                    TimeSpan.FromMilliseconds(500)).Result;
+                this.Sys.GetWebDescriptor(Cluster.Get(this.Sys).SelfAddress)
+                    .Ask<WebDescriptionResponse>(new WebDescriptionRequest(), TimeSpan.FromMilliseconds(500))
+                    .Result;
 
             Assert.NotNull(response.ServiceNames);
             Assert.True(response.ServiceNames.ContainsKey("firstServiceRoot"));

@@ -17,7 +17,7 @@
         }
 
         /Web/Descriptor {
-            type = "ClusterKit.WebWebDescriptorActor, ClusterKit.Web"
+            type = "ClusterKit.Web.WebDescriptorActor, ClusterKit.Web"
         }
 
  	}
