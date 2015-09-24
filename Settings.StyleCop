@@ -8,6 +8,7 @@
       <Value>serilog</Value>
       <Value>redis</Value>
       <Value>Owin</Value>
+      <Value>nginx</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

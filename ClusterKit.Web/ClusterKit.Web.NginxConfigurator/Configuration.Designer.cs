@@ -61,12 +61,33 @@ namespace ClusterKit.Web.NginxConfigurator {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to  {
+        ///	ClusterKit {
+        ///	 		Web {
+        ///	 			Nginx {
+        ///	 				// PathToConfig = &quot;[PathToConfig]&quot;
+        ///	 				ServicesHost {
+        ///	 					default: localhost
+        ///	 				}
+        ///	 			}
+        ///	 		}
+        ///	 	}
+        ///
+        /// 	akka.actor.deployment {
+        /// 		 /Web.Nginx {
+        ///            IsNameSpace = true
+        ///        }
+        ///
+        ///        /WebWeb.Nginx/Configurator {
+        ///            type = &quot;ClusterKit.Web.NginxConfigurator.ConfiguratorActor, ClusterKit.Web.NginxConfigurator&quot;
+        ///        }
+        ///
+        /// 	}
+        /// }.
         /// </summary>
-        internal static byte[] AkkaConfig {
+        internal static string AkkaConfig {
             get {
-                object obj = ResourceManager.GetObject("AkkaConfig", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("AkkaConfig", resourceCulture);
             }
         }
     }

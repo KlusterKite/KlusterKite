@@ -175,6 +175,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NginxConfiguratorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebDescriptorTest.cs" />
   </ItemGroup>
@@ -194,6 +195,10 @@
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
       <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>
       <Name>ClusterKit.Web.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.Web.NginxConfigurator\ClusterKit.Web.NginxConfigurator.csproj">
+      <Project>{81cb9b1a-25b1-46a8-8806-0bcf5595386e}</Project>
+      <Name>ClusterKit.Web.NginxConfigurator</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web\ClusterKit.Web.csproj">
       <Project>{477b201a-a30c-4360-b56a-6f61c049bb04}</Project>

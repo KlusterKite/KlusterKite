@@ -11,12 +11,15 @@
 	 	}
 
  	akka.actor.deployment {
- 		 /Web.Nginx {
+ 		 /Web {
             IsNameSpace = true
         }
+ 		 /Web/Nginx {
+            type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+        }        
 
-        /WebWeb.Nginx/Configurator {
-            type = "ClusterKit.Web.NginxConfigurator.ConfiguratorActor, ClusterKit.Web.NginxConfigurator"
+        /Web/Nginx/Configurator {
+            type = "ClusterKit.Web.NginxConfigurator.NginxConfiguratorActor, ClusterKit.Web.NginxConfigurator"
         }
 
  	}
