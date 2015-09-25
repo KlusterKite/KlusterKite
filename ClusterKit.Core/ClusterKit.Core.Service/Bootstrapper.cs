@@ -54,8 +54,12 @@ namespace ClusterKit.Core.Service
 
             container.RegisterWindsorInstallers();
 
-            // starting akka system
             var config = BaseInstaller.GetStackedConfig(container);
+
+            // performing prestart checks
+            BaseInstaller.RunPrecheck(container, config);
+
+            // starting akka system
             var actorSystem = ActorSystem.Create("ClusterKit", config);
             actorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, actorSystem));
             actorSystem.StartNameSpaceActorsFromConfiguration();

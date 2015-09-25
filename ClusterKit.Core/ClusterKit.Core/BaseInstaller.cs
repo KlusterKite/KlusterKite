@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Configuration;
     using System.Linq;
@@ -128,6 +129,27 @@ namespace ClusterKit.Core
         }
 
         /// <summary>
+        /// Runs all registered installers <seealso cref="PreCheck"/>
+        /// </summary>
+        /// <param name="container">
+        /// The windsor container.
+        /// </param>
+        /// <param name="config">Full akka config</param>
+        public static void RunPrecheck(IWindsorContainer container, Config config)
+        {
+            List<BaseInstaller> list;
+            if (!RegisteredInstallers.TryGetValue(container, out list))
+            {
+                return;
+            }
+
+            foreach (var installer in list.OrderBy(l => l.AkkaConfigLoadPriority))
+            {
+                installer.PreCheck(config);
+            }
+        }
+
+        /// <summary>
         /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
         /// </summary>
         /// <param name="container">The container.</param>
@@ -146,6 +168,18 @@ namespace ClusterKit.Core
 
             RegisteredInstallers[container].Add(this);
             this.RegisterWindsorComponents(container, store);
+        }
+
+        /// <summary>
+        /// Should check the config and environment for possible erorrs.
+        /// If any found, shod throw the exception to prevent node from starting.
+        /// </summary>
+        /// <param name="config">Full akka config</param>
+        /// <exception cref="Exception">
+        /// Thrown if there are error in configuration and/or environment
+        /// </exception>
+        public virtual void PreCheck(Config config)
+        {
         }
 
         /// <summary>
