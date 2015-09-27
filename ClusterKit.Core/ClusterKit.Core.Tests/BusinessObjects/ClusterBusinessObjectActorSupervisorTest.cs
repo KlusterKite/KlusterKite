@@ -25,6 +25,8 @@ namespace ClusterKit.Core.Tests.BusinessObjects
     using Xunit;
     using Xunit.Abstractions;
 
+    using CallingThreadDispatcher = ClusterKit.Core.TestKit.CallingThreadDispatcher;
+
     public class ClusterBusinessObjectActorSupervisorTest : BaseActorTest<ClusterBusinessObjectActorSupervisorTest.Configurator>
     {
         private readonly ConcurrentBag<EchoMessage> recievedEchoMessages = new ConcurrentBag<EchoMessage>();
@@ -646,7 +648,7 @@ namespace ClusterKit.Core.Tests.BusinessObjects
                     Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
                     1);
 
-            var superVisor = this.ActorOfAsTestActorRef<TestSupervisorActor>(this.Sys.DI().Props<TestSupervisorActor>());
+            var superVisor = this.ActorOfAsTestActorRef<TestSupervisorActor>(this.Sys.DI().Props<TestSupervisorActor>(), "supervisor");
 
             superVisor.Tell(
                 new ClusterEvent.MemberUp(
@@ -676,20 +678,23 @@ namespace ClusterKit.Core.Tests.BusinessObjects
             superVisor.Tell(echoMessage);
 
             var members = ImmutableSortedSet<Member>.Empty;
-            members.Add(Member.Create(Cluster.Get(this.Sys).SelfUniqueAddress, MemberStatus.Up, ImmutableHashSet.Create("test")));
-            members.Add(Member.Create(uniqueAddress, MemberStatus.Up, ImmutableHashSet.Create("test")));
+            var builder = members.ToBuilder();
+            builder.Add(Member.Create(Cluster.Get(this.Sys).SelfUniqueAddress, MemberStatus.Up, ImmutableHashSet.Create("test")));
+            builder.Add(Member.Create(uniqueAddress, MemberStatus.Up, ImmutableHashSet.Create("test")));
+            members = builder.ToImmutable();
 
             var roleLeaders = ImmutableDictionary<string, Address>.Empty;
 
-            superVisor.Tell(new ClusterEvent.CurrentClusterState(
-                    members,
-                    ImmutableHashSet<Member>.Empty,
-                    ImmutableHashSet<Address>.Empty,
-                    uniqueAddress.Address,
-                    roleLeaders));
+            var currentClusterState = new ClusterEvent.CurrentClusterState(
+                members,
+                ImmutableHashSet<Member>.Empty,
+                ImmutableHashSet<Address>.Empty,
+                uniqueAddress.Address,
+                roleLeaders);
+
+            superVisor.Tell(currentClusterState);
 
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
-
             created = this.ExpectMsg<string>();
             Assert.Equal("Created 1", created);
 
@@ -744,10 +749,9 @@ namespace ClusterKit.Core.Tests.BusinessObjects
             echoMessage = new EchoMessage { Id = "2", Text = "Hello 2-1" };
             superVisor.Tell(echoMessage);
 
+            Assert.Equal("2", this.ExpectMsg<ChildCreated>().Id);
             created = this.ExpectMsg<string>();
             Assert.Equal("Created 2", created);
-
-            Assert.Equal("2", this.ExpectMsg<ChildCreated>().Id);
 
             response = this.ExpectMsg<EchoMessage>();
             Assert.Equal(echoMessage, response);
@@ -770,7 +774,27 @@ namespace ClusterKit.Core.Tests.BusinessObjects
             /// </returns>
             public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
             {
-                return ConfigurationFactory.Empty
+                return ConfigurationFactory.ParseString(@"
+                    akka.actor.deployment {
+                        /supervisor {
+                            createChildTimeout = 1s
+                            sendTimeOut = 100ms
+                            nextAttmeptPause = 1s
+                            sendersCount = 1
+                            dispatcher = ClusterKit.test-dispatcher
+                        }
+
+                        ""/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
+                        ""/*/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
+                        ""/*/*/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
+                    }
+")
                 .WithFallback(
                     ConfigurationFactory.ParseString("akka.remote.helios.tcp.hostname = 127.0.0.1"))
                     .WithFallback(ConfigurationFactory.ParseString("akka.remote.helios.tcp.port = 0"))
@@ -789,15 +813,7 @@ namespace ClusterKit.Core.Tests.BusinessObjects
                     .WithFallback(ConfigurationFactory.ParseString("min-nr-of-members = 1"))
                     .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
                     .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 1s"))
-                    .WithFallback(ConfigurationFactory.ParseString(@" akka.actor.deployment {
-                        /supervisor {
-                            createChildTimeout = 1s
-                            sendTimeOut = 100ms
-                            nextAttmeptPause = 1s
-                            sendersCount = 1
-                            dispatcher = ClusterKit.test-dispatcher
-                        }
-                    }")).WithFallback(base.GetAkkaConfig(windsorContainer));
+                    .WithFallback(base.GetAkkaConfig(windsorContainer));
             }
         }
     }

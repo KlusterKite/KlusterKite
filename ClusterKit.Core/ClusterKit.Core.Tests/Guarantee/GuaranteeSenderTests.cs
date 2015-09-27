@@ -170,6 +170,15 @@ namespace ClusterKit.Core.Tests.Guarantee
                         routees.paths = [""/user/testReceiver""]
                         dispatcher = ClusterKit.test-dispatcher
                     }
+                    ""/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
+                        ""/*/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
+                        ""/*/*/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
                 }
             }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }

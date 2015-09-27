@@ -133,6 +133,15 @@ namespace ClusterKit.Core.Tests.Guarantee
                         endReciever = ""/user/test""
                         dispatcher = ClusterKit.test-dispatcher
                     }
+                    ""/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
+                        ""/*/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
+                        ""/*/*/*"" {
+                           dispatcher = ClusterKit.test-dispatcher
+                        }
                  }
             }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }

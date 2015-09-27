@@ -21,6 +21,8 @@ namespace ClusterKit.Core
     using Castle.MicroKernel.SubSystems.Configuration;
     using Castle.Windsor;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Base class to install ClusterKit plugin components
     /// </summary>
@@ -154,8 +156,13 @@ namespace ClusterKit.Core
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="store">The configuration store.</param>
-        public void Install(IWindsorContainer container, IConfigurationStore store)
+        public void Install([NotNull] IWindsorContainer container, IConfigurationStore store)
         {
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
             if (!RegisteredInstallers.ContainsKey(container))
             {
                 RegisteredInstallers[container] = new List<BaseInstaller>();
