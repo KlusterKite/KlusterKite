@@ -13,9 +13,7 @@ namespace ClusterKit.Web.NginxConfigurator
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Security.Policy;
     using System.Text;
-    using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Cluster;
@@ -210,20 +208,20 @@ namespace ClusterKit.Web.NginxConfigurator
             StringBuilder config = new StringBuilder();
             var akkaConfig = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.ServicesHost");
 
-            foreach (var hostPair in this.ConfigDictionary)
-            {
-                var hostName = hostPair.Key;
-                foreach (var servicePair in hostPair.Value)
-                {
-                    var serviceName = servicePair.Key;
-                    config.Append($@"
-upstream {this.GetUpStreamName(hostName, serviceName)} {{
-{string.Join("\n", servicePair.Value.Select(u => $"\tserver {u};"))}
-}}
-");
-                }
-            }
+            this.WriteUpStreamsToConfig(config);
+            this.WriteUpStreamsToConfig(config);
+            this.WriteServicesToConfig(akkaConfig, config);
 
+            File.WriteAllText(this.configPath, config.ToString());
+        }
+
+        /// <summary>
+        /// Writes every defined service to nginx config
+        /// </summary>
+        /// <param name="akkaConfig">Current node configuration</param>
+        /// <param name="config">Configuration file to write</param>
+        private void WriteServicesToConfig(Config akkaConfig, StringBuilder config)
+        {
             foreach (var hostPair in this.ConfigDictionary)
             {
                 var hostName = hostPair.Key;
@@ -245,8 +243,29 @@ upstream {this.GetUpStreamName(hostName, serviceName)} {{
                 }
                 config.Append("}\n");
             }
+        }
 
-            File.WriteAllText(this.configPath, config.ToString());
+        /// <summary>
+        /// Writes every defined upstream for every defined service to nginx config
+        /// </summary>
+        /// <param name="config">Configuration file to write</param>
+        private void WriteUpStreamsToConfig(StringBuilder config)
+        {
+            foreach (var hostPair in this.ConfigDictionary)
+            {
+                var hostName = hostPair.Key;
+                foreach (var servicePair in hostPair.Value)
+                {
+                    var serviceName = servicePair.Key;
+                    config.Append(
+                        $@"
+upstream {this.GetUpStreamName(hostName, serviceName)} {{
+{
+                            string.Join("\n", servicePair.Value.Select(u => $"\tserver {u};"))}
+}}
+");
+                }
+            }
         }
     }
 }
