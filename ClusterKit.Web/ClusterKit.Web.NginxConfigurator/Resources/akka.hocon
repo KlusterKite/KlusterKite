@@ -4,7 +4,10 @@
 	 			Nginx {
 	 				// PathToConfig = "[PathToConfig]"
 	 				ServicesHost {
-	 					default: localhost
+	 					default {
+	 						listen: "80" //nginx configuration for listen directive in server part
+	 						//server_name: "localhost" configuration for server_name directive in server part
+	 					}
 	 				}
 	 			}
 	 		}

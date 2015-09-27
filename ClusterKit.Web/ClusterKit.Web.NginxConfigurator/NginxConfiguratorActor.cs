@@ -9,13 +9,17 @@
 
 namespace ClusterKit.Web.NginxConfigurator
 {
+    using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Security.Policy;
+    using System.Text;
     using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Cluster;
+    using Akka.Configuration;
 
     using ClusterKit.Web.Client;
     using ClusterKit.Web.Client.Messages;
@@ -29,10 +33,16 @@ namespace ClusterKit.Web.NginxConfigurator
     public class NginxConfiguratorActor : ReceiveActor
     {
         /// <summary>
+        /// Current configuration file path
+        /// </summary>
+        private string configPath;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NginxConfiguratorActor"/> class.
         /// </summary>
         public NginxConfiguratorActor()
         {
+            this.configPath = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.PathToConfig");
             Cluster.Get(Context.System)
                 .Subscribe(
                     this.Self,
@@ -64,6 +74,27 @@ namespace ClusterKit.Web.NginxConfigurator
         /// Gets cahed data of published web urls in everey known node
         /// </summary>
         public Dictionary<Address, string> NodePublishUrls { get; } = new Dictionary<Address, string>();
+
+        /// <summary>
+        /// Compiles upstream name from hostname and servicename
+        /// </summary>
+        /// <param name="hostName">Host name of service</param>
+        /// <param name="serviceName">Service location</param>
+        /// <returns>The corresponding upstream name</returns>
+        private string GetUpStreamName([NotNull] string hostName, [NotNull] string serviceName)
+        {
+            if (hostName == null)
+            {
+                throw new ArgumentNullException(nameof(hostName));
+            }
+
+            if (serviceName == null)
+            {
+                throw new ArgumentNullException(nameof(serviceName));
+            }
+
+            return $"ClusterKitWeb_{hostName.Replace('.', '_')}_{serviceName.Replace('/', '_').Replace('.', '_')}";
+        }
 
         /// <summary>
         /// Applies node description to configuration
@@ -176,6 +207,46 @@ namespace ClusterKit.Web.NginxConfigurator
         /// </summary>
         private void WriteConfiguration()
         {
+            StringBuilder config = new StringBuilder();
+            var akkaConfig = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.ServicesHost");
+
+            foreach (var hostPair in this.ConfigDictionary)
+            {
+                var hostName = hostPair.Key;
+                foreach (var servicePair in hostPair.Value)
+                {
+                    var serviceName = servicePair.Key;
+                    config.Append($@"
+upstream {this.GetUpStreamName(hostName, serviceName)} {{
+{string.Join("\n", servicePair.Value.Select(u => $"\tserver {u};"))}
+}}
+");
+                }
+            }
+
+            foreach (var hostPair in this.ConfigDictionary)
+            {
+                var hostName = hostPair.Key;
+                var hostConfig = akkaConfig.GetConfig(hostName) ?? ConfigurationFactory.Empty;
+                config.Append("server {\n");
+                config.Append($"\tlisten {hostConfig.GetString("listen", "80")}\n");
+                var servername = hostConfig.GetString("server_name");
+                if (servername != null)
+                {
+                    config.Append($"\tserver_name {servername}\n");
+                }
+
+                foreach (var servicePair in hostPair.Value)
+                {
+                    var serviceName = servicePair.Key;
+                    config.Append($"\tlocation {serviceName} {{\n");
+                    config.Append($"\t\tproxy_pass http://{this.GetUpStreamName(hostName, serviceName)}\n");
+                    config.Append("\t}\n");
+                }
+                config.Append("}\n");
+            }
+
+            File.WriteAllText(this.configPath, config.ToString());
         }
     }
 }

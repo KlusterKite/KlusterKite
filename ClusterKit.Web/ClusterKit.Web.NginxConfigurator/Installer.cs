@@ -71,6 +71,11 @@
             {
                 throw new ConfigurationException($"Cannot access {path} for writing");
             }
+
+            if (config.GetConfig("ClusterKit.Web.Nginx.ServicesHost") == null)
+            {
+                throw new ConfigurationException("ClusterKit.Web.Nginx.ServiceHost is not defined");
+            }
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ namespace ClusterKit.Web.Tests
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.IO;
     using System.Linq;
 
     using Akka.Actor;
@@ -89,6 +90,9 @@ namespace ClusterKit.Web.Tests
             Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.ConfigDictionary["default"]["/TestWebService"][0]);
             Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.ConfigDictionary["default"]["/test/TestWebService2"][0]);
             Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.ConfigDictionary["web"]["/"][0]);
+
+            var config = File.ReadAllText("./nginx.conf");
+            this.Sys.Log.Info(config);
         }
 
         /// <summary>
@@ -113,6 +117,15 @@ namespace ClusterKit.Web.Tests
 	 		                    Web {
 	 			                    Nginx {
 	 				                    PathToConfig = ""./nginx.conf""
+                                        ServicesHost {
+                                            default {
+                                               listen: 80
+                                            }
+                                            web {
+                                               listen: 8080
+                                               server_name: ""www.example.com""
+                                            }
+                                        }
                                 }
                             }
                         }
