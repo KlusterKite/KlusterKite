@@ -12,6 +12,16 @@
           type = TaskDispatcher
         }
 
+        deployment {
+          /Core {
+            IsNameSpace = true
+          }
+
+          /Core/Ping {
+            type = "ClusterKit.Core.Ping.PingActor, ClusterKit.Core"
+          }
+        }
+
       }
 
       remote : {

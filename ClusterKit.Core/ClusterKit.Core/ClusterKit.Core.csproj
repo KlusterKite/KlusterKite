@@ -161,6 +161,9 @@
     <Compile Include="Guarantee\GuaranteeRecieverActor.cs" />
     <Compile Include="Guarantee\GuaranteeSenderActor.cs" />
     <Compile Include="NameSpaceActor.cs" />
+    <Compile Include="Ping\PingActor.cs" />
+    <Compile Include="Ping\PingMessage.cs" />
+    <Compile Include="Ping\PongMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\AkkaUtils.cs" />
     <Compile Include="Utils\DateTimeWrapper.cs" />
