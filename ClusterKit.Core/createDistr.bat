@@ -26,9 +26,9 @@ if exist *.sln (
 
 for %%f in (*.csproj) do (
 	echo Creating build for %CurrDirName%
-	%buildCmd% /t:Build /p:Configuration=Release;OutDir=%currentSolutionDir%\Build\%CurrDirName% /nologo /noconlog /m %%f
+	%buildCmd% /t:Rebuild /p:Configuration=Release;OutDir=%currentSolutionDir%\Build\%CurrDirName% /nologo /noconlog /m %%f
 	if exist %currentSolutionDir%\Build\%CurrDirName%\%CurrDirName%.dll (
-		xcopy %currentSolutionDir%\Build\%CurrDirName%\%CurrDirName%.dll %currentSolutionDir%\Lib\
+		xcopy /Q %currentSolutionDir%\Build\%CurrDirName%\%CurrDirName%.dll %currentSolutionDir%\Lib\
 	)
 	
 )

@@ -12,7 +12,9 @@ namespace ClusterKit.Core
     using System;
     using System.Collections.Generic;
     using System.Configuration;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Akka.Configuration;
     using Akka.Configuration.Hocon;
@@ -22,6 +24,8 @@ namespace ClusterKit.Core
     using Castle.Windsor;
 
     using JetBrains.Annotations;
+
+    using Serilog;
 
     /// <summary>
     /// Base class to install ClusterKit plugin components
@@ -86,8 +90,20 @@ namespace ClusterKit.Core
         /// </returns>
         public static Config GetStackedConfig(IWindsorContainer container)
         {
+            Log.Information("ClusterKit starting plugin manager");
             var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
             var config = section != null ? section.AkkaConfig : ConfigurationFactory.Empty;
+
+            var hoconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "akka.hocon");
+            if (File.Exists(hoconPath))
+            {
+                var hoconConfig = File.ReadAllText(hoconPath);
+                config = ConfigurationFactory.ParseString(hoconConfig).WithFallback(config);
+            }
+            else
+            {
+                Log.Warning("File {fileName} was not found", hoconPath);
+            }
 
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
