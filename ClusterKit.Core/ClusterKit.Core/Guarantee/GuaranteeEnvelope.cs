@@ -31,12 +31,6 @@ namespace ClusterKit.Core.Guarantee
         {
             get
             {
-                var che = this.Message as ConsistentHashableEnvelope;
-                if (che != null)
-                {
-                    return che.ConsistentHashKey;
-                }
-
                 var ch = this.Message as IConsistentHashable;
                 if (ch != null)
                 {

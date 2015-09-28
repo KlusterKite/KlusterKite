@@ -57,10 +57,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj">
-      <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
-      <Name>ClusterKit.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web\ClusterKit.Web.csproj">
       <Project>{477b201a-a30c-4360-b56a-6f61c049bb04}</Project>
       <Name>ClusterKit.Web</Name>
@@ -72,7 +68,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y $(SolutionDir)ClusterKit.Web\bin\Debug\* $(SolutionDir)..\ClusterKit.Core\ClusterKit.Core.Service\bin\Debug\</PostBuildEvent>
+    <PostBuildEvent>if exist $(SolutionDir) (
+xcopy /Y $(SolutionDir)ClusterKit.Web\bin\Debug\* $(SolutionDir)..\ClusterKit.Core\ClusterKit.Core.Service\bin\Debug\
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

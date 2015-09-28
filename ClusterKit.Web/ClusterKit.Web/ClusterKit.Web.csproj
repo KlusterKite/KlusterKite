@@ -68,6 +68,10 @@
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClusterKit.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ClusterKit.Core\Lib\ClusterKit.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Google.ProtocolBuffers, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.dll</HintPath>
@@ -169,10 +173,6 @@
     <Compile Include="WindsorDependencyScope.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj">
-      <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
-      <Name>ClusterKit.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
       <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>
       <Name>ClusterKit.Web.Client</Name>
