@@ -1,0 +1,20 @@
+ {
+ 	ClusterKit {
+ 		Web {
+            Services {
+               Monitoring = ClusterKitHost
+            }
+ 		}
+ 	}
+
+ 	akka.actor.deployment {
+ 		 /Monitoring {
+            IsNameSpace = true
+        }
+
+        /Monitoring/Watcher {
+            type = "ClusterKit.Monitoring.Actors.WatcherActor, ClusterKit.Monitoring"
+        }
+
+ 	}
+ }
