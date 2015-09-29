@@ -11,6 +11,7 @@ namespace ClusterKit.Web.NginxConfigurator
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -36,11 +37,18 @@ namespace ClusterKit.Web.NginxConfigurator
         private string configPath;
 
         /// <summary>
+        /// Nginx configuration reload command
+        /// </summary>
+        private string reloadCommand;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NginxConfiguratorActor"/> class.
         /// </summary>
         public NginxConfiguratorActor()
         {
             this.configPath = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.PathToConfig");
+            this.reloadCommand = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.ReloadCommand");
+
             Cluster.Get(Context.System)
                 .Subscribe(
                     this.Self,
@@ -213,6 +221,11 @@ namespace ClusterKit.Web.NginxConfigurator
             this.WriteServicesToConfig(akkaConfig, config);
 
             File.WriteAllText(this.configPath, config.ToString());
+
+            if (!string.IsNullOrWhiteSpace(this.reloadCommand))
+            {
+                Process.Start(this.reloadCommand);
+            }
         }
 
         /// <summary>
