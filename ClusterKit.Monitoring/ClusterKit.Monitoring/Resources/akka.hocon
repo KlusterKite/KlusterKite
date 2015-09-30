@@ -2,7 +2,7 @@
  	ClusterKit {
  		Web {
             Services {
-               Monitoring = ClusterKitHost
+               /MonitoringApi = ClusterKitHost
             }
  		}
  	}

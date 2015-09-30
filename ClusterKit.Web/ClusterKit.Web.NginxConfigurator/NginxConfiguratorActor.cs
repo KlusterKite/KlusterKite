@@ -34,12 +34,12 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <summary>
         /// Current configuration file path
         /// </summary>
-        private string configPath;
+        private readonly string configPath;
 
         /// <summary>
         /// Nginx configuration reload command
         /// </summary>
-        private string reloadCommand;
+        private readonly string reloadCommand;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NginxConfiguratorActor"/> class.
@@ -48,6 +48,7 @@ namespace ClusterKit.Web.NginxConfigurator
         {
             this.configPath = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.PathToConfig");
             this.reloadCommand = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.ReloadCommand");
+            this.InitFromConfiguration();
 
             Cluster.Get(Context.System)
                 .Subscribe(
@@ -69,7 +70,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <summary>
         /// Gets nodes configuration description
         /// </summary>
-        public Dictionary<string, Dictionary<string, List<string>>> ConfigDictionary { get; } = new Dictionary<string, Dictionary<string, List<string>>>();
+        public WebConfiguration Configuration { get; } = new WebConfiguration();
 
         /// <summary>
         /// Gets the list of known active web nodes addresses
@@ -103,6 +104,73 @@ namespace ClusterKit.Web.NginxConfigurator
         }
 
         /// <summary>
+        /// Initialized base nginx configuration from self configuration
+        /// </summary>
+        private void InitFromConfiguration()
+        {
+            var config = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.Configuration");
+            if (config == null)
+            {
+                return;
+            }
+
+            foreach (var pair in config.AsEnumerable())
+            {
+                var hostName = pair.Key;
+                this.InitHostFromConfiguration(hostName, config.GetConfig(hostName));
+            }
+        }
+
+        /// <summary>
+        /// Initializes nginx server configuration from self configuration
+        /// </summary>
+        /// <param name="hostName">Local host identification</param>
+        /// <param name="config">Section of self configuration, dedicated for the host configuration</param>
+        private void InitHostFromConfiguration(string hostName, Config config)
+        {
+            StringBuilder hostConfig = new StringBuilder();
+            foreach (var parameter in config.AsEnumerable())
+            {
+                if (parameter.Value.IsString())
+                {
+                    hostConfig.AppendFormat("\t{0} {1};\n", parameter.Key, parameter.Value.GetString());
+                }
+
+                if (parameter.Value.IsObject()
+                    && parameter.Key.StartsWith("location ", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var serviceName = parameter.Key.Substring("location ".Length).Trim();
+                    this.InitServiceFromConfiguration(
+                        this.Configuration[hostName],
+                        serviceName,
+                        config.GetConfig(parameter.Key));
+                }
+            }
+
+            this.Configuration[hostName].Config = hostConfig.ToString();
+        }
+
+        /// <summary>
+        /// Initializes nginx location configuration from self configuration
+        /// </summary>
+        /// <param name="host">The parent server configuration</param>
+        /// <param name="serviceName">Location name</param>
+        /// <param name="config">Section of self configuration, dedicated for the service configuration</param>
+        private void InitServiceFromConfiguration(HostConfiguration host, string serviceName, Config config)
+        {
+            StringBuilder serviceConfig = new StringBuilder();
+            foreach (var parameter in config.AsEnumerable())
+            {
+                if (parameter.Value.IsString())
+                {
+                    serviceConfig.AppendFormat("\t\t{0} {1};\n", parameter.Key, parameter.Value.GetString());
+                }
+            }
+
+            host[serviceName].Config = serviceConfig.ToString();
+        }
+
+        /// <summary>
         /// Applies node description to configuration
         /// </summary>
         /// <param name="description">The node description</param>
@@ -132,22 +200,10 @@ namespace ClusterKit.Web.NginxConfigurator
 
             foreach (var serviceDescription in description.ServiceNames)
             {
-                var serviceHost = serviceDescription.Value;
-                var servicePath = serviceDescription.Key;
-
-                if (!this.ConfigDictionary.ContainsKey(serviceHost))
+                var serviceConfiguration = this.Configuration[serviceDescription.Value][serviceDescription.Key];
+                if (!serviceConfiguration.ActiveNodes.Contains(nodeUrl))
                 {
-                    this.ConfigDictionary[serviceHost] = new Dictionary<string, List<string>>();
-                }
-
-                if (!this.ConfigDictionary[serviceHost].ContainsKey(servicePath))
-                {
-                    this.ConfigDictionary[serviceHost][servicePath] = new List<string>();
-                }
-
-                if (!this.ConfigDictionary[serviceHost][servicePath].Contains(nodeUrl))
-                {
-                    this.ConfigDictionary[serviceHost][servicePath].Add(nodeUrl);
+                    serviceConfiguration.ActiveNodes.Add(nodeUrl);
                 }
             }
 
@@ -168,28 +224,18 @@ namespace ClusterKit.Web.NginxConfigurator
                 return;
             }
 
-            foreach (var hostPair in this.ConfigDictionary.ToList())
+            foreach (var host in this.Configuration)
             {
-                var hostName = hostPair.Key;
-                foreach (var servicePair in hostPair.Value)
+                foreach (var service in host)
                 {
-                    var serviceName = servicePair.Key;
-                    servicePair.Value.Remove(nodeUrl);
-
-                    if (servicePair.Value.Count == 0)
-                    {
-                        this.ConfigDictionary[hostName].Remove(serviceName);
-                    }
+                    service.ActiveNodes.Remove(nodeUrl);
                 }
 
-                if (hostPair.Value.Count == 0)
-                {
-                    this.ConfigDictionary.Remove(hostName);
-                }
+                host.Flush();
             }
 
+            this.Configuration.Flush();
             this.NodePublishUrls.Remove(nodeAddress);
-
             this.WriteConfiguration();
         }
 
@@ -217,7 +263,6 @@ namespace ClusterKit.Web.NginxConfigurator
             var akkaConfig = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.ServicesHost");
 
             this.WriteUpStreamsToConfig(config);
-            this.WriteUpStreamsToConfig(config);
             this.WriteServicesToConfig(akkaConfig, config);
 
             File.WriteAllText(this.configPath, config.ToString());
@@ -235,23 +280,20 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <param name="config">Configuration file to write</param>
         private void WriteServicesToConfig(Config akkaConfig, StringBuilder config)
         {
-            foreach (var hostPair in this.ConfigDictionary)
+            foreach (var host in this.Configuration)
             {
-                var hostName = hostPair.Key;
-                var hostConfig = akkaConfig.GetConfig(hostName) ?? ConfigurationFactory.Empty;
                 config.Append("server {\n");
-                config.Append($"\tlisten {hostConfig.GetString("listen", "80")}\n");
-                var servername = hostConfig.GetString("server_name");
-                if (servername != null)
+                config.Append(host.Config);
+                foreach (var service in host)
                 {
-                    config.Append($"\tserver_name {servername}\n");
-                }
+                    config.Append($"\tlocation {service.ServiceName} {{\n");
+                    config.Append(service.Config);
+                    if (service.ActiveNodes.Count > 0)
+                    {
+                        config.Append(
+                            $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)}{service.ServiceName}\n");
+                    }
 
-                foreach (var servicePair in hostPair.Value)
-                {
-                    var serviceName = servicePair.Key;
-                    config.Append($"\tlocation {serviceName} {{\n");
-                    config.Append($"\t\tproxy_pass http://{this.GetUpStreamName(hostName, serviceName)}\n");
                     config.Append("\t}\n");
                 }
                 config.Append("}\n");
@@ -264,17 +306,15 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <param name="config">Configuration file to write</param>
         private void WriteUpStreamsToConfig(StringBuilder config)
         {
-            foreach (var hostPair in this.ConfigDictionary)
+            foreach (var host in this.Configuration)
             {
-                var hostName = hostPair.Key;
-                foreach (var servicePair in hostPair.Value)
+                foreach (var service in host.Where(s => s.ActiveNodes.Count > 0))
                 {
-                    var serviceName = servicePair.Key;
                     config.Append(
                         $@"
-upstream {this.GetUpStreamName(hostName, serviceName)} {{
+upstream {this.GetUpStreamName(host.HostName, service.ServiceName)} {{
 {
-                            string.Join("\n", servicePair.Value.Select(u => $"\tserver {u};"))}
+                            string.Join("\n", service.ActiveNodes.Select(u => $"\tserver {u};"))}
 }}
 ");
                 }

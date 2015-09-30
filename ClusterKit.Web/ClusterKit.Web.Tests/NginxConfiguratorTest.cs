@@ -80,16 +80,16 @@ namespace ClusterKit.Web.Tests
                                            {
                                                { "/TestWebService", "default" },
                                                { "/test/TestWebService2", "default" },
-                                               { "/", "web" }
+                                               { "/Api", "web" }
                                            }
                 },
                 webDescriptor);
 
             Assert.Equal(1, configurator.UnderlyingActor.NodePublishUrls.Count);
             Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.NodePublishUrls.First().Value);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.ConfigDictionary["default"]["/TestWebService"][0]);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.ConfigDictionary["default"]["/test/TestWebService2"][0]);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.ConfigDictionary["web"]["/"][0]);
+            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["default"]["/TestWebService"].ActiveNodes[0]);
+            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["default"]["/test/TestWebService2"].ActiveNodes[0]);
+            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web"]["/Api"].ActiveNodes[0]);
 
             var config = File.ReadAllText("./nginx.conf");
             this.Sys.Log.Info(config);
@@ -117,13 +117,16 @@ namespace ClusterKit.Web.Tests
 	 		                    Web {
 	 			                    Nginx {
 	 				                    PathToConfig = ""./nginx.conf""
-                                        ServicesHost {
+                                        Configuration {
                                             default {
                                                listen: 80
                                             }
                                             web {
                                                listen: 8080
                                                server_name: ""www.example.com""
+                                               ""location /"" {
+                                                         root = /var/www/example/
+                                                }
                                             }
                                         }
                                 }

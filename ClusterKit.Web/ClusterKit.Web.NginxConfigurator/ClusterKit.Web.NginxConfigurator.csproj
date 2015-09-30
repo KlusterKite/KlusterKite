@@ -121,9 +121,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
+    <Compile Include="HostConfiguration.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="NginxConfiguratorActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceConfiguration.cs" />
+    <Compile Include="WebConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Configuration.resx">
