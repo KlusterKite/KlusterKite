@@ -1,0 +1,9 @@
+ {
+ 	ClusterKit {
+ 		Web {
+			Services {
+ 			    "/signalr" = "default"
+ 			}
+ 		}
+ 	}
+ }

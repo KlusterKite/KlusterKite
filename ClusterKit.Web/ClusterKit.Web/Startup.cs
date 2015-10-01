@@ -11,7 +11,12 @@ namespace ClusterKit.Web
 {
     using System.Web.Http;
 
+    using Akka.Util.Internal;
+
     using Castle.Windsor;
+
+    using ClusterKit.Web.Client;
+
     using JetBrains.Annotations;
     using Microsoft.Practices.ServiceLocation;
     using Owin;
@@ -40,8 +45,8 @@ namespace ClusterKit.Web
                 */
             var dependencyResolver = new WindsorDependencyResolver(ServiceLocator.Current.GetInstance<IWindsorContainer>());
             config.DependencyResolver = dependencyResolver;
-
             appBuilder.UseWebApi(config);
+            ServiceLocator.Current.GetAllInstances<IOwinStartupConfigurator>().ForEach(c => c.Configure(appBuilder));
         }
     }
 }

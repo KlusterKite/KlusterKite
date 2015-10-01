@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.NginxConfigu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Client", "ClusterKit.Web.Client\ClusterKit.Web.Client.csproj", "{8E543EA4-65DE-475F-8045-C094CDE58E29}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.SignalR", "ClusterKit.Web.SignalR\ClusterKit.Web.SignalR.csproj", "{1158612D-1E02-4CC2-85A1-323AE272C2E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{8E543EA4-65DE-475F-8045-C094CDE58E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E543EA4-65DE-475F-8045-C094CDE58E29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E543EA4-65DE-475F-8045-C094CDE58E29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1158612D-1E02-4CC2-85A1-323AE272C2E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1158612D-1E02-4CC2-85A1-323AE272C2E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1158612D-1E02-4CC2-85A1-323AE272C2E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1158612D-1E02-4CC2-85A1-323AE272C2E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

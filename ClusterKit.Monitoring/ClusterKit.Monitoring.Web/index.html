@@ -3,12 +3,24 @@
 <head>
     <title>ClusterKit.Monitoring</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="Scripts/bootstrap.min.js">
+    <link rel="stylesheet" href="Content/bootstrap.min.css">
     <script type="text/javascript" src="Scripts/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="Scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="Scripts/knockout-3.3.0.js"></script>
+    <script type="text/javascript" src="Scripts/ClusterKit.Monitoring.js"></script>
 </head>
 <body>
-    <h1>Hello world</h1>
+    <div id="clusterMonitoringView">
+        <div data-bind="if: !Connected()">
+            <div class="alert alert-danger" role="alert">
+                ClusterKit system is unreachable
+            </div>
+        </div>
+        <div data-bind="if: Connected()">
+            <h1>
+                Successfully connected
+            </h1>
+        </div>
+    </div>
 </body>
 </html>
