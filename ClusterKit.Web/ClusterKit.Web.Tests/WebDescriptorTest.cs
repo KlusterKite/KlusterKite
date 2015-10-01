@@ -68,7 +68,7 @@ namespace ClusterKit.Web.Tests
             Assert.Equal("defaultHost", response.ServiceNames["firstServiceRoot"]);
             Assert.Equal("defaultHost", response.ServiceNames["secondServiceRoot/secondServiceBranch"]);
             Assert.Equal("otherHost", response.ServiceNames["thirdServiceRoot"]);
-            Assert.Equal(8080, response.ListeningPort);
+            Assert.Equal(8085, response.ListeningPort);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace ClusterKit.Web.Tests
                 {
                     ClusterKit {
  		                Web {
- 			                OwinBindAddress = ""http://*:8080""
+ 			                OwinBindAddress = ""http://*:8085""
                             Services {
                                firstServiceRoot = defaultHost
                                secondServiceRoot/secondServiceBranch = defaultHost

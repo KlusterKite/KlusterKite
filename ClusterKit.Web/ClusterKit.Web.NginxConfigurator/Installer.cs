@@ -37,45 +37,13 @@
         /// </exception>
         public override void PreCheck(Config config)
         {
-            var configPath = config.GetString("ClusterKit.Web.Nginx.PathToConfig");
-            if (string.IsNullOrWhiteSpace(configPath))
-            {
-                throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig is not defined");
-            }
-
-            if (!Path.IsPathRooted(configPath))
-            {
-                var currentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                if (string.IsNullOrWhiteSpace(currentExecutablePath))
-                {
-                    throw new ConfigurationException("Failed to determine current executable path");
-                }
-
-                configPath = Path.Combine(currentExecutablePath, configPath);
-            }
-
-            var configDirectory = Path.GetDirectoryName(configPath);
-            if (string.IsNullOrWhiteSpace(configDirectory))
-            {
-                throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig has no defined directory");
-            }
-
-            if (!Directory.Exists(configDirectory))
-            {
-                throw new ConfigurationException($"{configDirectory} does not exists");
-            }
-
-            var path = File.Exists(configPath) ? configPath : configDirectory;
-            var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
-            if (!permission.IsGranted())
-            {
-                throw new ConfigurationException($"Cannot access {path} for writing");
-            }
-
             if (config.GetConfig("ClusterKit.Web.Nginx.Configuration") == null)
             {
                 throw new ConfigurationException("ClusterKit.Web.Nginx.Configuration is not defined");
             }
+
+            CheckNginxConfigAccess(config);
+            CheckNginxReloadCommandAccess(config);
         }
 
         /// <summary>
@@ -102,6 +70,78 @@
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+        }
+
+        /// <summary>
+        /// Checks access to file
+        /// </summary>
+        /// <param name="filePath">Path to file for check</param>
+        /// <param name="permissionAccess">Permission to check</param>
+        private static void CheckFileAccess(string filePath, FileIOPermissionAccess permissionAccess)
+        {
+            if (!Path.IsPathRooted(filePath))
+            {
+                var currentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (string.IsNullOrWhiteSpace(currentExecutablePath))
+                {
+                    throw new ConfigurationException("Failed to determine current executable path");
+                }
+
+                filePath = Path.Combine(currentExecutablePath, filePath);
+            }
+
+            var configDirectory = Path.GetDirectoryName(filePath);
+            if (string.IsNullOrWhiteSpace(configDirectory))
+            {
+                throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig has no defined directory");
+            }
+
+            if (!Directory.Exists(configDirectory))
+            {
+                throw new ConfigurationException($"{configDirectory} does not exists");
+            }
+
+            var path = File.Exists(filePath) ? filePath : configDirectory;
+            var permission = new FileIOPermission(permissionAccess, path);
+            if (!permission.IsGranted())
+            {
+                throw new ConfigurationException($"Cannot access {path} for writing");
+            }
+        }
+
+        /// <summary>
+        /// Checks that service has access to nginx config file
+        /// </summary>
+        /// <param name="config">Akka configuration</param>
+        private static void CheckNginxConfigAccess(Config config)
+        {
+            var configPath = config.GetString("ClusterKit.Web.Nginx.PathToConfig");
+            if (string.IsNullOrWhiteSpace(configPath))
+            {
+                throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig is not defined");
+            }
+
+            CheckFileAccess(configPath, FileIOPermissionAccess.Write);
+        }
+
+        /// <summary>
+        /// Checks that service has access to nginx config file
+        /// </summary>
+        /// <param name="config">Akka configuration</param>
+        private static void CheckNginxReloadCommandAccess(Config config)
+        {
+            var reloadCommandConfig = config.GetConfig("ClusterKit.Web.Nginx.ReloadCommand");
+            if (reloadCommandConfig != null)
+            {
+                var commandPath = reloadCommandConfig.GetString("Command");
+                if (string.IsNullOrWhiteSpace(commandPath))
+                {
+                    throw new ConfigurationException("ClusterKit.Web.Nginx.ReloadCommand.Command is not defined");
+                }
+
+                // todo: actualy need to check Execute access
+                CheckFileAccess(commandPath, FileIOPermissionAccess.Read);
+            }
         }
     }
 }

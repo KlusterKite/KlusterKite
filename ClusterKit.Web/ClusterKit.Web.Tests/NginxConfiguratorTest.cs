@@ -78,18 +78,18 @@ namespace ClusterKit.Web.Tests
                     ListeningPort = 8080,
                     ServiceNames = new Dictionary<string, string>
                                            {
-                                               { "/TestWebService", "default" },
-                                               { "/test/TestWebService2", "default" },
-                                               { "/Api", "web" }
+                                               { "/TestWebService", "web1" },
+                                               { "/test/TestWebService2", "web1" },
+                                               { "/Api", "web2" }
                                            }
                 },
                 webDescriptor);
 
             Assert.Equal(1, configurator.UnderlyingActor.NodePublishUrls.Count);
             Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.NodePublishUrls.First().Value);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["default"]["/TestWebService"].ActiveNodes[0]);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["default"]["/test/TestWebService2"].ActiveNodes[0]);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web"]["/Api"].ActiveNodes[0]);
+            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web1"]["/TestWebService"].ActiveNodes[0]);
+            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web1"]["/test/TestWebService2"].ActiveNodes[0]);
+            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web2"]["/Api"].ActiveNodes[0]);
 
             var config = File.ReadAllText("./nginx.conf");
             this.Sys.Log.Info(config);
@@ -118,11 +118,11 @@ namespace ClusterKit.Web.Tests
 	 			                    Nginx {
 	 				                    PathToConfig = ""./nginx.conf""
                                         Configuration {
-                                            default {
-                                               listen: 80
+                                            web1 {
+                                               listen: 8081
                                             }
-                                            web {
-                                               listen: 8080
+                                            web2 {
+                                               listen: 8082
                                                server_name: ""www.example.com""
                                                ""location /"" {
                                                          root = /var/www/example/

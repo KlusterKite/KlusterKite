@@ -39,7 +39,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <summary>
         /// Nginx configuration reload command
         /// </summary>
-        private readonly string reloadCommand;
+        private readonly Config reloadCommand;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NginxConfiguratorActor"/> class.
@@ -47,7 +47,7 @@ namespace ClusterKit.Web.NginxConfigurator
         public NginxConfiguratorActor()
         {
             this.configPath = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.PathToConfig");
-            this.reloadCommand = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.ReloadCommand");
+            this.reloadCommand = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.ReloadCommand");
             this.InitFromConfiguration();
 
             Cluster.Get(Context.System)
@@ -263,22 +263,32 @@ namespace ClusterKit.Web.NginxConfigurator
             var akkaConfig = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.ServicesHost");
 
             this.WriteUpStreamsToConfig(config);
-            this.WriteServicesToConfig(akkaConfig, config);
+            this.WriteServicesToConfig(config);
 
             File.WriteAllText(this.configPath, config.ToString());
 
-            if (!string.IsNullOrWhiteSpace(this.reloadCommand))
+            if (this.reloadCommand != null)
             {
-                Process.Start(this.reloadCommand);
+                var command = this.reloadCommand.GetString("Command");
+                var arguments = this.reloadCommand.GetString("Arguments");
+                if (command != null)
+                {
+                    Process.Start(
+                        new ProcessStartInfo(command, arguments)
+                        {
+                            UseShellExecute = false,
+                            WorkingDirectory = Path.GetDirectoryName(command) ?? "."
+                        });
+                }
             }
         }
 
         /// <summary>
         /// Writes every defined service to nginx config
         /// </summary>
-        /// <param name="akkaConfig">Current node configuration</param>
         /// <param name="config">Configuration file to write</param>
-        private void WriteServicesToConfig(Config akkaConfig, StringBuilder config)
+        ///
+        private void WriteServicesToConfig(StringBuilder config)
         {
             foreach (var host in this.Configuration)
             {
@@ -291,7 +301,7 @@ namespace ClusterKit.Web.NginxConfigurator
                     if (service.ActiveNodes.Count > 0)
                     {
                         config.Append(
-                            $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)}{service.ServiceName}\n");
+                            $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)}{service.ServiceName};\n");
                     }
 
                     config.Append("\t}\n");
