@@ -1,10 +1,35 @@
 ﻿(function ($) {
     var signalrConnection;
     var hubProxy;
+    var timeout = 1000 * 60;
 
     var clusterState = {
-        Connected: ko.observable(false)
+        Connected: ko.observable(false),
+        Members: ko.observableArray([])
     };
+
+    function onDisconnected() {
+        clusterState.Connected(false);
+    }
+
+    function onConnected() {
+        clusterState.Connected(true);
+        $.ajax({
+            type: 'get',
+            url: '/MonitoringApi/GetClusterMemberList',
+            data: {
+            },
+            dataType: 'json',
+            timeout: timeout,
+            success: function (data) {
+                clusterState.Connected(true);
+                clusterState.Members(data);
+            },
+            error: function () {
+                onDisconnected();
+            }
+        });
+    }
 
     $(document).ready(function () {
         ko.applyBindings(clusterState, $("#clusterMonitoringView")[0]);
@@ -13,7 +38,7 @@
 
         // todo: register events
         signalrConnection.reconnected(function () {
-            clusterState.Connected(true);
+            onConnected();
         });
 
         signalrConnection.reconnecting(function () {
@@ -21,11 +46,11 @@
         });
 
         signalrConnection.disconnected(function () {
-            clusterState.Connected(false);
+            onDisconnected();
         });
 
         signalrConnection.start()
-            .done(function () { clusterState.Connected(true) })
-            .fail(function () { clusterState.Connected(false) });
+            .done(function () { onConnected(); })
+            .fail(function () { onDisconnected(); });
     });
 })(jQuery);

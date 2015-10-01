@@ -1,13 +1,16 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>ClusterKit.Monitoring</title>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <link rel="stylesheet" href="Content/bootstrap.min.css">
     <script type="text/javascript" src="Scripts/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="Scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="Scripts/knockout-3.3.0.js"></script>
     <script type="text/javascript" src="Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script type="text/javascript" src="Scripts/underscore.js"></script>
     <script type="text/javascript" src="Scripts/ClusterKit.Monitoring.js"></script>
 </head>
 <body>
@@ -18,9 +21,43 @@
             </div>
         </div>
         <div data-bind="if: Connected()">
-            <h1>
-                Successfully connected
-            </h1>
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="navbar navbar-default">
+                        <div class="container-fluid">
+                            <div class="navbar-header">
+                                <a class="navbar-brand" href="#">Nodes</a>
+                            </div>
+                            <div>
+                                <p class="navbar-text">
+                                    Total <span class="label label-default" data-bind="text:Members().length">0</span>
+                                </p>
+                            </div>
+                            <div>
+                                <p class="navbar-text">
+                                    Active <span class="label label-success" data-bind="text:_.filter(Members(), function(m){return m.Status == 1}).length">0</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ko foreach: Members()-->
+                    <div class="panel panel-default">
+                        <div class="panel-heading" data-bind="text: Address.Host + ':' + Address.Port"></div>
+                        <div class="panel-body">
+                            <p>Status: <span data-bind="text: Status"></span></p>
+                            <p>
+                                Roles:
+                                <!-- ko foreach: Roles-->
+                                <span class="label label-default" data-bind="text: $data"></span>
+                                <!-- /ko -->
+                            </p>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
         </div>
     </div>
 </body>

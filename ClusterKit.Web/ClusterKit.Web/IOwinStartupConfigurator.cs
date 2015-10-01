@@ -10,6 +10,8 @@
 
 namespace ClusterKit.Web
 {
+    using System.Web.Http;
+
     using Owin;
 
     /// <summary>
@@ -19,9 +21,15 @@ namespace ClusterKit.Web
     public interface IOwinStartupConfigurator
     {
         /// <summary>
+        /// Add additional http configuration
+        /// </summary>
+        /// <param name="httpConfiguration">The configuration</param>
+        void ConfigureApi(HttpConfiguration httpConfiguration);
+
+        /// <summary>
         /// Add additional owin configuration
         /// </summary>
         /// <param name="appBuilder">The builder</param>
-        void Configure(IAppBuilder appBuilder);
+        void ConfigureApp(IAppBuilder appBuilder);
     }
 }

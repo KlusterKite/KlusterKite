@@ -1,6 +1,8 @@
 ﻿namespace ClusterKit.Monitoring
 {
     using System.Collections.Generic;
+    using System.Web.Http;
+    using System.Web.Mvc;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -43,6 +45,7 @@
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.Register(Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ApiController))).LifestyleTransient());
         }
     }
 }
