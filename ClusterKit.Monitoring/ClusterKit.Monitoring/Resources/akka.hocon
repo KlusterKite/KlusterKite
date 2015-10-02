@@ -6,6 +6,13 @@
                /signalr = Monitoring
             }
  		}
+
+ 		Monitoring {
+ 			PingFrequency = 2s
+ 			PingTimeout = 2s,
+ 			BroadcastClientFrequency = 5s,
+ 			RemoveMemberTimeout = 1h
+ 		}
  	}
 
  	akka.actor.deployment {

@@ -11,6 +11,7 @@ namespace ClusterKit.Monitoring.WebApi
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using System.Web.Http;
 
     using Akka.Actor;
@@ -50,13 +51,20 @@ namespace ClusterKit.Monitoring.WebApi
         /// </summary>
         /// <returns>The member list</returns>
         [Route("MonitoringApi/GetClusterMemberList")]
-        public List<Member> GetClusterMemberList()
+        public async Task<List<MemberDescription>> GetClusterMemberList()
         {
-            var members =
-                this.system.ActorSelection("/user/Monitoring/Watcher")
-                .Ask<List<Member>>(new ClusterMemberListRequest(), this.systemTimeout).Result;
+            return await this.system.ActorSelection("/user/Monitoring/Watcher")
+                .Ask<List<MemberDescription>>(new ClusterMemberListRequest(), this.systemTimeout);
+        }
 
-            return members;
+        /// <summary>
+        /// Hello world
+        /// </summary>
+        /// <returns>The Hello world</returns>
+        [Route("MonitoringApi/Hello")]
+        public Task<string> Hello()
+        {
+            return Task.FromResult("Hello");
         }
     }
 }

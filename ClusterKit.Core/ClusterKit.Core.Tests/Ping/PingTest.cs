@@ -12,6 +12,7 @@ namespace ClusterKit.Core.Tests.Ping
     using System;
 
     using Akka.Actor;
+    using Akka.Cluster;
 
     using ClusterKit.Core.Ping;
     using ClusterKit.Core.TestKit;
@@ -40,11 +41,26 @@ namespace ClusterKit.Core.Tests.Ping
         /// Testing ping actor
         /// </summary>
         [Fact]
+        public void TestNetworkPing()
+        {
+            this.Sys.StartNameSpaceActorsFromConfiguration();
+            var now = DateTime.UtcNow;
+            var address = Cluster.Get(this.Sys).SelfAddress;
+
+            this.Sys.ActorSelection($"{address.ToString()}/user/Core/Ping").Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(200));
+            var elapsed = (DateTime.UtcNow - now).TotalMilliseconds;
+            this.Sys.Log.Info("Ping in {0}ms", elapsed);
+        }
+
+        /// <summary>
+        /// Testing ping actor
+        /// </summary>
+        [Fact]
         public void TestPing()
         {
             this.Sys.StartNameSpaceActorsFromConfiguration();
             var now = DateTime.UtcNow;
-            this.Sys.ActorSelection("/Core/Ping").Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(200));
+            this.Sys.ActorSelection("/user/Core/Ping").Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(200));
             var elapsed = (DateTime.UtcNow - now).TotalMilliseconds;
             this.Sys.Log.Info("Ping in {0}ms", elapsed);
         }
