@@ -60,7 +60,7 @@ namespace ClusterKit.Core.Tests.Ping
         {
             this.Sys.StartNameSpaceActorsFromConfiguration();
             var now = DateTime.UtcNow;
-            this.Sys.ActorSelection("/user/Core/Ping").Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(200));
+            this.Sys.ActorSelection("/user /Core/Ping").Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(200));
             var elapsed = (DateTime.UtcNow - now).TotalMilliseconds;
             this.Sys.Log.Info("Ping in {0}ms", elapsed);
         }

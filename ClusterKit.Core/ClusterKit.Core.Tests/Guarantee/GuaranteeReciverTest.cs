@@ -77,8 +77,8 @@ namespace ClusterKit.Core.Tests.Guarantee
 
             redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)] = "1";
             actor.Tell(envelope);
-            Assert.True(this.ExpectMsg<bool>());
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/test"));
+            Assert.True(this.ExpectMsg<bool>());
             Assert.Equal(string.Empty, redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)]);
         }
 
