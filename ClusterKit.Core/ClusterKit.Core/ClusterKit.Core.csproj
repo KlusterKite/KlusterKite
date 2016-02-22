@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ClusterKit.Core.nuspec" />
     <None Include="packages.config" />
     <None Include="Resources\akka.hocon" />
   </ItemGroup>
