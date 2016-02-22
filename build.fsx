@@ -1,8 +1,9 @@
-#r "../packages/FAKE/tools/FakeLib.dll" // include Fake lib
+#r "./packages/FAKE/tools/FakeLib.dll" // include Fake lib
 open Fake
 open System
 open System.IO
 open System.Xml
+open System.Linq
 
 // Properties
 let buildDir = "./build"
@@ -58,9 +59,10 @@ let installer (projFile : string, internalDependencies : string[]) =
     dependenciesDoc.Load(dir + "/packages.config")
 
     for dependency in dependenciesDoc.DocumentElement.SelectNodes("/packages/package") do
-        let dependencyElement = dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"))
-        dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value <- dependency.Attributes.["id"].Value
-        dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value <- dependency.Attributes.["version"].Value
+        if not(internalDependencies.Contains(dependency.Attributes.["id"].Value)) then
+            let dependencyElement = dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"))
+            dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value <- dependency.Attributes.["id"].Value
+            dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value <- dependency.Attributes.["version"].Value
 
     for dependency in internalDependencies do
         let dependencyElement = dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"))
@@ -95,6 +97,11 @@ Target "BuildApp" (fun _ ->
     installer("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj", ([||]))
     installer("./ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj", ([|"ClusterKit.Core"|]))
     installer("./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj", ([|"ClusterKit.Core"|]))
+    installer("./ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj", ([|"ClusterKit.Core"|]))
+    installer("./ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj", ([|"ClusterKit.Core"; "ClusterKit.Web.Client"|]))
+    installer("./ClusterKit.Web/ClusterKit.Web.NginxConfigurator/ClusterKit.Web.NginxConfigurator.csproj", ([|"ClusterKit.Core"; "ClusterKit.Web.Client"|]))
+    installer("./ClusterKit.Web/ClusterKit.Web.SignalR/ClusterKit.Web.SignalR.csproj", ([|"ClusterKit.Core"; "ClusterKit.Web.Client"|]))
+
     if Directory.Exists(buildDir) then Directory.Delete(buildDir, true)
 )
 
