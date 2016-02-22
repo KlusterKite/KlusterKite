@@ -58,6 +58,11 @@ let installer (projFile : string) =
         dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value <- dependency.Attributes.["id"].Value
         dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value <- dependency.Attributes.["version"].Value
 
+    let filesRootElement = nuspecData.DocumentElement.SelectSingleNode("/package").AppendChild(nuspecData.CreateElement("files"))
+    for file in Directory.GetFiles(outputDir) do
+        let fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"))
+        fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value <- Path.GetFileName(file)
+
     let nuspecFile = outputDir + "/" + projName + ".nuspec"
     nuspecData.Save(nuspecFile)
 
