@@ -71,7 +71,7 @@ let installer (projFile : string, internalDependencies : string[]) =
     for file in Directory.GetFiles(outputDir) do
         let fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"))
         fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value <- Path.GetFileName(file)
-        fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value <- ("./" + Path.GetFileName(file))
+        fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value <- ("./lib/" + Path.GetFileName(file))
 
     let nuspecFile = outputDir + "/" + projName + ".nuspec"
     nuspecData.Save(nuspecFile)
