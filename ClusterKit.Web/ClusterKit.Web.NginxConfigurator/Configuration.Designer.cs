@@ -63,27 +63,18 @@ namespace ClusterKit.Web.NginxConfigurator {
         /// <summary>
         ///   Looks up a localized string similar to  {
         ///	ClusterKit {
-        ///	 		Web {
-        ///	 			Nginx {
-        ///	 				// PathToConfig = &quot;[PathToConfig]&quot;
-        ///	 				ServicesHost {
-        ///	 					default: localhost
-        ///	 				}
-        ///	 			}
-        ///	 		}
-        ///	 	}
-        ///
-        /// 	akka.actor.deployment {
-        /// 		 /Web.Nginx {
-        ///            IsNameSpace = true
-        ///        }
-        ///
-        ///        /WebWeb.Nginx/Configurator {
-        ///            type = &quot;ClusterKit.Web.NginxConfigurator.ConfiguratorActor, ClusterKit.Web.NginxConfigurator&quot;
-        ///        }
-        ///
-        /// 	}
-        /// }.
+        /// 		Web {
+        /// 			Nginx {
+        /// 				// PathToConfig = &quot;[PathToConfig]&quot;
+        /// 				// ReloadCommand {
+        ///                //  Command = /etc/init.d/nginx
+        ///                //  Arguments = reload
+        ///                //} 
+        /// 				Configuration {
+        /// 					//default {
+        /// 					//	listen: &quot;80&quot; //nginx configuration for listen directive in server part
+        /// 						//server_name: &quot;localhost&quot; configuration for server_name directive in server part
+        /// 						//Static { // you can define static content. This part will be jus inserte [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AkkaConfig {
             get {

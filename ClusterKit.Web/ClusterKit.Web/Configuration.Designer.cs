@@ -61,7 +61,22 @@ namespace ClusterKit.Web {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to  {
+        /// 	ClusterKit {
+        /// 		Web {
+        /// 			OwinBindAddress = &quot;Http://*:8080&quot;
+        /// 			Services {
+        /// 			    // The list of services. Should be described as pair of directory and hostname.
+        /// 			    // It doesn&apos;t supposed (but is not prohibited) that this should be public service hostname.
+        /// 			    // It&apos;s just used to distinguish services with identical url paths to be correctly published on frontend web servers.
+        /// 				//&quot;default&quot; = &quot;default&quot;
+        /// 			}
+        /// 		}
+        /// 	}
+        ///
+        /// 	akka.actor.deployment {
+        /// 		 /Web {
+        ///            IsNameSpa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AkkaConfig {
             get {

@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web", "ClusterKit.Web\ClusterKit.Web.csproj", "{477B201A-A30C-4360-B56A-6F61C049BB04}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E142B59E-0646-4EAB-970E-D6175A16AC3E}"
 	ProjectSection(SolutionItems) = preProject
+		..\build.fsx = ..\build.fsx
 		..\nuget.config = ..\nuget.config
 		..\Settings.StyleCop = ..\Settings.StyleCop
 	EndProjectSection
