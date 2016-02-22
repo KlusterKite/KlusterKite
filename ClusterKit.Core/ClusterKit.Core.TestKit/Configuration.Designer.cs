@@ -63,8 +63,7 @@ namespace ClusterKit.Core.TestKit {
         /// <summary>
         ///   Looks up a localized string similar to             {
         ///              ClusterKit : {
-        ///                test-dispatcher {
-        ///                    type : &quot;ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit&quot;
+        ///                test-dispatcher {type : &quot;ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit&quot;
         ///                    throughput : 100
         ///                    throughput-deadline-time : 0ms
         ///                }
@@ -74,7 +73,7 @@ namespace ClusterKit.Core.TestKit {
         ///                stdout-loglevel : DEBUG
         ///                loggers : [&quot;Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog&quot;]
         ///                log-config-on-start : off
-        ///     [rest of string was truncated]&quot;;.
+        ///                l [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AkkaConfig {
             get {
