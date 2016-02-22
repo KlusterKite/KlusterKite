@@ -75,17 +75,13 @@ namespace ClusterKit.Core {
         ///          type = TaskDispatcher
         ///        }
         ///
-        ///      }
+        ///        deployment {
+        ///          /Core {
+        ///            IsNameSpace = true
+        ///          }
         ///
-        ///      reote : {
-        ///        helios.tcp : {
-        ///          hostname = 127.0.0.1
-        ///          port = 0
-        ///        }
-        ///      }
-        ///
-        ///      cluster: {
-        ///        auto-d [rest of string was truncated]&quot;;.
+        ///          /Core/Ping {
+        ///            type = &quot;ClusterKit.Core.Ping.PingA [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AkkaConfig {
             get {

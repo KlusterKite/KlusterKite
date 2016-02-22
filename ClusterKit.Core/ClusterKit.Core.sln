@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core", "ClusterKit.Core\ClusterKit.Core.csproj", "{BA97BEED-B078-499D-8C00-6A3D4A0635F2}"
 EndProject
@@ -9,6 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Tests", "Cl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EDC0C5DB-1204-478B-85D0-28F9AE9E16F3}"
 	ProjectSection(SolutionItems) = preProject
+		build.fsx = build.fsx
 		..\nuget.config = ..\nuget.config
 		..\Settings.StyleCop = ..\Settings.StyleCop
 	EndProjectSection
