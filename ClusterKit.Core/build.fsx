@@ -6,6 +6,7 @@ open System.Xml
 
 // Properties
 let buildDir = "./build"
+let packageDir = "./packageOut"
 let ver = environVar "version"
 
 let installer (projFile : string) =
@@ -63,7 +64,7 @@ let installer (projFile : string) =
     let nugetParams defaults : NuGetParams =
         {   defaults  with
                  WorkingDir = outputDir
-                 OutputPath = buildDir
+                 OutputPath = packageDir
                  Version = ver
         }
 
