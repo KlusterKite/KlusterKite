@@ -90,7 +90,8 @@ let installer (projFile : string) =
 //            "./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"
 
 Target "BuildApp" (fun _ ->
-      installer("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj")
+    if Directory.Exists(packageDir) then Directory.Delete(packageDir, true)
+    installer("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj")
 )
 
 Target "Deploy" (fun _ ->
