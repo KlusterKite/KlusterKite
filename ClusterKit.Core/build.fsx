@@ -61,6 +61,8 @@ let installer (projFile : string) =
     let nuspecFile = outputDir + "/" + projName + ".nuspec"
     nuspecData.Save(nuspecFile)
 
+    // generating package
+    if not (Directory.Exists(packageDir)) then Directory.CreateDirectory(packageDir) |> ignore
     let nugetParams defaults : NuGetParams =
         {   defaults  with
                  WorkingDir = outputDir
