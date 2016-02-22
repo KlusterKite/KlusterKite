@@ -9,7 +9,8 @@ let buildDir = "./build"
 let packageDir = "./packageOut"
 let ver = environVar "version"
 
-let installer (projFile : string) =
+// package building method
+let installer (projFile : string, internalDependencies : string[]) =
     let dir = Path.GetDirectoryName(Path.GetFullPath(projFile))
     trace dir
     let parts = dir.Split([|'/';'\\'|], StringSplitOptions.RemoveEmptyEntries)
@@ -49,6 +50,9 @@ let installer (projFile : string) =
     metadata.SelectSingleNode("authors").InnerText <- "ClusterKit Team"  // todo: @m_kantarovsky publish correct data
     metadata.SelectSingleNode("owners").InnerText <- "ClusterKit Team"  // todo: @m_kantarovsky publish correct data
     metadata.SelectSingleNode("description").InnerText <- "ClusterKit lib" // todo: @m_kantarovsky publish correct data
+
+    // adding dependencies
+
     let dependenciesRootElement = metadata.AppendChild(nuspecData.CreateElement("dependencies"))
     let dependenciesDoc = new XmlDocument()
     dependenciesDoc.Load(dir + "/packages.config")
@@ -58,10 +62,16 @@ let installer (projFile : string) =
         dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value <- dependency.Attributes.["id"].Value
         dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value <- dependency.Attributes.["version"].Value
 
+    for dependency in internalDependencies do
+        let dependencyElement = dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"))
+        dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value <- dependency
+        dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value <- ver
+
     let filesRootElement = nuspecData.DocumentElement.SelectSingleNode("/package").AppendChild(nuspecData.CreateElement("files"))
     for file in Directory.GetFiles(outputDir) do
         let fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"))
         fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value <- Path.GetFileName(file)
+        fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value <- ("./" + Path.GetFileName(file))
 
     let nuspecFile = outputDir + "/" + projName + ".nuspec"
     nuspecData.Save(nuspecFile)
@@ -77,21 +87,15 @@ let installer (projFile : string) =
 
     NuGetPackDirectly nugetParams  nuspecFile
 
-    // cleaning
-    if Directory.Exists(buildTmpDir) then Directory.Delete(buildTmpDir, true)
-    if Directory.Exists(outputDir) then Directory.Delete(outputDir, true)
-
-//    File.Copy(
-//        [dir; (projName + ".nuspec")] |> String.concat "/",
-//        [outputDir; (projName + ".nuspec")] |> String.concat "/"
-//    )
-
 //            "./ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj"
 //            "./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"
 
 Target "BuildApp" (fun _ ->
     if Directory.Exists(packageDir) then Directory.Delete(packageDir, true)
-    installer("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj")
+    installer("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj", ([||]))
+    installer("./ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj", ([|"ClusterKit.Core"|]))
+    installer("./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj", ([|"ClusterKit.Core"|]))
+    if Directory.Exists(buildDir) then Directory.Delete(buildDir, true)
 )
 
 Target "Deploy" (fun _ ->

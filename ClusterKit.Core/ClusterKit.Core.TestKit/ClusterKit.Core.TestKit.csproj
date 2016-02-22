@@ -183,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ClusterKit.Core.TestKit.nuspec" />
     <None Include="packages.config" />
     <None Include="Resources\akka.hocon">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
