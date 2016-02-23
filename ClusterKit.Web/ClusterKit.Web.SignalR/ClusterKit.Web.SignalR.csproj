@@ -209,9 +209,7 @@
     <None Include="app.config" />
     <None Include="ClusterKit.Web.SignalR.nuspec" />
     <None Include="packages.config" />
-    <None Include="Resources\akka.hocon">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="Resources\akka.hocon"/>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Configuration.resx">
