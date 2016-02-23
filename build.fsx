@@ -101,6 +101,7 @@ Target "BuildApp" (fun _ ->
     installer("./ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj", ([|"ClusterKit.Core"; "ClusterKit.Web.Client"|]))
     installer("./ClusterKit.Web/ClusterKit.Web.NginxConfigurator/ClusterKit.Web.NginxConfigurator.csproj", ([|"ClusterKit.Core"; "ClusterKit.Web.Client"|]))
     installer("./ClusterKit.Web/ClusterKit.Web.SignalR/ClusterKit.Web.SignalR.csproj", ([|"ClusterKit.Core"; "ClusterKit.Web.Client"|]))
+    installer("./ClusterKit.Monitoring/ClusterKit.Monitoring/ClusterKit.Monitoring.csproj", ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web"|]))
 
     if Directory.Exists(buildDir) then Directory.Delete(buildDir, true)
 )

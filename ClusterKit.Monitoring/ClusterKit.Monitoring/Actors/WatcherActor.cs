@@ -125,7 +125,7 @@ namespace ClusterKit.Monitoring.Actors
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<MonitoringHub>();
             context.Clients.All.reloadData(this.clusterMembers.Values.ToList());
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace ClusterKit.Monitoring.Actors
                 SendNewDescription(currentLeader);
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace ClusterKit.Monitoring.Actors
             description.Roles = member.Roles.ToList();
             description.Status = member.Status;
             SendNewDescription(description);
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace ClusterKit.Monitoring.Actors
                 this.clusterMembers.Remove(message.Address);
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace ClusterKit.Monitoring.Actors
         private Task OnClusterMemberListRequest()
         {
             this.Sender.Tell(this.clusterMembers.Values.ToList());
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace ClusterKit.Monitoring.Actors
                 description.PingValue = pingMeasurement.Result?.TotalMilliseconds;
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace ClusterKit.Monitoring.Actors
             }
 
             description.IsReachable = isReachable;
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace ClusterKit.Monitoring.Actors
                 SendNewDescription(currentLeader);
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>

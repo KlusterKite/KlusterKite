@@ -64,19 +64,28 @@ namespace ClusterKit.Monitoring {
         ///   Looks up a localized string similar to  {
         /// 	ClusterKit {
         /// 		Web {
-        /// 			OwinBindAddress = &quot;Http://*:8080&quot;
-        /// 			Services {
-        /// 			    // The list of services. Should be described as pair of directory and hostname.
-        /// 			    // It doesn&apos;t supposed (but is not prohibited) that this should be public service hostname.
-        /// 			    // It&apos;s just used to distinguish services with identical url paths to be correctly published on frontend web servers.
-        /// 				//&quot;default&quot; = &quot;default&quot;
-        /// 			}
+        ///            Services {
+        ///               /MonitoringApi = Monitoring
+        ///               /signalr = Monitoring
+        ///            }
+        /// 		}
+        ///
+        /// 		Monitoring {
+        /// 			PingFrequency = 2s
+        /// 			PingTimeout = 2s,
+        /// 			BroadcastClientFrequency = 5s,
+        /// 			RemoveMemberTimeout = 1h
         /// 		}
         /// 	}
         ///
         /// 	akka.actor.deployment {
         /// 		 /Monitoring {
-        ///            Is [rest of string was truncated]&quot;;.
+        ///            IsNameSpace = true
+        ///        }
+        ///
+        ///        /Monitoring/Watcher {
+        ///            type = &quot;ClusterKit.Monitoring.Actors.WatcherActor, ClusterKit.Monitoring&quot;
+        ///  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AkkaConfig {
             get {

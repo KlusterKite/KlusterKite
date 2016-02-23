@@ -92,7 +92,7 @@ namespace ClusterKit.Monitoring.Actors
                 this.Self
                 );
 
-            return Task.CompletedTask;
+            return Task.FromResult((object)null);
         }
 
         /// <summary>
