@@ -257,9 +257,13 @@ namespace ClusterKit.Build
                 projects.Where(p => p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests))
                     .Select(p => Path.Combine(p.TempBuildDirectory, $"{p.ProjectName}.dll"));
 
+            var runnerLocation = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages"))
+                .OrderByDescending(d => d)
+                .First();
+
             Func<XUnit2.XUnit2Params, XUnit2.XUnit2Params> testParameters = p =>
             {
-                p.SetFieldValue("ToolPath", Path.Combine(Directory.GetCurrentDirectory(), "packages", "xunit.runner.console", "tools", "xunit.console.exe"));
+                p.SetFieldValue("ToolPath", Path.Combine(runnerLocation, "tools", "xunit.console.exe"));
                 return p;
             };
 
