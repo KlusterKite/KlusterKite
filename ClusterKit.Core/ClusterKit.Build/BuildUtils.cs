@@ -17,6 +17,7 @@ namespace ClusterKit.Build
     using System.Xml;
 
     using Fake;
+    using Fake.Testing;
 
     using Microsoft.FSharp.Core;
 
@@ -110,16 +111,23 @@ namespace ClusterKit.Build
 
             projDoc.Save(project.ProjectFileName);
 
-            MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Rebuild", new[] { project.ProjectFileName });
-
-            // restoring original project file
-            originalProjDoc.Save(project.ProjectFileName);
+            try
+            {
+                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Rebuild", new[] { project.ProjectFileName });
+            }
+            finally
+            {
+                // restoring original project file
+                originalProjDoc.Save(project.ProjectFileName);
+            }
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
-            var buildFiles = Directory.GetFiles(project.TempBuildDirectory, $"({project.ProjectName}.*)");
+            var buildFiles = Directory.GetFiles(project.TempBuildDirectory, $"{project.ProjectName}.*");
             foreach (var file in buildFiles)
             {
-                File.Copy(Path.Combine(project.TempBuildDirectory, file), Path.Combine(project.CleanBuildDirectory, file));
+                var fileName = Path.GetFileName(file);
+                ConsoleLog($"Copying {fileName}");
+                File.Copy(Path.Combine(project.TempBuildDirectory, fileName), Path.Combine(project.CleanBuildDirectory, fileName));
             }
         }
 
@@ -163,6 +171,11 @@ namespace ClusterKit.Build
         /// </param>
         public static void CreateNuget(ProjectDescription project)
         {
+            if (!project.ProjectType.HasFlag(ProjectDescription.EnProjectType.NugetPackage))
+            {
+                return;
+            }
+
             var nuspecData = new XmlDocument();
             var nuspecDataFileName = $"{project.ProjectName}.nuspec";
             nuspecData.Load(Path.Combine(project.ProjectDirectory, nuspecDataFileName));
@@ -232,6 +245,25 @@ namespace ClusterKit.Build
             {
                 CreateNuget(project);
             }
+        }
+
+        /// <summary>
+        /// Runs defined unit tests on all projects
+        /// </summary>
+        /// <param name="projects">The list of projects to test</param>
+        public static void RunXUnitTest(IEnumerable<ProjectDescription> projects)
+        {
+            var testAssemblies =
+                projects.Where(p => p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests))
+                    .Select(p => Path.Combine(p.TempBuildDirectory, $"{p.ProjectName}.dll"));
+
+            Func<XUnit2.XUnit2Params, XUnit2.XUnit2Params> testParameters = p =>
+            {
+                p.SetFieldValue("ToolPath", Path.Combine(Directory.GetCurrentDirectory(), "packages", "xunit.runner.console", "tools", "xunit.console.exe"));
+                return p;
+            };
+
+            XUnit2.xUnit2(testParameters.ToFSharpFunc(), testAssemblies);
         }
 
         /// <summary>

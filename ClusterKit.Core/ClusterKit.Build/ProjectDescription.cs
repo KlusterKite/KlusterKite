@@ -23,13 +23,17 @@ namespace ClusterKit.Build
         /// <param name="projectFileName">
         ///     The project file name.
         /// </param>
+        /// <param name="projectType">
+        ///     The project type or types
+        /// </param>
         /// <param name="internalDependencies">
         ///     The internal dependencies.
         /// </param>
-        public ProjectDescription(string projectFileName, string[] internalDependencies = null)
+        public ProjectDescription(string projectFileName, EnProjectType projectType, string[] internalDependencies = null)
         {
             this.InternalDependencies = internalDependencies ?? new string[0];
             this.ProjectFileName = projectFileName;
+            this.ProjectType = projectType;
 
             if (projectFileName == null)
             {
@@ -44,6 +48,28 @@ namespace ClusterKit.Build
             }
 
             this.ProjectName = Path.GetFileNameWithoutExtension(projectFileName);
+        }
+
+        /// <summary>
+        /// Types of projects
+        /// </summary>
+        [Flags]
+        public enum EnProjectType
+        {
+            /// <summary>
+            /// Project has no specific type
+            /// </summary>
+            None = 0,
+
+            /// <summary>
+            /// Project can be packed in nuget package
+            /// </summary>
+            NugetPackage = 1,
+
+            /// <summary>
+            /// Project contains xunit tests
+            /// </summary>
+            XUnitTests = 2
         }
 
         /// <summary>
@@ -72,8 +98,13 @@ namespace ClusterKit.Build
         public string ProjectName { get; }
 
         /// <summary>
+        /// Gets current project types
+        /// </summary>
+        public EnProjectType ProjectType { get; }
+
+        /// <summary>
         /// Gets directory name for temporary build
         /// </summary>
-        public string TempBuildDirectory => Path.Combine(BuildUtils.BuildClean, this.ProjectName);
+        public string TempBuildDirectory => Path.Combine(BuildUtils.BuildTemp, this.ProjectName);
     }
 }

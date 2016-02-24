@@ -68,6 +68,12 @@
             </summary>
             <param name="projects">The list of projects to package</param>
         </member>
+        <member name="M:ClusterKit.Build.BuildUtils.RunXUnitTest(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Runs defined unit tests on all projects
+            </summary>
+            <param name="projects">The list of projects to test</param>
+        </member>
         <member name="M:ClusterKit.Build.BuildUtils.ConsoleLog(System.String)">
             <summary>
             Debugger method to write sum console output
@@ -87,16 +93,39 @@
             Short description of project to build
             </summary>
         </member>
-        <member name="M:ClusterKit.Build.ProjectDescription.#ctor(System.String,System.String[])">
+        <member name="M:ClusterKit.Build.ProjectDescription.#ctor(System.String,ClusterKit.Build.ProjectDescription.EnProjectType,System.String[])">
             <summary>
             Initializes a new instance of the <see cref="T:ClusterKit.Build.ProjectDescription"/> class.
             </summary>
             <param name="projectFileName">
                 The project file name.
             </param>
+            <param name="projectType">
+                The project type or types
+            </param>
             <param name="internalDependencies">
                 The internal dependencies.
             </param>
+        </member>
+        <member name="T:ClusterKit.Build.ProjectDescription.EnProjectType">
+            <summary>
+            Types of projects
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Build.ProjectDescription.EnProjectType.None">
+            <summary>
+            Project has no specific type
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Build.ProjectDescription.EnProjectType.NugetPackage">
+            <summary>
+            Project can be packed in nuget package
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Build.ProjectDescription.EnProjectType.XUnitTests">
+            <summary>
+            Project contains xunit tests
+            </summary>
         </member>
         <member name="P:ClusterKit.Build.ProjectDescription.CleanBuildDirectory">
             <summary>
@@ -121,6 +150,11 @@
         <member name="P:ClusterKit.Build.ProjectDescription.ProjectName">
             <summary>
             Gets current projects name
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.ProjectType">
+            <summary>
+            Gets current project types
             </summary>
         </member>
         <member name="P:ClusterKit.Build.ProjectDescription.TempBuildDirectory">
