@@ -9,6 +9,7 @@
       <Value>redis</Value>
       <Value>Owin</Value>
       <Value>nginx</Value>
+      <Value>nuget</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

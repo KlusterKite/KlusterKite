@@ -20,6 +20,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Client", "Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.SignalR", "ClusterKit.Web.SignalR\ClusterKit.Web.SignalR.csproj", "{1158612D-1E02-4CC2-85A1-323AE272C2E3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildScripts", "BuildScripts", "{94CA18D6-2915-4397-8717-01E564D992D0}"
+	ProjectSection(SolutionItems) = preProject
+		..\BuildScripts\tools.fsx = ..\BuildScripts\tools.fsx
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,5 +54,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{94CA18D6-2915-4397-8717-01E564D992D0} = {E142B59E-0646-4EAB-970E-D6175A16AC3E}
 	EndGlobalSection
 EndGlobal

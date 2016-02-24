@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ClusterKit.Build</name>
+    </assembly>
+    <members>
+        <member name="T:ClusterKit.Build.BuildUtils">
+            <summary>
+            Bundle of utilities to build project
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.BuildUtils.BuildClean">
+            <summary>
+            Gets temporary directory to store clean builds of projects
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.BuildUtils.BuildDirectory">
+            <summary>
+            Gets temporary directory to build projects
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.BuildUtils.BuildTemp">
+            <summary>
+            Gets temporary directory to use in build procedures
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.BuildUtils.PackageDirecotry">
+            <summary>
+            Gets output directory to put prepared nuget packages
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.BuildUtils.Version">
+            <summary>
+            Gets global output packages version
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.Build(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Builds current project
+            </summary>
+            <param name="project">Project to build</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.Build(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Builds all projects
+            </summary>
+            <param name="projects">The list of projects to build</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.Configure(System.String,System.String,System.String)">
+            <summary>
+            Configures current build execution
+            </summary>
+            <param name="version">Global output packages version</param>
+            <param name="buildDirectory">Temp directory to build projects</param>
+            <param name="packageDirecotry">Output directory to put prepared nuget packages</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.CreateNuget(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Creates nuget package
+            </summary>
+            <param name="project">
+            The project to publish
+            </param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.CreateNuget(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Creates nuget package for all projects
+            </summary>
+            <param name="projects">The list of projects to package</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.ConsoleLog(System.String)">
+            <summary>
+            Debugger method to write sum console output
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.SetFieldValue(System.Object,System.String,System.Object)">
+            <summary>
+            Kludge to work with F# objects
+            </summary>
+            <param name="obj">Object to modify</param>
+            <param name="fieldName">Field name</param>
+            <param name="value">Value to store</param>
+        </member>
+        <member name="T:ClusterKit.Build.ProjectDescription">
+            <summary>
+            Short description of project to build
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Build.ProjectDescription.#ctor(System.String,System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Build.ProjectDescription"/> class.
+            </summary>
+            <param name="projectFileName">
+                The project file name.
+            </param>
+            <param name="internalDependencies">
+                The internal dependencies.
+            </param>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.CleanBuildDirectory">
+            <summary>
+            Gets directory name for clean build
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.InternalDependencies">
+            <summary>
+            Gets list of internal (global across all modules bundle) dependencies
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.ProjectDirectory">
+            <summary>
+            Gets current project absolute directory path
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.ProjectFileName">
+            <summary>
+            Gets path to project file
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.ProjectName">
+            <summary>
+            Gets current projects name
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.TempBuildDirectory">
+            <summary>
+            Gets directory name for temporary build
+            </summary>
+        </member>
+    </members>
+</doc>
