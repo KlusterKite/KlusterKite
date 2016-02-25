@@ -21,7 +21,7 @@ namespace ClusterKit.Core.Cluster
         /// <summary>
         /// The cluster.
         /// </summary>
-        private Akka.Cluster.Cluster cluster;
+        private Cluster cluster;
 
         /// <summary>
         /// Processing cluster event
@@ -71,7 +71,7 @@ namespace ClusterKit.Core.Cluster
         /// </summary>
         protected override void PreStart()
         {
-            this.cluster = Akka.Cluster.Cluster.Get(Context.System);
+            this.cluster = Cluster.Get(Context.System);
             this.cluster.Subscribe(
                 this.Self,
                 ClusterEvent.InitialStateAsEvents,

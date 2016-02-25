@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</ProjectGuid>
+    <ProjectGuid>{2740E3E0-256E-40AB-B3C7-3465CD340B2C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClusterKit.Core</RootNamespace>
-    <AssemblyName>ClusterKit.Core</AssemblyName>
+    <RootNamespace>ClusterKit.BusinessObjects</RootNamespace>
+    <AssemblyName>ClusterKit.BusinessObjects</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -31,38 +31,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.6.16, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Akka">
       <HintPath>..\..\packages\Akka.1.0.6\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster, Version=1.0.6.17, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Akka.Cluster">
       <HintPath>..\..\packages\Akka.Cluster.1.0.6.17-beta\lib\net45\Akka.Cluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.CastleWindsor, Version=1.0.6.16, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Akka.DI.CastleWindsor">
       <HintPath>..\..\packages\Akka.DI.CastleWindsor.1.0.6\lib\net45\Akka.DI.CastleWindsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.Core, Version=1.0.6.16, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Akka.DI.Core">
       <HintPath>..\..\packages\Akka.DI.Core.1.0.6\lib\net45\Akka.DI.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Logger.Serilog, Version=1.0.6.16, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Akka.Logger.Serilog">
       <HintPath>..\..\packages\Akka.Logger.Serilog.1.0.6\lib\net45\Akka.Logger.Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Remote, Version=1.0.6.16, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Akka.Remote">
       <HintPath>..\..\packages\Akka.Remote.1.0.6\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Castle.Core">
       <HintPath>..\..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -70,23 +63,23 @@
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Google.ProtocolBuffers, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ClusterKit.Core">
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.37-master\lib\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers">
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Google.ProtocolBuffers.Serialization, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Google.ProtocolBuffers.Serialization">
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Helios, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Helios">
       <HintPath>..\..\packages\Helios.1.4.2\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="JetBrains.Annotations, Version=10.1.2.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="JetBrains.Annotations">
       <HintPath>..\..\packages\JetBrains.Annotations.10.1.2-eap\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -95,8 +88,7 @@
       <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serilog">
       <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -104,8 +96,7 @@
       <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="StackExchange.Redis, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="StackExchange.Redis">
       <HintPath>..\..\packages\StackExchange.Redis.1.1.572-alpha\lib\net45\StackExchange.Redis.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -114,21 +105,17 @@
       <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Reactive.Core, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Reactive.Core">
       <HintPath>..\..\packages\Rx-Core.2.3.0-beta2\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Reactive.Interfaces">
       <HintPath>..\..\packages\Rx-Interfaces.2.3.0-beta2\lib\net45\System.Reactive.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Reactive.Linq">
       <HintPath>..\..\packages\Rx-Linq.2.3.0-beta2\lib\net45\System.Reactive.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -140,34 +127,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActorSystemUtils.cs" />
-    <Compile Include="BaseInstaller.cs" />
-    <Compile Include="Cluster\ClusterLoggingActor.cs" />
-    <Compile Include="Configuration.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Configuration.resx</DependentUpon>
-    </Compile>
-    <Compile Include="NameSpaceActor.cs" />
-    <Compile Include="Ping\PingActor.cs" />
-    <Compile Include="Ping\PingMessage.cs" />
-    <Compile Include="Ping\PongMessage.cs" />
+    <Compile Include="BaseBusinessObjectReceiveActor.cs" />
+    <Compile Include="ClusterBusinessObjectActorSupervisor.cs" />
+    <Compile Include="Messages\ChildCreated.cs" />
+    <Compile Include="Messages\ChildRemoved.cs" />
+    <Compile Include="Messages\CreateChildCommand.cs" />
+    <Compile Include="Messages\EnvelopeToReceiver.cs" />
+    <Compile Include="Messages\EnvelopeToSender.cs" />
+    <Compile Include="Messages\IMessageToBusinessObjectActor.cs" />
+    <Compile Include="Messages\ResetChildren.cs" />
+    <Compile Include="Messages\RestoreObject.cs" />
+    <Compile Include="Messages\SetObjectId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\AkkaUtils.cs" />
-    <Compile Include="Utils\DateTimeWrapper.cs" />
-    <Compile Include="Installer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ClusterKit.Core.nuspec" />
+    <None Include="ClusterKit.BusinessObjects.nuspec" />
     <None Include="packages.config" />
-    <None Include="Resources\akka.hocon" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Configuration.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
