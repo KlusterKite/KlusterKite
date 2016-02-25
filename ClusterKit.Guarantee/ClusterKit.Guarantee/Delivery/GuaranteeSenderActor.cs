@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Core.Guarantee
+namespace ClusterKit.Guarantee.Delivery
 {
     using System;
 
@@ -204,7 +204,7 @@ namespace ClusterKit.Core.Guarantee
             {
                 var uid = Guid.NewGuid();
                 var db = this.redisConnection.GetDatabase();
-                db.StringSet(string.Format(GuaranteeEnvelope.RedisKeyFormat, uid), "1", TimeSpan.FromDays(1));
+                db.StringSet(string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)uid), "1", TimeSpan.FromDays(1));
 
                 var envelope = new GuaranteeEnvelope
                 {

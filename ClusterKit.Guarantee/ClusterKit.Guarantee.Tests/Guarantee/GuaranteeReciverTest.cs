@@ -7,22 +7,22 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Tests.Guarantee
+namespace ClusterKit.Guarantee.Tests.Guarantee
 {
     using System;
     using System.Collections.Concurrent;
+
     using Akka.Configuration;
-    using Akka.DI.Core;
+
     using Castle.Windsor;
-    using ClusterKit.Core.Guarantee;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Core.TestKit.Moq;
+
     using StackExchange.Redis;
+
     using Xunit;
     using Xunit.Abstractions;
 
     /// <summary>
-    /// Testing <seealso cref="GuaranteeRecieverActor"/> test
+    /// Testing <seealso cref="ClusterKit.Core.Guarantee.GuaranteeRecieverActor"/> test
     /// </summary>
     public class GuaranteeReciverTest : BaseActorTest<GuaranteeReciverTest.Configurator>
     {
@@ -75,11 +75,11 @@ namespace ClusterKit.Core.Tests.Guarantee
                 Sender = testActor
             };
 
-            redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)] = "1";
+            redis[string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)envelope.MessageId)] = "1";
             actor.Tell(envelope);
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/test"));
             Assert.True(this.ExpectMsg<bool>());
-            Assert.Equal(string.Empty, redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)]);
+            Assert.Equal(string.Empty, redis[string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)envelope.MessageId)]);
         }
 
         /// <summary>
@@ -104,11 +104,11 @@ namespace ClusterKit.Core.Tests.Guarantee
                 Sender = testActor
             };
 
-            redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)] = string.Empty;
+            redis[string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)envelope.MessageId)] = string.Empty;
             actor.Tell(envelope);
             Assert.False(this.ExpectMsg<bool>());
             this.ExpectNoMsg();
-            Assert.Equal(string.Empty, redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)]);
+            Assert.Equal(string.Empty, redis[string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)envelope.MessageId)]);
         }
 
         /// <summary>
