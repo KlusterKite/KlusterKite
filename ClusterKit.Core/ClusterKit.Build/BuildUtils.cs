@@ -214,6 +214,14 @@ namespace ClusterKit.Build
                 dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value = Version;
             }
 
+            var filesRootElement = nuspecData.DocumentElement.SelectSingleNode("/package").AppendChild(nuspecData.CreateElement("files"));
+            foreach (var file in Directory.GetFiles(project.CleanBuildDirectory))
+            {
+                var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
+                fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.GetFileName(file);
+                fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{Path.GetFileName(file)}";
+            }
+
             var generatedNuspecFile = Path.Combine(project.CleanBuildDirectory, nuspecDataFileName);
             nuspecData.Save(generatedNuspecFile);
 
