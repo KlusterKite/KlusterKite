@@ -1,5 +1,5 @@
 #r "./packages/FAKE/tools/FakeLib.dll" // include Fake lib
-#r @"BuildScripts/ClusterKit.Build.dll"
+#r @"BuildScripts/ClusterKit.Build.dll" // include budle of build utils
 open Fake
 open System
 open System.IO
@@ -17,6 +17,7 @@ let currentTarget = getBuildParam "target"
 BuildUtils.Configure(ver, buildDir, packageDir)
 
 let projects = [|
+    new ProjectDescription("./ClusterKit.Core/ClusterKit.Build/ClusterKit.Build.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
