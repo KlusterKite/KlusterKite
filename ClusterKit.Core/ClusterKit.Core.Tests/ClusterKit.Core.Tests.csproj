@@ -179,8 +179,6 @@
     <Compile Include="BusinessObjects\ClusterBusinessObjectActorSupervisorTest.cs" />
     <Compile Include="ConceptProof\AkkaClusterTest.cs" />
     <Compile Include="Configuration\ConfigurationTest.cs" />
-    <Compile Include="Guarantee\GuaranteeReciverTest.cs" />
-    <Compile Include="Guarantee\GuaranteeSenderTests.cs" />
     <Compile Include="Ping\PingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestUtils\CoreTestKitTests.cs" />

@@ -7,24 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Tests.Guarantee
+namespace ClusterKit.Guarantee.Tests.Guarantee
 {
-    using System;
-    using System.Collections.Concurrent;
-    using Akka.Actor;
-    using Akka.Configuration;
-    using Akka.DI.Core;
-    using Akka.TestKit;
-    using Castle.Windsor;
-    using ClusterKit.Core.Guarantee;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Core.TestKit.Moq;
-    using StackExchange.Redis;
-    using Xunit;
-    using Xunit.Abstractions;
+    using ClusterKit.Guarantee.Tests.Guarantee;
 
     /// <summary>
-    /// Testing <seealso cref="GuaranteeSenderActor"/>
+    /// Testing <seealso cref="ClusterKit.Core.Guarantee.GuaranteeSenderActor"/>
     /// </summary>
     public class GuaranteeSenderTests : BaseActorTest<GuaranteeSenderTests.Configurator>
     {
@@ -79,7 +67,7 @@ namespace ClusterKit.Core.Tests.Guarantee
             var rec = this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver", TimeSpan.FromMilliseconds(100));
 
             Assert.Equal("Hello world", rec.Message);
-            Assert.True(redis.ContainsKey(string.Format(GuaranteeEnvelope.RedisKeyFormat, rec.MessageId)));
+            Assert.True(redis.ContainsKey(string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)rec.MessageId)));
         }
 
         /// <summary>
@@ -130,7 +118,7 @@ namespace ClusterKit.Core.Tests.Guarantee
             actor.Tell("Hello world");
             var rec = this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver");
             Assert.Equal("Hello world", rec.Message);
-            Assert.True(redis.ContainsKey(string.Format(GuaranteeEnvelope.RedisKeyFormat, rec.MessageId)));
+            Assert.True(redis.ContainsKey(string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)rec.MessageId)));
         }
 
         /// <summary>

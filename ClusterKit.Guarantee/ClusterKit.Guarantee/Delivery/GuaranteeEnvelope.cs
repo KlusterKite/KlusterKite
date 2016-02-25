@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Guarantee
+namespace ClusterKit.Guarantee.Delivery
 {
     using System;
 

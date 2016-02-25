@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Guarantee
+namespace ClusterKit.Guarantee.Delivery
 {
     using Akka.Actor;
     using Akka.Event;
@@ -70,7 +70,7 @@ namespace ClusterKit.Core.Guarantee
         {
             var redis = this.redisConnection.GetDatabase();
             var isFirst = redis.StringGetSet(
-                string.Format(GuaranteeEnvelope.RedisKeyFormat, message.MessageId),
+                string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)message.MessageId),
                 string.Empty);
 
             if (!string.IsNullOrEmpty(isFirst))
