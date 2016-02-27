@@ -42,13 +42,13 @@ namespace ClusterKit.Core.Tests.TestUtils
         [Fact]
         public void CallingThreadDispatcherTest()
         {
-            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(50)));
+            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(500)));
             var testActor = this.ActorOfAsTestActorRef(() => new DelayedForwarder(this.TestActor));
 
             CallingThreadDispatcher.RiseBlock();
             Task.Run(() => testActor.Tell("hello world"));
             Assert.False(this.HasMessages);
-            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(110)));
+            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(500)));
             Assert.True(this.HasMessages);
         }
 

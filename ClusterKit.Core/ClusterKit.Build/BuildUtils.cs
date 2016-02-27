@@ -236,9 +236,21 @@ namespace ClusterKit.Build
             metaData.SelectSingleNode("id").InnerText = project.ProjectName;
             metaData.SelectSingleNode("version").InnerText = Version;
             metaData.SelectSingleNode("title").InnerText = project.ProjectName;
-            metaData.SelectSingleNode("authors").InnerText = "ClusterKit Team";  // todo: @m_kantarovsky publish correct data
-            metaData.SelectSingleNode("owners").InnerText = "ClusterKit Team";  // todo: @m_kantarovsky publish correct data
-            metaData.SelectSingleNode("description").InnerText = "ClusterKit lib"; // todo: @m_kantarovsky publish correct data
+
+            if ("$author$".Equals(metaData.SelectSingleNode("authors").InnerText))
+            {
+                metaData.SelectSingleNode("authors").InnerText = "ClusterKit Team";
+            }
+
+            if ("$author$".Equals(metaData.SelectSingleNode("owners").InnerText))
+            {
+                metaData.SelectSingleNode("owners").InnerText = "ClusterKit Team";
+            }
+
+            if ("$description$".Equals(metaData.SelectSingleNode("description").InnerText))
+            {
+                metaData.SelectSingleNode("description").InnerText = "ClusterKit lib";
+            }
 
             var dependenciesRootElement = metaData.AppendChild(nuspecData.CreateElement("dependencies"));
             var dependenciesDoc = new XmlDocument();
