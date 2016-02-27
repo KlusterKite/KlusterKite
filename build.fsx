@@ -44,7 +44,7 @@ Target "PreClean" (fun _ ->
 )
 
 Target "Build"  (fun _ ->
-    BuildUtils.Build(projects);
+    BuildUtils.Build(projects, true);
 )
 
 Target "PublishNuGet" (fun _ ->
