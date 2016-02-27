@@ -113,7 +113,8 @@ namespace ClusterKit.Build
                 }
             }
 
-            projDoc.Save(project.ProjectFileName);
+            ConsoleLog($"Writing modified {Path.GetFullPath(project.ProjectFileName)}");
+            projDoc.Save(Path.GetFullPath(project.ProjectFileName));
 
             try
             {
@@ -122,7 +123,8 @@ namespace ClusterKit.Build
             finally
             {
                 // restoring original project file
-                originalProjDoc.Save(project.ProjectFileName);
+                ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
+                originalProjDoc.Save(Path.GetFullPath(project.ProjectFileName));
                 projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
             }
 
