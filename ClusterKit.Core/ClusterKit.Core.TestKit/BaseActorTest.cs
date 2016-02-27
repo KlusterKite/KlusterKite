@@ -157,7 +157,11 @@ namespace ClusterKit.Core.TestKit
             if (this.HasMessages)
             {
                 var message = this.ExpectMsg<object>();
-                if (message.GetType().IsGenericType && message.GetType().GetGenericTypeDefinition() == typeof(TestMessage<>))
+                if (message == null)
+                {
+                    Assert.False(true, $"Expected no messages, but got null message");
+                }
+                else if (message.GetType().IsGenericType && message.GetType().GetGenericTypeDefinition() == typeof(TestMessage<>))
                 {
                     var path = (string)message.GetType().GetProperty("RecieverPathRooted").GetValue(message);
                     var type = message.GetType().GenericTypeArguments[0];

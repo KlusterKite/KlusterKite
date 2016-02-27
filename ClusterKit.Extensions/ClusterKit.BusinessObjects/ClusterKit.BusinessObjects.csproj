@@ -63,8 +63,9 @@
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core">
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.37-master\lib\ClusterKit.Core.dll</HintPath>
+    <Reference Include="ClusterKit.Core, Version=0.0.0.52, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.52-master\lib\ClusterKit.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers">
@@ -129,6 +130,12 @@
   <ItemGroup>
     <Compile Include="BaseBusinessObjectReceiveActor.cs" />
     <Compile Include="ClusterBusinessObjectActorSupervisor.cs" />
+    <Compile Include="Configuration.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Configuration.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Installer.cs" />
     <Compile Include="Messages\ChildCreated.cs" />
     <Compile Include="Messages\ChildRemoved.cs" />
     <Compile Include="Messages\CreateChildCommand.cs" />
@@ -144,6 +151,13 @@
     <None Include="app.config" />
     <None Include="ClusterKit.BusinessObjects.nuspec" />
     <None Include="packages.config" />
+    <None Include="Resources\akka.hocon" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

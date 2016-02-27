@@ -19,6 +19,7 @@
 
     using ClusterKit.BusinessObjects;
     using ClusterKit.BusinessObjects.Messages;
+    using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Core.TestKit.Moq;
     using ClusterKit.Core.Utils;
@@ -817,6 +818,17 @@
                     .WithFallback(ConfigurationFactory.ParseString("akka.loglevel = INFO"))
                     .WithFallback(ConfigurationFactory.ParseString("akka.cluster.auto-down-unreachable-after = 1s"))
                     .WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
+
+            /// <summary>
+            /// Gets list of all used plugin installers
+            /// </summary>
+            /// <returns>The list of installers</returns>
+            public override List<BaseInstaller> GetPluginInstallers()
+            {
+                var pluginInstallers = base.GetPluginInstallers();
+                pluginInstallers.Add(new ClusterKit.BusinessObjects.Installer());
+                return pluginInstallers;
             }
         }
     }

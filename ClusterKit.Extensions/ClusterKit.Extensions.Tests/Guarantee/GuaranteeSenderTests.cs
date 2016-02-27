@@ -11,6 +11,7 @@ namespace ClusterKit.Extensions.Tests.Guarantee
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -19,6 +20,7 @@ namespace ClusterKit.Extensions.Tests.Guarantee
 
     using Castle.Windsor;
 
+    using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Core.TestKit.Moq;
     using ClusterKit.Guarantee.Delivery;
@@ -81,10 +83,10 @@ namespace ClusterKit.Extensions.Tests.Guarantee
             actor.Tell("Hello world");
 
             this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver");
-            var rec = this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver", TimeSpan.FromMilliseconds(100));
+            var rec = this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver", TimeSpan.FromMilliseconds(500));
 
             Assert.Equal("Hello world", rec.Message);
-            Assert.True(redis.ContainsKey(string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)rec.MessageId)));
+            Assert.True(redis.ContainsKey(string.Format(GuaranteeEnvelope.RedisKeyFormat, rec.MessageId)));
         }
 
         /// <summary>
@@ -186,6 +188,17 @@ namespace ClusterKit.Extensions.Tests.Guarantee
                         }
                 }
             }").WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
+
+            /// <summary>
+            /// Gets list of all used plugin installers
+            /// </summary>
+            /// <returns>The list of installers</returns>
+            public override List<BaseInstaller> GetPluginInstallers()
+            {
+                var pluginInstallers = base.GetPluginInstallers();
+                pluginInstallers.Add(new ClusterKit.Guarantee.Installer());
+                return pluginInstallers;
             }
         }
     }

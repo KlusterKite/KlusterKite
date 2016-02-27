@@ -11,12 +11,14 @@ namespace ClusterKit.Extensions.Tests.Guarantee
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
 
     using Akka.Configuration;
     using Akka.DI.Core;
 
     using Castle.Windsor;
 
+    using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Core.TestKit.Moq;
     using ClusterKit.Guarantee.Delivery;
@@ -80,7 +82,7 @@ namespace ClusterKit.Extensions.Tests.Guarantee
                 Sender = testActor
             };
 
-            redis[string.Format((string)GuaranteeEnvelope.RedisKeyFormat, (object)envelope.MessageId)] = "1";
+            redis[string.Format(GuaranteeEnvelope.RedisKeyFormat, envelope.MessageId)] = "1";
             actor.Tell(envelope);
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/test"));
             Assert.True(this.ExpectMsg<bool>());
@@ -149,6 +151,17 @@ namespace ClusterKit.Extensions.Tests.Guarantee
                         }
                  }
             }").WithFallback(base.GetAkkaConfig(windsorContainer));
+            }
+
+            /// <summary>
+            /// Gets list of all used plugin installers
+            /// </summary>
+            /// <returns>The list of installers</returns>
+            public override List<BaseInstaller> GetPluginInstallers()
+            {
+                var pluginInstallers = base.GetPluginInstallers();
+                pluginInstallers.Add(new ClusterKit.Guarantee.Installer());
+                return pluginInstallers;
             }
         }
     }
