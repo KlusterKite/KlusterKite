@@ -337,6 +337,8 @@ namespace ClusterKit.Build
             {
                 p.SetFieldValue("ToolPath", Path.Combine(runnerLocation, "tools", "xunit.console.exe"));
                 p.SetFieldValue("ErrorLevel", UnitTestCommon.TestRunnerErrorLevel.DontFailBuild);
+                p.SetFieldValue("TimeOut", TimeSpan.FromHours(8));
+                p.SetFieldValue("ForceTeamCity", true);
                 return p;
             };
 
