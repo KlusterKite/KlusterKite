@@ -104,7 +104,8 @@ namespace ClusterKit.Build
                     refNode.Attributes["Include"].Value = $"{dependency}";
                     refNode.SelectSingleNode("./def:HintPath", namespaceManager).InnerText = Path.Combine(
                         Path.GetFullPath(BuildClean),
-                        $"{dependency}\\{dependency}.dll");
+                        dependency,
+                        $"{dependency}.dll");
                 }
                 else
                 {
