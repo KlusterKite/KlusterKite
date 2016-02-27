@@ -336,6 +336,7 @@ namespace ClusterKit.Build
             Func<XUnit2.XUnit2Params, XUnit2.XUnit2Params> testParameters = p =>
             {
                 p.SetFieldValue("ToolPath", Path.Combine(runnerLocation, "tools", "xunit.console.exe"));
+                p.SetFieldValue("ErrorLevel", UnitTestCommon.TestRunnerErrorLevel.DontFailBuild);
                 return p;
             };
 
