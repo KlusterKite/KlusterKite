@@ -14,6 +14,7 @@ namespace ClusterKit.Build
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using System.Xml;
 
     using Fake;
@@ -59,6 +60,8 @@ namespace ClusterKit.Build
         /// <param name="project">Project to build</param>
         public static void Build(ProjectDescription project)
         {
+            TraceHelper.trace($"Building {project.ProjectName}");
+
             if (Directory.Exists(project.TempBuildDirectory))
             {
                 Directory.Delete(project.TempBuildDirectory, true);
@@ -93,7 +96,7 @@ namespace ClusterKit.Build
                     .DocumentElement
                     .SelectNodes("//def:Reference", namespaceManager)
                     .Cast<XmlElement>()
-                    .FirstOrDefault(e => e.HasAttribute("Include") && e.Attributes["Include"].Value.IndexOf($"{dependency}, ") >= 0);
+                    .FirstOrDefault(e => e.HasAttribute("Include") && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"));
 
                 if (refNode != null)
                 {
@@ -176,6 +179,8 @@ namespace ClusterKit.Build
             {
                 return;
             }
+
+            TraceHelper.trace($"Packing {project.ProjectName}");
 
             var nuspecData = new XmlDocument();
             var nuspecDataFileName = $"{project.ProjectName}.nuspec";
