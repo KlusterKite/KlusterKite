@@ -37,9 +37,6 @@ namespace ClusterKit.Core.TestKit
         /// <param name="output">
         /// The output.
         /// </param>
-        /// <param name="config">
-        /// Custom test akka configuration
-        /// </param>
         protected BaseActorTest(ITestOutputHelper output) : base(CreateTestActorSystem(output))
         {
             this.Initialize();

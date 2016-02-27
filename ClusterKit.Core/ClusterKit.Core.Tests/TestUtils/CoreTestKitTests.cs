@@ -42,7 +42,7 @@ namespace ClusterKit.Core.Tests.TestUtils
         [Fact]
         public void CallingThreadDispatcherTest()
         {
-            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(10)));
+            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(50)));
             var testActor = this.ActorOfAsTestActorRef(() => new DelayedForwarder(this.TestActor));
 
             CallingThreadDispatcher.RiseBlock();

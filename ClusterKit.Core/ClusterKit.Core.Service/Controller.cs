@@ -72,7 +72,7 @@ namespace ClusterKit.Core.Service
         public void Stop()
         {
             this.startCancellationToken.Cancel(false);
-            this.actorSystem.Shutdown();
+            this.actorSystem.Terminate().Wait();
             Application.Stop();
             this.Logger.Info("Service was stopped.");
         }

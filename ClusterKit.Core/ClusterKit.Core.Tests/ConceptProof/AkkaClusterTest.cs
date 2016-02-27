@@ -14,20 +14,15 @@ namespace ClusterKit.Core.Tests.ConceptProof
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
     using Akka.Event;
     using Akka.Routing;
-
-    using Serilog;
-
     using ClusterKit.Core.TestKit;
-
+    using Serilog;
     using Xunit;
     using Xunit.Abstractions;
-
     using static Serilog.Log;
 
     /// <summary>
@@ -194,15 +189,8 @@ namespace ClusterKit.Core.Tests.ConceptProof
 
             // Thread.Sleep(TimeSpan.FromSeconds(2));
             */
-            foreach (var system in systems)
-            {
-                system.Shutdown();
-            }
 
-            foreach (var system in systems)
-            {
-                system.AwaitTermination();
-            }
+            Task.WaitAll(systems.Select(s => s.Terminate()).ToArray());
         }
 
         /// <summary>
@@ -267,10 +255,7 @@ namespace ClusterKit.Core.Tests.ConceptProof
 
             Log.Information("Cluster is UP and waiting ({Ms} for start)", (DateTimeOffset.Now - now).TotalMilliseconds);
 
-            foreach (var system in systems)
-            {
-                system.Shutdown();
-            }
+            Task.WaitAll(systems.Select(s => s.Terminate()).ToArray());
         }
 
         private static void SendClusterMessages(IActorRef sys2Router, int keysCol)
