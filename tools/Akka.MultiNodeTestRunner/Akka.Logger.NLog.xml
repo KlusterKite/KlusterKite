@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Akka.Logger.NLog</name>
+    </assembly>
+    <members>
+        <member name="T:Akka.Logger.NLog.NLogLogger">
+            <summary>
+            This class is used to receive log events and sends them to
+            the configured NLog logger. The following log events are
+            recognized: <see cref="T:Akka.Event.Debug"/>, <see cref="T:Akka.Event.Info"/>,
+            <see cref="T:Akka.Event.Warning"/> and <see cref="T:Akka.Event.Error"/>.
+            </summary>
+        </member>
+        <member name="M:Akka.Logger.NLog.NLogLogger.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Akka.Logger.NLog.NLogLogger"/> class.
+            </summary>
+        </member>
+    </members>
+</doc>
