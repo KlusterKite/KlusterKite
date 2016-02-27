@@ -98,7 +98,7 @@ namespace ClusterKit.Build
                 if (refNode != null)
                 {
                     ConsoleLog($"ref linked to {dependency} was updated");
-                    refNode.Attributes["Include"].Value = $"{dependency}, Version={Version}";
+                    refNode.Attributes["Include"].Value = $"{dependency}";
                     refNode.SelectSingleNode("./def:HintPath", namespaceManager).InnerText = Path.Combine(
                         Path.GetFullPath(BuildClean),
                         $"{dependency}\\{dependency}.dll");
@@ -119,6 +119,7 @@ namespace ClusterKit.Build
             {
                 // restoring original project file
                 originalProjDoc.Save(project.ProjectFileName);
+                projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
             }
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
