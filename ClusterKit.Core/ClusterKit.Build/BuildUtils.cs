@@ -58,7 +58,13 @@ namespace ClusterKit.Build
         /// Builds current project
         /// </summary>
         /// <param name="project">Project to build</param>
-        public static void Build(ProjectDescription project)
+        /// <param name="restoreOriginalProjectFile">
+        /// Whether or not it would restore original project file
+        /// <remarks>
+        /// During the build it changes internal package reference to local ones
+        /// </remarks>
+        /// </param>
+        public static void Build(ProjectDescription project, bool restoreOriginalProjectFile = true)
         {
             TraceHelper.trace($"Building {project.ProjectName}");
 
@@ -72,6 +78,9 @@ namespace ClusterKit.Build
                 Directory.Delete(project.CleanBuildDirectory, true);
             }
 
+            Directory.CreateDirectory(project.CleanBuildDirectory);
+            Directory.CreateDirectory(project.TempBuildDirectory);
+
             // restoring packages for project with respec to global configuration file
             Func<Unit, Unit> failFunc = u => u;
             var nugetPath = RestorePackageHelper.findNuget("./");
@@ -84,8 +93,6 @@ namespace ClusterKit.Build
             // modifying project file to substitute internal nute-through dependencies to currently built files
             var projDoc = new XmlDocument();
             projDoc.Load(project.ProjectFileName);
-            var originalProjDoc = new XmlDocument();
-            originalProjDoc.Load(project.ProjectFileName);
 
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
             namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
@@ -114,6 +121,7 @@ namespace ClusterKit.Build
             }
 
             ConsoleLog($"Writing modified {Path.GetFullPath(project.ProjectFileName)}");
+            File.Copy(Path.GetFullPath(project.ProjectFileName), Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"));
             projDoc.Save(Path.GetFullPath(project.ProjectFileName));
 
             try
@@ -122,10 +130,13 @@ namespace ClusterKit.Build
             }
             finally
             {
-                // restoring original project file
-                ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
-                originalProjDoc.Save(Path.GetFullPath(project.ProjectFileName));
-                projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
+                if (restoreOriginalProjectFile)
+                {
+                    // restoring original project file
+                    ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
+                    projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
+                    File.Copy(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"), Path.GetFullPath(project.ProjectFileName), true);
+                }
             }
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
@@ -144,9 +155,26 @@ namespace ClusterKit.Build
         /// <param name="projects">The list of projects to build</param>
         public static void Build(IEnumerable<ProjectDescription> projects)
         {
-            foreach (var project in projects)
+            try
             {
-                Build(project);
+                foreach (var project in projects)
+                {
+                    Build(project, false);
+                }
+            }
+            finally
+            {
+                foreach (var project in projects)
+                {
+                    var originalProjectFile = Path.Combine(
+                        project.TempBuildDirectory,
+                        $"{project.ProjectName}.csproj.orig");
+                    if (File.Exists(originalProjectFile))
+                    {
+                        ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
+                        File.Copy(originalProjectFile, Path.GetFullPath(project.ProjectFileName), true);
+                    }
+                }
             }
         }
 

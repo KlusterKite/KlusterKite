@@ -8,8 +8,8 @@ open System.Linq
 
 open  ClusterKit.Build
 
-let buildDir = "./build"
-let packageDir = "./packageOut"
+let buildDir = Path.GetFullPath("./build")
+let packageDir = Path.GetFullPath("./packageOut")
 let ver = environVar "version"
 
 let currentTarget = getBuildParam "target"
@@ -37,6 +37,10 @@ let projects = [|
 Target "PreClean" (fun _ ->
     trace "PreClean..."
     if Directory.Exists(packageDir) then Directory.Delete(packageDir, true)
+    if Directory.Exists(buildDir) then Directory.Delete(buildDir, true)
+    Directory.CreateDirectory(buildDir) |> ignore
+    Directory.CreateDirectory(Path.Combine(buildDir, "tmp")) |> ignore
+    Directory.CreateDirectory(Path.Combine(buildDir, "clean")) |> ignore
 )
 
 Target "Build"  (fun _ ->
