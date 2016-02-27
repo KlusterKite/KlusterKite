@@ -153,26 +153,41 @@ namespace ClusterKit.Build
         /// Builds all projects
         /// </summary>
         /// <param name="projects">The list of projects to build</param>
-        public static void Build(IEnumerable<ProjectDescription> projects)
+        /// <param name="restoreOriginalProjectFile">
+        /// Whether or not it would restore original project file
+        /// <remarks>
+        /// During the build it changes internal package reference to local ones
+        /// </remarks>
+        /// </param>
+        public static void Build(IEnumerable<ProjectDescription> projects, bool restoreOriginalProjectFile = true)
         {
+            var list = projects.ToList();
+
             try
             {
-                foreach (var project in projects)
+                foreach (var project in list)
                 {
                     Build(project, false);
                 }
             }
             finally
             {
-                foreach (var project in projects)
+                if (restoreOriginalProjectFile)
                 {
-                    var originalProjectFile = Path.Combine(
-                        project.TempBuildDirectory,
-                        $"{project.ProjectName}.csproj.orig");
-                    if (File.Exists(originalProjectFile))
+                    foreach (var project in list)
                     {
-                        ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
-                        File.Copy(originalProjectFile, Path.GetFullPath(project.ProjectFileName), true);
+                        var originalProjectFile = Path.Combine(
+                            project.TempBuildDirectory,
+                            $"{project.ProjectName}.csproj.orig");
+                        if (File.Exists(originalProjectFile))
+                        {
+                            ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
+                            File.Copy(originalProjectFile, Path.GetFullPath(project.ProjectFileName), true);
+                        }
+                        else
+                        {
+                            ConsoleLog($"There is no original {Path.GetFullPath(project.ProjectFileName)}");
+                        }
                     }
                 }
             }
