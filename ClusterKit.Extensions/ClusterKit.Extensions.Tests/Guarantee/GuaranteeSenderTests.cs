@@ -83,7 +83,7 @@ namespace ClusterKit.Extensions.Tests.Guarantee
             actor.Tell("Hello world");
 
             this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver");
-            var rec = this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver", TimeSpan.FromMilliseconds(500));
+            var rec = this.ExpectMsg<GuaranteeEnvelope>("/user/testReceiver", TimeSpan.FromMilliseconds(100));
 
             Assert.Equal("Hello world", rec.Message);
             Assert.True(redis.ContainsKey(string.Format(GuaranteeEnvelope.RedisKeyFormat, rec.MessageId)));
