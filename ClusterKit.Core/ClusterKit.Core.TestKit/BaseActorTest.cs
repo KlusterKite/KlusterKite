@@ -96,6 +96,7 @@ namespace ClusterKit.Core.TestKit
         /// </param>
         protected override void Dispose(bool disposing)
         {
+            this.Sys.Log.Info($"Test dispose launched with disposing as {disposing}");
             base.Dispose(disposing);
             this.Cleanup();
         }
