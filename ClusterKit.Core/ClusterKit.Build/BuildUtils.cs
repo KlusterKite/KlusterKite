@@ -322,9 +322,39 @@ namespace ClusterKit.Build
         /// <summary>
         /// Runs defined unit tests on all projects
         /// </summary>
+        /// <param name="project">The project to test</param>
+        public static void RunXUnitTest(ProjectDescription project)
+        {
+            if (!project.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests))
+            {
+                return;
+            }
+
+            var testAssembly = Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.dll");
+
+            var runnerLocation = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages"))
+                .OrderByDescending(d => d)
+                .First();
+
+            Func<XUnit2.XUnit2Params, XUnit2.XUnit2Params> testParameters = p =>
+            {
+                p.SetFieldValue("ToolPath", Path.Combine(runnerLocation, "tools", "xunit.console.exe"));
+                p.SetFieldValue("ErrorLevel", UnitTestCommon.TestRunnerErrorLevel.DontFailBuild);
+                p.SetFieldValue("TimeOut", TimeSpan.FromHours(8));
+                p.SetFieldValue("ForceTeamCity", true);
+                return p;
+            };
+
+            XUnit2.xUnit2(testParameters.ToFSharpFunc(), new[] { testAssembly });
+        }
+
+        /// <summary>
+        /// Runs defined unit tests on all projects
+        /// </summary>
         /// <param name="projects">The list of projects to test</param>
         public static void RunXUnitTest(IEnumerable<ProjectDescription> projects)
         {
+            /*
             var testAssemblies =
                 projects.Where(p => p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests))
                     .Select(p => Path.Combine(p.TempBuildDirectory, $"{p.ProjectName}.dll"));
@@ -343,6 +373,12 @@ namespace ClusterKit.Build
             };
 
             XUnit2.xUnit2(testParameters.ToFSharpFunc(), testAssemblies);
+            */
+
+            foreach (var project in projects)
+            {
+                RunXUnitTest(project);
+            }
         }
 
         /// <summary>

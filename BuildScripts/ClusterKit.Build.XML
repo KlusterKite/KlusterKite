@@ -80,6 +80,12 @@
             </summary>
             <param name="projects">The list of projects to package</param>
         </member>
+        <member name="M:ClusterKit.Build.BuildUtils.RunXUnitTest(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Runs defined unit tests on all projects
+            </summary>
+            <param name="project">The project to test</param>
+        </member>
         <member name="M:ClusterKit.Build.BuildUtils.RunXUnitTest(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
             <summary>
             Runs defined unit tests on all projects
