@@ -11,7 +11,7 @@
  					//default {
  					//	listen: "80" //nginx configuration for listen directive in server part
  						//server_name: "localhost" configuration for server_name directive in server part
- 						//Static { // you can define static content. This part will be jus inserted into nginx config
+ 						//Static { // you can define static content. This part will be just inserted into nginx config
 			            //    "/" = "
 			            //      root /var/www/root
 			            //    ";

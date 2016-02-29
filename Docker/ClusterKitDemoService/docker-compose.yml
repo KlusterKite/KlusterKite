@@ -1,0 +1,10 @@
+version: '2'
+services:
+  seed:
+    image: clusterkit/seed
+    ports:
+     - "80:80"
+  worker1:
+    image: clusterkit/worker
+  worker2:
+    image: clusterkit/worker    

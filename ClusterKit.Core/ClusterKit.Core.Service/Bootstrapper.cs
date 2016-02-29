@@ -46,11 +46,14 @@ namespace ClusterKit.Core.Service
             container.Register(Component.For<IWindsorContainer>().Instance(container));
 
             // registering redis connection
+
+            /*
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(ConfigurationManager.ConnectionStrings["redis"].ConnectionString);
             container.Register(
                 Component
                 .For<IConnectionMultiplexer>()
                 .Instance(redis).LifestyleSingleton());
+            */
 
             container.RegisterWindsorInstallers();
 

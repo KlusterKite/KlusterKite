@@ -1,0 +1,40 @@
+﻿{
+  ClusterKit {
+    Web {
+      Nginx {
+        PathToConfig = "/etc/nginx/sites-enabled/clusterkit.config"
+        ReloadCommand {
+          Command = /etc/init.d/nginx
+          Arguments = reload
+        } 
+        Configuration {
+          default {
+            listen: "80" //nginx configuration for listen directive in server part
+            //server_name: "localhost" configuration for server_name directive in server part
+            //Static { // you can define static content. This part will be just inserted into nginx config
+                  //    "/" = "
+                  //      root /var/www/root
+                  //    ";
+                  //  }
+          }
+        }
+      }
+    }
+  }
+
+
+
+  akka {
+    remote {
+      helios {
+        tcp {
+          hostname = 127.0.0.1
+          port = 3090
+        }
+      }
+    }
+    cluster {
+      seed-nodes = []
+    }
+  }
+}
