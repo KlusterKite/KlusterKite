@@ -20,8 +20,8 @@ mkdir build
 xcopy ..\..\build\tmp\ClusterKit.Core.Service\*.dll build\ /Y
 xcopy ..\..\build\tmp\ClusterKit.Core.Service\*.exe build\ /Y
 xcopy ..\..\build\tmp\ClusterKit.Core.Service\*.config build\ /Y
-xcopy ..\..\build\tmp\ClusterKit.Monitoring \*.dll build\ /Y
-xcopy ..\..\build\tmp\ClusterKit.Monitoring \*.config build\ /Y
+xcopy ..\..\build\tmp\ClusterKit.Monitoring\*.dll build\ /Y
+xcopy ..\..\build\tmp\ClusterKit.Monitoring\*.config build\ /Y
 xcopy akka.hocon build\ /Y
 docker build -t clusterkit/worker:latest .
 cd ..
