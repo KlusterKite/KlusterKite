@@ -28,13 +28,14 @@
     remote {
       helios {
         tcp {
-          hostname = 127.0.0.1
+          hostname = seed
           port = 3090
         }
       }
     }
     cluster {
-      seed-nodes = []
+      seed-nodes = ["akka.tcp://ClusterKit@seed:3090"]
+      min-nr-of-members = 3
     }
   }
 }

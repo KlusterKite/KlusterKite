@@ -1,6 +1,6 @@
-rem cd ../
-rem call build.bat
-rem cd Docker
+cd ../
+call build.bat
+cd Docker
 
 cd ClusterKitDemoSeed
 rmdir /S /Q build

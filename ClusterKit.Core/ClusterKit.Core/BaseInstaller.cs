@@ -105,6 +105,12 @@ namespace ClusterKit.Core
                 Log.Warning("File {fileName} was not found", hoconPath);
             }
 
+            var networkName = Environment.GetEnvironmentVariable("NETWORK_NAME");
+            if (!string.IsNullOrEmpty(networkName))
+            {
+                config = ConfigurationFactory.ParseString($"{{ akka.remote.helios.tcp.hostname = \"{networkName.Replace("\"", "\\\"")}\" }}").WithFallback(config);
+            }
+
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
             {

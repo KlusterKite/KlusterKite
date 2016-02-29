@@ -4,7 +4,18 @@ services:
     image: clusterkit/seed
     ports:
      - "80:80"
+    environment:
+     - NETWORK_NAME=seed
   worker1:
     image: clusterkit/worker
+    links:
+     - "seed"
+    environment:
+     - NETWORK_NAME=worker1
   worker2:
     image: clusterkit/worker    
+    links:
+     - "seed"
+    environment:
+     - NETWORK_NAME=worker2
+
