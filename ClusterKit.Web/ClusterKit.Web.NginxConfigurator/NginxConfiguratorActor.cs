@@ -330,6 +330,7 @@ namespace ClusterKit.Web.NginxConfigurator
                     config.Append(
                         $@"
 upstream {this.GetUpStreamName(host.HostName, service.ServiceName)} {{
+    ip_hash;
 {
                             string.Join("\n", service.ActiveNodes.Select(u => $"\tserver {u};"))}
 }}

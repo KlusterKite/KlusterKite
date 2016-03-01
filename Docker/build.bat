@@ -24,6 +24,9 @@ xcopy ..\..\ClusterKit.Monitoring\ClusterKit.Monitoring.Web\Scripts web\monitori
 
 
 docker build -t clusterkit/seed:latest .
+rmdir /S /Q build
+rmdir /S /Q web
+
 cd ..
 
 cd ClusterKitDemoWorker
@@ -36,6 +39,8 @@ xcopy ..\..\build\tmp\ClusterKit.Monitoring\*.dll build\ /Y
 xcopy ..\..\build\tmp\ClusterKit.Monitoring\*.config build\ /Y
 xcopy akka.hocon build\ /Y
 docker build -t clusterkit/worker:latest .
+rmdir /S /Q build
 cd ..
+
 
 
