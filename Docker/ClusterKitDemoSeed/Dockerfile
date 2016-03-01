@@ -3,6 +3,7 @@ MAINTAINER Mikhail Kantarovskiy <kantoramob@gmail.com>
 EXPOSE 3090
 WORKDIR /opt/clusterkit/
 COPY build/* /opt/clusterkit/
-RUN /etc/init.d/nginx start
-ENTRYPOINT mono ClusterKit.Core.Service.exe
+COPY web/monitoring /opt/web/monitoring
+RUN rm /etc/nginx/sites-enabled/default
+ENTRYPOINT /etc/init.d/nginx start && mono ClusterKit.Core.Service.exe
 

@@ -7,9 +7,9 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <link rel="stylesheet" href="Content/bootstrap.min.css">
     <link rel="stylesheet" href="Content/ClusterKit.Monitoring.css">
-    <script type="text/javascript" src="Scripts/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-2.2.0.min.js"></script>
     <script type="text/javascript" src="Scripts/bootstrap.min.js"></script>
-    <script type="text/javascript" src="Scripts/knockout-3.3.0.js"></script>
+    <script type="text/javascript" src="Scripts/knockout-3.4.0.js"></script>
     <script type="text/javascript" src="Scripts/jquery.signalR-2.2.0.min.js"></script>
     <script type="text/javascript" src="Scripts/underscore.js"></script>
     <script type="text/javascript" src="Scripts/ClusterKit.Monitoring.js"></script>
@@ -110,7 +110,8 @@
                                         <td>
                                             <span class="badge"
                                                   data-bind="text: _.filter($root.Members(), function(m) {
-                                                  return m.Roles.indexOf($data)>= 0
+                                                  return m.Roles.indexOf($data)>
+                                                = 0
                                                 && m.Status === 1
                                                 && m.IsReachable
                                                 && m.PingValue != null
@@ -120,7 +121,8 @@
                                         <td>
                                             <span class="badge"
                                                   data-bind="text: _.filter($root.Members(), function(m) {
-                                                  return m.Roles.indexOf($data)>= 0
+                                                  return m.Roles.indexOf($data)>
+                                                = 0
                                                 && (m.Status != 1
                                                 || !m.IsReachable
                                                 || m.PingValue == null

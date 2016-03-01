@@ -19,11 +19,14 @@ namespace ClusterKit.Web.NginxConfigurator
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
+    using Akka.Event;
 
     using ClusterKit.Web.Client;
     using ClusterKit.Web.Client.Messages;
 
     using JetBrains.Annotations;
+
+    using Serilog;
 
     /// <summary>
     /// Follows cluster changes for adding / removing new nodes with "web" role and configures local nginx for supported services
@@ -260,7 +263,6 @@ namespace ClusterKit.Web.NginxConfigurator
         private void WriteConfiguration()
         {
             StringBuilder config = new StringBuilder();
-            var akkaConfig = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.ServicesHost");
 
             this.WriteUpStreamsToConfig(config);
             this.WriteServicesToConfig(config);
@@ -273,12 +275,17 @@ namespace ClusterKit.Web.NginxConfigurator
                 var arguments = this.reloadCommand.GetString("Arguments");
                 if (command != null)
                 {
-                    Process.Start(
+                    var proccess = Process.Start(
                         new ProcessStartInfo(command, arguments)
                         {
                             UseShellExecute = false,
-                            WorkingDirectory = Path.GetDirectoryName(command) ?? "."
+                            WorkingDirectory = Path.GetDirectoryName(command) ?? ".",
                         });
+
+                    if (proccess != null && !proccess.WaitForExit(10000))
+                    {
+                        Context.GetLogger().Error("{Type}: NGinx reload command timeou", this.GetType().Name);
+                    }
                 }
             }
         }

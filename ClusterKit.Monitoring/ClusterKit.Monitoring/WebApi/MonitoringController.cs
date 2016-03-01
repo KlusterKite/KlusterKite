@@ -51,6 +51,7 @@ namespace ClusterKit.Monitoring.WebApi
         /// </summary>
         /// <returns>The member list</returns>
         [Route("MonitoringApi/GetClusterMemberList")]
+        [HttpGet, HttpPost]
         public async Task<List<MemberDescription>> GetClusterMemberList()
         {
             return await this.system.ActorSelection("/user/Monitoring/Watcher")
@@ -62,6 +63,7 @@ namespace ClusterKit.Monitoring.WebApi
         /// </summary>
         /// <returns>The Hello world</returns>
         [Route("MonitoringApi/Hello")]
+        [HttpGet, HttpPost]
         public Task<string> Hello()
         {
             return Task.FromResult("Hello");
