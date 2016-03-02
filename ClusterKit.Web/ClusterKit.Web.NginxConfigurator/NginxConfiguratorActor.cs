@@ -266,7 +266,7 @@ namespace ClusterKit.Web.NginxConfigurator
 
             this.WriteUpStreamsToConfig(config);
             this.WriteServicesToConfig(config);
-
+            Context.GetLogger().Debug("{Type}: {NginxConfigContent}", this.GetType().Name, config.ToString());
             File.WriteAllText(this.configPath, config.ToString());
 
             if (this.reloadCommand != null)
@@ -312,7 +312,17 @@ namespace ClusterKit.Web.NginxConfigurator
                     }
 
                     config.Append("\t}\n");
+
+                    // swagger
+                    if (service.ActiveNodes.Count > 0)
+                    {
+                        config.Append($"\tlocation {service.ServiceName}/swagger {{\n");
+                        config.Append(
+                            $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)}/swagger;\n");
+                        config.Append("\t}\n");
+                    }
                 }
+
                 config.Append("}\n");
             }
         }

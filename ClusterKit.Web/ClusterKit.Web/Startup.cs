@@ -9,7 +9,9 @@
 
 namespace ClusterKit.Web
 {
+    using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Net.Http.Formatting;
     using System.Web.Http;
@@ -23,6 +25,8 @@ namespace ClusterKit.Web
     using JetBrains.Annotations;
     using Microsoft.Practices.ServiceLocation;
     using Owin;
+
+    using Swashbuckle.Application;
 
     /// <summary>
     /// The OWIN startup class.
@@ -45,6 +49,18 @@ namespace ClusterKit.Web
             config.Formatters.Add(new JsonMediaTypeFormatter());
 
             config.MapHttpAttributeRoutes();
+            config.EnableSwagger(
+                c =>
+                {
+                    c.SingleApiVersion("v1", "Cluster API"); // todo: @kantora hereby need to show node template and node version
+                    var commentFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.xml");
+                    foreach (var commentFile in commentFiles)
+                    {
+                        c.IncludeXmlComments(Path.GetFullPath(commentFile));
+                    }
+
+                    c.UseFullTypeNameInSchemaIds();
+                }).EnableSwaggerUi();
 
             owinStartupConfigurators.ForEach(c => c.ConfigureApi(config));
             var dependencyResolver = new WindsorDependencyResolver(ServiceLocator.Current.GetInstance<IWindsorContainer>());
