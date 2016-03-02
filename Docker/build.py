@@ -7,13 +7,13 @@ import re
 def copyLib(libName, dest):
 	if platform.system() == 'Windows':
 		dest = dest.replace("/", "\\")
-		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.dll " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).stdout.read()
-		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.exe " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).stdout.read()
-		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.config " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).stdout.read()
+		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.dll " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).wait()
+		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.exe " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).wait()
+		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.config " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).wait()
 	else:
-		subprocess.Popen("cp ../build/tmp/" + libName + "/*.dll " + dest + "/", shell=True, stdout=subprocess.PIPE).stdout.read()
-		subprocess.Popen("cp ../build/tmp/" + libName + "/*.exe " + dest + "/" , shell=True, stdout=subprocess.PIPE).stdout.read()
-		subprocess.Popen("cp ../build/tmp/" + libName + "/*.config " + dest + "/", shell=True, stdout=subprocess.PIPE).stdout.read()
+		subprocess.Popen("cp ../build/tmp/" + libName + "/*.dll " + dest + "/", shell=True, stdout=subprocess.PIPE).wait()
+		subprocess.Popen("cp ../build/tmp/" + libName + "/*.exe " + dest + "/" , shell=True, stdout=subprocess.PIPE).wait()
+		subprocess.Popen("cp ../build/tmp/" + libName + "/*.config " + dest + "/", shell=True, stdout=subprocess.PIPE).wait()
 
 def copyWebContent(webSource, dest):
 	staticRe = re.compile(r"(.*)((\.jpg)|(\.gif)|(\.png)|(\.jpeg)|(\.html)|(\.html)|(\.js)|(\.css))$", re.IGNORECASE)
@@ -30,12 +30,31 @@ def copyWebContent(webSource, dest):
 			shutil.copyfile(fullName, os.path.join(dest, fileName))
 	return
 
+def correctAssemblyVersions(buildFolder):
+	if platform.system() == 'Windows':	
+		subprocess.call("..\\ClusterKit.Tools\\compiled\\assemblyVersion\\DependentAssemblyVersionCorrector.exe "
+		 + buildFolder 
+		 + " " 
+		 + buildFolder
+		 + "\\ClusterKit.Core.Service.exe.config ", 
+		 shell=True)
+	else:
+		subprocess.call("mono ../ClusterKit.Tools/compiled/assemblyVersion/DependentAssemblyVersionCorrector.exe "
+		 + buildFolder 
+		 + " " 
+		 + buildFolder
+		 + "/ClusterKit.Core.Service.exe.config ", 
+		 shell=True)
+	return
+
 
 print "Building sources, please wait"
 if platform.system() == 'Windows':	
-	subprocess.Popen("cd .. && build.bat", shell=True, stdout=subprocess.PIPE).stdout.read()
+	subprocess.call("cd .. && build.bat", shell = True)
+	pass
 else:
-	subprocess.Popen("cd .. && ./build.sh", shell=True, stdout=subprocess.PIPE).stdout.read()
+	subprocess.call("cd .. && ./build.sh", shell = True)
+	pass 
 
 
 # building ClusterKitDemoSeed
@@ -44,9 +63,12 @@ shutil.rmtree('./ClusterKitDemoSeed/build', True);
 shutil.rmtree('./ClusterKitDemoSeed/web', True);
 copyLib("ClusterKit.Core.Service", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.NginxConfigurator", './ClusterKitDemoSeed/build')
-copyWebContent("../ClusterKit.Monitoring/ClusterKit.Monitoring.Web", "./ClusterKitDemoSeed/web")
-print subprocess.Popen("docker build -t clusterkit/seed:latest ./ClusterKitDemoSeed/", shell=True, stdout=subprocess.PIPE).stdout.read()
-shutil.rmtree('./ClusterKitDemoSeed/build', True);
+shutil.copyfile('./ClusterKitDemoSeed/akka.hocon', './ClusterKitDemoSeed/build/akka.hocon')
+correctAssemblyVersions('./ClusterKitDemoSeed/build')
+os.mkdir('./ClusterKitDemoSeed/web');
+copyWebContent("../ClusterKit.Monitoring/ClusterKit.Monitoring.Web", "./ClusterKitDemoSeed/web/monitoring")
+subprocess.call("docker build -t clusterkit/seed:latest ./ClusterKitDemoSeed/", shell=True)
+#shutil.rmtree('./ClusterKitDemoSeed/build', True);
 shutil.rmtree('./ClusterKitDemoSeed/web', True);
 
 
@@ -54,9 +76,12 @@ shutil.rmtree('./ClusterKitDemoSeed/web', True);
 print "Preparing clusterkit/worker"
 shutil.rmtree('./ClusterKitDemoWorker/build', True);
 copyLib("ClusterKit.Core.Service", './ClusterKitDemoWorker/build')
+copyLib("ClusterKit.Web", './ClusterKitDemoWorker/build')
 copyLib("ClusterKit.Monitoring", './ClusterKitDemoWorker/build')
-print subprocess.Popen("docker build -t clusterkit/worker:latest ./ClusterKitDemoWorker/", shell=True, stdout=subprocess.PIPE).stdout.read()
-shutil.rmtree('./ClusterKitDemoWorker/build', True);
+shutil.copyfile('./ClusterKitDemoWorker/akka.hocon', './ClusterKitDemoWorker/build/akka.hocon')
+correctAssemblyVersions('./ClusterKitDemoWorker/build')
+subprocess.call("docker build -t clusterkit/worker:latest ./ClusterKitDemoWorker/", shell=True)
+#shutil.rmtree('./ClusterKitDemoWorker/build', True);
 
 
 

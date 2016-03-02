@@ -126,7 +126,8 @@ namespace ClusterKit.Build
 
             try
             {
-                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Rebuild", new[] { project.ProjectFileName });
+                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Clean", new[] { project.ProjectFileName });
+                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Build", new[] { project.ProjectFileName });
             }
             finally
             {
