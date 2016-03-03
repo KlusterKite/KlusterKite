@@ -26,8 +26,6 @@ namespace ClusterKit.Web.NginxConfigurator
 
     using JetBrains.Annotations;
 
-    using Serilog;
-
     /// <summary>
     /// Follows cluster changes for adding / removing new nodes with "web" role and configures local nginx for supported services
     /// </summary>
@@ -57,7 +55,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 .Subscribe(
                     this.Self,
                     ClusterEvent.InitialStateAsEvents,
-                    new[] { typeof(ClusterEvent.IMemberEvent), typeof(ClusterEvent.RoleLeaderChanged) });
+                    new[] { typeof(ClusterEvent.MemberUp), typeof(ClusterEvent.MemberRemoved) });
 
             this.Receive<ClusterEvent.MemberUp>(
                 m => m.Member.Roles.Contains("Web"),
@@ -170,11 +168,28 @@ namespace ClusterKit.Web.NginxConfigurator
                 }
                 else if (parameter.Value.IsArray())
                 {
-                    foreach (var hoconValue in parameter.Value.GetArray())
+                    var hoconValues = parameter.Value.GetArray();
+                    foreach (var hoconValue in hoconValues)
                     {
                         serviceConfig.AppendFormat("\t\t{0} {1};\n", parameter.Key, hoconValue.GetString());
                     }
                 }
+            }
+
+            // proxy_set_header Host $http_host;
+            var headers = config.GetValue("proxy_set_header");
+            if (headers == null
+                || (headers.IsString()
+                    && (headers.GetString() ?? string.Empty).ToLower()
+                           .IndexOf("Host ", StringComparison.InvariantCulture) < 0)
+                || (headers.IsArray()
+                    && headers.GetArray()
+                           .Select(v => v.GetString())
+                           .All(
+                               v =>
+                               (v ?? string.Empty).ToLower().IndexOf("Host ", StringComparison.InvariantCulture) < 0)))
+            {
+                serviceConfig.Append("\t\tproxy_set_header Host $http_host;\n");
             }
 
             host[serviceName].Config = serviceConfig.ToString();
@@ -316,20 +331,17 @@ namespace ClusterKit.Web.NginxConfigurator
                     {
                         config.Append(
                             $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)}{service.ServiceName};\n");
-                    }
-
-                    config.Append("\t}\n");
-
-                    // swagger
-                    if (service.ActiveNodes.Count > 0)
-                    {
-                        config.Append($"\tlocation {service.ServiceName}/swagger {{\n");
-                        config.Append($"\t\trewrite {service.ServiceName}/swagger(.*)$ /swagger$1 break;\n");
                         config.Append(
-                            $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)};\n");
-                        config.Append("\t\tproxy_set_header Host $host;\n ");
-                        config.Append("\t}\n");
+                            $"\t\t sub_filter {this.GetUpStreamName(host.HostName, service.ServiceName)} $host; \n");
+                        config.Append("\t\t sub_filter_once off; \n");
+                        config.Append("\t\t sub_filter_types text/xml; \n");
+                        config.Append("\t\t sub_filter_types text/json; \n");
+                        config.Append("\t\t sub_filter_types application/xml; \n");
+                        config.Append("\t\t sub_filter_types application/json; \n");
+                        //sub_filter "http://your_server/" "http://your_server/admin/";
+                        //sub_filter_once off;
                     }
+                    config.Append("\t}\n");
                 }
 
                 config.Append("}\n");

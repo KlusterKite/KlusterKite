@@ -2,7 +2,7 @@
 	ClusterKit {
 		Web {
 		    Services {
-	           /swagger/monitor = default              
+	           "/swagger/monitor" = default              
 	        } 
 		}
 	}
@@ -21,8 +21,8 @@
         }  
 
         /Web/Swagger/Monitor/workers {
-             router = round-robin-pool
-             nr-of-instances = 5
+            router = round-robin-pool
+            nr-of-instances = 5
         }               
  	}	
 }

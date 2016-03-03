@@ -18,6 +18,7 @@ namespace ClusterKit.Web.Swagger.Monitor
     using Akka.Event;
     using Akka.Routing;
 
+    using ClusterKit.Core.Utils;
     using ClusterKit.Web.Swagger.Messages;
 
     using JetBrains.Annotations;
@@ -40,7 +41,8 @@ namespace ClusterKit.Web.Swagger.Monitor
         /// </summary>
         public SwaggerCollectorActor()
         {
-            this.workers = Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(FromConfig.Instance), "workers");
+            //this.workers = Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(FromConfig.Instance), "workers");
+            this.workers = Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")), "workers");
             this.watcher = Context.ActorOf(Props.Create(typeof(Watcher)));
 
             this.Receive<SwaggerPublishDescription>(m => this.watcher.Forward(m));

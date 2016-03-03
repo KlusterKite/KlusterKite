@@ -14,6 +14,8 @@ namespace ClusterKit.Web.Swagger.Monitor
 
     using Owin;
 
+    using Serilog;
+
     /// <summary>
     /// External additional owin configuration.
     /// Should be registered in DI resolver

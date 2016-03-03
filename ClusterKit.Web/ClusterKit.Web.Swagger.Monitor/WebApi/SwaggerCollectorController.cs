@@ -16,9 +16,12 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Manages request corresponding registered swagger services
     /// </summary>
+    [UsedImplicitly]
     public class SwaggerCollectorController : ApiController
     {
         /// <summary>
@@ -47,7 +50,7 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
         /// Gets current cluster member list
         /// </summary>
         /// <returns>The member list</returns>
-        [Route("/swagger/monitor/getList")]
+        [Route("swagger/monitor/getList")]
         [HttpGet, HttpPost]
         public async Task<IReadOnlyCollection<string>> GetServices()
         {
@@ -55,7 +58,7 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
             {
                 return
                     await
-                    this.system.ActorSelection("/Web/Swagger/Monitor")
+                    this.system.ActorSelection("/user/Web/Swagger/Monitor")
                         .Ask<IReadOnlyCollection<string>>(
                             new SwaggerCollectorActor.SwaggerListRequest(),
                             this.systemTimeout);

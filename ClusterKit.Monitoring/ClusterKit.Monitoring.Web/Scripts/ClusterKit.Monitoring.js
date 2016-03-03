@@ -46,7 +46,7 @@
     function loadSwagger() {
         $.ajax({
             type: 'post',
-            url: '/Nginx/GetSwaggerList',
+            url: '/swagger/monitor/getList',
             data: {
             },
             dataType: 'json',

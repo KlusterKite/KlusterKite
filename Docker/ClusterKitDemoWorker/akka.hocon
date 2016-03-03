@@ -1,6 +1,16 @@
 ﻿{
   ClusterKit {
     Web {
+
+      Swagger.Publish {
+          publishDocPath = ""worker/swagger/doc""
+          publishUiPath = ""worker/swagger/ui""
+      }
+
+      Services {
+          "/worker/swagger" = "default"
+      }      
+
       Nginx {
         PathToConfig = "/etc/nginx/sites-enabled/clusterkit.config"
         ReloadCommand {

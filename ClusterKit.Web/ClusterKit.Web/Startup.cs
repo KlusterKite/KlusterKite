@@ -9,8 +9,6 @@
 
 namespace ClusterKit.Web
 {
-    using System;
-    using System.IO;
     using System.Linq;
     using System.Net.Http.Formatting;
     using System.Web.Http;
@@ -20,8 +18,6 @@ namespace ClusterKit.Web
     using JetBrains.Annotations;
     using Microsoft.Practices.ServiceLocation;
     using Owin;
-
-    using Swashbuckle.Application;
 
     /// <summary>
     /// The OWIN startup class.
@@ -39,14 +35,17 @@ namespace ClusterKit.Web
 
             // Configure Web API for self-host.
             var config = new HttpConfiguration();
+            config.MapHttpAttributeRoutes();
             config.Formatters.Clear();
             config.Formatters.Add(new XmlMediaTypeFormatter { UseXmlSerializer = true });
             config.Formatters.Add(new JsonMediaTypeFormatter());
 
-            config.MapHttpAttributeRoutes();
             owinStartupConfigurators.ForEach(c => c.ConfigureApi(config));
+
             var dependencyResolver = new WindsorDependencyResolver(ServiceLocator.Current.GetInstance<IWindsorContainer>());
             config.DependencyResolver = dependencyResolver;
+
+            config.EnsureInitialized();
             appBuilder.UseWebApi(config);
 
             owinStartupConfigurators.ForEach(c => c.ConfigureApp(appBuilder));

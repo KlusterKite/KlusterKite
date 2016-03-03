@@ -64,6 +64,8 @@ print "Preparing clusterkit/seed"
 shutil.rmtree('./ClusterKitDemoSeed/build', True);
 shutil.rmtree('./ClusterKitDemoSeed/web', True);
 copyLib("ClusterKit.Core.Service", './ClusterKitDemoSeed/build')
+copyLib("ClusterKit.Web.Swagger", './ClusterKitDemoSeed/build')
+copyLib("ClusterKit.Web.Swagger.Monitor", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.NginxConfigurator", './ClusterKitDemoSeed/build')
 shutil.copyfile('./ClusterKitDemoSeed/akka.hocon', './ClusterKitDemoSeed/build/akka.hocon')
 correctAssemblyVersions('./ClusterKitDemoSeed/build')
@@ -79,6 +81,7 @@ print "Preparing clusterkit/worker"
 shutil.rmtree('./ClusterKitDemoWorker/build', True);
 copyLib("ClusterKit.Core.Service", './ClusterKitDemoWorker/build')
 copyLib("ClusterKit.Web", './ClusterKitDemoWorker/build')
+copyLib("ClusterKit.Web.Swagger", './ClusterKitDemoWorker/build')
 copyLib("ClusterKit.Monitoring", './ClusterKitDemoWorker/build')
 shutil.copyfile('./ClusterKitDemoWorker/akka.hocon', './ClusterKitDemoWorker/build/akka.hocon')
 correctAssemblyVersions('./ClusterKitDemoWorker/build')

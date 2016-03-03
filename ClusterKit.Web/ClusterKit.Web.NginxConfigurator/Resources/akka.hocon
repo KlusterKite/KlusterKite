@@ -34,14 +34,5 @@
         /Web/Nginx/Configurator {
             type = "ClusterKit.Web.NginxConfigurator.NginxConfiguratorActor, ClusterKit.Web.NginxConfigurator"
         }
-
-        /Web/Nginx/Swagger {
-            type = "ClusterKit.Web.NginxConfigurator.SwaggerCollectorActor, ClusterKit.Web.NginxConfigurator"
-        }  
-
-        /Web/Nginx/Swagger/workers {
-             router = round-robin-pool
-             nr-of-instances = 5
-        }               
  	}
  }

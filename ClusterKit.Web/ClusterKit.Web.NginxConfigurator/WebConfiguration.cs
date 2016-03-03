@@ -31,14 +31,8 @@ namespace ClusterKit.Web.NginxConfigurator
                 .ForEach(hostName => this.hosts.Remove(hostName));
         }
 
-        public IEnumerator<HostConfiguration> GetEnumerator()
-        {
-            return this.hosts.Values.ToList().GetEnumerator();
-        }
+        public IEnumerator<HostConfiguration> GetEnumerator() => this.hosts.Values.ToList().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.hosts.Values.ToList().GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => this.hosts.Values.ToList().GetEnumerator();
     }
 }
