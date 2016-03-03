@@ -27,8 +27,6 @@ namespace ClusterKit.Core.Service
 
     using Microsoft.Practices.ServiceLocation;
 
-    using StackExchange.Redis;
-
     /// <summary>
     /// Dependency injection configuration
     /// </summary>
@@ -45,16 +43,6 @@ namespace ClusterKit.Core.Service
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
             container.Register(Component.For<Controller>().LifestyleTransient());
             container.Register(Component.For<IWindsorContainer>().Instance(container));
-
-            // registering redis connection
-
-            /*
-            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(ConfigurationManager.ConnectionStrings["redis"].ConnectionString);
-            container.Register(
-                Component
-                .For<IConnectionMultiplexer>()
-                .Instance(redis).LifestyleSingleton());
-            */
 
             container.RegisterWindsorInstallers();
             var config = BaseInstaller.GetStackedConfig(container);
