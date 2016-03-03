@@ -5,7 +5,8 @@
 
     var clusterState = {
         Connected: ko.observable(false),
-        Members: ko.observableArray([])
+        Members: ko.observableArray([]),
+        SwaggerList: ko.observableArray([]),
     };
 
     function connect() {
@@ -21,6 +22,11 @@
 
     function onConnected() {
         clusterState.Connected(true);
+        loadClusterMembers();
+        loadSwagger();
+    }
+
+    function loadClusterMembers() {
         $.ajax({
             type: 'get',
             url: '/MonitoringApi/GetClusterMemberList',
@@ -31,6 +37,23 @@
             success: function (data) {
                 clusterState.Connected(true);
                 clusterState.Members(data);
+            },
+            error: function () {
+            }
+        });
+    }
+
+    function loadSwagger() {
+        $.ajax({
+            type: 'post',
+            url: '/Nginx/GetSwaggerList',
+            data: {
+            },
+            dataType: 'json',
+            timeout: timeout,
+            success: function (data) {
+                clusterState.Connected(true);
+                clusterState.SwaggerList(data);
             },
             error: function () {
             }
@@ -57,10 +80,12 @@
 
         hubProxy.on("memberUpdate", function (member) {
             console.dir(member);
+            loadClusterMembers();
         });
 
         hubProxy.on("reloadData", function (data) {
             clusterState.Members(data);
+            loadSwagger();
         });
 
         connect();

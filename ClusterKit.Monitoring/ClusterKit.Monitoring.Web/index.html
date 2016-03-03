@@ -110,24 +110,43 @@
                                         <td>
                                             <span class="badge"
                                                   data-bind="text: _.filter($root.Members(), function(m) {
-                                                  return m.Roles.indexOf($data)>
-                                                = 0
-                                                && m.Status === 1
-                                                && m.IsReachable
-                                                && m.PingValue != null
-                                                && m.PingValue < 1000.0 }).length">
+                                                  return m.Roles.indexOf($data)&gt;=0
+                                                  && m.Status===1
+                                                  && m.IsReachable
+                                                  && m.PingValue !=null
+                                                  && m.PingValue &lt; 1000.0 }).length">
                                             </span>
                                         </td>
                                         <td>
                                             <span class="badge"
                                                   data-bind="text: _.filter($root.Members(), function(m) {
-                                                  return m.Roles.indexOf($data)>
-                                                = 0
-                                                && (m.Status != 1
-                                                || !m.IsReachable
-                                                || m.PingValue == null
-                                                || m.PingValue >= 1000.0) }).length">
+                                                  return m.Roles.indexOf($data)&gt;=0
+                                                  && (m.Status !=1
+                                                  || !m.IsReachable
+                                                  || m.PingValue==null
+                                                  || m.PingValue &gt;= 1000.0) }).length">
                                             </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Swagger</div>
+                        <div class="panel-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: SwaggerList">
+                                    <tr>
+                                        <td>
+                                            <a data-bind="text: $data, attr:{href: $data + '/swagger'}"></a>
                                         </td>
                                     </tr>
                                 </tbody>

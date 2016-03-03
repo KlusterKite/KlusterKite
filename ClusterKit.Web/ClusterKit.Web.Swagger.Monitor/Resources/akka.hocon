@@ -1,0 +1,28 @@
+{
+	ClusterKit {
+		Web {
+		    Services {
+	           /swagger/monitor = default              
+	        } 
+		}
+	}
+
+	akka.actor.deployment {
+ 		 /Web {
+            IsNameSpace = true
+        }
+ 		 /Web/Swagger {
+            type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+        }                
+
+        
+        /Web/Swagger/Monitor {
+            type = "ClusterKit.Web.Swagger.Monitor.SwaggerCollectorActor, ClusterKit.Web.Swagger.Monitor"
+        }  
+
+        /Web/Swagger/Monitor/workers {
+             router = round-robin-pool
+             nr-of-instances = 5
+        }               
+ 	}	
+}

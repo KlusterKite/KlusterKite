@@ -2,6 +2,7 @@
   <GlobalSettings>
     <StringProperty Name="Culture">en-US</StringProperty>
     <CollectionProperty Name="RecognizedWords">
+      <Value>api</Value>
       <Value>akka</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
@@ -10,6 +11,7 @@
       <Value>Owin</Value>
       <Value>nginx</Value>
       <Value>nuget</Value>
+      <Value>ui</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

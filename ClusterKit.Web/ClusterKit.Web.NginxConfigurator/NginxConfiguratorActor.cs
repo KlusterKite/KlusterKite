@@ -168,6 +168,13 @@ namespace ClusterKit.Web.NginxConfigurator
                 {
                     serviceConfig.AppendFormat("\t\t{0} {1};\n", parameter.Key, parameter.Value.GetString());
                 }
+                else if (parameter.Value.IsArray())
+                {
+                    foreach (var hoconValue in parameter.Value.GetArray())
+                    {
+                        serviceConfig.AppendFormat("\t\t{0} {1};\n", parameter.Key, hoconValue.GetString());
+                    }
+                }
             }
 
             host[serviceName].Config = serviceConfig.ToString();
@@ -266,7 +273,7 @@ namespace ClusterKit.Web.NginxConfigurator
 
             this.WriteUpStreamsToConfig(config);
             this.WriteServicesToConfig(config);
-            Context.GetLogger().Debug("{Type}: {NginxConfigContent}", this.GetType().Name, config.ToString());
+            Context.GetLogger().Info("{Type}: {NginxConfigContent}", this.GetType().Name, config.ToString());
             File.WriteAllText(this.configPath, config.ToString());
 
             if (this.reloadCommand != null)
@@ -317,8 +324,10 @@ namespace ClusterKit.Web.NginxConfigurator
                     if (service.ActiveNodes.Count > 0)
                     {
                         config.Append($"\tlocation {service.ServiceName}/swagger {{\n");
+                        config.Append($"\t\trewrite {service.ServiceName}/swagger(.*)$ /swagger$1 break;\n");
                         config.Append(
-                            $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)}/swagger;\n");
+                            $"\t\tproxy_pass http://{this.GetUpStreamName(host.HostName, service.ServiceName)};\n");
+                        config.Append("\t\tproxy_set_header Host $host;\n ");
                         config.Append("\t}\n");
                     }
                 }

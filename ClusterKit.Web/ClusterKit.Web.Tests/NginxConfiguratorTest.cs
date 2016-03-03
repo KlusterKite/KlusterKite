@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Web.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
@@ -26,6 +27,7 @@ namespace ClusterKit.Web.Tests
     using ClusterKit.Core.TestKit;
     using ClusterKit.Web.Client.Messages;
     using ClusterKit.Web.NginxConfigurator;
+    using ClusterKit.Web.Swagger.Monitor;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -42,7 +44,7 @@ namespace ClusterKit.Web.Tests
         /// The output.
         /// </param>
         public NginxConfiguratorTest(ITestOutputHelper output)
-                    : base(output)
+            : base(output)
         {
         }
 
@@ -76,19 +78,24 @@ namespace ClusterKit.Web.Tests
                 new WebDescriptionResponse
                 {
                     ListeningPort = 8080,
-                    ServiceNames = new Dictionary<string, string>
-                                           {
-                                               { "/TestWebService", "web1" },
-                                               { "/test/TestWebService2", "web1" },
-                                               { "/Api", "web2" }
-                                           }
+                    ServiceNames =
+                            new Dictionary<string, string>
+                                {
+                                    { "/TestWebService", "web1" },
+                                    { "/test/TestWebService2", "web1" },
+                                    { "/Api", "web2" }
+                                }
                 },
                 webDescriptor);
 
             Assert.Equal(1, configurator.UnderlyingActor.NodePublishUrls.Count);
             Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.NodePublishUrls.First().Value);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web1"]["/TestWebService"].ActiveNodes[0]);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web1"]["/test/TestWebService2"].ActiveNodes[0]);
+            Assert.Equal(
+                "127.0.0.1:8080",
+                configurator.UnderlyingActor.Configuration["web1"]["/TestWebService"].ActiveNodes[0]);
+            Assert.Equal(
+                "127.0.0.1:8080",
+                configurator.UnderlyingActor.Configuration["web1"]["/test/TestWebService2"].ActiveNodes[0]);
             Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web2"]["/Api"].ActiveNodes[0]);
 
             var config = File.ReadAllText("./nginx.conf");

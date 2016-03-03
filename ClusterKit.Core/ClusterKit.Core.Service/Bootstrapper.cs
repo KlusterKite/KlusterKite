@@ -12,6 +12,7 @@ namespace ClusterKit.Core.Service
     using System.Configuration;
 
     using Akka.Actor;
+    using Akka.Configuration;
     using Akka.DI.CastleWindsor;
     using Akka.DI.Core;
 
@@ -56,8 +57,8 @@ namespace ClusterKit.Core.Service
             */
 
             container.RegisterWindsorInstallers();
-
             var config = BaseInstaller.GetStackedConfig(container);
+            container.Register(Component.For<Config>().Instance(config));
 
             // performing prestart checks
             BaseInstaller.RunPrecheck(container, config);

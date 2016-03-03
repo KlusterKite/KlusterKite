@@ -1,0 +1,20 @@
+ {
+ 	ClusterKit {
+ 	}
+
+	akka.actor.deployment {
+ 		 /Web {
+            IsNameSpace = true
+        }
+ 		 /Web/Swagger {
+            type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+        }                
+
+        
+        /Web/Swagger/Descriptor {
+            type = "ClusterKit.Web.Swagger.SwaggerDescriptionActor, ClusterKit.Web.Swagger"
+        }  
+
+              
+ 	}	 	
+ }

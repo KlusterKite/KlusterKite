@@ -2,8 +2,8 @@
  	ClusterKit {
  		Web {
             Services {
-               /MonitoringApi = Monitoring
-               /signalr = Monitoring
+               /MonitoringApi = default
+               /signalr = default
             }
  		}
 

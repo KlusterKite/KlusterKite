@@ -32,7 +32,7 @@ namespace ClusterKit.Monitoring.WebApi
         /// <summary>
         /// The actor system negotiation timeout
         /// </summary>
-        private TimeSpan systemTimeout;
+        private readonly TimeSpan systemTimeout;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MonitoringController"/> class.

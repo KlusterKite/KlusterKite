@@ -8,10 +8,12 @@ def copyLib(libName, dest):
 	if platform.system() == 'Windows':
 		dest = dest.replace("/", "\\")
 		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.dll " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).wait()
+		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.xml " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).wait()
 		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.exe " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).wait()
 		subprocess.Popen("xcopy ..\\build\\tmp\\" + libName + "\\*.config " + dest +"\\ /Y", shell=True, stdout=subprocess.PIPE).wait()
 	else:
 		subprocess.Popen("cp ../build/tmp/" + libName + "/*.dll " + dest + "/", shell=True, stdout=subprocess.PIPE).wait()
+		subprocess.Popen("cp ../build/tmp/" + libName + "/*.xml " + dest + "/", shell=True, stdout=subprocess.PIPE).wait()
 		subprocess.Popen("cp ../build/tmp/" + libName + "/*.exe " + dest + "/" , shell=True, stdout=subprocess.PIPE).wait()
 		subprocess.Popen("cp ../build/tmp/" + libName + "/*.config " + dest + "/", shell=True, stdout=subprocess.PIPE).wait()
 
