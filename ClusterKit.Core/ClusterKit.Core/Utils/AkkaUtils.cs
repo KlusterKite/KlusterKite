@@ -10,8 +10,10 @@
 namespace ClusterKit.Core.Utils
 {
     using System;
+    using System.Linq;
 
     using Akka.Actor;
+    using Akka.Routing;
 
     using JetBrains.Annotations;
 
@@ -61,6 +63,30 @@ namespace ClusterKit.Core.Utils
         public static T DeserializeFromAkkaString<T>(this string serializedData, ActorSystem system)
         {
             return Convert.FromBase64String(serializedData).DeserializeFromAkka<T>(system);
+        }
+
+        public static RouterConfig GetFromConfiguration(this IActorRef actorRef, ActorSystem system, string childPath)
+        {
+            var childConfig = system.Settings.Config.GetConfig("akka.actor.deployment")
+                ?.GetConfig($"/{string.Join("/", actorRef.Path.Elements.Skip(1))}/{childPath}");
+
+            if (childConfig == null)
+            {
+                return RouterConfig.NoRouter;
+            }
+
+            string routerName = childConfig.GetString("router");
+            int numberOfInstances = childConfig.GetInt("nr-of-instances");
+            //todo: @kantora - realize all router parameters and types
+
+            switch (routerName)
+            {
+                case "round-robin-pool":
+                    return new RoundRobinPool(numberOfInstances);
+
+                default:
+                    return RouterConfig.NoRouter;
+            }
         }
 
         /// <summary>
