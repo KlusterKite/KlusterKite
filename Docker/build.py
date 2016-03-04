@@ -63,13 +63,15 @@ else:
 print "Preparing clusterkit/seed"
 shutil.rmtree('./ClusterKitDemoSeed/build', True);
 shutil.rmtree('./ClusterKitDemoSeed/web', True);
+os.mkdir('./ClusterKitDemoSeed/build');
+os.mkdir('./ClusterKitDemoSeed/web');
 copyLib("ClusterKit.Core.Service", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.Swagger", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.Swagger.Monitor", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.NginxConfigurator", './ClusterKitDemoSeed/build')
 shutil.copyfile('./ClusterKitDemoSeed/akka.hocon', './ClusterKitDemoSeed/build/akka.hocon')
 correctAssemblyVersions('./ClusterKitDemoSeed/build')
-os.mkdir('./ClusterKitDemoSeed/web');
+
 copyWebContent("../ClusterKit.Monitoring/ClusterKit.Monitoring.Web", "./ClusterKitDemoSeed/web/monitoring")
 subprocess.call("docker build -t clusterkit/seed:latest ./ClusterKitDemoSeed/", shell=True)
 #shutil.rmtree('./ClusterKitDemoSeed/build', True);
@@ -79,6 +81,7 @@ shutil.rmtree('./ClusterKitDemoSeed/web', True);
 # building ClusterKitDemoWorker
 print "Preparing clusterkit/worker"
 shutil.rmtree('./ClusterKitDemoWorker/build', True);
+os.mkdir('./ClusterKitDemoWorker/build');
 copyLib("ClusterKit.Core.Service", './ClusterKitDemoWorker/build')
 copyLib("ClusterKit.Web", './ClusterKitDemoWorker/build')
 copyLib("ClusterKit.Web.Swagger", './ClusterKitDemoWorker/build')
