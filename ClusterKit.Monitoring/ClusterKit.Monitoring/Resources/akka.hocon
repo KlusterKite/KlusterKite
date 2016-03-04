@@ -1,10 +1,13 @@
- {
+{
  	ClusterKit {
  		Web {
-            Services {
-               /MonitoringApi = default
-               /signalr = default
-            }
+      Services {
+            ClusterKit/Monitoring  { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
+              Port = 8080 // default owin port, current node listening port for server access
+              PublicHostName = default //public host name of this service. It doesn't supposed (but is not prohibited) that this should be real public service hostname. It's just used to distinguish services with identical url paths to be correctly published on frontend web servers. Real expected hostname should be configured in NginxConfigurator or similar publisher
+              Route = /MonitoringApi //route (aka directory) path to service
+            }                    
+      }
  		}
 
  		Monitoring {
@@ -17,12 +20,11 @@
 
  	akka.actor.deployment {
  		 /Monitoring {
-            IsNameSpace = true
-        }
+        IsNameSpace = true
+     }
 
-        /Monitoring/Watcher {
-            type = "ClusterKit.Monitoring.Actors.WatcherActor, ClusterKit.Monitoring"
-        }
-
- 	}
- }
+    /Monitoring/Watcher {
+      type = "ClusterKit.Monitoring.Actors.WatcherActor, ClusterKit.Monitoring"
+    }
+  }
+}

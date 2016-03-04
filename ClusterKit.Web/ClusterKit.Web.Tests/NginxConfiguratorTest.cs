@@ -74,29 +74,39 @@ namespace ClusterKit.Web.Tests
 
             Assert.Equal(1, configurator.UnderlyingActor.KnownActiveNodes.Count);
 
-            configurator.Tell(
-                new WebDescriptionResponse
-                {
-                    ListeningPort = 8080,
-                    ServiceNames =
-                            new Dictionary<string, string>
-                                {
-                                    { "/TestWebService", "web1" },
-                                    { "/test/TestWebService2", "web1" },
-                                    { "/Api", "web2" }
-                                }
-                },
-                webDescriptor);
+            configurator.Tell(new WebDescriptionResponse
+            {
+                Services = new List<ServiceDescription>
+                                                     {
+                                                         new ServiceDescription
+                                                             {
+                                                                 ListeningPort = 8080,
+                                                                 PublicHostName = "web1",
+                                                                 Route = "/TestWebService"
+                                                             },
+                                                         new ServiceDescription
+                                                             {
+                                                                 ListeningPort = 8080,
+                                                                 PublicHostName = "web1",
+                                                                 Route = "/test/TestWebService2"
+                                                             },
+                                                         new ServiceDescription
+                                                             {
+                                                                 ListeningPort = 8080,
+                                                                 PublicHostName = "web2",
+                                                                 Route = "/Api"
+                                                             }
+                                                     }.AsReadOnly()
+            });
 
             Assert.Equal(1, configurator.UnderlyingActor.NodePublishUrls.Count);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.NodePublishUrls.First().Value);
             Assert.Equal(
                 "127.0.0.1:8080",
-                configurator.UnderlyingActor.Configuration["web1"]["/TestWebService"].ActiveNodes[0]);
+                configurator.UnderlyingActor.Configuration["web1"]["/TestWebService"].ActiveNodes[0].NodeUrl);
             Assert.Equal(
                 "127.0.0.1:8080",
-                configurator.UnderlyingActor.Configuration["web1"]["/test/TestWebService2"].ActiveNodes[0]);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web2"]["/Api"].ActiveNodes[0]);
+                configurator.UnderlyingActor.Configuration["web1"]["/test/TestWebService2"].ActiveNodes[0].NodeUrl);
+            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web2"]["/Api"].ActiveNodes[0].NodeUrl);
 
             var config = File.ReadAllText("./nginx.conf");
             this.Sys.Log.Info(config);

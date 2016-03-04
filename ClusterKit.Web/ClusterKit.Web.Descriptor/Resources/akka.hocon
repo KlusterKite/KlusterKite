@@ -1,7 +1,7 @@
  {
  	ClusterKit {
  		Web {
- 			OwinBindAddress = "http://*:8080"
+ 			OwinBindAddress = "http://*:8080" 
  			Services {
  				//ServiceName { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
  				//	Port = 8080 // current node listening port for server access
@@ -9,7 +9,18 @@
  				//	Route = /directory/sub //route (aka directory) path to service
  				//	LocalHostName = $host //local hostname that proxy should path. This should be used to support virtual hosting inside single node
  				//}
+
  			}
  		}
  	}
-}
+ 	akka.actor.deployment {
+ 		 /Web {
+            IsNameSpace = true
+        }
+
+        /Web/Descriptor {
+            type = "ClusterKit.Web.Descriptor.WebDescriptorActor, ClusterKit.Web.Descriptor"
+        }
+
+ 	}
+ }

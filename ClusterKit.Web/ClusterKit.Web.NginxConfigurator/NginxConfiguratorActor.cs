@@ -81,7 +81,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <summary>
         /// Gets cahed data of published web urls in everey known node
         /// </summary>
-        public Dictionary<Address, string> NodePublishUrls { get; } = new Dictionary<Address, string>();
+        public Dictionary<Address, WebDescriptionResponse> NodePublishUrls { get; } = new Dictionary<Address, WebDescriptionResponse>();
 
         /// <summary>
         /// Compiles upstream name from hostname and servicename
@@ -220,15 +220,19 @@ namespace ClusterKit.Web.NginxConfigurator
                 return;
             }
 
-            var nodeUrl = $"{nodeAddress.Host}:{description.ListeningPort}";
-            this.NodePublishUrls[nodeAddress] = nodeUrl;
+            this.NodePublishUrls[nodeAddress] = description;
 
-            foreach (var serviceDescription in description.ServiceNames)
+            foreach (var serviceDescription in description.Services)
             {
-                var serviceConfiguration = this.Configuration[serviceDescription.Value][serviceDescription.Key];
-                if (!serviceConfiguration.ActiveNodes.Contains(nodeUrl))
+                var nodeServiceDescription = new NodeServiceConfiguration
                 {
-                    serviceConfiguration.ActiveNodes.Add(nodeUrl);
+                    NodeAddress = nodeAddress,
+                    ServiceDescription = serviceDescription
+                };
+                var serviceConfiguration = this.Configuration[serviceDescription.PublicHostName][serviceDescription.Route];
+                if (!serviceConfiguration.ActiveNodes.Contains(nodeServiceDescription))
+                {
+                    serviceConfiguration.ActiveNodes.Add(nodeServiceDescription);
                 }
             }
 
@@ -242,18 +246,24 @@ namespace ClusterKit.Web.NginxConfigurator
         private void OnWebNodeDown(Address nodeAddress)
         {
             this.KnownActiveNodes.Remove(nodeAddress);
-            string nodeUrl;
-            if (!this.NodePublishUrls.TryGetValue(nodeAddress, out nodeUrl))
+            WebDescriptionResponse description;
+            if (!this.NodePublishUrls.TryGetValue(nodeAddress, out description))
             {
-                // something sttrange. Local data is corrupted;
+                // something strange. Local data is corrupted;
                 return;
             }
 
-            foreach (var host in this.Configuration)
+            foreach (var serviceHost in description.Services.GroupBy(s => s.PublicHostName))
             {
-                foreach (var service in host)
+                var host = this.Configuration[serviceHost.Key];
+                foreach (var serviceDescription in serviceHost)
                 {
-                    service.ActiveNodes.Remove(nodeUrl);
+                    var activeNodes = host[serviceDescription.Route].ActiveNodes;
+                    var d = activeNodes.FirstOrDefault(n => n.ServiceDescription == serviceDescription);
+                    if (d != null)
+                    {
+                        activeNodes.Remove(d);
+                    }
                 }
 
                 host.Flush();
@@ -363,7 +373,7 @@ namespace ClusterKit.Web.NginxConfigurator
 upstream {this.GetUpStreamName(host.HostName, service.ServiceName)} {{
     ip_hash;
 {
-                            string.Join("\n", service.ActiveNodes.Select(u => $"\tserver {u};"))}
+                            string.Join("\n", service.ActiveNodes.Select(u => $"\tserver {u.NodeUrl};"))}
 }}
 ");
                 }

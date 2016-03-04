@@ -11,6 +11,7 @@ namespace ClusterKit.Web.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Akka.Actor;
     using Akka.Cluster;
@@ -60,15 +61,14 @@ namespace ClusterKit.Web.Tests
                     .Ask<WebDescriptionResponse>(new WebDescriptionRequest(), TimeSpan.FromMilliseconds(500))
                     .Result;
 
-            Assert.NotNull(response.ServiceNames);
-            Assert.True(response.ServiceNames.ContainsKey("firstServiceRoot"));
-            Assert.True(response.ServiceNames.ContainsKey("secondServiceRoot/secondServiceBranch"));
-            Assert.True(response.ServiceNames.ContainsKey("thirdServiceRoot"));
-            Assert.Equal(3, response.ServiceNames.Count);
-            Assert.Equal("defaultHost", response.ServiceNames["firstServiceRoot"]);
-            Assert.Equal("defaultHost", response.ServiceNames["secondServiceRoot/secondServiceBranch"]);
-            Assert.Equal("otherHost", response.ServiceNames["thirdServiceRoot"]);
-            Assert.Equal(8085, response.ListeningPort);
+            Assert.NotNull(response);
+            Assert.True(response.Services.Any(s => s.Route == "firstServiceRoot"));
+            Assert.True(response.Services.Any(s => s.Route == "secondServiceRoot/secondServiceBranch"));
+            Assert.True(response.Services.Any(s => s.Route == "thirdServiceRoot"));
+            Assert.Equal(3, response.Services.Count);
+            Assert.Equal(2, response.Services.Count(s => s.PublicHostName == "defaultHost"));
+            Assert.Equal(1, response.Services.Count(s => s.PublicHostName == "otherHost"));
+            Assert.Equal(3, response.Services.Count(s => s.ListeningPort == 8085));
         }
 
         /// <summary>
@@ -93,9 +93,21 @@ namespace ClusterKit.Web.Tests
  		                Web {
  			                OwinBindAddress = ""http://*:8085""
                             Services {
-                               firstServiceRoot = defaultHost
-                               secondServiceRoot/secondServiceBranch = defaultHost
-                               thirdServiceRoot = otherHost
+                                First = {
+                                    Port = 8085 //test
+                                    PublicHostName = defaultHost
+                                    Route = firstServiceRoot
+                                }
+                                Second = {
+                                    Port = 8085
+                                    PublicHostName = defaultHost
+                                    Route = secondServiceRoot/secondServiceBranch
+                                }
+                                Third = {
+                                    Port = 8085
+                                    PublicHostName = otherHost
+                                    Route = thirdServiceRoot
+                                }
                             }
                         }
                     }
@@ -109,7 +121,7 @@ namespace ClusterKit.Web.Tests
             public override List<BaseInstaller> GetPluginInstallers()
             {
                 var installers = base.GetPluginInstallers();
-                installers.Add(new Web.Installer());
+                installers.Add(new Descriptor.Installer());
                 return installers;
             }
         }

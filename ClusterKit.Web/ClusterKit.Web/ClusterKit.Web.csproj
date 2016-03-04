@@ -73,9 +73,9 @@
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core, Version=0.0.0.67, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Core, Version=0.0.0.69, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.67-master\lib\ClusterKit.Core.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.69-master\lib\ClusterKit.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
@@ -184,7 +184,6 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <Compile Include="WebDescriptorActor.cs" />
     <Compile Include="WindsorDependencyResolver.cs" />
     <Compile Include="WindsorDependencyScope.cs" />
   </ItemGroup>
@@ -192,6 +191,10 @@
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
       <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>
       <Name>ClusterKit.Web.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj">
+      <Project>{39ca45b9-b12c-48c6-b2f6-1355f151bdcc}</Project>
+      <Name>ClusterKit.Web.Descriptor</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

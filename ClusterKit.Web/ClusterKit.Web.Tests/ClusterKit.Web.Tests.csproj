@@ -93,14 +93,14 @@
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core, Version=0.0.0.67, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Core, Version=0.0.0.69, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.67-master\lib\ClusterKit.Core.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.69-master\lib\ClusterKit.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core.TestKit, Version=0.0.0.67, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Core.TestKit, Version=0.0.0.69, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.TestKit.0.0.0.67-master\lib\ClusterKit.Core.TestKit.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Core.TestKit.0.0.0.69-master\lib\ClusterKit.Core.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CommonServiceLocator.WindsorAdapter">
@@ -211,6 +211,10 @@
       <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>
       <Name>ClusterKit.Web.Client</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj">
+      <Project>{39ca45b9-b12c-48c6-b2f6-1355f151bdcc}</Project>
+      <Name>ClusterKit.Web.Descriptor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.NginxConfigurator\ClusterKit.Web.NginxConfigurator.csproj">
       <Project>{81cb9b1a-25b1-46a8-8806-0bcf5595386e}</Project>
       <Name>ClusterKit.Web.NginxConfigurator</Name>
@@ -231,6 +235,9 @@
       <Project>{477b201a-a30c-4360-b56a-6f61c049bb04}</Project>
       <Name>ClusterKit.Web</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

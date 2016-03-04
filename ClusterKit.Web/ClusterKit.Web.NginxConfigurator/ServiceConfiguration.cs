@@ -18,7 +18,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <summary>
         /// Gets the list of private nodes
         /// </summary>
-        public List<string> ActiveNodes { get; private set; } = new List<string>();
+        public List<NodeServiceConfiguration> ActiveNodes { get; private set; } = new List<NodeServiceConfiguration>();
 
         /// <summary>
         /// Gets or sets current location nginx configuration

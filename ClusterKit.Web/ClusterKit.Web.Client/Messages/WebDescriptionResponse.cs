@@ -17,22 +17,11 @@ namespace ClusterKit.Web.Client.Messages
     /// The message, that is sent as response to <seealso cref="WebDescriptionRequest"/>
     /// </summary>
     [UsedImplicitly]
-    public class WebDescriptionResponse
+    public struct WebDescriptionResponse
     {
         /// <summary>
-        /// Gets or sets the port, where web service is listening connections
+        /// Gets or sets collection of published services
         /// </summary>
-        [UsedImplicitly]
-        public int ListeningPort { get; set; }
-
-        /// <summary>
-        /// Gets or sets the the list of services.
-        /// </summary>
-        /// <remarks>
-        /// It doesn't supposed (but is not prohibited) that this should be public service hostname.
-        /// It's just used to distinguish services with identical url paths to be correctly published on frontend web servers.
-        /// </remarks>
-        [UsedImplicitly]
-        public Dictionary<string, string> ServiceNames { get; set; }
+        public IReadOnlyCollection<ServiceDescription> Services { get; set; }
     }
 }

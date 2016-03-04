@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Swagger.Moni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Swagger.Messages", "ClusterKit.Web.Swagger.Messages\ClusterKit.Web.Swagger.Messages.csproj", "{D80F5923-CD1B-4376-BAB5-1785EA4395A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Descriptor", "ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj", "{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,14 @@ Global
 		{D80F5923-CD1B-4376-BAB5-1785EA4395A9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D80F5923-CD1B-4376-BAB5-1785EA4395A9}.Release|x86.ActiveCfg = Release|Any CPU
 		{D80F5923-CD1B-4376-BAB5-1785EA4395A9}.Release|x86.Build.0 = Release|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Debug|x86.Build.0 = Debug|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Release|x86.ActiveCfg = Release|Any CPU
+		{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

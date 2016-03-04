@@ -4,8 +4,14 @@ namespace ClusterKit.Web.NginxConfigurator
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Nginx sites configuration description
+    /// </summary>
     public class WebConfiguration : IEnumerable<HostConfiguration>
     {
+        /// <summary>
+        ///
+        /// </summary>
         private readonly Dictionary<string, HostConfiguration> hosts = new Dictionary<string, HostConfiguration>();
 
         public int Count => this.hosts.Count;
