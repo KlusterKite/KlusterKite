@@ -20,7 +20,7 @@
     using ClusterKit.BusinessObjects;
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Core.TestKit.Moq;
+    using ClusterKit.Extensions.Tests.Moq;
 
     using JetBrains.Annotations;
 

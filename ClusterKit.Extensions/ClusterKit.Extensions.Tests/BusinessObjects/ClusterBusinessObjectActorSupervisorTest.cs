@@ -21,8 +21,8 @@
     using ClusterKit.BusinessObjects.Messages;
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Core.TestKit.Moq;
     using ClusterKit.Core.Utils;
+    using ClusterKit.Extensions.Tests.Moq;
 
     using JetBrains.Annotations;
 
