@@ -123,6 +123,7 @@ namespace ClusterKit.Build
             ConsoleLog($"Writing modified {Path.GetFullPath(project.ProjectFileName)}");
             File.Copy(Path.GetFullPath(project.ProjectFileName), Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"));
             projDoc.Save(Path.GetFullPath(project.ProjectFileName));
+            File.Copy(Path.GetFullPath(project.ProjectFileName), Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.mod"));
 
             try
             {
