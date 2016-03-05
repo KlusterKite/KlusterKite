@@ -6,6 +6,12 @@ services:
      - "80:80"
     environment:
      - NETWORK_NAME=seed
+  nuget:
+    image: clusterkit/nuget
+    ports:
+     - "81:80"
+    environment:
+     - NETWORK_NAME=nuget
   worker1:
     image: clusterkit/worker
     links:

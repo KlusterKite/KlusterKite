@@ -91,6 +91,15 @@ correctAssemblyVersions('./ClusterKitDemoWorker/build')
 subprocess.call("docker build -t clusterkit/worker:latest ./ClusterKitDemoWorker/", shell=True)
 #shutil.rmtree('./ClusterKitDemoWorker/build', True);
 
+# building ClusterKitNuget
+print "Preparing clusterkit/nuget"
+shutil.rmtree('./ClusterKitNuget/packages', True);
+os.mkdir('./ClusterKitNuget/packages');
+if platform.system() == 'Windows':
+	subprocess.Popen("xcopy ..\\packageOut\\* .\\ClusterKitNuget\\packages /Y", shell=True, stdout=subprocess.PIPE).wait()
+else:
+	subprocess.Popen("cp ../packageOut/* ./ClusterKitNuget/packages/", shell=True, stdout=subprocess.PIPE).wait()
+subprocess.call("docker build -t clusterkit/nuget:latest ./ClusterKitNuget/", shell=True)
 
 
 
