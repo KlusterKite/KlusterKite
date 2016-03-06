@@ -35,7 +35,13 @@ namespace ClusterKit.Core
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles node role functionality
         /// </summary>
+        [Obsolete("Sorry for orthography. Will be removed soon.")]
         protected const decimal PriorityClasterRole = 100M;
+
+        /// <summary>
+        /// Predefined priority to load configuration for plugins, that handles node role functionality
+        /// </summary>
+        protected const decimal PriorityClusterRole = 100M;
 
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles other plugins functionality

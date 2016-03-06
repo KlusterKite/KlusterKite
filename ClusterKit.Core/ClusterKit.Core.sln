@@ -20,6 +20,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Service", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Build", "ClusterKit.Build\ClusterKit.Build.csproj", "{30EE4EE5-28F9-48D3-B45B-758B08093D67}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.EF", "ClusterKit.Core.EF\ClusterKit.Core.EF.csproj", "{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.EF.Npgsql", "ClusterKit.Core.EF.Npgsql\ClusterKit.Core.EF.Npgsql.csproj", "{452AA14F-7657-49D2-8DA5-6A3058821217}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +50,14 @@ Global
 		{30EE4EE5-28F9-48D3-B45B-758B08093D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30EE4EE5-28F9-48D3-B45B-758B08093D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30EE4EE5-28F9-48D3-B45B-758B08093D67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{452AA14F-7657-49D2-8DA5-6A3058821217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{452AA14F-7657-49D2-8DA5-6A3058821217}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{452AA14F-7657-49D2-8DA5-6A3058821217}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{452AA14F-7657-49D2-8DA5-6A3058821217}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

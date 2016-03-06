@@ -16,7 +16,7 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClasterRole;
+        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClusterRole;
 
         /// <summary>
         /// Gets default akka configuration for current module

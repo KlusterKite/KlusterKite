@@ -9,6 +9,7 @@
       <Value>serilog</Value>
       <Value>redis</Value>
       <Value>Owin</Value>
+      <Value>postgres</Value>
       <Value>nginx</Value>
       <Value>nuget</Value>
       <Value>ui</Value>
