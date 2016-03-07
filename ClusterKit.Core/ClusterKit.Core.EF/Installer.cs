@@ -3,11 +3,14 @@
     using System;
     using System.Data.Entity;
     using System.Linq;
+    using System.Reflection;
 
     using Akka.Configuration;
 
     using Castle.MicroKernel.SubSystems.Configuration;
     using Castle.Windsor;
+
+    using Serilog;
 
     /// <summary>
     /// Installing components from current library
@@ -30,10 +33,18 @@
                         .SelectMany(a => a.GetTypes())
                         .Single(t => t.IsSubclassOf(typeof(BaseEntityFrameworkInstaller)));
 
-                installer = (BaseEntityFrameworkInstaller)installerType.GetConstructor(new Type[0])?.Invoke(new object[0]);
+                installer =
+                    (BaseEntityFrameworkInstaller)installerType.GetConstructor(new Type[0])?.Invoke(new object[0]);
                 if (installer == null)
                 {
                     throw new InvalidOperationException();
+                }
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                foreach (var le in e.LoaderExceptions.Take(30))
+                {
+                    Log.Logger.Error($"{le.Message}");
                 }
             }
             catch (InvalidOperationException)

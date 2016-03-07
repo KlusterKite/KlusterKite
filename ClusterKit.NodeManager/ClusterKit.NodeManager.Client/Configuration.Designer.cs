@@ -61,10 +61,20 @@ namespace ClusterKit.NodeManager.Client {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to  {	
-        ///
-        ///
-        /// }.
+        ///   Looks up a localized string similar to {	
+        ///	akka.actor.deployment {
+        ///		/NodeManager {
+        ///	    	IsNameSpace = true
+        ///	    }
+        ///        
+        ///        /NodeManager/DbWorker.Proxy {
+        ///        	actor-type = SingletonProxy
+        ///        	singleton-name = clusterkit.nodemanager.dbworker
+        ///        	singleton-path = /NodeManager/DbWorker
+        ///        	singleton-node-role = NodeManager            
+        ///        }
+        /// 	}
+        ///}.
         /// </summary>
         internal static string AkkaConfig {
             get {
