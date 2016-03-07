@@ -3,7 +3,7 @@
       
       stdout-loglevel : INFO
       loggers : ["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
-      log-config-on-start : on
+      log-config-on-start : off
       loglevel : INFO
 
       actor : {

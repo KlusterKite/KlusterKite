@@ -132,6 +132,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
+    <Compile Include="EnActorType.cs" />
     <Compile Include="NameSpaceActor.cs" />
     <Compile Include="Ping\PingActor.cs" />
     <Compile Include="Ping\PingMessage.cs" />
