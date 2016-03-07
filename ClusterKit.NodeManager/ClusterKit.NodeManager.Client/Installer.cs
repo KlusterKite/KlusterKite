@@ -1,4 +1,4 @@
-﻿namespace ClusterKit.NodeManager
+﻿namespace ClusterKit.NodeManager.Client
 {
     using System;
     using System.Collections.Generic;
@@ -28,36 +28,13 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => PriorityClasterRole;
-
-        /// <summary>
-        /// Should check the config and environment for possible erorrs.
-        /// If any found, shod throw the exception to prevent node from starting.
-        /// </summary>
-        /// <param name="config">Full akka config</param>
-        /// <exception cref="System.Exception">
-        /// Thrown if there are error in configuration and/or environment
-        /// </exception>
-        public override void PreCheck(Config config)
-        {
-            var connectionString = config.GetString("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString");
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new ConfigurationException("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString is not defined");
-            }
-        }
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
-
-        /// <summary>
-        /// Gets list of roles, that would be assign to cluster node with this plugin installed.
-        /// </summary>
-        /// <returns>The list of roles</returns>
-        protected override IEnumerable<string> GetRoles() => new[] { "NodeManager" };
 
         /// <summary>
         /// Registering DI components

@@ -17,14 +17,20 @@
  			}
  		}
  	}
+
  	akka.actor.deployment {
- 		 /NodeManager {
-            IsNameSpace = true
+		
+		/NodeManager {
+	    	IsNameSpace = true
+	    }
+        
+        /NodeManager/DbWorker {
+        	actor-type = Singleton
+        	singleton-name = clusterkit.nodemanager.dbworker
+        	singleton-node-role = NodeManager     
+        	type = "ClusterKit.NodeManager.ConfigurationDbWorker, ClusterKit.NodeManager"       
         }
-
-        ///Web/Descriptor {
-            //type = "ClusterKit.Web.Descriptor.WebDescriptorActor, ClusterKit.Web.Descriptor"
-        //}
-
  	}
+
+
  }

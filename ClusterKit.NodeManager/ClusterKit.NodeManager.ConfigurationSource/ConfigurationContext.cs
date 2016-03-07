@@ -15,7 +15,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     /// <summary>
     /// Configuration database context
     /// </summary>
-    [DbConfigurationType(typeof(EfConfiguration))]
     public class ConfigurationContext : DbContext
     {
         /// <summary>
