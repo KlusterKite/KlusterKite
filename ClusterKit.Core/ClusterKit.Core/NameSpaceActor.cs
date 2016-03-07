@@ -61,7 +61,7 @@ namespace ClusterKit.Core
 
                 var actorConfig = config.GetConfig(key);
                 EnActorType actorType;
-                if (!Enum.TryParse(actorConfig.GetString("actorType"), out actorType))
+                if (!Enum.TryParse(actorConfig.GetString("actor-type"), out actorType))
                 {
                     actorType = EnActorType.Simple;
                 }
@@ -72,6 +72,10 @@ namespace ClusterKit.Core
                 {
                     case EnActorType.Singleton:
                         CreateSingletonActor(context, actorConfig, currentPath, path.Last());
+                        break;
+
+                    case EnActorType.SingletonProxy:
+                        CreateSingletonProxyActor(context, actorConfig, currentPath, path.Last());
                         break;
 
                     default:
