@@ -4,7 +4,7 @@
 	    	IsNameSpace = true
 	    }
         
-        /NodeManager/DbWorker.Proxy {
+        /NodeManager/DbWorkerProxy {
         	actor-type = SingletonProxy
         	singleton-name = clusterkit.nodemanager.dbworker
         	singleton-path = /NodeManager/DbWorker
