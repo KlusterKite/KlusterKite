@@ -26,6 +26,14 @@
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
         protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
 
+        /// <summary>
+        /// Should check the config and environment for possible erorrs.
+        /// If any found, shod throw the exception to prevent node from starting.
+        /// </summary>
+        /// <param name="config">Full akka config</param>
+        /// <exception cref="Exception">
+        /// Thrown if there are error in configuration and/or environment
+        /// </exception>
         public override void PreCheck(Config config)
         {
             try
