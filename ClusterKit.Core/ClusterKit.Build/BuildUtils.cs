@@ -45,9 +45,14 @@ namespace ClusterKit.Build
         public static string BuildTemp { get; private set; }
 
         /// <summary>
+        /// Gets directory with sources nuget packages
+        /// </summary>
+        public static string PackageInputDirectory { get; private set; }
+
+        /// <summary>
         /// Gets output directory to put prepared nuget packages
         /// </summary>
-        public static string PackageDirecotry { get; private set; }
+        public static string PackageOutputDirectory { get; private set; }
 
         /// <summary>
         /// Gets global output packages version
@@ -81,14 +86,7 @@ namespace ClusterKit.Build
             Directory.CreateDirectory(project.CleanBuildDirectory);
             Directory.CreateDirectory(project.TempBuildDirectory);
 
-            // restoring packages for project with respec to global configuration file
-            Func<Unit, Unit> failFunc = u => u;
-            var nugetPath = RestorePackageHelper.findNuget("./");
-            RestorePackageHelper.runNuGet(
-                nugetPath,
-                TimeSpan.FromMinutes(10),
-                $"restore {project.ProjectFileName} -ConfigFile ./nuget.config",
-                failFunc.ToFSharpFunc());
+            RestoreProjectDependencies(project);
 
             // modifying project file to substitute internal nute-through dependencies to currently built files
             var projDoc = new XmlDocument();
@@ -200,16 +198,18 @@ namespace ClusterKit.Build
         /// </summary>
         /// <param name="version">Global output packages version</param>
         /// <param name="buildDirectory">Temp directory to build projects</param>
-        /// <param name="packageDirecotry">Output directory to put prepared nuget packages</param>
+        /// <param name="packageOutputDirectory">Output directory to put prepared nuget packages</param>
+        /// <param name="packageInputDirectory">directory with sources nuget packages</param>
         public static void Configure(
-            // ReSharper disable ParameterHidesMember
             string version,
             string buildDirectory,
-            string packageDirecotry /* ReSharper restore ParameterHidesMember */)
+            string packageOutputDirectory,
+            string packageInputDirectory)
         {
             BuildUtils.Version = version;
             BuildUtils.BuildDirectory = buildDirectory;
-            BuildUtils.PackageDirecotry = packageDirecotry;
+            BuildUtils.PackageOutputDirectory = packageOutputDirectory;
+            BuildUtils.PackageInputDirectory = packageInputDirectory;
 
             BuildTemp = Path.Combine(buildDirectory, "tmp");
             BuildClean = Path.Combine(buildDirectory, "clean");
@@ -291,16 +291,16 @@ namespace ClusterKit.Build
             var generatedNuspecFile = Path.Combine(project.CleanBuildDirectory, nuspecDataFileName);
             nuspecData.Save(generatedNuspecFile);
 
-            if (!Directory.Exists(PackageDirecotry))
+            if (!Directory.Exists(PackageOutputDirectory))
             {
-                Directory.CreateDirectory(PackageDirecotry);
+                Directory.CreateDirectory(PackageOutputDirectory);
             }
 
             Func<NuGetHelper.NuGetParams, NuGetHelper.NuGetParams> provider = defaults =>
                 {
                     defaults.SetFieldValue("Version", Version);
                     defaults.SetFieldValue("WorkingDir", project.CleanBuildDirectory);
-                    defaults.SetFieldValue("OutputPath", PackageDirecotry);
+                    defaults.SetFieldValue("OutputPath", PackageOutputDirectory);
                     return defaults;
                 };
 
@@ -318,6 +318,32 @@ namespace ClusterKit.Build
             foreach (var project in projects)
             {
                 CreateNuget(project);
+            }
+        }
+
+        /// <summary>
+        /// Removes local projects package references
+        /// </summary>
+        /// <param name="projects">List of local projects</param>
+        public static void ReloadNuget(IEnumerable<ProjectDescription> projects)
+        {
+            var projectList = projects.ToList();
+
+            if (!Directory.Exists(PackageInputDirectory))
+            {
+                return;
+            }
+
+            foreach (var installedPackageDir in projectList.Select(projectDescription => Path.Combine(
+                PackageInputDirectory,
+                $"{projectDescription.ProjectName}.{Version}")).Where(Directory.Exists))
+            {
+                Directory.Delete(installedPackageDir, true);
+            }
+
+            foreach (var projectDescription in projectList)
+            {
+                RestoreProjectDependencies(projectDescription);
             }
         }
 
@@ -393,6 +419,22 @@ namespace ClusterKit.Build
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(message);
             Console.ForegroundColor = currentColor;
+        }
+
+        /// <summary>
+        /// Executes nuget restore for project
+        /// </summary>
+        /// <param name="project">Project to restore</param>
+        private static void RestoreProjectDependencies(ProjectDescription project)
+        {
+            // restoring packages for project with respec to global configuration file
+            Func<Unit, Unit> failFunc = u => u;
+            var nugetPath = RestorePackageHelper.findNuget("./");
+            RestorePackageHelper.runNuGet(
+                nugetPath,
+                TimeSpan.FromMinutes(10),
+                $"restore {project.ProjectFileName} -ConfigFile ./nuget.config",
+                failFunc.ToFSharpFunc());
         }
 
         /// <summary>

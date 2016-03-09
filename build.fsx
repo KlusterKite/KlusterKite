@@ -14,7 +14,7 @@ let ver = environVar "version"
 
 let currentTarget = getBuildParam "target"
 
-BuildUtils.Configure(ver, buildDir, packageDir)
+BuildUtils.Configure(ver, buildDir, packageDir, "./packages")
 
 let projects = [|
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Build/ClusterKit.Build.csproj", ProjectDescription.EnProjectType.NugetPackage)
@@ -45,6 +45,7 @@ let projects = [|
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.EF"|]))
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager/ClusterKit.NodeManager.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"|]))
+    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Tests/ClusterKit.NodeManager.Tests.csproj", ProjectDescription.EnProjectType.SimpleBuild, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"; "ClusterKit.Core.EF.Npgsql"|]))
 
 |]
 
@@ -65,12 +66,17 @@ Target "PublishNuGet" (fun _ ->
     BuildUtils.CreateNuget(projects);
 )
 
+Target "ReloadNuGet" (fun _ ->
+    BuildUtils.ReloadNuget(projects);
+)
+
 Target "Test" (fun _ ->
     BuildUtils.RunXUnitTest(projects);
 )
 
 "PreClean" ==> "Build"
 "Build" ==> "PublishNuGet"
+"PublishNuGet" ==> "ReloadNuGet"
 "Build" ==> "Test"
 
 RunTargetOrDefault "PreClean"

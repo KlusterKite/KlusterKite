@@ -3,6 +3,7 @@
 
 		NodeManager {
 			//ConfigurationDatabaseConnectionString = ""
+                        ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
 		}
 
 		Web {

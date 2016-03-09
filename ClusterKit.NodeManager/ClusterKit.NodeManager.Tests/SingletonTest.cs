@@ -46,6 +46,8 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void SimpleTest()
         {
+            var actor = this.Sys.ActorOf(this.Sys.DI().Props<ConfigurationDbWorker>(), "cdb");
+            /*
             var singleTon =
                 this.Sys.ActorOf(
                     ClusterSingletonManager.Props(
@@ -61,8 +63,8 @@ namespace ClusterKit.NodeManager.Tests
                     ClusterSingletonProxy.Props("/user/nodemanager.dbworker",
                     new ClusterSingletonProxySettings("nodemanager.dbworker", "NodeManager", TimeSpan.FromSeconds(1), 1024)),
                     "nodemanager.dbworker.proxy");
-
-            var response = proxy.Ask<PongMessage>(new PingActor(), TimeSpan.FromSeconds(5)).Result;
+*/
+            var response = actor.Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(500)).Result;
             Assert.NotNull(response);
         }
 
@@ -83,6 +85,12 @@ namespace ClusterKit.NodeManager.Tests
             public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
             {
                 return ConfigurationFactory.ParseString(@"{
+                  ClusterKit {
+                    NodeManager {
+                        ConfigurationDatabaseConnectionString = ""User ID=postgres;Host=192.168.99.100;Port=5432;Pooling=true""
+                    }
+                  }
+
                   akka {
                     remote {
                       helios {
@@ -103,6 +111,10 @@ namespace ClusterKit.NodeManager.Tests
             public override List<BaseInstaller> GetPluginInstallers()
             {
                 var list = base.GetPluginInstallers();
+                list.Add(new Core.EF.Installer());
+                list.Add(new Core.EF.Npgsql.Installer());
+                list.Add(new NodeManager.Installer());
+                //list.Add(new Web.Installer());
                 list.Add(new Installer());
                 return list;
             }

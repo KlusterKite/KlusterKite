@@ -36,35 +36,6 @@
         /// </exception>
         public override void PreCheck(Config config)
         {
-            try
-            {
-                var installerType =
-                    AppDomain.CurrentDomain.GetAssemblies()
-                        .SelectMany(a => a.GetTypes())
-                        .Single(t => t.IsSubclassOf(typeof(BaseEntityFrameworkInstaller)));
-
-                this.installer = (BaseEntityFrameworkInstaller)installerType.GetConstructor(new Type[0])?.Invoke(new object[0]);
-                if (this.installer == null)
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-            catch (ReflectionTypeLoadException e)
-            {
-                foreach (var le in e.LoaderExceptions.Take(30))
-                {
-                    Log.Logger.Error($"{le.Message}");
-                }
-            }
-            catch (InvalidOperationException)
-            {
-                throw new ConfigurationException("There should be exactly one EntityFrameworkInstaller in plugins with public parameterless construcot");
-            }
-
-            if (this.installer != null)
-            {
-                DbConfiguration.SetConfiguration(installer.GetConfiguration());
-            }
         }
 
         /// <summary>
@@ -80,10 +51,47 @@
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
+            Log.Information("Registering EF endpoint driver");
+            try
+            {
+                var installerTypes =
+                    AppDomain.CurrentDomain.GetAssemblies()
+                        .SelectMany(a => a.GetTypes())
+                        .Where(t => t.IsSubclassOf(typeof(BaseEntityFrameworkInstaller))).ToList();
+
+                if (installerTypes.Count > 1)
+                {
+                    throw new ConfigurationException($"There should be only one BaseEntityFrameworkInstaller, but found \n{string.Join(", \n", installerTypes.Select(t => t.FullName))}");
+                }
+
+                if (installerTypes.Count == 0)
+                {
+                    throw new ConfigurationException($"There is no BaseEntityFrameworkInstaller");
+                }
+
+                this.installer = (BaseEntityFrameworkInstaller)installerTypes.Single().GetConstructor(new Type[0])?.Invoke(new object[0]);
+                if (this.installer == null)
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                foreach (var le in e.LoaderExceptions.Take(30))
+                {
+                    Log.Logger.Error($"{le.Message}");
+                }
+
+                throw;
+            }
+
             if (this.installer != null)
             {
+                DbConfiguration.SetConfiguration(this.installer.GetConfiguration());
+                var baseConnectionManager = this.installer.CreateConnectionManager();
+
                 container.Register(
-                    Component.For<BaseConnectionManager>().Instance(this.installer.CreateConnectionManager()));
+                    Component.For<BaseConnectionManager>().Instance(baseConnectionManager).LifestyleSingleton());
             }
         }
     }

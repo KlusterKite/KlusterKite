@@ -35,10 +35,16 @@
         /// </exception>
         public override void PreCheck(Config config)
         {
-            var connectionString = config.GetString("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString");
+            var connectionString = config.GetString(ConfigurationDbWorker.ConfigConnectionStringPath);
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new ConfigurationException("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString is not defined");
+                throw new ConfigurationException($"{ConfigurationDbWorker.ConfigConnectionStringPath} is not defined");
+            }
+
+            var databaseName = config.GetString(ConfigurationDbWorker.ConfigDatabaseNamePath);
+            if (string.IsNullOrEmpty(databaseName))
+            {
+                throw new ConfigurationException($"{ConfigurationDbWorker.ConfigDatabaseNamePath} is not defined");
             }
         }
 
