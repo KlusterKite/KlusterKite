@@ -16,6 +16,8 @@ namespace ClusterKit.Core.EF.Npgsql
 
     using global::Npgsql;
 
+    using Serilog;
+
     /// <summary>
     /// Npgsql connection manager
     /// </summary>
@@ -40,22 +42,20 @@ namespace ClusterKit.Core.EF.Npgsql
                 throw new ArgumentNullException(nameof(databaseName));
             }
 
+            databaseName = this.EscapeDatabaseName(databaseName);
             var command = npgsqlConnection.CreateCommand();
-            databaseName = Regex.Replace(databaseName, "[^\\w]+", string.Empty);
-            command.CommandText =
-                $@"DO
-                $do$
-                BEGIN
-
-                IF NOT EXISTS(SELECT 1 FROM pg_database WHERE datname = '{databaseName}') THEN
-                      PERFORM dblink_exec('dbname=' || current_database(), 'CREATE DATABASE {databaseName}');
-                END IF;
-
-                END
-                $do $";
+            command.CommandText = $"SELECT count(*) FROM pg_database WHERE datname = '{databaseName}'";
             command.CommandType = CommandType.Text;
 
-            command.ExecuteNonQuery();
+            var count = (long)command.ExecuteScalar();
+
+            if (count == 0)
+            {
+                Log.Logger.Debug("{Type}: Creating database \"{DatabaseName}\"", this.GetType().FullName, databaseName);
+                command = npgsqlConnection.CreateCommand();
+                command.CommandText = $"CREATE DATABASE \"{databaseName}\"";
+                command.ExecuteNonQuery();
+            }
         }
 
         /// <summary>

@@ -10,6 +10,9 @@
 namespace ClusterKit.Core.EF
 {
     using System.Data.Common;
+    using System.Text.RegularExpressions;
+
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Base class to create database connections
@@ -30,6 +33,17 @@ namespace ClusterKit.Core.EF
         /// <returns>Database connection</returns>
         /// <remarks>Don't forget to dispose it</remarks>
         public abstract DbConnection CreateConnection(string connectionString);
+
+        /// <summary>
+        /// Escapes stringed database name (or related object) in terms of current database system
+        /// </summary>
+        /// <param name="databaseName">Configured database name</param>
+        /// <returns>Escaped database name</returns>
+        [UsedImplicitly]
+        public virtual string EscapeDatabaseName(string databaseName)
+        {
+            return Regex.Replace(databaseName, "[^\\w]+", string.Empty);
+        }
 
         /// <summary>
         /// Changes database in database connection
