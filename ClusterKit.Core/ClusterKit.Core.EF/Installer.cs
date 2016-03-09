@@ -7,6 +7,7 @@
 
     using Akka.Configuration;
 
+    using Castle.MicroKernel.Registration;
     using Castle.MicroKernel.SubSystems.Configuration;
     using Castle.Windsor;
 
@@ -17,6 +18,8 @@
     /// </summary>
     public class Installer : BaseInstaller
     {
+        private BaseEntityFrameworkInstaller installer;
+
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
@@ -25,7 +28,6 @@
 
         public override void PreCheck(Config config)
         {
-            BaseEntityFrameworkInstaller installer = null;
             try
             {
                 var installerType =
@@ -33,9 +35,8 @@
                         .SelectMany(a => a.GetTypes())
                         .Single(t => t.IsSubclassOf(typeof(BaseEntityFrameworkInstaller)));
 
-                installer =
-                    (BaseEntityFrameworkInstaller)installerType.GetConstructor(new Type[0])?.Invoke(new object[0]);
-                if (installer == null)
+                this.installer = (BaseEntityFrameworkInstaller)installerType.GetConstructor(new Type[0])?.Invoke(new object[0]);
+                if (this.installer == null)
                 {
                     throw new InvalidOperationException();
                 }
@@ -52,7 +53,10 @@
                 throw new ConfigurationException("There should be exactly one EntityFrameworkInstaller in plugins with public parameterless construcot");
             }
 
-            DbConfiguration.SetConfiguration(installer.GetConfiguration());
+            if (this.installer != null)
+            {
+                DbConfiguration.SetConfiguration(installer.GetConfiguration());
+            }
         }
 
         /// <summary>
@@ -68,6 +72,11 @@
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
+            if (this.installer != null)
+            {
+                container.Register(
+                    Component.For<BaseConnectionManager>().Instance(this.installer.CreateConnectionManager()));
+            }
         }
     }
 }

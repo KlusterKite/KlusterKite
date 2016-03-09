@@ -69,9 +69,9 @@
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core, Version=0.0.0.75, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Core, Version=0.0.0.78, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.75-master\lib\ClusterKit.Core.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.78-master\lib\ClusterKit.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers">
@@ -138,6 +138,7 @@
     <EmbeddedResource Include="Configuration.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

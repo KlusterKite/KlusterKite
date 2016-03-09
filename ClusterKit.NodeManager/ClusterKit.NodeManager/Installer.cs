@@ -1,12 +1,9 @@
 ﻿namespace ClusterKit.NodeManager
 {
-    using System;
     using System.Collections.Generic;
 
     using Akka.Actor;
-    using Akka.Cluster.Tools.Singleton;
     using Akka.Configuration;
-    using Akka.DI.Core;
 
     using Castle.MicroKernel.Registration;
     using Castle.MicroKernel.SubSystems.Configuration;
@@ -15,8 +12,6 @@
     using ClusterKit.Core;
 
     using JetBrains.Annotations;
-
-    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// Installing components from current library
@@ -28,7 +23,7 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => PriorityClasterRole;
+        protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
 
         /// <summary>
         /// Should check the config and environment for possible erorrs.

@@ -197,9 +197,10 @@ namespace ClusterKit.Core
 
             context.GetLogger()
                 .Info(
-                    "{Type}: {NameSpaceName} initializing singleton of type {ActorType} on {PathString}",
+                    "{Type}: {NameSpaceName} initializing singleton {SingletonName} of type {ActorType} on {PathString}",
                     typeof(NameSpaceActor).Name,
                     currentPath,
+                    singletonName,
                     type.Name,
                     pathName);
 
@@ -262,6 +263,14 @@ namespace ClusterKit.Core
                         pathName);
                 return;
             }
+
+            context.GetLogger()
+               .Info(
+                   "{Type}: {NameSpaceName} initializing singleton proxy {SingletonName} for {PathString}",
+                   typeof(NameSpaceActor).Name,
+                   currentPath,
+                   singletonName,
+                   pathName);
 
             context.ActorOf(
                     ClusterSingletonProxy.Props(singletonManagerPath,

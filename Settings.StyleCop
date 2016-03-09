@@ -11,6 +11,7 @@
       <Value>Owin</Value>
       <Value>postgres</Value>
       <Value>nginx</Value>
+      <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>ui</Value>
     </CollectionProperty>

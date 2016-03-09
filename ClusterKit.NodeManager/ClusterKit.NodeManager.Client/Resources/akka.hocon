@@ -1,14 +1,14 @@
 {	
 	akka.actor.deployment {
-		/NodeManager {
+	       /NodeManager {
 	    	IsNameSpace = true
-	    }
+	       }
         
-        /NodeManager/DbWorkerProxy {
-        	actor-type = SingletonProxy
-        	singleton-name = clusterkit.nodemanager.dbworker
-        	singleton-path = /NodeManager/DbWorker
-        	singleton-node-role = NodeManager            
-        }
+                /NodeManager/DbWorkerProxy {
+        	       actor-type = SingletonProxy
+        	       singleton-name = clusterkit.nodemanager.dbworker
+        	       singleton-path = /NodeManager/DbWorker
+        	       singleton-node-role = NodeManager            
+                }
  	}
 }

@@ -12,16 +12,22 @@ services:
      - "81:80"
     environment:
      - NETWORK_NAME=nuget
+  configDb:
+    image: postgres
+    environment:
+     - NETWORK_NAME=postgres
   worker1:
     image: clusterkit/worker
     links:
      - "seed"
+     - "configDb"
     environment:
      - NETWORK_NAME=worker1
   worker2:
     image: clusterkit/worker    
     links:
      - "seed"
+     - "configDb"
     environment:
      - NETWORK_NAME=worker2
 
