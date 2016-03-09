@@ -17,6 +17,12 @@ namespace ClusterKit.Core.EF
     public abstract class BaseEntityFrameworkInstaller
     {
         /// <summary>
+        /// Creates singleton instance of connection manager for future dependency injection
+        /// </summary>
+        /// <returns>Instance of connection manager</returns>
+        public abstract BaseConnectionManager CreateConnectionManager();
+
+        /// <summary>
         /// Gets the configuration for entity framework
         /// </summary>
         /// <returns>EF configuration</returns>

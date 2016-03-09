@@ -21,6 +21,12 @@ namespace ClusterKit.Core.EF.Npgsql
     public class EntityFrameworkInstaller : BaseEntityFrameworkInstaller
     {
         /// <summary>
+        /// Creates singleton instance of connection manager for future dependency injection
+        /// </summary>
+        /// <returns>Instance of connection manager</returns>
+        public override BaseConnectionManager CreateConnectionManager() => new ConnectionManager();
+
+        /// <summary>
         /// Gets the configuration for entity framework
         /// </summary>
         /// <returns>EF configuration</returns>
