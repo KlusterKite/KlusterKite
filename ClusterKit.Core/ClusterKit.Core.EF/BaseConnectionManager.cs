@@ -42,7 +42,7 @@ namespace ClusterKit.Core.EF
         [UsedImplicitly]
         public virtual string EscapeDatabaseName(string databaseName)
         {
-            return Regex.Replace(databaseName, "[^\\w]+", string.Empty);
+            return Regex.Replace(databaseName, "[^\\w\\.]+", string.Empty);
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
  {
  	ClusterKit {
  		Web {
+ 			RestTimeout = 10s
  			OwinBindAddress = "http://*:8080"
  			Services {
  				//ServiceName { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node

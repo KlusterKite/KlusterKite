@@ -65,6 +65,13 @@ namespace ClusterKit.Core.Utils
             return Convert.FromBase64String(serializedData).DeserializeFromAkka<T>(system);
         }
 
+        /// <summary>
+        /// Workaround of https://github.com/akkadotnet/akka.net/issues/1321 bug
+        /// </summary>
+        /// <param name="actorRef">Current actor reference</param>
+        /// <param name="system">Akka actor system</param>
+        /// <param name="childPath">Path to create router</param>
+        /// <returns>Configured router</returns>
         public static RouterConfig GetFromConfiguration(this IActorRef actorRef, ActorSystem system, string childPath)
         {
             var childConfig = system.Settings.Config.GetConfig("akka.actor.deployment")
@@ -76,13 +83,14 @@ namespace ClusterKit.Core.Utils
             }
 
             string routerName = childConfig.GetString("router");
-            int numberOfInstances = childConfig.GetInt("nr-of-instances");
             //todo: @kantora - realize all router parameters and types
-
             switch (routerName)
             {
                 case "round-robin-pool":
-                    return new RoundRobinPool(numberOfInstances);
+                    return new RoundRobinPool(childConfig);
+
+                case "consistent-hashing-pool":
+                    return new ConsistentHashingPool(childConfig);
 
                 default:
                     return RouterConfig.NoRouter;

@@ -12,6 +12,7 @@ namespace ClusterKit.Web.Swagger
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Web.Http;
 
     using Akka.Configuration;
@@ -53,8 +54,8 @@ namespace ClusterKit.Web.Swagger
                         c.SingleApiVersion(
                             akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.apiVersion", "v1"),
                             akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.apiTitle", "Cluster API"));
-                        var commentFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.xml");
-                        foreach (var commentFile in commentFiles)
+                        var commentFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory);
+                        foreach (var commentFile in commentFiles.Where(cf => "xml".Equals(Path.GetExtension(cf), StringComparison.InvariantCultureIgnoreCase)))
                         {
                             c.IncludeXmlComments(Path.GetFullPath(commentFile));
                         }

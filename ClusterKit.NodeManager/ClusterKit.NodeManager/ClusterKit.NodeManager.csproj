@@ -79,6 +79,10 @@
       <HintPath>..\..\packages\ClusterKit.Core.EF.0.0.0.0-local\lib\ClusterKit.Core.EF.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClusterKit.Core.Rest">
+      <HintPath>..\..\packages\ClusterKit.Core.Rest.0.0.0.0-local\lib\ClusterKit.Core.Rest.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ClusterKit.Web, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\ClusterKit.Web.0.0.0.0-local\lib\ClusterKit.Web.dll</HintPath>
@@ -200,6 +204,7 @@
     <Compile Include="ConfigurationDbWorker.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebApi\NodeTemplateRestController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

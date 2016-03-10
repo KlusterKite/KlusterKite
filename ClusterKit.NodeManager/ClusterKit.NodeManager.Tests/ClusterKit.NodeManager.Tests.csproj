@@ -94,6 +94,10 @@
       <HintPath>..\..\packages\ClusterKit.Core.EF.Npgsql.0.0.0.0-local\lib\ClusterKit.Core.EF.Npgsql.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClusterKit.Core.Rest">
+      <HintPath>..\..\packages\ClusterKit.Core.Rest.0.0.0.0-local\lib\ClusterKit.Core.Rest.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ClusterKit.Core.TestKit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\ClusterKit.Core.TestKit.0.0.0.0-local\lib\ClusterKit.Core.TestKit.dll</HintPath>

@@ -104,6 +104,8 @@ namespace ClusterKit.NodeManager.Tests
                 connection.Open();
                 using (var context = new ConfigurationContext(connection))
                 {
+                    context.Database.Log = s => this.output.WriteLine(s);
+
                     var migrator = new MigrateDatabaseToLatestVersion<ConfigurationContext, ConfigurationSource.Migrations.Configuration>(true);
                     migrator.InitializeDatabase(context);
 
