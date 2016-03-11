@@ -13,23 +13,29 @@
 					PublicHostName = default //public host name of this service. It doesn't supposed (but is not prohibited) that this should be real public service hostname. It's just used to distinguish services with identical url paths to be correctly published on frontend web servers. Real expected hostname should be configured in NginxConfigurator or similar publisher
 					Route = /nodemanager //route (aka directory) path to service
 				//	LocalHostName = $host //local hostname that proxy should path. This should be used to support virtual hosting inside single node
-				//}
+				}
 
 			}
 		}
 	}
 
-	akka.actor.deployment {
-	
+
+        akka.actor.deployment {
+        
                 /NodeManager {
                         IsNameSpace = true
                 }
 
                 /NodeManager/DbWorker {
                         actor-type = Singleton
-                        singleton-name = clusterkit.nodemanager.dbworker
+                        singleton-name = ConfigurationDbManager
                         singleton-node-role = NodeManager     
                         type = "ClusterKit.NodeManager.ConfigurationDbWorker, ClusterKit.NodeManager"       
                 }
-	}
+
+                /NodeManager/DbWorker/ConfigurationDbManager/workers {
+                        router = consistent-hashing-pool
+                        nr-of-instances = 5                                                    
+                }                
+        }
 }

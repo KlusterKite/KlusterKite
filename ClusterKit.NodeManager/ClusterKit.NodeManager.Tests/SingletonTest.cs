@@ -11,6 +11,7 @@ namespace ClusterKit.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     using Akka.Actor;
     using Akka.Cluster.Tools.Singleton;
@@ -46,26 +47,58 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void SimpleTest()
         {
-            var actor = this.Sys.ActorOf(this.Sys.DI().Props<ConfigurationDbWorker>(), "cdb");
-            /*
+            var proxy =
+                this.Sys.ActorOf(
+                    ClusterSingletonProxy.Props(
+                        singletonManagerPath: "/user/singleton",
+                        settings:
+                            new ClusterSingletonProxySettings("dbWorker", "TimeSpan", TimeSpan.FromMilliseconds(200), 2048)),
+                    name: "proxy");
+
             var singleTon =
                 this.Sys.ActorOf(
                     ClusterSingletonManager.Props(
-                        this.Sys.DI().Props<ConfigurationDbWorker>(),
+                        this.Sys.DI().Props(typeof(ConfigurationDbWorker)),
                         new ClusterSingletonManagerSettings(
-                            "nodemanager.dbworker",
+                            "dbWorker",
                             "NodeManager",
-                            TimeSpan.FromSeconds(1),
-                            TimeSpan.FromSeconds(1))), "nodemanager.dbworker");
+                            TimeSpan.FromMilliseconds(500),
+                            TimeSpan.FromSeconds(1))),
+                    "singleton");
 
-            var proxy =
-                this.Sys.ActorOf(
-                    ClusterSingletonProxy.Props("/user/nodemanager.dbworker",
-                    new ClusterSingletonProxySettings("nodemanager.dbworker", "NodeManager", TimeSpan.FromSeconds(1), 1024)),
-                    "nodemanager.dbworker.proxy");
-*/
-            var response = actor.Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(500)).Result;
-            Assert.NotNull(response);
+            Thread.Sleep(TimeSpan.FromSeconds(10));
+            this.Log.Warning("--------------------------------");
+
+            singleTon.Tell(new PingMessage());
+            try
+            {
+                singleTon.Ask<ActorIdentity>(new Identify(Guid.NewGuid()), TimeSpan.FromSeconds(1)).Wait();
+            }
+            catch (Exception e)
+            {
+                this.Log.Error(e, "Error on singleton manager ask");
+            }
+
+            try
+            {
+                this.Sys.ActorSelection("/user/singleton/dbWorker")
+                    .Ask<PongMessage>(new PingMessage(), TimeSpan.FromSeconds(1))
+                    .Wait();
+            }
+            catch (Exception e)
+            {
+                this.Log.Error(e, "Error on singleton ask");
+            }
+
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+
+            this.Log.Warning("Sending message to proxy");
+
+            proxy.Ask<PongMessage>(new PingMessage(), TimeSpan.FromSeconds(5)).Wait();
+
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+
+            proxy.Ask<PongMessage>(new PingMessage(), TimeSpan.FromSeconds(5)).Wait();
         }
 
         /// <summary>
@@ -86,12 +119,60 @@ namespace ClusterKit.NodeManager.Tests
             {
                 return ConfigurationFactory.ParseString(@"{
                   ClusterKit {
-                    NodeManager {
+                 test-dispatcher {type : PinnedDispatcher
+                    throughput: 100
+                    throughput - deadline - time : 0ms
+                }
+
+            NodeManager {
                         ConfigurationDatabaseConnectionString = ""User ID=postgres;Host=192.168.99.100;Port=5432;Pooling=true""
                     }
                   }
 
+                default-dispatcher {
+                    type = PinnedDispatcher
+                }
+
+                  test : {
+                  calling-thread-dispatcher : {
+                    type : PinnedDispatcher
+                    throughput: 2147483647
+                  }
+            test-actor : {
+                    dispatcher : {
+                      type : PinnedDispatcher
+                      throughput : 2147483647
+                    }
+                    }
+                }
+
                   akka {
+                     actor {
+                            deployment {
+                            /singleton/dbWorker/workers {
+                                    dispatcher = default-dispatcher
+                                    router = consistent-hashing-pool
+                                    nr-of-instances = 5
+                            }
+
+                            ""/singleton/*/*"" {
+                                    dispatcher = default-dispatcher
+                            }
+
+                            ""/singleton/*"" {
+                                    dispatcher = default-dispatcher
+                            }
+
+                            /singleton {
+                                    dispatcher = default-dispatcher
+                            }
+
+                            /proxy {
+                                    dispatcher = default-dispatcher
+                            }
+                        }
+                    }
+
                     remote {
                       helios {
                         tcp {
@@ -101,9 +182,9 @@ namespace ClusterKit.NodeManager.Tests
                       }
                     }
 
-                        cluster {
+                    cluster {
                       seed-nodes = [""akka.tcp://test@127.0.0.1:3091""]
-                      min-nr-of-members = 1
+                      min-nr-of-members = 0
                     }       }
     }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }

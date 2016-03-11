@@ -12,6 +12,7 @@ namespace ClusterKit.NodeManager
     using System;
     using System.Data.Entity;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -24,10 +25,15 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Core.Utils;
     using ClusterKit.NodeManager.ConfigurationSource;
 
+    using Helios.Util;
+
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Singleton actor performing all node configuration related database working
     /// </summary>
-    public class ConfigurationDbWorker : ReceiveActor
+    [UsedImplicitly]
+    public class ConfigurationDbWorker : ReceiveActor, IWithUnboundedStash
     {
         /// <summary>
         /// Akka configuration path to connection string
@@ -58,15 +64,32 @@ namespace ClusterKit.NodeManager
         public ConfigurationDbWorker(BaseConnectionManager connectionManager)
         {
             this.connectionManager = connectionManager;
-            this.InitDatabase();
+            this.Self.Tell(new InitializationMessage());
+            this.Receive<InitializationMessage>(m => this.Initialize());
+            this.Receive<object>(m => this.Stash.Stash());
+            Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+        }
 
-            this.workers =
-                Context.ActorOf(
-                    Props.Create(() => new Worker(connectionManager))
-                        .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
-                    "workers");
+        /// <summary>
+        /// Gets or sets the stash. This will be automatically populated by the framework AFTER the constructor has been run.
+        ///             Implement this as an auto property.
+        /// </summary>
+        /// <value>
+        /// The stash.
+        /// </value>
+        public IStash Stash { get; set; }
 
-            this.Receive<IConsistentHashable>(m => this.workers.Forward(m));
+        /// <summary>
+        /// Is called when a message isn't handled by the current behavior of the actor
+        ///             by default it fails with either a <see cref="T:Akka.Actor.DeathPactException"/> (in
+        ///             case of an unhandled <see cref="T:Akka.Actor.Terminated"/> message) or publishes an <see cref="T:Akka.Event.UnhandledMessage"/>
+        ///             to the actor's system's <see cref="T:Akka.Event.EventStream"/>
+        /// </summary>
+        /// <param name="message">The unhandled message.</param>
+        protected override void Unhandled(object message)
+        {
+            Context.GetLogger().Warning("{Type}: recieved unsupported message of type {MessageTypeName}", this.GetType().Name, message.GetType().Name);
+            base.Unhandled(message);
         }
 
         /// <summary>
@@ -93,9 +116,49 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Supervisor initialization process
+        /// </summary>
+        private void Initialize()
+        {
+            try
+            {
+                this.InitDatabase();
+            }
+            catch (Exception e)
+            {
+                Context.GetLogger().Error(e, "{Type}: Exception during initialization", this.GetType().Name);
+                Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromSeconds(5), this.Self, new InitializationMessage(), this.Self);
+                return;
+            }
+
+            this.workers =
+                Context.ActorOf(
+                    Props.Create(() => new Worker(this.connectionManager))
+                        .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
+                    "workers");
+
+            this.Become(
+                () =>
+                    {
+                        // this.Receive<Identify>(m => this.Sender.Tell(new ActorIdentity(m.MessageId, this.Self)));
+                        this.Receive<IConsistentHashable>(m => this.workers.Forward(m));
+                    });
+
+            Context.GetLogger().Info("{Type}: initialized on {Path}", this.GetType().Name, this.Self.Path.ToString());
+            this.Stash.UnstashAll();
+        }
+
+        /// <summary>
+        /// Message used for self initialization
+        /// </summary>
+        private class InitializationMessage
+        {
+        }
+
+        /// <summary>
         /// Child actor intended to process database requests
         /// </summary>
-        protected class Worker : ReceiveActor
+        private class Worker : BaseCrudActor<ConfigurationContext, NodeTemplate, int>
         {
             /// <summary>
             /// Current database connection manager
@@ -110,9 +173,8 @@ namespace ClusterKit.NodeManager
             /// </param>
             public Worker(BaseConnectionManager connectionManager)
             {
+                Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
                 this.connectionManager = connectionManager;
-                this.Receive<RestActionMessage<NodeTemplate, int>>(m => this.OnIdRequest(m));
-                this.Receive<RestActionMessage<NodeTemplate, string>>(m => this.OnCodeRequest(m));
                 this.Receive<CollectionRequest>(m => this.OnCollectionRequest(m));
             }
 
@@ -120,7 +182,7 @@ namespace ClusterKit.NodeManager
             /// Opens new database connection and generates execution context
             /// </summary>
             /// <returns>New working context</returns>
-            private async Task<ConfigurationContext> GetContext()
+            protected override async Task<ConfigurationContext> GetContext()
             {
                 var connectionString = Context.System.Settings.Config.GetString(ConfigConnectionStringPath);
                 var databaseName =
@@ -133,35 +195,32 @@ namespace ClusterKit.NodeManager
             }
 
             /// <summary>
-            /// Process rest request based on Code field
+            /// Gets the table from context, corresponding current data object
             /// </summary>
-            /// <param name="request">Request to process</param>
-            /// <returns>Executing task</returns>
-            private async Task OnCodeRequest(RestActionMessage<NodeTemplate, string> request)
-            {
-                using (var ds = await this.GetContext())
-                {
-                    switch (request.ActionType)
-                    {
-                        case EnActionType.Get:
-                            this.Sender.Tell(await ds.Templates.FirstOrDefaultAsync(n => n.Code == request.Id));
-                            break;
+            /// <param name="context">The context.
+            ///             </param>
+            /// <returns>
+            /// The table
+            /// </returns>
+            protected override DbSet<NodeTemplate> GetDbSet(ConfigurationContext context) => context.Templates;
 
-                        case EnActionType.Create:
-                        case EnActionType.Update:
-                            await this.OnCreateUpdateRequest(request.ActionType, request.Request);
-                            break;
+            /// <summary>
+            /// Gets an object id
+            /// </summary>
+            /// <param name="object">The data object</param>
+            /// <returns>
+            /// Object identification number
+            /// </returns>
+            protected override int GetId(NodeTemplate @object) => @object.Id;
 
-                        case EnActionType.Delete:
-                            ds.Templates.RemoveRange(await ds.Templates.Where(t => t.Code == request.Id).ToListAsync());
-                            this.Sender.Tell(await ds.SaveChangesAsync() > 0);
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-            }
+            /// <summary>
+            /// Gets expression to validate id in data object
+            /// </summary>
+            /// <param name="id">Object identification number</param>
+            /// <returns>
+            /// Validity of identification field
+            /// </returns>
+            protected override Expression<Func<NodeTemplate, bool>> GetIdValidationExpression(int id) => o => o.Id == id;
 
             /// <summary>
             /// Process collection requests
@@ -172,96 +231,13 @@ namespace ClusterKit.NodeManager
             {
                 using (var ds = await this.GetContext())
                 {
-                    var query = ds.Templates.Skip(collectionRequest.Skip);
+                    var query = ds.Templates.OrderBy(t => t.Code).Skip(collectionRequest.Skip);
                     if (collectionRequest.Count.HasValue)
                     {
                         query = query.Take(collectionRequest.Count.Value);
                     }
 
                     this.Sender.Tell(await query.ToListAsync());
-                }
-            }
-
-            /// <summary>
-            /// Process of create or update request
-            /// </summary>
-            /// <param name="actionType">Action to validate</param>
-            /// <param name="request">new data</param>
-            /// <returns>Execution task</returns>
-            private async Task OnCreateUpdateRequest(EnActionType actionType, NodeTemplate request)
-            {
-                using (var ds = await this.GetContext())
-                {
-                    if (actionType == EnActionType.Create && request.Id != 0)
-                    {
-                        this.Sender.Tell(null);
-                        return;
-                    }
-
-                    if (actionType == EnActionType.Update)
-                    {
-                        if (request.Id == 0)
-                        {
-                            this.Sender.Tell(null);
-                            return;
-                        }
-
-                        if (await ds.Templates.FirstOrDefaultAsync(t => t.Id == request.Id) == null)
-                        {
-                            this.Sender.Tell(null);
-                            return;
-                        }
-                    }
-
-                    if (await ds.Templates.FirstOrDefaultAsync(t => t.Id != request.Id && t.Code == request.Code) != null)
-                    {
-                        this.Sender.Tell(null);
-                        return;
-                    }
-
-                    ds.Templates.Attach(request);
-
-                    try
-                    {
-                        await ds.SaveChangesAsync();
-                        this.Sender.Tell(request);
-                    }
-                    catch (Exception)
-                    {
-                        this.Sender.Tell(null);
-                        throw;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Process rest request based on Id field
-            /// </summary>
-            /// <param name="request">Request to process</param>
-            /// <returns>Executing task</returns>
-            private async Task OnIdRequest(RestActionMessage<NodeTemplate, int> request)
-            {
-                using (var ds = await this.GetContext())
-                {
-                    switch (request.ActionType)
-                    {
-                        case EnActionType.Get:
-                            this.Sender.Tell(await ds.Templates.FirstOrDefaultAsync(n => n.Id == request.Id));
-                            break;
-
-                        case EnActionType.Create:
-                        case EnActionType.Update:
-                            await this.OnCreateUpdateRequest(request.ActionType, request.Request);
-                            break;
-
-                        case EnActionType.Delete:
-                            ds.Templates.RemoveRange(await ds.Templates.Where(t => t.Id == request.Id).ToListAsync());
-                            this.Sender.Tell(await ds.SaveChangesAsync() > 0);
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
                 }
             }
         }

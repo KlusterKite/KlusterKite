@@ -21,6 +21,8 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.Web;
 
+    using Serilog;
+
     /// <summary>
     /// All rest actions with <see cref="NodeTemplate"/>
     /// </summary>
@@ -29,7 +31,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// <summary>
         /// Path to database worker actor
         /// </summary>
-        private const string UserNodemanagerDbworkerproxy = "/user/NodeManager/DbWorkerProxy";
+        private const string UserNodemanagerDbworkerProxy = "/user/NodeManager/DbWorkerProxy";
 
         /// <summary>
         /// Default timeout for actor system requests
@@ -58,38 +60,16 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <param name="id">Node template unique id</param>
         /// <returns>Execution task</returns>
-        [Route("/nodemanager/template")]
+        [Route("nodemanager/template")]
         [HttpDelete]
         public async Task Delete(int id)
         {
             var result =
                 await
-                this.system.ActorSelection(UserNodemanagerDbworkerproxy)
+                this.system.ActorSelection(UserNodemanagerDbworkerProxy)
                     .Ask<bool>(
                         new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Delete, Id = id },
                         this.akkaTimeout);
-
-            if (!result)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-        }
-
-        /// <summary>
-        /// Removes Node template
-        /// </summary>
-        /// <param name="code">Node template string id</param>
-        /// <returns>Execution task</returns>
-        [Route("/nodemanager/template")]
-        [HttpDelete]
-        public async Task Delete(string code)
-        {
-            var result =
-               await
-               this.system.ActorSelection(UserNodemanagerDbworkerproxy)
-                   .Ask<bool>(
-                       new RestActionMessage<NodeTemplate, string> { ActionType = EnActionType.Delete, Id = code },
-                       this.akkaTimeout);
 
             if (!result)
             {
@@ -102,39 +82,15 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <param name="id">Node template unique id</param>
         /// <returns>Node template</returns>
-        [Route("/nodemanager/template")]
+        [Route("nodemanager/template")]
         [HttpGet]
         public async Task<NodeTemplate> Get(int id)
         {
             var template =
                 await
-                this.system.ActorSelection(UserNodemanagerDbworkerproxy)
+                this.system.ActorSelection(UserNodemanagerDbworkerProxy)
                     .Ask<NodeTemplate>(
                         new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Get, Id = id },
-                        this.akkaTimeout);
-
-            if (template == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return template;
-        }
-
-        /// <summary>
-        /// Gets node template by its id
-        /// </summary>
-        /// <param name="code">Node template string id</param>
-        /// <returns>Node template</returns>
-        [Route("/nodemanager/template")]
-        [HttpGet]
-        public async Task<NodeTemplate> Get(string code)
-        {
-            var template =
-                await
-                this.system.ActorSelection(UserNodemanagerDbworkerproxy)
-                    .Ask<NodeTemplate>(
-                        new RestActionMessage<NodeTemplate, string> { ActionType = EnActionType.Get, Id = code },
                         this.akkaTimeout);
 
             if (template == null)
@@ -157,13 +113,14 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>
         /// list of node templates
         /// </returns>
-        [Route("/nodemanager/template")]
+        [Route("nodemanager/template/list")]
         [HttpGet]
         public async Task<List<NodeTemplate>> GetList(
             int count = 100,
             int skip = 0)
         {
-            return await this.system.ActorSelection(UserNodemanagerDbworkerproxy)
+            Log.Information("{Type}: Sending request to {ActorPath}", this.GetType().Name, UserNodemanagerDbworkerProxy);
+            return await this.system.ActorSelection(UserNodemanagerDbworkerProxy)
                     .Ask<List<NodeTemplate>>(
                         new CollectionRequest { Count = count, Skip = skip },
                         this.akkaTimeout);
@@ -174,7 +131,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <param name="request">Node template data</param>
         /// <returns>Updated node template</returns>
-        [Route("/nodemanager/template")]
+        [Route("nodemanager/template")]
         [HttpPost, HttpPut, HttpPatch]
         public async Task<NodeTemplate> Put(NodeTemplate request)
         {
@@ -185,7 +142,7 @@ namespace ClusterKit.NodeManager.WebApi
 
             var template =
                await
-               this.system.ActorSelection(UserNodemanagerDbworkerproxy)
+               this.system.ActorSelection(UserNodemanagerDbworkerProxy)
                    .Ask<NodeTemplate>(
                        new RestActionMessage<NodeTemplate, int> { ActionType = request.Id == 0 ? EnActionType.Create : EnActionType.Update, Request = request },
                        this.akkaTimeout);

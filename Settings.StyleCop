@@ -4,6 +4,8 @@
     <CollectionProperty Name="RecognizedWords">
       <Value>api</Value>
       <Value>akka</Value>
+      <Value>crud</Value>
+      <Value>ef</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
       <Value>serilog</Value>

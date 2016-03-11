@@ -39,6 +39,7 @@ namespace ClusterKit.Web
             config.Formatters.Clear();
             config.Formatters.Add(new XmlMediaTypeFormatter { UseXmlSerializer = true });
             config.Formatters.Add(new JsonMediaTypeFormatter());
+            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
             owinStartupConfigurators.ForEach(c => c.ConfigureApi(config));
 

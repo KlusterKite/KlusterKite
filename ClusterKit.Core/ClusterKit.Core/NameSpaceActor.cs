@@ -8,6 +8,7 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Linq;
+    using System.Runtime.CompilerServices;
 
     using Akka.Actor;
     using Akka.Cluster.Tools.Singleton;
@@ -48,6 +49,7 @@ namespace ClusterKit.Core
             foreach (var pair in config.AsEnumerable())
             {
                 var key = pair.Key;
+
                 var path = key.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                 if (path.Length != namespacePathElements.Count + 1)
                 {
@@ -265,21 +267,24 @@ namespace ClusterKit.Core
             }
 
             context.GetLogger()
-               .Info(
-                   "{Type}: {NameSpaceName} initializing singleton proxy {SingletonName} for {PathString}",
-                   typeof(NameSpaceActor).Name,
-                   currentPath,
-                   singletonName,
-                   pathName);
-
-            context.ActorOf(
-                    ClusterSingletonProxy.Props(singletonManagerPath,
-                    new ClusterSingletonProxySettings(
-                        singletonName,
-                        role,
-                        actorConfig.GetTimeSpan("singleton-identification-interval", TimeSpan.FromSeconds(1), false),
-                        actorConfig.GetInt("buffer-size", 2048))),
+                .Info(
+                    "{Type}: {NameSpaceName} initializing singleton proxy {SingletonManagerPath} / {SingletonName} for {PathString}",
+                    typeof(NameSpaceActor).Name,
+                    currentPath,
+                    singletonManagerPath,
+                    singletonName,
                     pathName);
+
+            var cell = context.ActorOf(
+                ClusterSingletonProxy.Props(
+                    singletonManagerPath: singletonManagerPath,
+                    settings:
+                        new ClusterSingletonProxySettings(
+                            singletonName,
+                            role,
+                            actorConfig.GetTimeSpan("singleton-identification-interval", TimeSpan.FromSeconds(1), false),
+                            actorConfig.GetInt("buffer-size", 2048))),
+                name: pathName) as LocalActorRef;
         }
     }
 }

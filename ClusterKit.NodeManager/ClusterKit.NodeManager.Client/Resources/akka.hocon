@@ -6,8 +6,8 @@
         
                 /NodeManager/DbWorkerProxy {
         	       actor-type = SingletonProxy
-        	       singleton-name = clusterkit.nodemanager.dbworker
-        	       singleton-path = /NodeManager/DbWorker
+        	       singleton-name = ConfigurationDbManager
+        	       singleton-path = "user/NodeManager/DbWorker"
         	       singleton-node-role = NodeManager            
                 }
  	}

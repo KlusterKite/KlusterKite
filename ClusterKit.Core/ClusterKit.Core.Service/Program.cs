@@ -36,7 +36,7 @@ namespace ClusterKit.Core.Service
             Container = new WindsorContainer();
 
             var loggerConfig = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
+                .MinimumLevel.Debug()
                 .WriteTo.ColoredConsole();
 
             var logger = loggerConfig.CreateLogger();
