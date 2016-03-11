@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{061CC7CB-942A-47D0-8AC9-3AD9CA4A98E8}</ProjectGuid>
+    <ProjectGuid>{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClusterKit.Web.Swagger.Monitor</RootNamespace>
-    <AssemblyName>ClusterKit.Web.Swagger.Monitor</AssemblyName>
+    <RootNamespace>ClusterKit.Web.CRUDS</RootNamespace>
+    <AssemblyName>ClusterKit.Web.CRUDS</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\ClusterKit.Web.Swagger.Monitor.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\ClusterKit.Web.CRUDS.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\ClusterKit.Web.Swagger.Monitor.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\ClusterKit.Web.CRUDS.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Akka, Version=1.0.6.16, Culture=neutral, processorArchitecture=MSIL">
@@ -80,6 +80,10 @@
     <Reference Include="ClusterKit.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\ClusterKit.Core.0.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ClusterKit.Core.Rest">
+      <HintPath>..\..\packages\ClusterKit.Core.Rest.0.0.0.0-local\lib\ClusterKit.Core.Rest.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
@@ -141,10 +145,6 @@
       <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Swashbuckle.Core">
-      <HintPath>..\..\packages\Swashbuckle.Core.Net45.5.2.1\lib\net45\Swashbuckle.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
@@ -183,44 +183,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Configuration.resx</DependentUpon>
-    </Compile>
+    <Compile Include="BaseCrudController.cs" />
+    <Compile Include="RestControllerAttribute.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="OwinConfiguration.cs" />
+    <Compile Include="OwinConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwaggerCollectorActor.cs" />
-    <Compile Include="WebApi\SwaggerCollectorController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ClusterKit.Web.Swagger.Monitor.nuspec">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="ClusterKit.Web.CRUDS.nuspec" />
     <None Include="packages.config" />
-    <None Include="Resources\akka.hocon" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
       <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>
       <Name>ClusterKit.Web.Client</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.Swagger.Messages\ClusterKit.Web.Swagger.Messages.csproj">
-      <Project>{d80f5923-cd1b-4376-bab5-1785ea4395a9}</Project>
-      <Name>ClusterKit.Web.Swagger.Messages</Name>
+    <ProjectReference Include="..\ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj">
+      <Project>{39ca45b9-b12c-48c6-b2f6-1355f151bdcc}</Project>
+      <Name>ClusterKit.Web.Descriptor</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web\ClusterKit.Web.csproj">
       <Project>{477b201a-a30c-4360-b56a-6f61c049bb04}</Project>
       <Name>ClusterKit.Web</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Configuration.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

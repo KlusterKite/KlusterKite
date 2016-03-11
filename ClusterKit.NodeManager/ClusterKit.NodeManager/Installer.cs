@@ -10,6 +10,7 @@
     using Castle.Windsor;
 
     using ClusterKit.Core;
+    using ClusterKit.NodeManager.WebApi;
 
     using JetBrains.Annotations;
 
@@ -69,6 +70,8 @@
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+
+            container.Register(Classes.From(typeof(NodeTemplatesController)).Pick().LifestyleScoped());
         }
     }
 }

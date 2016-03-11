@@ -16,6 +16,7 @@ namespace ClusterKit.Core.EF
     using System.Threading.Tasks;
 
     using Akka.Actor;
+    using Akka.Event;
 
     using ClusterKit.Core.Rest.ActionMessages;
 
@@ -76,45 +77,6 @@ namespace ClusterKit.Core.EF
         protected abstract Expression<Func<TObject, bool>> GetIdValidationExpression(TId id);
 
         /// <summary>
-        /// Process of create or update request
-        /// </summary>
-        /// <param name="actionType">Action to validate</param>
-        /// <param name="request">new data</param>
-        /// <returns>Execution task</returns>
-        private async Task OnCreateUpdateRequest(EnActionType actionType, TObject request)
-        {
-            using (var ds = await this.GetContext())
-            {
-                var oldObject = this.GetDbSet(ds).FirstOrDefaultAsync(this.GetIdValidationExpression(this.GetId(request)));
-
-                if (actionType == EnActionType.Create && oldObject != null)
-                {
-                    this.Sender.Tell(null);
-                    return;
-                }
-
-                if (actionType == EnActionType.Update && oldObject == null)
-                {
-                    this.Sender.Tell(null);
-                    return;
-                }
-
-                this.GetDbSet(ds).Attach(request);
-
-                try
-                {
-                    await ds.SaveChangesAsync();
-                    this.Sender.Tell(request);
-                }
-                catch (Exception)
-                {
-                    this.Sender.Tell(null);
-                    throw;
-                }
-            }
-        }
-
-        /// <summary>
         /// Request process method
         /// </summary>
         /// <param name="request">The action request</param>
@@ -123,19 +85,79 @@ namespace ClusterKit.Core.EF
         {
             using (var ds = await this.GetContext())
             {
+                var set = this.GetDbSet(ds);
                 switch (request.ActionType)
                 {
                     case EnActionType.Get:
-                        this.Sender.Tell(await this.GetDbSet(ds).FirstOrDefaultAsync(this.GetIdValidationExpression(request.Id)));
+                        this.Sender.Tell(await set.FirstOrDefaultAsync(this.GetIdValidationExpression(request.Id)));
                         break;
 
                     case EnActionType.Create:
-                    case EnActionType.Update:
-                        await this.OnCreateUpdateRequest(request.ActionType, request.Request);
-                        break;
+                        {
+                            var entity = request.Request;
+                            if (entity == null)
+                            {
+                                Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
+                                this.Sender.Tell(null);
+                                return;
+                            }
 
+                            var oldObject = await set.FirstOrDefaultAsync(this.GetIdValidationExpression(this.GetId(entity)));
+                            if (oldObject != null)
+                            {
+                                Context.GetLogger().Error("{Type}: create failed, there is already object with id {Id}", this.GetType().Name, this.GetId(entity).ToString());
+                                this.Sender.Tell(null);
+                                return;
+                            }
+
+                            set.Add(entity);
+                            try
+                            {
+                                await ds.SaveChangesAsync();
+                                this.Sender.Tell(entity);
+                                return;
+                            }
+                            catch (Exception exception)
+                            {
+                                Context.GetLogger().Error(exception, "{Type}: create failed, error while creating object with id {Id}", this.GetType().Name, this.GetId(entity).ToString());
+                                this.Sender.Tell(null);
+                                return;
+                            }
+                        }
+                    case EnActionType.Update:
+                        {
+                            var entity = request.Request;
+                            if (entity == null)
+                            {
+                                Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
+                                this.Sender.Tell(null);
+                                return;
+                            }
+
+                            var oldObject = await set.FirstOrDefaultAsync(this.GetIdValidationExpression(this.GetId(entity)));
+                            if (oldObject == null)
+                            {
+                                Context.GetLogger().Error("{Type}: update failed, there is no object with id {Id}", this.GetType().Name, this.GetId(entity).ToString());
+                                this.Sender.Tell(null);
+                                return;
+                            }
+
+                            set.Attach(entity);
+                            try
+                            {
+                                await ds.SaveChangesAsync();
+                                this.Sender.Tell(entity);
+                                return;
+                            }
+                            catch (Exception exception)
+                            {
+                                Context.GetLogger().Error(exception, "{Type}: update failed, error while creating object with id {Id}", this.GetType().Name, this.GetId(entity).ToString());
+                                this.Sender.Tell(null);
+                                return;
+                            }
+                        }
                     case EnActionType.Delete:
-                        this.GetDbSet(ds).RemoveRange(await this.GetDbSet(ds).Where(this.GetIdValidationExpression(request.Id)).ToListAsync());
+                        set.RemoveRange(await set.Where(this.GetIdValidationExpression(request.Id)).ToListAsync());
                         this.Sender.Tell(await ds.SaveChangesAsync() > 0);
                         break;
 
