@@ -26,14 +26,14 @@
                         IsNameSpace = true
                 }
 
-                /NodeManager/DbWorker {
+                /NodeManager/Manager {
                         actor-type = Singleton
-                        singleton-name = ConfigurationDbManager
+                        singleton-name = NodeManager
                         singleton-node-role = NodeManager     
-                        type = "ClusterKit.NodeManager.ConfigurationDbWorker, ClusterKit.NodeManager"       
+                        type = "ClusterKit.NodeManager.NodeManagerActor, ClusterKit.NodeManager"       
                 }
 
-                /NodeManager/DbWorker/ConfigurationDbManager/workers {
+                /NodeManager/Manager/NodeManager/workers {
                         router = consistent-hashing-pool
                         nr-of-instances = 5                                                    
                 }                

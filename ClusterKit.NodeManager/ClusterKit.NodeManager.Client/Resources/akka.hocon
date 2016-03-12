@@ -3,11 +3,15 @@
 	       /NodeManager {
 	    	IsNameSpace = true
 	       }
+
+               /NodeManager/Receiver {
+                        type = "ClusterKit.NodeManager.Client.NodeManagerReceiverActor, ClusterKit.NodeManager.Client"
+               }
         
-                /NodeManager/DbWorkerProxy {
+                /NodeManager/NodeManagerProxy {
         	       actor-type = SingletonProxy
-        	       singleton-name = ConfigurationDbManager
-        	       singleton-path = "user/NodeManager/DbWorker"
+        	       singleton-name = NodeManager
+        	       singleton-path = "user/NodeManager/Manager"
         	       singleton-node-role = NodeManager            
                 }
  	}

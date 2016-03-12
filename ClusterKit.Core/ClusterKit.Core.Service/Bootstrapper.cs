@@ -54,11 +54,9 @@ namespace ClusterKit.Core.Service
             // starting akka system
             var actorSystem = ActorSystem.Create("ClusterKit", config);
             actorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, actorSystem));
-            actorSystem.StartNameSpaceActorsFromConfiguration();
 
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
-            BaseInstaller.RunPostStart(container);
         }
     }
 }

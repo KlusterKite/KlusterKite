@@ -1,5 +1,12 @@
 ﻿{
   ClusterKit {
+
+    NodeManager {
+          NodeTemplate = demoSeed
+          ContainerType = seed
+          NodeTemplateVersion = 1
+    }
+    
     Web {
       Swagger.Publish {
           publishDocPath = ""seed/swagger/doc""

@@ -13,6 +13,10 @@ namespace ClusterKit.Core.Service
     using Akka.Event;
     using Castle.Windsor;
 
+    using Serilog;
+
+    using Topshelf;
+
     /// <summary>
     /// Service controller
     /// </summary>
@@ -22,11 +26,6 @@ namespace ClusterKit.Core.Service
         /// The actor system
         /// </summary>
         private readonly ActorSystem actorSystem;
-
-        /// <summary>
-        /// Service start cancellation token (in case of service stop, before service start was actualy completed)
-        /// </summary>
-        private readonly CancellationTokenSource startCancellationToken = new CancellationTokenSource();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Controller"/> class.
@@ -40,41 +39,32 @@ namespace ClusterKit.Core.Service
         }
 
         /// <summary>
-        /// Main system logger
-        /// </summary>
-        private ILoggingAdapter Logger => this.actorSystem.Log;
-
-        /// <summary>
-        /// Запуск сервиса
+        /// Service startup
         /// </summary>
         /// <param name="container">
         /// The container.
         /// </param>
+        /// <param name="hostControl">The running service control</param>
         /// <returns>
-        /// Успех запуска
+        /// The success of service startup
         /// </returns>
-        public bool Start(IWindsorContainer container)
+        public bool Start(IWindsorContainer container, HostControl hostControl)
         {
-            Task.Factory.StartNew(
-                () =>
-                    {
-                        Application.Start(this.actorSystem, container);
-                        this.Logger.Info("Service started.");
-                    },
-                this.startCancellationToken.Token);
-            this.Logger.Info("Service start initiated.");
+            Log.Logger.Information("Service starting");
+            this.actorSystem.WhenTerminated.ContinueWith(task => hostControl.Stop());
+            this.actorSystem.StartNameSpaceActorsFromConfiguration();
+            BaseInstaller.RunPostStart(container);
+            Log.Logger.Information("Service started");
             return true;
         }
 
         /// <summary>
-        /// Остановка сервиса
+        /// Service stop
         /// </summary>
         public void Stop()
         {
-            this.startCancellationToken.Cancel(false);
             this.actorSystem.Terminate().Wait();
-            Application.Stop();
-            this.Logger.Info("Service was stopped.");
+            Log.Logger.Information("Service was stopped.");
         }
     }
 }

@@ -167,7 +167,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Application.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Program.cs" />

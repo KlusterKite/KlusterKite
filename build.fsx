@@ -47,7 +47,7 @@ let projects = [|
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.EF"|]))
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager/ClusterKit.NodeManager.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"; "ClusterKit.Core.Rest"; "ClusterKit.Web.CRUDS"|]))
-    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Tests/ClusterKit.NodeManager.Tests.csproj", ProjectDescription.EnProjectType.SimpleBuild, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.Web.CRUDS"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"; "ClusterKit.Core.EF.Npgsql"; "ClusterKit.Core.Rest"|]))
+    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Tests/ClusterKit.NodeManager.Tests.csproj", ProjectDescription.EnProjectType.SimpleBuild, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.Web.CRUDS"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"; "ClusterKit.Core.EF.Npgsql"; "ClusterKit.Core.Rest"|]))
 
 |]
 

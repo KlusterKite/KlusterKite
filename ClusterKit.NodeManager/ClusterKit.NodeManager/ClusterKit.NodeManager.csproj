@@ -205,10 +205,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
-    <Compile Include="ConfigurationDbWorker.cs" />
+    <Compile Include="Messages\ActiveNodeDescriptionsRequest.cs" />
+    <Compile Include="NodeManagerActor.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebApi\NodeTemplatesController.cs" />
+    <Compile Include="WebApi\NodeManagerController.cs" />
+    <Compile Include="WebApi\NodeTemplatesRestController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

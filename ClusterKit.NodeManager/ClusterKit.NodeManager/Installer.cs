@@ -36,16 +36,16 @@
         /// </exception>
         public override void PreCheck(Config config)
         {
-            var connectionString = config.GetString(ConfigurationDbWorker.ConfigConnectionStringPath);
+            var connectionString = config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new ConfigurationException($"{ConfigurationDbWorker.ConfigConnectionStringPath} is not defined");
+                throw new ConfigurationException($"{NodeManagerActor.ConfigConnectionStringPath} is not defined");
             }
 
-            var databaseName = config.GetString(ConfigurationDbWorker.ConfigDatabaseNamePath);
+            var databaseName = config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
             if (string.IsNullOrEmpty(databaseName))
             {
-                throw new ConfigurationException($"{ConfigurationDbWorker.ConfigDatabaseNamePath} is not defined");
+                throw new ConfigurationException($"{NodeManagerActor.ConfigDatabaseNamePath} is not defined");
             }
         }
 
@@ -71,7 +71,7 @@
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
 
-            container.Register(Classes.From(typeof(NodeTemplatesController)).Pick().LifestyleScoped());
+            container.Register(Classes.From(typeof(NodeTemplatesRestController)).Pick().LifestyleScoped());
         }
     }
 }

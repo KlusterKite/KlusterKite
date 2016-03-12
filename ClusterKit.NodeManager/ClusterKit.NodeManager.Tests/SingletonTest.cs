@@ -58,7 +58,7 @@ namespace ClusterKit.NodeManager.Tests
             var singleTon =
                 this.Sys.ActorOf(
                     ClusterSingletonManager.Props(
-                        this.Sys.DI().Props(typeof(ConfigurationDbWorker)),
+                        this.Sys.DI().Props(typeof(NodeManagerActor)),
                         new ClusterSingletonManagerSettings(
                             "dbWorker",
                             "NodeManager",

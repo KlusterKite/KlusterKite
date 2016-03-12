@@ -69,6 +69,7 @@ copyLib("ClusterKit.Core.Service", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.Swagger", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.Swagger.Monitor", './ClusterKitDemoSeed/build')
 copyLib("ClusterKit.Web.NginxConfigurator", './ClusterKitDemoSeed/build')
+copyLib("ClusterKit.NodeManager.Client", './ClusterKitDemoSeed/build')
 shutil.copyfile('./ClusterKitDemoSeed/akka.hocon', './ClusterKitDemoSeed/build/akka.hocon')
 correctAssemblyVersions('./ClusterKitDemoSeed/build')
 

@@ -10,30 +10,31 @@
 namespace ClusterKit.NodeManager
 {
     using System;
+    using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     using Akka.Actor;
+    using Akka.Cluster;
     using Akka.Event;
     using Akka.Routing;
 
     using ClusterKit.Core.EF;
-    using ClusterKit.Core.Ping;
     using ClusterKit.Core.Rest.ActionMessages;
     using ClusterKit.Core.Utils;
+    using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
-
-    using Helios.Util;
+    using ClusterKit.NodeManager.Messages;
 
     using JetBrains.Annotations;
 
     /// <summary>
-    /// Singleton actor performing all node configuration related database working
+    /// Singleton actor performing all node configuration related work
     /// </summary>
     [UsedImplicitly]
-    public class ConfigurationDbWorker : ReceiveActor, IWithUnboundedStash
+    public class NodeManagerActor : ReceiveActor, IWithUnboundedStash
     {
         /// <summary>
         /// Akka configuration path to connection string
@@ -51,17 +52,27 @@ namespace ClusterKit.NodeManager
         private readonly BaseConnectionManager connectionManager;
 
         /// <summary>
+        /// List of known node desciptions
+        /// </summary>
+        private readonly Dictionary<Address, NodeDescription> nodeDescriptions = new Dictionary<Address, NodeDescription>();
+
+        /// <summary>
+        /// List of pending node description requests
+        /// </summary>
+        private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications = new Dictionary<Address, Cancelable>();
+
+        /// <summary>
         /// Child actor workers
         /// </summary>
         private IActorRef workers;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationDbWorker"/> class.
+        /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
         /// </summary>
         /// <param name="connectionManager">
         /// The connection manager.
         /// </param>
-        public ConfigurationDbWorker(BaseConnectionManager connectionManager)
+        public NodeManagerActor(BaseConnectionManager connectionManager)
         {
             this.connectionManager = connectionManager;
             this.Self.Tell(new InitializationMessage());
@@ -111,6 +122,8 @@ namespace ClusterKit.NodeManager
                     var migrator =
                         new MigrateDatabaseToLatestVersion<ConfigurationContext, ConfigurationSource.Migrations.Configuration>(true);
                     migrator.InitializeDatabase(context);
+
+                    context.InitEmptyTemplates();
                 }
             }
         }
@@ -137,15 +150,125 @@ namespace ClusterKit.NodeManager
                         .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                     "workers");
 
-            this.Become(
-                () =>
-                    {
-                        // this.Receive<Identify>(m => this.Sender.Tell(new ActorIdentity(m.MessageId, this.Self)));
-                        this.Receive<IConsistentHashable>(m => this.workers.Forward(m));
-                    });
-
-            Context.GetLogger().Info("{Type}: initialized on {Path}", this.GetType().Name, this.Self.Path.ToString());
+            this.Become(this.Start);
             this.Stash.UnstashAll();
+        }
+
+        /// <summary>
+        /// Receiver acror reveled itself, sending request
+        /// </summary>
+        /// <param name="actorIdentity">The actor identity</param>
+        private void OnActorIdentity(ActorIdentity actorIdentity)
+        {
+            if ("receiver".Equals(actorIdentity.MessageId as string) && actorIdentity.Subject != null)
+            {
+                this.Sender.Tell(new NodeDescriptionRequest());
+            }
+        }
+
+        /// <summary>
+        /// On new node description
+        /// </summary>
+        /// <param name="nodeDescription">Node description</param>
+        private void OnNodeDescription(NodeDescription nodeDescription)
+        {
+            Cancelable cancelable;
+            var address = nodeDescription.NodeAddress;
+            if (!this.requestDescriptionNotifications.TryGetValue(address, out cancelable))
+            {
+                Context.GetLogger().Warning(
+                    "{Type}: received nodeDescription from uknown node with address {NodeAddress}",
+                    this.GetType().Name,
+                    address.ToString());
+                return;
+            }
+
+            cancelable.Cancel();
+            this.requestDescriptionNotifications.Remove(address);
+            this.nodeDescriptions[address] = nodeDescription;
+
+            Context.GetLogger().Warning(
+                    "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
+                    this.GetType().Name,
+                    nodeDescription.NodeTemplate,
+                    address.ToString());
+        }
+
+        /// <summary>
+        /// Processes node removed cluster event
+        /// </summary>
+        /// <param name="address">Obsolete node address</param>
+        private void OnNodeDown(Address address)
+        {
+            Cancelable cancelable;
+            if (this.requestDescriptionNotifications.TryGetValue(address, out cancelable))
+            {
+                cancelable.Cancel();
+                this.requestDescriptionNotifications.Remove(address);
+            }
+
+            this.nodeDescriptions.Remove(address);
+        }
+
+        /// <summary>
+        /// Processes new node cluster event
+        /// </summary>
+        /// <param name="address">New node address</param>
+        private void OnNodeUp(Address address)
+        {
+            var cancelable = new Cancelable(Context.System.Scheduler);
+            this.requestDescriptionNotifications[address] = cancelable;
+            this.OnRequestDescriptionNotification(new RequestDescriptionNotification { Address = address });
+        }
+
+        /// <summary>
+        /// Sends new description request to foreign node
+        /// </summary>
+        /// <param name="message">Notification message</param>
+        private void OnRequestDescriptionNotification(RequestDescriptionNotification message)
+        {
+            Cancelable cancelable;
+            if (!this.requestDescriptionNotifications.TryGetValue(message.Address, out cancelable))
+            {
+                return;
+            }
+
+            Context.ActorSelection($"{message.Address}/user/NodeManager/Receiver").Tell(new Identify("receiver"), this.Self);
+            Context.System.Scheduler.ScheduleTellOnce(
+                TimeSpan.FromSeconds(10), // todo: @kantora move to configuration
+                this.Self,
+                message,
+                this.Self,
+                cancelable);
+        }
+
+        /// <summary>
+        /// Initializes normal actor work
+        /// </summary>
+        private void Start()
+        {
+            Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+
+            Cluster.Get(Context.System)
+                               .Subscribe(
+                                   this.Self,
+                                   ClusterEvent.InitialStateAsEvents,
+                                   new[] { typeof(ClusterEvent.MemberRemoved), typeof(ClusterEvent.MemberUp) });
+
+            this.Receive<ClusterEvent.MemberUp>(
+                m => m.Member.Roles.Contains("Web.Swagger.Publish"),
+                m => this.OnNodeUp(m.Member.Address));
+
+            this.Receive<ClusterEvent.MemberRemoved>(
+                m => m.Member.Roles.Contains("Web.Swagger.Publish"),
+                m => this.OnNodeDown(m.Member.Address));
+
+            this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
+            this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
+            this.Receive<ActiveNodeDescriptionsRequest>(m => this.Sender.Tell(this.nodeDescriptions.Values.ToList()));
+            this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
+
+            this.Receive<IConsistentHashable>(m => this.workers.Forward(m));
         }
 
         /// <summary>
@@ -153,6 +276,17 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private class InitializationMessage
         {
+        }
+
+        /// <summary>
+        /// Self notification to make additional request to get node description
+        /// </summary>
+        private class RequestDescriptionNotification
+        {
+            /// <summary>
+            /// Address of the node
+            /// </summary>
+            public Address Address { get; set; }
         }
 
         /// <summary>
@@ -176,6 +310,21 @@ namespace ClusterKit.NodeManager
                 Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
                 this.connectionManager = connectionManager;
                 this.Receive<CollectionRequest>(m => this.OnCollectionRequest(m));
+            }
+
+            /// <summary>
+            /// Method called before object modification in database
+            /// </summary>
+            /// <param name="newObject">The new Object.
+            ///             </param><param name="oldObject">The old Object.
+            ///             </param>
+            /// <returns>
+            /// The new version of object or null to prevent update
+            /// </returns>
+            protected override NodeTemplate BeforeUpdate(NodeTemplate newObject, NodeTemplate oldObject)
+            {
+                newObject.Version = oldObject.Version + 1;
+                return base.BeforeUpdate(newObject, oldObject);
             }
 
             /// <summary>

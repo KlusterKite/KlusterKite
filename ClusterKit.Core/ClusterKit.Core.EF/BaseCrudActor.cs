@@ -10,6 +10,7 @@
 namespace ClusterKit.Core.EF
 {
     using System;
+    using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
     using System.Linq.Expressions;
@@ -46,6 +47,72 @@ namespace ClusterKit.Core.EF
         }
 
         /// <summary>
+        /// Method called after successful object creation in database
+        /// </summary>
+        /// <param name="result">Created object</param>
+        protected virtual void AfterCreate(TObject result)
+        {
+        }
+
+        /// <summary>
+        /// Method called after successful object removal from database
+        /// </summary>
+        /// <param name="deletedObjects">List of removed objects</param>
+        protected void AfterDelete(List<TObject> deletedObjects)
+        {
+        }
+
+        /// <summary>
+        /// Method called after successful object modification in database
+        /// </summary>
+        /// <param name="newObject">
+        /// The new Object.
+        /// </param>
+        /// <param name="oldObject">
+        /// The old Object.
+        /// </param>
+        protected virtual void AfterUpdate(TObject newObject, TObject oldObject)
+        {
+        }
+
+        /// <summary>
+        /// Method call before object creation in database
+        /// </summary>
+        /// <param name="request">Object intended to be created</param>
+        /// <returns>Object that will be created or null to prevent creation</returns>
+        protected virtual TObject BeforeCreate(TObject request)
+        {
+            return request;
+        }
+
+        /// <summary>
+        /// Method call before object removal database
+        /// </summary>
+        /// <param name="deletedObjects">Object intended to be removed</param>
+        /// <returns>Object that will be removed</returns>
+        protected List<TObject> BeforeDelete(List<TObject> deletedObjects)
+        {
+            return deletedObjects;
+        }
+
+        /// <summary>
+        /// Method called before object modification in database
+        /// </summary>
+        /// <param name="newObject">
+        /// The new Object.
+        /// </param>
+        /// <param name="oldObject">
+        /// The old Object.
+        /// </param>
+        /// <returns>
+        /// The new version of object or null to prevent update
+        /// </returns>
+        protected virtual TObject BeforeUpdate(TObject newObject, TObject oldObject)
+        {
+            return newObject;
+        }
+
+        /// <summary>
         /// Gets current data context
         /// </summary>
         /// <returns>The data context</returns>
@@ -77,6 +144,16 @@ namespace ClusterKit.Core.EF
         protected abstract Expression<Func<TObject, bool>> GetIdValidationExpression(TId id);
 
         /// <summary>
+        /// Called on select. Sender will receive this method output.
+        /// </summary>
+        /// <param name="result">Selected object from database</param>
+        /// <returns>Result for requester</returns>
+        protected virtual TObject OnSelect(TObject result)
+        {
+            return result;
+        }
+
+        /// <summary>
         /// Request process method
         /// </summary>
         /// <param name="request">The action request</param>
@@ -89,7 +166,7 @@ namespace ClusterKit.Core.EF
                 switch (request.ActionType)
                 {
                     case EnActionType.Get:
-                        this.Sender.Tell(await set.FirstOrDefaultAsync(this.GetIdValidationExpression(request.Id)));
+                        this.Sender.Tell(this.OnSelect(await set.FirstOrDefaultAsync(this.GetIdValidationExpression(request.Id))));
                         break;
 
                     case EnActionType.Create:
@@ -110,11 +187,21 @@ namespace ClusterKit.Core.EF
                                 return;
                             }
 
+                            entity = this.BeforeCreate(entity);
+
+                            if (entity == null)
+                            {
+                                Context.GetLogger().Error("{Type}: create failed, prevented by BeforeCreate", this.GetType().Name);
+                                this.Sender.Tell(null);
+                                return;
+                            }
+
                             set.Add(entity);
                             try
                             {
                                 await ds.SaveChangesAsync();
                                 this.Sender.Tell(entity);
+                                this.AfterCreate(entity);
                                 return;
                             }
                             catch (Exception exception)
@@ -142,11 +229,20 @@ namespace ClusterKit.Core.EF
                                 return;
                             }
 
+                            entity = this.BeforeUpdate(entity, oldObject);
+                            if (entity == null)
+                            {
+                                Context.GetLogger().Error("{Type}: update of object with id {Id} failed, prevented by BeforeUpdate", this.GetType().Name, this.GetId(oldObject).ToString());
+                                this.Sender.Tell(null);
+                                return;
+                            }
+
                             set.Attach(entity);
                             try
                             {
                                 await ds.SaveChangesAsync();
                                 this.Sender.Tell(entity);
+                                this.AfterUpdate(entity, oldObject);
                                 return;
                             }
                             catch (Exception exception)
@@ -157,8 +253,15 @@ namespace ClusterKit.Core.EF
                             }
                         }
                     case EnActionType.Delete:
-                        set.RemoveRange(await set.Where(this.GetIdValidationExpression(request.Id)).ToListAsync());
-                        this.Sender.Tell(await ds.SaveChangesAsync() > 0);
+                        var deletedObjects = await set.Where(this.GetIdValidationExpression(request.Id)).ToListAsync();
+                        set.RemoveRange(this.BeforeDelete(deletedObjects));
+                        var success = await ds.SaveChangesAsync() > 0;
+                        if (success)
+                        {
+                            this.AfterDelete(deletedObjects);
+                        }
+
+                        this.Sender.Tell(success);
                         break;
 
                     default:
