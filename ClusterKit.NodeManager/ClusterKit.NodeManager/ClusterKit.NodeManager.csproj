@@ -206,6 +206,7 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="Messages\ActiveNodeDescriptionsRequest.cs" />
+    <Compile Include="Messages\NodeUpgradeRequest.cs" />
     <Compile Include="NodeManagerActor.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

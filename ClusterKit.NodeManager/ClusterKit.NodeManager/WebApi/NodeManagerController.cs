@@ -11,6 +11,7 @@ namespace ClusterKit.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Threading.Tasks;
     using System.Web.Http;
 
@@ -45,12 +46,12 @@ namespace ClusterKit.NodeManager.WebApi
         /// <summary>
         /// Gets timeout for actor system requests
         /// </summary>
-        protected virtual TimeSpan AkkaTimeout { get; }
+        private TimeSpan AkkaTimeout { get; }
 
         /// <summary>
         /// Gets the actor system
         /// </summary>
-        protected ActorSystem System { get; }
+        private ActorSystem System { get; }
 
         /// <summary>
         /// Gets current cluster active nodes descriptions
@@ -63,9 +64,26 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Manual node upgrade request
+        /// </summary>
+        /// <param name="address">Address of node to upgrade</param>
+        /// <returns>Execution task</returns>
+        [Route("upgradeNode")]
+        public async Task UpgradeNode(Address address)
+        {
+            var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new NodeUpgradeRequest { Address = address }, this.AkkaTimeout);
+            if (!result)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.OK);
+        }
+
+        /// <summary>
         /// Gets akka actor path for database worker
         /// </summary>
         /// <returns>Akka actor path</returns>
-        protected string GetManagerActorProxyPath() => "/user/NodeManager/NodeManagerProxy";
+        private string GetManagerActorProxyPath() => "/user/NodeManager/NodeManagerProxy";
     }
 }

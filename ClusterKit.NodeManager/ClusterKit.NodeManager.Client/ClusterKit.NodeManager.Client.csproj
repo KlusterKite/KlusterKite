@@ -129,6 +129,7 @@
     <Compile Include="Installer.cs" />
     <Compile Include="Messages\NodeDescription.cs" />
     <Compile Include="Messages\NodeDescriptionRequest.cs" />
+    <Compile Include="Messages\ShutdownMessage.cs" />
     <Compile Include="NodeManagerReceiverActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

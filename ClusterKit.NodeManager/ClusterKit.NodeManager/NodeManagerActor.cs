@@ -222,6 +222,21 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Process of manual node upgrade request
+        /// </summary>
+        /// <param name="request">manual node upgrade request</param>
+        private void OnNodeUpdateRequest(NodeUpgradeRequest request)
+        {
+            if (!this.nodeDescriptions.ContainsKey(request.Address))
+            {
+                this.Sender.Tell(false);
+            }
+
+            Context.ActorSelection($"{request.Address}/user/NodeManager/Receiver").Tell(new ShutdownMessage(), this.Self);
+            this.Sender.Tell(true);
+        }
+
+        /// <summary>
         /// Sends new description request to foreign node
         /// </summary>
         /// <param name="message">Notification message</param>
@@ -267,6 +282,7 @@ namespace ClusterKit.NodeManager
             this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
             this.Receive<ActiveNodeDescriptionsRequest>(m => this.Sender.Tell(this.nodeDescriptions.Values.ToList()));
             this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
+            this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m));
 
             this.Receive<IConsistentHashable>(m => this.workers.Forward(m));
         }

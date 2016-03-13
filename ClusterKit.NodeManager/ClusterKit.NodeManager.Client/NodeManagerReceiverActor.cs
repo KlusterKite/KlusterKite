@@ -65,6 +65,7 @@ namespace ClusterKit.NodeManager.Client
             };
 
             this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(this.description));
+            this.Receive<ShutdownMessage>(m => Context.System.Terminate());
         }
     }
 }
