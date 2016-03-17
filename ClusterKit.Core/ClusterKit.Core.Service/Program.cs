@@ -9,6 +9,11 @@
 
 namespace ClusterKit.Core.Service
 {
+    using System.Collections.Generic;
+
+    using Castle.Facilities.TypedFactory;
+    using Castle.MicroKernel.Registration;
+    using Castle.MicroKernel.Resolvers.SpecializedResolvers;
     using Castle.Windsor;
 
     using Serilog;
@@ -39,15 +44,25 @@ namespace ClusterKit.Core.Service
 
             var logger = loggerConfig.CreateLogger();
             Log.Logger = logger;
-            Bootstrapper.Configure(Container);
+
             HostFactory.Run(
                 x =>
                     {
+                        var configurations = new List<string>();
+
+                        x.AddCommandLineDefinition("config", fileName => configurations.Add(fileName));
+                        x.ApplyCommandLine();
+                        Bootstrapper.Configure(Container, configurations.ToArray());
+
                         x.Service<Controller>(
                             s =>
                                 {
                                     s.ConstructUsing(name => Container.Resolve<Controller>());
-                                    s.WhenStarted((tc, hc) => tc.Start(Container, hc));
+                                    s.WhenStarted(
+                                        (tc, hc) =>
+                                            {
+                                                return tc.Start(Container, hc);
+                                            });
                                     s.WhenStopped(
                                         tc =>
                                             {

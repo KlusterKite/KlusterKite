@@ -43,6 +43,18 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <summary>
+        /// Gets or sets the list of used NuGet feeds
+        /// </summary>
+        [UsedImplicitly]
+        public DbSet<NugetFeed> NugetFeeds { get; set; }
+
+        /// <summary>
+        ///  Gets or sets the list of addresses of cluster seeds
+        /// </summary>
+        [UsedImplicitly]
+        public DbSet<SeedAddress> SeedAddresses { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of node templates in database
         /// </summary>
         [UsedImplicitly]

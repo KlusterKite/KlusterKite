@@ -145,7 +145,12 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj">
+      <Project>{874ac41b-a084-4eed-9b7f-6b82efc416ee}</Project>
+      <Name>ClusterKit.NodeManager.Launcher.Messages</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

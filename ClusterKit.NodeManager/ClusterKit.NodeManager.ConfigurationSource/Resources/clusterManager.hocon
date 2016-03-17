@@ -33,7 +33,7 @@
       }
     }
     cluster {
-      seed-nodes = [$seed-nodes]
+      seed-nodes = []
     }
   }
 }

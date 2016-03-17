@@ -212,6 +212,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebApi\NodeManagerController.cs" />
     <Compile Include="WebApi\NodeTemplatesRestController.cs" />
+    <Compile Include="WebApi\NugetFeedsRestController.cs" />
+    <Compile Include="WebApi\SeedAddressesRestController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -232,6 +234,10 @@
     <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource\ClusterKit.NodeManager.ConfigurationSource.csproj">
       <Project>{25f679d9-4de1-4b82-b7a1-67ad3658cdfa}</Project>
       <Name>ClusterKit.NodeManager.ConfigurationSource</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj">
+      <Project>{874ac41b-a084-4eed-9b7f-6b82efc416ee}</Project>
+      <Name>ClusterKit.NodeManager.Launcher.Messages</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

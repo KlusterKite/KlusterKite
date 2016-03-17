@@ -9,13 +9,10 @@
 
 namespace ClusterKit.NodeManager.WebApi
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using System.Web.Http;
 
     using Akka.Actor;
 
-    using ClusterKit.Core.Rest.ActionMessages;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.Web.CRUDS;
 
@@ -34,28 +31,6 @@ namespace ClusterKit.NodeManager.WebApi
         public NodeTemplatesRestController(ActorSystem system)
             : base(system)
         {
-        }
-
-        /// <summary>
-        /// Gets the list of all node templates
-        /// </summary>
-        /// <param name="count">
-        /// The count of elements to return.
-        /// </param>
-        /// <param name="skip">
-        /// The count of elements to skip.
-        /// </param>
-        /// <returns>
-        /// list of node templates
-        /// </returns>
-        [Route("list")]
-        [HttpGet]
-        public async Task<List<NodeTemplate>> GetList(int count = 100, int skip = 0)
-        {
-            return
-                await
-                this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<List<NodeTemplate>>(new CollectionRequest { Count = count, Skip = skip }, this.AkkaTimeout);
         }
 
         /// <summary>

@@ -33,6 +33,13 @@ namespace ClusterKit.NodeManager.Client
         /// </summary>
         public NodeManagerReceiverActor()
         {
+            var requestIdString = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.RequestId");
+            Guid requestId;
+            if (!Guid.TryParse(requestIdString, out requestId))
+            {
+                requestId = Guid.NewGuid();
+            }
+
             this.description = new NodeDescription
             {
                 NodeAddress = Cluster.Get(Context.System).SelfAddress,
@@ -45,6 +52,7 @@ namespace ClusterKit.NodeManager.Client
                 NodeTemplateVersion =
                                 Context.System.Settings.Config.GetInt(
                                     "ClusterKit.NodeManager.NodeTemplateVersion"),
+                RequestId = requestId,
                 Modules =
                                 AppDomain.CurrentDomain.GetAssemblies()
                                 .Where(

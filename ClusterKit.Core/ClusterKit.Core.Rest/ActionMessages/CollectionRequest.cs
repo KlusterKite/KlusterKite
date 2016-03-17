@@ -13,6 +13,8 @@ namespace ClusterKit.Core.Rest.ActionMessages
 
     using Akka.Routing;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Collection of objects request
     /// </summary>
@@ -24,7 +26,7 @@ namespace ClusterKit.Core.Rest.ActionMessages
         /// <remarks>
         /// Collection request can't be assigned to specific id
         /// </remarks>
-        public object ConsistentHashKey => Guid.NewGuid();
+        public virtual object ConsistentHashKey => Guid.NewGuid();
 
         /// <summary>
         /// Gets or sets the maximum number of objects to return.
@@ -35,5 +37,13 @@ namespace ClusterKit.Core.Rest.ActionMessages
         /// Gets or sets the number of objects to skip in select
         /// </summary>
         public int Skip { get; set; } = 0;
+    }
+
+    /// <summary>
+    /// Collection of objects request
+    /// </summary>
+    [UsedImplicitly]
+    public class CollectionRequest<TObject> : CollectionRequest
+    {
     }
 }

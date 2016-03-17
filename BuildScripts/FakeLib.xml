@@ -102,6 +102,36 @@
  Provides functions and operators to deal with FAKE targets and target dependencies.
 </summary>
 </member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.Type">
+<summary>
+ Type of the artifact
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.DeploymentName">
+<summary>
+ Deployment name
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.FileName">
+<summary>
+ File name to display in the artifact tab
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.Path">
+<summary>
+ The full local path to the artifact
+</summary>
+</member>
+<member name="T:Fake.AppVeyor.PushArtifactParams">
+<summary>
+ AppVeyor parameters for artifact push
+</summary>
+</member>
+<member name="T:Fake.AppVeyor.ArtifactType">
+<summary>
+ Type of artifact that is pushed
+</summary>
+</member>
 <member name="T:Fake.AppVeyor.TestResultsType">
 <summary>
  Union type representing the available test result formats accepted by AppVeyor.
@@ -260,6 +290,26 @@
 <member name="T:Fake.AppVeyor.AppVeyorEnvironment">
 <summary>
  AppVeyor environment variables as [described](http://www.appveyor.com/docs/environment-variables)
+</summary>
+</member>
+<member name="M:Fake.AppVeyor.PushArtifacts(System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Push multiple artifacts
+</summary>
+</member>
+<member name="M:Fake.AppVeyor.PushArtifact(Microsoft.FSharp.Core.FSharpFunc{Fake.AppVeyor.PushArtifactParams,Fake.AppVeyor.PushArtifactParams})">
+<summary>
+ Push an artifact
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.defaultPushArtifactParams">
+<summary>
+ AppVeyor artifact push default parameters
+</summary>
+</member>
+<member name="M:Fake.AppVeyor.SetVariable(System.String,System.String)">
+<summary>
+ Set environment variable
 </summary>
 </member>
 <member name="M:Fake.AppVeyor.UploadTestResultsXml(Fake.AppVeyor.TestResultsType,System.String)">
@@ -7914,21 +7964,23 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 
  ## Sample usage
 
-     Target &quot;Create Paket Template&quot; (fun _ -&gt;
-        &quot;./temp/paket.template&quot;
-        |&gt; PaketTemplate (fun p -&gt; { p with
-                                     TemplateFilePath = Some &quot;./deploytemp/paket.template&quot;
-                                     Id = Some &quot;My.New.Package&quot;
-                                     Version = Some &quot;0.0.1-alpha&quot;
-                                     Authors = [&quot;Me&quot;; &quot;You&quot;; &quot;Someone Other&quot;] })
-                                     Files = [ Include (&quot;./**/*.dll&quot;, &quot;/lib/dlls&quot;)
-                                               Exclude &quot;./Foo/bar.dll&quot;
-                                               Include (&quot;./*.jpg&quot;, &quot;/images&quot;) ]
-                                     Dependencies = [ &quot;Paket1.FOO&quot;, AnyVersion
-                                                      &quot;Paket2.BAR&quot;, GreaterOrEqual CURRENTVERSION
-                                                      &quot;Paket3.BAZ&quot;, GreaterOrEqualSafe LOCKEDVERSION
-                                                      &quot;Paket4.BOO&quot;, GreaterOrEqual (Version &quot;1.2.3&quot;) ]
-     )
+    Target &quot;Create Paket Template&quot; (fun _ -&gt;
+       PaketTemplate (fun p -&gt;
+            { p with
+                TemplateFilePath = Some &quot;./deploytemp/paket.template&quot;
+                Id = Some &quot;My.New.Package&quot;
+                Version = Some &quot;0.0.1-alpha&quot;
+                Authors = [&quot;Me&quot;; &quot;You&quot;; &quot;Someone Other&quot;]
+                Files = [ Include (&quot;./**/*.dll&quot;, &quot;/lib/dlls&quot;)
+                          Exclude &quot;./Foo/bar.dll&quot;
+                          Include (&quot;./*.jpg&quot;, &quot;/images&quot;) ]
+                Dependencies = [ &quot;Paket1.FOO&quot;, AnyVersion
+                                 &quot;Paket2.BAR&quot;, GreaterOrEqual CURRENTVERSION
+                                 &quot;Paket3.BAZ&quot;, GreaterOrEqualSafe LOCKEDVERSION
+                                 &quot;Paket4.BOO&quot;, GreaterOrEqual (Version &quot;1.2.3&quot;) ]
+            }
+        )
+    )
 </summary>
 </member>
 <member name="P:Fake.PaketTemplate.DefaultPaketTemplateParams">
@@ -9803,6 +9855,16 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.SlackNotificationHelper">
 <summary>
  Contains a task to send notification messages to a [Slack](https://slack.com/) webhook
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.Config">
+<summary>
+ Read settings from configuration file
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.Settings">
+<summary>
+ Individual global settings for SonarQube
 </summary>
 </member>
 <member name="P:Fake.SonarQubeHelper.SonarQubeParams.Version">

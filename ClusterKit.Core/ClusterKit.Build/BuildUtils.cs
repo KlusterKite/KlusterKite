@@ -11,6 +11,7 @@ namespace ClusterKit.Build
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -261,6 +262,11 @@ namespace ClusterKit.Build
             foreach (XmlElement dependency in dependenciesDoc.DocumentElement.SelectNodes("/packages/package"))
             {
                 if (project.InternalDependencies.Contains(dependency.Attributes["id"].Value))
+                {
+                    continue;
+                }
+
+                if (!Directory.Exists(Path.Combine(PackageInputDirectory, $"{dependency.Attributes["id"].Value}.{dependency.Attributes["version"].Value}")))
                 {
                     continue;
                 }

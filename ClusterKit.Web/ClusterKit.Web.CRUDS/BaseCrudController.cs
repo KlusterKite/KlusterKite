@@ -10,6 +10,7 @@
 namespace ClusterKit.Web.CRUDS
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Net;
     using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace ClusterKit.Web.CRUDS
         /// <returns>Updated node template</returns>
         [HttpPost]
         [Route("")]
-        public async Task<TObject> Create(TObject request)
+        public virtual async Task<TObject> Create(TObject request)
         {
             var template =
                await
@@ -87,7 +88,7 @@ namespace ClusterKit.Web.CRUDS
         /// <returns>Execution task</returns>
         [HttpDelete]
         [Route("")]
-        public async Task Delete(TId id)
+        public virtual async Task Delete(TId id)
         {
             var result =
                 await
@@ -109,7 +110,7 @@ namespace ClusterKit.Web.CRUDS
         /// <returns>Node template</returns>
         [HttpGet]
         [Route("")]
-        public async Task<TObject> Get(TId id)
+        public virtual async Task<TObject> Get(TId id)
         {
             var template =
                 await
@@ -127,13 +128,35 @@ namespace ClusterKit.Web.CRUDS
         }
 
         /// <summary>
+        /// Gets the list of all node templates
+        /// </summary>
+        /// <param name="count">
+        /// The count of elements to return.
+        /// </param>
+        /// <param name="skip">
+        /// The count of elements to skip.
+        /// </param>
+        /// <returns>
+        /// list of node templates
+        /// </returns>
+        [Route("list")]
+        [HttpGet]
+        public virtual async Task<List<TObject>> GetList(int count = 100, int skip = 0)
+        {
+            return
+                await
+                this.System.ActorSelection(this.GetDbActorProxyPath())
+                    .Ask<List<TObject>>(new CollectionRequest<TObject> { Count = count, Skip = skip }, this.AkkaTimeout);
+        }
+
+        /// <summary>
         /// Updates or creates new Node template
         /// </summary>
         /// <param name="request">Node template data</param>
         /// <returns>Updated node template</returns>
         [HttpPatch, HttpPut]
         [Route("")]
-        public async Task<TObject> Update(TObject request)
+        public virtual async Task<TObject> Update(TObject request)
         {
             var template =
                await

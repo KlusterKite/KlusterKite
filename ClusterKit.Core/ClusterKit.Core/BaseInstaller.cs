@@ -91,31 +91,15 @@ namespace ClusterKit.Core
         /// <param name="container">
         /// The windsor container.
         /// </param>
+        /// <param name="config">
+        /// Top level config
+        /// </param>
         /// <returns>
         /// Akka and system configuration
         /// </returns>
-        public static Config GetStackedConfig(IWindsorContainer container)
+        public static Config GetStackedConfig(IWindsorContainer container, Config config)
         {
             Log.Information("ClusterKit starting plugin manager");
-            var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
-            var config = section != null ? section.AkkaConfig : ConfigurationFactory.Empty;
-
-            var hoconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "akka.hocon");
-            if (File.Exists(hoconPath))
-            {
-                var hoconConfig = File.ReadAllText(hoconPath);
-                config = ConfigurationFactory.ParseString(hoconConfig).WithFallback(config);
-            }
-            else
-            {
-                Log.Warning("File {fileName} was not found", hoconPath);
-            }
-
-            var networkName = Environment.GetEnvironmentVariable("NETWORK_NAME");
-            if (!string.IsNullOrEmpty(networkName))
-            {
-                config = ConfigurationFactory.ParseString($"{{ akka.remote.helios.tcp.hostname = \"{networkName.Replace("\"", "\\\"")}\" }}").WithFallback(config);
-            }
 
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))

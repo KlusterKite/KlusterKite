@@ -7,27 +7,35 @@ services:
     environment:
      - NETWORK_NAME=seed
   nuget:
-    image: clusterkit/nuget
+    image: sunside/simple-nuget-server
     ports:
      - "81:80"
     environment:
-     - NETWORK_NAME=nuget
+     - NUGET_API_KEY=ClusterKit
   configDb:
     image: postgres
     environment:
      - NETWORK_NAME=postgres
-  worker1:
-    image: clusterkit/worker
+  manager1:
+    image: clusterkit/demoworker
     links:
      - "seed"
      - "configDb"
     environment:
-     - NETWORK_NAME=worker1
-  worker2:
+     - NETWORK_NAME=manager1
+  manager2:
+    image: clusterkit/demoworker    
+    links:
+     - "seed"
+     - "configDb"
+    environment:
+     - NETWORK_NAME=manager2
+  worker:
     image: clusterkit/worker    
     links:
      - "seed"
      - "configDb"
-    environment:
-     - NETWORK_NAME=worker2
+     - "manager1"
+     - "manager2"
+     - "nuget"    
 

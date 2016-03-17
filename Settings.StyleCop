@@ -5,6 +5,7 @@
       <Value>api</Value>
       <Value>akka</Value>
       <Value>crud</Value>
+      <Value>dbset</Value>
       <Value>ef</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
@@ -16,6 +17,7 @@
       <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>ui</Value>
+      <Value>urls</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

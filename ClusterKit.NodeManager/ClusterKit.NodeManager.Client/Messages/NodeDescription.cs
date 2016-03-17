@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Client.Messages
 {
+    using System;
     using System.Collections.Generic;
 
     using Akka.Actor;
@@ -45,6 +46,11 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// Gets or sets current node template version
         /// </summary>
         public int NodeTemplateVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets request id to indicate node instance startup
+        /// </summary>
+        public Guid RequestId { get; set; }
 
         /// <summary>
         /// Description of installed module

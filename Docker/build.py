@@ -32,6 +32,16 @@ def copyWebContent(webSource, dest):
 			shutil.copyfile(fullName, os.path.join(dest, fileName))
 	return
 
+def sysCopy(source, dest):
+	if platform.system() == 'Windows':
+		dest = dest.replace("/", "\\")
+		source = source.replace("/", "\\")
+		subprocess.Popen("xcopy " + source + " " + dest +" /Y /S /Q", shell=False).wait()
+	else:
+		subprocess.Popen("cp -R " + source + " " + dest, shell=False).wait()
+
+
+
 def correctAssemblyVersions(buildFolder):
 	if platform.system() == 'Windows':	
 		subprocess.call("..\\ClusterKit.Tools\\compiled\\assemblyVersion\\DependentAssemblyVersionCorrector.exe "
@@ -51,7 +61,7 @@ def correctAssemblyVersions(buildFolder):
 
 
 print "Building sources, please wait"
-if platform.system() == 'Windows':	
+if platform.system() == 'Windows':
 	subprocess.call("cd .. && build.bat", shell = True)
 	pass
 else:
@@ -80,7 +90,7 @@ shutil.rmtree('./ClusterKitDemoSeed/web', True);
 
 
 # building ClusterKitDemoWorker
-print "Preparing clusterkit/worker"
+print "Preparing clusterkit/demoworker"
 shutil.rmtree('./ClusterKitDemoWorker/build', True);
 os.mkdir('./ClusterKitDemoWorker/build');
 copyLib("ClusterKit.Core.Service", './ClusterKitDemoWorker/build')
@@ -92,19 +102,30 @@ copyLib("ClusterKit.NodeManager", './ClusterKitDemoWorker/build')
 
 shutil.copyfile('./ClusterKitDemoWorker/akka.hocon', './ClusterKitDemoWorker/build/akka.hocon')
 correctAssemblyVersions('./ClusterKitDemoWorker/build')
-subprocess.call("docker build -t clusterkit/worker:latest ./ClusterKitDemoWorker/", shell=True)
+subprocess.call("docker build -t clusterkit/demoworker:latest ./ClusterKitDemoWorker/", shell=True)
 #shutil.rmtree('./ClusterKitDemoWorker/build', True);
 
-# building ClusterKitNuget
-print "Preparing clusterkit/nuget"
-shutil.rmtree('./ClusterKitNuget/packages', True);
-os.mkdir('./ClusterKitNuget/packages');
-if platform.system() == 'Windows':
-	subprocess.Popen("xcopy ..\\packageOut\\* .\\ClusterKitNuget\\packages /Y", shell=True, stdout=subprocess.PIPE).wait()
-else:
-	subprocess.Popen("cp ../packageOut/* ./ClusterKitNuget/packages/", shell=True, stdout=subprocess.PIPE).wait()
-subprocess.call("docker build -t clusterkit/nuget:latest ./ClusterKitNuget/", shell=True)
+# building ClusterKitWorker
+print "Preparing clusterkit/worker"
+shutil.rmtree('./ClusterKitWorker/build', True);
+shutil.rmtree('./ClusterKitWorker/preinstalled', True);
+shutil.rmtree('./ClusterKitWorker/packageCache', True);
+os.mkdir('./ClusterKitWorker/build');
+os.mkdir('./ClusterKitWorker/preinstalled');
+os.mkdir('./ClusterKitWorker/packageCache');
 
+for dir in os.listdir("../packages"):
+	if (dir.startswith("System.")):
+		os.mkdir('./ClusterKitWorker/preinstalled/' + dir + "/");		
+		sysCopy("../packages/" + dir , './ClusterKitWorker/preinstalled/' + dir + "/")
 
+packageDirs = os.listdir("../packages")
+for dir in packageDirs:
+	if (os.path.isdir(os.path.join("../packages",dir))):
+		for file in os.listdir(os.path.join("../packages",dir)):
+			if (file.endswith(".nupkg") and not os.path.isfile(os.path.join("..","packageOut", file))):
+				shutil.copyfile(os.path.join("../packages",dir, file), os.path.join(".","ClusterKitWorker", "packageCache", file))		
 
-
+copyLib("ClusterKit.NodeManager.Launcher", './ClusterKitWorker/build')
+shutil.copyfile('./ClusterKitWorker/ClusterKit.NodeManager.Launcher.exe.config', './ClusterKitWorker/build/ClusterKit.NodeManager.Launcher.exe.config')
+subprocess.call("docker build -t clusterkit/worker:latest ./ClusterKitWorker/", shell=True)

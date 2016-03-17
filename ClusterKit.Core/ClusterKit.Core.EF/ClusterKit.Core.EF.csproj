@@ -137,9 +137,11 @@
   <ItemGroup>
     <Compile Include="BaseConnectionManager.cs" />
     <Compile Include="BaseCrudActor.cs" />
+    <Compile Include="BaseCrudActorWithNotifications.cs" />
     <Compile Include="BaseEntityFrameworkInstaller.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdateMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClusterKit.Core.Rest\ClusterKit.Core.Rest.csproj">

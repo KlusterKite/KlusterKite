@@ -213,7 +213,7 @@ namespace ClusterKit.Core
                         singletonName,
                         role,
                         actorConfig.GetTimeSpan("removal-margin", TimeSpan.FromSeconds(1), false),
-                        actorConfig.GetTimeSpan("handover-retry-interval", TimeSpan.FromSeconds(1), false))),
+                        actorConfig.GetTimeSpan("handover-retry-interval", TimeSpan.FromSeconds(5), false))),
                 pathName);
         }
 

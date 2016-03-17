@@ -6,6 +6,21 @@
           NodeTemplate = demoWorker
           ContainerType = worker
           NodeTemplateVersion = 1
+          DefaultNugetFeeds {
+
+              publicFeed {
+                      address = "/opt/packageCache"
+                      type = public
+              } 
+
+              privateFeed {
+                      address = "http://192.168.99.100:81/"
+                      type = private
+              }             
+
+
+
+          }          
     }
 
     Web {

@@ -243,6 +243,10 @@
       <Project>{25f679d9-4de1-4b82-b7a1-67ad3658cdfa}</Project>
       <Name>ClusterKit.NodeManager.ConfigurationSource</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj">
+      <Project>{874ac41b-a084-4eed-9b7f-6b82efc416ee}</Project>
+      <Name>ClusterKit.NodeManager.Launcher.Messages</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager\ClusterKit.NodeManager.csproj">
       <Project>{9104e55c-4166-480a-add2-593807a00761}</Project>
       <Name>ClusterKit.NodeManager</Name>

@@ -12,12 +12,14 @@ namespace ClusterKit.NodeManager.WebApi
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
 
     using Akka.Actor;
 
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
     using ClusterKit.Web;
     using ClusterKit.Web.CRUDS;
@@ -64,11 +66,44 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Gets configuration for new empty node
+        /// </summary>
+        /// <param name="request">The configuration request</param>
+        /// <returns>The configuration to apply</returns>
+        [Route("getConfiguration")]
+        [HttpPost]
+        public async Task<NodeStartUpConfiguration> GetConfiguration(NewNodeTemplateRequest request)
+        {
+            var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<object>(request, this.AkkaTimeout);
+
+            var configuration = result as NodeStartUpConfiguration;
+            if (configuration != null)
+            {
+                return configuration;
+            }
+
+            var waitMessage = result as NodeStartupWaitMessage;
+            if (waitMessage != null)
+            {
+                var httpResponseMessage = new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.ServiceUnavailable
+                };
+
+                httpResponseMessage.Headers.Add("Retry-After", ((int)waitMessage.WaitTime.TotalSeconds).ToString());
+                throw new HttpResponseException(httpResponseMessage);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.InternalServerError);
+        }
+
+        /// <summary>
         /// Manual node upgrade request
         /// </summary>
         /// <param name="address">Address of node to upgrade</param>
         /// <returns>Execution task</returns>
         [Route("upgradeNode")]
+        [HttpPost]
         public async Task UpgradeNode(Address address)
         {
             var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new NodeUpgradeRequest { Address = address }, this.AkkaTimeout);
