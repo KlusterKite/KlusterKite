@@ -1,8 +1,0 @@
-FROM clusterkit/baseworker:latest
-MAINTAINER Mikhail Kantarovskiy <kantoramob@gmail.com>
-WORKDIR /opt/clusterkit/
-COPY build/* /opt/clusterkit/
-COPY setHostIp.sh /opt/
-ENTRYPOINT bash /opt/setHostIp.sh && mono ClusterKit.NodeManager.Launcher.exe && tail -f /var/log/faillog
-ENTRYPOINT tail -f /var/log/faillog
-

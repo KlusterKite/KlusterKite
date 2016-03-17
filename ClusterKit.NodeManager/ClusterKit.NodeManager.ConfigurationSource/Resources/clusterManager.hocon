@@ -2,12 +2,12 @@
   ClusterKit {
 
     NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
-
+      
     Web {
 
       Swagger.Publish {
           publishDocPath = ""clusterkit/manager/swagger/doc""
-          publishUiPath = ""clusterkit/manager/ui""
+          publishUiPath = ""clusterkit/manager/swagger/ui""
       }
 
       Services {
@@ -34,6 +34,7 @@
     }
     cluster {
       seed-nodes = []
+	  min-nr-of-members = 3
     }
   }
 }

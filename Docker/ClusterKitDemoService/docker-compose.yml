@@ -1,11 +1,6 @@
 version: '2'
 services:
-  seed:
-    image: clusterkit/seed
-    ports:
-     - "80:80"
-    environment:
-     - NETWORK_NAME=seed
+  #set of abstract utility servers
   nuget:
     image: sunside/simple-nuget-server
     ports:
@@ -16,25 +11,28 @@ services:
     image: postgres
     environment:
      - NETWORK_NAME=postgres
+
+  #Cluster servers
+  seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+    image: clusterkit/seed
+    ports:
+     - "80:80"
+    environment:
+     - NETWORK_NAME=seed
   manager1:
-    image: clusterkit/demoworker
+    image: clusterkit/manager
     links:
      - "seed"
-     - "configDb"
-    environment:
-     - NETWORK_NAME=manager1
+     - "configDb"    
   manager2:
-    image: clusterkit/demoworker    
+    image: clusterkit/manager    
     links:
      - "seed"
      - "configDb"
-    environment:
-     - NETWORK_NAME=manager2
   worker:
     image: clusterkit/worker    
     links:
      - "seed"
-     - "configDb"
      - "manager1"
      - "manager2"
      - "nuget"    

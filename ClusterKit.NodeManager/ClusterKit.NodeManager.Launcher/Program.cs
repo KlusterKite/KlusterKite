@@ -23,6 +23,8 @@ namespace ClusterKit.NodeManager.Launcher
 
     using ClusterKit.NodeManager.Launcher.Messages;
 
+    using Newtonsoft.Json;
+
     using RestSharp;
 
     /// <summary>
@@ -37,14 +39,8 @@ namespace ClusterKit.NodeManager.Launcher
         {
             if (!File.Exists("nuget.exe"))
             {
-                Console.WriteLine("nuget.exe not found");
+                Console.WriteLine(@"nuget.exe not found");
                 this.IsValid = false;
-            }
-
-            EnStartMode startMode;
-            if (Enum.TryParse(ConfigurationManager.AppSettings["startMode"], out startMode))
-            {
-                this.StartMode = startMode;
             }
 
             EnStopMode stopMode;
@@ -56,7 +52,7 @@ namespace ClusterKit.NodeManager.Launcher
             if (stopMode == EnStopMode.RunAction
                 && string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["stopAction"]))
             {
-                Console.WriteLine("stopAction is not configured");
+                Console.WriteLine(@"stopAction is not configured");
                 this.IsValid = false;
             }
 
@@ -66,19 +62,19 @@ namespace ClusterKit.NodeManager.Launcher
             }
             catch (ArgumentNullException)
             {
-                Console.WriteLine("nodeManagerUrl not configured");
+                Console.WriteLine(@"nodeManagerUrl not configured");
                 this.IsValid = false;
             }
             catch (UriFormatException)
             {
-                Console.WriteLine("nodeManagerUrl is not a valid URL");
+                Console.WriteLine(@"nodeManagerUrl is not a valid URL");
                 this.IsValid = false;
             }
 
             this.WorkingDirectory = ConfigurationManager.AppSettings["workingDirectory"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
-                Console.WriteLine("workingDirectory is not configured");
+                Console.WriteLine(@"workingDirectory is not configured");
                 this.IsValid = false;
             }
             else if (!Directory.Exists(this.WorkingDirectory))
@@ -89,7 +85,7 @@ namespace ClusterKit.NodeManager.Launcher
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("workingDirectory does not extist");
+                    Console.WriteLine(@"workingDirectory does not extist");
                     this.IsValid = false;
                 }
             }
@@ -98,32 +94,16 @@ namespace ClusterKit.NodeManager.Launcher
                 && Directory.Exists(this.WorkingDirectory)
                 && !CheckDirectoryAccess(this.WorkingDirectory))
             {
-                Console.WriteLine("workingDirectory is not accessable");
+                Console.WriteLine(@"workingDirectory is not accessable");
                 this.IsValid = false;
             }
 
             this.ContainerType = ConfigurationManager.AppSettings["containerType"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
-                Console.WriteLine("containerType is not configured");
+                Console.WriteLine(@"containerType is not configured");
                 this.IsValid = false;
             }
-        }
-
-        /// <summary>
-        /// First start mode
-        /// </summary>
-        public enum EnStartMode
-        {
-            /// <summary>
-            /// Will request cluster for node configuration
-            /// </summary>
-            CleanStart,
-
-            /// <summary>
-            /// At first will start node as is. In case of restart - will upgrade node according to configuration
-            /// </summary>
-            LaunchPredefinedNode
         }
 
         /// <summary>
@@ -158,15 +138,13 @@ namespace ClusterKit.NodeManager.Launcher
         public bool IsValid { get; } = true;
 
         /// <summary>
-        /// First start mode
-        /// </summary>
-        public EnStartMode StartMode { get; } = EnStartMode.CleanStart;
-
-        /// <summary>
         /// Action to be done after node stops
         /// </summary>
         public EnStopMode StopMode { get; } = EnStopMode.CleanRestart;
 
+        /// <summary>
+        /// Current working directory. All packages and new service will be stored here.
+        /// </summary>
         public string WorkingDirectory { get; }
 
         /// <summary>
@@ -236,17 +214,18 @@ namespace ClusterKit.NodeManager.Launcher
         /// </summary>
         private void ConfigureNode()
         {
-            Console.WriteLine("Configuring node...");
+            Console.WriteLine(@"Configuring node...");
 
             var client = new RestClient(this.ConfigurationUrl);
             var request = new RestRequest { Method = Method.POST };
             request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType });
 
-            var config = client.Execute<NodeStartUpConfiguration>(request);
+            var response = client.Execute<NodeStartUpConfiguration>(request);
+            NodeStartUpConfiguration config;
 
-            while (config.StatusCode == HttpStatusCode.ServiceUnavailable)
+            while (response.StatusCode == HttpStatusCode.ServiceUnavailable)
             {
-                var retryHeader = config.Headers.FirstOrDefault(
+                var retryHeader = response.Headers.FirstOrDefault(
                     h => "Retry - After".Equals(h.Name, StringComparison.InvariantCultureIgnoreCase));
                 int timeToWait;
                 if (!int.TryParse(retryHeader?.Value?.ToString(), out timeToWait))
@@ -256,22 +235,44 @@ namespace ClusterKit.NodeManager.Launcher
 
                 Console.WriteLine($"Config service anavailable, retrying in {timeToWait} seconds...");
                 Thread.Sleep(TimeSpan.FromSeconds(timeToWait));
-                config = client.Execute<NodeStartUpConfiguration>(request);
+                response = client.Execute<NodeStartUpConfiguration>(request);
             }
 
-            if (config.StatusCode != HttpStatusCode.OK || config.Data == null)
+            if (response.StatusCode != HttpStatusCode.OK || response.Data == null)
             {
-                throw new Exception("Could not get configuration from service");
+                var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
+                if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
+                {
+                    throw new Exception(
+                        "Could not get configuration from service and there is no fallback configuration");
+                }
+
+                var serializer = new Newtonsoft.Json.JsonSerializer();
+
+                using (var file = File.OpenRead(fallBackConfiguration))
+                using (var textReader = new StreamReader(file))
+                using (var jsonReader = new JsonTextReader(textReader))
+                {
+                    config = serializer.Deserialize<NodeStartUpConfiguration>(jsonReader);
+                }
+            }
+            else
+            {
+                config = response.Data;
             }
 
-            Console.WriteLine($"Got {config.Data.NodeTemplate} configuration");
+            Console.WriteLine($"Got {config.NodeTemplate} configuration");
             this.CleanWorkingDir();
-            this.PrepareNuGetConfig(config.Data);
-            this.InstallPackages(config.Data);
-            this.CreateService(config.Data);
+            this.PrepareNuGetConfig(config);
+            this.InstallPackages(config);
+            this.CreateService(config);
             this.FixAssemblyVersions();
         }
 
+        /// <summary>
+        /// Createst runnable service from installed packages
+        /// </summary>
+        /// <param name="configuration"></param>
         private void CreateService(NodeStartUpConfiguration configuration)
         {
             Console.WriteLine(@"Creating service");
@@ -311,6 +312,7 @@ namespace ClusterKit.NodeManager.Launcher
             }
 
             File.WriteAllText(Path.Combine(serviceDir, "akka.hocon"), configuration.Configuration);
+            Console.WriteLine($"General configuration: \n {configuration.Configuration}");
 
             string startConfig = $@"{{
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
@@ -319,8 +321,12 @@ namespace ClusterKit.NodeManager.Launcher
                 akka.cluster.seed-nodes = [{string.Join(", ", configuration.Seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
+            Console.WriteLine($"Start configuration: \n {startConfig}");
         }
 
+        /// <summary>
+        /// Fixes service configuration file to pass possible version conflicts in dependent assemblies
+        /// </summary>
         private void FixAssemblyVersions()
         {
             var dirName = Path.Combine(this.WorkingDirectory, "service");
@@ -375,19 +381,30 @@ namespace ClusterKit.NodeManager.Launcher
             confDoc.Save(configName);
         }
 
+        /// <summary>
+        /// Download specified nuget packages and their dependencies
+        /// </summary>
+        /// <param name="configuration">The node configuration</param>
         private void InstallPackages(NodeStartUpConfiguration configuration)
         {
             foreach (var package in configuration.Packages)
             {
                 Console.WriteLine($"Downloading {package}...");
-                var process = new Process();
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.WorkingDirectory = Path.GetFullPath(this.WorkingDirectory);
-                process.StartInfo.FileName = "nuget.exe";
-                process.StartInfo.Arguments = $"install {package} -PreRelease -NonInteractive -ConfigFile nuget.config -OutputDirectory packages -DisableParallelProcessing";
-                process.Start();
-                process.WaitForExit();
-                process.Dispose();
+                using (var process = new Process())
+                {
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.WorkingDirectory = Path.GetFullPath(this.WorkingDirectory);
+                    process.StartInfo.FileName = "nuget.exe";
+                    process.StartInfo.Arguments =
+                        $"install {package} -PreRelease -NonInteractive -ConfigFile nuget.config -OutputDirectory packages -DisableParallelProcessing";
+                    process.Start();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Could not install package {package}");
+                    }
+                }
             }
         }
 
@@ -444,25 +461,9 @@ namespace ClusterKit.NodeManager.Launcher
             switch (this.StopMode)
             {
                 case EnStopMode.CleanRestart:
-                    if (this.StartMode == EnStartMode.LaunchPredefinedNode)
-                    {
-                        try
-                        {
-                            this.LaunchNode();
-                        }
-                        catch (ThreadAbortException)
-                        {
-                            throw;
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine($"Failed to start in predefined mode, {exception.Message}");
-                            Console.WriteLine(exception.StackTrace);
-                        }
-                    }
-
                     while (true)
                     {
+                        // this is infinity cycle. LaunchNode will exit on node stop. This happens on manual or automatic system shutdown or major exception. In both cases node will be reinitiated.
                         try
                         {
                             this.ConfigureNode();

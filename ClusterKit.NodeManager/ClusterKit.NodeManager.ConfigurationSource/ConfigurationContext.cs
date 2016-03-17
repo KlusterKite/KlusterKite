@@ -79,7 +79,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     MaximumNeededInstances = 4,
                     ContainerTypes = new List<string> { "seed" },
                     Priority = 1000.0,
-                    Packages = new List<string> { "ClusterKit.Core.Service", "ClusterKit.Web.NginxConfigurator, ClusterKit.NodeManager.Client" },
+                    Packages =
+                            new List<string>
+                                {
+                                    "ClusterKit.Core.Service",
+                                    "ClusterKit.Web.NginxConfigurator",
+                                    "ClusterKit.NodeManager.Client"
+                                },
                     Configuration = Configurations.Seed
                 });
 
@@ -90,24 +96,34 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     Name = "Cluster manager (cluster monitoring and managing)",
                     MininmumRequiredInstances = 2,
                     MaximumNeededInstances = 3,
-                    ContainerTypes = new List<string> { "manager" },
+                    ContainerTypes = new List<string> { "manager", "worker" },
                     Priority = 100.0,
-                    Packages = new List<string> { "ClusterKit.Core.Service", "ClusterKit.Monitoring", "ClusterKit.NodeManager", "ClusterKit.Web.Swagger.Monitor" },
+                    Packages =
+                            new List<string>
+                                {
+                                    "ClusterKit.Core.Service",
+                                    "ClusterKit.Monitoring",
+                                    "ClusterKit.NodeManager",
+                                    "ClusterKit.Core.EF.Npgsql",
+                                    "ClusterKit.Web.Swagger.Monitor",
+                                    "ClusterKit.Web.Swagger.Publish"
+                                },
                     Configuration = Configurations.ClusterManager
                 });
 
             this.Templates.Add(
-               new NodeTemplate
-               {
-                   Code = "empty",
-                   Name = "Cluster manager empty instance",
-                   MininmumRequiredInstances = 0,
-                   MaximumNeededInstances = null,
-                   ContainerTypes = new List<string> { "worker" },
-                   Priority = 1.0,
-                   Packages = new List<string> { "ClusterKit.Core.Service", "ClusterKit.NodeManager.Client" },
-                   Configuration = Configurations.Empty
-               });
+                new NodeTemplate
+                {
+                    Code = "empty",
+                    Name = "Cluster empty instance, just for demo",
+                    MininmumRequiredInstances = 0,
+                    MaximumNeededInstances = null,
+                    ContainerTypes = new List<string> { "worker" },
+                    Priority = 1.0,
+                    Packages =
+                            new List<string> { "ClusterKit.Core.Service", "ClusterKit.NodeManager.Client" },
+                    Configuration = Configurations.Empty
+                });
 
             this.SaveChanges();
         }

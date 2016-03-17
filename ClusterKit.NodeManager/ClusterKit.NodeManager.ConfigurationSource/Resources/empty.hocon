@@ -27,6 +27,7 @@
     }
     cluster {
       seed-nodes = []
+	  min-nr-of-members = 3
     }
   }
 }

@@ -44,8 +44,8 @@ namespace ClusterKit.Web.Swagger
                 return;
             }
 
-            var publishDocUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", " swagger");
-            var publishUiUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", " swagger/ui");
+            var publishDocUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", "swagger");
+            var publishUiUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", "swagger/ui");
 
             config.EnableSwagger(
                 $"{publishDocUrl}/{{apiVersion}}",

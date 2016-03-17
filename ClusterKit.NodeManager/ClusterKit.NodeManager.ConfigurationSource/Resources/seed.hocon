@@ -1,22 +1,23 @@
 ﻿{
   ClusterKit {
-    
-      Nginx {
-        PathToConfig = "/etc/nginx/sites-enabled/clusterkit.config"
-        ReloadCommand {
-          Command = /etc/init.d/nginx
-          Arguments = reload
-        } 
-        Configuration {
-          default {
-            "location /" { // you can define static content. This part will be just inserted into nginx config
-              root = /opt/web/monitoring/
-              index = index.html
-            }
+	  Web {
+		  Nginx {
+			PathToConfig = "/etc/nginx/sites-enabled/clusterkit.config"
+			ReloadCommand {
+			  Command = /etc/init.d/nginx
+			  Arguments = reload
+			} 
+			Configuration {
+			  default {
+				"location /" { // you can define static content. This part will be just inserted into nginx config
+				  root = /opt/web/monitoring/
+				  index = index.html
+				}
 
-            "location /signalr" {
-                proxy_set_header = ["Upgrade $http_upgrade", "Connection \"upgrade\""]
-            }
+				"location /signalr" {
+					proxy_set_header = ["Upgrade $http_upgrade", "Connection \"upgrade\""]
+				}
+			}
           }
         }
       }
@@ -24,7 +25,7 @@
   }
 
 
-
+   
   akka {
     remote {
       helios {
