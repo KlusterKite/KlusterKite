@@ -19,21 +19,15 @@ services:
      - "80:80"
     environment:
      - NETWORK_NAME=seed
-  manager1:
+  manager:
     image: clusterkit/manager
     links:
      - "seed"
      - "configDb"    
-  manager2:
-    image: clusterkit/manager    
-    links:
-     - "seed"
-     - "configDb"
   worker:
     image: clusterkit/worker    
     links:
      - "seed"
-     - "manager1"
-     - "manager2"
+     - "manager"
      - "nuget"    
 

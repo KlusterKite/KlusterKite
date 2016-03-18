@@ -1,1 +1,0 @@
-FOR /f "tokens=*" %%i IN ('docker-machine env default') DO %%i

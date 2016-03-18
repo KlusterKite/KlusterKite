@@ -5,6 +5,7 @@ open System
 open System.IO
 open System.Xml
 open System.Linq
+open System.Text.RegularExpressions
 
 open  ClusterKit.Build
 
@@ -53,6 +54,20 @@ let projects = [|
 
 |]
 
+let buildDocker (containerName:string) (path:string) =
+    if (ExecProcess (fun info ->
+        info.FileName <- "docker"
+        info.Arguments <- (sprintf "build -t %s:latest %s" containerName path)
+    )  (TimeSpan.FromMinutes 30.0) <> 0) then
+        failwithf "Error while building %s" path
+
+let pushPackage package =
+    ExecProcess (fun info ->
+        info.FileName <- "nuget.exe";
+        info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" package "http://192.168.99.100:81/" "ClusterKit")
+        (TimeSpan.FromMinutes 30.0)
+        |> ignore
+
 Target "PreClean" (fun _ ->
     trace "PreClean..."
     if Directory.Exists(packageDir) then Directory.Delete(packageDir, true)
@@ -76,6 +91,94 @@ Target "ReloadNuGet" (fun _ ->
 
 Target "Test" (fun _ ->
     BuildUtils.RunXUnitTest(projects);
+)
+
+Target "DockerBase" (fun _ ->
+    buildDocker "clusterkit/baseworker" "Docker/ClusterKitBaseWorkerNode"
+    buildDocker "clusterkit/baseweb" "Docker/ClusterKitBaseWebNode"
+)
+
+Target "DockerContainers" (fun _ ->
+    RestorePackages |> ignore
+    MSBuildRelease "./build/launcher" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"|] |> ignore
+
+    let copyLauncherData (path : string) =
+        let fullPath = Path.GetFullPath(path)
+        let buildDir = Path.Combine ([|fullPath; "build"|])
+        let packageCacheDir = Path.Combine ([|fullPath; "packageCache"|])
+
+        Fake.FileHelper.CleanDirs [|buildDir; packageCacheDir|]
+        Fake.FileHelper.CopyDir buildDir "./build/launcher" (fun file -> true)
+
+        let copyThirdPartyPackage (f: FileInfo) =
+            if (hasExt ".nupkg" f.FullName) then
+                if not (File.Exists (Path.Combine [|(Path.GetFullPath("./packageOut/")); f.Name|])) then
+                    Fake.FileHelper.Copy packageCacheDir [|f.FullName|]
+
+        Fake.FileHelper.recursively
+            (fun d -> ())
+            copyThirdPartyPackage
+            (new DirectoryInfo(Path.GetFullPath("./packages")))
+
+    let copyWebContent source dest =
+        let fullPathSource = Path.GetFullPath(source)
+        let fullPathDest = Path.GetFullPath(dest)
+        Fake.FileHelper.CleanDirs [|fullPathDest|]
+        let matcher name = Regex.IsMatch(name, "(.*)((\.jpg)|(\.gif)|(\.png)|(\.jpeg)|(\.html)|(\.html)|(\.js)|(\.css))$", RegexOptions.IgnoreCase)
+        Fake.FileHelper.CopyDir fullPathDest fullPathSource matcher
+
+    copyLauncherData "./Docker/ClusterKitWorker" |> ignore
+    copyLauncherData "./Docker/ClusterKitSeed" |> ignore
+    buildDocker "clusterkit/worker" "Docker/ClusterKitWorker"
+    buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
+
+    copyWebContent "./ClusterKit.Monitoring/ClusterKit.Monitoring.Web" "./Docker/ClusterKitSeed/web/monitoring"
+    buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
+)
+
+Target "Proof" (fun _ ->
+    let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" "ClusterKit.Core"
+    let version = if nugetVersion.IsSome then (Fake.NuGetVersion.IncPatch nugetVersion.Value) else (SemVerHelper.parse "0.0.0")
+
+    trace (version.ToString())
+)
+
+Target "CleanDockerImages" (fun _ ->
+
+    let outputProcess line =
+        let parts = Regex.Split(line, "[\t ]+")
+        if ("<none>".Equals(parts.[0]) && parts.Length >= 3) then
+            let args = sprintf "rmi %s" parts.[2]
+            ExecProcess (fun info -> info.FileName <- "docker"; info.Arguments <- args) (TimeSpan.FromMinutes 30.0)
+                |> ignore
+
+    let lines = new ResizeArray<String>();
+    ExecProcessWithLambdas
+        (fun info -> info.FileName <- "docker"; info.Arguments <- "images")
+        (TimeSpan.FromMinutes 30.0)
+        true
+        (fun e -> failwith e)
+        (fun l -> lines.Add(l))
+        |> ignore
+
+    lines |> Seq.iter outputProcess
+)
+
+Target "PushPackages" (fun _ ->
+    let pushThirdPartyPackage (f: FileInfo) =
+            if (hasExt ".nupkg" f.FullName) then
+                if not (File.Exists (Path.Combine [|(Path.GetFullPath("./packageOut/")); f.Name|])) then
+                    pushPackage f.FullName
+
+    Fake.FileHelper.recursively
+            (fun d -> ())
+            pushThirdPartyPackage
+            (new DirectoryInfo(Path.GetFullPath("./packages")))
+
+    Directory.GetFiles(Path.GetFullPath("./packageOut"))
+        |> Seq.filter (hasExt ".nupkg")
+        |> Seq.iter pushPackage
+
 )
 
 "PreClean" ==> "Build"
