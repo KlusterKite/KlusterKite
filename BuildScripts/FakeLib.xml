@@ -11732,6 +11732,21 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains tasks to run [xUnit](https://github.com/xunit/xunit) v1 unit tests.
 </summary>
 </member>
+<member name="P:Fake.Testing.XUnit2.XUnit2Params.Method">
+<summary>
+ Run xUnit against a specific method
+</summary>
+</member>
+<member name="P:Fake.Testing.XUnit2.XUnit2Params.Class">
+<summary>
+ Run xUnit against a specific class
+</summary>
+</member>
+<member name="P:Fake.Testing.XUnit2.XUnit2Params.Namespace">
+<summary>
+ Run xUnit against a specific namespace
+</summary>
+</member>
 <member name="P:Fake.Testing.XUnit2.XUnit2Params.Wait">
 <summary>
  Waits for input after completion.
@@ -11923,6 +11938,9 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  - `ForceAppVeyor` - `false`
  - `Silent` - `false`
  - `Wait` - `false`
+ - `Namespace` - `None`
+ - `Class` - `None`
+ - `Method` - `None`
 </summary>
 </member>
 <member name="T:Fake.Testing.XUnit2">

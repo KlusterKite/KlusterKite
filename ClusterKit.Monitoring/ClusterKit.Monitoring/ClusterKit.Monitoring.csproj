@@ -77,24 +77,24 @@
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core, Version=0.0.0.77, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.77-master\lib\ClusterKit.Core.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Web, Version=0.0.0.68, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Web, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Web.0.0.0.68-master\lib\ClusterKit.Web.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Web.0.0.0.0-local\lib\ClusterKit.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Web.Client, Version=0.0.0.77, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Web.Client, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Web.Client.0.0.0.77-master\lib\ClusterKit.Web.Client.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Web.Client.0.0.0.0-local\lib\ClusterKit.Web.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Web.SignalR, Version=0.0.0.77, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClusterKit.Web.SignalR, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Web.SignalR.0.0.0.77-master\lib\ClusterKit.Web.SignalR.dll</HintPath>
+      <HintPath>..\..\packages\ClusterKit.Web.SignalR.0.0.0.0-local\lib\ClusterKit.Web.SignalR.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers, Version=2.4.1.555, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
@@ -178,10 +178,6 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces">
-      <HintPath>..\..\packages\Rx-Interfaces.2.3.0-beta2\lib\net46\System.Reactive.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
