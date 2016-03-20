@@ -42,7 +42,7 @@
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{}");
+        protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
         /// <summary>
         /// Registering DI components

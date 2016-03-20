@@ -62,7 +62,7 @@ namespace ClusterKit.Web.CRUDS
         /// </summary>
         /// <param name="request">Node template data</param>
         /// <returns>Updated node template</returns>
-        [HttpPost]
+        [HttpPut]
         [Route("")]
         public virtual async Task<TObject> Create(TObject request)
         {
@@ -87,7 +87,7 @@ namespace ClusterKit.Web.CRUDS
         /// <param name="id">Node template unique id</param>
         /// <returns>Execution task</returns>
         [HttpDelete]
-        [Route("")]
+        [Route("{id}/")]
         public virtual async Task Delete(TId id)
         {
             var result =
@@ -109,7 +109,7 @@ namespace ClusterKit.Web.CRUDS
         /// <param name="id">Node template unique id</param>
         /// <returns>Node template</returns>
         [HttpGet]
-        [Route("")]
+        [Route("{id}/")]
         public virtual async Task<TObject> Get(TId id)
         {
             var template =
@@ -139,7 +139,7 @@ namespace ClusterKit.Web.CRUDS
         /// <returns>
         /// list of node templates
         /// </returns>
-        [Route("list")]
+        [Route("")]
         [HttpGet]
         public virtual async Task<List<TObject>> GetList(int count = 100, int skip = 0)
         {
@@ -154,8 +154,8 @@ namespace ClusterKit.Web.CRUDS
         /// </summary>
         /// <param name="request">Node template data</param>
         /// <returns>Updated node template</returns>
-        [HttpPatch, HttpPut]
-        [Route("")]
+        [HttpPatch]
+        [Route("{id}/")]
         public virtual async Task<TObject> Update(TObject request)
         {
             var template =

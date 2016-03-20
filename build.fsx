@@ -248,9 +248,9 @@ Target "FinalBuildDocker" (fun _ -> ())
 
 // builds local packages and sends them to local cluster nuget server
 Target "FinalPushLocalPackages" (fun _ -> ())
-"SetVersion" ==> "PushLocalPackages"
-"FinalCreateNuGet" ==> "PushLocalPackages"
-"PushLocalPackages" ==> "PushLocalPackages"
+"SetVersion" ==> "FinalPushLocalPackages"
+"FinalCreateNuGet" ==> "FinalPushLocalPackages"
+"PushLocalPackages" ==> "FinalPushLocalPackages"
 
 // builds local packages and sends them to local cluster nuget server
 Target "FinalPushAllPackages" (fun _ -> ())

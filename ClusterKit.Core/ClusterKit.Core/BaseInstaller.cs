@@ -30,6 +30,7 @@ namespace ClusterKit.Core
     /// <summary>
     /// Base class to install ClusterKit plugin components
     /// </summary>
+    [UsedImplicitly]
     public abstract class BaseInstaller : IWindsorInstaller
     {
         /// <summary>
@@ -41,16 +42,19 @@ namespace ClusterKit.Core
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles node role functionality
         /// </summary>
+        [UsedImplicitly]
         protected const decimal PriorityClusterRole = 100M;
 
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles other plugins functionality
         /// </summary>
+        [UsedImplicitly]
         protected const decimal PrioritySharedLib = 10M;
 
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles unit tests
         /// </summary>
+        [UsedImplicitly]
         protected const decimal PriorityTest = 100M;
 
         /// <summary>

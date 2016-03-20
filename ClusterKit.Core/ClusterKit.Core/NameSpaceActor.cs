@@ -275,7 +275,7 @@ namespace ClusterKit.Core
                     singletonName,
                     pathName);
 
-            var cell = context.ActorOf(
+            context.ActorOf(
                 ClusterSingletonProxy.Props(
                     singletonManagerPath: singletonManagerPath,
                     settings:
@@ -284,7 +284,7 @@ namespace ClusterKit.Core
                             role,
                             actorConfig.GetTimeSpan("singleton-identification-interval", TimeSpan.FromSeconds(1), false),
                             actorConfig.GetInt("buffer-size", 2048))),
-                name: pathName) as LocalActorRef;
+                name: pathName);
         }
     }
 }
