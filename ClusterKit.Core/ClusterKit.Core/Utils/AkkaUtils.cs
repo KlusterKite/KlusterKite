@@ -65,24 +65,36 @@ namespace ClusterKit.Core.Utils
             return Convert.FromBase64String(serializedData).DeserializeFromAkka<T>(system);
         }
 
+        /// <summary>
+        /// Workaround of https://github.com/akkadotnet/akka.net/issues/1321 bug
+        /// </summary>
+        /// <param name="actorRef">Current actor reference</param>
+        /// <param name="system">Akka actor system</param>
+        /// <param name="childPath">Path to create router</param>
+        /// <returns>Configured router</returns>
         public static RouterConfig GetFromConfiguration(this IActorRef actorRef, ActorSystem system, string childPath)
         {
+            var actorPath = $"/{string.Join("/", actorRef.Path.Elements.Skip(1))}/{childPath}";
             var childConfig = system.Settings.Config.GetConfig("akka.actor.deployment")
-                ?.GetConfig($"/{string.Join("/", actorRef.Path.Elements.Skip(1))}/{childPath}");
+                ?.GetConfig(actorPath);
 
             if (childConfig == null)
             {
+                system.Log.Warning("{Type}: there is no router config for path {ActorPath}", typeof(AkkaUtils).Name, actorPath);
                 return RouterConfig.NoRouter;
             }
 
             string routerName = childConfig.GetString("router");
-            int numberOfInstances = childConfig.GetInt("nr-of-instances");
             //todo: @kantora - realize all router parameters and types
-
             switch (routerName)
             {
                 case "round-robin-pool":
-                    return new RoundRobinPool(numberOfInstances);
+                    system.Log.Info("{Type}: creating RoundRobinPool router for path {ActorPath}", typeof(AkkaUtils).Name, actorPath);
+                    return new RoundRobinPool(childConfig);
+
+                case "consistent-hashing-pool":
+                    system.Log.Info("{Type}: creating ConsistentHashingPool router for path {ActorPath}", typeof(AkkaUtils).Name, actorPath);
+                    return new ConsistentHashingPool(childConfig);
 
                 default:
                     return RouterConfig.NoRouter;

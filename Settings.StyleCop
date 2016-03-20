@@ -4,6 +4,9 @@
     <CollectionProperty Name="RecognizedWords">
       <Value>api</Value>
       <Value>akka</Value>
+      <Value>crud</Value>
+      <Value>dbset</Value>
+      <Value>ef</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
       <Value>serilog</Value>
@@ -11,8 +14,10 @@
       <Value>Owin</Value>
       <Value>postgres</Value>
       <Value>nginx</Value>
+      <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>ui</Value>
+      <Value>urls</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

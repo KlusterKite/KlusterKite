@@ -4,6 +4,9 @@ namespace ClusterKit.Web.NginxConfigurator
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Nginx description of host configuration
+    /// </summary>
     public class HostConfiguration : IEnumerable<ServiceConfiguration>
     {
         private readonly Dictionary<string, ServiceConfiguration> services = new Dictionary<string, ServiceConfiguration>();

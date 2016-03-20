@@ -102,6 +102,36 @@
  Provides functions and operators to deal with FAKE targets and target dependencies.
 </summary>
 </member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.Type">
+<summary>
+ Type of the artifact
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.DeploymentName">
+<summary>
+ Deployment name
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.FileName">
+<summary>
+ File name to display in the artifact tab
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.PushArtifactParams.Path">
+<summary>
+ The full local path to the artifact
+</summary>
+</member>
+<member name="T:Fake.AppVeyor.PushArtifactParams">
+<summary>
+ AppVeyor parameters for artifact push
+</summary>
+</member>
+<member name="T:Fake.AppVeyor.ArtifactType">
+<summary>
+ Type of artifact that is pushed
+</summary>
+</member>
 <member name="T:Fake.AppVeyor.TestResultsType">
 <summary>
  Union type representing the available test result formats accepted by AppVeyor.
@@ -262,9 +292,34 @@
  AppVeyor environment variables as [described](http://www.appveyor.com/docs/environment-variables)
 </summary>
 </member>
+<member name="M:Fake.AppVeyor.PushArtifacts(System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Push multiple artifacts
+</summary>
+</member>
+<member name="M:Fake.AppVeyor.PushArtifact(Microsoft.FSharp.Core.FSharpFunc{Fake.AppVeyor.PushArtifactParams,Fake.AppVeyor.PushArtifactParams})">
+<summary>
+ Push an artifact
+</summary>
+</member>
+<member name="P:Fake.AppVeyor.defaultPushArtifactParams">
+<summary>
+ AppVeyor artifact push default parameters
+</summary>
+</member>
+<member name="M:Fake.AppVeyor.SetVariable(System.String,System.String)">
+<summary>
+ Set environment variable
+</summary>
+</member>
 <member name="M:Fake.AppVeyor.UploadTestResultsXml(Fake.AppVeyor.TestResultsType,System.String)">
 <summary>
  Uploads all the test results &quot;.xml&quot; files in a directory to make them visible in Test tab of the build console.
+</summary>
+</member>
+<member name="M:Fake.AppVeyor.UploadTestResultsFile(Fake.AppVeyor.TestResultsType,System.String)">
+<summary>
+ Uploads a test result file to make them visible in Test tab of the build console.
 </summary>
 </member>
 <member name="M:Fake.AppVeyor.FinishTestCase(System.String,System.String,System.TimeSpan)">
@@ -1845,7 +1900,7 @@
  Contains functions which allows to deal with a cache.
 </summary>
 </member>
-<member name="M:Fake.ChangeWatcher.WatchChanges(Microsoft.FSharp.Core.FSharpFunc{System.Collections.Generic.IEnumerable{Fake.ChangeWatcher.FileChange},Microsoft.FSharp.Core.Unit},Fake.FileSystem.FileIncludes)">
+<member name="M:Fake.ChangeWatcher.WatchChangesWithOptions(Fake.ChangeWatcher.WatchChangesOption,Microsoft.FSharp.Core.FSharpFunc{System.Collections.Generic.IEnumerable{Fake.ChangeWatcher.FileChange},Microsoft.FSharp.Core.Unit},Fake.FileSystem.FileIncludes)">
 <summary>
  Watches the for changes in the matching files.
  Returns an IDisposable which allows to dispose all FileSystemWatchers.
@@ -1857,12 +1912,12 @@
  ## Sample
 
      Target &quot;Watch&quot; (fun _ -&gt;
-         use watcher = !! &quot;c:/projects/watchDir/*.txt&quot; |&gt; WatchChanges (fun changes -&gt; 
+         use watcher = !! &quot;c:/projects/watchDir/*.txt&quot; |&gt; WatchChanges (fun changes -&gt;
              // do something
          )
-     
+
          System.Console.ReadLine() |&gt; ignore
-     
+
          watcher.Dispose() // if you need to cleanup the watches.
      )
 
@@ -1871,6 +1926,465 @@
 <member name="T:Fake.ChangeWatcher">
 <summary>
  This module contains helpers to react to file system events.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPushParams.NonInteractive">
+<summary>
+ Do not prompt for user input or confirmations. Default `true`.
+ Equivalent to the `-y` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPushParams.AdditionalArgs">
+<summary>
+ A character string containing additional arguments to give to choco.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPushParams.ToolPath">
+<summary>
+ The location of the choco executable. Automatically found if null or empty.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPushParams.Timeout">
+<summary>
+ The choco execution timeout.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPushParams.ApiKey">
+<summary>
+ The api key for the source. If not specified (and not local file source), does a lookup. 
+ If not specified and one is not found for an https source, push will fail.
+ Equivalent to the `--apikey &lt;apikey&gt;` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPushParams.Source">
+<summary>
+ The source we are pushing the package to. Default: &quot;https://chocolatey.org/&quot;
+ Equivalent to the `--source &lt;source&gt;` option.
+</summary>
+</member>
+<member name="T:Fake.Choco.ChocoPushParams">
+<summary>
+ The choco push parameter type.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.UninstallPath">
+<summary>
+ Either:
+
+ - For zip: the zip filename originally installed
+ - For exe or msi: the full path to the native uninstaller to run
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.InstallerType">
+<summary>
+ Installer type. Default: Zip.
+ Used to create chocolateyInstall.ps1 and/or chocolateyUninstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.UnzipLocation">
+<summary>
+ Unzip location for zip package. Default: Chocolatey install folder.
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.SilentArgs">
+<summary>
+ Silent args for the installer.
+ Used to create chocolateyInstall.ps1 and/or chocolateyUninstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.PackageDownload64Url">
+<summary>
+ Url pointing to the installer (exe, msi, zip) of the 64 bits version of the package.
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.PackageDownloadUrl">
+<summary>
+ Url pointing to the installer (exe, msi, zip) of the package.
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.DevelopmentDependency">
+<summary>
+ Boolean specifying whether the package will be marked as a [development-only dependency](https://docs.nuget.org/Release-Notes/NuGet-2.7#development-only-dependencies). Default: false.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.ProjectSourceUrl">
+<summary>
+ Url pointing to the location of the underlying software source.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.BugTrackerUrl">
+<summary>
+ Url pointing to the location where issues and tickets can be accessed.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.MailingListUrl">
+<summary>
+ Url pointing to the forum or email list group for the software.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.DocsUrl">
+<summary>
+ Url pointing to the location of the wiki or docs of the software.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.PackageSourceUrl">
+<summary>
+ Url to the chocolatey package repository, not the software (unless they are the same).
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.RequireLicenseAcceptance">
+<summary>
+ True if the software needs license acceptance. Default: false.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.LicenseUrl">
+<summary>
+ Url to the license of the software.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.IconUrl">
+<summary>
+ Url to the icon of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.ProjectUrl">
+<summary>
+ Url to the software.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Files">
+<summary>
+ Files of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.FrameworkAssemblies">
+<summary>
+ Framework assemblies of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.ReferencesByFramework">
+<summary>
+ References by framework of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.References">
+<summary>
+ References of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.DependenciesByFramework">
+<summary>
+ Dependencies by framework of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Dependencies">
+<summary>
+ Dependencies of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.OutputDir">
+<summary>
+ Output directory for the files (nuspec, chocolateyInstall.ps1 and chocolateyUninstall.ps1) creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Copyright">
+<summary>
+ Copyright of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.ReleaseNotes">
+<summary>
+ Release notes of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Tags">
+<summary>
+ Tags of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Description">
+<summary>
+ Description of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Summary">
+<summary>
+ Summary of the package.
+ Used for the nuspec, chocolateyInstall.ps1 and chocolateyUninstall.ps1 creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Title">
+<summary>
+ Title of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.PackageId">
+<summary>
+ Id of the package. Should be lowercase, not contains weird chars and use dash (-) instead of spaces.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Owners">
+<summary>
+ Owners of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Authors">
+<summary>
+ Authors of the package.
+ Used for the nuspec creation.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.NonInteractive">
+<summary>
+ Do not prompt for user input or confirmations. Default `true`.
+ Equivalent to the `-y` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.AdditionalArgs">
+<summary>
+ A character string containing additional arguments to give to choco.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.ToolPath">
+<summary>
+ The location of the choco executable. Automatically found if null or empty.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Timeout">
+<summary>
+ The choco execution timeout.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Version">
+<summary>
+ The version you would like to insert into the package.
+ Equivalent to the `--version &lt;version&gt;` option.
+</summary>
+</member>
+<member name="T:Fake.Choco.ChocoPackParams">
+<summary>
+ The choco pack parameter type.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.NonInteractive">
+<summary>
+ Do not prompt for user input or confirmations. Default `true`.
+ Equivalent to the `-y` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.AdditionalArgs">
+<summary>
+ A character string containing additional arguments to give to choco.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.ToolPath">
+<summary>
+ The location of the choco executable. Automatically found if null or empty.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.Timeout">
+<summary>
+ The choco execution timeout.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.Password">
+<summary>
+ Password - the user&apos;s password to the source.
+ Equivalent to the `--password &lt;password&gt;` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.User">
+<summary>
+ User - used with authenticated feeds.
+ Equivalent to the `--user &lt;user&gt;` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.SkipPowershell">
+<summary>
+ Skip Powershell - Do not run chocolateyInstall.ps1. Default `false`.
+ Equivalent to the `--skippowershell` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.OverrideArgs">
+<summary>
+ Should install arguments be used exclusively without appending to current package passed arguments? Default `false`.
+ Equivalent to the `--overrideargs` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.InstallArgs">
+<summary>
+ Install Arguments to pass to the native installer in the package.
+ Equivalent to the `--installargs &lt;args&gt;` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.ForceX86">
+<summary>
+ Force x86 (32bit) installation on 64 bit systems. Default `false`.
+ Equivalent to the `--forcex86` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.Source">
+<summary>
+ The source to find the package(s) to install.
+ Equivalent to the `--source &lt;source&gt;` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.PackageParameters">
+<summary>
+ Parameters to pass to the package.
+ Equivalent to the `--params &lt;params&gt;` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.Prerelease">
+<summary>
+ Include prerelease. Default `false`.
+ Equivalent to the `--pre` option.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallParams.Version">
+<summary>
+ Version of the package
+ Equivalent to the `--version &lt;version&gt;` option.
+</summary>
+</member>
+<member name="T:Fake.Choco.ChocoInstallParams">
+<summary>
+ The choco install parameter type.
+</summary>
+</member>
+<member name="M:Fake.Choco.Push(Microsoft.FSharp.Core.FSharpFunc{Fake.Choco.ChocoPushParams,Fake.Choco.ChocoPushParams},System.String)">
+<summary>
+ Call choco to [push](https://github.com/chocolatey/choco/wiki/CommandsPush) a package
+ ## Parameters
+  - `setParams` - Function used to manipulate the default choco parameters. See `ChocoPushParams`
+  - `nupkgPath` - path to the .nupkg to push
+ ## Sample usage
+     
+     Target &quot;ChocoPush&quot; (fun _ -&gt;
+         &quot;pretzel.0.5.0.nupkg&quot; |&gt; Choco.Push (fun p -&gt; { p with ApiKey = &quot;123-123123-123&quot; })
+     )
+</summary>
+</member>
+<member name="M:Fake.Choco.PackFromTemplate(Microsoft.FSharp.Core.FSharpFunc{Fake.Choco.ChocoPackParams,Fake.Choco.ChocoPackParams},System.String)">
+<summary>
+ Call choco to [pack](https://github.com/chocolatey/choco/wiki/CommandsPack) a package
+ ## Parameters
+  - `setParams` - Function used to manipulate the default choco parameters. See `ChocoPackParams`
+  - `nuspecPath` - path to the .nuspec to pack
+ ## Sample usage
+     
+     Target &quot;ChocoPack&quot; (fun _ -&gt;
+         &quot;pretzel.nuspec&quot; |&gt; Choco.Pack (fun p -&gt; { p with Version = &quot;0.5.0&quot; })
+     )
+</summary>
+</member>
+<member name="M:Fake.Choco.Pack(Microsoft.FSharp.Core.FSharpFunc{Fake.Choco.ChocoPackParams,Fake.Choco.ChocoPackParams})">
+<summary>
+ Call choco to [pack](https://github.com/chocolatey/choco/wiki/CommandsPack) a package and create .nuspec, chocolateyInstall.ps1 and chocolateyUninstall.ps1 if informations are specified
+ ## Parameters
+  - `setParams` - Function used to manipulate the default choco parameters. See `ChocoPackParams`
+ ## Sample usage
+     
+     Target &quot;ChocoPack&quot; (fun _ -&gt;
+         Choco.Pack (fun p -&gt; { p with Version = &quot;0.5.0&quot;; ... })
+     )
+</summary>
+</member>
+<member name="M:Fake.Choco.Install(Microsoft.FSharp.Core.FSharpFunc{Fake.Choco.ChocoInstallParams,Fake.Choco.ChocoInstallParams},System.String)">
+<summary>
+ Call choco to [install](https://github.com/chocolatey/choco/wiki/CommandsInstall) a package
+ ## Parameters
+  - `setParams` - Function used to manipulate the default choco parameters. See `ChocoInstallParams`
+  - `packages` - Names of packages, path to packages.config, .nuspec or .nupkg to install
+ ## Sample usage
+     
+     Target &quot;ChocoInstall&quot; (fun _ -&gt;
+         &quot;pretzel&quot; |&gt; Choco.Install (fun p -&gt; { p with Version = &quot;0.4.0&quot; })
+     )
+</summary>
+</member>
+<member name="P:Fake.Choco.IsAvailable">
+<summary>
+ True if choco is available (only on windows)
+ ## Sample usage
+     &quot;Build&quot; =?&gt; (&quot;ChocoInstall&quot;, Choco.IsAvailable)
+</summary>
+</member>
+<member name="M:Fake.Choco.createNuSpec(Fake.Choco.ChocoPackParams,System.String)">
+<summary>
+ [omit]
+ Create nuspec from data
+</summary>
+</member>
+<member name="M:Fake.Choco.createNuSpecFromTemplate(Fake.Choco.ChocoPackParams,System.IO.FileInfo,System.String)">
+<summary>
+ [omit]
+ Create nuspec from template
+</summary>
+</member>
+<member name="M:Fake.Choco.callChoco(System.String,System.String,System.TimeSpan)">
+<summary>
+ [omit]
+ Invokes chocolatey with the specified arguments
+ ## Parameters
+  - `exePath` - The location of choco executable. Automatically found if null or empty.
+  - `args` - The arguments given to the executable.
+  - `timeout` - The choco execution timeout
+</summary>
+</member>
+<member name="P:Fake.Choco.FindExe">
+<summary>
+ [omit]
+ Tries to find the specified choco executable:
+
+ 1. In the `&lt;ProgramData&gt;\chocolatey\bin` directory
+ 2. In the `PATH` environment variable.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPushDefaults">
+<summary>
+ The default option set given to choco pack.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackDefaults">
+<summary>
+ The default option set given to choco pack.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoInstallDefaults">
+<summary>
+ The default option set given to choco install.
+</summary>
+</member>
+<member name="T:Fake.Choco">
+<summary>
+ Contains tasks which allow to call [Chocolatey](https://chocolatey.org)
 </summary>
 </member>
 <member name="M:Fake.ConfigurationHelper.applyXslOnConfig(System.String,System.String)">
@@ -7266,6 +7780,247 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains helper functions and task which allow to inspect, create and publish [NuGet](https://www.nuget.org/) packages with [Paket](http://fsprojects.github.io/Paket/index.html).
 </summary>
 </member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.IncludePDBs">
+<summary>
+ With the `IncludePDBs` switch you can tell `paket` to pack pdbs into the package.
+ this only works for paket.template files of type &apos;Project&apos;.
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.DevelopmentDependency">
+<summary>
+ If set to `true` this will tell `nuget`/`paket` that this is a development dependency
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.RequireLicenseAcceptance">
+<summary>
+ If set to `true` this will tell `nuget`/`paket` to prompt the user for
+ the acceptance of the provided license
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.ExcludedDependencies">
+<summary>
+ A list of excluded dependencies
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Dependencies">
+<summary>
+ A list of dependencies to other packages
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.FrameworkAssemblies">
+<summary>
+ A list of referenced framework assemblies
+ if omitted all used Framework assemblies will be used by `paket`
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.References">
+<summary>
+ A list of references
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Files">
+<summary>
+ The included or excluded files (use this if the `TemplateType` is `File`)
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Tags">
+<summary>
+ a list of tags
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Copyright">
+<summary>
+ the copyright information
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.IconUrl">
+<summary>
+ URL to an icon
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.ProjectUrl">
+<summary>
+ URL to the where the project of the package is hosted
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.LicenseUrl">
+<summary>
+ URL to the license of the package
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Language">
+<summary>
+ The package language
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Summary">
+<summary>
+ a short summary (line by line)
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.ReleaseNotes">
+<summary>
+ the release notes (line by line)
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Owners">
+<summary>
+ A list of package owners
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Authors">
+<summary>
+ a list of authors for the nuget package.
+ If omitted, `paket`will use reflection to obtain the value of the `AssemblyCompanyAttribute`.
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Title">
+<summary>
+ The title of the package
+ If omitted, `paket` will use reflection to obtain the value of the `AssemblyTitleAttribute`.
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Description">
+<summary>
+ The package description
+ If omitted, `paket` will use reflection to obtain the value of the `AssemblyDescriptionAttribute`.
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Version">
+<summary>
+ The package version.
+ If omitted, `paket` will use reflection to obtain the value of the `AssemblyInformationalVersionAttribute` or if that is missing the `AssemblyVersionAttribute`.
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.Id">
+<summary>
+ The NuGet Package ID
+ If omitted, `paket` will use reflection to determine the assembly name.
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.TemplateType">
+<summary>
+ The type of the template (`File` or `Project`)
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.PaketTemplateParams.TemplateFilePath">
+<summary>
+ The file path to the `paket.template` file
+ if omitted, a `paket.template` file will be created in the current directory
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketTemplateParams">
+<summary>
+ Contains the different parameters to create a paket.template file
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketDependencyVersionInfo.AnyVersion">
+<summary>
+ no explicit version
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketDependencyVersionInfo.GreaterOrEqual">
+<summary>
+ For example &gt;= 2.0
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketDependencyVersionInfo.GreaterOrEqualSafe">
+<summary>
+ For example ~&gt; 2.0
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketDependencyVersion.LOCKEDVERSION">
+<summary>
+ Use the currently locked version as dependency
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketDependencyVersion.CURRENTVERSION">
+<summary>
+ Use the currently loaded version as dependency
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketDependencyVersion.Version">
+<summary>
+ A specific version string
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketFileInfo.Exclude">
+<summary>
+ Explicitely exclude a file
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate.PaketFileInfo.Include">
+<summary>
+ Include a file and store it into a targed
+</summary>
+</member>
+<member name="M:Fake.PaketTemplate.PaketTemplate(Microsoft.FSharp.Core.FSharpFunc{Fake.PaketTemplate.PaketTemplateParams,Fake.PaketTemplate.PaketTemplateParams})">
+<summary>
+ Creates a paket.template file with the given filename
+ Will fail if the file could not be written
+
+ ## Parameters
+  - `setParams` - Function used to manipulate the default `PaketTemplateParams` value
+
+ ## Sample usage
+
+    Target &quot;Create Paket Template&quot; (fun _ -&gt;
+       PaketTemplate (fun p -&gt;
+            { p with
+                TemplateFilePath = Some &quot;./deploytemp/paket.template&quot;
+                Id = Some &quot;My.New.Package&quot;
+                Version = Some &quot;0.0.1-alpha&quot;
+                Authors = [&quot;Me&quot;; &quot;You&quot;; &quot;Someone Other&quot;]
+                Files = [ Include (&quot;./**/*.dll&quot;, &quot;/lib/dlls&quot;)
+                          Exclude &quot;./Foo/bar.dll&quot;
+                          Include (&quot;./*.jpg&quot;, &quot;/images&quot;) ]
+                Dependencies = [ &quot;Paket1.FOO&quot;, AnyVersion
+                                 &quot;Paket2.BAR&quot;, GreaterOrEqual CURRENTVERSION
+                                 &quot;Paket3.BAZ&quot;, GreaterOrEqualSafe LOCKEDVERSION
+                                 &quot;Paket4.BOO&quot;, GreaterOrEqual (Version &quot;1.2.3&quot;) ]
+            }
+        )
+    )
+</summary>
+</member>
+<member name="P:Fake.PaketTemplate.DefaultPaketTemplateParams">
+<summary>
+ The default parameters for the generation of the `paket.template`
+
+ ## Defaults
+
+   - TemplateFilePath - `None`
+   - TemplateType - `Project`
+   - Id - `None`
+   - Version - `None`
+   - Description - `None`
+   - Title - `None`
+   - Authors - `Empty list`
+   - Owners - `Empty list`
+   - ReleaseNotes - `Empty list`
+   - Summary - `Empty list`
+   - Language - `None`
+   - LicenseUrl - `None`
+   - ProjectUrl - `None`
+   - IconUrl - `None`
+   - Copyright - `None`
+   - Tags - `Empty list`
+   - Files - `Empty list`
+   - References - `Empty list`
+   - FrameworkAssemblies - `Empty list`
+   - Dependencies - `Empty list`
+   - ExcludedDependencies - `Empty list`
+   - RequireLicenseAcceptance - `None`
+   - DevelopmentDependency - `None`
+   - IncludePDBs - `None`
+</summary>
+</member>
+<member name="T:Fake.PaketTemplate">
+<summary>
+ Contains helper functions and task which allow it to generate a paket.template
+ file for [Paket](http://fsprojects.github.io/Paket/index.html)
+</summary>
+</member>
 <member name="M:Fake.PermissionsHelper.requiresAdmin``1(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,``0})">
 <summary>
  Checks that the current user has administrator permissions - otherwise it throws an exception.
@@ -8964,6 +9719,216 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  can not be found, the dev certificate will be used.
 </summary>
 </member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationParams.Unfurl_Links">
+<summary>
+ Whether to force inline unfurling of attached links. Default value: false.
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationParams.Icon_Emoji">
+<summary>
+ The emoji to be displayed with the message. Default value: Specified in your slack Webhook configuration.
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationParams.Icon_URL">
+<summary>
+ The icon to be displayed with the message. Default value: Specified in your slack Webhook configuration.
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationParams.Channel">
+<summary>
+ Channel to which the message will be posted. Default value: Specified in your Slack Webhook configuration.
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationParams.From">
+<summary>
+ Name the message will appear to be sent from. Default value: Specified in your Slack Webhook configuration.
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationParams.Text">
+<summary>
+ (Required) The message body
+</summary>
+</member>
+<member name="T:Fake.SlackNotificationHelper.SlackNotificationParams">
+<summary>
+ The Slack notification parameter type
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams.Fields">
+<summary>
+ Text to be displayed as a table below the message
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams.Color">
+<summary>
+ Color of the attachment text. Can be hex-value(e.g. &quot;#AABBCC&quot;) or one of &quot;&apos;good&apos;, &apos;warning&apos;, &apos;danger&apos;.
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams.Pretext">
+<summary>
+ Text that should appear above the formatted data
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams.Text">
+<summary>
+ Text that should appear within the attachment
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams.Title_Link">
+<summary>
+ Content to which the title should link
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams.Title">
+<summary>
+ The title of the attachment
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams.Fallback">
+<summary>
+ (Required) Text summary of the attachment that is shown by clients that understand attachments but choose not to show them
+</summary>
+</member>
+<member name="T:Fake.SlackNotificationHelper.SlackNotificationAttachmentParams">
+<summary>
+ The Slack notification attachment parameter type
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentFieldParams.Short">
+<summary>
+ Whether the value is short enough to be displayed side-by-side with other values
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentFieldParams.Value">
+<summary>
+ (Required) Text value of the field
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentFieldParams.Title">
+<summary>
+ (Required) The field title
+</summary>
+</member>
+<member name="T:Fake.SlackNotificationHelper.SlackNotificationAttachmentFieldParams">
+<summary>
+ The Slack notification attachment field parameter type
+</summary>
+</member>
+<member name="M:Fake.SlackNotificationHelper.SlackNotification(System.String,Microsoft.FSharp.Core.FSharpFunc{Fake.SlackNotificationHelper.SlackNotificationParams,Fake.SlackNotificationHelper.SlackNotificationParams})">
+<summary>
+ Sends a notification to a Slack Channel
+ ## Parameters
+  - `webhookURL` - The Slack webhook URL
+  - `setParams` - Function used to override the default notification parameters
+</summary>
+</member>
+<member name="M:Fake.SlackNotificationHelper.SerializeData``1(``0)">
+<summary>
+ [omit]
+</summary>
+</member>
+<member name="M:Fake.SlackNotificationHelper.ValidateParams(System.String,Fake.SlackNotificationHelper.SlackNotificationParams)">
+<summary>
+ [omit]
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.lowerCaseContractResolver">
+<summary>
+ [omit]
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentFieldDefaults">
+<summary>
+ The default parameters for Slack notification attachment fields
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationAttachmentDefaults">
+<summary>
+ The default parameters for Slack notification attachments
+</summary>
+</member>
+<member name="P:Fake.SlackNotificationHelper.SlackNotificationDefaults">
+<summary>
+ The default Slack notification parameters
+</summary>
+</member>
+<member name="T:Fake.SlackNotificationHelper">
+<summary>
+ Contains a task to send notification messages to a [Slack](https://slack.com/) webhook
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.Config">
+<summary>
+ Read settings from configuration file
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.Settings">
+<summary>
+ Individual global settings for SonarQube
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.Version">
+<summary>
+ Version number of the project
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.Name">
+<summary>
+ Name of the project
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.Key">
+<summary>
+ Key to identify the sonar qube project
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeParams.ToolsPath">
+<summary>
+ FileName of the sonar qube runner exe. 
+</summary>
+</member>
+<member name="T:Fake.SonarQubeHelper.SonarQubeParams">
+<summary>
+ Parameter type to configure the sonar qube runner.
+</summary>
+</member>
+<member name="T:Fake.SonarQubeHelper.SonarQubeCall">
+<summary>
+ The supported commands of Sonar Qube. It is called with Begin before compilation, and End after compilation.
+</summary>
+</member>
+<member name="M:Fake.SonarQubeHelper.SonarQube(Fake.SonarQubeHelper.SonarQubeCall,Microsoft.FSharp.Core.FSharpFunc{Fake.SonarQubeHelper.SonarQubeParams,Fake.SonarQubeHelper.SonarQubeParams})">
+<summary>
+ This task to can be used to run [Sonar Qube](http://conarqube.org/) on a project.
+ ## Parameters
+
+  - `call` - Begin or End, to start analysis or finish it
+  - `setParams` - Function used to overwrite the SonarQube default parameters.
+
+ ## Sample
+   SonarQube Begin (fun p -&gt;
+    {p with
+      Key = &quot;MyProject&quot;
+      Name = &quot;MainTool&quot;
+      Version = &quot;1.0 })
+
+</summary>
+</member>
+<member name="M:Fake.SonarQubeHelper.SonarQubeCall(Fake.SonarQubeHelper.SonarQubeCall,Fake.SonarQubeHelper.SonarQubeParams)">
+<summary>
+ Execute the external msbuild runner of Sonar Qube. Parameters are fiven to the command line tool as required.
+</summary>
+</member>
+<member name="P:Fake.SonarQubeHelper.SonarQubeDefaults">
+<summary>
+ SonarQube default parameters - tries to locate MSBuild.SonarQube.exe in any subfolder.
+</summary>
+</member>
+<member name="T:Fake.SonarQubeHelper">
+<summary>
+ Contains a task to run the msbuild runner of [Sonar Qube analyzer](http://sonarqube.org).
+</summary>
+</member>
 <member name="T:Fake.SpecFlowHelper.SpecFlowParams">
 <summary>
  SpecFlow execution parameter type.
@@ -10408,6 +11373,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Default: [TestRunnerErrorLevel](fake-unittestcommon-testrunnererrorlevel.html).Error
 </summary>
 </member>
+<member name="P:Fake.Testing.NUnit3.NUnit3Params.Labels">
+<summary>
+ Specify whether to write test case names to the output.
+</summary>
+</member>
 <member name="P:Fake.Testing.NUnit3.NUnit3Params.TeamCity">
 <summary>
  Turns on use of TeamCity service messages.
@@ -10522,6 +11492,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  The NUnit 3 Console Parameters type. FAKE will use [NUnit3Defaults](fake-testing-nunit3.html) for values not provided.
 
  For reference, see: [NUnit3 command line options](https://github.com/nunit/nunit/wiki/Console-Command-Line)
+</summary>
+</member>
+<member name="T:Fake.Testing.NUnit3.LabelsLevel">
+<summary>
+ The --labels option in NUnit3 console runner. Specify whether to write test case names to the output.
 </summary>
 </member>
 <member name="T:Fake.Testing.NUnit3.NUnit3ErrorLevel">
@@ -10757,6 +11732,21 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains tasks to run [xUnit](https://github.com/xunit/xunit) v1 unit tests.
 </summary>
 </member>
+<member name="P:Fake.Testing.XUnit2.XUnit2Params.Method">
+<summary>
+ Run xUnit against a specific method
+</summary>
+</member>
+<member name="P:Fake.Testing.XUnit2.XUnit2Params.Class">
+<summary>
+ Run xUnit against a specific class
+</summary>
+</member>
+<member name="P:Fake.Testing.XUnit2.XUnit2Params.Namespace">
+<summary>
+ Run xUnit against a specific namespace
+</summary>
+</member>
 <member name="P:Fake.Testing.XUnit2.XUnit2Params.Wait">
 <summary>
  Waits for input after completion.
@@ -10948,6 +11938,9 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  - `ForceAppVeyor` - `false`
  - `Silent` - `false`
  - `Wait` - `false`
+ - `Namespace` - `None`
+ - `Class` - `None`
+ - `Method` - `None`
 </summary>
 </member>
 <member name="T:Fake.Testing.XUnit2">

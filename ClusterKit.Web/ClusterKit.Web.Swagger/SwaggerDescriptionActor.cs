@@ -29,8 +29,8 @@ namespace ClusterKit.Web.Swagger
         /// </summary>
         public SwaggerDescriptionActor()
         {
-            var publishDocUrl = Context.System.Settings.Config.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", " /swagger");
-            var publishUiUrl = Context.System.Settings.Config.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", " /swagger/ui");
+            var publishDocUrl = Context.System.Settings.Config.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", "swagger");
+            var publishUiUrl = Context.System.Settings.Config.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", "swagger/ui");
 
             this.description = new SwaggerPublishDescription
             {

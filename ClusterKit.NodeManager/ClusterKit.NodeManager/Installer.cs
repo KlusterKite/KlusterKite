@@ -10,6 +10,7 @@
     using Castle.Windsor;
 
     using ClusterKit.Core;
+    using ClusterKit.NodeManager.WebApi;
 
     using JetBrains.Annotations;
 
@@ -23,7 +24,7 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => PriorityClasterRole;
+        protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
 
         /// <summary>
         /// Should check the config and environment for possible erorrs.
@@ -35,10 +36,16 @@
         /// </exception>
         public override void PreCheck(Config config)
         {
-            var connectionString = config.GetString("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString");
+            var connectionString = config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new ConfigurationException("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString is not defined");
+                throw new ConfigurationException($"{NodeManagerActor.ConfigConnectionStringPath} is not defined");
+            }
+
+            var databaseName = config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
+            if (string.IsNullOrEmpty(databaseName))
+            {
+                throw new ConfigurationException($"{NodeManagerActor.ConfigDatabaseNamePath} is not defined");
             }
         }
 
@@ -63,6 +70,8 @@
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+
+            container.Register(Classes.From(typeof(NodeTemplatesRestController)).Pick().LifestyleScoped());
         }
     }
 }

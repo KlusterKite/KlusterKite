@@ -69,7 +69,12 @@ namespace ClusterKit.Build
             /// <summary>
             /// Project contains xunit tests
             /// </summary>
-            XUnitTests = 2
+            XUnitTests = 2,
+
+            /// <summary>
+            /// Project just need to be built and nothing else
+            /// </summary>
+            SimpleBuild = 3
         }
 
         /// <summary>

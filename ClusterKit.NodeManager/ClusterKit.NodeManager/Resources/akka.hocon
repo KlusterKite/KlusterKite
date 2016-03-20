@@ -1,30 +1,56 @@
- {
- 	ClusterKit {
+{
+	ClusterKit {
 
- 		NodeManager {
- 			//ConfigurationDatabaseConnectionString = ""
- 		}
+		NodeManager {
+			//ConfigurationDatabaseConnectionString = ""
+                        ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
+                        FullClusterWaitTimeout = 60s // In case of cluster is full, timespan that new node candidate will repeat join request
+                        NewNodeJoinTimeout = 30s // After configuration request, it is assumed that new node of template shuld be up soon, and this is taken into account on subsequient configuration templates. This is timeout, after it it is supposed that something have gone wrong and that request is obsolete.
+                        NewNodeRequestDescriptionNotificationTimeout = 10s
+                        NewNodeRequestDescriptionNotificationMaxRequests = 10
+                        DefaultNugetFeeds {
+                                //privateFeed {
+                                //        address = "http://private-nuget-server/feed/"
+                                //        type = private
+                                //}
+                                //publicFeed {
+                                //        address = "http://public-nuget-server/feed/"
+                                //        type = public
+                                //}
+                        }
 
- 		Web {
- 			Services {
- 				//ServiceName { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
- 				//	Port = 8080 // current node listening port for server access
- 				//	PublicHostName = default //public host name of this service. It doesn't supposed (but is not prohibited) that this should be real public service hostname. It's just used to distinguish services with identical url paths to be correctly published on frontend web servers. Real expected hostname should be configured in NginxConfigurator or similar publisher
- 				//	Route = /directory/sub //route (aka directory) path to service
- 				//	LocalHostName = $host //local hostname that proxy should path. This should be used to support virtual hosting inside single node
- 				//}
+		}
 
- 			}
- 		}
- 	}
- 	akka.actor.deployment {
- 		 /NodeManager {
-            IsNameSpace = true
+		Web {
+			Services {
+				NodeManager { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
+					Port = 8080 // current node listening port for server access
+					PublicHostName = default //public host name of this service. It doesn't supposed (but is not prohibited) that this should be real public service hostname. It's just used to distinguish services with identical url paths to be correctly published on frontend web servers. Real expected hostname should be configured in NginxConfigurator or similar publisher
+					Route = /nodemanager //route (aka directory) path to service
+				//	LocalHostName = $host //local hostname that proxy should path. This should be used to support virtual hosting inside single node
+				}
+
+			}
+		}
+	}
+
+
+        akka.actor.deployment {
+        
+                /NodeManager {
+                        IsNameSpace = true
+                }
+
+                /NodeManager/Manager {
+                        actor-type = Singleton
+                        singleton-name = NodeManager
+                        singleton-node-role = NodeManager     
+                        type = "ClusterKit.NodeManager.NodeManagerActor, ClusterKit.NodeManager"       
+                }
+
+                /NodeManager/Manager/NodeManager/workers {
+                        router = consistent-hashing-pool
+                        nr-of-instances = 5                                                    
+                } 
         }
-
-        ///Web/Descriptor {
-            //type = "ClusterKit.Web.Descriptor.WebDescriptorActor, ClusterKit.Web.Descriptor"
-        //}
-
- 	}
- }
+}

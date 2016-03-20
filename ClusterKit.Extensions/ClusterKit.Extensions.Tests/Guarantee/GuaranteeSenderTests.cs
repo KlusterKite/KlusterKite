@@ -57,7 +57,8 @@ namespace ClusterKit.Extensions.Tests.Guarantee
 
             this.ActorOf(() => new TestActorForwarder(this.TestActor), "testReceiver");
 
-            var actor = this.ActorOfAsTestActorRef<GuaranteeSenderActor>(
+            var
+                actor = this.ActorOfAsTestActorRef<GuaranteeSenderActor>(
                 this.Sys.DI().Props<GuaranteeSenderActor>().WithDispatcher("ClusterKit.test-dispatcher"),
                 "testsender");
 

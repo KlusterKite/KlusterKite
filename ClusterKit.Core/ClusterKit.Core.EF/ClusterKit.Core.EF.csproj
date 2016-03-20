@@ -136,11 +136,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseConnectionManager.cs" />
+    <Compile Include="BaseCrudActor.cs" />
+    <Compile Include="BaseCrudActorWithNotifications.cs" />
     <Compile Include="BaseEntityFrameworkInstaller.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdateMessage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ClusterKit.Core.Rest\ClusterKit.Core.Rest.csproj">
+      <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
+      <Name>ClusterKit.Core.Rest</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Core\ClusterKit.Core.csproj">
       <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
       <Name>ClusterKit.Core</Name>

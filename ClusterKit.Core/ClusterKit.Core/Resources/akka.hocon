@@ -22,6 +22,17 @@
           }
         }
 
+        serializers {
+          akka-singleton = "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"
+        }
+        serialization-bindings {
+          "Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools" = akka-singleton
+        }
+        serialization-identifiers {
+          "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools" = 14
+        }
+
+
       }
 
       remote : {
@@ -34,6 +45,12 @@
       cluster: {
         auto-down-unreachable-after = 15s
         seed-nodes = []
+        singleton {
+            # The number of retries are derived from hand-over-retry-interval and
+            # akka.cluster.down-removal-margin (or ClusterSingletonManagerSettings.removalMargin),
+            # but it will never be less than this property.
+            min-number-of-hand-over-retries = 10          
+        }
       }
     }
 }

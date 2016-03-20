@@ -24,7 +24,12 @@
             Gets temporary directory to use in build procedures
             </summary>
         </member>
-        <member name="P:ClusterKit.Build.BuildUtils.PackageDirecotry">
+        <member name="P:ClusterKit.Build.BuildUtils.PackageInputDirectory">
+            <summary>
+            Gets directory with sources nuget packages
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.BuildUtils.PackageOutputDirectory">
             <summary>
             Gets output directory to put prepared nuget packages
             </summary>
@@ -58,13 +63,14 @@
             </remarks>
             </param>
         </member>
-        <member name="M:ClusterKit.Build.BuildUtils.Configure(System.String,System.String,System.String)">
+        <member name="M:ClusterKit.Build.BuildUtils.Configure(System.String,System.String,System.String,System.String)">
             <summary>
             Configures current build execution
             </summary>
             <param name="version">Global output packages version</param>
             <param name="buildDirectory">Temp directory to build projects</param>
-            <param name="packageDirecotry">Output directory to put prepared nuget packages</param>
+            <param name="packageOutputDirectory">Output directory to put prepared nuget packages</param>
+            <param name="packageInputDirectory">directory with sources nuget packages</param>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.CreateNuget(ClusterKit.Build.ProjectDescription)">
             <summary>
@@ -79,6 +85,12 @@
             Creates nuget package for all projects
             </summary>
             <param name="projects">The list of projects to package</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.ReloadNuget(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Removes local projects package references
+            </summary>
+            <param name="projects">List of local projects</param>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.RunXUnitTest(ClusterKit.Build.ProjectDescription)">
             <summary>
@@ -97,6 +109,12 @@
             Debugger method to write sum console output
             </summary>
             <param name="message"></param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.RestoreProjectDependencies(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Executes nuget restore for project
+            </summary>
+            <param name="project">Project to restore</param>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.SetFieldValue(System.Object,System.String,System.Object)">
             <summary>
@@ -143,6 +161,11 @@
         <member name="F:ClusterKit.Build.ProjectDescription.EnProjectType.XUnitTests">
             <summary>
             Project contains xunit tests
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Build.ProjectDescription.EnProjectType.SimpleBuild">
+            <summary>
+            Project just need to be built and nothing else
             </summary>
         </member>
         <member name="P:ClusterKit.Build.ProjectDescription.CleanBuildDirectory">

@@ -31,7 +31,8 @@ namespace ClusterKit.Core.TestKit
         /// </returns>
         public virtual Config GetAkkaConfig(IWindsorContainer windsorContainer)
         {
-            return ConfigurationFactory.ParseString(@"
+            var config = ConfigurationFactory.ParseString(
+                @"
                         ""/*"" {
                            dispatcher = ClusterKit.test-dispatcher
                         }
@@ -40,9 +41,9 @@ namespace ClusterKit.Core.TestKit
                         }
                         ""/*/*/*"" {
                            dispatcher = ClusterKit.test-dispatcher
-                        }
-                ")
-                .WithFallback(BaseInstaller.GetStackedConfig(windsorContainer));
+                        }");
+
+            return BaseInstaller.GetStackedConfig(windsorContainer, config);
         }
 
         /// <summary>

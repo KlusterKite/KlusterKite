@@ -11,9 +11,11 @@ namespace ClusterKit.Build
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
 
@@ -45,9 +47,14 @@ namespace ClusterKit.Build
         public static string BuildTemp { get; private set; }
 
         /// <summary>
+        /// Gets directory with sources nuget packages
+        /// </summary>
+        public static string PackageInputDirectory { get; private set; }
+
+        /// <summary>
         /// Gets output directory to put prepared nuget packages
         /// </summary>
-        public static string PackageDirecotry { get; private set; }
+        public static string PackageOutputDirectory { get; private set; }
 
         /// <summary>
         /// Gets global output packages version
@@ -81,14 +88,7 @@ namespace ClusterKit.Build
             Directory.CreateDirectory(project.CleanBuildDirectory);
             Directory.CreateDirectory(project.TempBuildDirectory);
 
-            // restoring packages for project with respec to global configuration file
-            Func<Unit, Unit> failFunc = u => u;
-            var nugetPath = RestorePackageHelper.findNuget("./");
-            RestorePackageHelper.runNuGet(
-                nugetPath,
-                TimeSpan.FromMinutes(10),
-                $"restore {project.ProjectFileName} -ConfigFile ./nuget.config",
-                failFunc.ToFSharpFunc());
+            RestoreProjectDependencies(project);
 
             // modifying project file to substitute internal nute-through dependencies to currently built files
             var projDoc = new XmlDocument();
@@ -99,20 +99,20 @@ namespace ClusterKit.Build
 
             foreach (var dependency in project.InternalDependencies)
             {
-                var refNode = projDoc
-                    .DocumentElement
-                    .SelectNodes("//def:Reference", namespaceManager)
-                    .Cast<XmlElement>()
-                    .FirstOrDefault(e => e.HasAttribute("Include") && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"));
+                var refNode =
+                    projDoc.DocumentElement.SelectNodes("//def:Reference", namespaceManager)
+                        .Cast<XmlElement>()
+                        .FirstOrDefault(
+                            e =>
+                            e.HasAttribute("Include")
+                            && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"));
 
                 if (refNode != null)
                 {
                     ConsoleLog($"ref linked to {dependency} was updated");
                     refNode.Attributes["Include"].Value = $"{dependency}";
-                    refNode.SelectSingleNode("./def:HintPath", namespaceManager).InnerText = Path.Combine(
-                        Path.GetFullPath(BuildClean),
-                        dependency,
-                        $"{dependency}.dll");
+                    refNode.SelectSingleNode("./def:HintPath", namespaceManager).InnerText =
+                        Path.Combine(Path.GetFullPath(BuildClean), dependency, $"{dependency}.dll");
                 }
                 else
                 {
@@ -121,9 +121,29 @@ namespace ClusterKit.Build
             }
 
             ConsoleLog($"Writing modified {Path.GetFullPath(project.ProjectFileName)}");
-            File.Copy(Path.GetFullPath(project.ProjectFileName), Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"));
+            File.Copy(
+                Path.GetFullPath(project.ProjectFileName),
+                Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"));
+            var assemblyInfoPath = Path.Combine(
+                Path.GetFullPath(project.ProjectDirectory),
+                "Properties",
+                "AssemblyInfo.cs");
+            File.Copy(assemblyInfoPath, Path.Combine(project.TempBuildDirectory, "AssemblyInfo.cs.orig"));
+
             projDoc.Save(Path.GetFullPath(project.ProjectFileName));
-            File.Copy(Path.GetFullPath(project.ProjectFileName), Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.mod"));
+            File.Copy(
+                Path.GetFullPath(project.ProjectFileName),
+                Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.mod"));
+
+            //[assembly: AssemblyMetadata("NugetVersion", "0.0.0.0-local")]
+            var assemblyText = File.ReadAllText(assemblyInfoPath);
+            assemblyText += $"\n[assembly: AssemblyMetadata(\"NugetVersion\", \"{Version?.Replace("\"", "\\\"")}\")]\n";
+
+            var assemblyVersion = Regex.Replace(Version ?? "1.0.0.0", "((\\d\\.?)+)(.*)", "$1");
+
+            assemblyText = Regex.Replace(assemblyText, "AssemblyVersion\\(\"([^\\)]+)\"\\)", $"AssemblyVersion(\"{assemblyVersion}\")");
+            assemblyText = Regex.Replace(assemblyText, "AssemblyFileVersion\\(\"([^\\)]+)\"\\)", $"AssemblyFileVersion(\"{assemblyVersion}\")");
+            File.WriteAllText(assemblyInfoPath, assemblyText);
 
             try
             {
@@ -132,13 +152,14 @@ namespace ClusterKit.Build
             }
             finally
             {
-                if (restoreOriginalProjectFile)
-                {
-                    // restoring original project file
-                    ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
-                    projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
-                    File.Copy(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"), Path.GetFullPath(project.ProjectFileName), true);
-                }
+                // restoring original project file
+                ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
+                projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
+                File.Copy(
+                    Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"),
+                    Path.GetFullPath(project.ProjectFileName),
+                    true);
+                File.Copy(Path.Combine(project.TempBuildDirectory, "AssemblyInfo.cs.orig"), assemblyInfoPath, true);
             }
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
@@ -147,7 +168,9 @@ namespace ClusterKit.Build
             {
                 var fileName = Path.GetFileName(file);
                 ConsoleLog($"Copying {fileName}");
-                File.Copy(Path.Combine(project.TempBuildDirectory, fileName), Path.Combine(project.CleanBuildDirectory, fileName));
+                File.Copy(
+                    Path.Combine(project.TempBuildDirectory, fileName),
+                    Path.Combine(project.CleanBuildDirectory, fileName));
             }
         }
 
@@ -200,16 +223,18 @@ namespace ClusterKit.Build
         /// </summary>
         /// <param name="version">Global output packages version</param>
         /// <param name="buildDirectory">Temp directory to build projects</param>
-        /// <param name="packageDirecotry">Output directory to put prepared nuget packages</param>
+        /// <param name="packageOutputDirectory">Output directory to put prepared nuget packages</param>
+        /// <param name="packageInputDirectory">directory with sources nuget packages</param>
         public static void Configure(
-            // ReSharper disable ParameterHidesMember
             string version,
             string buildDirectory,
-            string packageDirecotry /* ReSharper restore ParameterHidesMember */)
+            string packageOutputDirectory,
+            string packageInputDirectory)
         {
             BuildUtils.Version = version;
             BuildUtils.BuildDirectory = buildDirectory;
-            BuildUtils.PackageDirecotry = packageDirecotry;
+            BuildUtils.PackageOutputDirectory = packageOutputDirectory;
+            BuildUtils.PackageInputDirectory = packageInputDirectory;
 
             BuildTemp = Path.Combine(buildDirectory, "tmp");
             BuildClean = Path.Combine(buildDirectory, "clean");
@@ -265,6 +290,11 @@ namespace ClusterKit.Build
                     continue;
                 }
 
+                if (!Directory.Exists(Path.Combine(PackageInputDirectory, $"{dependency.Attributes["id"].Value}.{dependency.Attributes["version"].Value}")))
+                {
+                    continue;
+                }
+
                 var dependencyElement = dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"));
                 dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value =
                     dependency.Attributes["id"].Value;
@@ -291,16 +321,16 @@ namespace ClusterKit.Build
             var generatedNuspecFile = Path.Combine(project.CleanBuildDirectory, nuspecDataFileName);
             nuspecData.Save(generatedNuspecFile);
 
-            if (!Directory.Exists(PackageDirecotry))
+            if (!Directory.Exists(PackageOutputDirectory))
             {
-                Directory.CreateDirectory(PackageDirecotry);
+                Directory.CreateDirectory(PackageOutputDirectory);
             }
 
             Func<NuGetHelper.NuGetParams, NuGetHelper.NuGetParams> provider = defaults =>
                 {
                     defaults.SetFieldValue("Version", Version);
                     defaults.SetFieldValue("WorkingDir", project.CleanBuildDirectory);
-                    defaults.SetFieldValue("OutputPath", PackageDirecotry);
+                    defaults.SetFieldValue("OutputPath", PackageOutputDirectory);
                     return defaults;
                 };
 
@@ -318,6 +348,32 @@ namespace ClusterKit.Build
             foreach (var project in projects)
             {
                 CreateNuget(project);
+            }
+        }
+
+        /// <summary>
+        /// Removes local projects package references
+        /// </summary>
+        /// <param name="projects">List of local projects</param>
+        public static void ReloadNuget(IEnumerable<ProjectDescription> projects)
+        {
+            var projectList = projects.ToList();
+
+            if (!Directory.Exists(PackageInputDirectory))
+            {
+                return;
+            }
+
+            foreach (var installedPackageDir in projectList.Select(projectDescription => Path.Combine(
+                PackageInputDirectory,
+                $"{projectDescription.ProjectName}.{Version}")).Where(Directory.Exists))
+            {
+                Directory.Delete(installedPackageDir, true);
+            }
+
+            foreach (var projectDescription in projectList)
+            {
+                RestoreProjectDependencies(projectDescription);
             }
         }
 
@@ -393,6 +449,22 @@ namespace ClusterKit.Build
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(message);
             Console.ForegroundColor = currentColor;
+        }
+
+        /// <summary>
+        /// Executes nuget restore for project
+        /// </summary>
+        /// <param name="project">Project to restore</param>
+        private static void RestoreProjectDependencies(ProjectDescription project)
+        {
+            // restoring packages for project with respec to global configuration file
+            Func<Unit, Unit> failFunc = u => u;
+            var nugetPath = RestorePackageHelper.findNuget("./");
+            RestorePackageHelper.runNuGet(
+                nugetPath,
+                TimeSpan.FromMinutes(10),
+                $"restore {project.ProjectFileName} -ConfigFile ./nuget.config",
+                failFunc.ToFSharpFunc());
         }
 
         /// <summary>

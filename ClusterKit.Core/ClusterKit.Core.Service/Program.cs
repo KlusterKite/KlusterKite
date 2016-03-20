@@ -9,6 +9,11 @@
 
 namespace ClusterKit.Core.Service
 {
+    using System.Collections.Generic;
+
+    using Castle.Facilities.TypedFactory;
+    using Castle.MicroKernel.Registration;
+    using Castle.MicroKernel.Resolvers.SpecializedResolvers;
     using Castle.Windsor;
 
     using Serilog;
@@ -35,45 +40,46 @@ namespace ClusterKit.Core.Service
         {
             Container = new WindsorContainer();
 
-            var loggerConfig = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.ColoredConsole();
+            var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.ColoredConsole();
 
             var logger = loggerConfig.CreateLogger();
             Log.Logger = logger;
-            Bootstrapper.Configure(Container);
+
             HostFactory.Run(
-                            x =>
-                            {
-                                x.Service<Controller>(
-                                    s =>
-                                    {
-                                        s.ConstructUsing(name => Container.Resolve<Controller>());
-                                        s.WhenStarted((tc, hc) => tc.Start(Container));
-                                        s.WhenStopped(
-                                            tc =>
+                x =>
+                    {
+                        var configurations = new List<string>();
+
+                        x.AddCommandLineDefinition("config", fileName => configurations.Add(fileName));
+                        x.ApplyCommandLine();
+                        Bootstrapper.Configure(Container, configurations.ToArray());
+
+                        x.Service<Controller>(
+                            s =>
+                                {
+                                    s.ConstructUsing(name => Container.Resolve<Controller>());
+                                    s.WhenStarted(
+                                        (tc, hc) =>
+                                            {
+                                                return tc.Start(Container, hc);
+                                            });
+                                    s.WhenStopped(
+                                        tc =>
                                             {
                                                 tc.Stop();
                                                 Container.Release(tc);
                                                 Container.Dispose();
                                             });
-                                    });
+                                });
 
-                                x.EnableServiceRecovery(
-                                    rc =>
-                                    {
-                                        rc.RestartService(1);
-                                        rc.SetResetPeriod(7);
-                                    });
-
-                                x.UseSerilog(loggerConfig);
-                                x.StartAutomatically();
-                                x.RunAsLocalSystem();
-                                x.SetDescription("ClusterKit Node service");
-                                x.SetDisplayName("ClusterKitNode");
-                                x.SetServiceName("ClusterKitNode");
-                                x.UseLinuxIfAvailable();
-                            });
+                        x.UseSerilog(loggerConfig);
+                        x.StartAutomatically();
+                        x.RunAsLocalSystem();
+                        x.SetDescription("ClusterKit Node service");
+                        x.SetDisplayName("ClusterKitNode");
+                        x.SetServiceName("ClusterKitNode");
+                        x.UseLinuxIfAvailable();
+                    });
         }
     }
 }

@@ -12,6 +12,7 @@ namespace ClusterKit.Web.Swagger
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Web.Http;
 
     using Akka.Configuration;
@@ -43,24 +44,32 @@ namespace ClusterKit.Web.Swagger
                 return;
             }
 
-            var publishDocUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", " swagger");
-            var publishUiUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", " swagger/ui");
+            var publishDocUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", "swagger");
+            var publishUiUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", "swagger/ui");
 
             config.EnableSwagger(
-                $"{publishDocUrl}/{{apiVersion}}", //swagger/docs/{apiVersion}
+                $"{publishDocUrl}/{{apiVersion}}",
+                //swagger/docs/{apiVersion}
                 c =>
                     {
                         c.SingleApiVersion(
                             akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.apiVersion", "v1"),
                             akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.apiTitle", "Cluster API"));
-                        var commentFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.xml");
-                        foreach (var commentFile in commentFiles)
+                        var commentFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory);
+                        foreach (
+                            var commentFile in
+                                commentFiles.Where(
+                                    cf =>
+                                    ".xml".Equals(
+                                        Path.GetExtension(Path.GetFileName(cf)),
+                                        StringComparison.InvariantCultureIgnoreCase)))
                         {
                             c.IncludeXmlComments(Path.GetFullPath(commentFile));
                         }
                         c.UseFullTypeNameInSchemaIds();
                     }).EnableSwaggerUi(
-                        $"{publishUiUrl}/{{*assetPath}}", //{*assetPath}
+                        $"{publishUiUrl}/{{*assetPath}}",
+                        //{*assetPath}
                         c =>
                             {
                                 c.DisableValidator();

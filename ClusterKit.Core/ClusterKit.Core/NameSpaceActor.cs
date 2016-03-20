@@ -8,6 +8,7 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Linq;
+    using System.Runtime.CompilerServices;
 
     using Akka.Actor;
     using Akka.Cluster.Tools.Singleton;
@@ -48,6 +49,7 @@ namespace ClusterKit.Core
             foreach (var pair in config.AsEnumerable())
             {
                 var key = pair.Key;
+
                 var path = key.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                 if (path.Length != namespacePathElements.Count + 1)
                 {
@@ -197,9 +199,10 @@ namespace ClusterKit.Core
 
             context.GetLogger()
                 .Info(
-                    "{Type}: {NameSpaceName} initializing singleton of type {ActorType} on {PathString}",
+                    "{Type}: {NameSpaceName} initializing singleton {SingletonName} of type {ActorType} on {PathString}",
                     typeof(NameSpaceActor).Name,
                     currentPath,
+                    singletonName,
                     type.Name,
                     pathName);
 
@@ -210,7 +213,7 @@ namespace ClusterKit.Core
                         singletonName,
                         role,
                         actorConfig.GetTimeSpan("removal-margin", TimeSpan.FromSeconds(1), false),
-                        actorConfig.GetTimeSpan("handover-retry-interval", TimeSpan.FromSeconds(1), false))),
+                        actorConfig.GetTimeSpan("handover-retry-interval", TimeSpan.FromSeconds(5), false))),
                 pathName);
         }
 
@@ -263,14 +266,25 @@ namespace ClusterKit.Core
                 return;
             }
 
-            context.ActorOf(
-                    ClusterSingletonProxy.Props(singletonManagerPath,
-                    new ClusterSingletonProxySettings(
-                        singletonName,
-                        role,
-                        actorConfig.GetTimeSpan("singleton-identification-interval", TimeSpan.FromSeconds(1), false),
-                        actorConfig.GetInt("buffer-size", 2048))),
+            context.GetLogger()
+                .Info(
+                    "{Type}: {NameSpaceName} initializing singleton proxy {SingletonManagerPath} / {SingletonName} for {PathString}",
+                    typeof(NameSpaceActor).Name,
+                    currentPath,
+                    singletonManagerPath,
+                    singletonName,
                     pathName);
+
+            context.ActorOf(
+                ClusterSingletonProxy.Props(
+                    singletonManagerPath: singletonManagerPath,
+                    settings:
+                        new ClusterSingletonProxySettings(
+                            singletonName,
+                            role,
+                            actorConfig.GetTimeSpan("singleton-identification-interval", TimeSpan.FromSeconds(1), false),
+                            actorConfig.GetInt("buffer-size", 2048))),
+                name: pathName);
         }
     }
 }
