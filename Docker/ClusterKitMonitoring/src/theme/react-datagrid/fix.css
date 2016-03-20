@@ -1,0 +1,20 @@
+body .react-datagrid .z-header .z-column-header.z-cell:not(.z-first) {
+  border: none;
+}
+
+body .react-datagrid .z-header .z-column-header.z-cell.z-last {
+  border: none;
+}
+
+body .react-datagrid .z-header-wrapper {
+  background: none;
+  border: none;
+}
+
+body .react-datagrid.z-style-alternate .z-odd.z-row {
+  background: none;
+}
+
+body .react-datagrid.z-style-alternate .z-odd.z-row.z-over {
+  background: #d7e7ff;
+}
