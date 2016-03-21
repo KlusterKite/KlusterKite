@@ -143,6 +143,11 @@ namespace ClusterKit.NodeManager.Launcher
         public EnStopMode StopMode { get; } = EnStopMode.CleanRestart;
 
         /// <summary>
+        /// Gets current node unique identification number
+        /// </summary>
+        public Guid Uid { get; } = Guid.NewGuid();
+
+        /// <summary>
         /// Current working directory. All packages and new service will be stored here.
         /// </summary>
         public string WorkingDirectory { get; }
@@ -218,7 +223,7 @@ namespace ClusterKit.NodeManager.Launcher
 
             var client = new RestClient(this.ConfigurationUrl);
             var request = new RestRequest { Method = Method.POST };
-            request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType });
+            request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType, NodeUid = this.Uid });
 
             var response = client.Execute<NodeStartUpConfiguration>(request);
             NodeStartUpConfiguration config;
@@ -317,7 +322,7 @@ namespace ClusterKit.NodeManager.Launcher
             string startConfig = $@"{{
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}
-                ClusterKit.NodeManager.RequestId = {configuration.RequestId}
+                ClusterKit.NodeManager.NodeId = { this.Uid }
                 akka.cluster.seed-nodes = [{string.Join(", ", configuration.Seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);

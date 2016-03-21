@@ -51,7 +51,7 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
         /// </summary>
         /// <returns>The member list</returns>
         [Route("swagger/monitor/getList")]
-        [HttpGet, HttpPost]
+        [HttpGet]
         public async Task<IReadOnlyCollection<string>> GetServices()
         {
             try

@@ -16,6 +16,7 @@ namespace ClusterKit.NodeManager.Client
     using Akka.Cluster;
 
     using ClusterKit.Core;
+    using ClusterKit.Core.Utils;
     using ClusterKit.NodeManager.Client.Messages;
 
     /// <summary>
@@ -29,15 +30,20 @@ namespace ClusterKit.NodeManager.Client
         private readonly NodeDescription description;
 
         /// <summary>
+        /// Start time of the node
+        /// </summary>
+        private readonly long startTimeStamp = DateTimeOffset.UtcNow.UtcTicks;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerReceiverActor"/> class.
         /// </summary>
         public NodeManagerReceiverActor()
         {
-            var requestIdString = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.RequestId");
-            Guid requestId;
-            if (!Guid.TryParse(requestIdString, out requestId))
+            var nodeIdString = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.NodeId");
+            Guid nodeId;
+            if (!Guid.TryParse(nodeIdString, out nodeId))
             {
-                requestId = Guid.NewGuid();
+                nodeId = Guid.NewGuid();
             }
 
             this.description = new NodeDescription
@@ -52,7 +58,8 @@ namespace ClusterKit.NodeManager.Client
                 NodeTemplateVersion =
                                 Context.System.Settings.Config.GetInt(
                                     "ClusterKit.NodeManager.NodeTemplateVersion"),
-                RequestId = requestId,
+                NodeId = nodeId,
+                StartTimeStamp = this.startTimeStamp,
                 Modules =
                                 AppDomain.CurrentDomain.GetAssemblies()
                                 .Where(
@@ -61,9 +68,9 @@ namespace ClusterKit.NodeManager.Client
                                         .Any(t => t.IsSubclassOf(typeof(BaseInstaller))))
                                 .Select(
                                     a =>
-                                    new NodeDescription.ModuleDescription
+                                    new PackageDescription()
                                     {
-                                        Name = a.GetName().Name,
+                                        Id = a.GetName().Name,
                                         Version =
                                                 a.GetName()
                                                 .Version

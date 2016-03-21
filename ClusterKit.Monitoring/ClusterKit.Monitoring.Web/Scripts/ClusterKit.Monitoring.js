@@ -45,7 +45,7 @@
 
     function loadSwagger() {
         $.ajax({
-            type: 'post',
+            type: 'get',
             url: '/swagger/monitor/getList',
             data: {
             },

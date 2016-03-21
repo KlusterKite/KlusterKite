@@ -29,7 +29,7 @@ namespace ClusterKit.NodeManager.Tests
             this.output = output;
         }
 
-        //[Fact]
+        [Fact]
         public void Test()
         {
             var feedUrl = "http://192.168.99.100:81/";

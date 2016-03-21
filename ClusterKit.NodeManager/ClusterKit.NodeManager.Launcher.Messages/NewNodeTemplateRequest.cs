@@ -9,6 +9,8 @@
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
+    using System;
+
     /// <summary>
     /// Request from newly started node
     /// </summary>
@@ -18,5 +20,10 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         /// Gets or sets container type to start node
         /// </summary>
         public string ContainerType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique node identification number.
+        /// </summary>
+        public Guid NodeUid { get; set; }
     }
 }

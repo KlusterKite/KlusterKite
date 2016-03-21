@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeStarttupConfiguration.cs" company="ClusterKit">
+// <copyright file="NodeStartUpConfiguration.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -9,7 +9,6 @@
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -41,11 +40,6 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         /// Gets or sets NuGet feed urls to download packages
         /// </summary>
         public List<string> PackageSources { get; set; }
-
-        /// <summary>
-        /// Gets or sets request id to indicate node instance startup
-        /// </summary>
-        public Guid RequestId { get; set; }
 
         /// <summary>
         /// Gets or sets list of akka cluster seeds to configure akka cluster node

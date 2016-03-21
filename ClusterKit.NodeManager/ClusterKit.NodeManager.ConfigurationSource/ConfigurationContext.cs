@@ -102,11 +102,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                             new List<string>
                                 {
                                     "ClusterKit.Core.Service",
+                                    "ClusterKit.NodeManager.Client",
                                     "ClusterKit.Monitoring",
                                     "ClusterKit.NodeManager",
                                     "ClusterKit.Core.EF.Npgsql",
                                     "ClusterKit.Web.Swagger.Monitor",
-                                    "ClusterKit.Web.Swagger.Publish"
+                                    "ClusterKit.Web.Swagger"
                                 },
                     Configuration = Configurations.ClusterManager
                 });

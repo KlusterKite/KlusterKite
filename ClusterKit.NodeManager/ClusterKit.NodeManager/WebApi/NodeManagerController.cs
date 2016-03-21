@@ -113,7 +113,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <returns>Success of the operation</returns>
         [Route("reloadPackages")]
-        [HttpGet]
+        [HttpPost]
         public async Task ReloadPackages()
         {
             var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);

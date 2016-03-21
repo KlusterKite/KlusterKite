@@ -28,14 +28,24 @@ namespace ClusterKit.NodeManager.Client.Messages
         public string ContainerType { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether software and or configuration is obsolete and needed to be upgraded
+        /// </summary>
+        public bool IsObsolete { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of descriptions of installed modules
         /// </summary>
-        public List<ModuleDescription> Modules { get; set; }
+        public List<PackageDescription> Modules { get; set; }
 
         /// <summary>
         /// Gets or sets node's address
         /// </summary>
         public Address NodeAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets request id to indicate node instance startup
+        /// </summary>
+        public Guid NodeId { get; set; }
 
         /// <summary>
         /// Gets or sets node template code
@@ -48,24 +58,8 @@ namespace ClusterKit.NodeManager.Client.Messages
         public int NodeTemplateVersion { get; set; }
 
         /// <summary>
-        /// Gets or sets request id to indicate node instance startup
+        /// Gets or sets node start time
         /// </summary>
-        public Guid RequestId { get; set; }
-
-        /// <summary>
-        /// Description of installed module
-        /// </summary>
-        public class ModuleDescription
-        {
-            /// <summary>
-            /// Gets or sets name of module
-            /// </summary>
-            public string Name { get; set; }
-
-            /// <summary>
-            /// Gets or sets version of module
-            /// </summary>
-            public string Version { get; set; }
-        }
+        public long StartTimeStamp { get; set; }
     }
 }

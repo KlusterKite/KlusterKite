@@ -79,6 +79,16 @@ namespace ClusterKit.NodeManager
         private readonly TimeSpan newNodeJoinTimeout;
 
         /// <summary>
+        /// Maximum number of <seealso cref="RequestDescriptionNotification"/> sent to newly joined node
+        /// </summary>
+        private readonly int newNodeRequestDescriptionNotificationMaxRequests;
+
+        /// <summary>
+        /// Timeout to send new <seealso cref="RequestDescriptionNotification"/> message to newly joined node
+        /// </summary>
+        private readonly TimeSpan newNodeRequestDescriptionNotificationTimeout;
+
+        /// <summary>
         /// List of known node desciptions
         /// </summary>
         private readonly Dictionary<Address, NodeDescription> nodeDescriptions = new Dictionary<Address, NodeDescription>();
@@ -94,11 +104,6 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<int, NugetFeed> nugetFeeds = new Dictionary<int, NugetFeed>();
 
         /// <summary>
-        /// List of packages in local repository;
-        /// </summary>
-        private readonly List<IPackage> packages = new List<IPackage>();
-
-        /// <summary>
         /// List of pending node description requests
         /// </summary>
         private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications = new Dictionary<Address, Cancelable>();
@@ -109,14 +114,21 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<int, SeedAddress> seedAddresses = new Dictionary<int, SeedAddress>();
 
         /// <summary>
-        /// Maximum number of <seealso cref="RequestDescriptionNotification"/> sent to newly joined node
+        /// Part of currently active nodes, that could be sent to upgrade at once. 1.0M - all active nodes (above minimum required) could be sent to upgrade.
         /// </summary>
-        private int newNodeRequestDescriptionNotificationMaxRequests;
+        private readonly decimal upgradablePart;
 
         /// <summary>
-        /// Timeout to send new <seealso cref="RequestDescriptionNotification"/> message to newly joined node
+        /// List of nodes with upgrade in progress
         /// </summary>
-        private TimeSpan newNodeRequestDescriptionNotificationTimeout;
+        private readonly Dictionary<Guid, UpgradeData> upgradingNodes = new Dictionary<Guid, UpgradeData>();
+
+        /// <summary>
+        /// List of packages in local repository;
+        /// </summary>
+        private Dictionary<string, PackageDescription> packages = new Dictionary<string, PackageDescription>();
+
+        private Cancelable upgradeMessageSchedule = null;
 
         /// <summary>
         /// Child actor workers
@@ -137,6 +149,7 @@ namespace ClusterKit.NodeManager
             this.newNodeJoinTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.NewNodeJoinTimeout", TimeSpan.FromSeconds(30), false);
             this.newNodeRequestDescriptionNotificationTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationTimeout", TimeSpan.FromSeconds(10), false);
             this.newNodeRequestDescriptionNotificationMaxRequests = Context.System.Settings.Config.GetInt("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
+            this.upgradablePart = Context.System.Settings.Config.GetDecimal("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
 
             this.Self.Tell(new InitializationMessage());
             this.Receive<InitializationMessage>(m => this.Initialize());
@@ -171,6 +184,44 @@ namespace ClusterKit.NodeManager
                 Context.GetLogger().Warning("{Type}: recieved unsupported message of type {MessageTypeName}", this.GetType().Name, message.GetType().Name);
             }
             base.Unhandled(message);
+        }
+
+        /// <summary>
+        /// Checks node for available upgrades
+        /// </summary>
+        /// <param name="nodeDescription">Node description to check</param>
+        private void CheckNodeIsObsolete(NodeDescription nodeDescription)
+        {
+            var nodeWasObsolete = nodeDescription.IsObsolete;
+            nodeDescription.IsObsolete = false;
+            NodeTemplate template;
+            if (!this.nodeTemplates.TryGetValue(nodeDescription.NodeTemplate, out template)
+                || template.Version != nodeDescription.NodeTemplateVersion)
+            {
+                nodeDescription.IsObsolete = true;
+            }
+
+            foreach (var module in nodeDescription.Modules)
+            {
+                PackageDescription package;
+                if (!this.packages.TryGetValue(module.Id, out package))
+                {
+                    Context.GetLogger().Error(
+                        "{Type}: node with template {TemplateCode} on container {ContainerCode} on address {NodeAddressString} has module {PackageId} that does not contained in repository. This node cannot be upgraded",
+                        this.GetType().Name,
+                        nodeDescription.NodeTemplate,
+                        nodeDescription.ContainerType,
+                        nodeDescription.NodeAddress.ToString(),
+                        module.Id);
+                    nodeDescription.IsObsolete = false;
+                    return;
+                }
+
+                if (package.Version != module.Version)
+                {
+                    nodeDescription.IsObsolete = true;
+                }
+            }
         }
 
         /// <summary>
@@ -369,8 +420,6 @@ namespace ClusterKit.NodeManager
                 selectedTemplate = templates.Last();
             }
 
-            var requestId = Guid.NewGuid();
-
             var rnd = new Random();
 
             this.Sender.Tell(
@@ -379,7 +428,6 @@ namespace ClusterKit.NodeManager
                     NodeTemplate = selectedTemplate.Code,
                     NodeTemplateVersion = selectedTemplate.Version,
                     Configuration = selectedTemplate.Configuration,
-                    RequestId = requestId,
                     Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => rnd.NextDouble()).ToList(),
                     Packages = selectedTemplate.Packages,
                     PackageSources = this.nugetFeeds.Values.Select(f => f.Address).ToList()
@@ -392,12 +440,12 @@ namespace ClusterKit.NodeManager
                 this.awaitingRequestsByTemplate[selectedTemplate.Code] = requests;
             }
 
-            requests.Add(requestId);
+            requests.Add(request.NodeUid);
 
             Context.System.Scheduler.ScheduleTellOnce(
                 this.newNodeJoinTimeout,
                 this.Self,
-                new RequestTimeOut { RequestId = requestId, TemplateCode = selectedTemplate.Code },
+                new RequestTimeOut { NodeId = request.NodeUid, TemplateCode = selectedTemplate.Code },
                 this.Self);
         }
 
@@ -430,6 +478,10 @@ namespace ClusterKit.NodeManager
             }
 
             cancelable.Cancel();
+
+            this.upgradingNodes.Remove(nodeDescription.NodeId);
+            this.CheckNodeIsObsolete(nodeDescription);
+
             this.requestDescriptionNotifications.Remove(address);
             this.nodeDescriptions[address] = nodeDescription;
 
@@ -450,7 +502,7 @@ namespace ClusterKit.NodeManager
                 List<Guid> awaitingRequests;
                 if (this.awaitingRequestsByTemplate.TryGetValue(nodeDescription.NodeTemplate, out awaitingRequests))
                 {
-                    awaitingRequests.Remove(nodeDescription.RequestId);
+                    awaitingRequests.Remove(nodeDescription.NodeId);
                 }
 
                 Context.GetLogger()
@@ -468,6 +520,8 @@ namespace ClusterKit.NodeManager
                         this.GetType().Name,
                         address.ToString());
             }
+
+            this.Self.Tell(new UpgradeMessage());
         }
 
         /// <summary>
@@ -532,16 +586,90 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Process of manual node upgrade request
         /// </summary>
-        /// <param name="request">manual node upgrade request</param>
-        private void OnNodeUpdateRequest(NodeUpgradeRequest request)
+        /// <param name="address">Address of the node tu upgrade</param>
+        private void OnNodeUpdateRequest(Address address)
         {
-            if (!this.nodeDescriptions.ContainsKey(request.Address))
+            if (!this.nodeDescriptions.ContainsKey(address))
             {
                 this.Sender.Tell(false);
             }
 
-            Context.ActorSelection($"{request.Address}/user/NodeManager/Receiver").Tell(new ShutdownMessage(), this.Self);
+            Context.ActorSelection($"{address}/user/NodeManager/Receiver").Tell(new ShutdownMessage(), this.Self);
             this.Sender.Tell(true);
+        }
+
+        /// <summary>
+        /// Checks current nodes for possible upgrade need and performs an upgrade
+        /// </summary>
+        private void OnNodeUpgrade()
+        {
+            this.upgradeMessageSchedule?.Cancel();
+
+            var upgradeTimeOut = this.newNodeJoinTimeout + this.newNodeRequestDescriptionNotificationTimeout;
+            // removing lost nodes
+            var obsoleteUpgrades =
+                this.upgradingNodes.Values.Where(
+                    u => DateTimeOffset.Now - u.UpgradeStartTime >= upgradeTimeOut).ToList();
+
+            obsoleteUpgrades.ForEach(u => this.upgradingNodes.Remove(u.NodeId));
+            var isUpgrading = false;
+
+            // searching for nodes to upgrade
+            var nodesToUpgrade = this.nodeDescriptions.Values.Where(n => n.IsObsolete).GroupBy(n => n.NodeTemplate);
+            foreach (var nodeGroup in nodesToUpgrade)
+            {
+                NodeTemplate nodeTemplate;
+                if (!this.nodeTemplates.TryGetValue(nodeGroup.Key, out nodeTemplate))
+                {
+                    Context.GetLogger()
+                        .Error(
+                            "{Type}: could not find template with {TemplateCode} during upgrade proccess",
+                            this.GetType().Name,
+                            nodeGroup.Key);
+                    nodeGroup.ForEach(n => n.IsObsolete = false);
+                    continue;
+                }
+
+                if (nodeGroup.Count() <= nodeTemplate.MininmumRequiredInstances)
+                {
+                    // node upgrade is blocked if it will cause cluster mulfunction
+                    continue;
+                }
+
+                var nodesInUpgrade = this.upgradingNodes.Values.Count(u => u.NodeTemplate == nodeGroup.Key);
+
+                var nodesToUpgradeCount = (int)Math.Ceiling(nodeGroup.Count() * 100.0M / this.upgradablePart)
+                                          - nodesInUpgrade;
+
+                if (nodesToUpgradeCount <= 0)
+                {
+                    continue;
+                }
+
+                var nodes = nodeGroup.OrderBy(n => n.StartTimeStamp).Take(nodesToUpgradeCount);
+                isUpgrading = true;
+                foreach (var node in nodes)
+                {
+                    this.upgradingNodes[node.NodeId] = new UpgradeData
+                    {
+                        NodeId = node.NodeId,
+                        NodeTemplate = node.NodeTemplate,
+                        UpgradeStartTime = DateTimeOffset.Now
+                    };
+                    this.OnNodeUpdateRequest(node.NodeAddress);
+                }
+            }
+
+            if (isUpgrading)
+            {
+                this.upgradeMessageSchedule = new Cancelable(Context.System.Scheduler);
+                Context.System.Scheduler.ScheduleTellOnce(
+                    upgradeTimeOut.Add(TimeSpan.FromSeconds(1)),
+                    this.Self,
+                    new UpgradeMessage(),
+                    this.Self,
+                    this.upgradeMessageSchedule);
+            }
         }
 
         /// <summary>
@@ -605,7 +733,7 @@ namespace ClusterKit.NodeManager
             List<Guid> requests;
             if (this.awaitingRequestsByTemplate.TryGetValue(requestTimeOut.TemplateCode, out requests))
             {
-                requests.Remove(requestTimeOut.RequestId);
+                requests.Remove(requestTimeOut.NodeId);
             }
         }
 
@@ -637,8 +765,19 @@ namespace ClusterKit.NodeManager
             var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(feedUrl);
 
             var newPackages = nugetRepository.Search(string.Empty, true).Where(p => p.IsLatestVersion).ToList();
-            this.packages.Clear();
-            this.packages.AddRange(newPackages);
+
+            this.packages = newPackages.Select(p => new PackageDescription
+            {
+                Id = p.Id,
+                Version = p.Version.Version.ToString()
+            }).ToDictionary(p => p.Id);
+
+            foreach (var node in this.nodeDescriptions.Values)
+            {
+                this.CheckNodeIsObsolete(node);
+            }
+
+            this.Self.Tell(new UpgradeMessage());
         }
 
         /// <summary>
@@ -662,7 +801,7 @@ namespace ClusterKit.NodeManager
             this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
             this.Receive<ActiveNodeDescriptionsRequest>(m => this.Sender.Tell(this.nodeDescriptions.Values.ToList()));
             this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
-            this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m));
+            this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m.Address));
 
             this.Receive<UpdateMessage<NodeTemplate>>(m => this.OnNodeTemplateUpdate(m));
             this.Receive<UpdateMessage<SeedAddress>>(m => this.OnSeedAddressUpdate(m));
@@ -671,10 +810,7 @@ namespace ClusterKit.NodeManager
             this.Receive<NewNodeTemplateRequest>(m => this.OnNewNodeTemplateRequest(m));
             this.Receive<RequestTimeOut>(m => this.OnRequestTimeOut(m));
 
-            this.Receive<PackageListRequest>(
-                m =>
-                this.Sender.Tell(
-                    this.packages.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList()));
+            this.Receive<PackageListRequest>(m => this.Sender.Tell(this.packages.Values.ToList()));
 
             this.Receive<ReloadPackageListRequest>(
                 m =>
@@ -690,6 +826,8 @@ namespace ClusterKit.NodeManager
                             Context.GetLogger().Error(e, "{Type}: Exception during package list load", this.GetType().Name);
                         }
                     });
+
+            this.Receive<UpgradeMessage>(m => this.OnNodeUpgrade());
 
             this.Receive<CollectionRequest<NodeTemplate>>(m => this.workers.Forward(m));
             this.Receive<RestActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));
@@ -728,14 +866,42 @@ namespace ClusterKit.NodeManager
         private class RequestTimeOut
         {
             /// <summary>
-            /// Gets or sets <seealso cref="NodeStartUpConfiguration"/> request id
+            /// Gets or sets nodes unique id
             /// </summary>
-            public Guid RequestId { get; set; }
+            public Guid NodeId { get; set; }
 
             /// <summary>
             /// Gets or sets code of <seealso cref="NodeTemplate"/> assigned to request
             /// </summary>
             public string TemplateCode { get; set; }
+        }
+
+        /// <summary>
+        /// Information about node, that was sent to upgrade
+        /// </summary>
+        private class UpgradeData
+        {
+            /// <summary>
+            /// Gets or sets node unique identification number
+            /// </summary>
+            public Guid NodeId { get; set; }
+
+            /// <summary>
+            /// Gets or sets node template code before upgrade
+            /// </summary>
+            public string NodeTemplate { get; set; }
+
+            /// <summary>
+            /// Gets or sets time of upgrade initialization proccess
+            /// </summary>
+            public DateTimeOffset UpgradeStartTime { get; set; }
+        }
+
+        /// <summary>
+        /// Message used for self check and initiate node upgrade
+        /// </summary>
+        private class UpgradeMessage
+        {
         }
 
         /// <summary>
