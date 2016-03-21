@@ -2,6 +2,7 @@
 	ClusterKit {
 
 		NodeManager {
+			PackageRepository = "http://192.168.99.100:81/"
 			//ConfigurationDatabaseConnectionString = ""
                         ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
                         FullClusterWaitTimeout = 60s // In case of cluster is full, timespan that new node candidate will repeat join request

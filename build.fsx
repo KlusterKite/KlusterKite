@@ -118,6 +118,7 @@ Target "DockerContainers" (fun _ ->
 
         Fake.FileHelper.CleanDirs [|buildDir; packageCacheDir|]
         Fake.FileHelper.CopyDir buildDir "./build/launcher" (fun file -> true)
+        Fake.FileHelper.CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
 
         let copyThirdPartyPackage (f: FileInfo) =
             if (hasExt ".nupkg" f.FullName) then
@@ -191,7 +192,7 @@ Target "PushLocalPackages" (fun _ ->
 // switches nuget and build version from init one, to latest posible on docker nuget server
 Target "SetVersion" (fun _ ->
     let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" "ClusterKit.Core"
-    let version = if nugetVersion.IsSome then sprintf "%s-local" ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"
+    let version = if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"
     BuildUtils.Configure(version, buildDir, packageDir, "./packages")
 )
 

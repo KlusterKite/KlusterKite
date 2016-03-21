@@ -30,6 +30,8 @@ namespace ClusterKit.NodeManager
 
     using JetBrains.Annotations;
 
+    using NuGet;
+
     /// <summary>
     /// Singleton actor performing all node configuration related work
     /// </summary>
@@ -45,6 +47,11 @@ namespace ClusterKit.NodeManager
         /// Akka configuration path to connection string
         /// </summary>
         public const string ConfigDatabaseNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseName";
+
+        /// <summary>
+        /// Akka configuration path to connection string
+        /// </summary>
+        public const string PacakgeRepositoryUrlPath = "ClusterKit.NodeManager.PackageRepository";
 
         /// <summary>
         /// List of node by templates
@@ -85,6 +92,11 @@ namespace ClusterKit.NodeManager
         /// List of configured seed nuget feeds
         /// </summary>
         private readonly Dictionary<int, NugetFeed> nugetFeeds = new Dictionary<int, NugetFeed>();
+
+        /// <summary>
+        /// List of packages in local repository;
+        /// </summary>
+        private readonly List<IPackage> packages = new List<IPackage>();
 
         /// <summary>
         /// List of pending node description requests
@@ -247,6 +259,21 @@ namespace ClusterKit.NodeManager
             catch (Exception e)
             {
                 Context.GetLogger().Error(e, "{Type}: Exception during initialization", this.GetType().Name);
+                Context.System.Scheduler.ScheduleTellOnce(
+                    TimeSpan.FromSeconds(5),
+                    this.Self,
+                    new InitializationMessage(),
+                    this.Self);
+                return;
+            }
+
+            try
+            {
+                this.ReloadPackageList();
+            }
+            catch (Exception e)
+            {
+                Context.GetLogger().Error(e, "{Type}: Exception during package list load", this.GetType().Name);
                 Context.System.Scheduler.ScheduleTellOnce(
                     TimeSpan.FromSeconds(5),
                     this.Self,
@@ -602,6 +629,19 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Loads list of packages from repository
+        /// </summary>
+        private void ReloadPackageList()
+        {
+            var feedUrl = Context.System.Settings.Config.GetString(PacakgeRepositoryUrlPath);
+            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(feedUrl);
+
+            var newPackages = nugetRepository.Search(string.Empty, true).Where(p => p.IsLatestVersion).ToList();
+            this.packages.Clear();
+            this.packages.AddRange(newPackages);
+        }
+
+        /// <summary>
         /// Initializes normal actor work
         /// </summary>
         private void Start()
@@ -630,6 +670,26 @@ namespace ClusterKit.NodeManager
 
             this.Receive<NewNodeTemplateRequest>(m => this.OnNewNodeTemplateRequest(m));
             this.Receive<RequestTimeOut>(m => this.OnRequestTimeOut(m));
+
+            this.Receive<PackageListRequest>(
+                m =>
+                this.Sender.Tell(
+                    this.packages.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList()));
+
+            this.Receive<ReloadPackageListRequest>(
+                m =>
+                    {
+                        try
+                        {
+                            this.ReloadPackageList();
+                            this.Sender.Tell(true);
+                        }
+                        catch (Exception e)
+                        {
+                            this.Sender.Tell(false);
+                            Context.GetLogger().Error(e, "{Type}: Exception during package list load", this.GetType().Name);
+                        }
+                    });
 
             this.Receive<CollectionRequest<NodeTemplate>>(m => this.workers.Forward(m));
             this.Receive<RestActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));

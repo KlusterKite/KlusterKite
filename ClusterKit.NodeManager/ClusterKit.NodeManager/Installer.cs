@@ -47,6 +47,12 @@
             {
                 throw new ConfigurationException($"{NodeManagerActor.ConfigDatabaseNamePath} is not defined");
             }
+
+            var packageRepository = config.GetString(NodeManagerActor.PacakgeRepositoryUrlPath);
+            if (string.IsNullOrEmpty(packageRepository))
+            {
+                throw new ConfigurationException($"{NodeManagerActor.ConfigDatabaseNamePath} is not defined");
+            }
         }
 
         /// <summary>

@@ -98,6 +98,31 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Gets list of available packages from local cluster repository
+        /// </summary>
+        /// <returns>The list of available packages</returns>
+        [Route("getPackages")]
+        [HttpGet]
+        public async Task<List<PackageDescription>> GetPackages()
+        {
+            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
+        }
+
+        /// <summary>
+        /// Request to server to reload package list
+        /// </summary>
+        /// <returns>Success of the operation</returns>
+        [Route("reloadPackages")]
+        [HttpGet]
+        public async Task ReloadPackages()
+        {
+            var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);
+            throw result
+                      ? new HttpResponseException(HttpStatusCode.OK)
+                      : new HttpResponseException(HttpStatusCode.InternalServerError);
+        }
+
+        /// <summary>
         /// Manual node upgrade request
         /// </summary>
         /// <param name="address">Address of node to upgrade</param>
