@@ -22,7 +22,7 @@
     "boilerplate",
     "babel"
   ],
-  "main": "bin/server.js",
+  "main": "jsbin/server.js",
   "scripts": {
     "start": "concurrent --kill-others \"npm run start-prod\" \"npm run start-prod-api\"",
     "start-prod": "better-npm-run start-prod",
@@ -40,7 +40,7 @@
   },
   "betterScripts": {
     "start-prod": {
-      "command": "node ./bin/server.js",
+      "command": "node ./jsbin/server.js",
       "env": {
         "NODE_PATH": "./src",
         "NODE_ENV": "production",
@@ -49,7 +49,7 @@
       }
     },
     "start-prod-api": {
-      "command": "node ./bin/api.js",
+      "command": "node ./jsbin/api.js",
       "env": {
         "NODE_PATH": "./api",
         "NODE_ENV": "production",
@@ -57,7 +57,7 @@
       }
     },
     "start-dev": {
-      "command": "node ./bin/server.js",
+      "command": "node ./jsbin/server.js",
       "env": {
         "NODE_PATH": "./src",
         "NODE_ENV": "development",
@@ -66,7 +66,7 @@
       }
     },
     "start-dev-api": {
-      "command": "node ./bin/api.js",
+      "command": "node ./jsbin/api.js",
       "env": {
         "NODE_PATH": "./api",
         "NODE_ENV": "development",
