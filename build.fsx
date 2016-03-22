@@ -62,9 +62,14 @@ let buildDocker (containerName:string) (path:string) =
         failwithf "Error while building %s" path
 
 let pushPackage package =
+    trace package
+    let localPath = Fake.FileSystemHelper.currentDirectory
+    trace localPath
+    let packageLocal = package.Replace(localPath, ".")
+    trace packageLocal
     ExecProcess (fun info ->
         info.FileName <- "nuget.exe";
-        info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" package "http://192.168.99.100:81/" "ClusterKit")
+        info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" packageLocal "http://192.168.99.100:81/" "ClusterKit")
         (TimeSpan.FromMinutes 30.0)
         |> ignore
 
