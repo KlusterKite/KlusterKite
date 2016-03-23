@@ -28,6 +28,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Rest", "Clu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Data", "ClusterKit.Core.Data\ClusterKit.Core.Data.csproj", "{0D6871D1-5A69-4533-BA4B-073B876232C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Data.TestKit", "ClusterKit.Core.Data.TestKit\ClusterKit.Core.Data.TestKit.csproj", "{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.EF.TestKit", "ClusterKit.Core.EF.TestKit\ClusterKit.Core.EF.TestKit.csproj", "{6D78C999-7A74-488B-A55D-919C593197CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +74,14 @@ Global
 		{0D6871D1-5A69-4533-BA4B-073B876232C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D6871D1-5A69-4533-BA4B-073B876232C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D6871D1-5A69-4533-BA4B-073B876232C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D78C999-7A74-488B-A55D-919C593197CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D78C999-7A74-488B-A55D-919C593197CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D78C999-7A74-488B-A55D-919C593197CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D78C999-7A74-488B-A55D-919C593197CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

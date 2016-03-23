@@ -98,6 +98,10 @@
       <HintPath>..\..\packages\ClusterKit.Core.Data.0.0.0.0-local\lib\ClusterKit.Core.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClusterKit.Core.Data.TestKit">
+      <HintPath>..\..\packages\ClusterKit.Core.Data.TestKit.0.0.0.0-local\lib\ClusterKit.Core.Data.TestKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ClusterKit.Core.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\ClusterKit.Core.EF.0.0.0.0-local\lib\ClusterKit.Core.EF.dll</HintPath>
@@ -106,6 +110,10 @@
     <Reference Include="ClusterKit.Core.EF.Npgsql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\ClusterKit.Core.EF.Npgsql.0.0.0.0-local\lib\ClusterKit.Core.EF.Npgsql.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ClusterKit.Core.EF.TestKit">
+      <HintPath>..\..\packages\ClusterKit.Core.EF.TestKit.0.0.0.0-local\lib\ClusterKit.Core.EF.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ClusterKit.Core.Rest">
@@ -172,10 +180,6 @@
     <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Moq">
-      <HintPath>..\..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
