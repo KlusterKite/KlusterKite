@@ -21,11 +21,12 @@ let projects = [|
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Build/ClusterKit.Build.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Rest/ClusterKit.Core.Rest.csproj", ProjectDescription.EnProjectType.NugetPackage)
+    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Data/ClusterKit.Core.Data.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core.Rest"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Tests/ClusterKit.Core.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"|]))
-    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.EF/ClusterKit.Core.EF.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.Rest"|]))
-    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.EF.Npgsql/ClusterKit.Core.EF.Npgsql.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.EF"|]))
+    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.EF/ClusterKit.Core.EF.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.Rest"; "ClusterKit.Core.Data"|]))
+    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.EF.Npgsql/ClusterKit.Core.EF.Npgsql.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.EF"; "ClusterKit.Core.Data"|]))
 
     new ProjectDescription("./ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Web/ClusterKit.Web.Descriptor/ClusterKit.Web.Descriptor.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"|]))
@@ -48,9 +49,24 @@ let projects = [|
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher.Messages/ClusterKit.NodeManager.Launcher.Messages.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.NodeManager.Launcher.Messages"|]))
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"|]))
-    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.EF"|]))
-    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager/ClusterKit.NodeManager.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"; "ClusterKit.Core.Rest"; "ClusterKit.Web.CRUDS"; "ClusterKit.NodeManager.Launcher.Messages"|]))
-    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Tests/ClusterKit.NodeManager.Tests.csproj", ProjectDescription.EnProjectType.SimpleBuild, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.Web.CRUDS"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"; "ClusterKit.Core.EF.Npgsql"; "ClusterKit.Core.Rest"; "ClusterKit.NodeManager.Launcher.Messages"|]))
+    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.EF"; "ClusterKit.Core.Data"|]))
+    new ProjectDescription(
+        "./ClusterKit.NodeManager/ClusterKit.NodeManager/ClusterKit.NodeManager.csproj",
+        ProjectDescription.EnProjectType.NugetPackage,
+        ([|
+            "ClusterKit.Core";
+            "ClusterKit.Core.EF";
+            "ClusterKit.Core.Data";
+            "ClusterKit.Core.Rest";
+            "ClusterKit.Web.Client";
+            "ClusterKit.Web.Descriptor";
+            "ClusterKit.Web";
+            "ClusterKit.Web.CRUDS";
+            "ClusterKit.NodeManager.Client";
+            "ClusterKit.NodeManager.ConfigurationSource";
+            "ClusterKit.NodeManager.Launcher.Messages"
+            |]))
+    new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Tests/ClusterKit.NodeManager.Tests.csproj", ProjectDescription.EnProjectType.SimpleBuild, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.Web.CRUDS"; "ClusterKit.NodeManager.Client"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.Core.EF"; "ClusterKit.Core.Data"; "ClusterKit.Core.EF.Npgsql"; "ClusterKit.Core.Rest"; "ClusterKit.NodeManager.Launcher.Messages"|]))
 
 |]
 
@@ -104,6 +120,7 @@ Target "Test" (fun _ ->
 Target "DockerBase" (fun _ ->
     buildDocker "clusterkit/baseworker" "Docker/ClusterKitBaseWorkerNode"
     buildDocker "clusterkit/baseweb" "Docker/ClusterKitBaseWebNode"
+    buildDocker "clusterkit/nuget" "Docker/ClusterKitNuget"
 )
 
 // builds standard docker images
@@ -192,7 +209,9 @@ Target "PushLocalPackages" (fun _ ->
 // switches nuget and build version from init one, to latest posible on docker nuget server
 Target "SetVersion" (fun _ ->
     let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" "ClusterKit.Core"
-    let version = if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"
+    if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
+    let version = Regex.Replace((if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"), "((\\d+\\.?)+)(.*)", "$1-local")
+    tracef "New version is %s \n" version
     BuildUtils.Configure(version, buildDir, packageDir, "./packages")
 )
 
@@ -221,6 +240,8 @@ Target "CleanPackageCache" (fun _ ->
 "DockerBase" ?=> "CleanDockerImages"
 "DockerContainers" ?=> "CleanDockerImages"
 "DockerBase" ?=> "DockerContainers"
+
+"CleanPackageCache" <=? "CreateNuGet"
 
 "PushLocalPackages" <=? "CreateNuGet"
 "PushThirdPartyPackages" <=? "CleanPackageCache"
@@ -262,5 +283,6 @@ Target "FinalPushAllPackages" (fun _ -> ())
 Target "FinalRefreshLocalDependencies" (fun _ -> ())
 "RefreshLocalDependencies" ==> "FinalRefreshLocalDependencies"
 "FinalCreateNuGet" ==> "FinalRefreshLocalDependencies"
+"CleanPackageCache" ==> "FinalRefreshLocalDependencies"
 
 RunTargetOrDefault "FinalRefreshLocalDependencies"

@@ -5,6 +5,7 @@
       <Value>api</Value>
       <Value>akka</Value>
       <Value>crud</Value>
+      <Value>datasource</Value>
       <Value>dbset</Value>
       <Value>ef</Value>
       <Value>hocon</Value>

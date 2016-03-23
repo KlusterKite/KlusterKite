@@ -11,9 +11,11 @@ namespace ClusterKit.NodeManager.Client
 {
     using System;
     using System.Linq;
+    using System.Reflection;
 
     using Akka.Actor;
     using Akka.Cluster;
+    using Akka.Event;
 
     using ClusterKit.Core;
     using ClusterKit.Core.Utils;
@@ -46,41 +48,53 @@ namespace ClusterKit.NodeManager.Client
                 nodeId = Guid.NewGuid();
             }
 
-            this.description = new NodeDescription
+            try
             {
-                NodeAddress = Cluster.Get(Context.System).SelfAddress,
-                NodeTemplate =
-                                Context.System.Settings.Config.GetString(
-                                    "ClusterKit.NodeManager.NodeTemplate"),
-                ContainerType =
-                                Context.System.Settings.Config.GetString(
-                                    "ClusterKit.NodeManager.ContainerType"),
-                NodeTemplateVersion =
-                                Context.System.Settings.Config.GetInt(
-                                    "ClusterKit.NodeManager.NodeTemplateVersion"),
-                NodeId = nodeId,
-                StartTimeStamp = this.startTimeStamp,
-                Modules =
-                                AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(
-                                    a =>
-                                    a.GetTypes()
-                                        .Any(t => t.IsSubclassOf(typeof(BaseInstaller))))
-                                .Select(
-                                    a =>
-                                    new PackageDescription()
-                                    {
-                                        Id = a.GetName().Name,
-                                        Version =
-                                                a.GetName()
-                                                .Version
-                                                .ToString()
-                                    })
-                                .ToList()
-            };
+                this.description = new NodeDescription
+                {
+                    NodeAddress = Cluster.Get(Context.System).SelfAddress,
+                    NodeTemplate =
+                                               Context.System.Settings.Config.GetString(
+                                                   "ClusterKit.NodeManager.NodeTemplate"),
+                    ContainerType =
+                                               Context.System.Settings.Config.GetString(
+                                                   "ClusterKit.NodeManager.ContainerType"),
+                    NodeTemplateVersion =
+                                               Context.System.Settings.Config.GetInt(
+                                                   "ClusterKit.NodeManager.NodeTemplateVersion"),
+                    NodeId = nodeId,
+                    StartTimeStamp = this.startTimeStamp,
+                    Modules =
+                                               AppDomain.CurrentDomain.GetAssemblies()
+                                               .Where(
+                                                   a =>
+                                                   a.GetTypes()
+                                                       .Any(t => t.IsSubclassOf(typeof(BaseInstaller))))
+                                               .Select(
+                                                   a =>
+                                                   new PackageDescription()
+                                                   {
+                                                       Id = a.GetName().Name,
+                                                       Version =
+                                                               a.GetName()
+                                                               .Version.ToString()
+                                                   })
+                                               .ToList()
+                };
+            }
+            catch (ReflectionTypeLoadException exception)
+            {
+                foreach (var loaderException in exception.LoaderExceptions)
+                {
+                    Context.GetLogger()
+                        .Error(loaderException, "{Type}: exception during assemblies read", this.GetType().Name);
+                }
+
+                throw;
+            }
 
             this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(this.description));
-            this.Receive<ShutdownMessage>(m => Context.System.Terminate());
+            this.Receive<ShutdownMessage>(m => { Context.System.Terminate(); });
         }
     }
 }

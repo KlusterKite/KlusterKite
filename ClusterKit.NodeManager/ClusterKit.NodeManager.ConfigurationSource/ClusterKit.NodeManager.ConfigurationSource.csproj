@@ -81,6 +81,10 @@
       <HintPath>..\..\packages\ClusterKit.Core.0.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClusterKit.Core.Data">
+      <HintPath>..\..\packages\ClusterKit.Core.Data.0.0.0.0-local\lib\ClusterKit.Core.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ClusterKit.Core.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\ClusterKit.Core.EF.0.0.0.0-local\lib\ClusterKit.Core.EF.dll</HintPath>
@@ -152,11 +156,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationContext.cs" />
+    <Compile Include="ConfigurationContextFactory.cs" />
     <Compile Include="Configurations.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Configurations.resx</DependentUpon>
     </Compile>
+    <Compile Include="Installer.cs" />
     <Compile Include="Migrations\201603060827581_Init.cs" />
     <Compile Include="Migrations\201603060827581_Init.Designer.cs">
       <DependentUpon>201603060827581_Init.cs</DependentUpon>
@@ -179,9 +185,12 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeTemplate.cs" />
+    <Compile Include="NodeTemplateFactory.cs" />
     <Compile Include="NugetFeed.cs" />
+    <Compile Include="NugetFeedFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SeedAddress.cs" />
+    <Compile Include="SeedAddressFactorycs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -21,6 +21,22 @@
         private BaseEntityFrameworkInstaller installer;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Installer"/> class.
+        /// </summary>
+        public Installer()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Installer"/> class.
+        /// </summary>
+        /// <param name="installer">Entity framework driver installer</param>
+        public Installer(BaseEntityFrameworkInstaller installer)
+        {
+            this.installer = installer;
+        }
+
+        /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
@@ -51,38 +67,45 @@
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
-            Log.Information("Registering EF endpoint driver");
-            try
+            if (this.installer == null)
             {
-                var installerTypes =
-                    AppDomain.CurrentDomain.GetAssemblies()
-                        .SelectMany(a => a.GetTypes())
-                        .Where(t => t.IsSubclassOf(typeof(BaseEntityFrameworkInstaller))).ToList();
-
-                if (installerTypes.Count > 1)
+                Log.Information("Registering EF endpoint driver");
+                try
                 {
-                    throw new ConfigurationException($"There should be only one BaseEntityFrameworkInstaller, but found \n{string.Join(", \n", installerTypes.Select(t => t.FullName))}");
-                }
+                    var installerTypes =
+                        AppDomain.CurrentDomain.GetAssemblies()
+                            .SelectMany(a => a.GetTypes())
+                            .Where(t => t.IsSubclassOf(typeof(BaseEntityFrameworkInstaller)))
+                            .ToList();
 
-                if (installerTypes.Count == 0)
-                {
-                    throw new ConfigurationException($"There is no BaseEntityFrameworkInstaller");
-                }
+                    if (installerTypes.Count > 1)
+                    {
+                        throw new ConfigurationException(
+                            $"There should be only one BaseEntityFrameworkInstaller, but found \n{string.Join(", \n", installerTypes.Select(t => t.FullName))}");
+                    }
 
-                this.installer = (BaseEntityFrameworkInstaller)installerTypes.Single().GetConstructor(new Type[0])?.Invoke(new object[0]);
-                if (this.installer == null)
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-            catch (ReflectionTypeLoadException e)
-            {
-                foreach (var le in e.LoaderExceptions.Take(30))
-                {
-                    Log.Logger.Error($"{le.Message}");
-                }
+                    if (installerTypes.Count == 0)
+                    {
+                        throw new ConfigurationException($"There is no BaseEntityFrameworkInstaller");
+                    }
 
-                throw;
+                    this.installer =
+                        (BaseEntityFrameworkInstaller)
+                        installerTypes.Single().GetConstructor(new Type[0])?.Invoke(new object[0]);
+                    if (this.installer == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    foreach (var le in e.LoaderExceptions.Take(30))
+                    {
+                        Log.Logger.Error($"{le.Message}");
+                    }
+
+                    throw;
+                }
             }
 
             if (this.installer != null)

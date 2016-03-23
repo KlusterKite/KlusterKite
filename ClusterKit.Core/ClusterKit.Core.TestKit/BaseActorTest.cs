@@ -7,18 +7,16 @@
 namespace ClusterKit.Core.TestKit
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
 
     using Akka.Actor;
-    using Akka.Configuration;
     using Akka.DI.CastleWindsor;
     using Akka.DI.Core;
     using Akka.TestKit;
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
     using ClusterKit.Core.Utils;
+
     using Serilog;
     using Xunit;
     using Xunit.Abstractions;

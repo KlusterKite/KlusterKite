@@ -3,18 +3,14 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Generic actor to permom basic crud operation on EF objects
+//   Generic actor to perform basic crud operation on EF objects
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-// ReSharper disable FormatStringProblem
-namespace ClusterKit.Core.EF
+namespace ClusterKit.Core.Data
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
-    using System.Linq;
-    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -22,15 +18,17 @@ namespace ClusterKit.Core.EF
 
     using ClusterKit.Core.Rest.ActionMessages;
 
+    using JetBrains.Annotations;
+
     /// <summary>
-    /// Generic actor to perform basic crud operation on EF objects
+    /// Generic actor to perform basic crud operation on data objects
     /// </summary>
     /// <typeparam name="TContext">
     /// The database context
     /// </typeparam>
     public abstract class BaseCrudActor<TContext>
         : ReceiveActor
-        where TContext : DbContext
+        where TContext : IDisposable
     {
         /// <summary>
         /// Method called after successful object creation in database
@@ -49,8 +47,8 @@ namespace ClusterKit.Core.EF
         /// <typeparam name="TObject">
         /// The type of ef object
         /// </typeparam>
-        /// <param name="deletedObjects">List of removed objects</param>
-        protected virtual void AfterDelete<TObject>(List<TObject> deletedObjects) where TObject : class
+        /// <param name="deletedObject">removed object</param>
+        protected virtual void AfterDelete<TObject>(TObject deletedObject) where TObject : class
         {
         }
 
@@ -128,29 +126,18 @@ namespace ClusterKit.Core.EF
         /// <typeparam name="TObject">
         /// The type of ef object
         /// </typeparam>
+        /// <typeparam name="TId">
+        /// The type of object identity field
+        /// </typeparam>
         /// <param name="collectionRequest">Collection request</param>
-        /// <param name="getDbSet">
-        /// Method to retrieve dbset from context
-        /// </param>
-        /// <param name="sortFunction">
-        /// Method to sort entities
-        /// </param>
         /// <returns>The list of objects</returns>
-        protected virtual async Task OnCollectionRequest<TObject>(
-            CollectionRequest<TObject> collectionRequest,
-            Func<TContext, DbSet<TObject>> getDbSet,
-            Func<IQueryable<TObject>, IOrderedQueryable<TObject>> sortFunction)
+        protected virtual async Task OnCollectionRequest<TObject, TId>(CollectionRequest<TObject> collectionRequest)
             where TObject : class
         {
             using (var ds = await this.GetContext())
             {
-                var query = sortFunction(getDbSet(ds)).Skip(collectionRequest.Skip);
-                if (collectionRequest.Count.HasValue)
-                {
-                    query = query.Take(collectionRequest.Count.Value);
-                }
-
-                this.Sender.Tell(await query.ToListAsync());
+                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+                this.Sender.Tell(await factory.GetList(collectionRequest.Skip, collectionRequest.Count));
             }
         }
 
@@ -166,32 +153,20 @@ namespace ClusterKit.Core.EF
         /// <param name="request">
         /// The action request
         /// </param>
-        /// <param name="getDbSet">
-        /// Method to retrieve dbset from context
-        /// </param>
-        /// <param name="getId">
-        /// Method to retrieve id from object
-        /// </param>
-        /// <param name="getIdValidationExpression">
-        /// Method to get expression to check object's id
-        /// </param>
         /// <returns>
         /// Execution task
         /// </returns>
-        protected virtual async Task OnRequest<TObject, TId>(
-            RestActionMessage<TObject, TId> request,
-             Func<TContext, DbSet<TObject>> getDbSet,
-             Func<TObject, TId> getId,
-             Func<TId, Expression<Func<TObject, bool>>> getIdValidationExpression)
+        [UsedImplicitly]
+        protected virtual async Task OnRequest<TObject, TId>(RestActionMessage<TObject, TId> request)
             where TObject : class
         {
             using (var ds = await this.GetContext())
             {
-                var set = getDbSet(ds);
+                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
                 switch (request.ActionType)
                 {
                     case EnActionType.Get:
-                        this.Sender.Tell(this.OnSelect(await set.FirstOrDefaultAsync(getIdValidationExpression(request.Id))));
+                        this.Sender.Tell(this.OnSelect(await factory.Get(request.Id)));
                         break;
 
                     case EnActionType.Create:
@@ -204,10 +179,14 @@ namespace ClusterKit.Core.EF
                                 return;
                             }
 
-                            var oldObject = await set.FirstOrDefaultAsync(getIdValidationExpression(getId(entity)));
+                            var oldObject = await factory.Get(factory.GetId(entity));
                             if (oldObject != null)
                             {
-                                Context.GetLogger().Error("{Type}: create failed, there is already object with id {Id}", this.GetType().Name, getId(entity).ToString());
+                                Context.GetLogger()
+                                    .Error(
+                                        "{Type}: create failed, there is already object with id {Id}",
+                                        this.GetType().Name,
+                                        factory.GetId(entity).ToString());
                                 this.Sender.Tell(null);
                                 return;
                             }
@@ -216,22 +195,27 @@ namespace ClusterKit.Core.EF
 
                             if (entity == null)
                             {
-                                Context.GetLogger().Error("{Type}: create failed, prevented by BeforeCreate", this.GetType().Name);
+                                Context.GetLogger()
+                                    .Error("{Type}: create failed, prevented by BeforeCreate", this.GetType().Name);
                                 this.Sender.Tell(null);
                                 return;
                             }
 
-                            set.Add(entity);
                             try
                             {
-                                await ds.SaveChangesAsync();
+                                await factory.Insert(entity);
                                 this.Sender.Tell(entity);
                                 this.AfterCreate(entity);
                                 return;
                             }
                             catch (Exception exception)
                             {
-                                Context.GetLogger().Error(exception, "{Type}: create failed, error while creating object with id {Id}", this.GetType().Name, getId(entity).ToString());
+                                Context.GetLogger()
+                                    .Error(
+                                        exception,
+                                        "{Type}: create failed, error while creating object with id {Id}",
+                                        this.GetType().Name,
+                                        factory.GetId(entity).ToString());
                                 this.Sender.Tell(null);
                                 return;
                             }
@@ -247,10 +231,14 @@ namespace ClusterKit.Core.EF
                                 return;
                             }
 
-                            var oldObject = await set.FirstOrDefaultAsync(getIdValidationExpression(getId(entity)));
+                            var oldObject = await factory.Get(factory.GetId(entity));
                             if (oldObject == null)
                             {
-                                Context.GetLogger().Error("{Type}: update failed, there is no object with id {Id}", this.GetType().Name, getId(entity).ToString());
+                                Context.GetLogger()
+                                    .Error(
+                                        "{Type}: update failed, there is no object with id {Id}",
+                                        this.GetType().Name,
+                                        factory.GetId(entity).ToString());
                                 this.Sender.Tell(null);
                                 return;
                             }
@@ -258,38 +246,66 @@ namespace ClusterKit.Core.EF
                             entity = this.BeforeUpdate(entity, oldObject);
                             if (entity == null)
                             {
-                                Context.GetLogger().Error("{Type}: update of object with id {Id} failed, prevented by BeforeUpdate", this.GetType().Name, getId(oldObject).ToString());
+                                Context.GetLogger()
+                                    .Error(
+                                        "{Type}: update of object with id {Id} failed, prevented by BeforeUpdate",
+                                        this.GetType().Name,
+                                        factory.GetId(request.Request).ToString());
                                 this.Sender.Tell(null);
                                 return;
                             }
 
-                            set.Attach(entity);
                             try
                             {
-                                await ds.SaveChangesAsync();
+                                await factory.Update(entity);
                                 this.Sender.Tell(entity);
                                 this.AfterUpdate(entity, oldObject);
                                 return;
                             }
                             catch (Exception exception)
                             {
-                                Context.GetLogger().Error(exception, "{Type}: update failed, error while creating object with id {Id}", this.GetType().Name, getId(entity).ToString());
+                                Context.GetLogger()
+                                    .Error(
+                                        exception,
+                                        "{Type}: update failed, error while creating object with id {Id}",
+                                        this.GetType().Name,
+                                        factory.GetId(entity).ToString());
                                 this.Sender.Tell(null);
                                 return;
                             }
                         }
 
                     case EnActionType.Delete:
-                        var deletedObjects = await set.Where(getIdValidationExpression(request.Id)).ToListAsync();
-                        set.RemoveRange(this.BeforeDelete(deletedObjects));
-                        var success = await ds.SaveChangesAsync() > 0;
-                        if (success)
                         {
-                            this.AfterDelete(deletedObjects);
-                        }
+                            try
+                            {
+                                var oldObject = await factory.Delete(request.Id);
+                                if (oldObject == null)
+                                {
+                                    Context.GetLogger()
+                                        .Error(
+                                            "{Type}: delete failed, there is no object with id {Id}",
+                                            this.GetType().Name,
+                                            request.Id.ToString());
+                                    this.Sender.Tell(false);
+                                }
 
-                        this.Sender.Tell(success);
-                        break;
+                                this.AfterDelete(oldObject);
+                                this.Sender.Tell(true);
+                                return;
+                            }
+                            catch (Exception exception)
+                            {
+                                Context.GetLogger()
+                                    .Error(
+                                        exception,
+                                        "{Type}: delete failed, error while deleting object with id {Id}",
+                                        this.GetType().Name,
+                                        request.Id.ToString());
+                                this.Sender.Tell(false);
+                                return;
+                            }
+                        }
 
                     default:
                         throw new ArgumentOutOfRangeException();
