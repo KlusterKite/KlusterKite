@@ -26,14 +26,8 @@ namespace ClusterKit.Core.TestKit
         public string ReceiverPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the receiver address path from actor system root.
+        /// Getsthe receiver address path from actor system root.
         /// </summary>
-        public string ReceiverPathRooted
-        {
-            get
-            {
-                return TestActorForwarder.RootedPath(this.ReceiverPath);
-            }
-        }
+        public string ReceiverPathRooted => TestActorForwarder.RootedPath(this.ReceiverPath);
     }
 }

@@ -34,6 +34,7 @@ namespace ClusterKit.Core.TestKit
         {
             description.Container.Register(Component.For<IActorRef>().Instance(this.TestActor).Named("testActor"));
             description.Container.Register(Component.For<IWindsorContainer>().Instance(description.Container).LifestyleSingleton());
+            description.Container.Register(Component.For<ActorSystem>().Instance(this.Sys).LifestyleSingleton());
             this.WindsorContainer = description.Container;
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(this.WindsorContainer));
         }

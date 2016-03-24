@@ -11,7 +11,6 @@ namespace ClusterKit.NodeManager
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -20,8 +19,8 @@ namespace ClusterKit.NodeManager
     using Akka.Event;
     using Akka.Util.Internal;
 
+    using ClusterKit.Core;
     using ClusterKit.Core.Data;
-    using ClusterKit.Core.EF;
     using ClusterKit.Core.Ping;
     using ClusterKit.Core.Rest.ActionMessages;
     using ClusterKit.Core.Utils;
@@ -31,8 +30,6 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.Messages;
 
     using JetBrains.Annotations;
-
-    using NuGet;
 
     /// <summary>
     /// Singleton actor performing all node configuration related work
@@ -111,6 +108,11 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications = new Dictionary<Address, Cancelable>();
 
         /// <summary>
+        /// The node message router
+        /// </summary>
+        private readonly IMessageRouter router;
+
+        /// <summary>
         /// List of configured seed addresses
         /// </summary>
         private readonly Dictionary<int, SeedAddress> seedAddresses = new Dictionary<int, SeedAddress>();
@@ -134,7 +136,7 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private Dictionary<string, PackageDescription> packages = new Dictionary<string, PackageDescription>();
 
-        private Cancelable upgradeMessageSchedule = null;
+        private Cancelable upgradeMessageSchedule;
 
         /// <summary>
         /// Child actor workers
@@ -147,9 +149,15 @@ namespace ClusterKit.NodeManager
         /// <param name="contextFactory">
         /// Configuration context factory
         /// </param>
-        public NodeManagerActor(IContextFactory<ConfigurationContext> contextFactory)
+        /// <param name="router">
+        /// The node message router
+        /// </param>
+        public NodeManagerActor(
+            IContextFactory<ConfigurationContext> contextFactory,
+            IMessageRouter router)
         {
             this.contextFactory = contextFactory;
+            this.router = router;
 
             this.fullClusterWaitTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.FullClusterWaitTimeout", TimeSpan.FromSeconds(60), false);
             this.newNodeJoinTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.NewNodeJoinTimeout", TimeSpan.FromSeconds(30), false);
@@ -508,7 +516,7 @@ namespace ClusterKit.NodeManager
         /// Process the node template update event
         /// </summary>
         /// <param name="message">Note template update notification</param>
-        private void OnNodeTemplateUpdate(Core.Data.UpdateMessage<NodeTemplate> message)
+        private void OnNodeTemplateUpdate(UpdateMessage<NodeTemplate> message)
         {
             switch (message.ActionType)
             {
@@ -552,7 +560,7 @@ namespace ClusterKit.NodeManager
                 this.Sender.Tell(false);
             }
 
-            Context.ActorSelection($"{address}/user/NodeManager/Receiver").Tell(new ShutdownMessage(), this.Self);
+            this.router.Tell(address, "/user/NodeManager/Receiver", new ShutdownMessage(), this.Self);
             this.Sender.Tell(true);
         }
 
@@ -634,7 +642,7 @@ namespace ClusterKit.NodeManager
         /// Process the <seealso cref="NugetFeed"/> update event
         /// </summary>
         /// <param name="message"><seealso cref="NugetFeed"/> update notification</param>
-        private void OnNugetFeedUpdate(Core.Data.UpdateMessage<NugetFeed> message)
+        private void OnNugetFeedUpdate(UpdateMessage<NugetFeed> message)
         {
             switch (message.ActionType)
             {
@@ -661,7 +669,7 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            Context.ActorSelection($"{message.Address}/user/NodeManager/Receiver").Tell(new Identify("receiver"), this.Self);
+            this.router.Tell(message.Address, "/user/NodeManager/Receiver", new Identify("receiver"), this.Self);
 
             if (message.Attempt >= this.newNodeRequestDescriptionNotificationMaxRequests)
             {
@@ -699,7 +707,7 @@ namespace ClusterKit.NodeManager
         /// Process the <seealso cref="SeedAddress"/> update event
         /// </summary>
         /// <param name="message"><seealso cref="SeedAddress"/> update notification</param>
-        private void OnSeedAddressUpdate(Core.Data.UpdateMessage<SeedAddress> message)
+        private void OnSeedAddressUpdate(UpdateMessage<SeedAddress> message)
         {
             switch (message.ActionType)
             {
@@ -811,7 +819,7 @@ namespace ClusterKit.NodeManager
             /// <summary>
             /// Gets or sets request attempt number
             /// </summary>
-            public int Attempt { get; set; } = 0;
+            public int Attempt { get; set; }
         }
 
         /// <summary>
@@ -861,7 +869,7 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Child actor intended to process database requests related to <seealso cref="NodeTemplate"/>
         /// </summary>
-        private class Worker : Core.Data.BaseCrudActorWithNotifications<ConfigurationContext>
+        private class Worker : BaseCrudActorWithNotifications<ConfigurationContext>
         {
             private readonly string connectionString;
 
@@ -875,6 +883,12 @@ namespace ClusterKit.NodeManager
             /// <summary>
             /// Initializes a new instance of the <see cref="Worker"/> class.
             /// </summary>
+            /// <param name="connectionString">
+            /// The database connection string
+            /// </param>
+            /// <param name="databaseName">
+            /// The database name
+            /// </param>
             /// <param name="contextFactory">
             /// Configuration context factory
             /// </param>
