@@ -127,8 +127,14 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private readonly Dictionary<Guid, UpgradeData> upgradingNodes = new Dictionary<Guid, UpgradeData>();
 
+        /// <summary>
+        /// The database connection string
+        /// </summary>
         private string connectionString;
 
+        /// <summary>
+        /// The database name
+        /// </summary>
         private string databaseName;
 
         /// <summary>

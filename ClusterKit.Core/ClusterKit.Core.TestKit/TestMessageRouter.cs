@@ -49,14 +49,8 @@ namespace ClusterKit.Core.TestKit
         /// <returns>The response</returns>
         public Task<T> Ask<T>(Address nodeAddress, string path, object message, TimeSpan timeout)
         {
-            return this.testActor.Ask<T>(
-                new RemoteTestMessage<object>
-                {
-                    Message = message,
-                    ReceiverPath = path,
-                    RecipientAddress = nodeAddress
-                },
-            timeout);
+            var forwardedMessage = CreateForwardedMessage(nodeAddress, path, message);
+            return this.testActor.Ask<T>(forwardedMessage, timeout);
         }
 
         /// <summary>
@@ -76,14 +70,28 @@ namespace ClusterKit.Core.TestKit
         /// </param>
         public void Tell(Address nodeAddress, string path, object message, IActorRef sender = null)
         {
-            this.testActor.Tell(
-                new RemoteTestMessage<object>
-                {
-                    Message = message,
-                    ReceiverPath = path,
-                    RecipientAddress = nodeAddress
-                },
-            sender);
+            var forwardedMessage = CreateForwardedMessage(nodeAddress, path, message);
+            this.testActor.Tell(forwardedMessage, sender);
+        }
+
+        /// <summary>
+        ///  Create forwarded message with specified parameters
+        /// </summary>
+        /// <param name="nodeAddress">The node address.</param>
+        /// <param name="path">The recipient path.</param>
+        /// <param name="message">The message.</param>
+        /// <returns>The message wrapped in <see cref="RemoteTestMessage{T}"/></returns>
+        private static object CreateForwardedMessage(
+            Address nodeAddress,
+            string path,
+            object message)
+        {
+            var returnType = typeof(RemoteTestMessage<>).MakeGenericType(message.GetType());
+            var forwardedMessage = Activator.CreateInstance(returnType);
+            returnType.GetProperty("Message").SetValue(forwardedMessage, message);
+            returnType.GetProperty("ReceiverPath").SetValue(forwardedMessage, path);
+            returnType.GetProperty("RecipientAddress").SetValue(forwardedMessage, nodeAddress);
+            return forwardedMessage;
         }
     }
 }
