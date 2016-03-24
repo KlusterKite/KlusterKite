@@ -262,11 +262,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbContextTest.cs" />
     <Compile Include="NodeManagerActorTests.cs" />
-    <Compile Include="NuGetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SingletonTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

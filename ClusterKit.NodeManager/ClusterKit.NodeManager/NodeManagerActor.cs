@@ -536,6 +536,13 @@ namespace ClusterKit.NodeManager
                     {
                         this.nodeTemplates.Remove(message.OldObject.Code);
                     }
+
+                    foreach (var value in this.nodeDescriptions.Values)
+                    {
+                        this.CheckNodeIsObsolete(value);
+                    }
+
+                    this.OnNodeUpgrade();
                     break;
 
                 case EnActionType.Delete:
@@ -767,7 +774,11 @@ namespace ClusterKit.NodeManager
 
             this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
             this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
-            this.Receive<ActiveNodeDescriptionsRequest>(m => this.Sender.Tell(this.nodeDescriptions.Values.ToList()));
+            this.Receive<ActiveNodeDescriptionsRequest>(
+                m =>
+                    {
+                        this.Sender.Tell(this.nodeDescriptions.Values.ToList());
+                    });
             this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
             this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m.Address));
 

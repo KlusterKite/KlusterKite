@@ -14,6 +14,8 @@ namespace ClusterKit.Core.Data.TestKit
     using System.Linq;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Base mock object for data access
     /// </summary>
@@ -39,7 +41,8 @@ namespace ClusterKit.Core.Data.TestKit
         /// <summary>
         /// Local mock storage
         /// </summary>
-        private Dictionary<TId, TObject> Storage { get; } = new Dictionary<TId, TObject>();
+        [UsedImplicitly]
+        public Dictionary<TId, TObject> Storage { get; } = new Dictionary<TId, TObject>();
 
         /// <summary>
         /// Deletes object from datasource

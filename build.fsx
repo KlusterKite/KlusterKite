@@ -70,7 +70,7 @@ let projects = [|
             |]))
     new ProjectDescription(
         "./ClusterKit.NodeManager/ClusterKit.NodeManager.Tests/ClusterKit.NodeManager.Tests.csproj",
-        ProjectDescription.EnProjectType.SimpleBuild,
+        ProjectDescription.EnProjectType.XUnitTests,
         ([|
             "ClusterKit.Core";
             "ClusterKit.Core.TestKit";
