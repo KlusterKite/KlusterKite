@@ -7,6 +7,8 @@ import {
     Home,
     Login,
     LoginSuccess,
+    Templates,
+    TemplatesEdit,
     NotFound,
   } from 'containers';
 
@@ -44,6 +46,12 @@ export default (store) => {
 
       { /* Routes */ }
       <Route path="login" component={Login}/>
+      <Route component={Templates}>
+        <Route path="edit/:id" component={TemplatesEdit} />
+        <Route path="templates" />
+      </Route>
+      // <Route path="templates/edit/:id" component={TemplatesEdit}/>
+
       { /* Catch all route */ }
       <Route path="*" component={NotFound} status={404} />
     </Route>

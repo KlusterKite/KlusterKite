@@ -60,7 +60,7 @@ export default class App extends Component {
         <Navbar fixedTop>
           <Navbar.Header>
             <Navbar.Brand>
-              <IndexLink to="/" activeStyle={{color: '#FFCD33'}}>
+              <IndexLink to="/" activeStyle={{color: '#333'}}>
                 <div className={styles.brand}/>
                 <span>{config.app.title}</span>
               </IndexLink>
@@ -70,6 +70,9 @@ export default class App extends Component {
 
           <Navbar.Collapse eventKey={0}>
             <Nav navbar>
+              <LinkContainer to="/templates">
+                <NavItem eventKey={1}>Templates</NavItem>
+              </LinkContainer>
               {!user && false &&
               <LinkContainer to="/login">
                 <NavItem eventKey={5}>Login</NavItem>

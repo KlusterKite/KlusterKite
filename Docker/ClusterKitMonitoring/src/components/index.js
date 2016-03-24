@@ -5,4 +5,4 @@
  *
  */
 
-// export RegistrationForm from './RegistrationForm/RegistrationForm';
+export TemplateForm from './TemplateForm/TemplateForm';
