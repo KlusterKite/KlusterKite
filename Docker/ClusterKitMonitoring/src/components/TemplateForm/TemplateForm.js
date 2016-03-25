@@ -5,7 +5,18 @@ import {Hidden, Input, MultipleInput, Submit, TextArea} from '../forms/index';
 
 @reduxForm({
   form: 'template',
-  fields: ['Id', 'Code', 'Configuration', 'ContainerTypes', 'MaximumNeededInstances', 'MininmumRequiredInstances', 'Name', 'Packages', 'Priority', 'Version'],
+  fields: [
+    'Id',
+    'Code',
+    'Configuration',
+    'ContainerTypes[]',
+    'MaximumNeededInstances',
+    'MininmumRequiredInstances',
+    'Name',
+    'Packages[]',
+    'Priority',
+    'Version'
+  ],
   validate: templateValidation
 })
 export default
@@ -18,17 +29,22 @@ class TemplateForm extends Component {
     handleSubmit: PropTypes.func.isRequired,
     invalid: PropTypes.bool.isRequired,
     pristine: PropTypes.bool.isRequired,
-    valid: PropTypes.bool.isRequired
+    valid: PropTypes.bool.isRequired,
+    saving: PropTypes.bool,
+    saved: PropTypes.bool,
+    saveError: PropTypes.string
   }
 
   render() {
     const {
       fields: {Id, Code, Configuration, ContainerTypes, MaximumNeededInstances, MininmumRequiredInstances, Name, Packages, Priority, Version},
-      handleSubmit
+      handleSubmit,
+      saving,
+      saved,
+      saveError
       } = this.props;
 
     // Packages, ContainerTypes - arrays
-
     return (
       <div>
         <form onSubmit={handleSubmit}>
@@ -39,11 +55,10 @@ class TemplateForm extends Component {
           <Input field={MaximumNeededInstances} label="Maximum Needed Instances" />
           <Input field={Priority} label="Priority" />
           <Input field={Version} label="Version" />
-          <MultipleInput label="Packages" {...Packages} />
-          <TextArea field={Packages} label="Packages" rows={3} />
-          <TextArea field={ContainerTypes} label="ContainerTypes" rows={3} />
+          <MultipleInput field={Packages} label="Packages" />
+          <MultipleInput field={ContainerTypes} label="Container Types" />
           <TextArea field={Configuration} label="Configuration" rows={10} />
-          <Submit onClick={handleSubmit} />
+          <Submit onClick={handleSubmit} saving={saving} saved={saved} saveError={saveError} text="Save" />
         </form>
       </div>
     );

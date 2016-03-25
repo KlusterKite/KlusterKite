@@ -14,7 +14,10 @@ function fetchDataDeferred() {
   state => ({
     data: state.templates.data,
     loading: state.templates.loading,
-    loaded: state.templates.loaded
+    loaded: state.templates.loaded,
+    saving: state.templates.saving,
+    saved: state.templates.saved,
+    saveError: state.templates.saveError
   }),
   {...actions, initialize })
 
@@ -24,8 +27,12 @@ export default class TemplatesEdit extends Component {
     loading: PropTypes.bool,
     loaded: PropTypes.bool.isRequired,
     loadById: PropTypes.func.isRequired,
+    update: PropTypes.func.isRequired,
     initialize: PropTypes.func.isRequired,
-    data: PropTypes.object
+    data: PropTypes.object,
+    saving: PropTypes.bool,
+    saved: PropTypes.bool,
+    saveError: PropTypes.string
   };
 
   componentDidMount() {
@@ -45,28 +52,27 @@ export default class TemplatesEdit extends Component {
   }
 
   handleSubmit = (data) => {
-    window.alert('Data submitted! ' + JSON.stringify(data));
+    const {update} = this.props;
+
+    update(data);
   }
 
   render() {
-    const {loading, loaded, data} = this.props;
-
-    let loadClassName = 'fa fa-refresh';
-    if (loading) {
-      loadClassName += ' fa-spin';
-    }
+    const {loaded, saving, saved, saveError} = this.props;
 
     return (
         <div className="container">
-          <h1>Edit</h1>
+          <h1>Edit template</h1>
 
-          {!loaded && loading &&
+          {!loaded &&
           <div className="container">
             <p><i className="fa fa-spinner fa-spin"></i> Loading data… </p>
           </div>
           }
 
-          <TemplateForm onSubmit={this.handleSubmit} data={data}/>
+          {loaded &&
+            <TemplateForm onSubmit={this.handleSubmit} saving={saving} saved={saved} saveError={saveError} />
+          }
         </div>
     );
   }

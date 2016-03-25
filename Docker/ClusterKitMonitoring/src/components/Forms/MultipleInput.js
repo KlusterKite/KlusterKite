@@ -2,20 +2,29 @@ import React, { Component, PropTypes } from 'react';
 
 export default class MultipleInput extends Component {
   static propTypes = {
-    label: PropTypes.string.isRequired,
-    value: PropTypes.any
+    field: PropTypes.arrayOf(PropTypes.object),
+    label: PropTypes.string.isRequired
+  }
+
+  handleAdd = () => {
+    const {field} = this.props;
+
+    event.preventDefault();    // prevent form submission
+    field.addField();
   }
 
   render() {
-    const {label, value} = this.props;
-    console.log('multiple input');
-    console.log(value);
-    // const items = field.split(',');
-    // console.log(items);
+    const {field, label} = this.props;
 
     return (
-      <div>
-        {label}
+      <div className={'form-group'}>
+        <label>{label} <i className="fa fa-plus-circle" role="button" onClick={this.handleAdd}></i></label>
+        {!field.length && <div>No Items</div>}
+        {field && field.map((item, index) =>
+            <div key={index} className="form-group">
+              <input type="text" className="form-control" id={item.name} {...item}/>
+            </div>
+          )}
       </div>
     );
   }

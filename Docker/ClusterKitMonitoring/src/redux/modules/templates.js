@@ -1,6 +1,9 @@
 const LOAD = 'clusterkit-monitoring/templates/LOAD';
 const LOAD_SUCCESS = 'clusterkit-monitoring/templates/LOAD_SUCCESS';
 const LOAD_FAIL = 'clusterkit-monitoring/templates/LOAD_FAIL';
+const SAVE = 'clusterkit-monitoring/templates/SAVE';
+const SAVE_SUCCESS = 'clusterkit-monitoring/templates/SAVE_SUCCESS';
+const SAVE_FAIL = 'clusterkit-monitoring/templates/SAVE_FAIL';
 
 const initialState = {
   loaded: false,
@@ -30,6 +33,26 @@ export default function reducer(state = initialState, action = {}) {
         data: null,
         error: action.error
       };
+    case SAVE:
+      return {
+        ...state,
+        saving: true
+      };
+    case SAVE_SUCCESS:
+      return {
+        ...state,
+        saving: false,
+        saved: true,
+        saveError: null
+      };
+    case SAVE_FAIL:
+      console.log(action);
+      return {
+        ...state,
+        saving: false,
+        saved: false,
+        saveError: 'Saving data error. Sorry!'
+      };
     default:
       return state;
   }
@@ -45,7 +68,7 @@ export function load() {
 
   return {
     types: [LOAD, LOAD_SUCCESS, LOAD_FAIL],
-    promise: (client) => client.get(path) // params not used, just shown as demonstration
+    promise: (client) => client.get(path)
   };
 }
 
@@ -55,6 +78,18 @@ export function loadById(id) {
 
   return {
     types: [LOAD, LOAD_SUCCESS, LOAD_FAIL],
-    promise: (client) => client.get(path) // params not used, just shown as demonstration
+    promise: (client) => client.get(path)
+  };
+}
+
+export function update(data) {
+  const path = '/templates/update/' + data.Id;
+  console.log(`updatiting data to ${path}`);
+
+  return {
+    types: [SAVE, SAVE_SUCCESS, SAVE_FAIL],
+    promise: (client) => client.patch(path, {
+      data: data
+    })
   };
 }

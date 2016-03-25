@@ -4,3 +4,4 @@ export MultipleInput from './MultipleInput';
 export RadioButton from './RadioButton';
 export Submit from './Submit';
 export TextArea from './TextArea';
+export ObjectSelect from './ObjectSelect';

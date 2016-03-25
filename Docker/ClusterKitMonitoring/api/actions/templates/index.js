@@ -24,3 +24,16 @@ export function getById(req) {
     request.end((err, { body } = {}) => err ? reject(body || err) : resolve(body));
   });
 }
+
+export function update(req) {
+  const id = req.url.split('/')[3];
+  return new Promise((resolve, reject) => {
+    const request = superagent['patch'](formatUrl('/nodemanager/templates/' + id));
+    request.set('Accept', 'application/json');
+    request.send(req.body);
+
+    console.log('Sending to ' + request.url);
+
+    request.end((err, { body } = {}) => err ? reject(body || err) : resolve(body));
+  });
+}

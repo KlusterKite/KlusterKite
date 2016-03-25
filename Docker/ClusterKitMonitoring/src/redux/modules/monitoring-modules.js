@@ -44,6 +44,6 @@ export function loadModules() {
 
   return {
     types: [LOAD, LOAD_SUCCESS, LOAD_FAIL],
-    promise: (client) => client.get(path) // params not used, just shown as demonstration
+    promise: (client) => client.get(path)
   };
 }
