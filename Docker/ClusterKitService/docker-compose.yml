@@ -12,6 +12,11 @@ services:
     image: postgres
     environment:
      - NETWORK_NAME=postgres
+  monitoringUI:
+    image: clusterkit/monitoring-ui
+    ports:
+     - "82:8080"
+
 
   #Cluster servers
   seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes

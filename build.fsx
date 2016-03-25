@@ -187,6 +187,8 @@ Target "DockerContainers" (fun _ ->
 
     copyWebContent "./ClusterKit.Monitoring/ClusterKit.Monitoring.Web" "./Docker/ClusterKitSeed/web/monitoring"
     buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
+
+    buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
 )
 
 // removes unnamed dockaer images

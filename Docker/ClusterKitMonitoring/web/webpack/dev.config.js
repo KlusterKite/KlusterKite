@@ -48,6 +48,9 @@ babelLoaderQuery.extra['react-transform'].transforms.push({
 module.exports = {
   devtool: 'inline-source-map',
   context: path.resolve(__dirname, '..'),
+  watchOptions: {
+    poll: true
+  },
   entry: {
     'main': [
       'webpack-hot-middleware/client?path=http://' + host + ':' + port + '/__webpack_hmr',
