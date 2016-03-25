@@ -114,7 +114,7 @@ namespace ClusterKit.Core.Data.TestKit
         {
             if (!this.Storage.ContainsKey(this.GetId(obj)))
             {
-                throw new InvalidOperationException("Duplicate insert");
+                throw new InvalidOperationException("There is no item to update");
             }
 
             this.Storage[this.GetId(obj)] = obj;

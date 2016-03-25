@@ -11,10 +11,13 @@ namespace ClusterKit.Core.Data
 {
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Data context creation factory contract
     /// </summary>
     /// <typeparam name="TContext">Type of context to create</typeparam>
+    [UsedImplicitly]
     public interface IContextFactory<TContext>
     {
         /// <summary>
@@ -30,6 +33,7 @@ namespace ClusterKit.Core.Data
         /// <returns>
         /// The data context
         /// </returns>
+        [UsedImplicitly]
         Task<TContext> CreateAndUpgradeContext(string connectionString, string databaseName);
 
         /// <summary>
@@ -45,6 +49,7 @@ namespace ClusterKit.Core.Data
         /// <returns>
         /// The data context
         /// </returns>
+        [UsedImplicitly]
         Task<TContext> CreateContext(string connectionString, string databaseName);
     }
 }
