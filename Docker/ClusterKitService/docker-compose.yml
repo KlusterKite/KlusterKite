@@ -2,7 +2,8 @@ version: '2'
 services:
   #set of abstract utility servers
   nuget:
-    image: sunside/simple-nuget-server
+    #image: sunside/simple-nuget-server
+    image: clusterkit/nuget
     ports:
      - "81:80"
     environment:

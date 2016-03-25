@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BaseCrudActorWithNotifications.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,15 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.EF
+namespace ClusterKit.Core.Data
 {
-    using System.Collections.Generic;
-    using System.Data.Entity;
-
+    using System;
     using Akka.Actor;
-
     using ClusterKit.Core.Rest.ActionMessages;
-
     using JetBrains.Annotations;
 
     /// <summary>
@@ -25,7 +21,7 @@ namespace ClusterKit.Core.EF
     /// The database context
     /// </typeparam>
     public abstract class BaseCrudActorWithNotifications<TContext> : BaseCrudActor<TContext>
-        where TContext : DbContext
+        where TContext : IDisposable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseCrudActorWithNotifications{TContext}"/> class.
@@ -64,16 +60,12 @@ namespace ClusterKit.Core.EF
         /// <typeparam name="TObject">
         /// The type of ef object
         /// </typeparam>
-        /// <param name="deletedObjects">List of removed objects</param>
-        protected override void AfterDelete<TObject>(List<TObject> deletedObjects)
+        /// <param name="deletedObject">The removed object</param>
+        protected override void AfterDelete<TObject>(TObject deletedObject)
         {
-            foreach (var template in deletedObjects)
-            {
-                this.NotificationReceiver.Tell(
-                    new UpdateMessage<TObject> { ActionType = EnActionType.Delete, OldObject = template });
-            }
-
-            base.AfterDelete(deletedObjects);
+            this.NotificationReceiver.Tell(
+                    new UpdateMessage<TObject> { ActionType = EnActionType.Delete, OldObject = deletedObject });
+            base.AfterDelete(deletedObject);
         }
 
         /// <summary>

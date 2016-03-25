@@ -43,27 +43,33 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <summary>
+        /// Gets value indicating whether current context is test mock
+        /// </summary>
+        [UsedImplicitly]
+        public virtual bool IsMoq { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the list of used NuGet feeds
         /// </summary>
         [UsedImplicitly]
-        public DbSet<NugetFeed> NugetFeeds { get; set; }
+        public virtual DbSet<NugetFeed> NugetFeeds { get; set; }
 
         /// <summary>
         ///  Gets or sets the list of addresses of cluster seeds
         /// </summary>
         [UsedImplicitly]
-        public DbSet<SeedAddress> SeedAddresses { get; set; }
+        public virtual DbSet<SeedAddress> SeedAddresses { get; set; }
 
         /// <summary>
         /// Gets or sets the list of node templates in database
         /// </summary>
         [UsedImplicitly]
-        public DbSet<NodeTemplate> Templates { get; set; }
+        public virtual DbSet<NodeTemplate> Templates { get; set; }
 
         /// <summary>
         /// Initializes empty <seealso cref="Templates"/> with default data
         /// </summary>
-        public void InitEmptyTemplates()
+        public virtual void InitEmptyTemplates()
         {
             if (this.Templates.Any())
             {

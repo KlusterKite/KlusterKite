@@ -43,6 +43,7 @@ namespace ClusterKit.Core
             container.Register(
                     Classes.FromThisAssembly()
                     .Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.Register(Component.For<IMessageRouter>().ImplementedBy<MessageRouter>().LifestyleTransient());
         }
     }
 }

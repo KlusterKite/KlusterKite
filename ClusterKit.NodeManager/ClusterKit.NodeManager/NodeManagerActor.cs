@@ -11,7 +11,6 @@ namespace ClusterKit.NodeManager
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -20,7 +19,9 @@ namespace ClusterKit.NodeManager
     using Akka.Event;
     using Akka.Util.Internal;
 
-    using ClusterKit.Core.EF;
+    using ClusterKit.Core;
+    using ClusterKit.Core.Data;
+    using ClusterKit.Core.Ping;
     using ClusterKit.Core.Rest.ActionMessages;
     using ClusterKit.Core.Utils;
     using ClusterKit.NodeManager.Client.Messages;
@@ -29,8 +30,6 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.Messages;
 
     using JetBrains.Annotations;
-
-    using NuGet;
 
     /// <summary>
     /// Singleton actor performing all node configuration related work
@@ -64,9 +63,9 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<string, List<Guid>> awaitingRequestsByTemplate = new Dictionary<string, List<Guid>>();
 
         /// <summary>
-        /// Current database connection manager
+        /// The data source context factory
         /// </summary>
-        private readonly BaseConnectionManager connectionManager;
+        private readonly IContextFactory<ConfigurationContext> contextFactory;
 
         /// <summary>
         /// In case of cluster is full, timespan that new node candidate will repeat join request
@@ -109,6 +108,11 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications = new Dictionary<Address, Cancelable>();
 
         /// <summary>
+        /// The node message router
+        /// </summary>
+        private readonly IMessageRouter router;
+
+        /// <summary>
         /// List of configured seed addresses
         /// </summary>
         private readonly Dictionary<int, SeedAddress> seedAddresses = new Dictionary<int, SeedAddress>();
@@ -124,11 +128,21 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<Guid, UpgradeData> upgradingNodes = new Dictionary<Guid, UpgradeData>();
 
         /// <summary>
+        /// The database connection string
+        /// </summary>
+        private string connectionString;
+
+        /// <summary>
+        /// The database name
+        /// </summary>
+        private string databaseName;
+
+        /// <summary>
         /// List of packages in local repository;
         /// </summary>
         private Dictionary<string, PackageDescription> packages = new Dictionary<string, PackageDescription>();
 
-        private Cancelable upgradeMessageSchedule = null;
+        private Cancelable upgradeMessageSchedule;
 
         /// <summary>
         /// Child actor workers
@@ -138,12 +152,18 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
         /// </summary>
-        /// <param name="connectionManager">
-        /// The connection manager.
+        /// <param name="contextFactory">
+        /// Configuration context factory
         /// </param>
-        public NodeManagerActor(BaseConnectionManager connectionManager)
+        /// <param name="router">
+        /// The node message router
+        /// </param>
+        public NodeManagerActor(
+            IContextFactory<ConfigurationContext> contextFactory,
+            IMessageRouter router)
         {
-            this.connectionManager = connectionManager;
+            this.contextFactory = contextFactory;
+            this.router = router;
 
             this.fullClusterWaitTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.FullClusterWaitTimeout", TimeSpan.FromSeconds(60), false);
             this.newNodeJoinTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.NewNodeJoinTimeout", TimeSpan.FromSeconds(30), false);
@@ -192,7 +212,6 @@ namespace ClusterKit.NodeManager
         /// <param name="nodeDescription">Node description to check</param>
         private void CheckNodeIsObsolete(NodeDescription nodeDescription)
         {
-            var nodeWasObsolete = nodeDescription.IsObsolete;
             nodeDescription.IsObsolete = false;
             NodeTemplate template;
             if (!this.nodeTemplates.TryGetValue(nodeDescription.NodeTemplate, out template)
@@ -229,72 +248,25 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void InitDatabase()
         {
-            var connectionString = Context.System.Settings.Config.GetString(ConfigConnectionStringPath);
-            var databaseName =
-                this.connectionManager.EscapeDatabaseName(
-                    Context.System.Settings.Config.GetString(ConfigDatabaseNamePath));
-            using (var connection = this.connectionManager.CreateConnection(connectionString))
+            this.connectionString = Context.System.Settings.Config.GetString(ConfigConnectionStringPath);
+            this.databaseName = Context.System.Settings.Config.GetString(ConfigDatabaseNamePath);
+
+            using (var context = this.contextFactory.CreateAndUpgradeContext(this.connectionString, this.databaseName).Result)
             {
-                connection.Open();
-                this.connectionManager.CheckCreateDatabase(connection, databaseName);
-                connection.ChangeDatabase(databaseName);
-                using (var context = new ConfigurationContext(connection))
-                {
-                    var migrator =
-                        new MigrateDatabaseToLatestVersion
-                            <ConfigurationContext, ConfigurationSource.Migrations.Configuration>(true);
-                    migrator.InitializeDatabase(context);
+                DataFactory<ConfigurationContext, NodeTemplate, int>
+                    .CreateFactory(context)
+                    .GetList(0, null).Result
+                    .ForEach(t => this.nodeTemplates[t.Code] = t);
 
-                    context.InitEmptyTemplates();
+                DataFactory<ConfigurationContext, SeedAddress, int>
+                    .CreateFactory(context)
+                    .GetList(0, null).Result
+                    .ForEach(s => this.seedAddresses[s.Id] = s);
 
-                    if (!context.SeedAddresses.Any())
-                    {
-                        var seedsFromConfig =
-                            Cluster.Get(Context.System)
-                                .Settings.SeedNodes.Select(
-                                    address =>
-                                    new SeedAddress
-                                    {
-                                        Address =
-                                                $"{address.Protocol}://{address.System}@{address.Host}:{address.Port}"
-                                    });
-
-                        foreach (var seedAddress in seedsFromConfig)
-                        {
-                            context.SeedAddresses.Add(seedAddress);
-                        }
-
-                        context.SaveChanges();
-                    }
-
-                    if (!context.NugetFeeds.Any())
-                    {
-                        var config = Context.System.Settings.Config.GetConfig(
-                            "ClusterKit.NodeManager.DefaultNugetFeeds");
-                        if (config != null)
-                        {
-                            foreach (var pair in config.AsEnumerable())
-                            {
-                                var feedConfig = config.GetConfig(pair.Key);
-
-                                NugetFeed.EnFeedType feedType;
-                                if (!Enum.TryParse<NugetFeed.EnFeedType>(feedConfig.GetString("type"), out feedType))
-                                {
-                                    feedType = NugetFeed.EnFeedType.Private;
-                                }
-
-                                context.NugetFeeds.Add(
-                                    new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType });
-                            }
-
-                            context.SaveChanges();
-                        }
-                    }
-
-                    context.Templates.ForEach(t => this.nodeTemplates[t.Code] = t);
-                    context.SeedAddresses.ForEach(s => this.seedAddresses[s.Id] = s);
-                    context.NugetFeeds.ForEach(f => this.nugetFeeds[f.Id] = f);
-                }
+                DataFactory<ConfigurationContext, NugetFeed, int>
+                    .CreateFactory(context)
+                    .GetList(0, null).Result
+                    .ForEach(f => this.nugetFeeds[f.Id] = f);
             }
         }
 
@@ -335,7 +307,7 @@ namespace ClusterKit.NodeManager
 
             this.workers =
                 Context.ActorOf(
-                    Props.Create(() => new Worker(this.connectionManager, this.Self))
+                    Props.Create(() => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
                         .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                     "workers");
 
@@ -564,6 +536,13 @@ namespace ClusterKit.NodeManager
                     {
                         this.nodeTemplates.Remove(message.OldObject.Code);
                     }
+
+                    foreach (var value in this.nodeDescriptions.Values)
+                    {
+                        this.CheckNodeIsObsolete(value);
+                    }
+
+                    this.OnNodeUpgrade();
                     break;
 
                 case EnActionType.Delete:
@@ -594,7 +573,7 @@ namespace ClusterKit.NodeManager
                 this.Sender.Tell(false);
             }
 
-            Context.ActorSelection($"{address}/user/NodeManager/Receiver").Tell(new ShutdownMessage(), this.Self);
+            this.router.Tell(address, "/user/NodeManager/Receiver", new ShutdownMessage(), this.Self);
             this.Sender.Tell(true);
         }
 
@@ -703,7 +682,7 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            Context.ActorSelection($"{message.Address}/user/NodeManager/Receiver").Tell(new Identify("receiver"), this.Self);
+            this.router.Tell(message.Address, "/user/NodeManager/Receiver", new Identify("receiver"), this.Self);
 
             if (message.Attempt >= this.newNodeRequestDescriptionNotificationMaxRequests)
             {
@@ -762,15 +741,9 @@ namespace ClusterKit.NodeManager
         private void ReloadPackageList()
         {
             var feedUrl = Context.System.Settings.Config.GetString(PacakgeRepositoryUrlPath);
-            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(feedUrl);
+            var factory = DataFactory<string, PackageDescription, string>.CreateFactory(feedUrl);
 
-            var newPackages = nugetRepository.Search(string.Empty, true).Where(p => p.IsLatestVersion).ToList();
-
-            this.packages = newPackages.Select(p => new PackageDescription
-            {
-                Id = p.Id,
-                Version = p.Version.Version.ToString()
-            }).ToDictionary(p => p.Id);
+            this.packages = factory.GetList(0, null).Result.ToDictionary(p => p.Id);
 
             foreach (var node in this.nodeDescriptions.Values)
             {
@@ -793,13 +766,19 @@ namespace ClusterKit.NodeManager
                                    ClusterEvent.InitialStateAsEvents,
                                    new[] { typeof(ClusterEvent.MemberRemoved), typeof(ClusterEvent.MemberUp) });
 
-            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member.Address));
+            // ping message will indicate that actor started and ready to work
+            this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
 
+            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member.Address));
             this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member.Address));
 
             this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
             this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
-            this.Receive<ActiveNodeDescriptionsRequest>(m => this.Sender.Tell(this.nodeDescriptions.Values.ToList()));
+            this.Receive<ActiveNodeDescriptionsRequest>(
+                m =>
+                    {
+                        this.Sender.Tell(this.nodeDescriptions.Values.ToList());
+                    });
             this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
             this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m.Address));
 
@@ -857,7 +836,7 @@ namespace ClusterKit.NodeManager
             /// <summary>
             /// Gets or sets request attempt number
             /// </summary>
-            public int Attempt { get; set; } = 0;
+            public int Attempt { get; set; }
         }
 
         /// <summary>
@@ -909,35 +888,52 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private class Worker : BaseCrudActorWithNotifications<ConfigurationContext>
         {
+            private readonly string connectionString;
+
             /// <summary>
-            /// Current database connection manager
+            /// Configuration context factory
             /// </summary>
-            private readonly BaseConnectionManager connectionManager;
+            private readonly IContextFactory<ConfigurationContext> contextFactory;
+
+            private readonly string databaseName;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Worker"/> class.
             /// </summary>
-            /// <param name="connectionManager">
-            /// The connection manager.
+            /// <param name="connectionString">
+            /// The database connection string
+            /// </param>
+            /// <param name="databaseName">
+            /// The database name
+            /// </param>
+            /// <param name="contextFactory">
+            /// Configuration context factory
             /// </param>
             /// <param name="parent">
             /// Reference to the <seealso cref="NodeManagerActor"/>
             /// </param>
-            public Worker(BaseConnectionManager connectionManager, IActorRef parent) : base(parent)
+            public Worker(
+                string connectionString,
+                string databaseName,
+                IContextFactory<ConfigurationContext> contextFactory,
+                IActorRef parent) : base(parent)
             {
                 Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
-                this.connectionManager = connectionManager;
 
-                this.Receive<RestActionMessage<NodeTemplate, int>>(
-                    m => this.OnRequest(m, c => c.Templates, t => t.Id, id => t => t.Id == id));
-                this.Receive<RestActionMessage<SeedAddress, int>>(
-                    m => this.OnRequest(m, c => c.SeedAddresses, s => s.Id, id => s => s.Id == id));
-                this.Receive<RestActionMessage<NugetFeed, int>>(
-                    m => this.OnRequest(m, c => c.NugetFeeds, s => s.Id, id => s => s.Id == id));
+                this.connectionString = connectionString;
+                this.databaseName = databaseName;
+                this.contextFactory = contextFactory;
 
-                this.Receive<CollectionRequest<NodeTemplate>>(m => this.OnCollectionRequest(m, c => c.Templates, templates => templates.OrderBy(t => t.Code)));
-                this.Receive<CollectionRequest<SeedAddress>>(m => this.OnCollectionRequest(m, c => c.SeedAddresses, seeds => seeds.OrderBy(t => t.Id)));
-                this.Receive<CollectionRequest<NugetFeed>>(m => this.OnCollectionRequest(m, c => c.NugetFeeds, feeds => feeds.OrderBy(t => t.Id)));
+                this.ReceiveAsync<RestActionMessage<NodeTemplate, int>>(
+                    this.OnRequest);
+                this.ReceiveAsync<RestActionMessage<SeedAddress, int>>(
+                    this.OnRequest);
+                this.ReceiveAsync<RestActionMessage<NugetFeed, int>>(
+                    this.OnRequest);
+
+                this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
+                this.ReceiveAsync<CollectionRequest<SeedAddress>>(this.OnCollectionRequest<SeedAddress, int>);
+                this.ReceiveAsync<CollectionRequest<NugetFeed>>(this.OnCollectionRequest<NugetFeed, int>);
             }
 
             /// <summary>
@@ -956,7 +952,6 @@ namespace ClusterKit.NodeManager
                     ((NodeTemplate)(object)newObject).Version = ((NodeTemplate)(object)oldObject).Version + 1;
                 }
 
-                // newObject.Version = oldObject.Version + 1;
                 return base.BeforeUpdate(newObject, oldObject);
             }
 
@@ -966,14 +961,7 @@ namespace ClusterKit.NodeManager
             /// <returns>New working context</returns>
             protected override async Task<ConfigurationContext> GetContext()
             {
-                var connectionString = Context.System.Settings.Config.GetString(ConfigConnectionStringPath);
-                var databaseName =
-                    this.connectionManager.EscapeDatabaseName(
-                        Context.System.Settings.Config.GetString(ConfigDatabaseNamePath));
-                var connection = this.connectionManager.CreateConnection(connectionString);
-                await connection.OpenAsync();
-                connection.ChangeDatabase(databaseName);
-                return new ConfigurationContext(connection);
+                return await this.contextFactory.CreateContext(this.connectionString, this.databaseName);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="UpdateMessage.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,10 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.EF
+namespace ClusterKit.Core.Data
 {
-    using System;
-
     using ClusterKit.Core.Rest.ActionMessages;
 
     /// <summary>
