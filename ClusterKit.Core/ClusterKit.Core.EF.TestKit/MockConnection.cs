@@ -54,7 +54,7 @@
         /// <returns>
         /// The version of the database. The format of the string returned depends on the specific type of connection you are using.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException"><see cref="P:System.Data.Common.DbConnection.ServerVersion"/> was called while the returned Task was not completed and the connection was not opened after a call to <see cref="Overload:System.Data.Common.DbConnection.OpenAsync"/>.</exception><filterpriority>2</filterpriority>
+        /// <exception cref="T:System.InvalidOperationException"><see cref="P:System.Data.Common.DbConnection.ServerVersion"/> was called while the returned Task was not completed and the connection was not opened after a call to <see cref="System.Data.Common.DbConnection.OpenAsync"/>.</exception><filterpriority>2</filterpriority>
         public override string ServerVersion
         {
             get
@@ -72,6 +72,10 @@
         /// <filterpriority>1</filterpriority>
         public override ConnectionState State => ConnectionState.Open;
 
+        /// <summary>
+        /// Changes the current database for an open Connection object.
+        /// </summary>
+        /// <param name="databaseName">The name of the database to use in place of the current database. </param>
         public override void ChangeDatabase(string databaseName)
         {
             this.database = databaseName;
