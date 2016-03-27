@@ -13,12 +13,14 @@ namespace ClusterKit.NodeManager.Tests
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
     using Akka.DI.Core;
+    using Akka.Event;
     using Akka.TestKit;
 
     using Castle.MicroKernel.Registration;
@@ -86,6 +88,8 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<string, PackageDescription, string>)
                 this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
 
+            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+
             await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
             await packageFactory.Insert(new PackageDescription { Id = "TestModule-2", Version = "0.1.0" });
             await
@@ -103,50 +107,57 @@ namespace ClusterKit.NodeManager.Tests
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
 
-            var virtualNodes = new List<VirtualNode>()
+            var virtualNodes = new List<VirtualNode>
                                    {
-                                       new VirtualNode(1, this.Sys),
-                                       new VirtualNode(2, this.Sys),
-                                       new VirtualNode(3, this.Sys),
+                                       new VirtualNode(1, testActor, this.Sys),
+                                       new VirtualNode(2, testActor, this.Sys),
+                                       new VirtualNode(3, testActor, this.Sys),
                                    };
 
-            this.SetAutoPilot(
-                new DelegateAutoPilot(
-                    delegate (IActorRef sender, object message)
+            virtualNodes.ForEach(
+                n =>
                     {
-                        var identifyMessage = message as RemoteTestMessage<Identify>;
-                        if (identifyMessage != null)
-                        {
-                            virtualNodes
-                            .FirstOrDefault(n => n.Address.Address == identifyMessage.RecipientAddress)
-                            ?.Client.Tell(identifyMessage.Message, sender);
-                        }
-
-                        var shutDownMessage = message as RemoteTestMessage<ShutdownMessage>;
-                        if (shutDownMessage != null)
-                        {
-                            virtualNodes
-                            .FirstOrDefault(n => n.Address.Address == shutDownMessage.RecipientAddress)
-                            ?.Client.Tell(shutDownMessage.Message, sender);
-                        }
-
-                        return AutoPilot.KeepRunning;
-                    }));
-
-            foreach (var virtualNode in virtualNodes)
-            {
-                testActor.Tell(
-                    new ClusterEvent.MemberUp(
-                        Member.Create(virtualNode.Address, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
-            }
-
-            this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
-            this.ExpectMsg<NodeDescriptionRequest>();
+                        router.RegisterVirtualNode(n.Address.Address, n.Client);
+                        n.GoUp();
+                    });
 
             var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
-            Assert.Equal(1, descriptions.Count);
-            Assert.Equal(true, descriptions[0].IsObsolete);
+            Assert.Equal(3, descriptions.Count);
+            Assert.True(descriptions.All(d => !d.IsObsolete));
+
+            packageFactory.Storage["TestModule-1"].Version = "0.2.0";
+
+            testActor.Tell(new ReloadPackageListRequest());
+            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+
+            Assert.NotNull(descriptions);
+            Assert.Equal(2, descriptions.Count);
+            Assert.Equal(2, virtualNodes.Count(n => n.IsUp));
+            Assert.True(descriptions.All(d => d.IsObsolete));
+
+            // this will check that no additional upgrades will cause new nodes to reboot
+            testActor.Tell(new ReloadPackageListRequest());
+            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+
+            Assert.NotNull(descriptions);
+            Assert.Equal(2, descriptions.Count);
+            Assert.Equal(2, virtualNodes.Count(n => n.IsUp));
+            Assert.True(descriptions.All(d => d.IsObsolete));
+
+            var virtualNode = virtualNodes.First(n => n.Number == 1);
+            Assert.False(virtualNode.IsUp); // the oldest node gone to upgrade
+
+            virtualNode.Description.StartTimeStamp = VirtualNode.GetNextTime();
+            virtualNode.Description.Modules[0].Version = "0.2.0";
+            virtualNode.GoUp();
+
+            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+
+            Assert.NotNull(descriptions);
+            Assert.Equal(2, descriptions.Count);
+            Assert.Equal(2, virtualNodes.Count(n => n.IsUp));
+            Assert.Equal(1, descriptions.Count(d => d.IsObsolete));
         }
 
         /// <summary>
@@ -590,14 +601,25 @@ namespace ClusterKit.NodeManager.Tests
                     .Instance(new UniversalTestDataFactory<string, PackageDescription, string>(null, o => o.Id)).LifestyleSingleton());
 
                 container.Register(Component.For<IContextFactory<ConfigurationContext>>().Instance(new TestContextFactory<ConfigurationContext>()).LifestyleSingleton());
-                container.Register(Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleTransient());
+                container.Register(Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
             }
         }
 
+        /// <summary>
+        /// Virtual node to emulate cluster node responses to update
+        /// </summary>
         private class VirtualNode
         {
-            public VirtualNode(int num, ActorSystem system)
+            private static long time;
+
+            /// <summary>
+            /// Reference to node manager actor
+            /// </summary>
+            private readonly IActorRef nodeManager;
+
+            public VirtualNode(int num, IActorRef nodeManager, ActorSystem system)
             {
+                this.nodeManager = nodeManager;
                 this.Number = num;
                 this.NodeId = Guid.NewGuid();
                 this.Address = new UniqueAddress(new Address("akka.tcp", "ClusterKit", $"testNode{num}", num), num);
@@ -620,22 +642,58 @@ namespace ClusterKit.NodeManager.Tests
                     NodeAddress = this.Address.Address,
                     NodeId = this.NodeId,
                     NodeTemplate = "test-template",
-                    StartTimeStamp = 10,
+                    StartTimeStamp = GetNextTime(),
                     NodeTemplateVersion = 0
                 };
 
                 this.Client = system.ActorOf(Props.Create(() => new VirtualClient(this)), $"virtualNode{num}");
             }
 
-            public UniqueAddress Address { get; set; }
+            public UniqueAddress Address { get; }
 
-            public IActorRef Client { get; set; }
+            public IActorRef Client { get; }
 
-            public NodeDescription Description { get; set; }
+            public NodeDescription Description { get; }
 
-            public Guid NodeId { get; set; }
+            /// <summary>
+            /// Gets the node state
+            /// </summary>
+            public bool IsUp { get; private set; }
 
-            public int Number { get; set; }
+            public Guid NodeId { get; }
+
+            public int Number { get; }
+
+            public static long GetNextTime()
+            {
+                return Interlocked.Add(ref time, 1L);
+            }
+
+            public void GoDown()
+            {
+                if (!this.IsUp)
+                {
+                    return;
+                }
+
+                this.nodeManager.Tell(
+                    new ClusterEvent.MemberRemoved(
+                        Member.Create(this.Address, 1, MemberStatus.Removed, ImmutableHashSet<string>.Empty), MemberStatus.Up));
+                this.IsUp = false;
+            }
+
+            public void GoUp()
+            {
+                if (this.IsUp)
+                {
+                    return;
+                }
+
+                this.nodeManager.Tell(
+                    new ClusterEvent.MemberUp(
+                        Member.Create(this.Address, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+                this.IsUp = true;
+            }
 
             public class VirtualClient : ReceiveActor
             {
@@ -645,8 +703,21 @@ namespace ClusterKit.NodeManager.Tests
                 {
                     this.node = node;
 
-                    this.Receive<Identify>(m => this.Sender.Tell(new ActorIdentity(m.MessageId, this.Self)));
+                    this.Receive<TestMessage<Identify>>(m => this.Sender.Tell(new ActorIdentity(m.Message.MessageId, this.Self)));
                     this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(this.node.Description, this.Self));
+                    this.Receive<TestMessage<ShutdownMessage>>(m => this.node.GoDown());
+                }
+
+                protected override bool AroundReceive(Receive receive, object message)
+                {
+                    Context.GetLogger().Warning($"Got message of type {message.GetType().FullName}");
+                    return base.AroundReceive(receive, message);
+                }
+
+                protected override void Unhandled(object message)
+                {
+                    Context.GetLogger().Error($"Got unhandled message of type {message.GetType().FullName}");
+                    base.Unhandled(message);
                 }
             }
         }

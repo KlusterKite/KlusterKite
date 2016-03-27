@@ -594,9 +594,14 @@ namespace ClusterKit.NodeManager
             var isUpgrading = false;
 
             // searching for nodes to upgrade
-            var nodesToUpgrade = this.nodeDescriptions.Values.Where(n => n.IsObsolete).GroupBy(n => n.NodeTemplate);
-            foreach (var nodeGroup in nodesToUpgrade)
+            var grouppedNodes = this.nodeDescriptions.Values.GroupBy(n => n.NodeTemplate);
+            foreach (var nodeGroup in grouppedNodes)
             {
+                if (!nodeGroup.Any(n => n.IsObsolete))
+                {
+                    continue;
+                }
+
                 NodeTemplate nodeTemplate;
                 if (!this.nodeTemplates.TryGetValue(nodeGroup.Key, out nodeTemplate))
                 {
@@ -611,13 +616,13 @@ namespace ClusterKit.NodeManager
 
                 if (nodeGroup.Count() <= nodeTemplate.MininmumRequiredInstances)
                 {
-                    // node upgrade is blocked if it will cause cluster mulfunction
+                    // node upgrade is blocked if it can cause cluster mulfunction
                     continue;
                 }
 
                 var nodesInUpgrade = this.upgradingNodes.Values.Count(u => u.NodeTemplate == nodeGroup.Key);
 
-                var nodesToUpgradeCount = (int)Math.Ceiling(nodeGroup.Count() * 100.0M / this.upgradablePart)
+                var nodesToUpgradeCount = (int)Math.Ceiling(nodeGroup.Count() * this.upgradablePart / 100.0M)
                                           - nodesInUpgrade;
 
                 if (nodesToUpgradeCount <= 0)
@@ -625,7 +630,7 @@ namespace ClusterKit.NodeManager
                     continue;
                 }
 
-                var nodes = nodeGroup.OrderBy(n => n.StartTimeStamp).Take(nodesToUpgradeCount);
+                var nodes = nodeGroup.Where(n => n.IsObsolete).OrderBy(n => n.StartTimeStamp).Take(nodesToUpgradeCount);
                 isUpgrading = true;
                 foreach (var node in nodes)
                 {

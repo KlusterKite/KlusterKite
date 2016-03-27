@@ -10,6 +10,7 @@
 namespace ClusterKit.Core.TestKit
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -22,6 +23,11 @@ namespace ClusterKit.Core.TestKit
     [UsedImplicitly]
     public class TestMessageRouter : IMessageRouter
     {
+        /// <summary>
+        /// The list of actors that would receive all messages to the virtual node as <see cref="TestMessage{T}"/>
+        /// </summary>
+        private readonly Dictionary<Address, IActorRef> registerdNodes = new Dictionary<Address, IActorRef>();
+
         /// <summary>
         /// Reference to the test actor
         /// </summary>
@@ -50,7 +56,28 @@ namespace ClusterKit.Core.TestKit
         public Task<T> Ask<T>(Address nodeAddress, string path, object message, TimeSpan timeout)
         {
             var forwardedMessage = CreateForwardedMessage(nodeAddress, path, message);
-            return this.testActor.Ask<T>(forwardedMessage, timeout);
+
+            IActorRef receiver;
+
+            if (this.registerdNodes.TryGetValue(nodeAddress, out receiver))
+            {
+                return receiver.Ask<T>(forwardedMessage, timeout);
+            }
+            else
+            {
+                return this.testActor.Ask<T>(forwardedMessage, timeout);
+            }
+        }
+
+        /// <summary>
+        /// Registers virtual node as actor, that would receive all messages as <see cref="TestMessage{T}"/>
+        /// </summary>
+        /// <param name="address">The virtual node address</param>
+        /// <param name="receiver">Virtual node representative</param>
+        [UsedImplicitly]
+        public void RegisterVirtualNode(Address address, IActorRef receiver)
+        {
+            this.registerdNodes[address] = receiver;
         }
 
         /// <summary>
@@ -71,7 +98,15 @@ namespace ClusterKit.Core.TestKit
         public void Tell(Address nodeAddress, string path, object message, IActorRef sender = null)
         {
             var forwardedMessage = CreateForwardedMessage(nodeAddress, path, message);
-            this.testActor.Tell(forwardedMessage, sender);
+            IActorRef receiver;
+            if (this.registerdNodes.TryGetValue(nodeAddress, out receiver))
+            {
+                receiver.Tell(forwardedMessage, sender);
+            }
+            else
+            {
+                this.testActor.Tell(forwardedMessage, sender);
+            }
         }
 
         /// <summary>
