@@ -9,7 +9,7 @@ services:
     environment:
      - NUGET_API_KEY=ClusterKit
   configDb:
-    image: postgres
+    image: clusterkit/postgres
     environment:
      - NETWORK_NAME=postgres
   monitoringUI:

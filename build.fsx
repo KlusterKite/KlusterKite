@@ -147,6 +147,7 @@ Target "DockerBase" (fun _ ->
     buildDocker "clusterkit/baseworker" "Docker/ClusterKitBaseWorkerNode"
     buildDocker "clusterkit/baseweb" "Docker/ClusterKitBaseWebNode"
     buildDocker "clusterkit/nuget" "Docker/ClusterKitNuget"
+    buildDocker "clusterkit/postgres" "Docker/ClusterKitPostgres"
 )
 
 // builds standard docker images
