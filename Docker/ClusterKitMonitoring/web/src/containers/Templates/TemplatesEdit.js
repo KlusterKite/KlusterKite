@@ -1,15 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import {connect} from 'react-redux';
 import {initialize} from 'redux-form';
-import connectData from 'helpers/connectData';
 import * as actions from 'redux/modules/templates';
 import {TemplateForm} from 'components';
 
-function fetchDataDeferred() {
-  return null;
-}
-
-@connectData(null, fetchDataDeferred)
 @connect(
   state => ({
     data: state.templates.data,

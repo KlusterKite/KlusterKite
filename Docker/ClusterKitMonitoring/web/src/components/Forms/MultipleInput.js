@@ -17,7 +17,7 @@ export default class MultipleInput extends Component {
     const {field, label} = this.props;
 
     return (
-      <div className={'form-group'}>
+      <div className="row">
         <label>{label} <i className="fa fa-plus-circle" role="button" onClick={this.handleAdd}></i></label>
         {!field.length && <div>No Items</div>}
         {field && field.map((item, index) =>

@@ -1,4 +1,4 @@
-require('babel/polyfill');
+require('babel-polyfill');
 
 // Webpack config for creating the production bundle.
 var path = require('path');
@@ -17,9 +17,6 @@ var webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(require('./w
 module.exports = {
   devtool: 'source-map',
   context: path.resolve(__dirname, '..'),
-  watchOptions: {
-    poll: true
-  },  
   entry: {
     'main': [
       'bootstrap-sass!./src/theme/bootstrap.config.prod.js',
@@ -35,7 +32,6 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader')},
       { test: /\.jsx?$/, exclude: /node_modules/, loaders: [strip.loader('debug'), 'babel']},
       { test: /\.json$/, loader: 'json-loader' },
       { test: /\.less$/, loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=2&sourceMap!autoprefixer?browsers=last 2 version!less?outputStyle=expanded&sourceMap=true&sourceMapContents=true') },
@@ -62,25 +58,18 @@ module.exports = {
     // css files from the extract-text-plugin loader
     new ExtractTextPlugin('[name]-[chunkhash].css', {allChunks: true}),
     new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"production"'
+      },
+
       __CLIENT__: true,
       __SERVER__: false,
       __DEVELOPMENT__: false,
-      __DEVTOOLS__: false,
-      'process.env': {
-        BROWSER: JSON.stringify(true)
-      },
+      __DEVTOOLS__: false
     }),
 
     // ignore dev config
     new webpack.IgnorePlugin(/\.\/dev/, /\/config$/),
-
-    // set global vars
-    new webpack.DefinePlugin({
-      'process.env': {
-        // Useful to reduce the size of client-side libraries, e.g. react
-        NODE_ENV: JSON.stringify('production')
-      }
-    }),
 
     // optimizations
     new webpack.optimize.DedupePlugin(),

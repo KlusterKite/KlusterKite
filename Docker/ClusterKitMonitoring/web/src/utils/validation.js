@@ -14,12 +14,6 @@ export function required(value) {
   }
 }
 
-export function checked(value) {
-  if (isEmpty(value) || !value) {
-    return 'Required';
-  }
-}
-
 export function minLength(min) {
   return value => {
     if (!isEmpty(value) && value.length < min) {

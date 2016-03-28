@@ -1,16 +1,20 @@
 import React, { Component, PropTypes } from 'react';
 import {connect} from 'react-redux';
-import connectData from 'helpers/connectData';
 import * as modulesActions from 'redux/modules/monitoring-modules';
 import {isLoaded, loadModules as loadModulesOnInit} from 'redux/modules/monitoring-modules';
+import { asyncConnect } from 'redux-async-connect';
 
-function fetchDataDeferred(getState, dispatch) {
-  if (!isLoaded(getState())) {
-    return dispatch(loadModulesOnInit());
+@asyncConnect([{
+  promise: ({store: {dispatch, getState}}) => {
+    const promises = [];
+
+    if (!isLoaded(getState())) {
+      promises.push(dispatch(loadModulesOnInit()));
+    }
+
+    return Promise.all(promises);
   }
-}
-
-@connectData(null, fetchDataDeferred)
+}])
 @connect(
   state => ({
     data: state.monitoringModules.data,
