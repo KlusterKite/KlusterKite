@@ -199,7 +199,7 @@ namespace ClusterKit.Build
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
 
-            var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe" };
+            var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe", "dll.config", "exe.config" };
 
             var buildFiles = Directory.GetFiles(project.TempBuildDirectory)
                 .Where(f => extensions.Any(e => $"{project.ProjectName}.{e}".Equals(Path.GetFileName(f), StringComparison.InvariantCultureIgnoreCase)));

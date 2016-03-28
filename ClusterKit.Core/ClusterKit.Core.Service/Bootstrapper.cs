@@ -10,6 +10,7 @@
 namespace ClusterKit.Core.Service
 {
     using System;
+    using System.Collections.Generic;
     using System.Configuration;
     using System.IO;
     using System.Linq;
@@ -60,6 +61,11 @@ namespace ClusterKit.Core.Service
 
             Console.WriteLine(@"Preparing config");
             var config = BaseInstaller.GetStackedConfig(container, CreateTopLevelConfig(args));
+
+            Log.Debug($"Cluster configuration: seed-nodes { string.Join(", ", config.GetStringList("akka.cluster.seed-nodes") ?? new List<string>())}");
+            Log.Debug($"Cluster configuration: min-nr-of-members { config.GetInt("akka.cluster.min-nr-of-members")}");
+            Log.Debug($"Cluster configuration: roles { string.Join(", ", config.GetStringList("akka.cluster.roles") ?? new List<string>())}");
+
             container.Register(Component.For<Config>().Instance(config));
             Console.WriteLine(@"Config created");
 

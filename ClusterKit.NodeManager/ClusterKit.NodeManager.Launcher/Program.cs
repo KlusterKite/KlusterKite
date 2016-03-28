@@ -319,11 +319,19 @@ namespace ClusterKit.NodeManager.Launcher
             File.WriteAllText(Path.Combine(serviceDir, "akka.hocon"), configuration.Configuration);
             Console.WriteLine($"General configuration: \n {configuration.Configuration}");
 
+            // cluster self-join is not welcomed
+            var networkName = Environment.GetEnvironmentVariable("NETWORK_NAME");
+            var seeds = configuration.Seeds.ToList();
+            if (!string.IsNullOrEmpty(networkName))
+            {
+                seeds = seeds.Where(s => !s.Contains(networkName)).ToList();
+            }
+
             string startConfig = $@"{{
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}
                 ClusterKit.NodeManager.NodeId = { this.Uid }
-                akka.cluster.seed-nodes = [{string.Join(", ", configuration.Seeds.Select(s => $"\"{s}\""))}]
+                akka.cluster.seed-nodes = [{string.Join(", ", seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
             Console.WriteLine($"Start configuration: \n {startConfig}");

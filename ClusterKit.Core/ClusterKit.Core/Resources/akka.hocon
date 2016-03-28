@@ -1,10 +1,10 @@
 ﻿{
     akka : {
       
-      stdout-loglevel : INFO
+      stdout-loglevel : DEBUG
       loggers : ["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
       log-config-on-start : off
-      loglevel : INFO
+      loglevel : DEBUG
 
       actor : {
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"
@@ -44,7 +44,7 @@
 
       cluster: {
         auto-down-unreachable-after = 15s
-		min-nr-of-members = 3
+		min-nr-of-members = 0
         seed-nodes = []
         singleton {
             # The number of retries are derived from hand-over-retry-interval and

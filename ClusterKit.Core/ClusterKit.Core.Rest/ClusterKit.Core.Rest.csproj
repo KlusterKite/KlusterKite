@@ -33,9 +33,9 @@
     <DocumentationFile>bin\Release\ClusterKit.Core.Rest.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.7.178, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka, Version=1.0.7.182, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.1.0.7.178-beta\lib\net45\Akka.dll</HintPath>
+      <HintPath>..\..\packages\Akka.1.0.7.182-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations">
