@@ -44,12 +44,13 @@
 
       cluster: {
         auto-down-unreachable-after = 15s
+		min-nr-of-members = 3
         seed-nodes = []
         singleton {
             # The number of retries are derived from hand-over-retry-interval and
             # akka.cluster.down-removal-margin (or ClusterSingletonManagerSettings.removalMargin),
             # but it will never be less than this property.
-            min-number-of-hand-over-retries = 10          
+            min-number-of-hand-over-retries = 10       			   
         }
       }
     }

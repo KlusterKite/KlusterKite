@@ -22,6 +22,9 @@ let projects = [|
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Rest/ClusterKit.Core.Rest.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Data/ClusterKit.Core.Data.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core.Rest"|]))
+
+    (*
+
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Data.TestKit/ClusterKit.Core.Data.TestKit.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core.Rest"; "ClusterKit.Core.Data"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
@@ -42,7 +45,7 @@ let projects = [|
     new ProjectDescription("./ClusterKit.Web/ClusterKit.Web.Tests/ClusterKit.Web.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web.NginxConfigurator"; "ClusterKit.Web.SignalR"|]))
 
     new ProjectDescription("./ClusterKit.Monitoring/ClusterKit.Monitoring/ClusterKit.Monitoring.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.SignalR"|]))
-    new ProjectDescription("./ClusterKit.Monitoring/ClusterKit.Monitoring.Tests/ClusterKit.Monitoring.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core";  "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web"|]))
+    //new ProjectDescription("./ClusterKit.Monitoring/ClusterKit.Monitoring.Tests/ClusterKit.Monitoring.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core";  "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.SignalR"|]))
 
     new ProjectDescription("./ClusterKit.Extensions/ClusterKit.Guarantee/ClusterKit.Guarantee.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Extensions/ClusterKit.BusinessObjects/ClusterKit.BusinessObjects.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
@@ -52,6 +55,7 @@ let projects = [|
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.NodeManager.Launcher.Messages"|]))
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"|]))
     new ProjectDescription("./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.EF"; "ClusterKit.Core.Data"|]))
+
     new ProjectDescription(
         "./ClusterKit.NodeManager/ClusterKit.NodeManager/ClusterKit.NodeManager.csproj",
         ProjectDescription.EnProjectType.NugetPackage,
@@ -88,6 +92,8 @@ let projects = [|
             "ClusterKit.NodeManager.ConfigurationSource";
             "ClusterKit.NodeManager.Launcher.Messages"
           |]))
+
+    *)
 
 |]
 
@@ -148,6 +154,7 @@ Target "DockerBase" (fun _ ->
     buildDocker "clusterkit/baseweb" "Docker/ClusterKitBaseWebNode"
     buildDocker "clusterkit/nuget" "Docker/ClusterKitNuget"
     buildDocker "clusterkit/postgres" "Docker/ClusterKitPostgres"
+    buildDocker "clusterkit/entry" "Docker/ClusterKitEntry"
 )
 
 // builds standard docker images

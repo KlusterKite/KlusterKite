@@ -82,7 +82,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     Code = "seed",
                     Name = "Cluster seed and Nginx configurator",
                     MininmumRequiredInstances = 2,
-                    MaximumNeededInstances = 4,
+                    MaximumNeededInstances = null,
                     ContainerTypes = new List<string> { "seed" },
                     Priority = 1000.0,
                     Packages =
@@ -92,7 +92,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Web.NginxConfigurator",
                                     "ClusterKit.NodeManager.Client"
                                 },
-                    Configuration = Configurations.Seed
+                    Configuration = Configurations.Seed,
+                    Version = 0
                 });
 
             this.Templates.Add(
@@ -115,7 +116,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Web.Swagger.Monitor",
                                     "ClusterKit.Web.Swagger"
                                 },
-                    Configuration = Configurations.ClusterManager
+                    Configuration = Configurations.ClusterManager,
+                    Version = 0
                 });
 
             this.Templates.Add(
@@ -129,7 +131,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     Priority = 1.0,
                     Packages =
                             new List<string> { "ClusterKit.Core.Service", "ClusterKit.NodeManager.Client" },
-                    Configuration = Configurations.Empty
+                    Configuration = Configurations.Empty,
+                    Version = 0
                 });
 
             this.SaveChanges();

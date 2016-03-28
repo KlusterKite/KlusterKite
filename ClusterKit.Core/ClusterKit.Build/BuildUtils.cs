@@ -73,6 +73,8 @@ namespace ClusterKit.Build
         /// </param>
         public static void Build(ProjectDescription project, bool restoreOriginalProjectFile = true)
         {
+            var tempSrc = Path.Combine(Path.GetPathRoot(BuildDirectory), "src");
+
             TraceHelper.trace($"Building {project.ProjectName}");
 
             if (Directory.Exists(project.TempBuildDirectory))
@@ -85,17 +87,28 @@ namespace ClusterKit.Build
                 Directory.Delete(project.CleanBuildDirectory, true);
             }
 
+            if (Directory.Exists(tempSrc))
+            {
+                Directory.Delete(tempSrc, true);
+            }
+
             Directory.CreateDirectory(project.CleanBuildDirectory);
             Directory.CreateDirectory(project.TempBuildDirectory);
 
             RestoreProjectDependencies(project);
 
+            Func<string, bool> filter = s => true;
+            FileHelper.CopyDir(tempSrc, project.ProjectDirectory, filter.ToFSharpFunc());
+            var projectFileName = Path.Combine(tempSrc, Path.GetFileName(project.ProjectFileName));
+
             // modifying project file to substitute internal nute-through dependencies to currently built files
             var projDoc = new XmlDocument();
-            projDoc.Load(project.ProjectFileName);
+            projDoc.Load(projectFileName);
 
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
             namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+            var refItemGroup = projDoc.DocumentElement.SelectSingleNode("//def:ItemGroup[def:Reference]", namespaceManager);
 
             foreach (var dependency in project.InternalDependencies)
             {
@@ -105,14 +118,36 @@ namespace ClusterKit.Build
                         .FirstOrDefault(
                             e =>
                             e.HasAttribute("Include")
-                            && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"));
+                            && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
+                    ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
+                        .Cast<XmlElement>()
+                        .FirstOrDefault(
+                            e =>
+                            e.HasAttribute("Include")
+                            && Regex.IsMatch(e.Attributes["Include"].Value, $"(^|[\\\\\\/]){Regex.Escape(dependency)}.csproj$"));
+
+                if (refNode == null)
+                {
+                    var pr = projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager).Cast<XmlElement>().Where(e => e.HasAttribute("Include"));
+                    foreach (var refel in pr)
+                    {
+                        ConsoleLog($"Comparing {refel.Attributes["Include"].Value} and {dependency}");
+                    }
+                }
 
                 if (refNode != null)
                 {
+                    var libPath = Path.Combine(Path.GetFullPath(BuildClean), dependency, $"{dependency}.dll");
+                    refNode.ParentNode.RemoveChild(refNode);
+                    refNode = projDoc.CreateElement("Reference", "http://schemas.microsoft.com/developer/msbuild/2003");
+                    refItemGroup.AppendChild(refNode);
+                    refNode.SetAttribute("Include", dependency);
+                    refNode.InnerXml = $"<SpecificVersion>False</SpecificVersion><HintPath>{libPath}</HintPath><Private>True</Private>";
                     ConsoleLog($"ref linked to {dependency} was updated");
-                    refNode.Attributes["Include"].Value = $"{dependency}";
-                    refNode.SelectSingleNode("./def:HintPath", namespaceManager).InnerText =
-                        Path.Combine(Path.GetFullPath(BuildClean), dependency, $"{dependency}.dll");
+                    if (!File.Exists(libPath))
+                    {
+                        ConsoleLog($"!!!!!{libPath} does not exist!!!!");
+                    }
                 }
                 else
                 {
@@ -120,22 +155,14 @@ namespace ClusterKit.Build
                 }
             }
 
-            ConsoleLog($"Writing modified {Path.GetFullPath(project.ProjectFileName)}");
-            File.Copy(
-                Path.GetFullPath(project.ProjectFileName),
-                Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"));
+            ConsoleLog($"Writing modified {projectFileName}");
+            projDoc.Save(projectFileName);
+
             var assemblyInfoPath = Path.Combine(
-                Path.GetFullPath(project.ProjectDirectory),
+                tempSrc,
                 "Properties",
                 "AssemblyInfo.cs");
-            File.Copy(assemblyInfoPath, Path.Combine(project.TempBuildDirectory, "AssemblyInfo.cs.orig"));
 
-            projDoc.Save(Path.GetFullPath(project.ProjectFileName));
-            File.Copy(
-                Path.GetFullPath(project.ProjectFileName),
-                Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.mod"));
-
-            //[assembly: AssemblyMetadata("NugetVersion", "0.0.0.0-local")]
             var assemblyText = File.ReadAllText(assemblyInfoPath);
             assemblyText += $"\n[assembly: AssemblyMetadata(\"NugetVersion\", \"{Version?.Replace("\"", "\\\"")}\")]\n";
 
@@ -145,22 +172,8 @@ namespace ClusterKit.Build
             assemblyText = Regex.Replace(assemblyText, "AssemblyFileVersion\\(\"([^\\)]+)\"\\)", $"AssemblyFileVersion(\"{assemblyVersion}\")");
             File.WriteAllText(assemblyInfoPath, assemblyText);
 
-            try
-            {
-                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Clean", new[] { project.ProjectFileName });
-                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Build", new[] { project.ProjectFileName });
-            }
-            finally
-            {
-                // restoring original project file
-                ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
-                projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
-                File.Copy(
-                    Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"),
-                    Path.GetFullPath(project.ProjectFileName),
-                    true);
-                File.Copy(Path.Combine(project.TempBuildDirectory, "AssemblyInfo.cs.orig"), assemblyInfoPath, true);
-            }
+            MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Clean", new[] { projectFileName });
+            MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Build", new[] { projectFileName });
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
             var buildFiles = Directory.GetFiles(project.TempBuildDirectory, $"{project.ProjectName}.*");

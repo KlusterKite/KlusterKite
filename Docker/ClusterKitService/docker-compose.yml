@@ -10,30 +10,48 @@ services:
      - NUGET_API_KEY=ClusterKit
   configDb:
     image: clusterkit/postgres
+  entry:
+    image: clusterkit/entry
+    links:
+     - "seed1"
+     - "seed2"
+    ports:
+     - "80:80"
+     - "443:443"
+
+  #Cluster servers
+  seed1: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+    image: clusterkit/seed
     environment:
-     - NETWORK_NAME=postgres
+     - NETWORK_NAME=seed1
+  seed2: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+    image: clusterkit/seed
+    environment:
+     - NETWORK_NAME=seed2
+  seed3: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+    image: clusterkit/seed
+    environment:
+     - NETWORK_NAME=seed3
+
+  manager:
+    image: clusterkit/manager
+    links:
+     - "seed1"
+     - "seed2"
+     - "configDb"
+     - "nuget"    
+    
   monitoringUI:
     image: clusterkit/monitoring-ui
     ports:
      - "82:8080"
 
-
-  #Cluster servers
-  seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes
-    image: clusterkit/seed
-    ports:
-     - "80:80"
-    environment:
-     - NETWORK_NAME=seed
-  manager:
-    image: clusterkit/manager
-    links:
-     - "seed"
-     - "configDb"    
   worker:
     image: clusterkit/worker    
     links:
-     - "seed"
+     - "seed1"
+     - "seed2"
      - "manager"
      - "nuget"    
+     - "configDb"
 
