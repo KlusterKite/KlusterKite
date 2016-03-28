@@ -243,8 +243,10 @@ namespace ClusterKit.NodeManager.Launcher
                 response = client.Execute<NodeStartUpConfiguration>(request);
             }
 
+            bool usedFallBack;
             if (response.StatusCode != HttpStatusCode.OK || response.Data == null)
             {
+                usedFallBack = true;
                 var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
                 if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
                 {
@@ -252,7 +254,7 @@ namespace ClusterKit.NodeManager.Launcher
                         "Could not get configuration from service and there is no fallback configuration");
                 }
 
-                var serializer = new Newtonsoft.Json.JsonSerializer();
+                var serializer = new JsonSerializer();
 
                 using (var file = File.OpenRead(fallBackConfiguration))
                 using (var textReader = new StreamReader(file))
@@ -263,6 +265,7 @@ namespace ClusterKit.NodeManager.Launcher
             }
             else
             {
+                usedFallBack = false;
                 config = response.Data;
             }
 
@@ -270,15 +273,16 @@ namespace ClusterKit.NodeManager.Launcher
             this.CleanWorkingDir();
             this.PrepareNuGetConfig(config);
             this.InstallPackages(config);
-            this.CreateService(config);
+            this.CreateService(config, usedFallBack);
             this.FixAssemblyVersions();
         }
 
         /// <summary>
         /// Createst runnable service from installed packages
         /// </summary>
-        /// <param name="configuration"></param>
-        private void CreateService(NodeStartUpConfiguration configuration)
+        /// <param name="configuration">Current node configuration</param>
+        /// <param name="usedFallback">Value indicating whether configuration was received from cluster or used fallbcack for cluster start</param>
+        private void CreateService(NodeStartUpConfiguration configuration, bool usedFallback)
         {
             Console.WriteLine(@"Creating service");
             var serviceDir = Path.Combine(this.WorkingDirectory, "service");
@@ -320,9 +324,11 @@ namespace ClusterKit.NodeManager.Launcher
             Console.WriteLine($"General configuration: \n {configuration.Configuration}");
 
             // cluster self-join is not welcomed
+            var allowSelfJoin = "true".Equals(Environment.GetEnvironmentVariable("SELF_JOIN"), StringComparison.InvariantCultureIgnoreCase);
             var networkName = Environment.GetEnvironmentVariable("NETWORK_NAME");
             var seeds = configuration.Seeds.ToList();
-            if (!string.IsNullOrEmpty(networkName))
+
+            if (!string.IsNullOrEmpty(networkName) && (!usedFallback || !allowSelfJoin))
             {
                 seeds = seeds.Where(s => !s.Contains(networkName)).ToList();
             }

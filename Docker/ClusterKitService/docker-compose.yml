@@ -24,6 +24,7 @@ services:
     image: clusterkit/seed
     environment:
      - NETWORK_NAME=seed1
+     - SELF_JOIN=true
   seed2: #seeds should be limited and with fixed addresses preknown to other cluster nodes
     image: clusterkit/seed
     environment:
