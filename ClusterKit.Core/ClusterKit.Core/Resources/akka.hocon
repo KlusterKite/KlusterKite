@@ -23,9 +23,11 @@
         }
 
         serializers {
+		  wire = "Akka.Serialization.WireSerializer, Akka.Serialization.Wire"
           akka-singleton = "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"
         }
         serialization-bindings {
+		  "System.Object" = wire
           "Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools" = akka-singleton
         }
         serialization-identifiers {
