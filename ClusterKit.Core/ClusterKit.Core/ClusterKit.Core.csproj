@@ -136,7 +136,6 @@
     <Compile Include="ActorSystemUtils.cs" />
     <Compile Include="BaseInstaller.cs" />
     <Compile Include="Cluster\ClusterLoggingActor.cs" />
-    <Compile Include="Cluster\SeederActor.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

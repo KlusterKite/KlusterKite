@@ -754,6 +754,35 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Process the <seealso cref="TemplatesStatisticsRequest"/> request
+        /// </summary>
+        private void OnTemplatesStatisticsRequest()
+        {
+            var stats = new TemplatesUsageStatistics
+            {
+                Templates =
+                    this.nodeTemplates.Values.Select(
+                        t =>
+                        new TemplatesUsageStatistics.TemplateUsageStatistics
+                        {
+                            MaximumRequiredNodes = t.MaximumNeededInstances,
+                            MinimumRequiredNodes = t.MininmumRequiredInstances,
+                            Name = t.Code,
+                            ActiveNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
+                                ? this.activeNodesByTemplate[t.Code].Count
+                                : 0,
+                            ObsoleteNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
+                                ? this.activeNodesByTemplate[t.Code].Count(a => this.nodeDescriptions[a].IsObsolete)
+                                : 0,
+                            UpgradingNodes = this.upgradingNodes.Values.Count(d => d.NodeTemplate == t.Code)
+                        })
+                    .ToList()
+            };
+
+            this.Sender.Tell(stats, this.Self);
+        }
+
+        /// <summary>
         /// Loads list of packages from repository
         /// </summary>
         private void ReloadPackageList()
@@ -825,6 +854,9 @@ namespace ClusterKit.NodeManager
                     });
 
             this.Receive<UpgradeMessage>(m => this.OnNodeUpgrade());
+            this.Receive<AvailableTemplatesRequest>(
+                m => this.Sender.Tell(this.GetPossibleTemplatesForContainer(m.ContainerType)));
+            this.Receive<TemplatesStatisticsRequest>(m => this.OnTemplatesStatisticsRequest());
 
             this.Receive<CollectionRequest<NodeTemplate>>(m => this.workers.Forward(m));
             this.Receive<RestActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));
