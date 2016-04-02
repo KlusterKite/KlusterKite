@@ -37,6 +37,7 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Core.TestKit;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
 
     using Xunit;
@@ -728,6 +729,69 @@ namespace ClusterKit.NodeManager.Tests
             templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
             Assert.NotNull(templates);
             Assert.Equal(1, templates.Count);
+        }
+
+        /// <summary>
+        /// Tests template selection
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [Fact]
+        public async Task TemplateSelectionTest()
+        {
+            var templatesFactory =
+                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
+                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
+            var packageFactory =
+                (UniversalTestDataFactory<string, PackageDescription, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+
+            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+
+            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template",
+                        Code = "test-template",
+                        Id = 1,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 0,
+                        MaximumNeededInstances = null,
+                        Priority = 1000000
+                    });
+
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template2",
+                        Code = "test-template2",
+                        Id = 2,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 0,
+                        MaximumNeededInstances = null,
+                        Priority = 1
+                    });
+
+            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+
+            var templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(2, templates.Count);
+
+            var description =
+                await
+                testActor.Ask<NodeStartUpConfiguration>(
+                    new NewNodeTemplateRequest { ContainerType = "test", NodeUid = Guid.NewGuid() });
+            Assert.NotNull(description);
+            Assert.Equal("test-template", description.NodeTemplate); // we have 1 in million chance of false failure
         }
 
         /// <summary>

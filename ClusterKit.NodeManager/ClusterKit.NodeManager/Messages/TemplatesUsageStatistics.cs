@@ -54,6 +54,11 @@ namespace ClusterKit.NodeManager.Messages
             /// <summary>
             /// Gets or sets the number of nodes that are in upgrade process now
             /// </summary>
+            public int StartingNodes { get; set; }
+
+            /// <summary>
+            /// Gets or sets the number of nodes that are in upgrade process now
+            /// </summary>
             public int UpgradingNodes { get; set; }
         }
     }

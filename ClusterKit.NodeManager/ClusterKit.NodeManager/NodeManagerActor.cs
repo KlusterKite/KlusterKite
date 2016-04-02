@@ -142,6 +142,14 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private Dictionary<string, PackageDescription> packages = new Dictionary<string, PackageDescription>();
 
+        /// <summary>
+        /// Random number generator
+        /// </summary>
+        private Random rnd = new Random();
+
+        /// <summary>
+        /// Handle to prevent excess upgrade messages
+        /// </summary>
         private Cancelable upgradeMessageSchedule;
 
         /// <summary>
@@ -384,15 +392,15 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            var dice = new Random().NextDouble();
+            var dice = this.rnd.NextDouble();
             var sumWeight = templates.Sum(t => t.Priority);
 
             var check = 0.0;
             NodeTemplate selectedTemplate = null;
             foreach (var template in templates)
             {
-                check += template.Priority / sumWeight;
-                if (check <= dice)
+                check += (template.Priority / sumWeight);
+                if (dice <= check)
                 {
                     selectedTemplate = template;
                     break;
@@ -402,10 +410,9 @@ namespace ClusterKit.NodeManager
             // this could never happen, but code analyzers can't understand it
             if (selectedTemplate == null)
             {
+                Context.GetLogger().Warning("{Type}: Failed to select template with dice", this.GetType().Name);
                 selectedTemplate = templates.Last();
             }
-
-            var rnd = new Random();
 
             this.Sender.Tell(
                 new NodeStartUpConfiguration
@@ -413,7 +420,7 @@ namespace ClusterKit.NodeManager
                     NodeTemplate = selectedTemplate.Code,
                     NodeTemplateVersion = selectedTemplate.Version,
                     Configuration = selectedTemplate.Configuration,
-                    Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => rnd.NextDouble()).ToList(),
+                    Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => this.rnd.NextDouble()).ToList(),
                     Packages = selectedTemplate.Packages,
                     PackageSources = this.nugetFeeds.Values.Select(f => f.Address).ToList()
                 });
@@ -774,7 +781,8 @@ namespace ClusterKit.NodeManager
                             ObsoleteNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
                                 ? this.activeNodesByTemplate[t.Code].Count(a => this.nodeDescriptions[a].IsObsolete)
                                 : 0,
-                            UpgradingNodes = this.upgradingNodes.Values.Count(d => d.NodeTemplate == t.Code)
+                            UpgradingNodes = this.upgradingNodes.Values.Count(d => d.NodeTemplate == t.Code),
+                            StartingNodes = this.awaitingRequestsByTemplate.ContainsKey(t.Code) ? this.awaitingRequestsByTemplate[t.Code].Count : 0,
                         })
                     .ToList()
             };
