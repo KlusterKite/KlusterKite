@@ -1,14 +1,17 @@
 import { combineReducers } from 'redux';
-import { routerStateReducer } from 'redux-router';
+// import multireducer from 'multireducer';
+import { routeReducer } from 'react-router-redux';
+import {reducer as reduxAsyncConnect} from 'redux-async-connect';
 
 import auth from './auth';
 import monitoringModules from './monitoring-modules';
 import monitoringSwagger from './monitoring-swagger';
-import {reducer as form} from 'redux-form';   // we are using redux-form to store form data in Redux
+import {reducer as form} from 'redux-form';
 import templates from './templates';
 
 export default combineReducers({
-  router: routerStateReducer,
+  routing: routeReducer,
+  reduxAsyncConnect,
   auth,
   form,
   monitoringModules,

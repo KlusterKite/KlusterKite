@@ -1,4 +1,4 @@
-require('babel/polyfill');
+require('babel-polyfill');
 
 const environment = {
   development: {
@@ -17,10 +17,10 @@ module.exports = Object.assign({
   serverApiHost: '192.168.99.100',
   serverApiPort: '80',
   app: {
-    title: 'ClusterKit.Monitoring',
-    description: '',
+    title: 'React Redux Example',
+    description: 'All the modern best practices in one example.',
     head: {
-      titleTemplate: 'ClusterKit.Monitoring: %s',
+      titleTemplate: 'React Redux Example: %s',
       meta: [
         {name: 'description', content: ''},
         {charset: 'utf-8'},
@@ -30,8 +30,8 @@ module.exports = Object.assign({
         {property: 'og:title', content: 'ClusterKit.Monitoring'},
         {property: 'og:description', content: ''},
         {property: 'og:card', content: 'summary'},
-        {property: 'og:site', content: '@erikras'},
-        {property: 'og:creator', content: '@erikras'},
+        {property: 'og:site', content: '@spurikov'},
+        {property: 'og:creator', content: '@spurikov'},
         {property: 'og:image:width', content: '200'},
         {property: 'og:image:height', content: '200'}
       ]

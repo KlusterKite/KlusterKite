@@ -13,12 +13,12 @@ import {
   } from 'containers';
 
 export default (store) => {
-  const requireLogin = (nextState, replaceState, cb) => {
+  const requireLogin = (nextState, replace, cb) => {
     function checkAuth() {
       const { auth: { user }} = store.getState();
       if (!user) {
         // oops, not logged in, so can't be here!
-        replaceState(null, '/');
+        replace('/');
       }
       cb();
     }
@@ -46,11 +46,9 @@ export default (store) => {
 
       { /* Routes */ }
       <Route path="login" component={Login}/>
-      <Route component={Templates}>
-        <Route path="edit/:id" component={TemplatesEdit} />
-        <Route path="templates" />
-      </Route>
-      // <Route path="templates/edit/:id" component={TemplatesEdit}/>
+      <Route path="login" component={Login}/>
+      <Route path="templates/edit/:id" component={TemplatesEdit} />
+      <Route path="templates" component={Templates} />
 
       { /* Catch all route */ }
       <Route path="*" component={NotFound} status={404} />

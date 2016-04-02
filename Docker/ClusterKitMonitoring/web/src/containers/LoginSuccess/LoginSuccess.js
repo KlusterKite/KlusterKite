@@ -28,10 +28,6 @@ class LoginSuccess extends Component {
             The same function will forward you to <code>/</code> should you chose to log out. The choice is yours...
           </p>
 
-          <p>
-            Your token is <b>{user.token}</b>. Enjoy.
-          </p>
-
           <div>
             <button className="btn btn-danger" onClick={logout}><i className="fa fa-sign-out"/>{' '}Log Out</button>
           </div>

@@ -7,22 +7,24 @@ import Nav from 'react-bootstrap/lib/Nav';
 import NavItem from 'react-bootstrap/lib/NavItem';
 import Helmet from 'react-helmet';
 import { isLoaded as isAuthLoaded, load as loadAuth, logout } from 'redux/modules/auth';
-import { pushState } from 'redux-router';
-import connectData from 'helpers/connectData';
+import { routeActions } from 'react-router-redux';
 import config from '../../config';
+import { asyncConnect } from 'redux-async-connect';
 
-function fetchData(getState, dispatch) {
-  const promises = [];
-  if (!isAuthLoaded(getState())) {
-    promises.push(dispatch(loadAuth()));
+@asyncConnect([{
+  promise: ({store: {dispatch, getState}}) => {
+    const promises = [];
+
+    if (!isAuthLoaded(getState())) {
+      promises.push(dispatch(loadAuth()));
+    }
+
+    return Promise.all(promises);
   }
-  return Promise.all(promises);
-}
-
-@connectData(fetchData)
+}])
 @connect(
   state => ({user: state.auth.user}),
-  {logout, pushState})
+  {logout, pushState: routeActions.push})
 export default class App extends Component {
   static propTypes = {
     children: PropTypes.object.isRequired,
@@ -38,17 +40,17 @@ export default class App extends Component {
   componentWillReceiveProps(nextProps) {
     if (!this.props.user && nextProps.user) {
       // login
-      this.props.pushState(null, '/loginSuccess');
+      this.props.pushState('/loginSuccess');
     } else if (this.props.user && !nextProps.user) {
       // logout
-      this.props.pushState(null, '/');
+      this.props.pushState('/');
     }
   }
 
   handleLogout = (event) => {
     event.preventDefault();
     this.props.logout();
-  }
+  };
 
   render() {
     const {user} = this.props;

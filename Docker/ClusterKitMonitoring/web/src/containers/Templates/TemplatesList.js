@@ -1,16 +1,20 @@
 import React, { Component, PropTypes } from 'react';
 import {connect} from 'react-redux';
-import connectData from 'helpers/connectData';
 import * as actions from 'redux/modules/templates';
 import {isLoaded, load as loadOnInit} from 'redux/modules/templates';
+import { asyncConnect } from 'redux-async-connect';
 
-function fetchDataDeferred(getState, dispatch) {
-  if (!isLoaded(getState())) {
-    return dispatch(loadOnInit());
+@asyncConnect([{
+  promise: ({store: {dispatch, getState}}) => {
+    const promises = [];
+
+    if (!isLoaded(getState())) {
+      promises.push(dispatch(loadOnInit()));
+    }
+
+    return Promise.all(promises);
   }
-}
-
-@connectData(null, fetchDataDeferred)
+}])
 @connect(
   state => ({
     data: state.templates.data,
