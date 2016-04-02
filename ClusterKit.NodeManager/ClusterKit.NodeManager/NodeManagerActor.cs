@@ -142,6 +142,14 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private Dictionary<string, PackageDescription> packages = new Dictionary<string, PackageDescription>();
 
+        /// <summary>
+        /// Random number generator
+        /// </summary>
+        private Random rnd = new Random();
+
+        /// <summary>
+        /// Handle to prevent excess upgrade messages
+        /// </summary>
         private Cancelable upgradeMessageSchedule;
 
         /// <summary>
@@ -244,6 +252,48 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Selects list of templates available for container
+        /// </summary>
+        /// <param name="containerType">The type of container</param>
+        /// <returns>The list of available templates</returns>
+        private List<NodeTemplate> GetPossibleTemplatesForContainer(string containerType)
+        {
+            var availableTmplates =
+                this.nodeTemplates.Values.Where(t => t.ContainerTypes.Contains(containerType))
+                    .Select(
+                        t =>
+                        new
+                        {
+                            Template = t,
+                            NodesCount =
+                            (this.activeNodesByTemplate.ContainsKey(t.Code) ? this.activeNodesByTemplate[t.Code].Count : 0)
+                            + (this.awaitingRequestsByTemplate.ContainsKey(t.Code)
+                                   ? this.awaitingRequestsByTemplate[t.Code].Count
+                                   : 0)
+                        })
+                    .ToList();
+
+            // first we choos among templates that have nodes less then minimum required
+            var templates =
+                availableTmplates.Where(
+                    t => t.Template.MininmumRequiredInstances > 0 && t.NodesCount < t.Template.MininmumRequiredInstances)
+                    .Select(t => t.Template)
+                    .ToList();
+
+            if (templates.Count == 0)
+            {
+                // if all node templates has at least minimum required node quantity, we will use node template, untill it has maximum needed quantity
+                templates =
+                    availableTmplates.Where(
+                        t =>
+                        !t.Template.MaximumNeededInstances.HasValue
+                        || (t.Template.MaximumNeededInstances.Value > 0
+                            && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template).ToList();
+            }
+            return templates;
+        }
+
+        /// <summary>
         /// Checks current database connection. Updates database schema to latest version.
         /// </summary>
         private void InitDatabase()
@@ -333,36 +383,7 @@ namespace ClusterKit.NodeManager
         /// <param name="request"></param>
         private void OnNewNodeTemplateRequest(NewNodeTemplateRequest request)
         {
-            var availableTmplates =
-                this.nodeTemplates.Values.Where(t => t.ContainerTypes.Contains(request.ContainerType))
-                    .Select(
-                        t =>
-                        new
-                        {
-                            Template = t,
-                            NodesCount =
-                            (this.activeNodesByTemplate.ContainsKey(t.Code) ? this.activeNodesByTemplate[t.Code].Count : 0)
-                            + (this.awaitingRequestsByTemplate.ContainsKey(t.Code) ? this.awaitingRequestsByTemplate[t.Code].Count : 0)
-                        })
-                    .ToList();
-
-            // first we choos among templates that have nodes less then minimum required
-            var templates =
-                availableTmplates.Where(
-                    t => t.Template.MininmumRequiredInstances > 0 && t.NodesCount < t.Template.MininmumRequiredInstances)
-                    .Select(t => t.Template)
-                    .ToList();
-
-            if (templates.Count == 0)
-            {
-                // if all node templates has at least minimum required node quantity, we will use node template, untill it has maximum needed quantity
-                templates =
-                    availableTmplates.Where(
-                        t =>
-                        !t.Template.MaximumNeededInstances.HasValue
-                        || (t.Template.MaximumNeededInstances.Value > 0
-                            && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template).ToList();
-            }
+            var templates = this.GetPossibleTemplatesForContainer(request.ContainerType);
 
             if (templates.Count == 0)
             {
@@ -371,15 +392,15 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            var dice = new Random().NextDouble();
+            var dice = this.rnd.NextDouble();
             var sumWeight = templates.Sum(t => t.Priority);
 
             var check = 0.0;
             NodeTemplate selectedTemplate = null;
             foreach (var template in templates)
             {
-                check += template.Priority / sumWeight;
-                if (check <= dice)
+                check += (template.Priority / sumWeight);
+                if (dice <= check)
                 {
                     selectedTemplate = template;
                     break;
@@ -389,10 +410,9 @@ namespace ClusterKit.NodeManager
             // this could never happen, but code analyzers can't understand it
             if (selectedTemplate == null)
             {
+                Context.GetLogger().Warning("{Type}: Failed to select template with dice", this.GetType().Name);
                 selectedTemplate = templates.Last();
             }
-
-            var rnd = new Random();
 
             this.Sender.Tell(
                 new NodeStartUpConfiguration
@@ -400,7 +420,7 @@ namespace ClusterKit.NodeManager
                     NodeTemplate = selectedTemplate.Code,
                     NodeTemplateVersion = selectedTemplate.Version,
                     Configuration = selectedTemplate.Configuration,
-                    Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => rnd.NextDouble()).ToList(),
+                    Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => this.rnd.NextDouble()).ToList(),
                     Packages = selectedTemplate.Packages,
                     PackageSources = this.nugetFeeds.Values.Select(f => f.Address).ToList()
                 });
@@ -741,6 +761,36 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Process the <seealso cref="TemplatesStatisticsRequest"/> request
+        /// </summary>
+        private void OnTemplatesStatisticsRequest()
+        {
+            var stats = new TemplatesUsageStatistics
+            {
+                Templates =
+                    this.nodeTemplates.Values.Select(
+                        t =>
+                        new TemplatesUsageStatistics.TemplateUsageStatistics
+                        {
+                            MaximumRequiredNodes = t.MaximumNeededInstances,
+                            MinimumRequiredNodes = t.MininmumRequiredInstances,
+                            Name = t.Code,
+                            ActiveNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
+                                ? this.activeNodesByTemplate[t.Code].Count
+                                : 0,
+                            ObsoleteNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
+                                ? this.activeNodesByTemplate[t.Code].Count(a => this.nodeDescriptions[a].IsObsolete)
+                                : 0,
+                            UpgradingNodes = this.upgradingNodes.Values.Count(d => d.NodeTemplate == t.Code),
+                            StartingNodes = this.awaitingRequestsByTemplate.ContainsKey(t.Code) ? this.awaitingRequestsByTemplate[t.Code].Count : 0,
+                        })
+                    .ToList()
+            };
+
+            this.Sender.Tell(stats, this.Self);
+        }
+
+        /// <summary>
         /// Loads list of packages from repository
         /// </summary>
         private void ReloadPackageList()
@@ -812,6 +862,9 @@ namespace ClusterKit.NodeManager
                     });
 
             this.Receive<UpgradeMessage>(m => this.OnNodeUpgrade());
+            this.Receive<AvailableTemplatesRequest>(
+                m => this.Sender.Tell(this.GetPossibleTemplatesForContainer(m.ContainerType)));
+            this.Receive<TemplatesStatisticsRequest>(m => this.OnTemplatesStatisticsRequest());
 
             this.Receive<CollectionRequest<NodeTemplate>>(m => this.workers.Forward(m));
             this.Receive<RestActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));

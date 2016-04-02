@@ -51,17 +51,11 @@
             </remarks>
             </param>
         </member>
-        <member name="M:ClusterKit.Build.BuildUtils.Build(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription},System.Boolean)">
+        <member name="M:ClusterKit.Build.BuildUtils.Build(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
             <summary>
             Builds all projects
             </summary>
             <param name="projects">The list of projects to build</param>
-            <param name="restoreOriginalProjectFile">
-            Whether or not it would restore original project file
-            <remarks>
-            During the build it changes internal package reference to local ones
-            </remarks>
-            </param>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.Configure(System.String,System.String,System.String,System.String)">
             <summary>

@@ -3,7 +3,7 @@
   
     
 
-  "NodeTemplate": "manager",
+  "NodeTemplate": "clusterManager",
   "NodeTemplateVersion": 0,
   "Packages": [
     "ClusterKit.Core.Service",

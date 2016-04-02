@@ -17,6 +17,7 @@ namespace ClusterKit.Build
     using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System.Threading;
     using System.Xml;
 
     using Fake;
@@ -73,6 +74,8 @@ namespace ClusterKit.Build
         /// </param>
         public static void Build(ProjectDescription project, bool restoreOriginalProjectFile = true)
         {
+            var tempSrc = Path.Combine(Path.GetFullPath(BuildDirectory), "src");
+
             TraceHelper.trace($"Building {project.ProjectName}");
 
             if (Directory.Exists(project.TempBuildDirectory))
@@ -85,17 +88,47 @@ namespace ClusterKit.Build
                 Directory.Delete(project.CleanBuildDirectory, true);
             }
 
+            if (Directory.Exists(tempSrc))
+            {
+                var attmept = 0;
+                while (true)
+                {
+                    try
+                    {
+                        Directory.Delete(tempSrc, true);
+                        continue;
+                    }
+                    catch (IOException)
+                    {
+                        ConsoleLog("Src directory is blocked. Retrying...");
+                        attmept++;
+                        Thread.Sleep(100);
+                        if (attmept >= 10)
+                        {
+                            throw;
+                        }
+                    }
+                    break;
+                }
+            }
+
             Directory.CreateDirectory(project.CleanBuildDirectory);
             Directory.CreateDirectory(project.TempBuildDirectory);
 
             RestoreProjectDependencies(project);
 
+            Func<string, bool> filter = s => true;
+            FileHelper.CopyDir(tempSrc, project.ProjectDirectory, filter.ToFSharpFunc());
+            var projectFileName = Path.Combine(tempSrc, Path.GetFileName(project.ProjectFileName));
+
             // modifying project file to substitute internal nute-through dependencies to currently built files
             var projDoc = new XmlDocument();
-            projDoc.Load(project.ProjectFileName);
+            projDoc.Load(projectFileName);
 
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
             namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+            var refItemGroup = projDoc.DocumentElement.SelectSingleNode("//def:ItemGroup[def:Reference]", namespaceManager);
 
             foreach (var dependency in project.InternalDependencies)
             {
@@ -105,14 +138,36 @@ namespace ClusterKit.Build
                         .FirstOrDefault(
                             e =>
                             e.HasAttribute("Include")
-                            && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"));
+                            && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
+                    ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
+                        .Cast<XmlElement>()
+                        .FirstOrDefault(
+                            e =>
+                            e.HasAttribute("Include")
+                            && Regex.IsMatch(e.Attributes["Include"].Value, $"(^|[\\\\\\/]){Regex.Escape(dependency)}.csproj$"));
+
+                if (refNode == null)
+                {
+                    var pr = projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager).Cast<XmlElement>().Where(e => e.HasAttribute("Include"));
+                    foreach (var refel in pr)
+                    {
+                        ConsoleLog($"Comparing {refel.Attributes["Include"].Value} and {dependency}");
+                    }
+                }
 
                 if (refNode != null)
                 {
+                    var libPath = Path.Combine(Path.GetFullPath(BuildClean), dependency, $"{dependency}.dll");
+                    refNode.ParentNode.RemoveChild(refNode);
+                    refNode = projDoc.CreateElement("Reference", "http://schemas.microsoft.com/developer/msbuild/2003");
+                    refItemGroup.AppendChild(refNode);
+                    refNode.SetAttribute("Include", dependency);
+                    refNode.InnerXml = $"<SpecificVersion>False</SpecificVersion><HintPath>{libPath}</HintPath><Private>True</Private>";
                     ConsoleLog($"ref linked to {dependency} was updated");
-                    refNode.Attributes["Include"].Value = $"{dependency}";
-                    refNode.SelectSingleNode("./def:HintPath", namespaceManager).InnerText =
-                        Path.Combine(Path.GetFullPath(BuildClean), dependency, $"{dependency}.dll");
+                    if (!File.Exists(libPath))
+                    {
+                        ConsoleLog($"!!!!!{libPath} does not exist!!!!");
+                    }
                 }
                 else
                 {
@@ -120,22 +175,16 @@ namespace ClusterKit.Build
                 }
             }
 
-            ConsoleLog($"Writing modified {Path.GetFullPath(project.ProjectFileName)}");
-            File.Copy(
-                Path.GetFullPath(project.ProjectFileName),
-                Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"));
+            // todo: @kantora update NuGet package referencies in case of directory structure change
+
+            ConsoleLog($"Writing modified {projectFileName}");
+            projDoc.Save(projectFileName);
+
             var assemblyInfoPath = Path.Combine(
-                Path.GetFullPath(project.ProjectDirectory),
+                tempSrc,
                 "Properties",
                 "AssemblyInfo.cs");
-            File.Copy(assemblyInfoPath, Path.Combine(project.TempBuildDirectory, "AssemblyInfo.cs.orig"));
 
-            projDoc.Save(Path.GetFullPath(project.ProjectFileName));
-            File.Copy(
-                Path.GetFullPath(project.ProjectFileName),
-                Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.mod"));
-
-            //[assembly: AssemblyMetadata("NugetVersion", "0.0.0.0-local")]
             var assemblyText = File.ReadAllText(assemblyInfoPath);
             assemblyText += $"\n[assembly: AssemblyMetadata(\"NugetVersion\", \"{Version?.Replace("\"", "\\\"")}\")]\n";
 
@@ -145,25 +194,15 @@ namespace ClusterKit.Build
             assemblyText = Regex.Replace(assemblyText, "AssemblyFileVersion\\(\"([^\\)]+)\"\\)", $"AssemblyFileVersion(\"{assemblyVersion}\")");
             File.WriteAllText(assemblyInfoPath, assemblyText);
 
-            try
-            {
-                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Clean", new[] { project.ProjectFileName });
-                MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Build", new[] { project.ProjectFileName });
-            }
-            finally
-            {
-                // restoring original project file
-                ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
-                projDoc.Save(Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.modified"));
-                File.Copy(
-                    Path.Combine(project.TempBuildDirectory, $"{project.ProjectName}.csproj.orig"),
-                    Path.GetFullPath(project.ProjectFileName),
-                    true);
-                File.Copy(Path.Combine(project.TempBuildDirectory, "AssemblyInfo.cs.orig"), assemblyInfoPath, true);
-            }
+            MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Clean", new[] { projectFileName });
+            MSBuildHelper.MSBuildRelease(project.TempBuildDirectory, "Build", new[] { projectFileName });
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
-            var buildFiles = Directory.GetFiles(project.TempBuildDirectory, $"{project.ProjectName}.*");
+
+            var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe", "dll.config", "exe.config" };
+
+            var buildFiles = Directory.GetFiles(project.TempBuildDirectory)
+                .Where(f => extensions.Any(e => $"{project.ProjectName}.{e}".Equals(Path.GetFileName(f), StringComparison.InvariantCultureIgnoreCase)));
             foreach (var file in buildFiles)
             {
                 var fileName = Path.GetFileName(file);
@@ -172,49 +211,21 @@ namespace ClusterKit.Build
                     Path.Combine(project.TempBuildDirectory, fileName),
                     Path.Combine(project.CleanBuildDirectory, fileName));
             }
+
+            TraceHelper.trace($"Build {project.ProjectName} finished");
         }
 
         /// <summary>
         /// Builds all projects
         /// </summary>
         /// <param name="projects">The list of projects to build</param>
-        /// <param name="restoreOriginalProjectFile">
-        /// Whether or not it would restore original project file
-        /// <remarks>
-        /// During the build it changes internal package reference to local ones
-        /// </remarks>
-        /// </param>
-        public static void Build(IEnumerable<ProjectDescription> projects, bool restoreOriginalProjectFile = true)
+        public static void Build(IEnumerable<ProjectDescription> projects)
         {
             var list = projects.ToList();
 
-            try
+            foreach (var project in list)
             {
-                foreach (var project in list)
-                {
-                    Build(project, false);
-                }
-            }
-            finally
-            {
-                if (restoreOriginalProjectFile)
-                {
-                    foreach (var project in list)
-                    {
-                        var originalProjectFile = Path.Combine(
-                            project.TempBuildDirectory,
-                            $"{project.ProjectName}.csproj.orig");
-                        if (File.Exists(originalProjectFile))
-                        {
-                            ConsoleLog($"Restoring original {Path.GetFullPath(project.ProjectFileName)}");
-                            File.Copy(originalProjectFile, Path.GetFullPath(project.ProjectFileName), true);
-                        }
-                        else
-                        {
-                            ConsoleLog($"There is no original {Path.GetFullPath(project.ProjectFileName)}");
-                        }
-                    }
-                }
+                Build(project, false);
             }
         }
 

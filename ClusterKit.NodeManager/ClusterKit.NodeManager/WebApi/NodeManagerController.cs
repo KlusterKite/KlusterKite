@@ -19,6 +19,7 @@ namespace ClusterKit.NodeManager.WebApi
     using Akka.Actor;
 
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
     using ClusterKit.Web;
@@ -66,6 +67,17 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Gets list of available templates for specified container type for current cluster state
+        /// </summary>
+        /// <returns>The list of available templates</returns>
+        [Route("availableTemplates/{containerType}")]
+        [HttpGet]
+        public async Task<List<NodeTemplate>> GetAvailableTemplates(string containerType)
+        {
+            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = containerType }, this.AkkaTimeout);
+        }
+
+        /// <summary>
         /// Gets configuration for new empty node
         /// </summary>
         /// <param name="request">The configuration request</param>
@@ -106,6 +118,17 @@ namespace ClusterKit.NodeManager.WebApi
         public async Task<List<PackageDescription>> GetPackages()
         {
             return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
+        }
+
+        /// <summary>
+        /// Gets current cluster node template usage for debug purposes
+        /// </summary>
+        /// <returns>Current cluster statistics</returns>
+        [Route("stats")]
+        [HttpGet]
+        public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
+        {
+            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
         }
 
         /// <summary>

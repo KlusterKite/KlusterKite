@@ -37,6 +37,7 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Core.TestKit;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
 
     using Xunit;
@@ -506,6 +507,291 @@ namespace ClusterKit.NodeManager.Tests
             var response = await testActor.Ask<List<PackageDescription>>(new PackageListRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(response);
             Assert.Equal(2, response.Count);
+        }
+
+        /// <summary>
+        /// Tests template distibution
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [Fact]
+        public async Task TemplateDistributionTest()
+        {
+            var templatesFactory =
+                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
+                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
+            var packageFactory =
+                (UniversalTestDataFactory<string, PackageDescription, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+
+            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+
+            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template",
+                        Code = "test-template",
+                        Id = 1,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 1,
+                        MaximumNeededInstances = 2
+                    });
+
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template2",
+                        Code = "test-template2",
+                        Id = 2,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 0,
+                        MaximumNeededInstances = null
+                    });
+
+            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+            var stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
+            Assert.NotNull(stats);
+            Assert.Equal(2, stats.Templates.Count);
+
+            var templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(1, templates.Count);
+            Assert.Equal("test-template", templates.First().Code); // there is less then minimum required of test-template
+
+            var node1 = new VirtualNode(1, testActor, this.Sys)
+            {
+                Description =
+                                    {
+                                        NodeTemplate = "test-template",
+                                        ContainerType = "test",
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.0.0" } }
+                                    }
+            };
+
+            router.RegisterVirtualNode(node1.Address.Address, node1.Client);
+            node1.GoUp();
+
+            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
+            Assert.NotNull(stats);
+            Assert.Equal(2, stats.Templates.Count);
+            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
+            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
+
+            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(2, templates.Count);
+
+            var node2 = new VirtualNode(2, testActor, this.Sys)
+            {
+                Description =
+                                    {
+                                        NodeTemplate = "test-template",
+                                        ContainerType = "test",
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0" } }
+                                    }
+            };
+            router.RegisterVirtualNode(node2.Address.Address, node2.Client);
+            node2.GoUp();
+
+            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
+            Assert.NotNull(stats);
+            Assert.Equal(2, stats.Templates.Count);
+            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
+            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
+            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").UpgradingNodes);
+            Assert.False(node1.IsUp);
+
+            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(2, templates.Count);
+
+            node1.Description.Modules[0].Version = "0.1.0";
+            node1.GoUp();
+
+            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
+            Assert.NotNull(stats);
+            Assert.Equal(2, stats.Templates.Count);
+            Assert.Equal(2, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
+            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
+            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").UpgradingNodes);
+
+            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(1, templates.Count);
+        }
+
+        /// <summary>
+        /// Tests template distibution
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [Fact]
+        public async Task TemplateDistributionWithUpgradeTest()
+        {
+            var templatesFactory =
+                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
+                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
+            var packageFactory =
+                (UniversalTestDataFactory<string, PackageDescription, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+
+            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+
+            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template",
+                        Code = "test-template",
+                        Id = 1,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 1,
+                        MaximumNeededInstances = 2
+                    });
+
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template2",
+                        Code = "test-template2",
+                        Id = 2,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 0,
+                        MaximumNeededInstances = null
+                    });
+
+            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+            var stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
+            Assert.NotNull(stats);
+            Assert.Equal(2, stats.Templates.Count);
+
+            var templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(1, templates.Count);
+            Assert.Equal("test-template", templates.First().Code); // there is less then minimum required of test-template
+
+            var node1 = new VirtualNode(1, testActor, this.Sys)
+            {
+                Description =
+                                    {
+                                        NodeTemplate = "test-template",
+                                        ContainerType = "test",
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0" } }
+                                    }
+            };
+
+            router.RegisterVirtualNode(node1.Address.Address, node1.Client);
+            node1.GoUp();
+
+            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
+            Assert.NotNull(stats);
+            Assert.Equal(2, stats.Templates.Count);
+            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
+            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
+
+            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(2, templates.Count);
+
+            var node2 = new VirtualNode(2, testActor, this.Sys)
+            {
+                Description =
+                                    {
+                                        NodeTemplate = "test-template",
+                                        ContainerType = "test",
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0" } }
+                                    }
+            };
+            router.RegisterVirtualNode(node2.Address.Address, node2.Client);
+            node2.GoUp();
+
+            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
+            Assert.NotNull(stats);
+            Assert.Equal(2, stats.Templates.Count);
+            Assert.Equal(2, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
+            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
+
+            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(1, templates.Count);
+        }
+
+        /// <summary>
+        /// Tests template selection
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [Fact]
+        public async Task TemplateSelectionTest()
+        {
+            var templatesFactory =
+                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
+                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
+            var packageFactory =
+                (UniversalTestDataFactory<string, PackageDescription, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+
+            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+
+            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template",
+                        Code = "test-template",
+                        Id = 1,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 0,
+                        MaximumNeededInstances = null,
+                        Priority = 1000000
+                    });
+
+            await
+                templatesFactory.Insert(
+                    new NodeTemplate
+                    {
+                        Name = "test-template2",
+                        Code = "test-template2",
+                        Id = 2,
+                        Version = 0,
+                        ContainerTypes = new List<string> { "test" },
+                        Packages = new List<string> { "TestModule-1" },
+                        MininmumRequiredInstances = 0,
+                        MaximumNeededInstances = null,
+                        Priority = 1
+                    });
+
+            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+
+            var templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            Assert.NotNull(templates);
+            Assert.Equal(2, templates.Count);
+
+            var description =
+                await
+                testActor.Ask<NodeStartUpConfiguration>(
+                    new NewNodeTemplateRequest { ContainerType = "test", NodeUid = Guid.NewGuid() });
+            Assert.NotNull(description);
+            Assert.Equal("test-template", description.NodeTemplate); // we have 1 in million chance of false failure
         }
 
         /// <summary>
