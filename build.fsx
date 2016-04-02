@@ -159,6 +159,7 @@ Target "DockerBase" (fun _ ->
 Target "DockerContainers" (fun _ ->
     RestorePackages |> ignore
     MSBuildRelease "./build/launcher" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"|] |> ignore
+    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"|] |> ignore
 
     let copyLauncherData (path : string) =
         let fullPath = Path.GetFullPath(path)
@@ -186,13 +187,17 @@ Target "DockerContainers" (fun _ ->
         let matcher name = Regex.IsMatch(name, "(.*)((\.jpg)|(\.gif)|(\.png)|(\.jpeg)|(\.html)|(\.html)|(\.js)|(\.css))$", RegexOptions.IgnoreCase)
         Fake.FileHelper.CopyDir fullPathDest fullPathSource matcher
 
+    Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeed/build"|]
+    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seed" (fun file -> true)
+    buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
+
     copyLauncherData "./Docker/ClusterKitWorker" |> ignore
-    copyLauncherData "./Docker/ClusterKitSeed" |> ignore
+    copyLauncherData "./Docker/ClusterKitPublisher" |> ignore
     buildDocker "clusterkit/worker" "Docker/ClusterKitWorker"
     buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
 
-    copyWebContent "./ClusterKit.Monitoring/ClusterKit.Monitoring.Web" "./Docker/ClusterKitSeed/web/monitoring"
-    buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
+    copyWebContent "./ClusterKit.Monitoring/ClusterKit.Monitoring.Web" "./Docker/ClusterKitPublisher/web/monitoring"
+    buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
 
     buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
 )

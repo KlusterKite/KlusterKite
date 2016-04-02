@@ -124,7 +124,7 @@
   <data name="Empty" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\empty.hocon;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="Seed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\seed.hocon;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="Publisher" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\publisher.hocon;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

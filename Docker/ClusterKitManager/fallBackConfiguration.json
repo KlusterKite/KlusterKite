@@ -20,8 +20,6 @@
   ],
   "RequestId": "e49705ca-9d3c-42c0-98f1-ed55fe1d7f1a",
   "Seeds": [
-    "akka.tcp://ClusterKit@seed1:3090",
-    "akka.tcp://ClusterKit@seed2:3090",
-    "akka.tcp://ClusterKit@seed3:3090"
+    "akka.tcp://ClusterKit@seed:3090"
   ]
 }

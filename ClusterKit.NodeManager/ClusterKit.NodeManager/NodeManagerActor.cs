@@ -244,6 +244,48 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Selects list of templates available for container
+        /// </summary>
+        /// <param name="containerType">The type of container</param>
+        /// <returns>The list of available templates</returns>
+        private List<NodeTemplate> GetPossibleTemplatesForContainer(string containerType)
+        {
+            var availableTmplates =
+                this.nodeTemplates.Values.Where(t => t.ContainerTypes.Contains(containerType))
+                    .Select(
+                        t =>
+                        new
+                        {
+                            Template = t,
+                            NodesCount =
+                            (this.activeNodesByTemplate.ContainsKey(t.Code) ? this.activeNodesByTemplate[t.Code].Count : 0)
+                            + (this.awaitingRequestsByTemplate.ContainsKey(t.Code)
+                                   ? this.awaitingRequestsByTemplate[t.Code].Count
+                                   : 0)
+                        })
+                    .ToList();
+
+            // first we choos among templates that have nodes less then minimum required
+            var templates =
+                availableTmplates.Where(
+                    t => t.Template.MininmumRequiredInstances > 0 && t.NodesCount < t.Template.MininmumRequiredInstances)
+                    .Select(t => t.Template)
+                    .ToList();
+
+            if (templates.Count == 0)
+            {
+                // if all node templates has at least minimum required node quantity, we will use node template, untill it has maximum needed quantity
+                templates =
+                    availableTmplates.Where(
+                        t =>
+                        !t.Template.MaximumNeededInstances.HasValue
+                        || (t.Template.MaximumNeededInstances.Value > 0
+                            && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template).ToList();
+            }
+            return templates;
+        }
+
+        /// <summary>
         /// Checks current database connection. Updates database schema to latest version.
         /// </summary>
         private void InitDatabase()
@@ -333,36 +375,7 @@ namespace ClusterKit.NodeManager
         /// <param name="request"></param>
         private void OnNewNodeTemplateRequest(NewNodeTemplateRequest request)
         {
-            var availableTmplates =
-                this.nodeTemplates.Values.Where(t => t.ContainerTypes.Contains(request.ContainerType))
-                    .Select(
-                        t =>
-                        new
-                        {
-                            Template = t,
-                            NodesCount =
-                            (this.activeNodesByTemplate.ContainsKey(t.Code) ? this.activeNodesByTemplate[t.Code].Count : 0)
-                            + (this.awaitingRequestsByTemplate.ContainsKey(t.Code) ? this.awaitingRequestsByTemplate[t.Code].Count : 0)
-                        })
-                    .ToList();
-
-            // first we choos among templates that have nodes less then minimum required
-            var templates =
-                availableTmplates.Where(
-                    t => t.Template.MininmumRequiredInstances > 0 && t.NodesCount < t.Template.MininmumRequiredInstances)
-                    .Select(t => t.Template)
-                    .ToList();
-
-            if (templates.Count == 0)
-            {
-                // if all node templates has at least minimum required node quantity, we will use node template, untill it has maximum needed quantity
-                templates =
-                    availableTmplates.Where(
-                        t =>
-                        !t.Template.MaximumNeededInstances.HasValue
-                        || (t.Template.MaximumNeededInstances.Value > 0
-                            && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template).ToList();
-            }
+            var templates = this.GetPossibleTemplatesForContainer(request.ContainerType);
 
             if (templates.Count == 0)
             {

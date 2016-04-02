@@ -324,15 +324,7 @@ namespace ClusterKit.NodeManager.Launcher
             Console.WriteLine($"General configuration: \n {configuration.Configuration}");
 
             // cluster self-join is not welcomed
-            var allowSelfJoin = "true".Equals(Environment.GetEnvironmentVariable("SELF_JOIN"), StringComparison.InvariantCultureIgnoreCase);
-            var networkName = Environment.GetEnvironmentVariable("NETWORK_NAME");
             var seeds = configuration.Seeds.ToList();
-
-            if (!string.IsNullOrEmpty(networkName) && (!usedFallback || !allowSelfJoin))
-            {
-                seeds = seeds.Where(s => !s.Contains(networkName)).ToList();
-            }
-
             string startConfig = $@"{{
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}

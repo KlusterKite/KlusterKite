@@ -79,11 +79,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             this.Templates.Add(
                 new NodeTemplate
                 {
-                    Code = "seed",
-                    Name = "Cluster seed and Nginx configurator",
-                    MininmumRequiredInstances = 2,
+                    Code = "publisher",
+                    Name = "Cluster Nginx configurator",
+                    MininmumRequiredInstances = 1,
                     MaximumNeededInstances = null,
-                    ContainerTypes = new List<string> { "seed" },
+                    ContainerTypes = new List<string> { "publisher" },
                     Priority = 1000.0,
                     Packages =
                             new List<string>
@@ -92,7 +92,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Web.NginxConfigurator",
                                     "ClusterKit.NodeManager.Client"
                                 },
-                    Configuration = Configurations.Seed,
+                    Configuration = Configurations.Publisher,
                     Version = 0
                 });
 
@@ -101,7 +101,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 {
                     Code = "clusterManager",
                     Name = "Cluster manager (cluster monitoring and managing)",
-                    MininmumRequiredInstances = 2,
+                    MininmumRequiredInstances = 1,
                     MaximumNeededInstances = 3,
                     ContainerTypes = new List<string> { "manager", "worker" },
                     Priority = 100.0,

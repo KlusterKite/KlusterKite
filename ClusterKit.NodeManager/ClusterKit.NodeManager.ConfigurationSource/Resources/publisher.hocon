@@ -31,13 +31,12 @@
       helios {
         tcp {
           hostname = 0.0.0.0
-          port = 3090
+          port = 0
         }
       }
     }
     cluster {
       seed-nodes = []
-      min-nr-of-members = 3
     }
   }
 }

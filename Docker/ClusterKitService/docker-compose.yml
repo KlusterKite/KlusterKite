@@ -13,46 +13,73 @@ services:
   entry:
     image: clusterkit/entry
     links:
-     - "seed1"
-     - "seed2"
+     - "seed"
+     - "publisher1"
+     - "publisher2"
     ports:
      - "80:80"
      - "443:443"
 
   #Cluster servers
-  seed1: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+  seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes
     image: clusterkit/seed
     environment:
-     - NETWORK_NAME=seed1
+     - NETWORK_NAME=seed
      - SELF_JOIN=true
-  seed2: #seeds should be limited and with fixed addresses preknown to other cluster nodes
-    image: clusterkit/seed
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
+
+  publisher1: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+    image: clusterkit/publisher
     environment:
-     - NETWORK_NAME=seed2
-  seed3: #seeds should be limited and with fixed addresses preknown to other cluster nodes
-    image: clusterkit/seed
+     - NETWORK_NAME=publisher1
+     - SELF_JOIN=true
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
+
+
+  publisher2: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+    image: clusterkit/publisher
     environment:
-     - NETWORK_NAME=seed3
+     - NETWORK_NAME=publisher2
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
 
   manager:
     image: clusterkit/manager
     links:
-     - "seed1"
-     - "seed2"
+     - "seed"
      - "configDb"
-     - "nuget"    
-    
+     - "nuget"   
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
+
   monitoringUI:
     image: clusterkit/monitoring-ui
     ports:
      - "82:8080"
-
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
   worker:
     image: clusterkit/worker    
     links:
-     - "seed1"
-     - "seed2"
+     - "seed"
      - "manager"
      - "nuget"    
      - "configDb"
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
+
 

@@ -197,12 +197,13 @@
     <None Include="packages.config" />
     <None Include="Resources\empty.hocon" />
     <None Include="Resources\clusterManager.hocon" />
-    <None Include="Resources\seed.hocon" />
+    <None Include="Resources\publisher.hocon" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Configurations.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Configurations.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201603060827581_Init.resx">
       <DependentUpon>201603060827581_Init.cs</DependentUpon>

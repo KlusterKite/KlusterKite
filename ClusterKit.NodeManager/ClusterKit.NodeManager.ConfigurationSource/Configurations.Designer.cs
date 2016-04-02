@@ -65,17 +65,17 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         ///  ClusterKit {
         ///
         ///    NodeManager.ConfigurationDatabaseConnectionString = &quot;User ID=postgres;Host=configDb;Port=5432;Pooling=true&quot;
-        ///
+        ///      
         ///    Web {
         ///
         ///      Swagger.Publish {
         ///          publishDocPath = &quot;&quot;clusterkit/manager/swagger/doc&quot;&quot;
-        ///          publishUiPath = &quot;&quot;clusterkit/manager/ui&quot;&quot;
+        ///          publishUiPath = &quot;&quot;clusterkit/manager/swagger/ui&quot;&quot;
         ///      }
         ///
         ///      Services {
         ///        ClusterKit/Web/Swagger { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
-        ///          Port = 8080 //  [rest of string was truncated]&quot;;.
+        ///          P [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ClusterManager {
             get {
@@ -87,18 +87,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         ///   Looks up a localized string similar to {
         ///  ClusterKit {
         ///
-        ///    NodeManager.ConfigurationDatabaseConnectionString = &quot;User ID=postgres;Host=configDb;Port=5432;Pooling=true&quot;
-        ///
         ///    Web {
         ///
-        ///      Swagger.Publish {
-        ///          publishDocPath = &quot;&quot;clusterkit/manager/swagger/doc&quot;&quot;
-        ///          publishUiPath = &quot;&quot;clusterkit/manager/ui&quot;&quot;
-        ///      }
-        ///
         ///      Services {
-        ///        ClusterKit/Web/Swagger { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
-        ///          Port = 8080 //  [rest of string was truncated]&quot;;.
+        ///        //ClusterKit/Web/Swagger { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
+        ///          //Port = 8080 // default owin port, current node listening port for server access
+        ///          //PublicHostName = default //public host name of this service. It doesn&apos;t supposed (but is not prohibited) that this should be real public service hostname. It&apos;s just used to distinguish  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Empty {
             get {
@@ -109,26 +103,27 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  ClusterKit {
-        ///    
-        ///      Nginx {
-        ///        PathToConfig = &quot;/etc/nginx/sites-enabled/clusterkit.config&quot;
-        ///        ReloadCommand {
-        ///          Command = /etc/init.d/nginx
-        ///          Arguments = reload
-        ///        } 
-        ///        Configuration {
-        ///          default {
-        ///            &quot;location /&quot; { // you can define static content. This part will be just inserted into nginx config
-        ///              root = /opt/web/monitoring/
-        ///              index = index.html
-        ///            }
+        ///	  Web {
+        ///		  Nginx {
+        ///			PathToConfig = &quot;/etc/nginx/sites-enabled/clusterkit.config&quot;
+        ///			ReloadCommand {
+        ///			  Command = /etc/init.d/nginx
+        ///			  Arguments = reload
+        ///			} 
+        ///			Configuration {
+        ///			  default {
+        ///				&quot;location /&quot; { // you can define static content. This part will be just inserted into nginx config
+        ///				  root = /opt/web/monitoring/
+        ///				  index = index.html
+        ///				}
         ///
-        ///            &quot;location /signalr&quot; {
-        ///           [rest of string was truncated]&quot;;.
+        ///				&quot;location /signalr&quot; {
+        ///					proxy_set_header = [&quot;Upgrade $http_upgrade&quot;, &quot;Connection \&quot;upgrade\&quot;&quot;]
+        ///				}        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Seed {
+        internal static string Publisher {
             get {
-                return ResourceManager.GetString("Seed", resourceCulture);
+                return ResourceManager.GetString("Publisher", resourceCulture);
             }
         }
     }
