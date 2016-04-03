@@ -9,12 +9,12 @@ Now you can call build scripts like:
 
 ## Targets
 
-All targets are devided into two groups:
-* single task targets, that do only one task and usually it is required that some other task should be done previosly
-* Complex task targets - that do all tasks in right order to achive final task
+All targets are divided into two groups:
+* single task targets, that do only one task and usually it is required that some other task should be done previously
+* Complex task targets - that do all tasks in right order to achieve final task
 
-Normaly one shall run *Complex task targets*
-Default target (if ommited) is *FinalRefreshLocalDependencies*
+Normally one shall run *Complex task targets*
+Default target (if omitted) is *FinalRefreshLocalDependencies*
 
 
 ### Single task targets
@@ -24,7 +24,7 @@ Remove contents of all temp directories used during the build
 
 #### Build
 Compiles all projects (with respect to all dependencies) and places output to `build/tmp` (complete build result) and `build/clean` (just library itself)
-All assemblies are marked with default version `0.0.0-local`, if `SetVersion` target was not called in this session. In that case they are marked as newest possible version acording to the local cluster nuget server.
+All assemblies are marked with default version `0.0.0-local`, if `SetVersion` target was not called in this session. In that case they are marked as newest possible version according to the local cluster nuget server.
 
 #### CreateNuGet
 Creates NuGet packages from previos built projects.
@@ -32,28 +32,28 @@ All packages are marked with default version `0.0.0-local`, if `SetVersion` targ
 All packages are placed into the `packageOut` directory
 
 #### RefreshLocalDependencies
-Removes all content from `packages` directory and perfoms full package restore procedure for every project
+Removes all content from `packages` directory and performs full package restore procedure for every project
 
 #### Test
-Runs all specified xunit tests from previosly built projects
+Runs all specified xunit tests from previously built projects
 
 #### DockerBase
-Performs the build of base docker images. Base docker images does not contain modified project files and are not intended for future change (or frequient changes).
+Performs the build of base docker images. Base docker images does not contain modified project files and are not intended for future change (or frequent changes).
 
 #### DockerContainers
-Perfoms the build of the rest docker images. The can conatain service launcher and cache of currently used packages for faster start (that are all packages from `packages` folder, excluding ones, that are also contained in `packageOut` directory).
+Preforms the build of the rest docker images. They can contain service launcher and cache of currently used packages for faster start (that are all packages from `packages` folder, excluding ones, that are also contained in `packageOut` directory).
 
 #### CleanDockerImages
-Removes unnamed images from local docker. This type of images are usually appear during subsequient builds of images, when one image replaces the other.
+Removes unnamed images from local docker. This type of images are usually appear during subsequent builds of images, when one image replaces the other.
 
 #### PushThirdPartyPackages
-Pushes all NuGet packages from solution cache (`packages` folder) to local cluster NuGet server, exluding ones, that are also contained in `packageOut` directory
+Pushes all NuGet packages from solution cache (`packages` folder) to local cluster NuGet server, excluding ones, that are also contained in `packageOut` directory
 
 #### PushLocalPackages
 Pushes all created NuGet packages from `packageOut` directory
 
 #### SetVersion
-Asks current cluster NuGet server for latest version of `ClusterKit.Core` library and assigns next version for subsequient build or package creation task.
+Asks current cluster NuGet server for latest version of `ClusterKit.Core` library and assigns next version for subsequent build or package creation task.
 
 #### CleanPackageCache
 The same as `RefreshLocalDependencies`. TODO: remove duplicate
@@ -85,7 +85,7 @@ Performs *Clean* -> *SetVersion* -> *Build* -> *CreateNuGet* -> *PushLocalPackag
 
 #### FinalRefreshLocalDependencies
 Rebuilds all projects and reinstalls local dependent packages
-This is usually done when one modifies severeal solutions with indirect dependencies to intoduce changes from one solution to another
+This is usually done when one modifies several solutions with indirect dependencies to introduce changes from one solution to another
 Performs *Clean* -> *Build* -> *CreateNuGet* -> *CleanPackageCache* -> *RefreshLocalDependencies*
 
 
