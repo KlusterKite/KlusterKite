@@ -294,6 +294,7 @@ Target "FinalBuild" (fun _ -> ())
 
 "Clean" ==> "FinalBuild"
 "Build" ==> "FinalBuild"
+"RefreshLocalDependencies" ==> "FinalBuild"
 
 //runs all tests
 Target "FinalTest" (fun _ -> ())
