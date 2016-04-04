@@ -274,6 +274,7 @@ Target "CleanPackageCache" (fun _ ->
 "Build" ?=> "Test"
 
 "Build" ?=> "RefreshLocalDependencies"
+"Build" ?=> "CleanPackageCache"
 "CreateNuGet" ?=> "RefreshLocalDependencies"
 
 "DockerBase" ?=> "CleanDockerImages"
@@ -294,7 +295,7 @@ Target "FinalBuild" (fun _ -> ())
 
 "Clean" ==> "FinalBuild"
 "Build" ==> "FinalBuild"
-"RefreshLocalDependencies" ==> "FinalBuild"
+"CleanPackageCache" ==> "FinalBuild"
 
 //runs all tests
 Target "FinalTest" (fun _ -> ())
