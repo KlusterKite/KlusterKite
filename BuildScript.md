@@ -65,6 +65,10 @@ The same as `RefreshLocalDependencies`. TODO: remove duplicate
 Builds all projects
 Performs *Clean* -> *Build*
 
+#### FinalTest
+Builds all projects and runs all XUnit test
+Performs *Clean* -> *Build* -> *Test*
+
 #### FinalCreateNuGet
 Creates nuget packages from projects
 Performs *Clean* -> *Build* -> *CreateNuGet*

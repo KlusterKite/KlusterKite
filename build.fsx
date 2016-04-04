@@ -295,6 +295,12 @@ Target "FinalBuild" (fun _ -> ())
 "Clean" ==> "FinalBuild"
 "Build" ==> "FinalBuild"
 
+//runs all tests
+Target "FinalTest" (fun _ -> ())
+
+"FinalBuild" ==> "FinalTest"
+"Test" ==> "FinalTest"
+
 // creates local nuget packages
 Target "FinalCreateNuGet" (fun _ -> ())
 "FinalBuild" ==> "FinalCreateNuGet"
