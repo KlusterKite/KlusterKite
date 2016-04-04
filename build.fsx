@@ -11,11 +11,11 @@ open  ClusterKit.Build
 
 let buildDir = Path.GetFullPath("./build")
 let packageDir = Path.GetFullPath("./packageOut")
-//let ver = environVar "version"
+let ver = environVar "version"
 
 let currentTarget = getBuildParam "target"
 
-BuildUtils.Configure("0.0.0.0-local", buildDir, packageDir, "./packages")
+BuildUtils.Configure((if ver <> null then ver else "0.0.0.0-local"), buildDir, packageDir, "./packages")
 
 let projects = [|
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Build/ClusterKit.Build.csproj", ProjectDescription.EnProjectType.NugetPackage)
