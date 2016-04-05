@@ -231,14 +231,14 @@ namespace ClusterKit.Core.Data
                                 return;
                             }
 
-                            var oldObject = await factory.Get(factory.GetId(entity));
+                            var oldObject = await factory.Get(request.Id);
                             if (oldObject == null)
                             {
                                 Context.GetLogger()
                                     .Error(
                                         "{Type}: update failed, there is no object with id {Id}",
                                         this.GetType().Name,
-                                        factory.GetId(entity).ToString());
+                                        request.Id.ToString());
                                 this.Sender.Tell(null);
                                 return;
                             }
@@ -250,14 +250,14 @@ namespace ClusterKit.Core.Data
                                     .Error(
                                         "{Type}: update of object with id {Id} failed, prevented by BeforeUpdate",
                                         this.GetType().Name,
-                                        factory.GetId(request.Request).ToString());
+                                       request.Id.ToString());
                                 this.Sender.Tell(null);
                                 return;
                             }
 
                             try
                             {
-                                await factory.Update(entity);
+                                await factory.Update(entity, oldObject);
                                 this.Sender.Tell(entity);
                                 this.AfterUpdate(entity, oldObject);
                                 return;

@@ -108,16 +108,22 @@ namespace ClusterKit.Core.Data.TestKit
         /// <summary>
         /// Updates an object in datasource
         /// </summary>
-        /// <param name="obj">The object to update</param>
+        /// <param name="newData">The new object's data</param>
+        /// <param name="oldData">The old object's data</param>
         /// <returns>Async execution task</returns>
-        public override Task Update(TObject obj)
+        public override Task Update(TObject newData, TObject oldData)
         {
-            if (!this.Storage.ContainsKey(this.GetId(obj)))
+            if (!this.Storage.ContainsKey(this.GetId(oldData)))
             {
                 throw new InvalidOperationException("There is no item to update");
             }
 
-            this.Storage[this.GetId(obj)] = obj;
+            if (!this.GetId(oldData).Equals(this.GetId(newData)))
+            {
+                this.Storage.Remove(this.GetId(oldData));
+            }
+
+            this.Storage[this.GetId(newData)] = newData;
             return Task.FromResult<object>(null);
         }
     }

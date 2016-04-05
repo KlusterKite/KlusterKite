@@ -93,8 +93,9 @@ namespace ClusterKit.Core.Data
         /// <summary>
         /// Updates an object in datasource
         /// </summary>
-        /// <param name="obj">The object to update</param>
+        /// <param name="newData">The new object's data</param>
+        /// <param name="oldData">The old object's data</param>
         /// <returns>Async execution task</returns>
-        public abstract Task Update(TObject obj);
+        public abstract Task Update(TObject newData, TObject oldData);
     }
 }

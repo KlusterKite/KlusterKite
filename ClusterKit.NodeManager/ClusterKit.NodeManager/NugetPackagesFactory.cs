@@ -106,11 +106,11 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Updates an object in datasource
         /// </summary>
-        /// <param name="obj">The object to update</param>
+        /// <param name="newData">The new object's data</param><param name="oldData">The old object's data</param>
         /// <returns>
         /// Async execution task
         /// </returns>
-        public override Task Update(PackageDescription obj)
+        public override Task Update(PackageDescription newData, PackageDescription oldData)
         {
             throw new NotImplementedException();
         }

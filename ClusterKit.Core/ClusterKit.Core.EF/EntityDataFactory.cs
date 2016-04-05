@@ -114,11 +114,12 @@ namespace ClusterKit.Core.EF
         /// <summary>
         /// Updates an object in datasource
         /// </summary>
-        /// <param name="obj">The object to update</param>
+        /// <param name="newData">The new object's data</param>
+        /// <param name="oldData">The old object's data</param>
         /// <returns>Async execution task</returns>
-        public override async Task Update(TObject obj)
+        public override async Task Update(TObject newData, TObject oldData)
         {
-            this.GetDbSet().Attach(obj);
+            this.Context.Entry(oldData).CurrentValues.SetValues(newData);
             await this.Context.SaveChangesAsync();
         }
 

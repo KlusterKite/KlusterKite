@@ -11,7 +11,6 @@ namespace ClusterKit.Web.CRUDS
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Net;
     using System.Threading.Tasks;
     using System.Web.Http;
@@ -32,7 +31,6 @@ namespace ClusterKit.Web.CRUDS
     /// The type of object identity field
     /// </typeparam>
     [UsedImplicitly]
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Reviewed. Suppression is OK here.")]
     public abstract class BaseCrudController<TObject, TId> : ApiController
     {
         /// <summary>
@@ -55,6 +53,7 @@ namespace ClusterKit.Web.CRUDS
         /// <summary>
         /// Gets the actor system
         /// </summary>
+        [UsedImplicitly]
         protected ActorSystem System { get; }
 
         /// <summary>
@@ -64,6 +63,7 @@ namespace ClusterKit.Web.CRUDS
         /// <returns>Updated node template</returns>
         [HttpPut]
         [Route("")]
+        [UsedImplicitly]
         public virtual async Task<TObject> Create(TObject request)
         {
             var template =
@@ -88,6 +88,7 @@ namespace ClusterKit.Web.CRUDS
         /// <returns>Execution task</returns>
         [HttpDelete]
         [Route("{id}/")]
+        [UsedImplicitly]
         public virtual async Task Delete(TId id)
         {
             var result =
@@ -110,6 +111,7 @@ namespace ClusterKit.Web.CRUDS
         /// <returns>Node template</returns>
         [HttpGet]
         [Route("{id}/")]
+        [UsedImplicitly]
         public virtual async Task<TObject> Get(TId id)
         {
             var template =
@@ -141,6 +143,7 @@ namespace ClusterKit.Web.CRUDS
         /// </returns>
         [Route("")]
         [HttpGet]
+        [UsedImplicitly]
         public virtual async Task<List<TObject>> GetList(int count = 100, int skip = 0)
         {
             return
@@ -152,17 +155,23 @@ namespace ClusterKit.Web.CRUDS
         /// <summary>
         /// Updates or creates new Node template
         /// </summary>
-        /// <param name="request">Node template data</param>
-        /// <returns>Updated node template</returns>
+        /// <param name="id">Node template unique id</param>
+        /// <param name="request">
+        /// Node template data
+        /// </param>
+        /// <returns>
+        /// Updated node template
+        /// </returns>
         [HttpPatch]
         [Route("{id}/")]
-        public virtual async Task<TObject> Update(TObject request)
+        [UsedImplicitly]
+        public virtual async Task<TObject> Update([FromUri] TId id, [FromBody] TObject request)
         {
             var template =
                await
                this.System.ActorSelection(this.GetDbActorProxyPath())
                    .Ask<TObject>(
-                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Request = request },
+                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Request = request, Id = id },
                        this.AkkaTimeout);
 
             if (template == null)
