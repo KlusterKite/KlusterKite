@@ -9,6 +9,7 @@
                         NewNodeJoinTimeout = 30s // After configuration request, it is assumed that new node of template shuld be up soon, and this is taken into account on subsequient configuration templates. This is timeout, after it it is supposed that something have gone wrong and that request is obsolete.
                         NewNodeRequestDescriptionNotificationTimeout = 10s
                         NewNodeRequestDescriptionNotificationMaxRequests = 10
+						ConfigurationSeederType = "ClusterKit.NodeManager.ConfigurationSource.ConfigurationSeeder,  ClusterKit.NodeManager.ConfigurationSource"
                         DefaultNugetFeeds {
                                 //privateFeed {
                                 //        address = "http://private-nuget-server/feed/"

@@ -170,6 +170,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Configurations.resx</DependentUpon>
     </Compile>
+    <Compile Include="ConfigurationSeeder.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="Migrations\201603060827581_Init.cs" />
     <Compile Include="Migrations\201603060827581_Init.Designer.cs">

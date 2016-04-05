@@ -7,6 +7,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using Akka.Actor;
     using Akka.Cluster;
 
+    using ClusterKit.Core.Data;
     using ClusterKit.Core.EF;
 
     using JetBrains.Annotations;
@@ -45,7 +46,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         public override async Task<ConfigurationContext> CreateAndUpgradeContext(string connectionString, string databaseName)
         {
             var context = await base.CreateAndUpgradeContext(connectionString, databaseName);
-            context.InitEmptyTemplates();
+            var seederTypeName = this.akkaSystem.Settings.Config.GetString("ClusterKit.NodeManager.ConfigurationSeederType");
+            var seederType = string.IsNullOrWhiteSpace(seederTypeName) ? null : Type.GetType(seederTypeName);
+
+            var seeder = seederType == null
+                             ? new ConfigurationSeeder()
+                             : (IDataSeeder<ConfigurationContext>)Activator.CreateInstance(seederType);
+            seeder.Seed(context);
 
             if (!context.SeedAddresses.Any())
             {

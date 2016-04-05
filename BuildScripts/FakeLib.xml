@@ -1304,6 +1304,57 @@
  Contains tasks to package Azure Cloud Services.
 </summary>
 </member>
+<member name="T:Fake.Azure.Kudu.WebJobType">
+<summary>
+ The different types of web jobs.
+</summary>
+</member>
+<member name="M:Fake.Azure.Kudu.kuduSync">
+<summary>
+ Synchronises all stages files from the temporary deployment to the actual deployment, removing
+ any obsolete files, updating changed files and adding new files.
+</summary>
+</member>
+<member name="M:Fake.Azure.Kudu.stageWebJob(Fake.Azure.Kudu.WebJobType,System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Stages a webjob into the temp deployment area, ready for deployment into the website as a webjob.
+</summary>
+</member>
+<member name="M:Fake.Azure.Kudu.stageWebsite(System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Stages a set of files into the temp deployment area, ready from deployment into the website.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.kuduPath">
+<summary>
+ The path to the KuduSync application.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.previousManifestPath">
+<summary>
+ Used by KuduSync for tracking and diffing deployments.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.nextManifestPath">
+<summary>
+ Used by KuduSync for tracking and diffing deployments.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.deploymentTarget">
+<summary>
+ Location where synced outputs should be deployed to.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.deploymentTemp">
+<summary>
+ Location where staged outputs should go before before synced up to the site.
+</summary>
+</member>
+<member name="T:Fake.Azure.Kudu">
+<summary>
+ Contains tasks to stage and deploy Azure website and webjobs using source code deployment with Kudu Sync.
+</summary>
+</member>
 <member name="P:Fake.Azure.WebJobs.WebSite.WebJobs">
 <summary>
  The webjobs to deploy to this web site
@@ -7451,6 +7502,17 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  (default: 10 minutes)
 </summary>
 </member>
+<member name="P:Fake.OctoTools.DeployReleaseOptions.Progress">
+<summary>
+ Show progress of the deployment.
+ (Sets --waitfordeployment and --norawlog to true.)
+</summary>
+</member>
+<member name="P:Fake.OctoTools.DeployReleaseOptions.NoRawLog">
+<summary>
+ Don&apos;t print the raw log of failed tasks
+</summary>
+</member>
 <member name="P:Fake.OctoTools.DeployReleaseOptions.WaitForDeployment">
 <summary>
  Whether to wait synchronously for deployment to finish
@@ -9951,6 +10013,76 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains a task which allows to run [SpecFlow](http://www.specflow.org/) tests.
 </summary>
 </member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.DropObjectsNotInSource">
+<summary>
+ Drops objects in the destination that do not exist in the source. Defaults to false.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.BlockOnPossibleDataLoss">
+<summary>
+ Block deployment if data loss can occur. Defaults to true.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Timeout">
+<summary>
+ Timeout for deploy (defaults to 120 seconds).
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Destination">
+<summary>
+ Path to destination (path to DACPAC or Connection String).
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Source">
+<summary>
+ Path to source (path to DACPAC or Connection String).
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Action">
+<summary>
+ Type of action to execute. Defaults to Deploy.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployDbArgs">
+<summary>
+ Configuration arguments for DacPac deploy
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction.Report">
+<summary>
+ Generate an XML report for the differences between two databases.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction.Script">
+<summary>
+ Generate a SQL script to sync two databases.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction.Deploy">
+<summary>
+ Generate and apply a synchronisation between two databases.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction">
+<summary>
+ The type of action to execute.
+</summary>
+</member>
+<member name="M:Fake.Sql.DacPac.deployDb(Microsoft.FSharp.Core.FSharpFunc{Fake.Sql.DacPac.DeployDbArgs,Fake.Sql.DacPac.DeployDbArgs})">
+<summary>
+ Deploys a SQL DacPac or database to another database or DacPac.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.defaultDeploymentArgs">
+<summary>
+ The default DacPac deployment arguments.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac">
+<summary>
+ Contains helpers around deploying databases.
+</summary>
+</member>
 <member name="P:Fake.Squirrel.SquirrelParams.SigningSecret">
 <summary>
  The secret key for the code signing certificate
@@ -10027,7 +10159,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  ## Sample usage
 
      Target &quot;CreatePackage&quot; (fun _ -&gt;
-         SquirrelPack (fun p -&gt; { p with WorkingDir = Some &quot;./tmp&quot; }) &quot;./my.nuget&quot;
+         SquirrelPack (fun p -&gt; { p with WorkingDir = Some &quot;./tmp&quot; }) &quot;./my.nupkg&quot;
      )
 </summary>
 </member>
@@ -10046,7 +10178,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  - `ToolPath` - The `squirrel.exe` path if it exists in a subdirectory of the current directory.
  - `TimeOut` - 10 minutes
  - `SignExecutable` - `None`
- - `SigningSecret` - `None`
+ - `SigningKeyFile` - `None`
  - `SigningSecret` - `None`
 </summary>
 </member>
@@ -11104,6 +11236,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="P:Fake.TeamCityHelper.sendTeamCityDotCoverHome">
 <summary>
  Sends the full path to the dotCover home folder to override the bundled dotCover to TeamCity
+</summary>
+</member>
+<member name="M:Fake.TeamCityHelper.sendTeamCityDotNetCoverageImportForTool(System.String,Fake.TeamCityHelper.TeamCityDotNetCoverageTool)">
+<summary>
+ Sends an dotcover, partcover, ncover or ncover3 results filename to TeamCity    
 </summary>
 </member>
 <member name="M:Fake.TeamCityHelper.sendTeamCityDotNetCoverageImport(System.String)">
@@ -12707,6 +12844,66 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
   - `assemblyFile` - The assembly file path.
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.HeatParams.VariableName">
+<summary>
+ Substitute File/@Source=&quot;SourceDir&quot; with a preprocessor or a wix variable  (Parameter: -var)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.ComponentGroupName">
+<summary>
+ Component group name, cannot contain spaces. (Parameter: -cg)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.DirectoryReference">
+<summary>
+ Directory reference to root directories, cannot contains spaces. (Parameter: -dr)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressUniqueIds">
+<summary>
+ Suppress unique identifiers for files, components, &amp; directories.(Parameter: -suid)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressRegistry">
+<summary>
+ Suppress registry harvesting. (Parameter: -sreg)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressRootDirectory">
+<summary>
+ Suppress harvesting the root directory as an element. (Parameter: -srd)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressDirectoryFragments">
+<summary>
+ Suppress generation of fragments for directories and components. (Parameter: -sfrag)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressComElements">
+<summary>
+ Suppress COM elements. (Parameter: -scom)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.GenerateGuidNow">
+<summary>
+ Generate guids now. All components are given a guid when heat is run. (Parameter: -gg)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.AutoGenerateGuid">
+<summary>
+ Auto generate component guids at compile time, e.g. set Guid=&quot;*&quot;. (Parameter: -ag)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.TimeOut">
+<summary>
+ Timeout for the call to Heat
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.ToolDirectory">
+<summary>
+ Directory that contains the Heat tool
+</summary>
+</member>
 <member name="P:Fake.WiXHelper.Script.CustomReplacements">
 <summary>
  You can add custom replacements for the wix xml here.
@@ -13523,6 +13720,21 @@ hidden
 <member name="T:Fake.WiXHelper.WiXFile">
 <summary>
  WiX File Element
+</summary>
+</member>
+<member name="M:Fake.WiXHelper.HarvestDirectory(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.HeatParams,Fake.WiXHelper.HeatParams},System.String,System.String)">
+<summary>
+ Harvests the contents of a Directory for use with Wix using the [Heat](http://wixtoolset.org/documentation/manual/v3/overview/heat.html) tool.
+ ## Parameters
+  - `setParams` - Function used to manipulate the Heat default parameters.
+  - `directory` - The path to the directory that will be harvested by Heat.
+  - `outputFile` - The output file path given to Heat.
+
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatDefaulParams">
+<summary>
+ Default values for the Heat harvesting
 </summary>
 </member>
 <member name="M:Fake.WiXHelper.WiX(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXParams,Fake.WiXHelper.WiXParams},System.String,System.String)">
