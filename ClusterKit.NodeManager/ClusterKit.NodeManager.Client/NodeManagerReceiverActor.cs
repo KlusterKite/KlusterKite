@@ -77,7 +77,8 @@ namespace ClusterKit.NodeManager.Client
                                                        Id = a.GetName().Name,
                                                        Version =
                                                                a.GetName()
-                                                               .Version.ToString()
+                                                               .Version.ToString(),
+                                                       BuildDate = a.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(attr => attr.Key == "BuildDate")?.Value
                                                    })
                                                .ToList()
                 };
@@ -88,6 +89,11 @@ namespace ClusterKit.NodeManager.Client
                 {
                     Context.GetLogger()
                         .Error(loaderException, "{Type}: exception during assemblies read", this.GetType().Name);
+                    if (loaderException.InnerException != null)
+                    {
+                        Context.GetLogger()
+                            .Error(loaderException.InnerException, "{Type}: Innerxception", this.GetType().Name);
+                    }
                 }
 
                 throw;

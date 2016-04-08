@@ -9,10 +9,8 @@
 
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
-    using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.Entity;
-    using System.Linq;
 
     using JetBrains.Annotations;
 
@@ -43,10 +41,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <summary>
-        /// Gets value indicating whether current context is test mock
+        /// Gets or sets a value indicating whether current context is test mock
         /// </summary>
         [UsedImplicitly]
-        public virtual bool IsMoq { get; set; } = false;
+        public virtual bool IsMoq { get; set; }
 
         /// <summary>
         /// Gets or sets the list of used NuGet feeds

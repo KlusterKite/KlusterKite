@@ -27,7 +27,7 @@
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{ClusterKit.NodeManager.ConfigurationSeederType = \"ClusterKit.NodeManager.ConfigurationSource.ConfigurationSeeder, ClusterKit.NodeManager.ConfigurationSource\"}");
 
         /// <summary>
         /// Registering DI components

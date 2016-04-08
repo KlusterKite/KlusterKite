@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {reduxForm} from 'redux-form';
 import templateValidation from './TemplateValidation';
-import {Hidden, Input, MultipleInput, Submit, TextArea} from '../forms/index';
+import {Hidden, Input, MultipleInput, Submit, TextArea} from '../Forms/index';
 
 @reduxForm({
   form: 'template',

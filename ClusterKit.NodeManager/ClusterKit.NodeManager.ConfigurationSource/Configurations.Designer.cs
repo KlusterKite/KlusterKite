@@ -22,7 +22,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Configurations {
+    public class Configurations {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ClusterKit.NodeManager.ConfigurationSource.Configurations", typeof(Configurations).Assembly);
@@ -51,7 +51,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -77,7 +77,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         ///        ClusterKit/Web/Swagger { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
         ///          P [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string ClusterManager {
+        public static string ClusterManager {
             get {
                 return ResourceManager.GetString("ClusterManager", resourceCulture);
             }
@@ -94,7 +94,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         ///          //Port = 8080 // default owin port, current node listening port for server access
         ///          //PublicHostName = default //public host name of this service. It doesn&apos;t supposed (but is not prohibited) that this should be real public service hostname. It&apos;s just used to distinguish  [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Empty {
+        public static string Empty {
             get {
                 return ResourceManager.GetString("Empty", resourceCulture);
             }
@@ -121,7 +121,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         ///					proxy_set_header = [&quot;Upgrade $http_upgrade&quot;, &quot;Connection \&quot;upgrade\&quot;&quot;]
         ///				}        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Publisher {
+        public static string Publisher {
             get {
                 return ResourceManager.GetString("Publisher", resourceCulture);
             }

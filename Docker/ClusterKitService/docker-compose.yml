@@ -65,7 +65,7 @@ services:
   monitoringUI:
     image: clusterkit/monitoring-ui
     ports:
-     - "82:8080"
+     - "82:3000"
     logging:
         driver: json-file
         options:

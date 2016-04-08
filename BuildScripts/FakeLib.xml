@@ -1317,13 +1317,20 @@
 </member>
 <member name="M:Fake.Azure.Kudu.stageWebJob(Fake.Azure.Kudu.WebJobType,System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
- Stages a webjob into the temp deployment area, ready for deployment into the website as a webjob.
+ Stages a set of files into a WebJob folder in the temp deployment area, ready for deployment into the website as a webjob.
 </summary>
 </member>
-<member name="M:Fake.Azure.Kudu.stageWebsite(System.Collections.Generic.IEnumerable{System.String})">
+<member name="M:Fake.Azure.Kudu.getWebJobPath(Fake.Azure.Kudu.WebJobType,System.String)">
 <summary>
- Stages a set of files into the temp deployment area, ready from deployment into the website.
+ Gets the path for deploying a web job to.
 </summary>
+</member>
+<member name="M:Fake.Azure.Kudu.stageFolder(System.String,Microsoft.FSharp.Core.FSharpFunc{System.String,System.Boolean})">
+ <summary>
+ Stages a folder and all subdirectories into the temp deployment area, ready for deployment into the website.
+ </summary>
+ <param name="source">The source folder to copy.</param>
+ <param name="shouldInclude">A predicate which includes files from the folder. If the entire directory should be copied, this predicate should always return true.</param>
 </member>
 <member name="P:Fake.Azure.Kudu.kuduPath">
 <summary>

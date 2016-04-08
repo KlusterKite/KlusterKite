@@ -47,6 +47,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         {
             var context = await base.CreateAndUpgradeContext(connectionString, databaseName);
             var seederTypeName = this.akkaSystem.Settings.Config.GetString("ClusterKit.NodeManager.ConfigurationSeederType");
+            this.akkaSystem.Log.Warning("{Type}: Using seeder {SeederTypeName}", this.GetType().Name, seederTypeName ?? "default");
+
             var seederType = string.IsNullOrWhiteSpace(seederTypeName) ? null : Type.GetType(seederTypeName);
 
             var seeder = seederType == null

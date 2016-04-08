@@ -326,6 +326,7 @@ namespace ClusterKit.NodeManager.Launcher
             // cluster self-join is not welcomed
             var seeds = configuration.Seeds.ToList();
             string startConfig = $@"{{
+                ClusterKit.NodeManager.NodeTemplateVersion = {configuration.NodeTemplateVersion}
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}
                 ClusterKit.NodeManager.NodeId = { this.Uid }

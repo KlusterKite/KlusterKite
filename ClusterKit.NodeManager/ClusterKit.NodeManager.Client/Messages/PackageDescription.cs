@@ -15,6 +15,11 @@ namespace ClusterKit.NodeManager.Client.Messages
     public class PackageDescription
     {
         /// <summary>
+        /// Gets or sets build time of assembly (if specified)
+        /// </summary>
+        public string BuildDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the package Id
         /// </summary>
         public string Id { get; set; }

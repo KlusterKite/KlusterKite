@@ -33,13 +33,12 @@
     <DocumentationFile>bin\Release\ClusterKit.Core.Rest.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.7.182, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.1.0.7.182-beta\lib\net45\Akka.dll</HintPath>
+    <Reference Include="Akka">
+      <HintPath>..\..\packages\Akka.1.0.8.183-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Serialization.Wire">
-      <HintPath>..\..\packages\Akka.Serialization.Wire.1.0.7.182-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Serialization.Wire.1.0.8.183-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations">

@@ -258,7 +258,7 @@ Target "SetVersion" (fun _ ->
 Target "CleanPackageCache" (fun _ ->
     Directory.GetDirectories(Path.GetFullPath("./packages"))
         |> Seq.filter (fun d -> not("FAKE".Equals(d.Split(Path.DirectorySeparatorChar) |> Seq.last)))
-        |> Seq.iter (fun d -> Fake.FileUtils.rm_rf d)
+        |> Seq.iter (fun d -> try Fake.FileUtils.rm_rf d with e -> tracefn "could not remove %s" d)
     RestorePackages()
 )
 

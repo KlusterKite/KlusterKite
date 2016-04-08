@@ -187,6 +187,7 @@ namespace ClusterKit.Build
 
             var assemblyText = File.ReadAllText(assemblyInfoPath);
             assemblyText += $"\n[assembly: AssemblyMetadata(\"NugetVersion\", \"{Version?.Replace("\"", "\\\"")}\")]\n";
+            assemblyText += $"\n[assembly: AssemblyMetadata(\"BuildDate\", \"{DateTimeOffset.Now.ToString("s")}\")]\n";
 
             var assemblyVersion = Regex.Replace(Version ?? "1.0.0.0", "((\\d\\.?)+)(.*)", "$1");
 
