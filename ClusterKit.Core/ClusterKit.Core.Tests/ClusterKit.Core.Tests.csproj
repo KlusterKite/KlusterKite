@@ -184,6 +184,7 @@
     <Compile Include="ConceptProof\AkkaClusterTest.cs" />
     <Compile Include="Configuration\ConfigurationTest.cs" />
     <Compile Include="Data\ContextFactoryTest.cs" />
+    <Compile Include="Monads\MaybeTests.cs" />
     <Compile Include="Ping\PingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestUtils\CoreTestKitTests.cs" />

@@ -16,6 +16,7 @@ namespace ClusterKit.Core.Data
     using Akka.Actor;
     using Akka.Event;
 
+    using ClusterKit.Core.Monads;
     using ClusterKit.Core.Rest.ActionMessages;
 
     using JetBrains.Annotations;
@@ -175,7 +176,7 @@ namespace ClusterKit.Core.Data
                             if (entity == null)
                             {
                                 Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
 
@@ -187,7 +188,7 @@ namespace ClusterKit.Core.Data
                                         "{Type}: create failed, there is already object with id {Id}",
                                         this.GetType().Name,
                                         factory.GetId(entity).ToString());
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
 
@@ -197,14 +198,14 @@ namespace ClusterKit.Core.Data
                             {
                                 Context.GetLogger()
                                     .Error("{Type}: create failed, prevented by BeforeCreate", this.GetType().Name);
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
 
                             try
                             {
                                 await factory.Insert(entity);
-                                this.Sender.Tell(entity);
+                                this.Sender.Tell(new Maybe<TObject>(entity));
                                 this.AfterCreate(entity);
                                 return;
                             }
@@ -216,7 +217,7 @@ namespace ClusterKit.Core.Data
                                         "{Type}: create failed, error while creating object with id {Id}",
                                         this.GetType().Name,
                                         factory.GetId(entity).ToString());
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
                         }
@@ -227,7 +228,7 @@ namespace ClusterKit.Core.Data
                             if (entity == null)
                             {
                                 Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
 
@@ -239,7 +240,7 @@ namespace ClusterKit.Core.Data
                                         "{Type}: update failed, there is no object with id {Id}",
                                         this.GetType().Name,
                                         request.Id.ToString());
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
 
@@ -251,14 +252,14 @@ namespace ClusterKit.Core.Data
                                         "{Type}: update of object with id {Id} failed, prevented by BeforeUpdate",
                                         this.GetType().Name,
                                        request.Id.ToString());
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
 
                             try
                             {
                                 await factory.Update(entity, oldObject);
-                                this.Sender.Tell(entity);
+                                this.Sender.Tell(new Maybe<TObject>(entity));
                                 this.AfterUpdate<TObject>(entity, oldObject);
                                 return;
                             }
@@ -270,7 +271,7 @@ namespace ClusterKit.Core.Data
                                         "{Type}: update failed, error while creating object with id {Id}",
                                         this.GetType().Name,
                                         factory.GetId(entity).ToString());
-                                this.Sender.Tell(null);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
                         }
@@ -287,11 +288,11 @@ namespace ClusterKit.Core.Data
                                             "{Type}: delete failed, there is no object with id {Id}",
                                             this.GetType().Name,
                                             request.Id.ToString());
-                                    this.Sender.Tell(false);
+                                    this.Sender.Tell(new Maybe<TObject>(null));
                                 }
 
                                 this.AfterDelete<TObject>(oldObject);
-                                this.Sender.Tell(true);
+                                this.Sender.Tell(new Maybe<TObject>(oldObject));
                                 return;
                             }
                             catch (Exception exception)
@@ -302,7 +303,7 @@ namespace ClusterKit.Core.Data
                                         "{Type}: delete failed, error while deleting object with id {Id}",
                                         this.GetType().Name,
                                         request.Id.ToString());
-                                this.Sender.Tell(false);
+                                this.Sender.Tell(new Maybe<TObject>(null));
                                 return;
                             }
                         }

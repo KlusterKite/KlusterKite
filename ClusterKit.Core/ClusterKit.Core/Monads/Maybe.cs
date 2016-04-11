@@ -94,7 +94,7 @@ namespace ClusterKit.Core.Monads
 
             if (this.Value == null || other.Value == null)
             {
-                return true;
+                return false;
             }
 
             return this.Value.Equals(other.Value);

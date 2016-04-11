@@ -17,6 +17,7 @@ namespace ClusterKit.Web.CRUDS
 
     using Akka.Actor;
 
+    using ClusterKit.Core.Monads;
     using ClusterKit.Core.Rest.ActionMessages;
 
     using JetBrains.Annotations;
@@ -31,7 +32,7 @@ namespace ClusterKit.Web.CRUDS
     /// The type of object identity field
     /// </typeparam>
     [UsedImplicitly]
-    public abstract class BaseCrudController<TObject, TId> : ApiController
+    public abstract class BaseCrudController<TObject, TId> : ApiController where TObject : class
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseCrudController{TObject,TId}"/> class.
@@ -66,19 +67,19 @@ namespace ClusterKit.Web.CRUDS
         [UsedImplicitly]
         public virtual async Task<TObject> Create(TObject request)
         {
-            var template =
+            var result =
                await
                this.System.ActorSelection(this.GetDbActorProxyPath())
-                   .Ask<TObject>(
+                   .Ask<Maybe<TObject>>(
                        new RestActionMessage<TObject, TId> { ActionType = EnActionType.Create, Request = request },
                        this.AkkaTimeout);
 
-            if (template == null)
+            if (result == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return template;
+            return result;
         }
 
         /// <summary>
@@ -89,19 +90,21 @@ namespace ClusterKit.Web.CRUDS
         [HttpDelete]
         [Route("{id}/")]
         [UsedImplicitly]
-        public virtual async Task Delete(TId id)
+        public virtual async Task<TObject> Delete(TId id)
         {
             var result =
                 await
                 this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<bool>(
+                    .Ask<Maybe<TObject>>(
                         new RestActionMessage<TObject, TId> { ActionType = EnActionType.Delete, Id = id },
                         this.AkkaTimeout);
 
-            if (!result)
+            if (result == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+
+            return result;
         }
 
         /// <summary>
@@ -117,7 +120,7 @@ namespace ClusterKit.Web.CRUDS
             var template =
                 await
                 this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<TObject>(
+                    .Ask<Maybe<TObject>>(
                         new RestActionMessage<TObject, TId> { ActionType = EnActionType.Get, Id = id },
                         this.AkkaTimeout);
 
@@ -170,7 +173,7 @@ namespace ClusterKit.Web.CRUDS
             var template =
                await
                this.System.ActorSelection(this.GetDbActorProxyPath())
-                   .Ask<TObject>(
+                   .Ask<Maybe<TObject>>(
                        new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Request = request, Id = id },
                        this.AkkaTimeout);
 
