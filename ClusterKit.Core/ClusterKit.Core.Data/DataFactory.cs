@@ -14,6 +14,8 @@ namespace ClusterKit.Core.Data
 
     using Castle.Windsor;
 
+    using ClusterKit.Core.Monads;
+
     using JetBrains.Annotations;
 
     using Microsoft.Practices.ServiceLocation;
@@ -24,7 +26,7 @@ namespace ClusterKit.Core.Data
     /// <typeparam name="TContext">The current datasource context</typeparam>
     /// <typeparam name="TObject">Type of data object to work with</typeparam>
     /// <typeparam name="TId">The type of object identification field</typeparam>
-    public abstract class DataFactory<TContext, TObject, TId>
+    public abstract class DataFactory<TContext, TObject, TId> where TObject : class
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DataFactory{TContext,TObject,TId}"/> class.
@@ -59,14 +61,14 @@ namespace ClusterKit.Core.Data
         /// </summary>
         /// <param name="id">Objects identification</param>
         /// <returns>Removed objects data</returns>
-        public abstract Task<TObject> Delete(TId id);
+        public abstract Task<Maybe<TObject>> Delete(TId id);
 
         /// <summary>
         /// Gets an object from datasource using it's identification
         /// </summary>
         /// <param name="id">The object's identification</param>
         /// <returns>Async execution task</returns>
-        public abstract Task<TObject> Get(TId id);
+        public abstract Task<Maybe<TObject>> Get(TId id);
 
         /// <summary>
         /// Gets the object's identification from object

@@ -17,6 +17,7 @@ namespace ClusterKit.Core.EF
     using System.Threading.Tasks;
 
     using ClusterKit.Core.Data;
+    using ClusterKit.Core.Monads;
 
     using JetBrains.Annotations;
 
@@ -46,7 +47,7 @@ namespace ClusterKit.Core.EF
         /// </summary>
         /// <param name="id">Objects identification</param>
         /// <returns>Removed objects data</returns>
-        public override async Task<TObject> Delete(TId id)
+        public override async Task<Maybe<TObject>> Delete(TId id)
         {
             var oldObject = await this.Get(id);
             if (oldObject == null)
@@ -64,7 +65,7 @@ namespace ClusterKit.Core.EF
         /// </summary>
         /// <param name="id">The object's identification</param>
         /// <returns>Async execution task</returns>
-        public override async Task<TObject> Get(TId id)
+        public override async Task<Maybe<TObject>> Get(TId id)
         {
             return await this.GetDbSet().FirstOrDefaultAsync(this.GetIdValidationExpression(id));
         }
@@ -74,6 +75,7 @@ namespace ClusterKit.Core.EF
         /// </summary>
         /// <param name="id">The identification to check</param>
         /// <returns>The expression</returns>
+        [UsedImplicitly]
         public abstract Expression<Func<TObject, bool>> GetIdValidationExpression(TId id);
 
         /// <summary>
@@ -98,6 +100,7 @@ namespace ClusterKit.Core.EF
         /// </summary>
         /// <param name="set">The unordered set of objects</param>
         /// <returns>The ordered set of objects</returns>
+        [UsedImplicitly]
         public abstract IOrderedQueryable<TObject> GetSortFunction(IQueryable<TObject> set);
 
         /// <summary>

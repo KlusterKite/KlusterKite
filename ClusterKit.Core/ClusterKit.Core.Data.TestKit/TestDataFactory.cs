@@ -14,6 +14,8 @@ namespace ClusterKit.Core.Data.TestKit
     using System.Linq;
     using System.Threading.Tasks;
 
+    using ClusterKit.Core.Monads;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -49,16 +51,16 @@ namespace ClusterKit.Core.Data.TestKit
         /// </summary>
         /// <param name="id">Objects identification</param>
         /// <returns>Removed objects data</returns>
-        public override Task<TObject> Delete(TId id)
+        public override Task<Maybe<TObject>> Delete(TId id)
         {
             TObject obj;
             if (this.Storage.TryGetValue(id, out obj))
             {
                 this.Storage.Remove(id);
-                return Task.FromResult(obj);
+                return Task.FromResult(new Maybe<TObject>(obj));
             }
 
-            return Task.FromResult<TObject>(null);
+            return Task.FromResult(new Maybe<TObject>(null));
         }
 
         /// <summary>
@@ -66,10 +68,10 @@ namespace ClusterKit.Core.Data.TestKit
         /// </summary>
         /// <param name="id">The object's identification</param>
         /// <returns>Async execution task</returns>
-        public override Task<TObject> Get(TId id)
+        public override Task<Maybe<TObject>> Get(TId id)
         {
             TObject obj;
-            return this.Storage.TryGetValue(id, out obj) ? Task.FromResult(obj) : Task.FromResult<TObject>(null);
+            return this.Storage.TryGetValue(id, out obj) ? Task.FromResult(new Maybe<TObject>(obj)) : Task.FromResult(new Maybe<TObject>(null));
         }
 
         /// <summary>

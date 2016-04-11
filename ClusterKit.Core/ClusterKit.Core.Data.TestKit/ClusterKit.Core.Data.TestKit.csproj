@@ -146,6 +146,10 @@
       <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
       <Name>ClusterKit.Core.Rest</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.Core\ClusterKit.Core.csproj">
+      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
+      <Name>ClusterKit.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

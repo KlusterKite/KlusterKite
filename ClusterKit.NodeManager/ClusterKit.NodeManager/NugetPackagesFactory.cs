@@ -16,13 +16,17 @@ namespace ClusterKit.NodeManager
     using System.Threading.Tasks;
 
     using ClusterKit.Core.Data;
+    using ClusterKit.Core.Monads;
     using ClusterKit.NodeManager.Client.Messages;
+
+    using JetBrains.Annotations;
 
     using NuGet;
 
     /// <summary>
     /// Data factory to read packages from nuget feed
     /// </summary>
+    [UsedImplicitly]
     public class NugetPackagesFactory : DataFactory<string, PackageDescription, string>
     {
         /// <summary>
@@ -43,7 +47,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// Removed objects data
         /// </returns>
-        public override Task<PackageDescription> Delete(string id)
+        public override Task<Maybe<PackageDescription>> Delete(string id)
         {
             throw new NotImplementedException();
         }
@@ -55,7 +59,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// Async execution task
         /// </returns>
-        public override Task<PackageDescription> Get(string id)
+        public override Task<Maybe<PackageDescription>> Get(string id)
         {
             throw new NotImplementedException();
         }

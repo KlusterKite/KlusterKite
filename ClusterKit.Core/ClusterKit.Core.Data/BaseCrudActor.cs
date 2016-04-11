@@ -243,7 +243,7 @@ namespace ClusterKit.Core.Data
                                 return;
                             }
 
-                            entity = this.BeforeUpdate(entity, oldObject);
+                            entity = this.BeforeUpdate<TObject>(entity, oldObject);
                             if (entity == null)
                             {
                                 Context.GetLogger()
@@ -259,7 +259,7 @@ namespace ClusterKit.Core.Data
                             {
                                 await factory.Update(entity, oldObject);
                                 this.Sender.Tell(entity);
-                                this.AfterUpdate(entity, oldObject);
+                                this.AfterUpdate<TObject>(entity, oldObject);
                                 return;
                             }
                             catch (Exception exception)
@@ -290,7 +290,7 @@ namespace ClusterKit.Core.Data
                                     this.Sender.Tell(false);
                                 }
 
-                                this.AfterDelete(oldObject);
+                                this.AfterDelete<TObject>(oldObject);
                                 this.Sender.Tell(true);
                                 return;
                             }

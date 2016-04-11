@@ -21,9 +21,9 @@ let projects = [|
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Build/ClusterKit.Build.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Rest/ClusterKit.Core.Rest.csproj", ProjectDescription.EnProjectType.NugetPackage)
-    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Data/ClusterKit.Core.Data.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core.Rest"|]))
+    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Data/ClusterKit.Core.Data.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.Rest"|]))
 
-    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Data.TestKit/ClusterKit.Core.Data.TestKit.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core.Rest"; "ClusterKit.Core.Data"|]))
+    new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Data.TestKit/ClusterKit.Core.Data.TestKit.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.Rest"; "ClusterKit.Core.Data"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("./ClusterKit.Core/ClusterKit.Core.EF/ClusterKit.Core.EF.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Core.Rest"; "ClusterKit.Core.Data"|]))
