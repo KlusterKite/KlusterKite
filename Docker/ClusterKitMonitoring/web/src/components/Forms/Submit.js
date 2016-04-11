@@ -18,7 +18,7 @@ export default class Submit extends Component {
     }
 
     return (
-      <div className="form-group">
+      <div className="col-xs-12 form-group">
         {saveError &&
         <div className="alert alert-danger" role="alert">
           <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>

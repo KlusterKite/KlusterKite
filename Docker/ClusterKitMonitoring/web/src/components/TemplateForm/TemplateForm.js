@@ -49,14 +49,14 @@ class TemplateForm extends Component {
       <div>
         <form onSubmit={handleSubmit}>
           <Hidden field={Id} />
-          <Input field={Code} label="Code" />
+          <Input field={Code} label="Code" size="medium" />
           <Input field={Name} label="Name" />
           <Input field={MininmumRequiredInstances} label="Minimum Needed Instances" size="small" />
           <Input field={MaximumNeededInstances} label="Maximum Needed Instances" size="small" />
-          <Input field={Priority} label="Priority" />
-          <Input field={Version} label="Version" />
-          <MultipleInput field={Packages} label="Packages" />
-          <MultipleInput field={ContainerTypes} label="Container Types" />
+          <Input field={Priority} label="Priority" size="small" />
+          <Input field={Version} label="Version" size="small" />
+          <MultipleInput field={Packages} label="Packages" size="medium" />
+          <MultipleInput field={ContainerTypes} label="Container Types" size="medium" />
           <TextArea field={Configuration} label="Configuration" rows={10} />
           <Submit onClick={handleSubmit} saving={saving} saved={saved} saveError={saveError} text="Save" />
         </form>

@@ -6,7 +6,7 @@ ENV PATH $PATH:/nodejs/bin
 
 WORKDIR /app
 COPY ./web/package.json /app/
-RUN npm -g install npm@2.1.1
+RUN npm -g install npm@latest
 RUN npm install
 COPY ./web /app
 EXPOSE 8080
