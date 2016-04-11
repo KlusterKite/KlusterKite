@@ -10,8 +10,9 @@
       <Value>ef</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
-      <Value>serilog</Value>
       <Value>redis</Value>
+      <Value>serilog</Value>
+      <Value>Sharding</Value>
       <Value>Owin</Value>
       <Value>postgres</Value>
       <Value>nginx</Value>
