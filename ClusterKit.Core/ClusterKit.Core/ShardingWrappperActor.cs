@@ -115,6 +115,12 @@ namespace ClusterKit.Core
                 return;
             }
 
+            Context.GetLogger()
+                   .Info(
+                       "{Type}: initializing Sharding manager on {PathString}",
+                       typeof(NameSpaceActor).Name,
+                       this.Self.Path.ToString());
+
             var shardingRegion = ClusterSharding.Get(Context.System)
                 .Start(
                     shardingTypeName,

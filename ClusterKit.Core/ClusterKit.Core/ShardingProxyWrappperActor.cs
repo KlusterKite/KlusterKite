@@ -91,6 +91,12 @@ namespace ClusterKit.Core
                 return;
             }
 
+            Context.GetLogger()
+                   .Info(
+                       "{Type}: initializing Sharding proxy manager on {PathString}",
+                       typeof(NameSpaceActor).Name,
+                       this.Self.Path.ToString());
+
             var shardingRegion = ClusterSharding.Get(Context.System)
                 .StartProxy(
                     shardingTypeName,

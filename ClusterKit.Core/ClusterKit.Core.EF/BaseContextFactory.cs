@@ -13,6 +13,8 @@ namespace ClusterKit.Core.EF
     using System.Data.Common;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
+    using System.Data.Entity.Validation;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
@@ -142,8 +144,25 @@ namespace ClusterKit.Core.EF
                 throw new Exception(@"Created null context");
             }
 
-            var migrator = new MigrateDatabaseToLatestVersion<TContext, TMigrationConfiguration>(true);
-            migrator.InitializeDatabase(context);
+            try
+            {
+                var migrator = new MigrateDatabaseToLatestVersion<TContext, TMigrationConfiguration>(true);
+                migrator.InitializeDatabase(context);
+            }
+            catch (DbEntityValidationException entityValidationException)
+            {
+                var entityErrors = string.Join(
+                    "",
+                    entityValidationException.EntityValidationErrors.Select(error => $"\t{error.Entry.GetType().Name}:\n{string.Join("", error.ValidationErrors.Select(ve => $"\t\t{ve.PropertyName}: {ve.ErrorMessage}\n"))}"));
+                var errorMessage = $"{typeof(TContext).Name} migration error\n{entityErrors}";
+                context.Dispose();
+                throw new Exception(errorMessage, entityValidationException);
+            }
+            catch (Exception)
+            {
+                context.Dispose();
+                throw;
+            }
 
             return context;
         }
