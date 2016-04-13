@@ -7,6 +7,7 @@ import auth from './auth';
 import monitoringModules from './monitoring-modules';
 import monitoringSwagger from './monitoring-swagger';
 import {reducer as form} from 'redux-form';
+import packages from './packages';
 import templates from './templates';
 
 export default combineReducers({
@@ -16,5 +17,6 @@ export default combineReducers({
   form,
   monitoringModules,
   monitoringSwagger,
+  packages,
   templates
 });

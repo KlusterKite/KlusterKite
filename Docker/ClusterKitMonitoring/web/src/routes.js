@@ -7,6 +7,7 @@ import {
     Home,
     Login,
     LoginSuccess,
+    Packages,
     Templates,
     TemplatesEdit,
     NotFound,
@@ -47,6 +48,7 @@ export default (store) => {
       { /* Routes */ }
       <Route path="login" component={Login}/>
       <Route path="login" component={Login}/>
+      <Route path="packages" component={Packages} />
       <Route path="templates/edit/:id" component={TemplatesEdit} />
       <Route path="templates" component={Templates} />
 

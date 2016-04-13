@@ -36,6 +36,7 @@ export default function reducer(state = initialState, action = {}) {
     case SAVE:
       return {
         ...state,
+        data: action.data,
         saving: true
       };
     case SAVE_SUCCESS:
@@ -82,7 +83,7 @@ export function loadById(id) {
   };
 }
 
-export function update(data) {
+export function saveData(data) {
   const path = '/templates/update/' + data.Id;
   console.log(`updatiting data to ${path}`);
 
@@ -90,6 +91,7 @@ export function update(data) {
     types: [SAVE, SAVE_SUCCESS, SAVE_FAIL],
     promise: (client) => client.patch(path, {
       data: data
-    })
+    }),
+    data: data
   };
 }

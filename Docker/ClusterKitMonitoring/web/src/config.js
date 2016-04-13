@@ -17,10 +17,10 @@ module.exports = Object.assign({
   serverApiHost: '192.168.99.100',
   serverApiPort: '80',
   app: {
-    title: 'React Redux Example',
+    title: 'ClusterKit.Monitoring',
     description: 'All the modern best practices in one example.',
     head: {
-      titleTemplate: 'React Redux Example: %s',
+      titleTemplate: 'ClusterKit.Monitoring: %s',
       meta: [
         {name: 'description', content: ''},
         {charset: 'utf-8'},

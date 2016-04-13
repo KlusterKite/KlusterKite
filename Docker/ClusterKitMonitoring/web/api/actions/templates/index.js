@@ -32,8 +32,6 @@ export function update(req) {
     request.set('Accept', 'application/json');
     request.send(req.body);
 
-    console.log('Sending to ' + request.url);
-
     request.end((err, { body } = {}) => err ? reject(body || err) : resolve(body));
   });
 }
