@@ -21,7 +21,7 @@ export default class TemplatesEdit extends Component {
     loading: PropTypes.bool,
     loaded: PropTypes.bool.isRequired,
     loadById: PropTypes.func.isRequired,
-    update: PropTypes.func.isRequired,
+    saveData: PropTypes.func.isRequired,
     initialize: PropTypes.func.isRequired,
     data: PropTypes.object,
     saving: PropTypes.bool,
@@ -46,9 +46,9 @@ export default class TemplatesEdit extends Component {
   }
 
   handleSubmit = (data) => {
-    const {update} = this.props;
+    const {saveData} = this.props;
 
-    update(data);
+    saveData(data);
   }
 
   render() {
