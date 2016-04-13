@@ -12,8 +12,11 @@
     using ClusterKit.Core;
     using ClusterKit.Core.Data;
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
+
+    using NuGet;
 
     /// <summary>
     /// Installing components from current library
@@ -79,7 +82,7 @@
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
 
             container.Register(
-                Component.For<DataFactory<string, PackageDescription, string>>()
+                Component.For<DataFactory<string, IPackage, string>>()
                     .ImplementedBy<NugetPackagesFactory>()
                     .LifestyleTransient());
         }

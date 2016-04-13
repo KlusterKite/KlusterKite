@@ -66,13 +66,7 @@ namespace ClusterKit.Build
         /// Builds current project
         /// </summary>
         /// <param name="project">Project to build</param>
-        /// <param name="restoreOriginalProjectFile">
-        /// Whether or not it would restore original project file
-        /// <remarks>
-        /// During the build it changes internal package reference to local ones
-        /// </remarks>
-        /// </param>
-        public static void Build(ProjectDescription project, bool restoreOriginalProjectFile = true)
+        public static void Build(ProjectDescription project)
         {
             var tempSrc = Path.Combine(Path.GetFullPath(BuildDirectory), "src");
 
@@ -203,14 +197,23 @@ namespace ClusterKit.Build
             var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe", "dll.config", "exe.config" };
 
             var buildFiles = Directory.GetFiles(project.TempBuildDirectory)
-                .Where(f => extensions.Any(e => $"{project.ProjectName}.{e}".Equals(Path.GetFileName(f), StringComparison.InvariantCultureIgnoreCase)));
-            foreach (var file in buildFiles)
+                .Where(f => extensions.Any(e => $"{project.ProjectName}.{e}".Equals(Path.GetFileName(f), StringComparison.InvariantCultureIgnoreCase)))
+                .ToList();
+
+            foreach (var fileName in buildFiles.Select(Path.GetFileName).Where(fileName => fileName != null))
             {
-                var fileName = Path.GetFileName(file);
                 ConsoleLog($"Copying {fileName}");
                 File.Copy(
                     Path.Combine(project.TempBuildDirectory, fileName),
                     Path.Combine(project.CleanBuildDirectory, fileName));
+            }
+
+            if (buildFiles.Any(f => f.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
+                Directory.CreateDirectory(toolsDir);
+                Func<string, bool> alwaysTrue = f => true;
+                FileHelper.CopyDir(toolsDir, project.TempBuildDirectory, alwaysTrue.ToFSharpFunc());
             }
 
             TraceHelper.trace($"Build {project.ProjectName} finished");
@@ -226,7 +229,7 @@ namespace ClusterKit.Build
 
             foreach (var project in list)
             {
-                Build(project, false);
+                Build(project);
             }
         }
 
@@ -328,6 +331,17 @@ namespace ClusterKit.Build
                 var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
                 fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.GetFileName(file);
                 fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{Path.GetFileName(file)}";
+            }
+
+            var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
+            if (Directory.Exists(toolsDir))
+            {
+                foreach (var file in Directory.GetFiles(toolsDir))
+                {
+                    var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.Combine("tools", Path.GetFileName(file));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./tools/{Path.GetFileName(file)}";
+                }
             }
 
             var generatedNuspecFile = Path.Combine(project.CleanBuildDirectory, nuspecDataFileName);

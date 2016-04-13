@@ -14,6 +14,8 @@ namespace ClusterKit.NodeManager.Client.Messages
 
     using Akka.Actor;
 
+    using ClusterKit.NodeManager.Launcher.Messages;
+
     using JetBrains.Annotations;
 
     /// <summary>

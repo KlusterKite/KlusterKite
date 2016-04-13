@@ -20,6 +20,7 @@ namespace ClusterKit.NodeManager.Client
     using ClusterKit.Core;
     using ClusterKit.Core.Utils;
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.Launcher.Messages;
 
     /// <summary>
     /// Small client actor for node managing. Provides current node configuration information and executes update related commands

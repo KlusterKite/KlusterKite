@@ -39,17 +39,11 @@
             Gets global output packages version
             </summary>
         </member>
-        <member name="M:ClusterKit.Build.BuildUtils.Build(ClusterKit.Build.ProjectDescription,System.Boolean)">
+        <member name="M:ClusterKit.Build.BuildUtils.Build(ClusterKit.Build.ProjectDescription)">
             <summary>
             Builds current project
             </summary>
             <param name="project">Project to build</param>
-            <param name="restoreOriginalProjectFile">
-            Whether or not it would restore original project file
-            <remarks>
-            During the build it changes internal package reference to local ones
-            </remarks>
-            </param>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.Build(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
             <summary>

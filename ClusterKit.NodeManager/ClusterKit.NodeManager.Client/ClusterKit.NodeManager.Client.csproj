@@ -145,7 +145,6 @@
     <Compile Include="Installer.cs" />
     <Compile Include="Messages\NodeDescription.cs" />
     <Compile Include="Messages\NodeDescriptionRequest.cs" />
-    <Compile Include="Messages\PackageDescription.cs" />
     <Compile Include="Messages\PackageListRequest.cs" />
     <Compile Include="Messages\ReloadPackageListRequest.cs" />
     <Compile Include="Messages\ShutdownMessage.cs" />

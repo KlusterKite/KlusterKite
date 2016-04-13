@@ -11,13 +11,11 @@ namespace ClusterKit.NodeManager
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
 
     using ClusterKit.Core.Data;
     using ClusterKit.Core.Monads;
-    using ClusterKit.NodeManager.Client.Messages;
 
     using JetBrains.Annotations;
 
@@ -27,7 +25,7 @@ namespace ClusterKit.NodeManager
     /// Data factory to read packages from nuget feed
     /// </summary>
     [UsedImplicitly]
-    public class NugetPackagesFactory : DataFactory<string, PackageDescription, string>
+    public class NugetPackagesFactory : DataFactory<string, IPackage, string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NugetPackagesFactory"/> class.
@@ -47,7 +45,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// Removed objects data
         /// </returns>
-        public override Task<Maybe<PackageDescription>> Delete(string id)
+        public override Task<Maybe<IPackage>> Delete(string id)
         {
             throw new NotImplementedException();
         }
@@ -59,7 +57,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// Async execution task
         /// </returns>
-        public override Task<Maybe<PackageDescription>> Get(string id)
+        public override Task<Maybe<IPackage>> Get(string id)
         {
             throw new NotImplementedException();
         }
@@ -71,7 +69,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// The object's identification
         /// </returns>
-        public override string GetId(PackageDescription obj) => obj.Id;
+        public override string GetId(IPackage obj) => obj.Id;
 
         /// <summary>
         /// Gets a list of objects from datasource
@@ -80,19 +78,13 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// The list of objects from datasource
         /// </returns>
-        public override async Task<List<PackageDescription>> GetList(int skip, int? count)
+        public override async Task<List<IPackage>> GetList(int skip, int? count)
         {
             var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(this.Context);
 
-            return await Task.Run(() => nugetRepository
-                .Search(string.Empty, true)
-                .Where(p => p.IsLatestVersion)
-                .ToList()
-                .Select(p => new PackageDescription
-                {
-                    Id = p.Id,
-                    Version = p.Version.Version.ToString()
-                }).ToList());
+            return
+                await Task.Run(
+                    () => nugetRepository.Search(string.Empty, true).Where(p => p.IsLatestVersion).ToList());
         }
 
         /// <summary>
@@ -102,7 +94,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// Async execution task
         /// </returns>
-        public override Task Insert(PackageDescription obj)
+        public override Task Insert(IPackage obj)
         {
             throw new NotImplementedException();
         }
@@ -114,7 +106,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// Async execution task
         /// </returns>
-        public override Task Update(PackageDescription newData, PackageDescription oldData)
+        public override Task Update(IPackage newData, IPackage oldData)
         {
             throw new NotImplementedException();
         }

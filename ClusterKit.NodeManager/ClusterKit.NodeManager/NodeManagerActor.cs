@@ -31,6 +31,8 @@ namespace ClusterKit.NodeManager
 
     using JetBrains.Annotations;
 
+    using NuGet;
+
     /// <summary>
     /// Singleton actor performing all node configuration related work
     /// </summary>
@@ -140,7 +142,7 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// List of packages in local repository;
         /// </summary>
-        private Dictionary<string, PackageDescription> packages = new Dictionary<string, PackageDescription>();
+        private Dictionary<string, IPackage> packages = new Dictionary<string, IPackage>();
 
         /// <summary>
         /// Random number generator
@@ -230,7 +232,7 @@ namespace ClusterKit.NodeManager
 
             foreach (var module in nodeDescription.Modules)
             {
-                PackageDescription package;
+                IPackage package;
                 if (!this.packages.TryGetValue(module.Id, out package))
                 {
                     Context.GetLogger().Error(
@@ -244,7 +246,7 @@ namespace ClusterKit.NodeManager
                     return;
                 }
 
-                if (package.Version != module.Version)
+                if (package.Version.Version.ToString() != module.Version)
                 {
                     nodeDescription.IsObsolete = true;
                 }
@@ -414,6 +416,47 @@ namespace ClusterKit.NodeManager
                 selectedTemplate = templates.Last();
             }
 
+            // todo: @kantora create and keep update cache of template packages
+            var packageDescriptions = selectedTemplate.Packages
+                .Select(name => this.packages.ContainsKey(name) ? this.packages[name] : null)
+                .Where(p => p != null)
+                .ToList();
+
+            var dependenciesSet = packageDescriptions.SelectMany(d => d.DependencySets).SelectMany(d => d.Dependencies).ToList();
+            var dependencies =
+                dependenciesSet.Select(d => d.Id)
+                    .Distinct()
+                    .Where(id => packageDescriptions.All(p => p.Id != id))
+                    .Select(
+                        delegate (string id)
+                            {
+                                IPackage package;
+                                if (this.packages.TryGetValue(id, out package))
+                                {
+                                    return new PackageDescription
+                                    {
+                                        Id = package.Id,
+                                        Version = package.Version.ToString()
+                                    };
+                                }
+                                else
+                                {
+                                    var dependency =
+                                        dependenciesSet.First(
+                                            d =>
+                                            d.Id == id
+                                            && d.VersionSpec.MinVersion
+                                            == dependenciesSet.Where(dp => dp.Id == id)
+                                                   .Max(dp => dp.VersionSpec.MinVersion));
+
+                                    return new PackageDescription
+                                    {
+                                        Id = dependency.Id,
+                                        Version = dependency.VersionSpec.MinVersion.ToString()
+                                    };
+                                }
+                            }).ToList();
+
             this.Sender.Tell(
                 new NodeStartUpConfiguration
                 {
@@ -421,7 +464,7 @@ namespace ClusterKit.NodeManager
                     NodeTemplateVersion = selectedTemplate.Version,
                     Configuration = selectedTemplate.Configuration,
                     Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => this.rnd.NextDouble()).ToList(),
-                    Packages = selectedTemplate.Packages,
+                    Packages = packageDescriptions.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).Union(dependencies).ToList(),
                     PackageSources = this.nugetFeeds.Values.Select(f => f.Address).ToList()
                 });
 
@@ -594,6 +637,10 @@ namespace ClusterKit.NodeManager
             }
 
             this.router.Tell(address, "/user/NodeManager/Receiver", new ShutdownMessage(), this.Self);
+
+            // experimental node force removal from cluster t speed up process
+            Cluster.Get(Context.System).Leave(address);
+            Cluster.Get(Context.System).Down(address);
             this.Sender.Tell(true);
         }
 
@@ -796,7 +843,7 @@ namespace ClusterKit.NodeManager
         private void ReloadPackageList()
         {
             var feedUrl = Context.System.Settings.Config.GetString(PacakgeRepositoryUrlPath);
-            var factory = DataFactory<string, PackageDescription, string>.CreateFactory(feedUrl);
+            var factory = DataFactory<string, IPackage, string>.CreateFactory(feedUrl);
 
             this.packages = factory.GetList(0, null).Result.ToDictionary(p => p.Id);
 
@@ -844,7 +891,7 @@ namespace ClusterKit.NodeManager
             this.Receive<NewNodeTemplateRequest>(m => this.OnNewNodeTemplateRequest(m));
             this.Receive<RequestTimeOut>(m => this.OnRequestTimeOut(m));
 
-            this.Receive<PackageListRequest>(m => this.Sender.Tell(this.packages.Values.ToList()));
+            this.Receive<PackageListRequest>(m => this.Sender.Tell(this.packages.Values.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList()));
 
             this.Receive<ReloadPackageListRequest>(
                 m =>

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PackageDescription.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages
+namespace ClusterKit.NodeManager.Launcher.Messages
 {
     /// <summary>
     /// Short description of NuGet package

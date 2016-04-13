@@ -3,8 +3,14 @@
   "NodeTemplate": "manager",
   "NodeTemplateVersion": 0,
   "Packages": [
-    "ClusterKit.Core.Service",
-    "ClusterKit.NodeManager.Client"
+    {
+      "Id": "ClusterKit.Core.Service",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.NodeManager.Client",
+      "Version": "0.0.0-local"
+    }
   ],
   "PackageSources": [
     "/opt/packageCache",

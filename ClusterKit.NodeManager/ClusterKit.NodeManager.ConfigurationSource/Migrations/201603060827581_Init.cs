@@ -1,18 +1,35 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="201603060827581_Init.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Initial database creation
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 {
-    using System;
     using System.Data.Entity.Migrations;
 
+    /// <summary>
+    /// Initial database creation
+    /// </summary>
     public partial class Init : DbMigration
     {
+        /// <summary>
+        /// Operations to be performed during the downgrade process.
+        /// </summary>
         public override void Down()
         {
-            DropTable("dbo.NodeTemplates");
+            this.DropTable("dbo.NodeTemplates");
         }
 
+        /// <summary>
+        /// Operations to be performed during the upgrade process.
+        /// </summary>
         public override void Up()
         {
-            CreateTable(
+            this.CreateTable(
                 "dbo.NodeTemplates",
                 c => new
                 {

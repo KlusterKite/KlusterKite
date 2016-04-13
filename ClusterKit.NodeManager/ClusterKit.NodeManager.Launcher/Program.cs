@@ -399,24 +399,47 @@ namespace ClusterKit.NodeManager.Launcher
         /// <param name="configuration">The node configuration</param>
         private void InstallPackages(NodeStartUpConfiguration configuration)
         {
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<packages>\n</packages>\n");
+            // ReSharper disable PossibleNullReferenceException
+            var rootNode = xmlDocument.DocumentElement.SelectSingleNode("/packages");
             foreach (var package in configuration.Packages)
             {
-                Console.WriteLine($"Downloading {package}...");
-                using (var process = new Process())
-                {
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.WorkingDirectory = Path.GetFullPath(this.WorkingDirectory);
-                    process.StartInfo.FileName = "nuget.exe";
-                    process.StartInfo.Arguments =
-                        $"install {package} -PreRelease -NonInteractive -ConfigFile nuget.config -OutputDirectory packages -DisableParallelProcessing";
-                    process.Start();
-                    process.WaitForExit();
+                var packageNode = (XmlElement)rootNode.AppendChild(xmlDocument.CreateElement("package"));
+                packageNode.SetAttribute("id", package.Id);
+                packageNode.SetAttribute("version", package.Version);
+            }
 
-                    if (process.ExitCode != 0)
-                    {
-                        throw new Exception($"Could not install package {package}");
-                    }
+            xmlDocument.Save(Path.Combine(this.WorkingDirectory, "packages.config"));
+            using (var process = new Process())
+            {
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.WorkingDirectory = Path.GetFullPath(this.WorkingDirectory);
+                process.StartInfo.FileName = "nuget.exe";
+                process.StartInfo.Arguments =
+                    $"install packages.config -PreRelease -NonInteractive -ConfigFile nuget.config -OutputDirectory packages -DisableParallelProcessing";
+                process.Start();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception($"Could not install packages");
                 }
+            }
+
+            //Checking installation
+            var installedPackages = Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")).Select(Path.GetFileName).ToList();
+            var missedPackages = configuration.Packages
+                .Where(p => installedPackages.All(d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-\\w*)?$")))
+                .ToList();
+            foreach (var packageName in missedPackages)
+            {
+                Console.WriteLine($"Package {packageName.Id} was not installed");
+            }
+
+            if (missedPackages.Any())
+            {
+                throw new Exception($"Could not install packages");
             }
         }
 
