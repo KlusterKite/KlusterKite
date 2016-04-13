@@ -5,3 +5,9 @@ dist/
 webpack-assets.json
 webpack-stats.json
 npm-debug.log
+!**/packages/*
+!*/packages/*
+!packages
+!**/Packages/*
+!*/Packages/*
+!Packages
