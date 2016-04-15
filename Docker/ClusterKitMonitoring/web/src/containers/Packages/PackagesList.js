@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import * as actions from 'redux/modules/packages';
 import {isLoaded, load as loadOnInit} from 'redux/modules/packages';
 import { asyncConnect } from 'redux-async-connect';
+import PackagesReload from './PackagesReload';
 
 @asyncConnect([{
   promise: ({store: {dispatch, getState}}) => {
@@ -19,10 +20,7 @@ import { asyncConnect } from 'redux-async-connect';
   state => ({
     data: state.packages.data,
     loading: state.packages.loading,
-    loaded: state.packages.loaded,
-    reloading: state.packages.reloading,
-    reloaded: state.packages.reloaded,
-    error: state.packages.error
+    loaded: state.packages.loaded
   }),
   {...actions })
 
@@ -31,11 +29,7 @@ export default class PackagesList extends Component {
     data: PropTypes.any,
     loading: PropTypes.bool,
     loaded: PropTypes.bool.isRequired,
-    load: PropTypes.func.isRequired,
-    error: PropTypes.string,
-    reloading: PropTypes.bool,
-    reloaded: PropTypes.bool,
-    reload: PropTypes.func.isRequired
+    load: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -46,15 +40,8 @@ export default class PackagesList extends Component {
     }
   }
 
-  handleReload = () => {
-    const {reload, load} = this.props;
-    reload().then(function afterReload() {
-      load();
-    });
-  }
-
   render() {
-    const {loading, loaded, error, data, reloading, reloaded} = this.props;
+    const {loading, loaded, data} = this.props;
 
     let records = null;
     // Sort items by name
@@ -77,11 +64,6 @@ export default class PackagesList extends Component {
       loadClassName += ' fa-spin';
     }
 
-    let reloadClassName = 'fa fa-refresh';
-    if (reloading) {
-      reloadClassName += ' fa-spin';
-    }
-
     return (
         <div>
           {!loaded && loading &&
@@ -90,27 +72,7 @@ export default class PackagesList extends Component {
           </div>
           }
 
-          <div>
-            {error &&
-            <div className="alert alert-danger" role="alert">
-              <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-              {' '}
-              {error}
-            </div>
-            }
-
-            {reloaded &&
-            <div className="alert alert-success" role="alert">
-              <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
-              {' '}
-              Reloaded
-            </div>
-            }
-
-            <button type="button" className="btn btn-primary btn-lg" onClick={this.handleReload}>
-              <i className={reloadClassName}/> {' '} Reload packages
-            </button>
-          </div>
+          <PackagesReload />
 
           {loaded &&
           <table className="table table-hover">
