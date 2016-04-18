@@ -30,6 +30,22 @@ export function maxLength(max) {
   };
 }
 
+export function minValue(min) {
+  return value => {
+    if (!isEmpty(value) && value * 1 < min) {
+      return `Must be at least ${min}`;
+    }
+  };
+}
+
+export function maxValue(max) {
+  return value => {
+    if (!isEmpty(value) && value * 1 > max) {
+      return `Must be no more than ${max}`;
+    }
+  };
+}
+
 export function integer(value) {
   if (!Number.isInteger(Number(value))) {
     return 'Must be an integer';
@@ -49,6 +65,26 @@ export function match(field) {
     if (data) {
       if (value !== data[field]) {
         return 'Do not match';
+      }
+    }
+  };
+}
+
+export function lessThan(field) {
+  return (value, data) => {
+    if (value && data) {
+      if (value * 1 > data[field] * 1) {
+        return 'Must be less than ' + data[field];
+      }
+    }
+  };
+}
+
+export function moreThan(field) {
+  return (value, data) => {
+    if (value && data) {
+      if (value * 1 < data[field] * 1) {
+        return 'Must be more than ' + data[field];
       }
     }
   };

@@ -11,7 +11,8 @@ import {TemplateForm} from 'components';
     loaded: state.templates.loaded,
     saving: state.templates.saving,
     saved: state.templates.saved,
-    saveError: state.templates.saveError
+    saveError: state.templates.saveError,
+    createId: state.templates.createId
   }),
   {...actions, initialize })
 
@@ -22,49 +23,64 @@ export default class TemplatesEdit extends Component {
     loaded: PropTypes.bool.isRequired,
     loadById: PropTypes.func.isRequired,
     saveData: PropTypes.func.isRequired,
+    createRecord: PropTypes.func.isRequired,
     initialize: PropTypes.func.isRequired,
     data: PropTypes.object,
     saving: PropTypes.bool,
     saved: PropTypes.bool,
-    saveError: PropTypes.string
+    saveError: PropTypes.string,
+    createId: PropTypes.number,
+    onRedirectStart: PropTypes.func.isRequired
   };
 
   componentDidMount() {
     const {loading, loadById} = this.props;
 
-    if (!loading) {
+    if (!loading && this.props.params.id) {
       loadById(this.props.params.id);
     }
   }
 
   componentDidUpdate() {
-    const {loaded, data} = this.props;
+    const {loaded, data, createId, onRedirectStart, loadById} = this.props;
 
     if (loaded && data) {
       this.props.initialize('template', data);
     }
+    if (createId && createId > 0) {
+      // Redirect to edit page
+      const id = createId;
+      onRedirectStart();
+      loadById(id);
+    }
   }
 
   handleSubmit = (data) => {
-    const {saveData} = this.props;
+    const {saveData, createRecord} = this.props;
 
-    saveData(data);
+    if (data.Id) {
+      saveData(data);
+    } else {
+      createRecord(data);
+    }
   }
 
   render() {
     const {loaded, saving, saved, saveError} = this.props;
+    const newItem = !this.props.params.id;
+    const name = newItem ? 'Create' : 'Edit';
 
     return (
         <div className="container">
-          <h1>Edit template</h1>
+          <h1>{name} template</h1>
 
-          {!loaded &&
+          {!loaded && !newItem &&
           <div className="container">
             <p><i className="fa fa-spinner fa-spin"></i> Loading data… </p>
           </div>
           }
 
-          {loaded &&
+          {(loaded || newItem) &&
             <TemplateForm onSubmit={this.handleSubmit} saving={saving} saved={saved} saveError={saveError} />
           }
         </div>

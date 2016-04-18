@@ -35,3 +35,13 @@ export function update(req) {
     request.end((err, { body } = {}) => err ? reject(body || err) : resolve(body));
   });
 }
+
+export function create(req) {
+  return new Promise((resolve, reject) => {
+    const request = superagent['put'](formatUrl('/nodemanager/templates'));
+    request.set('Accept', 'application/json');
+    request.send(req.body);
+
+    request.end((err, { body } = {}) => err ? reject(body || err) : resolve(body));
+  });
+}
