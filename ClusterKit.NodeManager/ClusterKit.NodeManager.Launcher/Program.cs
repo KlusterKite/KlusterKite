@@ -278,6 +278,27 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
+        /// Copy directory
+        /// </summary>
+        /// <param name="source">The source directory</param>
+        /// <param name="target">The destination directory</param>
+        private void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+        {
+            var subDirectories = target.GetDirectories();
+            foreach (var dir in source.GetDirectories())
+            {
+                var directoryInfo = subDirectories.FirstOrDefault(d => d.Name == dir.Name)
+                                    ?? target.CreateSubdirectory(dir.Name);
+                this.CopyFilesRecursively(dir, directoryInfo);
+            }
+
+            foreach (var file in source.GetFiles())
+            {
+                file.CopyTo(Path.Combine(target.FullName, file.Name), true);
+            }
+        }
+
+        /// <summary>
         /// Createst runnable service from installed packages
         /// </summary>
         /// <param name="configuration">Current node configuration</param>
@@ -314,10 +335,7 @@ namespace ClusterKit.NodeManager.Launcher
 
                 endDir = endDir != null ? Path.Combine(directory, "lib", endDir) : Path.Combine(directory, "lib");
                 Console.WriteLine($"Installing {Path.GetDirectoryName(directory)} from {endDir}");
-                foreach (var file in Directory.GetFiles(endDir))
-                {
-                    File.Copy(file, Path.Combine(this.WorkingDirectory, "service", Path.GetFileName(file)), true);
-                }
+                this.CopyFilesRecursively(new DirectoryInfo(endDir), new DirectoryInfo(Path.Combine(this.WorkingDirectory, "service")));
             }
 
             File.WriteAllText(Path.Combine(serviceDir, "akka.hocon"), configuration.Configuration);

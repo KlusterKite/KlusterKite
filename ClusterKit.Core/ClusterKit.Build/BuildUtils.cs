@@ -169,7 +169,7 @@ namespace ClusterKit.Build
                 }
             }
 
-            // todo: @kantora update NuGet package referencies in case of directory structure change
+            // todo: @kantora update NuGet package references in case of directory structure change
 
             ConsoleLog($"Writing modified {projectFileName}");
             projDoc.Save(projectFileName);
@@ -208,11 +208,22 @@ namespace ClusterKit.Build
                     Path.Combine(project.CleanBuildDirectory, fileName));
             }
 
+            Func<string, bool> alwaysTrue = f => true;
+
+            foreach (var directory in Directory.GetDirectories(project.TempBuildDirectory).Select(Path.GetFileName))
+            {
+                ConsoleLog($"Copying localization {directory}");
+                FileHelper.CopyDir(
+                    Path.Combine(project.CleanBuildDirectory, directory),
+                    Path.Combine(project.TempBuildDirectory, directory),
+                    alwaysTrue.ToFSharpFunc());
+            }
+
             if (buildFiles.Any(f => f.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase)))
             {
                 var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
                 Directory.CreateDirectory(toolsDir);
-                Func<string, bool> alwaysTrue = f => true;
+
                 FileHelper.CopyDir(toolsDir, project.TempBuildDirectory, alwaysTrue.ToFSharpFunc());
             }
 
@@ -331,6 +342,16 @@ namespace ClusterKit.Build
                 var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
                 fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.GetFileName(file);
                 fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{Path.GetFileName(file)}";
+            }
+
+            foreach (var directory in Directory.GetDirectories(project.CleanBuildDirectory).Select(Path.GetFileName).Where(d => d != "tools"))
+            {
+                foreach (var file in Directory.GetFiles(Path.Combine(project.CleanBuildDirectory, directory)))
+                {
+                    var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.Combine(directory, Path.GetFileName(file));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{directory}/{Path.GetFileName(file)}";
+                }
             }
 
             var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
