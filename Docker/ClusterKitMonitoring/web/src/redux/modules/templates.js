@@ -4,6 +4,7 @@ const LOAD_FAIL = 'clusterkit-monitoring/templates/LOAD_FAIL';
 const SAVE = 'clusterkit-monitoring/templates/SAVE';
 const SAVE_SUCCESS = 'clusterkit-monitoring/templates/SAVE_SUCCESS';
 const SAVE_FAIL = 'clusterkit-monitoring/templates/SAVE_FAIL';
+const REDIRECT_START = 'clusterkit-monitoring/templates/REDIRECT_START';
 
 const initialState = {
   loaded: false,
@@ -44,7 +45,8 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         saving: false,
         saved: true,
-        saveError: null
+        saveError: null,
+        createId: action.result.Id
       };
     case SAVE_FAIL:
       console.log(action);
@@ -53,6 +55,11 @@ export default function reducer(state = initialState, action = {}) {
         saving: false,
         saved: false,
         saveError: 'Saving data error. Sorry!'
+      };
+    case REDIRECT_START:
+      return {
+        ...state,
+        createId: null
       };
     default:
       return state;
@@ -93,5 +100,24 @@ export function saveData(data) {
       data: data
     }),
     data: data
+  };
+}
+
+export function createRecord(data) {
+  const path = '/templates/create/';
+  console.log(`saving data to ${path}`);
+
+  return {
+    types: [SAVE, SAVE_SUCCESS, SAVE_FAIL],
+    promise: (client) => client.put(path, {
+      data: data
+    }),
+    data: data
+  };
+}
+
+export function onRedirectStart() {
+  return {
+    type: REDIRECT_START
   };
 }

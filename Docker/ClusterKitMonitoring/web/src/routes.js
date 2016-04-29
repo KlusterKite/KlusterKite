@@ -50,6 +50,7 @@ export default (store) => {
       <Route path="login" component={Login}/>
       <Route path="packages" component={Packages} />
       <Route path="templates/edit/:id" component={TemplatesEdit} />
+      <Route path="templates/create/" component={TemplatesEdit} />
       <Route path="templates" component={Templates} />
 
       { /* Catch all route */ }

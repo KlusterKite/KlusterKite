@@ -55,6 +55,8 @@ export default class TemplatesList extends Component {
           </div>
           }
 
+          <a href="/templates/create/" className="btn btn-primary" role="button">Add a new template</a>
+
           {loaded &&
           <table className="table table-hover">
             <thead>
