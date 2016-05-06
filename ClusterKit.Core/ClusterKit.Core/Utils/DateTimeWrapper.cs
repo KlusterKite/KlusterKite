@@ -11,6 +11,8 @@ namespace ClusterKit.Core.Utils
 {
     using System;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// DateTime mock. Should be used everywhere in application, so it could be easily tested
     /// </summary>
@@ -41,7 +43,7 @@ namespace ClusterKit.Core.Utils
 #if DEBUG
                 return NowGetter?.Invoke() ?? DateTimeOffset.Now + Shift;
 #else
-                return DateTimeOffset.Now;
+                return NowGetter?.Invoke() ?? DateTimeOffset.Now;
 #endif
             }
         }
@@ -49,6 +51,7 @@ namespace ClusterKit.Core.Utils
         /// <summary>
         /// Gets or sets current time shift (in time travel jumps)
         /// </summary>
+        [UsedImplicitly]
         public static TimeSpan Shift
         {
             get
@@ -69,9 +72,9 @@ namespace ClusterKit.Core.Utils
         }
 
         /// <summary>
-        /// Проверка есть ли смещение
+        /// Check, that shif is enabled
         /// </summary>
-        /// <returns>Есть ли смещение</returns>
+        /// <returns>Shift is enabled</returns>
         public static bool IsShiftingEnabled()
         {
             return Shift != TimeSpan.Zero;

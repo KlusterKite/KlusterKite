@@ -44,7 +44,7 @@ namespace ClusterKit.Core.TestKit
                     test-dispatcher {
 					    type : ""ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit""
                         throughput: 100
-                        throughput - deadline - time : 0ms
+                        throughput-deadline-time : 0ms
                     }
                 }
 
