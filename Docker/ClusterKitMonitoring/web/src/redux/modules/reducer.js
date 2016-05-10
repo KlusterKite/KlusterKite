@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 // import multireducer from 'multireducer';
-import { routeReducer } from 'react-router-redux';
+import { routerReducer } from 'react-router-redux';
 import {reducer as reduxAsyncConnect} from 'redux-async-connect';
 
 import auth from './auth';
@@ -12,7 +12,7 @@ import nugetfeeds from './nugetfeeds';
 import templates from './templates';
 
 export default combineReducers({
-  routing: routeReducer,
+  routing: routerReducer,
   reduxAsyncConnect,
   auth,
   form,
