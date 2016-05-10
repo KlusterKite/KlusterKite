@@ -75,8 +75,11 @@ export default class App extends Component {
               <LinkContainer to="/templates">
                 <NavItem eventKey={1}>Templates</NavItem>
               </LinkContainer>
+              <LinkContainer to="/nugetfeeds">
+                <NavItem eventKey={2}>Nuget Feeds</NavItem>
+              </LinkContainer>
               <LinkContainer to="/packages">
-                <NavItem eventKey={2}>Packages</NavItem>
+                <NavItem eventKey={3}>Packages</NavItem>
               </LinkContainer>
               {!user && false &&
               <LinkContainer to="/login">

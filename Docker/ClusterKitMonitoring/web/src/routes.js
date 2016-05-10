@@ -7,6 +7,7 @@ import {
     Home,
     Login,
     LoginSuccess,
+    NugetFeeds,
     Packages,
     Templates,
     TemplatesEdit,
@@ -52,6 +53,7 @@ export default (store) => {
       <Route path="templates/edit/:id" component={TemplatesEdit} />
       <Route path="templates/create/" component={TemplatesEdit} />
       <Route path="templates" component={Templates} />
+      <Route path="nugetfeeds" component={NugetFeeds} />
 
       { /* Catch all route */ }
       <Route path="*" component={NotFound} status={404} />

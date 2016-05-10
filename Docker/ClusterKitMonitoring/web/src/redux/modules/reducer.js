@@ -8,6 +8,7 @@ import monitoringModules from './monitoring-modules';
 import monitoringSwagger from './monitoring-swagger';
 import {reducer as form} from 'redux-form';
 import packages from './packages';
+import nugetfeeds from './nugetfeeds';
 import templates from './templates';
 
 export default combineReducers({
@@ -18,5 +19,6 @@ export default combineReducers({
   monitoringModules,
   monitoringSwagger,
   packages,
+  nugetfeeds,
   templates
 });

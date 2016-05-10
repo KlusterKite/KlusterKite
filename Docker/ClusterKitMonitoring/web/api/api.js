@@ -31,6 +31,7 @@ app.use((req, res) => {
   const {action, params} = mapUrl(actions, splittedUrlPath);
 
   if (action) {
+    // console.log('API got request to ' + action + ' with params ' + params);
     action(req, params)
       .then((result) => {
         if (result instanceof Function) {

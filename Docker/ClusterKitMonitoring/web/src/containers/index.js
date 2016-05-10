@@ -3,6 +3,7 @@ export Home from './Home/Home';
 export Login from './Login/Login';
 export LoginSuccess from './LoginSuccess/LoginSuccess';
 export Monitoring from './Monitoring/Monitoring';
+export NugetFeeds from './NugetFeeds/NugetFeeds';
 export Packages from './Packages/Packages';
 export Templates from './Templates/Templates';
 export TemplatesEdit from './Templates/TemplatesEdit';
