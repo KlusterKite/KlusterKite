@@ -68,6 +68,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
@@ -78,6 +79,7 @@
                         new UniqueAddress(
                             Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
                             1),
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
@@ -117,6 +119,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
@@ -127,7 +130,7 @@
                     1);
             superVisor.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(secondNodeAddress, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+                    Member.Create(secondNodeAddress, 1, MemberStatus.Up, ImmutableHashSet.Create("test"))));
 
             this.ExpectMsg<ResetChildren>();
 
@@ -154,7 +157,7 @@
 
             superVisor.Tell(
                 new ClusterEvent.MemberRemoved(
-                    Member.Create(secondNodeAddress, MemberStatus.Removed, ImmutableHashSet.Create("test")),
+                    Member.Create(secondNodeAddress, 1, MemberStatus.Removed, ImmutableHashSet.Create("test")),
                     MemberStatus.Up));
 
             Assert.Equal(
@@ -186,6 +189,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
@@ -196,6 +200,7 @@
                         new UniqueAddress(
                             Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
                             1),
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
@@ -244,6 +249,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             var address = new UniqueAddress(
@@ -254,6 +260,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         address,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
@@ -277,6 +284,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         address,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             this.ExpectMsg<EnvelopeToReceiver>();
@@ -294,6 +302,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
@@ -304,6 +313,7 @@
                         new UniqueAddress(
                             Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
                             1),
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
@@ -370,14 +380,15 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
             superVisor.Tell(
-                new ClusterEvent.MemberUp(Member.Create(address, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+                new ClusterEvent.MemberUp(Member.Create(address, 1, MemberStatus.Up, ImmutableHashSet.Create("test"))));
 
             superVisor.Tell(
-                new ClusterEvent.MemberUp(Member.Create(address2, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+                new ClusterEvent.MemberUp(Member.Create(address2, 1, MemberStatus.Up, ImmutableHashSet.Create("test"))));
 
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", address.Address));
             superVisor.Tell(new ResetChildren());
@@ -394,7 +405,7 @@
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
             superVisor.Tell(
                 new ClusterEvent.MemberRemoved(
-                    Member.Create(address, MemberStatus.Removed, ImmutableHashSet.Create("test")),
+                    Member.Create(address, 1, MemberStatus.Removed, ImmutableHashSet.Create("test")),
                     MemberStatus.Up));
             var created = this.ExpectMsg<string>();
             Assert.Equal((string)"Created 1", (string)created);
@@ -441,14 +452,15 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
             superVisor.Tell(
-                new ClusterEvent.MemberUp(Member.Create(address, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+                new ClusterEvent.MemberUp(Member.Create(address, 1, MemberStatus.Up, ImmutableHashSet.Create("test"))));
 
             superVisor.Tell(
-                new ClusterEvent.MemberUp(Member.Create(address2, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+                new ClusterEvent.MemberUp(Member.Create(address2, 1, MemberStatus.Up, ImmutableHashSet.Create("test"))));
 
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", address.Address));
             superVisor.Tell(new ResetChildren());
@@ -464,7 +476,7 @@
 
             superVisor.Tell(
                 new ClusterEvent.MemberRemoved(
-                    Member.Create(address, MemberStatus.Removed, ImmutableHashSet.Create("test")),
+                    Member.Create(address, 1, MemberStatus.Removed, ImmutableHashSet.Create("test")),
                     MemberStatus.Up));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
 
@@ -493,6 +505,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
@@ -504,6 +517,7 @@
                         new UniqueAddress(
                             Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
                             1),
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
@@ -531,6 +545,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
@@ -540,7 +555,7 @@
                     Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
                     1);
             superVisor.Tell(
-                new ClusterEvent.MemberUp(Member.Create(address, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+                new ClusterEvent.MemberUp(Member.Create(address, 1, MemberStatus.Up, ImmutableHashSet.Create("test"))));
 
             this.ExpectMsg<ResetChildren>();
             superVisor.UnderlyingActor.SelectNodeToPlaceChildOverride = s => this.TestActor;
@@ -606,6 +621,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             var address = new UniqueAddress(
@@ -616,6 +632,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         address,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 
@@ -658,13 +675,14 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
 
             superVisor.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(uniqueAddress, MemberStatus.Up, ImmutableHashSet.Create("test"))));
+                    Member.Create(uniqueAddress, 1, MemberStatus.Up, ImmutableHashSet.Create("test"))));
 
             this.ExpectMsg<ResetChildren>();
 
@@ -683,8 +701,8 @@
 
             var members = ImmutableSortedSet<Member>.Empty;
             var builder = members.ToBuilder();
-            builder.Add(Member.Create(Cluster.Get(this.Sys).SelfUniqueAddress, MemberStatus.Up, ImmutableHashSet.Create("test")));
-            builder.Add(Member.Create(uniqueAddress, MemberStatus.Up, ImmutableHashSet.Create("test")));
+            builder.Add(Member.Create(Cluster.Get(this.Sys).SelfUniqueAddress, 1, MemberStatus.Up, ImmutableHashSet.Create("test")));
+            builder.Add(Member.Create(uniqueAddress, 1, MemberStatus.Up, ImmutableHashSet.Create("test")));
             members = builder.ToImmutable();
 
             var roleLeaders = ImmutableDictionary<string, Address>.Empty;
@@ -720,6 +738,7 @@
                 new ClusterEvent.MemberUp(
                     Member.Create(
                         Cluster.Get(this.Sys).SelfUniqueAddress,
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
             superVisor.Tell(new ClusterEvent.RoleLeaderChanged("test", Cluster.Get(this.Sys).SelfAddress));
@@ -730,6 +749,7 @@
                         new UniqueAddress(
                             Cluster.Get(this.Sys).SelfAddress.WithPort(Cluster.Get(this.Sys).SelfAddress.Port + 1),
                             1),
+                        1,
                         MemberStatus.Up,
                         ImmutableHashSet.Create("test"))));
 

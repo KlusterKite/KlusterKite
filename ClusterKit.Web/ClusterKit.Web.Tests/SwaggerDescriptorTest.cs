@@ -58,6 +58,7 @@ namespace ClusterKit.Web.Tests
                     new ClusterEvent.MemberUp(
                         Member.Create(
                             Cluster.Get(this.Sys).SelfUniqueAddress,
+                            1,
                             MemberStatus.Up,
                             ImmutableHashSet.Create("Web.Swagger.Monitor"))));
             this.ExpectMsg<SwaggerPublishDescription>("/user/Web/Swagger/Monitor");

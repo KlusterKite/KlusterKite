@@ -33,33 +33,39 @@
     <DocumentationFile>bin\Release\ClusterKit.Core.Rest.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.8.185, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.1.0.8.185-beta\lib\net45\Akka.dll</HintPath>
+      <HintPath>..\..\packages\Akka.1.0.9.198-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster">
-      <HintPath>..\..\packages\Akka.Cluster.1.0.8.185-beta\lib\net45\Akka.Cluster.dll</HintPath>
+    <Reference Include="Akka.Cluster, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.1.0.9.198-beta\lib\net45\Akka.Cluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster.Sharding">
-      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.0.8.185-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
+    <Reference Include="Akka.Cluster.Sharding, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.0.9.198-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster.Tools">
-      <HintPath>..\..\packages\Akka.Cluster.Tools.1.0.8.185-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
+    <Reference Include="Akka.Cluster.Tools, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.Tools.1.0.9.198-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Persistence">
-      <HintPath>..\..\packages\Akka.Persistence.1.0.8.185-beta\lib\net45\Akka.Persistence.dll</HintPath>
+    <Reference Include="Akka.Persistence, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Persistence.1.0.9.198-beta\lib\net45\Akka.Persistence.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Remote">
-      <HintPath>..\..\packages\Akka.Remote.1.0.8.185-beta\lib\net45\Akka.Remote.dll</HintPath>
+    <Reference Include="Akka.Remote, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Remote.1.0.9.198-beta\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Serialization.Wire">
-      <HintPath>..\..\packages\Akka.Serialization.Wire.1.0.8.183-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
+    <Reference Include="Akka.Serialization.Wire, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Serialization.Wire.1.0.9.198-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers">
@@ -70,17 +76,19 @@
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Helios">
-      <HintPath>..\..\packages\Helios.1.4.2\lib\net45\Helios.dll</HintPath>
+    <Reference Include="Helios, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Helios.2.0.1\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="JetBrains.Annotations">
-      <HintPath>..\..\packages\JetBrains.Annotations.10.1.2-eap\lib\net20\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=10.1.4.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\JetBrains.Annotations.10.1.4\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

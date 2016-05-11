@@ -69,7 +69,7 @@ namespace ClusterKit.Web.Tests
             var address = Cluster.Get(this.Sys).SelfAddress;
             configurator.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(new UniqueAddress(address, 1), MemberStatus.Up, ImmutableHashSet.Create("Web"))));
+                    Member.Create(new UniqueAddress(address, 1), 1, MemberStatus.Up, ImmutableHashSet.Create("Web"))));
             this.ExpectTestMsg<WebDescriptionRequest>();
 
             Assert.Equal(1, configurator.UnderlyingActor.KnownActiveNodes.Count);

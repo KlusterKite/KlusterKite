@@ -31,59 +31,59 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.1.0.8.183-beta\lib\net45\Akka.dll</HintPath>
+      <HintPath>..\..\packages\Akka.1.0.9.198-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Cluster, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Cluster.1.0.8.183-beta\lib\net45\Akka.Cluster.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Cluster.1.0.9.198-beta\lib\net45\Akka.Cluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster.Tools, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Cluster.Tools, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Cluster.Tools.1.0.8.183-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Cluster.Tools.1.0.9.198-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.CastleWindsor, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.DI.CastleWindsor, Version=1.0.8.191, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.DI.CastleWindsor.1.0.8.183-beta\lib\net45\Akka.DI.CastleWindsor.dll</HintPath>
+      <HintPath>..\..\packages\Akka.DI.CastleWindsor.1.0.8.191-beta\lib\net45\Akka.DI.CastleWindsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.Core, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.DI.Core, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.DI.Core.1.0.8.183-beta\lib\net45\Akka.DI.Core.dll</HintPath>
+      <HintPath>..\..\packages\Akka.DI.Core.1.0.9.198-beta\lib\net45\Akka.DI.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.TestKit, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.DI.TestKit, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.DI.TestKit.1.0.8.183-beta\lib\net45\Akka.DI.TestKit.dll</HintPath>
+      <HintPath>..\..\packages\Akka.DI.TestKit.1.0.9.198-beta\lib\net45\Akka.DI.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Logger.Serilog, Version=1.0.7.154, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Logger.Serilog, Version=1.0.8.7, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Logger.Serilog.1.0.7.154-beta\lib\net45\Akka.Logger.Serilog.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Logger.Serilog.1.0.8.7-beta\lib\net45\Akka.Logger.Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Remote, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Remote, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Remote.1.0.8.183-beta\lib\net45\Akka.Remote.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Remote.1.0.9.198-beta\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Serialization.Wire, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Serialization.Wire.1.0.8.183-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Serialization.Wire.1.0.9.198-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.TestKit, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.TestKit, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.TestKit.1.0.8.183-beta\lib\net45\Akka.TestKit.dll</HintPath>
+      <HintPath>..\..\packages\Akka.TestKit.1.0.9.198-beta\lib\net45\Akka.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.TestKit.Xunit2, Version=1.0.8.183, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.TestKit.Xunit2, Version=1.0.9.198, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.0.8.183-beta\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
+      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.0.9.198-beta\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Castle.Core">
@@ -142,8 +142,9 @@
       <HintPath>..\..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="EntityFramework6.Npgsql">
-      <HintPath>..\..\packages\EntityFramework6.Npgsql.3.0.5\lib\net45\EntityFramework6.Npgsql.dll</HintPath>
+    <Reference Include="EntityFramework6.Npgsql, Version=3.0.7.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\EntityFramework6.Npgsql.3.0.7\lib\net45\EntityFramework6.Npgsql.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers">
@@ -154,12 +155,14 @@
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Helios">
-      <HintPath>..\..\packages\Helios.1.4.2\lib\net45\Helios.dll</HintPath>
+    <Reference Include="Helios, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Helios.2.0.1\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="JetBrains.Annotations">
-      <HintPath>..\..\packages\JetBrains.Annotations.10.1.2-eap\lib\net20\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=10.1.4.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\JetBrains.Annotations.10.1.4\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Owin">
@@ -189,28 +192,26 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Npgsql">
-      <HintPath>..\..\packages\Npgsql.3.0.5\lib\net45\Npgsql.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NuGet.Core, Version=2.10.1.766, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="Npgsql, Version=3.0.7.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Core.2.10.1\lib\net40-Client\NuGet.Core.dll</HintPath>
+      <HintPath>..\..\packages\Npgsql.3.0.7\lib\net45\Npgsql.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Core, Version=2.11.1.812, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NuGet.Core.2.11.1\lib\net40-Client\NuGet.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog">
-      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Serilog.FullNetFx">
-      <HintPath>..\..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Serilog.2.0.0-beta-541\lib\net45\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
