@@ -11,9 +11,6 @@ namespace ClusterKit.Core.Service
 {
     using System.Collections.Generic;
 
-    using Castle.Facilities.TypedFactory;
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.Resolvers.SpecializedResolvers;
     using Castle.Windsor;
 
     using Serilog;
@@ -72,7 +69,8 @@ namespace ClusterKit.Core.Service
                                             });
                                 });
 
-                        x.UseSerilog(loggerConfig);
+                        //Version incompatibility. Should remove after Topshelf introduces support for Serilog 2
+                        //x.UseSerilog(loggerConfig);
                         x.StartAutomatically();
                         x.RunAsLocalSystem();
                         x.SetDescription("ClusterKit Node service");
