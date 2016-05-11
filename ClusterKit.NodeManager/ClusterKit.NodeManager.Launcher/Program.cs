@@ -448,7 +448,7 @@ namespace ClusterKit.NodeManager.Launcher
             //Checking installation
             var installedPackages = Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")).Select(Path.GetFileName).ToList();
             var missedPackages = configuration.Packages
-                .Where(p => installedPackages.All(d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-\\w*)?$")))
+                .Where(p => installedPackages.All(d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-[\\w\\d\\-]*)?$")))
                 .ToList();
             foreach (var packageName in missedPackages)
             {
