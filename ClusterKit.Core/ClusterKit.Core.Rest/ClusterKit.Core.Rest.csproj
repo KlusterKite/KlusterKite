@@ -112,6 +112,7 @@
     <Compile Include="ActionMessages\CollectionRequest.cs" />
     <Compile Include="ActionMessages\EnActionType.cs" />
     <Compile Include="ActionMessages\RestActionMessage.cs" />
+    <Compile Include="ActionMessages\RestActionResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

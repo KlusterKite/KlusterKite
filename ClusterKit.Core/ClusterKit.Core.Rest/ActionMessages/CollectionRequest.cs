@@ -31,18 +31,27 @@ namespace ClusterKit.Core.Rest.ActionMessages
         /// <summary>
         /// Gets or sets the maximum number of objects to return.
         /// </summary>
+        [UsedImplicitly]
         public int? Count { get; set; }
 
         /// <summary>
         /// Gets or sets the number of objects to skip in select
         /// </summary>
-        public int Skip { get; set; } = 0;
+        [UsedImplicitly]
+        public int Skip { get; set; }
+
+        /// <summary>
+        /// Gets or sets some extra data, that will be returned with the response
+        /// </summary>
+        [UsedImplicitly]
+        public object ExtraData { get; set; }
     }
 
     /// <summary>
     /// Collection of objects request
     /// </summary>
     [UsedImplicitly]
+    // ReSharper disable once UnusedTypeParameter
     public class CollectionRequest<TObject> : CollectionRequest
     {
     }

@@ -11,6 +11,8 @@ namespace ClusterKit.Core.Rest.ActionMessages
 {
     using Akka.Routing;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Request to process some action
     /// </summary>
@@ -31,11 +33,19 @@ namespace ClusterKit.Core.Rest.ActionMessages
         /// <summary>
         /// Gets or sets the identification of object.
         /// </summary>
+        [UsedImplicitly]
         public TId Id { get; set; }
 
         /// <summary>
         /// Gets or sets the object itself.
         /// </summary>
-        public TData Request { get; set; }
+        [UsedImplicitly]
+        public TData Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets some extra data, that will be returned with the response
+        /// </summary>
+        public object ExtraData { get; set; }
+
     }
 }

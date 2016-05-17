@@ -303,7 +303,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(false, descriptions[0].IsObsolete);
 
             var nodeTemplate = templatesFactory.Storage[1];
-            testActor.Tell(new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Request = nodeTemplate });
+            testActor.Tell(new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Data = nodeTemplate });
 
             //nodeTemplate.Version = 2;
             //testActor.Tell(new UpdateMessage<NodeTemplate> { ActionType = EnActionType.Update, NewObject = nodeTemplate, OldObject = nodeTemplate });

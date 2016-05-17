@@ -11,6 +11,7 @@ open  ClusterKit.Build
 
 let buildDir = Path.GetFullPath("./build")
 let packageDir = Path.GetFullPath("./packageOut")
+let packagePushDir = Path.GetFullPath("./packagePush")
 let ver = environVar "version"
 
 let currentTarget = getBuildParam "target"
@@ -43,6 +44,7 @@ let projects = [|
     new ProjectDescription("./ClusterKit.Web/ClusterKit.Web.Swagger.Monitor/ClusterKit.Web.Swagger.Monitor.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.Swagger.Messages"|]))
     new ProjectDescription("./ClusterKit.Web/ClusterKit.Web.Tests/ClusterKit.Web.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web.NginxConfigurator"; "ClusterKit.Web.SignalR"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Web.Swagger.Monitor"; "ClusterKit.Web.Swagger"; "ClusterKit.Web"|]))
 
+    
     new ProjectDescription("./ClusterKit.Monitoring/ClusterKit.Monitoring/ClusterKit.Monitoring.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.SignalR"|]))
     //new ProjectDescription("./ClusterKit.Monitoring/ClusterKit.Monitoring.Tests/ClusterKit.Monitoring.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core";  "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.SignalR"|]))
 
@@ -93,6 +95,7 @@ let projects = [|
             "ClusterKit.NodeManager.ConfigurationSource";
             "ClusterKit.NodeManager.Launcher.Messages"
           |]))
+                              
 
 |]
 
@@ -229,7 +232,7 @@ Target "CleanDockerImages" (fun _ ->
 Target "PushThirdPartyPackages" (fun _ ->
     let pushThirdPartyPackage (f: FileInfo) =
             if (hasExt ".nupkg" f.FullName) then
-                if not (File.Exists (Path.Combine [|(Path.GetFullPath("./packageOut/")); f.Name|])) then
+                if not (File.Exists (Path.Combine [|packagePushDir; f.Name|])) then
                     pushPackage f.FullName
 
     Fake.FileHelper.recursively
@@ -241,7 +244,7 @@ Target "PushThirdPartyPackages" (fun _ ->
 
 // sends prepared packages to docker nuget server
 Target "PushLocalPackages" (fun _ ->
-    Directory.GetFiles(Path.GetFullPath("./packageOut"))
+    Directory.GetFiles(packagePushDir)
         |> Seq.filter (hasExt ".nupkg")
         |> Seq.iter pushPackage
 )
@@ -252,7 +255,7 @@ Target "SetVersion" (fun _ ->
     if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
     let version = Regex.Replace((if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"), "((\\d+\\.?)+)(.*)", "$1-local")
     tracef "New version is %s \n" version
-    BuildUtils.Configure(version, buildDir, packageDir, "./packages")
+    BuildUtils.Configure(version, buildDir, packagePushDir, "./packages")
 )
 
 // removes all installed packages and restores them (so this will remove obsolete packages)

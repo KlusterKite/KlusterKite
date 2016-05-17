@@ -75,7 +75,7 @@ namespace ClusterKit.Core.Tests.Configuration
         /// Testing correct <seealso cref="NameSpaceActor"/> work
         /// </summary>
         [Fact]
-        public async Task NameSpaceActorTest()
+        public void NameSpaceActorTest()
         {
             // todo: fix test cluster joining and add all types of actors to test
             /*

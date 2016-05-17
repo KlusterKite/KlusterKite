@@ -18,7 +18,7 @@ namespace ClusterKit.Core.Monads
     public struct Maybe<T> where T : class
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Maybe{T}"/> struct.
+        /// Initializes a new instance of the <see cref="Maybe{T}"/> structure.
         /// </summary>
         /// <param name="value">
         /// The value.
@@ -37,7 +37,8 @@ namespace ClusterKit.Core.Monads
         /// <summary>
         /// Gets the value.
         /// </summary>
-        private T Value { get; }
+        [UsedImplicitly]
+        public T Value { get; }
 
         /// <summary>
         /// Converts original object to wrapper
@@ -62,7 +63,7 @@ namespace ClusterKit.Core.Monads
         /// </summary>
         /// <param name="left">Left wrapper</param>
         /// <param name="right">Right wrapper</param>
-        /// <returns>Whether theese to wrapers are not equal</returns>
+        /// <returns>Whether theese to wrappers are not equal</returns>
         public static bool operator !=(Maybe<T> left, Maybe<T> right)
         {
             return !left.Equals(right);
@@ -73,7 +74,7 @@ namespace ClusterKit.Core.Monads
         /// </summary>
         /// <param name="left">Left wrapper</param>
         /// <param name="right">Right wrapper</param>
-        /// <returns>Whether theese to wrapers are equal</returns>
+        /// <returns>Whether theese to wrappers are equal</returns>
         public static bool operator ==(Maybe<T> left, Maybe<T> right)
         {
             return left.Equals(right);
@@ -83,7 +84,7 @@ namespace ClusterKit.Core.Monads
         /// Equals for two wrappers
         /// </summary>
         /// <param name="other">Wrapper to compare</param>
-        /// <returns>Whether theese to wrapers are equal</returns>
+        /// <returns>Whether theese to wrappers are equal</returns>
         [UsedImplicitly]
         public bool Equals(Maybe<T> other)
         {

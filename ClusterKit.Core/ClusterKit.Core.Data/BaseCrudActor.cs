@@ -16,7 +16,6 @@ namespace ClusterKit.Core.Data
     using Akka.Actor;
     using Akka.Event;
 
-    using ClusterKit.Core.Monads;
     using ClusterKit.Core.Rest.ActionMessages;
 
     using JetBrains.Annotations;
@@ -172,11 +171,13 @@ namespace ClusterKit.Core.Data
 
                     case EnActionType.Create:
                         {
-                            var entity = request.Request;
+                            var entity = request.Data;
                             if (entity == null)
                             {
+                                // ReSharper disable FormatStringProblem
                                 Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                // ReSharper restore FormatStringProblem
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
 
@@ -185,10 +186,12 @@ namespace ClusterKit.Core.Data
                             {
                                 Context.GetLogger()
                                     .Error(
+                                        // ReSharper disable FormatStringProblem
                                         "{Type}: create failed, there is already object with id {Id}",
+                                        // ReSharper restore FormatStringProblem
                                         this.GetType().Name,
                                         factory.GetId(entity).ToString());
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
 
@@ -197,15 +200,17 @@ namespace ClusterKit.Core.Data
                             if (entity == null)
                             {
                                 Context.GetLogger()
+                                    // ReSharper disable FormatStringProblem
                                     .Error("{Type}: create failed, prevented by BeforeCreate", this.GetType().Name);
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                // ReSharper restore FormatStringProblem
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
 
                             try
                             {
                                 await factory.Insert(entity);
-                                this.Sender.Tell(new Maybe<TObject>(entity));
+                                this.Sender.Tell(new RestActionResponse<TObject>(entity, request.ExtraData));
                                 this.AfterCreate(entity);
                                 return;
                             }
@@ -214,21 +219,25 @@ namespace ClusterKit.Core.Data
                                 Context.GetLogger()
                                     .Error(
                                         exception,
+                                        // ReSharper disable FormatStringProblem
                                         "{Type}: create failed, error while creating object with id {Id}",
+                                        // ReSharper restore FormatStringProblem
                                         this.GetType().Name,
                                         factory.GetId(entity).ToString());
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
                         }
 
                     case EnActionType.Update:
                         {
-                            var entity = request.Request;
+                            var entity = request.Data;
                             if (entity == null)
                             {
+                                // ReSharper disable FormatStringProblem
                                 Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                // ReSharper restore FormatStringProblem
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
 
@@ -237,10 +246,14 @@ namespace ClusterKit.Core.Data
                             {
                                 Context.GetLogger()
                                     .Error(
+                                        // ReSharper disable FormatStringProblem
                                         "{Type}: update failed, there is no object with id {Id}",
+                                        // ReSharper restore FormatStringProblem
                                         this.GetType().Name,
+                                        // ReSharper disable RedundantToStringCallForValueType
                                         request.Id.ToString());
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                // ReSharper restore RedundantToStringCallForValueType
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
 
@@ -249,17 +262,21 @@ namespace ClusterKit.Core.Data
                             {
                                 Context.GetLogger()
                                     .Error(
+                                        // ReSharper disable FormatStringProblem
                                         "{Type}: update of object with id {Id} failed, prevented by BeforeUpdate",
+                                        // ReSharper restore FormatStringProblem
                                         this.GetType().Name,
+                                        // ReSharper disable RedundantToStringCallForValueType
                                        request.Id.ToString());
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                // ReSharper restore RedundantToStringCallForValueType
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
 
                             try
                             {
                                 await factory.Update(entity, oldObject);
-                                this.Sender.Tell(new Maybe<TObject>(entity));
+                                this.Sender.Tell(new RestActionResponse<TObject>(entity, request.ExtraData));
                                 this.AfterUpdate<TObject>(entity, oldObject);
                                 return;
                             }
@@ -268,10 +285,14 @@ namespace ClusterKit.Core.Data
                                 Context.GetLogger()
                                     .Error(
                                         exception,
+                                        // ReSharper disable FormatStringProblem
                                         "{Type}: update failed, error while creating object with id {Id}",
+                                        // ReSharper restore FormatStringProblem
                                         this.GetType().Name,
+                                        // ReSharper disable RedundantToStringCallForValueType
                                         factory.GetId(entity).ToString());
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                // ReSharper restore RedundantToStringCallForValueType
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
                         }
@@ -285,14 +306,18 @@ namespace ClusterKit.Core.Data
                                 {
                                     Context.GetLogger()
                                         .Error(
+                                            // ReSharper disable FormatStringProblem
                                             "{Type}: delete failed, there is no object with id {Id}",
+                                            // ReSharper restore FormatStringProblem
                                             this.GetType().Name,
+                                            // ReSharper disable RedundantToStringCallForValueType
                                             request.Id.ToString());
-                                    this.Sender.Tell(new Maybe<TObject>(null));
+                                    // ReSharper restore RedundantToStringCallForValueType
+                                    this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 }
 
                                 this.AfterDelete<TObject>(oldObject);
-                                this.Sender.Tell(new Maybe<TObject>(oldObject));
+                                this.Sender.Tell(new RestActionResponse<TObject>(oldObject, request.ExtraData));
                                 return;
                             }
                             catch (Exception exception)
@@ -300,10 +325,14 @@ namespace ClusterKit.Core.Data
                                 Context.GetLogger()
                                     .Error(
                                         exception,
+                                        // ReSharper disable FormatStringProblem
                                         "{Type}: delete failed, error while deleting object with id {Id}",
+                                        // ReSharper restore FormatStringProblem
                                         this.GetType().Name,
+                                        // ReSharper disable RedundantToStringCallForValueType
                                         request.Id.ToString());
-                                this.Sender.Tell(new Maybe<TObject>(null));
+                                // ReSharper restore RedundantToStringCallForValueType
+                                this.Sender.Tell(new RestActionResponse<TObject>(null, request.ExtraData));
                                 return;
                             }
                         }

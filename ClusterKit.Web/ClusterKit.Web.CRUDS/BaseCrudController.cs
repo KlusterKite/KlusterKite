@@ -70,16 +70,16 @@ namespace ClusterKit.Web.CRUDS
             var result =
                await
                this.System.ActorSelection(this.GetDbActorProxyPath())
-                   .Ask<Maybe<TObject>>(
-                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Create, Request = request },
+                   .Ask<RestActionResponse<TObject>>(
+                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Create, Data = request },
                        this.AkkaTimeout);
 
-            if (result == null)
+            if (result?.Data == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return result;
+            return result.Data;
         }
 
         /// <summary>
@@ -95,16 +95,16 @@ namespace ClusterKit.Web.CRUDS
             var result =
                 await
                 this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<Maybe<TObject>>(
+                    .Ask<RestActionResponse<TObject>>(
                         new RestActionMessage<TObject, TId> { ActionType = EnActionType.Delete, Id = id },
                         this.AkkaTimeout);
 
-            if (result == null)
+            if (result?.Data == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return result;
+            return result.Data;
         }
 
         /// <summary>
@@ -120,16 +120,16 @@ namespace ClusterKit.Web.CRUDS
             var template =
                 await
                 this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<Maybe<TObject>>(
+                    .Ask<RestActionResponse<TObject>>(
                         new RestActionMessage<TObject, TId> { ActionType = EnActionType.Get, Id = id },
                         this.AkkaTimeout);
 
-            if (template == null)
+            if (template?.Data == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return template;
+            return template.Data;
         }
 
         /// <summary>
@@ -173,16 +173,16 @@ namespace ClusterKit.Web.CRUDS
             var template =
                await
                this.System.ActorSelection(this.GetDbActorProxyPath())
-                   .Ask<Maybe<TObject>>(
-                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Request = request, Id = id },
+                   .Ask<RestActionResponse<TObject>>(
+                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Data = request, Id = id },
                        this.AkkaTimeout);
 
-            if (template == null)
+            if (template?.Data == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return template;
+            return template.Data;
         }
 
         /// <summary>
