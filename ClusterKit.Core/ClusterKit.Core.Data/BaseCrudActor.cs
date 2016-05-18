@@ -166,7 +166,7 @@ namespace ClusterKit.Core.Data
                 switch (request.ActionType)
                 {
                     case EnActionType.Get:
-                        this.Sender.Tell(this.OnSelect(await factory.Get(request.Id)));
+                        this.Sender.Tell(new RestActionResponse<TObject>(this.OnSelect(await factory.Get(request.Id)), request.ExtraData));
                         break;
 
                     case EnActionType.Create:
