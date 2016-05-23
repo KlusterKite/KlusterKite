@@ -56,7 +56,7 @@ services:
     links:
      - "seed"
      - "configDb"
-     - "nuget"   
+     - "nuget"
     logging:
         driver: json-file
         options:
@@ -65,21 +65,19 @@ services:
   monitoringUI:
     image: clusterkit/monitoring-ui
     ports:
-     - "82:3000"
+     - "82:8080"
     logging:
         driver: json-file
         options:
             max-size: "1m"
   worker:
-    image: clusterkit/worker    
+    image: clusterkit/worker
     links:
      - "seed"
      - "manager"
-     - "nuget"    
+     - "nuget"
      - "configDb"
     logging:
         driver: json-file
         options:
             max-size: "1m"
-
-

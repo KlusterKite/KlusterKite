@@ -4,11 +4,12 @@ RUN mkdir /nodejs && curl https://nodejs.org/dist/v4.2.2/node-v4.2.2-linux-x64.t
 
 ENV PATH $PATH:/nodejs/bin
 
+EXPOSE 8080
 WORKDIR /app
 COPY ./web/package.json /app/
 RUN npm -g install npm@latest
 RUN npm install
 COPY ./web /app
-EXPOSE 8080
+RUN npm run build
 
-ENTRYPOINT ["/nodejs/bin/npm", "run", "dev"]
+ENTRYPOINT ["/nodejs/bin/npm", "run", "start"]

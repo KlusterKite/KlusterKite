@@ -18,7 +18,7 @@ module.exports = Object.assign({
   serverApiPort: '80',
   app: {
     title: 'ClusterKit.Monitoring',
-    description: 'All the modern best practices in one example.',
+    description: 'UI to the bundle of utils to create scalable and redundant services',
     head: {
       titleTemplate: 'ClusterKit.Monitoring: %s',
       meta: [
