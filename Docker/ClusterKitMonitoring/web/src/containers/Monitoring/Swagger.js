@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import * as actions from 'redux/modules/monitoring-swagger';
 import {isLoaded, loadModules as loadModulesOnInit} from 'redux/modules/monitoring-swagger';
 import { asyncConnect } from 'redux-async-connect';
+import config from '../../config';
 
 @asyncConnect([{
   promise: ({store: {dispatch, getState}}) => {
@@ -70,9 +71,11 @@ export default class MonitoringSwagger extends Component {
                 </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>{data}</td>
-              </tr>
+              {data && data.map((module) =>
+                <tr>
+                  <td><a href={`http://${config.serverApiHost}/${module}/index`} target="_blank">{module}</a></td>
+                </tr>
+              )}
             </tbody>
           </table>
           }
