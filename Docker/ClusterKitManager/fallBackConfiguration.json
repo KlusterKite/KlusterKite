@@ -5,58 +5,118 @@
   "Packages": [
     {
       "BuildDate": null,
+      "Id": "ClusterKit.Core",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Core.Data",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Core.EF",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
       "Id": "ClusterKit.Core.EF.Npgsql",
-      "Version": "0.0.0.0-local"
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Core.Rest",
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "ClusterKit.Core.Service",
-      "Version": "0.0.0.0-local"
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "ClusterKit.Monitoring",
-      "Version": "0.0.0.0-local"
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "ClusterKit.NodeManager",
-      "Version": "0.0.0.0-local"
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "ClusterKit.NodeManager.Client",
-      "Version": "0.0.0.0-local"
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.NodeManager.ConfigurationSource",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.NodeManager.Launcher.Messages",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.CRUDS",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.Descriptor",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.SignalR",
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "ClusterKit.Web.Swagger",
-      "Version": "0.0.0.0-local"
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.Swagger.Messages",
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "ClusterKit.Web.Swagger.Monitor",
-      "Version": "0.0.0.0-local"
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "Akka",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Sharding",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Tools",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
@@ -66,7 +126,7 @@
     {
       "BuildDate": null,
       "Id": "Akka.DI.Core",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
@@ -76,17 +136,17 @@
     {
       "BuildDate": null,
       "Id": "Akka.Persistence",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Remote",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Serialization.Wire",
-      "Version": "1.0.9.198-beta"
+      "Version": "1.0.9.204-beta"
     },
     {
       "BuildDate": null,
@@ -97,66 +157,6 @@
       "BuildDate": null,
       "Id": "Castle.Windsor",
       "Version": "3.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core.Data",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core.EF",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core.Rest",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.NodeManager.ConfigurationSource",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.NodeManager.Launcher.Messages",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Client",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.CRUDS",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Descriptor",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.SignalR",
-      "Version": "0.0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Swagger.Messages",
-      "Version": "0.0.0.0-local"
     },
     {
       "BuildDate": null,
@@ -186,7 +186,7 @@
     {
       "BuildDate": null,
       "Id": "Helios",
-      "Version": "1.4.1"
+      "Version": "2.1.0"
     },
     {
       "BuildDate": null,
