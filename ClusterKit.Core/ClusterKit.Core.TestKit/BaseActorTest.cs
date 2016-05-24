@@ -17,6 +17,8 @@ namespace ClusterKit.Core.TestKit
     using Castle.Windsor;
     using ClusterKit.Core.Utils;
 
+    using JetBrains.Annotations;
+
     using Serilog;
     using Xunit;
     using Xunit.Abstractions;
@@ -64,7 +66,7 @@ namespace ClusterKit.Core.TestKit
         /// </returns>
         public new TestActorRef<TActor> ActorOfAsTestActorRef<TActor>(Expression<Func<TActor>> factory, string name = null) where TActor : ActorBase
         {
-            return new TestActorRef<TActor>(this.Sys, Props.Create(factory).WithDispatcher("ClusterKit.test-dispatcher"), null, name);
+            return new TestActorRef<TActor>(this.Sys, Props.Create(factory).WithDispatcher("akka.test.calling-thread-dispatcher"), null, name);
         }
 
         /// <summary>
@@ -75,16 +77,16 @@ namespace ClusterKit.Core.TestKit
         /// <typeparam name="TActor">The type of the actor. It must have a parameterless public constructor</typeparam><param name="props">The <see cref="T:Akka.Actor.Props"/> object</param><param name="name">Optional: The name.</param>
         public new TestActorRef<TActor> ActorOfAsTestActorRef<TActor>(Props props, string name = null) where TActor : ActorBase
         {
-            return new TestActorRef<TActor>(this.Sys, props.WithDispatcher("ClusterKit.test-dispatcher"), (IActorRef)null, name);
+            return new TestActorRef<TActor>(this.Sys, props.WithDispatcher("akka.test.calling-thread-dispatcher"), (IActorRef)null, name);
         }
 
         /// <summary>
         /// Cleanup after test run
         /// </summary>
+        [UsedImplicitly]
         public virtual void Cleanup()
         {
             DateTimeWrapper.NowGetter = null;
-            CallingThreadDispatcher.ConcurrentMode = false;
         }
 
         /// <summary>
@@ -143,7 +145,7 @@ namespace ClusterKit.Core.TestKit
         /// The original message type
         /// </typeparam>
         /// <remarks>
-        /// It is supposed that bitween now and timespan they will be now messagres, and message should arrive exactly at specified time
+        /// It is supposed that bitween now and timespan they will be now messages, and message should arrive exactly at specified time
         /// </remarks>
         /// <returns>
         /// The original message
@@ -210,14 +212,14 @@ namespace ClusterKit.Core.TestKit
         /// The <see cref="TestMessage{T}"/>.
         /// </returns>
         /// <remarks>
-        /// It is supposed that bitween now and timespan they will be now messagres, and message should arrive exactly at specified time
+        /// It is supposed that bitween now and timespan they will be now messages, and message should arrive exactly at specified time
         /// </remarks>
         protected TestMessage<T> ExpectTestMsg<T>(TimeSpan timeout)
         {
             this.ExpectNoTestMsg();
-            TimeMachineScheduler.JumpJustBefore(timeout);
+            ((TestScheduler)this.Sys.Scheduler).Advance(timeout - TimeSpan.FromMilliseconds(1));
             this.ExpectNoTestMsg();
-            TimeMachineScheduler.JumpAfter();
+            ((TestScheduler)this.Sys.Scheduler).Advance(TimeSpan.FromMilliseconds(1));
             return this.ExpectTestMsg<T>();
         }
 
@@ -274,9 +276,7 @@ namespace ClusterKit.Core.TestKit
         /// </summary>
         private void Initialize()
         {
-            DateTimeWrapper.NowGetter = () => TimeMachineScheduler.GetCurrentLocation().DateTime;
-            TimeMachineScheduler.Reset();
-            CallingThreadDispatcher.ConcurrentMode = false;
+            DateTimeWrapper.NowGetter = () => ((TestScheduler)this.Sys.Scheduler).Now;
         }
     }
 }

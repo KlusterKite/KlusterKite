@@ -5,10 +5,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace ClusterKit.Core.Tests.Configuration
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Cluster.Sharding;
@@ -19,6 +17,8 @@ namespace ClusterKit.Core.Tests.Configuration
     using Castle.Windsor;
 
     using ClusterKit.Core.TestKit;
+
+    using JetBrains.Annotations;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -86,6 +86,8 @@ namespace ClusterKit.Core.Tests.Configuration
             this.Sys.StartNameSpaceActorsFromConfiguration();
             this.Sys.ActorSelection("/user/testNameSpace/forwarder").Tell("Hello world");
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/testNameSpace/forwarder"));
+            this.Sys.ActorSelection("/user/testNameSpace/second/forwarder").Tell("Hello world");
+            Assert.Equal("Hello world", this.ExpectMsg<string>("/user/testNameSpace/second/forwarder"));
 
             /*
             var shardingActor = this.Sys.ActorSelection("/user/testNameSpace/sharding");
@@ -120,7 +122,6 @@ namespace ClusterKit.Core.Tests.Configuration
                 akka.actor.deployment {
                     /testNameSpace {
                         IsNameSpace = true
-                        dispatcher = ClusterKit.test-dispatcher
                     }
 
                     /somethingElse {
@@ -128,7 +129,14 @@ namespace ClusterKit.Core.Tests.Configuration
 
                     /testNameSpace/forwarder {
                         type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
-                        dispatcher = ClusterKit.test-dispatcher
+                    }
+
+                    /testNameSpace/second {
+                        type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
+                    }
+
+                    /testNameSpace/second/forwarder {
+                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
                     }
 
                     /testNameSpace/sharding {
@@ -172,6 +180,7 @@ namespace ClusterKit.Core.Tests.Configuration
         /// <summary>
         /// Test message extractor
         /// </summary>
+        [UsedImplicitly]
         public class TestMessageExtractor : IMessageExtractor
         {
             /// <summary>

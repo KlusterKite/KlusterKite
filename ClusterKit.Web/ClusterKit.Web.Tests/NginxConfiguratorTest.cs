@@ -56,16 +56,10 @@ namespace ClusterKit.Web.Tests
         {
             BaseInstaller.RunPrecheck(this.WindsorContainer, this.Sys.Settings.Config);
             var configurator = this.ActorOfAsTestActorRef<NginxConfiguratorActor>("configurator");
-            var webNamespace =
-                this.ActorOfAsTestActorRef<NginxConfiguratorActor>(this.Sys.DI().Props<TestActorForwarder>(), "Web");
-            var webDescriptor =
-                webNamespace.Ask<IActorRef>(
-                    new TestActorForwarder.CreateChildMessage()
-                    {
-                        Props = this.Sys.DI().Props<TestActorForwarder>(),
-                        Name = "Descriptor"
-                    }).Result;
 
+            this.ActorOfAsTestActorRef<NameSpaceActor>(this.Sys.DI().Props<NameSpaceActor>(), "Web");
+
+           
             var address = Cluster.Get(this.Sys).SelfAddress;
             configurator.Tell(
                 new ClusterEvent.MemberUp(
@@ -74,30 +68,33 @@ namespace ClusterKit.Web.Tests
 
             Assert.Equal(1, configurator.UnderlyingActor.KnownActiveNodes.Count);
 
-            configurator.Tell(new WebDescriptionResponse
-            {
-                Services = new List<ServiceDescription>
-                                                     {
-                                                         new ServiceDescription
-                                                             {
-                                                                 ListeningPort = 8080,
-                                                                 PublicHostName = "web1",
-                                                                 Route = "/TestWebService"
-                                                             },
-                                                         new ServiceDescription
-                                                             {
-                                                                 ListeningPort = 8080,
-                                                                 PublicHostName = "web1",
-                                                                 Route = "/test/TestWebService2"
-                                                             },
-                                                         new ServiceDescription
-                                                             {
-                                                                 ListeningPort = 8080,
-                                                                 PublicHostName = "web2",
-                                                                 Route = "/Api"
-                                                             }
-                                                     }.AsReadOnly()
-            });
+            configurator.Tell(
+                new WebDescriptionResponse
+                    {
+                        Services =
+                            new List<ServiceDescription>
+                                {
+                                    new ServiceDescription
+                                        {
+                                            ListeningPort = 8080,
+                                            PublicHostName = "web1",
+                                            Route = "/TestWebService"
+                                        },
+                                    new ServiceDescription
+                                        {
+                                            ListeningPort = 8080,
+                                            PublicHostName = "web1",
+                                            Route = "/test/TestWebService2"
+                                        },
+                                    new ServiceDescription
+                                        {
+                                            ListeningPort = 8080,
+                                            PublicHostName = "web2",
+                                            Route = "/Api"
+                                        }
+                                }
+                            .AsReadOnly()
+                    });
 
             Assert.Equal(1, configurator.UnderlyingActor.NodePublishUrls.Count);
             Assert.Equal(
@@ -106,7 +103,9 @@ namespace ClusterKit.Web.Tests
             Assert.Equal(
                 "127.0.0.1:8080",
                 configurator.UnderlyingActor.Configuration["web1"]["/test/TestWebService2"].ActiveNodes[0].NodeUrl);
-            Assert.Equal("127.0.0.1:8080", configurator.UnderlyingActor.Configuration["web2"]["/Api"].ActiveNodes[0].NodeUrl);
+            Assert.Equal(
+                "127.0.0.1:8080",
+                configurator.UnderlyingActor.Configuration["web2"]["/Api"].ActiveNodes[0].NodeUrl);
 
             var config = File.ReadAllText("./nginx.conf");
             this.Sys.Log.Info(config);
@@ -149,18 +148,20 @@ namespace ClusterKit.Web.Tests
                                 }
                             }
                         }
-
-                    akka.actor.deployment {
-                        ""/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
+                
+            akka.actor.deployment {
+                    /Web {
+                        IsNameSpace = true
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
+
+                    /Web/Descriptor {
+                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        dispatcher = akka.test.calling-thread-dispatcher
+                    }
+
+                }
+                    
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }
 

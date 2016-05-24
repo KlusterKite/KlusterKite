@@ -102,28 +102,11 @@ namespace ClusterKit.Web.Tests
                         }
 
                     akka.actor.deployment {
-                        ""/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
+                     
 
                         /collector/workers {
                              router = round-robin-pool
                              nr-of-instances = 5
-                             dispatcher = ClusterKit.test-dispatcher
-                        }
-
-                        ""/collector/*"" {
-                             dispatcher = ClusterKit.test-dispatcher
-                        }
-
-                        ""/collector/workers/*"" {
-                             dispatcher = ClusterKit.test-dispatcher
                         }
 
                         /Web {
@@ -131,12 +114,10 @@ namespace ClusterKit.Web.Tests
                         }
  		                 /Web/Swagger {
                             type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
-                            dispatcher = ClusterKit.test-dispatcher
                         }
 
                         /Web/Swagger/Descriptor {
                             type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
-                            dispatcher = ClusterKit.test-dispatcher
                         }
                     }
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));

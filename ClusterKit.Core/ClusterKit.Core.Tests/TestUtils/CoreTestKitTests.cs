@@ -14,6 +14,7 @@ namespace ClusterKit.Core.Tests.TestUtils
     using System.Threading.Tasks;
 
     using Akka.Actor;
+    using Akka.TestKit;
 
     using ClusterKit.Core.TestKit;
 
@@ -34,22 +35,6 @@ namespace ClusterKit.Core.Tests.TestUtils
         public CoreTestKitTests(ITestOutputHelper output)
                     : base(output)
         {
-        }
-
-        /// <summary>
-        /// <seealso cref="CallingThreadDispatcher"/> testing
-        /// </summary>
-        [Fact]
-        public void CallingThreadDispatcherTest()
-        {
-            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(500)));
-            var testActor = this.ActorOfAsTestActorRef(() => new DelayedForwarder(this.TestActor));
-
-            CallingThreadDispatcher.RiseBlock();
-            Task.Run(() => testActor.Tell("hello world"));
-            Assert.False(this.HasMessages);
-            Assert.True(CallingThreadDispatcher.WaitForAllDone(TimeSpan.FromMilliseconds(500)));
-            Assert.True(this.HasMessages);
         }
 
         /// <summary>
@@ -97,7 +82,7 @@ namespace ClusterKit.Core.Tests.TestUtils
             var message = this.ExpectMsg<TestMessage<string>>();
             Assert.Equal("hello world", message.Message);
             Assert.Equal("/user/test-1", message.ReceiverPathRooted);
-            Assert.Equal(typeof(TimeMachineScheduler), this.Sys.Scheduler.GetType());
+            Assert.Equal(typeof(TestScheduler), this.Sys.Scheduler.GetType());
         }
 
         /// <summary>

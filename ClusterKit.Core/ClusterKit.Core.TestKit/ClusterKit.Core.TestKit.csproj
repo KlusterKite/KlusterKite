@@ -197,8 +197,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseActorTest.cs" />
-    <Compile Include="CallingThreadDispatcher.cs" />
-    <Compile Include="CallingThreadDispatcherConfigurator.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -210,11 +208,9 @@
     <Compile Include="RemoteTestMessage.cs" />
     <Compile Include="TestActorForwarder.cs" />
     <Compile Include="TestConfigurator.cs" />
-    <Compile Include="TestMailbox.cs" />
     <Compile Include="TestMessage.cs" />
     <Compile Include="TestMessageRouter.cs" />
     <Compile Include="TestWithSerilog.cs" />
-    <Compile Include="TimeMachineScheduler.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="XunitOutputWriter.cs" />
   </ItemGroup>
@@ -236,6 +232,7 @@
     <EmbeddedResource Include="Configuration.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

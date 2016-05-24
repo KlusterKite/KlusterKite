@@ -10,9 +10,12 @@
 namespace ClusterKit.NodeManager.Tests
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.IO;
     using System.Linq;
+    using System.Runtime.Versioning;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -39,6 +42,8 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
+
+    using NuGet;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -86,13 +91,13 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
                 this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
             var packageFactory =
-                (UniversalTestDataFactory<string, PackageDescription, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-2", Version = "0.1.0" });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
             await
                 templatesFactory.Insert(
                     new NodeTemplate
@@ -127,7 +132,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(3, descriptions.Count);
             Assert.True(descriptions.All(d => !d.IsObsolete));
 
-            packageFactory.Storage["TestModule-1"].Version = "0.2.0";
+            ((TestPackage)packageFactory.Storage["TestModule-1"]).Version = new SemanticVersion(0, 2, 0, 0);
 
             testActor.Tell(new ReloadPackageListRequest());
             descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
@@ -234,11 +239,11 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
                 this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
             var packageFactory =
-                (UniversalTestDataFactory<string, PackageDescription, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-2", Version = "0.1.0" });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
             await
                 templatesFactory.Insert(
                     new NodeTemplate
@@ -303,7 +308,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(false, descriptions[0].IsObsolete);
 
             var nodeTemplate = templatesFactory.Storage[1];
-            testActor.Tell(new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Data = nodeTemplate });
+            testActor.Tell(new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Data = nodeTemplate, Id = nodeTemplate.Id});
 
             //nodeTemplate.Version = 2;
             //testActor.Tell(new UpdateMessage<NodeTemplate> { ActionType = EnActionType.Update, NewObject = nodeTemplate, OldObject = nodeTemplate });
@@ -326,11 +331,12 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
                 this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
             var packageFactory =
-                (UniversalTestDataFactory<string, PackageDescription, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-2", Version = "0.1.0" });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
+
             await
                 templatesFactory.Insert(
                     new NodeTemplate
@@ -394,7 +400,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(1, descriptions.Count);
             Assert.Equal(false, descriptions[0].IsObsolete);
 
-            packageFactory.Storage["TestModule-1"].Version = "0.2.0";
+            ((TestPackage)packageFactory.Storage["TestModule-1"]).Version = SemanticVersion.Parse("0.2.0");
             testActor.Tell(new ReloadPackageListRequest());
             descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
@@ -415,11 +421,11 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
                 this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
             var packageFactory =
-                (UniversalTestDataFactory<string, PackageDescription, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.2.0" });
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-2", Version = "0.1.0" });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.2.0") });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
             await
                 templatesFactory.Insert(
                     new NodeTemplate
@@ -498,10 +504,14 @@ namespace ClusterKit.NodeManager.Tests
             var addressFactory = (UniversalTestDa taFactory<ConfigurationContext, SeedAddress, int>)this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, SeedAddress, int>>();
             var feedFactory = (UniversalTestDataFactory<ConfigurationContext, NugetFeed, int>)this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NugetFeed, int>>();
             */
-            var packageFactory = (UniversalTestDataFactory<string, PackageDescription, string>)this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModeule-1", Version = "0.1.0" });
-            await packageFactory.Insert(new PackageDescription { Id = "TestModeule-2", Version = "0.1.0" });
+            var packageFactory =
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
+
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
+
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
             var response = await testActor.Ask<List<PackageDescription>>(new PackageListRequest(), TimeSpan.FromSeconds(1));
@@ -522,12 +532,13 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
                 this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
             var packageFactory =
-                (UniversalTestDataFactory<string, PackageDescription, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
+
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
 
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
             await
                 templatesFactory.Insert(
                     new NodeTemplate
@@ -641,12 +652,13 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
                 this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
             var packageFactory =
-                (UniversalTestDataFactory<string, PackageDescription, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
+
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
 
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
             await
                 templatesFactory.Insert(
                     new NodeTemplate
@@ -744,12 +756,14 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
                 this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
             var packageFactory =
-                (UniversalTestDataFactory<string, PackageDescription, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, PackageDescription, string>>();
+                (UniversalTestDataFactory<string, IPackage, string>)
+                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
+
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0"), DependencySets = new List<PackageDependencySet>()});
+            
 
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
 
-            await packageFactory.Insert(new PackageDescription { Id = "TestModule-1", Version = "0.1.0" });
             await
                 templatesFactory.Insert(
                     new NodeTemplate
@@ -822,20 +836,15 @@ namespace ClusterKit.NodeManager.Tests
                 ClusterKit.NodeManager.ConfigurationDatabaseName = ""TestConfigurationDatabase""
 
                 akka : {
-                  stdout-loglevel : INFO
-                  loggers : [""Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog""]
-                  log - config - on - start : off
-                  loglevel: INFO
 
                   actor: {
                     provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
-                    default- dispatcher {
-                      type = TaskDispatcher
-                    }
 
+                    deployment {
                     /nodemanager/workers {
                         router = consistent-hashing-pool
                         nr-of-instances = 5
+                    }
                     }
 
                     serializers {
@@ -883,8 +892,10 @@ namespace ClusterKit.NodeManager.Tests
                 container.Register(Component.For<DataFactory<ConfigurationContext, SeedAddress, int>>()
                     .Instance(new UniversalTestDataFactory<ConfigurationContext, SeedAddress, int>(null, o => o.Id)).LifestyleSingleton());
 
-                container.Register(Component.For<DataFactory<string, PackageDescription, string>>()
-                    .Instance(new UniversalTestDataFactory<string, PackageDescription, string>(null, o => o.Id)).LifestyleSingleton());
+                container.Register(
+                    Component.For<DataFactory<string, IPackage, string>>()
+                        .Instance(new UniversalTestDataFactory<string, IPackage, string>(null, o => o.Id))
+                        .LifestyleSingleton());
 
                 container.Register(Component.For<IContextFactory<ConfigurationContext>>().Instance(new TestContextFactory<ConfigurationContext>()).LifestyleSingleton());
                 container.Register(Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
@@ -1004,6 +1015,89 @@ namespace ClusterKit.NodeManager.Tests
                 {
                     Context.GetLogger().Error($"Got unhandled message of type {message.GetType().FullName}");
                     base.Unhandled(message);
+                }
+            }
+        }
+
+        private class TestPackage : IPackage
+        {
+            public string Id { get; set; }
+
+            public SemanticVersion Version { get; set; }
+
+            public string Title { get; set; }
+
+            public IEnumerable<string> Authors { get; set; }
+
+            public IEnumerable<string> Owners { get; set; }
+
+            public Uri IconUrl { get; set; }
+
+            public Uri LicenseUrl { get; set; }
+
+            public Uri ProjectUrl { get; set; }
+
+            public bool RequireLicenseAcceptance { get; set; }
+
+            public bool DevelopmentDependency { get; set; }
+
+            public string Description { get; set; }
+
+            public string Summary { get; set; }
+
+            public string ReleaseNotes { get; set; }
+
+            public string Language { get; set; }
+
+            public string Tags { get; set; }
+
+            public string Copyright { get; set; }
+
+            public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies { get; set; }
+
+            public ICollection<PackageReferenceSet> PackageAssemblyReferences { get; set; }
+
+            public IEnumerable<PackageDependencySet> DependencySets { get; set; }
+
+            public Version MinClientVersion { get; set; }
+
+            public Uri ReportAbuseUrl { get; set; }
+
+            public int DownloadCount { get; set; }
+
+            public IEnumerable<IPackageFile> GetFiles()
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<FrameworkName> GetSupportedFrameworks()
+            {
+                throw new NotImplementedException();
+            }
+
+            public Stream GetStream()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void ExtractContents(IFileSystem fileSystem, string extractPath)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool IsAbsoluteLatestVersion { get; set; }
+
+            public bool IsLatestVersion { get; set; }
+
+            public bool Listed { get; set; }
+
+            public DateTimeOffset? Published { get; set; }
+
+            public IEnumerable<IPackageAssemblyReference> AssemblyReferences
+            {
+                get
+                {
+                    throw new NotImplementedException();
                 }
             }
         }

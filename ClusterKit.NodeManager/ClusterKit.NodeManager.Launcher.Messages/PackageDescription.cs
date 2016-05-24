@@ -9,10 +9,12 @@
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
+    using NuGet;
+
     /// <summary>
     /// Short description of NuGet package
     /// </summary>
-    public class PackageDescription
+    public class PackageDescription 
     {
         /// <summary>
         /// Gets or sets build time of assembly (if specified)

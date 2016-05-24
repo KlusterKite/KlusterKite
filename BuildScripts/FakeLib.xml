@@ -3444,6 +3444,16 @@
  Sets the environment variable with the given name for the current process.
 </summary>
 </member>
+<member name="M:Fake.EnvironmentHelper.setMachineEnvironVar(System.String,System.String)">
+<summary>
+ Sets the environment variable with the given name for the current machine.
+</summary>
+</member>
+<member name="M:Fake.EnvironmentHelper.setUserEnvironVar(System.String,System.String)">
+<summary>
+ Sets the environment variable with the given name for the current user.
+</summary>
+</member>
 <member name="M:Fake.EnvironmentHelper.setEnvironVar(System.String,System.String)">
 <summary>
  Sets the environment variable with the given name
@@ -3802,11 +3812,11 @@
 </member>
 <member name="M:Fake.FileHelper.Rename(System.String,System.String)">
 <summary>
- Renames the file to the target file name.
+ Renames the file or directory to the target name.
  ## Parameters
  
-  - `target` - The target file name.
-  - `file` - The orginal file name.
+  - `target` - The target file or directory name.
+  - `fileName` - The orginal file or directory name.
 </summary>
 </member>
 <member name="M:Fake.FileHelper.CopyCached(System.String,System.String,System.Collections.Generic.IEnumerable{System.String})">
@@ -3980,7 +3990,8 @@
 </member>
 <member name="M:Fake.FileSystem.findToolInSubPath(System.String,System.String)">
 <summary>
- Looks for a tool first in its default path, if not found in all subfolders of the root folder - returns the tool file name.
+ Looks for a tool first in its default path, if not found the in ./packages/ and then
+ in all subfolders of the root folder - returns the tool file name.
 </summary>
 </member>
 <member name="M:Fake.FileSystem.op_BangBang(System.String)">
@@ -5707,6 +5718,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains a task to send notification messages to a [HipChat](https://www.hipchat.com/) room
 </summary>
 </member>
+<member name="P:Fake.HockeyAppHelper.HockeyAppUploadParams.AppId">
+<summary>
+ Set to your App Id (required for UWP apps targeting windows phone)
+</summary>
+</member>
 <member name="P:Fake.HockeyAppHelper.HockeyAppUploadParams.UploadTimeout">
 <summary>
  Set maximum upload delay
@@ -6162,17 +6178,35 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 </member>
 <member name="M:Fake.MSBuildHelper.BuildWebsites(System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
- Builds the given web project files in debug mode and copies them to the given websiteDir.
+ Builds the given web project files with debug configuration and copies them to the given websiteDir.
  ## Parameters
   - `outputPath` - The output path.
   - `projectFiles` - The project file paths.
 </summary>
 </member>
-<member name="M:Fake.MSBuildHelper.BuildWebsite(System.String,System.String)">
+<member name="M:Fake.MSBuildHelper.BuildWebsitesConfig(System.String,System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
- Builds the given web project file in debug mode and copies it to the given websiteDir.
+ Builds the given web project files in specified configuration and copies them to the given outputPath.
  ## Parameters
   - `outputPath` - The output path.
+  - `configuration` - MSBuild configuration.
+  - `projectFiles` - The project file paths.
+</summary>
+</member>
+<member name="M:Fake.MSBuildHelper.BuildWebsite(System.String,System.String)">
+<summary>
+ Builds the given web project file with debug configuration and copies it to the given outputPath.
+ ## Parameters
+  - `outputPath` - The output path.
+  - `projectFile` - The project file path.
+</summary>
+</member>
+<member name="M:Fake.MSBuildHelper.BuildWebsiteConfig(System.String,System.String,System.String)">
+<summary>
+ Builds the given web project file in the specified configuration and copies it to the given outputPath.
+ ## Parameters
+  - `outputPath` - The output path.
+  - `configuration` - MSBuild configuration.
   - `projectFile` - The project file path.
 </summary>
 </member>
@@ -8115,6 +8149,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains functions which allow to deal with permissions.
 </summary>
 </member>
+<member name="P:Fake.PicklesHelper.PicklesParams.IncludeExperimentalFeatures">
+<summary>
+ Option which allows to enable some experimental features
+</summary>
+</member>
 <member name="P:Fake.PicklesHelper.PicklesParams.ErrorLevel">
 <summary>
  Option which allows to specify if failure of pickles should break the build.
@@ -8232,6 +8271,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  - `SystemUnderTestVersion` - `None`
  - `TimeOut` - 5 minutes
  - `ErrorLevel` - `Error`
+ - `IncludeExperimentalFeatures` - `None` 
 </summary>
 </member>
 <member name="T:Fake.PicklesHelper">
@@ -9771,6 +9811,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  The signtool will be search in the toolPath.
 </summary>
 </member>
+<member name="M:Fake.SignToolHelper.AppendSignature(System.String,Fake.SignToolHelper.SignParams,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Appends a SHA 256 signature to assemblies according to the settings specified in the parameters using signtool.exe.
+ This will be looked up using the toolsPath parameter.
+</summary>
+</member>
 <member name="M:Fake.SignToolHelper.Sign(System.String,Fake.SignToolHelper.SignParams,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
  Signs assemblies according to the settings specified in the parameters using signtool.exe.
@@ -10844,6 +10890,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  [omit]
 </summary>
 </member>
+<member name="M:Fake.TargetHelper.GetErrors">
+<summary>
+ Get Errors - Returns the errors that occured during execution
+</summary>
+</member>
 <member name="M:Fake.TargetHelper.Target(System.String,Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,Microsoft.FSharp.Core.Unit})">
 <summary>
  Creates a Target.
@@ -10863,35 +10914,35 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  The following sample creates 4 targets using TargetTemplateWithDependencies and hooks them into the build pipeline.
 
      // Create target creation functions
-     let createCompileTarget name strategy = 
-     TargetTemplateWithDependencies 
-         [&quot;Clean&quot;; &quot;ResolveDependencies&quot;] // dependencies to other targets 
-         (fun targetParameter -&gt; 
-           tracefn &quot;--- start compile product...&quot;  
+     let createCompileTarget name strategy =
+     TargetTemplateWithDependencies
+         [&quot;Clean&quot;; &quot;ResolveDependencies&quot;] // dependencies to other targets
+         (fun targetParameter -&gt;
+           tracefn &quot;--- start compile product...&quot;
            if targetParameter = &quot;a&quot; then
              tracefn &quot;    ---- Strategy A&quot;
            else
              tracefn &quot;    ---- Strategy B&quot;
-           tracefn &quot;--- finish compile product ...&quot;    
+           tracefn &quot;--- finish compile product ...&quot;
          ) name strategy
-     
-     let createTestTarget name dependencies filePattern = 
-       TargetTemplateWithDependencies 
-         dependencies 
-         (fun filePattern -&gt;   
+
+     let createTestTarget name dependencies filePattern =
+       TargetTemplateWithDependencies
+         dependencies
+         (fun filePattern -&gt;
            tracefn &quot;--- start compile tests ...&quot;
            !! filePattern
            |&gt; RunTests
            tracefn &quot;--- finish compile tests ...&quot;)
          name filePattern
-     
+
      // create some targets
      createCompileTarget &quot;C1&quot; &quot;a&quot;
      createCompileTarget &quot;C2&quot; &quot;b&quot;
-     
+
      createTestTarget &quot;T1&quot; [&quot;C1&quot;] &quot;**/C1/*.*&quot;
      createTestTarget &quot;T2&quot; [&quot;C1&quot;; &quot;C2&quot;] &quot;**/C?/*.*&quot;
-     
+
      // hook targets to normal build pipeline
      &quot;T1&quot; ==&gt; &quot;T2&quot; ==&gt; &quot;Test&quot;
 
@@ -12911,6 +12962,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Directory that contains the Heat tool
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.Script.Platform">
+<summary>
+ Specify architecture of package. For 64Bit Setups set ProgramFilesFolder to ProgramFiles64, package platform to X64, all components to Win64 = yes and all files&apos; processorArchitecture to X64.
+</summary>
+</member>
 <member name="P:Fake.WiXHelper.Script.CustomReplacements">
 <summary>
  You can add custom replacements for the wix xml here.
@@ -13303,6 +13359,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.WiXHelper.CustomActionExecute">
 <summary>
  Used in WiXCustomAction for determing when to run the custom action
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXScript.Platform">
+<summary>
+ Specify architecture of package. For 64Bit Setups set ProgramFilesFolder to ProgramFiles64, package platform to X64, all components to Win64 = yes and all files&apos; processorArchitecture to X64.
 </summary>
 </member>
 <member name="P:Fake.WiXHelper.WiXScript.ActionSequences">
@@ -13724,6 +13785,26 @@ hidden
  Specifies whether an action occur on install, uninstall or both.
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.WiXFile.ProcessorArchitecture">
+<summary>
+ File Architecture, either X64 or X86, defaults to X64
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXFile.Source">
+<summary>
+ File Path in WiX definition
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXFile.Name">
+<summary>
+ File Name in WiX definition
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXFile.Id">
+<summary>
+ File Id in WiX definition
+</summary>
+</member>
 <member name="T:Fake.WiXHelper.WiXFile">
 <summary>
  WiX File Element
@@ -14091,7 +14172,7 @@ hidden
  Use this to attach service installs to your components.          
 </summary>
 </member>
-<member name="M:Fake.WiXHelper.bulkComponentCreationAsSubDir(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo)">
+<member name="M:Fake.WiXHelper.bulkComponentCreationAsSubDir(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo,Fake.WiXHelper.Architecture)">
 <summary>
  Creates WiX component with directories and files from the given DirectoryInfo
  The function will create one component for each file [best practice](https://support.microsoft.com/de-de/kb/290997/en-us)
@@ -14100,7 +14181,7 @@ hidden
  The components are embedded into the passed in root directory.
 </summary>
 </member>
-<member name="M:Fake.WiXHelper.bulkComponentCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo)">
+<member name="M:Fake.WiXHelper.bulkComponentCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo,Fake.WiXHelper.Architecture)">
 <summary>
  Creates WiX component with directories and files from the given DirectoryInfo
  The function will create one component for each file [best practice](https://support.microsoft.com/de-de/kb/290997/en-us)
@@ -14109,7 +14190,7 @@ hidden
  You can use the getComponentIdsFromWiXString function for getting all created component refs and adding them to features.
 </summary>
 </member>
-<member name="M:Fake.WiXHelper.bulkComponentTreeCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},Microsoft.FSharp.Core.FSharpFunc{System.IO.DirectoryInfo,System.Boolean},System.IO.DirectoryInfo)">
+<member name="M:Fake.WiXHelper.bulkComponentTreeCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},Microsoft.FSharp.Core.FSharpFunc{System.IO.DirectoryInfo,System.Boolean},System.IO.DirectoryInfo,Fake.WiXHelper.Architecture)">
 <summary>
  Creates a WiX directory and component hierarchy from the given DirectoryInfo
  The function will create one component for each file [best practice](https://support.microsoft.com/de-de/kb/290997/en-us)

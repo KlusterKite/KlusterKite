@@ -84,11 +84,13 @@ namespace ClusterKit.Core
         /// </summary>
         /// <param name="context">Current actor context (will create child actor)</param>
         /// <param name="actorConfig">Configuration to create from</param>
+        /// <param name="windsorContainer">Dependency resolver</param>
         /// <param name="currentPath">Parent (current) actor path</param>
         /// <param name="pathName">New actor's path name</param>
         private static void CreateSimpleActor(
             IActorContext context,
             Config actorConfig,
+            IWindsorContainer windsorContainer,
             string currentPath,
             string pathName)
         {
@@ -108,7 +110,16 @@ namespace ClusterKit.Core
                         currentPath,
                         type.Name,
                         pathName);
-                context.ActorOf(Context.System.DI().Props(type), pathName);
+
+                if (type == typeof(NameSpaceActor))
+                {
+                    // this is done for tests, otherwise it would lead to CircularDependencyException
+                    context.ActorOf(Props.Create(() => new NameSpaceActor(windsorContainer)), pathName);
+                }
+                else
+                {
+                    context.ActorOf(Context.System.DI().Props(type), pathName);
+                }
             }
             else
             {
@@ -326,7 +337,7 @@ namespace ClusterKit.Core
                         break;
 
                     default:
-                        CreateSimpleActor(context, actorConfig, currentPath, path.Last());
+                        CreateSimpleActor(context, actorConfig, container, currentPath, path.Last());
                         break;
                 }
             }
