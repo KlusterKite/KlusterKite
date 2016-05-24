@@ -85,7 +85,7 @@ namespace ClusterKit.NodeManager.Launcher
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine(@"workingDirectory does not extist");
+                    Console.WriteLine(@"workingDirectory does not exist");
                     this.IsValid = false;
                 }
             }
