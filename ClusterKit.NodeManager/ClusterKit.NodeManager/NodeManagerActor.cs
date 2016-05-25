@@ -246,13 +246,13 @@ namespace ClusterKit.NodeManager
                     return;
                 }
 
-                SemanticVersion version;
-                if (!SemanticVersion.TryParse(module.Version, out version))
+                Version version;
+                if (!Version.TryParse(module.Version, out version))
                 {
                     continue;
                 }
 
-                if (package.Version != version)
+                if (package.Version.Version != version)
                 {
                     nodeDescription.IsObsolete = true;
                 }

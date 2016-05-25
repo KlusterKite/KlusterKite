@@ -334,7 +334,7 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<string, IPackage, string>)
                 this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.0.0-local") });
             await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
 
             await
@@ -375,7 +375,7 @@ namespace ClusterKit.NodeManager.Tests
                                                         new PackageDescription
                                                             {
                                                                 Id = "TestModule-1",
-                                                                Version = "0.1.0"
+                                                                Version = "0.0.0.0"
                                                             }
                                                 },
                                     NodeAddress = nodeAddress.Address,
