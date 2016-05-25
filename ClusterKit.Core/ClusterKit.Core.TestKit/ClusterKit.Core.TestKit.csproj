@@ -204,6 +204,7 @@
     </Compile>
     <Compile Include="HackedBaseActorTest.cs" />
     <Compile Include="IMessageWithPath.cs" />
+    <Compile Include="NameSpaceForwarder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteTestMessage.cs" />
     <Compile Include="TestActorForwarder.cs" />

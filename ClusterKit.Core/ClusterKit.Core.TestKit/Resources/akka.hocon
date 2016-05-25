@@ -59,10 +59,10 @@
         }
       }
 
-      default-dispatcher : {
-        type : "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
-        throughput = 2147483647
-      }
+      #default-dispatcher : {
+      #  type : "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+      #  throughput = 2147483647
+      #}
     }
   }
 }
