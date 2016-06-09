@@ -30,30 +30,24 @@
             this.testActor = testActor;
 
             // ReSharper disable FormatStringProblem
-            Context.GetLogger().Info("{Type}: started on {ActorPathString}", this.GetType().Name, this.Self.Path);
+            Context.GetLogger().Info("{Type}: started on {ActorPathString} with test actor path {TestActorPathString}", this.GetType().Name, this.Self.Path, this.testActor?.Path.ToString());
             // ReSharper restore FormatStringProblem
         }
 
         /// <summary>
-        /// To be implemented by concrete UntypedActor, this defines the behavior of the UntypedActor.
-        /// This method is called for every message received by the actor.
+        /// Creates simple actor from config
         /// </summary>
-        /// <param name="message">The message.</param>
-        protected override void OnReceive(object message)
-        {
-            this.testActor.Forward(message);
-            // ReSharper disable FormatStringProblem
-            Context.GetLogger().Info("{Type}: received {MessageTypeName}", this.GetType().Name, message.GetType().Name);
-            // ReSharper restore FormatStringProblem
-            base.OnReceive(message);
-        }
-
+        /// <param name="context">Current actor context (will create child actor)</param>
+        /// <param name="actorConfig">Configuration to create from</param>
+        /// <param name="windsorContainer">Dependency resolver</param>
+        /// <param name="currentPath">Parent (current) actor path</param>
+        /// <param name="pathName">New actor's path name</param>
         protected override void CreateSimpleActor(
-            IActorContext context,
-            Config actorConfig,
-            IWindsorContainer windsorContainer,
-            string currentPath,
-            string pathName)
+                    IActorContext context,
+                    Config actorConfig,
+                    IWindsorContainer windsorContainer,
+                    string currentPath,
+                    string pathName)
         {
             var childTypeName = actorConfig.GetString("type");
             if (string.IsNullOrWhiteSpace(childTypeName))
@@ -96,6 +90,40 @@
                         currentPath,
                         pathName);
             }
+        }
+
+        /// <summary>
+        /// Message forwarding to test actor
+        /// </summary>
+        /// <param name="obj">The original message</param>
+        protected virtual void ForwardMessage(object obj)
+        {
+            var messsageToSendType = typeof(TestMessage<>).MakeGenericType(obj.GetType());
+            var messageToSend = Activator.CreateInstance(messsageToSendType);
+            messsageToSendType.GetProperty("Message").SetValue(messageToSend, obj);
+            messsageToSendType.GetProperty("ReceiverPath").SetValue(messageToSend, this.Self.Path.ToString());
+            this.testActor.Tell(messageToSend, Context.Sender);
+        }
+
+        /// <summary>
+        /// To be implemented by concrete UntypedActor, this defines the behavior of the UntypedActor.
+        /// This method is called for every message received by the actor.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        protected override void OnReceive(object message)
+        {
+            // ReSharper disable FormatStringProblem
+            Context.GetLogger().Info("{Type}: received {MessageTypeName}", this.GetType().Name, message.GetType().Name);
+
+            if (this.testActor == null)
+            {
+                Context.GetLogger().Error("{Type}: test actor was not defined", this.GetType().Name);
+                return;
+            }
+
+            this.ForwardMessage(message);
+            // ReSharper restore FormatStringProblem
+            base.OnReceive(message);
         }
     }
 }

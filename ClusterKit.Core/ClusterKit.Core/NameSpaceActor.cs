@@ -25,6 +25,8 @@ namespace ClusterKit.Core
     [UsedImplicitly]
     public class NameSpaceActor : UntypedActor
     {
+        private readonly IWindsorContainer container;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NameSpaceActor"/> class.
         /// </summary>
@@ -33,18 +35,7 @@ namespace ClusterKit.Core
         /// </param>
         public NameSpaceActor(IWindsorContainer windsorContainer)
         {
-            this.InitChildActorsFromConfig(Context, this.Self.Path, windsorContainer);
-        }
-
-        /// <summary>
-        /// The on receive.
-        /// </summary>
-        /// <param name="message">
-        /// The message.
-        /// </param>
-        protected override void OnReceive(object message)
-        {
-            this.Unhandled(message);
+            this.container = windsorContainer;
         }
 
         /// <summary>
@@ -277,6 +268,23 @@ namespace ClusterKit.Core
                             actorConfig.GetTimeSpan("singleton-identification-interval", TimeSpan.FromSeconds(1), false),
                             actorConfig.GetInt("buffer-size", 2048))),
                 name: pathName);
+        }
+
+        /// <summary>
+        /// The on receive.
+        /// </summary>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        protected override void OnReceive(object message)
+        {
+            this.Unhandled(message);
+        }
+
+        protected override void PreStart()
+        {
+            base.PreStart();
+            this.InitChildActorsFromConfig(Context, this.Self.Path, this.container);
         }
 
         /// <summary>
