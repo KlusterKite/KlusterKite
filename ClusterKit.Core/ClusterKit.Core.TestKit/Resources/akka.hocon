@@ -20,11 +20,11 @@
 
       # duration to wait in expectMsg and friends outside of within() block
       # by default
-      single-expect-default = 3s
+      single-expect-default = 500ms
 
       # The timeout that is added as an implicit by DefaultTimeout trait 
       # This is used for Ask-pattern
-      default-timeout = 5s
+      default-timeout = 500ms
 
       calling-thread-dispatcher {
         type = "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
