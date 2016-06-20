@@ -272,7 +272,6 @@ namespace ClusterKit.Build
         /// <param name="projects">The list of projects</param>
         public static void CreateGlobalSolution(IEnumerable<ProjectDescription> projects)
         {
-            var solutionUid = Guid.NewGuid();
             using (var writer = File.CreateText(Path.Combine(BuildDirectory, "global.sln")))
             {
                 writer.Write($@"

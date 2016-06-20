@@ -91,3 +91,8 @@ Performs *Clean* -> *SetVersion* -> *Build* -> *CreateNuGet* -> *PushLocalPackag
 Rebuilds all projects and reinstalls local dependent packages
 This is usually done when one modifies several solutions with indirect dependencies to introduce changes from one solution to another
 Performs *Clean* -> *Build* -> *CreateNuGet* -> *CleanPackageCache* -> *RefreshLocalDependencies*
+
+### Special dev-time tasks
+
+#### CreateGlobalSolution
+Creates special global solution(`global.sln`) in build directory with all defined projects in it (useful while global third-party libs upgrade or other batch edits)
