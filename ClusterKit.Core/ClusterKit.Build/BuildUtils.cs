@@ -267,6 +267,99 @@ namespace ClusterKit.Build
         }
 
         /// <summary>
+        /// Creates global solution file that includes all registered projects
+        /// </summary>
+        /// <param name="projects">The list of projects</param>
+        public static void CreateGlobalSolution(IEnumerable<ProjectDescription> projects)
+        {
+            var solutionUid = Guid.NewGuid();
+            using (var writer = File.CreateText(Path.Combine(BuildDirectory, "global.sln")))
+            {
+                writer.Write($@"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""Solution Items"", ""Solution Items"", ""{{{Guid.NewGuid()}}}""
+	ProjectSection(SolutionItems) = preProject
+		..\build.fsx = ..\build.fsx
+		..\BuildScript.md = ..\BuildScript.md
+		..\nuget.config = ..\nuget.config
+		Readme.md = Readme.md
+		..\Settings.StyleCop = ..\Settings.StyleCop
+	EndProjectSection
+EndProject
+
+                ");
+
+                var folders = new List<string>();
+
+                foreach (var package in projects.GroupBy(p => p.PackageName))
+                {
+                    var packageUid = Guid.NewGuid();
+                    writer.Write(
+                        $@"
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""{package.Key}"", ""{package.Key}"", ""{{{packageUid}}}""
+EndProject
+");
+
+                    foreach (var project in package)
+                    {
+                        try
+                        {
+                            var doc = new XmlDocument();
+                            doc.Load(project.ProjectFileName);
+                            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
+                            namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+                            var uid =
+                                doc?.DocumentElement?.SelectSingleNode(
+                                    "/def:Project/def:PropertyGroup/def:ProjectGuid",
+                                    namespaceManager)?.InnerText;
+
+                            if (string.IsNullOrEmpty(uid))
+                            {
+                                throw new Exception("Could not parse project uid");
+                            }
+
+                            writer.Write(
+                                $@"
+Project(""{{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}}"") = ""{project.ProjectName}"", ""../{project
+                                    .ProjectFileName}"", ""{uid}""
+EndProject
+
+");
+                            folders.Add($"\t\t{uid} = {{{packageUid}}}\n");
+                        }
+                        catch (Exception e)
+                        {
+                            ConsoleLog(
+                                $"Could not add {project.ProjectName} to global solution, {e.Message} \n {e.StackTrace}");
+                        }
+                    }
+                }
+                writer.Write($@"
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+");
+                foreach (var folder in folders)
+                {
+                    writer.Write(folder);
+                }
+                writer.Write($@"
+	EndGlobalSection
+EndGlobal
+");
+            }
+        }
+
+        /// <summary>
         /// Creates nuget package
         /// </summary>
         /// <param name="project">

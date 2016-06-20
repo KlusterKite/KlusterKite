@@ -11,6 +11,7 @@ namespace ClusterKit.Build
 {
     using System;
     using System.IO;
+    using System.Linq;
 
     /// <summary>
     /// Short description of project to build
@@ -30,7 +31,38 @@ namespace ClusterKit.Build
         ///     The internal dependencies.
         /// </param>
         public ProjectDescription(string projectFileName, EnProjectType projectType, string[] internalDependencies = null)
+            : this(null, projectFileName, projectType, internalDependencies)
         {
+            if (!string.IsNullOrEmpty(projectFileName))
+            {
+                this.PackageName = string.Join(
+                    ".",
+                    projectFileName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries).Take(2));
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProjectDescription"/> class.
+        /// </summary>
+        /// <param name="packageName">
+        ///     The package name.
+        /// </param>
+        /// <param name="projectFileName">
+        ///     The project file name.
+        /// </param>
+        /// <param name="projectType">
+        ///     The project type or types
+        /// </param>
+        /// <param name="internalDependencies">
+        ///     The internal dependencies.
+        /// </param>
+        public ProjectDescription(
+            string packageName,
+            string projectFileName,
+            EnProjectType projectType,
+            string[] internalDependencies = null)
+        {
+            this.PackageName = packageName;
             this.InternalDependencies = internalDependencies ?? new string[0];
             this.ProjectFileName = projectFileName;
             this.ProjectType = projectType;
@@ -86,6 +118,11 @@ namespace ClusterKit.Build
         /// Gets list of internal (global across all modules bundle) dependencies
         /// </summary>
         public string[] InternalDependencies { get; }
+
+        /// <summary>
+        /// Gets or sets the name of projects bucket (all projects with the same package name are usually in one local solution
+        /// </summary>
+        public string PackageName { get; set; }
 
         /// <summary>
         /// Gets current project absolute directory path

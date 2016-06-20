@@ -60,6 +60,12 @@
             <param name="packageOutputDirectory">Output directory to put prepared nuget packages</param>
             <param name="packageInputDirectory">directory with sources nuget packages</param>
         </member>
+        <member name="M:ClusterKit.Build.BuildUtils.CreateGlobalSolution(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Creates global solution file that includes all registered projects
+            </summary>
+            <param name="projects">The list of projects</param>
+        </member>
         <member name="M:ClusterKit.Build.BuildUtils.CreateNuget(ClusterKit.Build.ProjectDescription)">
             <summary>
             Creates nuget package
@@ -131,6 +137,23 @@
                 The internal dependencies.
             </param>
         </member>
+        <member name="M:ClusterKit.Build.ProjectDescription.#ctor(System.String,System.String,ClusterKit.Build.ProjectDescription.EnProjectType,System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Build.ProjectDescription"/> class.
+            </summary>
+            <param name="packageName">
+                The package name.
+            </param>
+            <param name="projectFileName">
+                The project file name.
+            </param>
+            <param name="projectType">
+                The project type or types
+            </param>
+            <param name="internalDependencies">
+                The internal dependencies.
+            </param>
+        </member>
         <member name="T:ClusterKit.Build.ProjectDescription.EnProjectType">
             <summary>
             Types of projects
@@ -164,6 +187,11 @@
         <member name="P:ClusterKit.Build.ProjectDescription.InternalDependencies">
             <summary>
             Gets list of internal (global across all modules bundle) dependencies
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Build.ProjectDescription.PackageName">
+            <summary>
+            Gets or sets the name of projects bucket (all projects with the same package name are usually in one local solution
             </summary>
         </member>
         <member name="P:ClusterKit.Build.ProjectDescription.ProjectDirectory">
