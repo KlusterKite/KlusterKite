@@ -98,11 +98,33 @@
             </summary>
             <param name="projects">The list of projects to test</param>
         </member>
+        <member name="M:ClusterKit.Build.BuildUtils.SwitchToPackageRefs(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Updates current projects (csproj) to reference projects in other folders as Nuget Package
+            </summary>
+            <param name="projects">The list of projects</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.SwitchToProjectRefs(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Updates current projects (csproj) to reference projects in other folders as projects
+            </summary>
+            <remarks>
+            Usefull while working in global solution
+            </remarks>
+            <param name="projects">The list of projects</param>
+        </member>
         <member name="M:ClusterKit.Build.BuildUtils.ConsoleLog(System.String)">
             <summary>
             Debugger method to write sum console output
             </summary>
             <param name="message"></param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GetProjectUid(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Extracts project uid from project file
+            </summary>
+            <param name="project">The project description</param>
+            <returns>The project's uid</returns>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.RestoreProjectDependencies(ClusterKit.Build.ProjectDescription)">
             <summary>

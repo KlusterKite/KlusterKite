@@ -263,6 +263,14 @@ Target "CreateGlobalSolution"  (fun _ ->
     BuildUtils.CreateGlobalSolution(projects);
 )
 
+Target "SwitchToPackageRefs"  (fun _ ->
+    BuildUtils.SwitchToPackageRefs(projects);
+)
+
+Target "SwitchToProjectRefs"  (fun _ ->
+    BuildUtils.SwitchToProjectRefs(projects);
+)
+
 // switches nuget and build version from init one, to latest posible on docker nuget server
 Target "SetVersion" (fun _ ->
     let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" "ClusterKit.Core"

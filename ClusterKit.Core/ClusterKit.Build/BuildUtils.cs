@@ -306,14 +306,7 @@ EndProject
                     {
                         try
                         {
-                            var doc = new XmlDocument();
-                            doc.Load(project.ProjectFileName);
-                            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
-                            namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
-                            var uid =
-                                doc?.DocumentElement?.SelectSingleNode(
-                                    "/def:Project/def:PropertyGroup/def:ProjectGuid",
-                                    namespaceManager)?.InnerText;
+                            var uid = GetProjectUid(project);
 
                             if (string.IsNullOrEmpty(uid))
                             {
@@ -579,6 +572,157 @@ EndGlobal
         }
 
         /// <summary>
+        /// Updates current projects (csproj) to reference projects in other folders as Nuget Package
+        /// </summary>
+        /// <param name="projects">The list of projects</param>
+        public static void SwitchToPackageRefs(IEnumerable<ProjectDescription> projects)
+        {
+            var projectList = projects.ToList();
+
+            foreach (var project in projectList)
+            {
+                var projDoc = new XmlDocument();
+                projDoc.Load(project.ProjectFileName);
+
+                XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
+                namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+                var refItemGroup = projDoc.DocumentElement.SelectSingleNode(
+                    "//def:ItemGroup[def:Reference]",
+                    namespaceManager);
+
+                foreach (var dependency in project.InternalDependencies)
+                {
+                    var refProject = projectList.FirstOrDefault(p => p.ProjectName == dependency);
+                    if (refProject == null)
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref project was not registered");
+                        continue;
+                    }
+
+                    if (refProject.PackageName == project.PackageName)
+                    {
+                        continue;
+                    }
+
+                    //ConsoleLog($"{project.ProjectName} {dependency} updating...");
+
+                    var refNode =
+                        projDoc.DocumentElement.SelectNodes("//def:Reference", namespaceManager)
+                            .Cast<XmlElement>()
+                            .FirstOrDefault(
+                                e =>
+                                e.HasAttribute("Include")
+                                && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
+                        ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
+                               .Cast<XmlElement>()
+                               .FirstOrDefault(
+                                   e =>
+                                   e.HasAttribute("Include")
+                                   && Regex.IsMatch(
+                                       e.Attributes["Include"].Value,
+                                       $"(^|[\\\\\\/]){Regex.Escape(dependency)}.csproj$"));
+
+                    if (refNode != null)
+                    {
+                        refNode.ParentNode.RemoveChild(refNode);
+                        refNode = projDoc.CreateElement(
+                                                    "Reference",
+                                                    "http://schemas.microsoft.com/developer/msbuild/2003");
+                        refItemGroup.AppendChild(refNode);
+                        refNode.SetAttribute("Include", $"{refProject.ProjectName}, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL");
+                        refNode.InnerXml = $"\n     <SpecificVersion>False</SpecificVersion>\r\n      <HintPath>..\\..\\packages\\{refProject.ProjectName}.0.0.0-local\\lib\\{refProject.ProjectName}.dll</HintPath>\r\n      <Private>True</Private>\r\n";
+
+                        //ConsoleLog($"{project.ProjectName} {dependency} {refNode.Name}");
+                    }
+                    else
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref node was not found");
+                    }
+                }
+
+                projDoc.Save(project.ProjectFileName);
+            }
+        }
+
+        /// <summary>
+        /// Updates current projects (csproj) to reference projects in other folders as projects
+        /// </summary>
+        /// <remarks>
+        /// Usefull while working in global solution
+        /// </remarks>
+        /// <param name="projects">The list of projects</param>
+        public static void SwitchToProjectRefs(IEnumerable<ProjectDescription> projects)
+        {
+            var projectList = projects.ToList();
+
+            foreach (var project in projectList)
+            {
+                var projDoc = new XmlDocument();
+                projDoc.Load(project.ProjectFileName);
+
+                XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
+                namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+                var refItemGroup = projDoc.DocumentElement.SelectSingleNode(
+                    "//def:ItemGroup[def:Reference]",
+                    namespaceManager);
+
+                foreach (var dependency in project.InternalDependencies)
+                {
+                    var refProject = projectList.FirstOrDefault(p => p.ProjectName == dependency);
+                    if (refProject == null)
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref project was not registered");
+                        continue;
+                    }
+
+                    if (refProject.PackageName == project.PackageName)
+                    {
+                        continue;
+                    }
+
+                    //ConsoleLog($"{project.ProjectName} {dependency} updating...");
+
+                    var refNode =
+                        projDoc.DocumentElement.SelectNodes("//def:Reference", namespaceManager)
+                            .Cast<XmlElement>()
+                            .FirstOrDefault(
+                                e =>
+                                e.HasAttribute("Include")
+                                && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
+                        ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
+                               .Cast<XmlElement>()
+                               .FirstOrDefault(
+                                   e =>
+                                   e.HasAttribute("Include")
+                                   && Regex.IsMatch(
+                                       e.Attributes["Include"].Value,
+                                       $"(^|[\\\\\\/]){Regex.Escape(dependency)}.csproj$"));
+
+                    if (refNode != null)
+                    {
+                        refNode.ParentNode.RemoveChild(refNode);
+                        refNode = projDoc.CreateElement(
+                                                    "ProjectReference",
+                                                    "http://schemas.microsoft.com/developer/msbuild/2003");
+                        refItemGroup.AppendChild(refNode);
+                        refNode.SetAttribute("Include", "../../" + refProject.ProjectFileName);
+                        refNode.InnerXml = $"\n      <Project>{GetProjectUid(refProject)}</Project>\r\n      <Name>{refProject.ProjectName}</Name>\r\n";
+
+                        //ConsoleLog($"{project.ProjectName} {dependency} {refNode.Name}");
+                    }
+                    else
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref node was not found");
+                    }
+                }
+
+                projDoc.Save(project.ProjectFileName);
+            }
+        }
+
+        /// <summary>
         /// Debugger method to write sum console output
         /// </summary>
         /// <param name="message"></param>
@@ -588,6 +732,23 @@ EndGlobal
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(message);
             Console.ForegroundColor = currentColor;
+        }
+
+        /// <summary>
+        /// Extracts project uid from project file
+        /// </summary>
+        /// <param name="project">The project description</param>
+        /// <returns>The project's uid</returns>
+        private static string GetProjectUid(ProjectDescription project)
+        {
+            var doc = new XmlDocument();
+            doc.Load(project.ProjectFileName);
+            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
+            namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+            var uid =
+                doc.DocumentElement?.SelectSingleNode("/def:Project/def:PropertyGroup/def:ProjectGuid", namespaceManager)?
+                    .InnerText;
+            return uid;
         }
 
         /// <summary>
