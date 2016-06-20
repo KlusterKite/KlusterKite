@@ -122,6 +122,7 @@ namespace ClusterKit.Core.Tests.Configuration
                 akka.actor.deployment {
                     /testNameSpace {
                         IsNameSpace = true
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /somethingElse {
@@ -129,14 +130,17 @@ namespace ClusterKit.Core.Tests.Configuration
 
                     /testNameSpace/forwarder {
                         type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /testNameSpace/second {
                         type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /testNameSpace/second/forwarder {
                         type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /testNameSpace/sharding {
@@ -145,6 +149,7 @@ namespace ClusterKit.Core.Tests.Configuration
                         type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
                         role = test
                         message-extractor = ""ClusterKit.Core.Tests.Configuration.ConfigurationTest+TestMessageExtractor, ClusterKit.Core.Tests""
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
                  }
             }").WithFallback(base.GetAkkaConfig(windsorContainer));

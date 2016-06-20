@@ -44,7 +44,6 @@ let projects = [|
     new ProjectDescription("./ClusterKit.Web/ClusterKit.Web.Swagger.Monitor/ClusterKit.Web.Swagger.Monitor.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.Swagger.Messages"|]))
     new ProjectDescription("./ClusterKit.Web/ClusterKit.Web.Tests/ClusterKit.Web.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web.NginxConfigurator"; "ClusterKit.Web.SignalR"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Web.Swagger.Monitor"; "ClusterKit.Web.Swagger"; "ClusterKit.Web"|]))
 
-    
     new ProjectDescription("./ClusterKit.Monitoring/ClusterKit.Monitoring/ClusterKit.Monitoring.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.SignalR"|]))
     //new ProjectDescription("./ClusterKit.Monitoring/ClusterKit.Monitoring.Tests/ClusterKit.Monitoring.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core";  "ClusterKit.Core.TestKit"; "ClusterKit.Web.Client"; "ClusterKit.Web"; "ClusterKit.Web.SignalR"|]))
 
@@ -91,7 +90,6 @@ let projects = [|
             "ClusterKit.NodeManager.ConfigurationSource";
             "ClusterKit.NodeManager.Launcher.Messages"
           |]))
-                              
 
 |]
 
@@ -143,7 +141,21 @@ Target "RefreshLocalDependencies" (fun _ ->
 
 // runs all xunit tests
 Target "Test" (fun _ ->
-    BuildUtils.RunXUnitTest(projects);
+    let runTest (project : ProjectDescription) =
+        printfn "%s" project.ProjectName
+        let testAssembly = Path.Combine(project.TempBuildDirectory, project.ProjectName + ".dll");
+        let runnerLocation = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages")) |> Seq.sortByDescending (fun d -> d) |> Seq.head
+        [|testAssembly|]
+        |> Fake.Testing.XUnit2.xUnit2 ( fun p -> {p with
+                                                      ForceTeamCity = false;
+                                                      ToolPath = Path.Combine(runnerLocation, "tools", "xunit.console.exe");
+                                                      TimeOut = TimeSpan.FromHours(1.0);
+                                                      ErrorLevel = UnitTestCommon.TestRunnerErrorLevel.DontFailBuild;
+                                                      Parallel =  Fake.Testing.XUnit2.ParallelMode.NoParallelization;} )
+
+    projects |> Seq.where (fun p -> p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests)) |> Seq.iter runTest
+    //BuildUtils.RunXUnitTest(projects);
+
 )
 
 // builds base (system) docker images
