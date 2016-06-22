@@ -127,6 +127,7 @@ namespace ClusterKit.NodeManager.Tests
                         n.GoUp();
                     });
 
+            this.ExpectNoMsg();
             var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(3, descriptions.Count);
@@ -155,7 +156,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(virtualNode.IsUp); // the oldest node gone to upgrade
 
             virtualNode.Description.StartTimeStamp = VirtualNode.GetNextTime();
-            virtualNode.Description.Modules[0].Version = "0.2.0";
+            virtualNode.Description.Modules[0].Version = "0.2.0.0";
             virtualNode.GoUp();
 
             descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
@@ -258,7 +259,7 @@ namespace ClusterKit.NodeManager.Tests
                     });
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-
+            this.ExpectNoMsg();
             var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
             this.SetAutoPilot(
                 new DelegateAutoPilot(
@@ -282,7 +283,7 @@ namespace ClusterKit.NodeManager.Tests
                                                         new PackageDescription
                                                             {
                                                                 Id = "TestModule-1",
-                                                                Version = "0.1.0"
+                                                                Version = "0.1.0.0"
                                                             }
                                                 },
                                     NodeAddress = nodeAddress.Address,
@@ -308,7 +309,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(false, descriptions[0].IsObsolete);
 
             var nodeTemplate = templatesFactory.Storage[1];
-            testActor.Tell(new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Data = nodeTemplate, Id = nodeTemplate.Id});
+            testActor.Tell(new RestActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Data = nodeTemplate, Id = nodeTemplate.Id });
 
             //nodeTemplate.Version = 2;
             //testActor.Tell(new UpdateMessage<NodeTemplate> { ActionType = EnActionType.Update, NewObject = nodeTemplate, OldObject = nodeTemplate });
@@ -512,7 +513,6 @@ namespace ClusterKit.NodeManager.Tests
             await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
             await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
 
-
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
             var response = await testActor.Ask<List<PackageDescription>>(new PackageListRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(response);
@@ -520,7 +520,7 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Tests template distibution
+        /// Tests template distribution
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -535,7 +535,7 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<string, IPackage, string>)
                 this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0.0") });
 
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
 
@@ -583,7 +583,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.0.0" } }
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.0.0.0" } }
                                     }
             };
 
@@ -606,7 +606,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0" } }
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
                                     }
             };
             router.RegisterVirtualNode(node2.Address.Address, node2.Client);
@@ -624,7 +624,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.NotNull(templates);
             Assert.Equal(2, templates.Count);
 
-            node1.Description.Modules[0].Version = "0.1.0";
+            node1.Description.Modules[0].Version = "0.1.0.0";
             node1.GoUp();
 
             stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
@@ -703,7 +703,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0" } }
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
                                     }
             };
 
@@ -726,7 +726,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0" } }
+                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
                                     }
             };
             router.RegisterVirtualNode(node2.Address.Address, node2.Client);
@@ -759,8 +759,7 @@ namespace ClusterKit.NodeManager.Tests
                 (UniversalTestDataFactory<string, IPackage, string>)
                 this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0"), DependencySets = new List<PackageDependencySet>()});
-            
+            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0"), DependencySets = new List<PackageDependencySet>() });
 
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
 
@@ -836,29 +835,35 @@ namespace ClusterKit.NodeManager.Tests
                 ClusterKit.NodeManager.ConfigurationDatabaseName = ""TestConfigurationDatabase""
 
                 akka : {
-
                   actor: {
                     provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
-
                     deployment {
-                    /nodemanager/workers {
-                        router = consistent-hashing-pool
-                        nr-of-instances = 5
-                    }
+                        /nodemanager/workers {
+                            router = consistent-hashing-pool
+                            nr-of-instances = 5
+                            dispatcher = akka.test.calling-thread-dispatcher
+                        }
                     }
 
                     serializers {
-                      akka-singleton = ""Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools""
+		                wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
+                        akka-singleton = ""Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools""
                     }
                     serialization-bindings {
-                      ""Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools"" = akka-singleton
+		                ""System.Object"" = wire
+                        ""Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools"" = akka-singleton
                     }
                     serialization-identifiers {
-                      ""Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"" = 14
+                        ""Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"" = 14
+                    }
+
+                    default-dispatcher : {
+                      type : ""Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit""
+                      throughput = 2147483647
                     }
                   }
 
-                  remote : {
+                remote : {
                     helios.tcp : {
                       hostname = 127.0.0.1
                       port = 0
@@ -868,7 +873,7 @@ namespace ClusterKit.NodeManager.Tests
                   cluster: {
                     auto-down-unreachable-after = 15s
                     seed-nodes = []
-            singleton {
+                    singleton {
                         # The number of retries are derived from hand-over-retry-interval and
                         # akka.cluster.down-removal-margin (or ClusterSingletonManagerSettings.removalMargin),
                         # but it will never be less than this property.
@@ -899,6 +904,65 @@ namespace ClusterKit.NodeManager.Tests
 
                 container.Register(Component.For<IContextFactory<ConfigurationContext>>().Instance(new TestContextFactory<ConfigurationContext>()).LifestyleSingleton());
                 container.Register(Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
+            }
+        }
+
+        private class TestPackage : IPackage
+        {
+            public IEnumerable<IPackageAssemblyReference> AssemblyReferences
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public IEnumerable<string> Authors { get; set; }
+            public string Copyright { get; set; }
+            public IEnumerable<PackageDependencySet> DependencySets { get; set; }
+            public string Description { get; set; }
+            public bool DevelopmentDependency { get; set; }
+            public int DownloadCount { get; set; }
+            public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies { get; set; }
+            public Uri IconUrl { get; set; }
+            public string Id { get; set; }
+
+            public bool IsAbsoluteLatestVersion { get; set; }
+            public bool IsLatestVersion { get; set; }
+            public string Language { get; set; }
+            public Uri LicenseUrl { get; set; }
+            public bool Listed { get; set; }
+            public Version MinClientVersion { get; set; }
+            public IEnumerable<string> Owners { get; set; }
+            public ICollection<PackageReferenceSet> PackageAssemblyReferences { get; set; }
+            public Uri ProjectUrl { get; set; }
+            public DateTimeOffset? Published { get; set; }
+            public string ReleaseNotes { get; set; }
+            public Uri ReportAbuseUrl { get; set; }
+            public bool RequireLicenseAcceptance { get; set; }
+            public string Summary { get; set; }
+            public string Tags { get; set; }
+            public string Title { get; set; }
+            public SemanticVersion Version { get; set; }
+
+            public void ExtractContents(IFileSystem fileSystem, string extractPath)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<IPackageFile> GetFiles()
+            {
+                throw new NotImplementedException();
+            }
+
+            public Stream GetStream()
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<FrameworkName> GetSupportedFrameworks()
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -933,7 +997,7 @@ namespace ClusterKit.NodeManager.Tests
                                                                    "TestModule-1",
                                                                Version
                                                                    =
-                                                                   "0.1.0"
+                                                                   "0.1.0.0"
                                                            }
                                                    },
                     NodeAddress = this.Address.Address,
@@ -1015,89 +1079,6 @@ namespace ClusterKit.NodeManager.Tests
                 {
                     Context.GetLogger().Error($"Got unhandled message of type {message.GetType().FullName}");
                     base.Unhandled(message);
-                }
-            }
-        }
-
-        private class TestPackage : IPackage
-        {
-            public string Id { get; set; }
-
-            public SemanticVersion Version { get; set; }
-
-            public string Title { get; set; }
-
-            public IEnumerable<string> Authors { get; set; }
-
-            public IEnumerable<string> Owners { get; set; }
-
-            public Uri IconUrl { get; set; }
-
-            public Uri LicenseUrl { get; set; }
-
-            public Uri ProjectUrl { get; set; }
-
-            public bool RequireLicenseAcceptance { get; set; }
-
-            public bool DevelopmentDependency { get; set; }
-
-            public string Description { get; set; }
-
-            public string Summary { get; set; }
-
-            public string ReleaseNotes { get; set; }
-
-            public string Language { get; set; }
-
-            public string Tags { get; set; }
-
-            public string Copyright { get; set; }
-
-            public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies { get; set; }
-
-            public ICollection<PackageReferenceSet> PackageAssemblyReferences { get; set; }
-
-            public IEnumerable<PackageDependencySet> DependencySets { get; set; }
-
-            public Version MinClientVersion { get; set; }
-
-            public Uri ReportAbuseUrl { get; set; }
-
-            public int DownloadCount { get; set; }
-
-            public IEnumerable<IPackageFile> GetFiles()
-            {
-                throw new NotImplementedException();
-            }
-
-            public IEnumerable<FrameworkName> GetSupportedFrameworks()
-            {
-                throw new NotImplementedException();
-            }
-
-            public Stream GetStream()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void ExtractContents(IFileSystem fileSystem, string extractPath)
-            {
-                throw new NotImplementedException();
-            }
-
-            public bool IsAbsoluteLatestVersion { get; set; }
-
-            public bool IsLatestVersion { get; set; }
-
-            public bool Listed { get; set; }
-
-            public DateTimeOffset? Published { get; set; }
-
-            public IEnumerable<IPackageAssemblyReference> AssemblyReferences
-            {
-                get
-                {
-                    throw new NotImplementedException();
                 }
             }
         }

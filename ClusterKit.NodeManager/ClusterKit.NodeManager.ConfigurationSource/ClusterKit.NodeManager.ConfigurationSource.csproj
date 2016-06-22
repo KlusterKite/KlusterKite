@@ -33,6 +33,10 @@
     <DocumentationFile>bin\Release\ClusterKit.NodeManager.ConfigurationSource.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.Rest\ClusterKit.Core.Rest.csproj">
+      <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
+      <Name>ClusterKit.Core.Rest</Name>
+    </ProjectReference>
     <Reference Include="Akka, Version=1.0.9.204, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Akka.1.0.9.204-beta\lib\net45\Akka.dll</HintPath>
@@ -79,24 +83,6 @@
     </Reference>
     <Reference Include="Castle.Windsor">
       <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net45\Castle.Windsor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ClusterKit.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ClusterKit.Core.Data">
-      <HintPath>..\..\packages\ClusterKit.Core.Data.0.0.0-local\lib\ClusterKit.Core.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ClusterKit.Core.EF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.EF.0.0.0-local\lib\ClusterKit.Core.EF.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ClusterKit.Core.Rest">
-      <HintPath>..\..\packages\ClusterKit.Core.Rest.0.0.0-local\lib\ClusterKit.Core.Rest.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework">
@@ -162,6 +148,21 @@
       <HintPath>..\..\packages\Wire.0.0.6\lib\Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Core.EF, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.EF.0.0.0-local\lib\ClusterKit.Core.EF.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Core.Data, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.Data.0.0.0-local\lib\ClusterKit.Core.Data.dll</HintPath>
+      <Private>True</Private>
+</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationContext.cs" />

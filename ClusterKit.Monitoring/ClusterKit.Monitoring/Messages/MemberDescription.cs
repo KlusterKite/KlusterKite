@@ -5,6 +5,8 @@ namespace ClusterKit.Monitoring.Messages
 {
     using Akka.Cluster;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Cluster member description
     /// </summary>
@@ -15,10 +17,17 @@ namespace ClusterKit.Monitoring.Messages
         /// </summary>
         private MemberStatus status;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemberDescription"/> class.
+        /// </summary>
         public MemberDescription()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemberDescription"/> class.
+        /// </summary>
+        /// <param name="member">The member data</param>
         public MemberDescription(Member member)
         {
             this.Address = $"{member.Address.Host}:{member.Address.Port}";
@@ -31,6 +40,7 @@ namespace ClusterKit.Monitoring.Messages
         /// <summary>
         /// Gets or sets address of current node
         /// </summary>
+        [UsedImplicitly]
         public string Address { get; set; }
 
         /// <summary>
@@ -41,11 +51,13 @@ namespace ClusterKit.Monitoring.Messages
         /// <summary>
         /// Gets or sets a value indicating whether this node is currently reachable by cluster
         /// </summary>
+        [UsedImplicitly]
         public bool IsReachable { get; set; }
 
         /// <summary>
         /// Gets or sets last measured ping to node in milliseconds
         /// </summary>
+        [UsedImplicitly]
         public double? PingValue { get; set; }
 
         /// <summary>
@@ -70,6 +82,7 @@ namespace ClusterKit.Monitoring.Messages
             set
             {
                 this.status = value;
+
                 switch (this.status)
                 {
                     case MemberStatus.Up:
@@ -91,6 +104,7 @@ namespace ClusterKit.Monitoring.Messages
         /// <summary>
         /// Gets or sets unique identification of current node incarnation
         /// </summary>
+        [UsedImplicitly]
         public int Uid { get; set; }
     }
 }

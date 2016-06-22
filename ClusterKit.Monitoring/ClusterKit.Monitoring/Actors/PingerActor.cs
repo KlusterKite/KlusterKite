@@ -5,15 +5,17 @@ namespace ClusterKit.Monitoring.Actors
     using System;
 
     using Akka.Actor;
-    using Akka.Event;
 
     using ClusterKit.Core.Ping;
     using ClusterKit.Core.Utils;
     using ClusterKit.Monitoring.Messages;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Pings cluster nodes
     /// </summary>
+    [UsedImplicitly]
     public class PingerActor : ReceiveActor
     {
         /// <summary>
@@ -27,15 +29,18 @@ namespace ClusterKit.Monitoring.Actors
         private readonly TimeSpan pingTimeOut;
 
         /// <summary>
-        /// Node adress to check
+        /// Node address to check
         /// </summary>
         private Address nodeAddress;
 
         /// <summary>
-        /// Node adress to check
+        /// Node address to check
         /// </summary>
         private ICanTell nodeToPing;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PingerActor"/> class.
+        /// </summary>
         public PingerActor()
         {
             this.pingTimeOut = Context.System.Settings.Config.GetTimeSpan(
@@ -73,15 +78,15 @@ namespace ClusterKit.Monitoring.Actors
         /// </summary>
         /// <param name="address">Node address to ping</param>
         /// <returns>Async task</returns>
-        private Task Initialize(Address address)
+        private void Initialize(Address address)
         {
             this.nodeAddress = address;
-            this.nodeToPing = Context.System.ActorSelection($"{address.ToString()}/user/Core/Ping");
+            this.nodeToPing = Context.System.ActorSelection($"{address}/user/Core/Ping");
 
             this.Become(
                 () =>
                     {
-                        this.Receive<TimeToPing>(m => this.Ping());
+                        this.ReceiveAsync<TimeToPing>(m => this.Ping());
                     });
 
             Context.System.Scheduler.ScheduleTellRepeatedly(
@@ -91,8 +96,6 @@ namespace ClusterKit.Monitoring.Actors
                 new TimeToPing(),
                 this.Self
                 );
-
-            return Task.FromResult((object)null);
         }
 
         /// <summary>
@@ -123,7 +126,7 @@ namespace ClusterKit.Monitoring.Actors
         }
 
         /// <summary>
-        /// Private notification to perfom measurement
+        /// Private notification to perform measurement
         /// </summary>
         private class TimeToPing
         {

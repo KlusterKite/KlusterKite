@@ -1484,6 +1484,41 @@
  Contains tasks to control the local Azure Emulator
 </summary>
 </member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.Tag">
+<summary>
+ The tag of a commit that kicked off the build. This value is only available on tags.
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.RepoSlug">
+<summary>
+ The URL-friendly version of a repository name.
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.RepoOwner">
+<summary>
+ The name of the account in which the repository lives
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.Commit">
+<summary>
+ The commit hash of a commit that kicked off the build
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.Branch">
+<summary>
+ The branch on which the build was kicked off. This value is only available on branches.
+</summary>
+</member>
+<member name="T:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment">
+<summary>
+ Bitbucket Pipelines environment variables as [described](https://confluence.atlassian.com/bitbucket/environment-variables-in-bitbucket-pipelines-794502608.html)
+</summary>
+</member>
+<member name="T:Fake.BitbucketPipelines">
+<summary>
+ Contains code to configure FAKE for Bitbucket Pipelines integration
+</summary>
+</member>
 <member name="M:Fake.Boot.CommandHandler.Interact">
 <summary>
  Runs the handler with the default environment.
@@ -1627,6 +1662,65 @@
  download dependencies with NuGet and do other preparatory work in
  the first stage, and have these dependencies available in the
  second stage.
+</summary>
+</member>
+<member name="T:Fake.BowerHelper.BowerParams">
+<summary>
+ The Bower parameter type
+</summary>
+</member>
+<member name="T:Fake.BowerHelper.BowerCommand">
+<summary>
+ The list of support Bower commands. The `Custom` alternative
+ can be used for other commands not in the list until they are
+ implemented
+</summary>
+</member>
+<member name="T:Fake.BowerHelper.InstallArgs">
+<summary>
+ Arguments for the Bower install command
+</summary>
+</member>
+<member name="M:Fake.BowerHelper.Bower(Microsoft.FSharp.Core.FSharpFunc{Fake.BowerHelper.BowerParams,Fake.BowerHelper.BowerParams})">
+<summary>
+ Runs bower with the given modification function. Make sure to have bower installed,
+ you can install bower with nuget or a regular install. To change which `Bower` executable
+ to use you can set the `BowerFilePath` parameter with the `setParams` function.
+
+ ## Parameters
+
+ - `setParams` - Function used to overwrite the Bower default parameters.
+
+ ## Sample
+
+         Target &quot;Web&quot; (fun _ -&gt;
+             Bower (fun p -&gt;
+                       { p with
+                           Command = Install Standard
+                           WorkingDirectory = &quot;./src/FakeSimple.Web/&quot;
+                       })
+
+             Bower (fun p -&gt;
+                       { p with
+                           Command = (Run &quot;build&quot;)
+                           WorkingDirectory = &quot;./src/FAKESimple.Web/&quot;
+                       })
+         )
+</summary>
+</member>
+<member name="P:Fake.BowerHelper.defaultBowerParams">
+<summary>
+ Bower default parameters
+</summary>
+</member>
+<member name="P:Fake.BowerHelper.bowerFileName">
+<summary>
+ Default paths to Bower
+</summary>
+</member>
+<member name="T:Fake.BowerHelper">
+<summary>
+ Contains function to run bower tasks
 </summary>
 </member>
 <member name="T:Fake.BuildServerHelper.TraceMode">
@@ -2631,6 +2725,60 @@
  Contains tasks to compile C# source files with CSC.EXE (C# Compiler).
 </summary>
 </member>
+<member name="P:Fake.DocFxHelper.DocFxParams.Serve">
+<summary>
+ Serves the generated documentation on localhost. Default: false
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.Timeout">
+<summary>
+ Allows to specify a timeout for DocFx. Default: 5 min
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.WorkingDirectory">
+<summary>
+ DocFx WorkingDirectory. Default: docs
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.DocFxJson">
+<summary>
+ the DocFxJson Config-File. Default: docs/docfx.json
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.ToolPath">
+<summary>
+ The tool path - FAKE tries to find docfx.exe automatically in any sub folder.
+</summary>
+</member>
+<member name="T:Fake.DocFxHelper.DocFxParams">
+<summary>
+ The parameter type for DocFx.
+</summary>
+</member>
+<member name="M:Fake.DocFxHelper.DocFx(Microsoft.FSharp.Core.FSharpFunc{Fake.DocFxHelper.DocFxParams,Fake.DocFxHelper.DocFxParams})">
+<summary>
+ Generates a DocFx documentation.
+ ## Parameters
+  - `setParams` - Function used to manipulate the default DocFx parameters. See `DocFxDefaults`
+ ## Sample
+
+     DocFx (fun p -&gt; 
+      { p with 
+          DocFxJson = &quot;foo&quot; @@ &quot;bar&quot; @@ &quot;docfx.json&quot;
+          Timeout = TimeSpan.FromMinutes 10.
+      })
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxDefaults">
+<summary>
+ The default parameters
+</summary>
+</member>
+<member name="T:Fake.DocFxHelper">
+<summary>
+ Contains helper functions to run the documentation tool &quot;docfx&quot;.
+</summary>
+</member>
 <member name="P:Fake.DocuHelper.DocuParams.OutputPath">
 <summary>
  The output path of the generated docs. The default is &quot;./output/&quot;.
@@ -3464,7 +3612,17 @@
  Retrieves all environment variables from the given target
 </summary>
 </member>
+<member name="M:Fake.EnvironmentHelper.op_LessDivideGreater(System.String,System.String)">
+<summary>
+ Combines two path strings using Path.Combine
+</summary>
+</member>
 <member name="M:Fake.EnvironmentHelper.op_AtAt(System.String,System.String)">
+<summary>
+ Combines two path strings using Path.Combine
+</summary>
+</member>
+<member name="M:Fake.EnvironmentHelper.combinePathsNoTrim(System.String,System.String)">
 <summary>
  Combines two path strings using Path.Combine
 </summary>
@@ -4837,6 +4995,15 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Uses `Passive Mode` FTP and handles all files as binary (and not ASCII).
  Assumes direct network connectivity to destination FTP server (not via a proxy).
  Does not support FTPS and SFTP.
+</summary>
+</member>
+<member name="M:Fake.FuchuHelper.Fuchu(System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Execute Fuchu tests from one or more assemblies.
+ Multiple assemblies are run concurrently.
+ ## Parameters
+ 
+  - `testExes` - The paths of the executables containing Fuchu tests to run.
 </summary>
 </member>
 <member name="T:Fake.FxCopHelper.FxCopParams">
@@ -8728,6 +8895,24 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.ProcessTestRunner">
 <summary>
  Allows to execute processes as unit tests.
+</summary>
+</member>
+<member name="M:Fake.PsExecHelper.execRemote(System.String,System.String,System.String,System.String,System.String,System.TimeSpan)">
+<summary>
+ Use Sysinternals PsExec to execute a process on a remote machine.
+ ## Parameters
+
+ - `host` - The hostname of the machine to connect to.
+ - `username` - A username valid for connecting to the remote machine.
+ - `password` - The cleartext password of the given user.
+ - `exe` - The path to the file that is to be executed.
+ - `inputs` - The command-line arguments to pass to the remote process.
+ - `timeOut` - The timeout for PsExec.
+</summary>
+</member>
+<member name="T:Fake.PsExecHelper">
+<summary>
+ Contains functions for working with Sysinternals PsExec
 </summary>
 </member>
 <member name="T:Fake.REST.PostMethod">

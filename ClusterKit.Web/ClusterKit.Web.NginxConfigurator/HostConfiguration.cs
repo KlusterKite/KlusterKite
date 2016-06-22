@@ -14,17 +14,35 @@ namespace ClusterKit.Web.NginxConfigurator
         /// </summary>
         private readonly Dictionary<string, ServiceConfiguration> services = new Dictionary<string, ServiceConfiguration>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HostConfiguration"/> class.
+        /// </summary>
+        /// <param name="hostName">The virtual hostname to group services</param>
         public HostConfiguration(string hostName)
         {
             this.HostName = hostName;
         }
 
+        /// <summary>
+        /// Gets the additional configuration
+        /// </summary>
         public string Config { get; set; }
 
+        /// <summary>
+        /// Gets the configured services count
+        /// </summary>
         public int Count => this.services.Count;
 
+        /// <summary>
+        /// Gets or sets the virtual hostname to group services
+        /// </summary>
         public string HostName { get; private set; }
 
+        /// <summary>
+        /// Gets the service description
+        /// </summary>
+        /// <param name="serviceName">The service name</param>
+        /// <returns>The service description</returns>
         public ServiceConfiguration this[string serviceName]
         {
             get
@@ -38,6 +56,9 @@ namespace ClusterKit.Web.NginxConfigurator
             }
         }
 
+        /// <summary>
+        /// Removes from cache services without active nodes
+        /// </summary>
         public void Flush()
         {
             this.services.Values
@@ -46,11 +67,15 @@ namespace ClusterKit.Web.NginxConfigurator
                 .ForEach(serviceName => this.services.Remove(serviceName));
         }
 
+        /// <summary>Returns an enumerator that iterates through the collection.</summary>
+        /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<ServiceConfiguration> GetEnumerator()
         {
             return this.services.Values.ToList().GetEnumerator();
         }
 
+        /// <summary>Returns an enumerator that iterates through a collection.</summary>
+        /// <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.services.Values.ToList().GetEnumerator();

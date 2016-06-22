@@ -21,11 +21,14 @@ namespace ClusterKit.Monitoring.Actors
 
     using ClusterKit.Monitoring.Messages;
 
+    using JetBrains.Annotations;
+
     using Microsoft.AspNet.SignalR;
 
     /// <summary>
     /// Watcher actor. It's main purpose to monitor any cluster changes and store complete data about current cluster health
     /// </summary>
+    [UsedImplicitly]
     public class WatcherActor : ReceiveActor
     {
         /// <summary>
@@ -44,30 +47,30 @@ namespace ClusterKit.Monitoring.Actors
         private readonly Dictionary<Address, IActorRef> pingers = new Dictionary<Address, IActorRef>();
 
         /// <summary>
+        /// Timeout, after wich member removed from cluster will be removed from monitoring
+        /// </summary>
+        private readonly TimeSpan removeMemberTimeout;
+
+        /// <summary>
         /// The current cluster leader.
         /// </summary>
         private Address currentClusterLeader;
-
-        /// <summary>
-        /// Timeout, after wich member removed from cluster will be removed from monitoring
-        /// </summary>
-        private TimeSpan removeMemberTimeout;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WatcherActor"/> class.
         /// </summary>
         public WatcherActor()
         {
-            this.Receive<ClusterEvent.MemberStatusChange>(m => this.MemberStatusChange(m.Member));
-            this.Receive<ClusterEvent.ReachabilityEvent>(
+            this.ReceiveAsync<ClusterEvent.MemberStatusChange>(m => this.MemberStatusChange(m.Member));
+            this.ReceiveAsync<ClusterEvent.ReachabilityEvent>(
                 m => this.ReachabilityChanged(m.Member, m is ClusterEvent.ReachableMember));
-            this.Receive<ClusterEvent.LeaderChanged>(m => this.ClusterLeaderChanged(m.Leader));
-            this.Receive<ClusterEvent.RoleLeaderChanged>(m => this.RoleLeaderChanged(m.Role, m.Leader));
-            this.Receive<ClusterMemberListRequest>(m => this.OnClusterMemberListRequest());
+            this.ReceiveAsync<ClusterEvent.LeaderChanged>(m => this.ClusterLeaderChanged(m.Leader));
+            this.ReceiveAsync<ClusterEvent.RoleLeaderChanged>(m => this.RoleLeaderChanged(m.Role, m.Leader));
+            this.ReceiveAsync<ClusterMemberListRequest>(m => this.OnClusterMemberListRequest());
 
-            this.Receive<PingMeasurement>(m => this.OnPingMeasurement(m));
-            this.Receive<TimeToBroadcastMemebers>(m => this.BroadcastMembers());
-            this.Receive<CheckRemovedMember>(m => this.OnCheckRemovedMember(m));
+            this.ReceiveAsync<PingMeasurement>(this.OnPingMeasurement);
+            this.ReceiveAsync<TimeToBroadcastMembers>(m => this.BroadcastMembers());
+            this.ReceiveAsync<CheckRemovedMember>(this.OnCheckRemovedMember);
 
             Cluster.Get(Context.System)
                 .Subscribe(
@@ -77,8 +80,7 @@ namespace ClusterKit.Monitoring.Actors
 
             this.removeMemberTimeout = Context.System.Settings.Config.GetTimeSpan(
                 "ClusterKit.Monitoring.RemoveMemberTimeout",
-                TimeSpan.FromHours(1),
-                true);
+                TimeSpan.FromHours(1));
 
             var broadCastFrequency =
                 Context.System.Settings.Config.GetTimeSpan(
@@ -90,10 +92,16 @@ namespace ClusterKit.Monitoring.Actors
                  broadCastFrequency,
                  broadCastFrequency,
                  this.Self,
-                 new TimeToBroadcastMemebers(),
+                 new TimeToBroadcastMembers(),
                  this.Self);
         }
 
+        /// <summary>
+        ///     User overridable callback: By default it calls `preStart()`.
+        ///     <p />
+        ///     Is called right AFTER restart on the newly created Actor to allow reinitialization after an Actor crash.
+        /// </summary>
+        /// <param name="reason">the Exception that caused the restart to happen.</param>
         protected override void PostRestart(Exception reason)
         {
             if (reason != null)
@@ -241,7 +249,7 @@ namespace ClusterKit.Monitoring.Actors
         /// <summary>
         /// Writes actual ping measurement
         /// </summary>
-        /// <param name="pingMeasurement">Perfomed measurement</param>
+        /// <param name="pingMeasurement">Performed measurement</param>
         /// <returns>Async task</returns>
         private Task OnPingMeasurement(PingMeasurement pingMeasurement)
         {
@@ -314,7 +322,7 @@ namespace ClusterKit.Monitoring.Actors
             public int Uid { get; set; }
         }
 
-        private class TimeToBroadcastMemebers
+        private class TimeToBroadcastMembers
         {
         }
     }

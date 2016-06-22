@@ -14,8 +14,16 @@ namespace ClusterKit.Web.NginxConfigurator
         /// </summary>
         private readonly Dictionary<string, HostConfiguration> hosts = new Dictionary<string, HostConfiguration>();
 
+        /// <summary>
+        /// Gets the configured hosts count
+        /// </summary>
         public int Count => this.hosts.Count;
 
+        /// <summary>
+        /// Gets the host configuration by it's name
+        /// </summary>
+        /// <param name="hostName">The host's name</param>
+        /// <returns>The host configuration</returns>
         public HostConfiguration this[string hostName]
         {
             get
@@ -29,6 +37,9 @@ namespace ClusterKit.Web.NginxConfigurator
             }
         }
 
+        /// <summary>
+        /// Removes empty host configurations from cache
+        /// </summary>
         public void Flush()
         {
             this.hosts.Values
@@ -37,8 +48,12 @@ namespace ClusterKit.Web.NginxConfigurator
                 .ForEach(hostName => this.hosts.Remove(hostName));
         }
 
+        /// <summary>Returns an enumerator that iterates through the collection.</summary>
+        /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<HostConfiguration> GetEnumerator() => this.hosts.Values.ToList().GetEnumerator();
 
+        /// <summary>Returns an enumerator that iterates through a collection.</summary>
+        /// <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>
         IEnumerator IEnumerable.GetEnumerator() => this.hosts.Values.ToList().GetEnumerator();
     }
 }

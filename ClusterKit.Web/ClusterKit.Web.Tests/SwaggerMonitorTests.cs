@@ -51,18 +51,21 @@ namespace ClusterKit.Web.Tests
         public void SwaggerCollectorTest()
         {
             this.Sys.StartNameSpaceActorsFromConfiguration();
+            this.ExpectNoMsg();
             var collector = this.ActorOfAsTestActorRef<SwaggerCollectorActor>("collector");
             var response = collector.Ask<IReadOnlyCollection<string>>(new SwaggerCollectorActor.SwaggerListRequest(), TimeSpan.FromMilliseconds(200)).Result;
             Assert.NotNull(response);
             Assert.Equal(0, response.Count);
 
             collector.Tell(new SwaggerPublishDescription { Url = "test", DocUrl = "docTest" });
+            this.ExpectNoMsg();
             response = collector.Ask<IReadOnlyCollection<string>>(new SwaggerCollectorActor.SwaggerListRequest(), TimeSpan.FromMilliseconds(200)).Result;
             Assert.NotNull(response);
             Assert.Equal(1, response.Count);
             Assert.Equal("test", response.First());
 
             collector.Tell(new SwaggerPublishDescription { Url = "test2", DocUrl = "docTest" });
+            this.ExpectNoMsg();
             response = collector.Ask<IReadOnlyCollection<string>>(new SwaggerCollectorActor.SwaggerListRequest(), TimeSpan.FromMilliseconds(200)).Result;
             Assert.NotNull(response);
             Assert.Equal(1, response.Count);
@@ -99,25 +102,27 @@ namespace ClusterKit.Web.Tests
                 return ConfigurationFactory.ParseString(@"
                 {
                     ClusterKit {
-                        }
+                    }
 
                     akka.actor.deployment {
-                     
-
                         /collector/workers {
                              router = round-robin-pool
                              nr-of-instances = 5
+                             dispatcher = akka.test.calling-thread-dispatcher
                         }
 
                         /Web {
                             IsNameSpace = true
+                            dispatcher = akka.test.calling-thread-dispatcher
                         }
  		                 /Web/Swagger {
                             type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
+                            dispatcher = akka.test.calling-thread-dispatcher
                         }
 
                         /Web/Swagger/Descriptor {
                             type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                            dispatcher = akka.test.calling-thread-dispatcher
                         }
                     }
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));

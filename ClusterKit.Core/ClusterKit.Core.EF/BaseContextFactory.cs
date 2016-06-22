@@ -30,7 +30,7 @@ namespace ClusterKit.Core.EF
     /// Database migration configuration
     /// </typeparam>
     /// <remarks>
-    /// Expected that <see cref="TContext"/> has a public constructor with <see cref="DbConnection"/> and <see cref="bool"/> arguments
+    /// Expected that TContext has a public constructor with <see cref="DbConnection"/> and <see cref="bool"/> arguments
     /// </remarks>
     public class BaseContextFactory<TContext, TMigrationConfiguration>
         : IContextFactory<TContext>
