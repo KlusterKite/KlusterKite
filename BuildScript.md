@@ -96,3 +96,9 @@ Performs *Clean* -> *Build* -> *CreateNuGet* -> *CleanPackageCache* -> *RefreshL
 
 #### CreateGlobalSolution
 Creates special global solution(`global.sln`) in build directory with all defined projects in it (useful while global third-party libs upgrade or other batch edits)
+
+#### SwitchToPackageRefs
+Updates all `csproj` files to reference local dependencies (that goes to project, not in local solution) via locally built NuGet packages
+
+#### SwitchToPackageRefs
+Updates all `csproj` files to reference local dependencies (that goes to project, not in local solution) as project reference (especially useful while working with global solution)

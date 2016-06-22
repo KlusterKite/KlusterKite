@@ -9,6 +9,11 @@
             Bundle of utilities to build project
             </summary>
         </member>
+        <member name="F:ClusterKit.Build.BuildUtils.definedProjectDescriptions">
+            <summary>
+            The list of defined projects
+            </summary>
+        </member>
         <member name="P:ClusterKit.Build.BuildUtils.BuildClean">
             <summary>
             Gets temporary directory to store clean builds of projects
@@ -79,6 +84,18 @@
             Creates nuget package for all projects
             </summary>
             <param name="projects">The list of projects to package</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.DefineProjects(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Defines the project list
+            </summary>
+            <param name="projects">The project list</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GetProjects">
+            <summary>
+            Gets the list of defined projects
+            </summary>
+            <returns>The list of defined projects</returns>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.ReloadNuget(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
             <summary>

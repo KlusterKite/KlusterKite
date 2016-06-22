@@ -15,6 +15,7 @@ namespace ClusterKit.Build
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -32,6 +33,11 @@ namespace ClusterKit.Build
     /// </summary>
     public static class BuildUtils
     {
+        /// <summary>
+        /// The list of defined projects
+        /// </summary>
+        private static List<ProjectDescription> definedProjectDescriptions = new List<ProjectDescription>();
+
         /// <summary>
         /// Gets temporary directory to store clean builds of projects
         /// </summary>
@@ -194,7 +200,7 @@ namespace ClusterKit.Build
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
 
-            var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe", "dll.config", "exe.config" };
+            var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe", "dll.config", "exe.config", "fsx" };
 
             var buildFiles = Directory.GetFiles(project.TempBuildDirectory)
                 .Where(f => extensions.Any(e => $"{project.ProjectName}.{e}".Equals(Path.GetFileName(f), StringComparison.InvariantCultureIgnoreCase)))
@@ -219,7 +225,7 @@ namespace ClusterKit.Build
                     alwaysTrue.ToFSharpFunc());
             }
 
-            if (buildFiles.Any(f => f.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase)))
+            if (buildFiles.Any(f => f.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase) || f.EndsWith(".fsx", StringComparison.InvariantCultureIgnoreCase)))
             {
                 var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
                 Directory.CreateDirectory(toolsDir);
@@ -279,9 +285,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""Solution Items"", ""Solution Items"", ""{{{Guid.NewGuid()}}}""
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""_Solution Items"", ""_Solution Items"", ""{{{Guid.NewGuid()}}}""
 	ProjectSection(SolutionItems) = preProject
 		..\build.fsx = ..\build.fsx
+        ..\build.config.fsx = ..\build.config.fsx
 		..\BuildScript.md = ..\BuildScript.md
 		..\nuget.config = ..\nuget.config
 		Readme.md = Readme.md
@@ -481,6 +488,24 @@ EndGlobal
             {
                 CreateNuget(project);
             }
+        }
+
+        /// <summary>
+        /// Defines the project list
+        /// </summary>
+        /// <param name="projects">The project list</param>
+        public static void DefineProjects(IEnumerable<ProjectDescription> projects)
+        {
+            definedProjectDescriptions = projects.ToList();
+        }
+
+        /// <summary>
+        /// Gets the list of defined projects
+        /// </summary>
+        /// <returns>The list of defined projects</returns>
+        public static IEnumerable<ProjectDescription> GetProjects()
+        {
+            return definedProjectDescriptions;
         }
 
         /// <summary>

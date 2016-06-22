@@ -1,0 +1,284 @@
+#r "./FakeLib.dll" // include Fake lib
+#r @"./ClusterKit.Build.dll" // include budle of build utils
+open Fake
+open System
+open System.IO
+open System.Xml
+open System.Linq
+open System.Text.RegularExpressions
+
+open  ClusterKit.Build
+
+let buildDir = Path.GetFullPath("./build")
+let packageDir = Path.GetFullPath("./packageOut")
+let packagePushDir = Path.GetFullPath("./packagePush")
+let ver = environVar "version"
+
+let currentTarget = getBuildParam "target"
+
+BuildUtils.Configure((if ver <> null then ver else "0.0.0-local"), buildDir, packageDir, "./packages")
+
+let buildDocker (containerName:string) (path:string) =
+    if (ExecProcess (fun info ->
+        info.FileName <- "docker"
+        info.Arguments <- (sprintf "build -t %s:latest %s" containerName path)
+    )  (TimeSpan.FromMinutes 30.0) <> 0) then
+        failwithf "Error while building %s" path
+
+let pushPackage package =
+    trace package
+    let localPath = Fake.FileSystemHelper.currentDirectory
+    trace localPath
+    let packageLocal = package.Replace(localPath, ".")
+    trace packageLocal
+    ExecProcess (fun info ->
+        info.FileName <- "nuget.exe";
+        info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" packageLocal "http://192.168.99.100:81/" "ClusterKit")
+        (TimeSpan.FromMinutes 30.0)
+        |> ignore
+
+// This target removes all temp and build result files
+Target "Clean" (fun _ ->
+    trace "PreClean..."
+    Fake.FileHelper.CleanDirs [|
+        packageDir
+        buildDir
+        Path.Combine(buildDir, "tmp")
+        Path.Combine(buildDir, "clean")
+        |]
+)
+
+// perfoms global project compilation
+Target "Build"  (fun _ ->
+    BuildUtils.Build(BuildUtils.GetProjects());
+)
+
+// creates nuget package for every project
+Target "CreateNuGet" (fun _ ->
+    Fake.FileHelper.CleanDirs [|packageDir|]
+    BuildUtils.CreateNuget(BuildUtils.GetProjects());
+)
+
+// removes installed internal package from packages directory and restores them from latest build
+Target "RefreshLocalDependencies" (fun _ ->
+    BuildUtils.ReloadNuget(BuildUtils.GetProjects());
+)
+
+// runs all xunit tests
+Target "Test" (fun _ ->
+    let runTest (project : ProjectDescription) =
+        printfn "%s" project.ProjectName
+        let testAssembly = Path.Combine(project.TempBuildDirectory, project.ProjectName + ".dll");
+        let runnerLocation = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages")) |> Seq.sortByDescending (fun d -> d) |> Seq.head
+        [|testAssembly|]
+        |> Fake.Testing.XUnit2.xUnit2 ( fun p -> {p with
+                                                      ForceTeamCity = true;
+                                                      ToolPath = Path.Combine(runnerLocation, "tools", "xunit.console.exe");
+                                                      TimeOut = TimeSpan.FromHours(1.0);
+                                                      ErrorLevel = UnitTestCommon.TestRunnerErrorLevel.DontFailBuild;
+                                                      Parallel =  Fake.Testing.XUnit2.ParallelMode.NoParallelization;} )
+
+    BuildUtils.GetProjects() |> Seq.where (fun p -> p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests)) |> Seq.iter runTest
+    //BuildUtils.RunXUnitTest(projects);
+
+)
+
+// builds base (system) docker images
+Target "DockerBase" (fun _ ->
+    buildDocker "clusterkit/baseworker" "Docker/ClusterKitBaseWorkerNode"
+    buildDocker "clusterkit/baseweb" "Docker/ClusterKitBaseWebNode"
+    buildDocker "clusterkit/nuget" "Docker/ClusterKitNuget"
+    buildDocker "clusterkit/postgres" "Docker/ClusterKitPostgres"
+    buildDocker "clusterkit/entry" "Docker/ClusterKitEntry"
+)
+
+// builds standard docker images
+Target "DockerContainers" (fun _ ->
+    RestorePackages |> ignore
+    MSBuildRelease "./build/launcher" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"|] |> ignore
+    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"|] |> ignore
+
+    let copyLauncherData (path : string) =
+        let fullPath = Path.GetFullPath(path)
+        let buildDir = Path.Combine ([|fullPath; "build"|])
+        let packageCacheDir = Path.Combine ([|fullPath; "packageCache"|])
+
+        Fake.FileHelper.CleanDirs [|buildDir; packageCacheDir|]
+        Fake.FileHelper.CopyDir buildDir "./build/launcher" (fun file -> true)
+        Fake.FileHelper.CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
+
+        let copyThirdPartyPackage (f: FileInfo) =
+            if (hasExt ".nupkg" f.FullName) then
+                if not (File.Exists (Path.Combine [|(Path.GetFullPath("./packageOut/")); f.Name|])) then
+                    Fake.FileHelper.Copy packageCacheDir [|f.FullName|]
+
+        Fake.FileHelper.recursively
+            (fun d -> ())
+            copyThirdPartyPackage
+            (new DirectoryInfo(Path.GetFullPath("./packages")))
+
+    let copyWebContent source dest =
+        let fullPathSource = Path.GetFullPath(source)
+        let fullPathDest = Path.GetFullPath(dest)
+        Fake.FileHelper.CleanDirs [|fullPathDest|]
+        let matcher name = Regex.IsMatch(name, "(.*)((\.jpg)|(\.gif)|(\.png)|(\.jpeg)|(\.html)|(\.html)|(\.js)|(\.css))$", RegexOptions.IgnoreCase)
+        Fake.FileHelper.CopyDir fullPathDest fullPathSource matcher
+
+    Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeed/build"|]
+    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seed" (fun file -> true)
+    buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
+
+    copyLauncherData "./Docker/ClusterKitWorker" |> ignore
+    copyLauncherData "./Docker/ClusterKitPublisher" |> ignore
+    buildDocker "clusterkit/worker" "Docker/ClusterKitWorker"
+    buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
+
+    copyWebContent "./ClusterKit.Monitoring/ClusterKit.Monitoring.Web" "./Docker/ClusterKitPublisher/web/monitoring"
+    buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
+
+    buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
+)
+
+// removes unnamed dockaer images
+Target "CleanDockerImages" (fun _ ->
+
+    let outputProcess line =
+        let parts = Regex.Split(line, "[\t ]+")
+        if ("<none>".Equals(parts.[0]) && parts.Length >= 3) then
+            let args = sprintf "rmi %s" parts.[2]
+            ExecProcess (fun info -> info.FileName <- "docker"; info.Arguments <- args) (TimeSpan.FromMinutes 30.0)
+                |> ignore
+
+    let lines = new ResizeArray<String>();
+    ExecProcessWithLambdas
+        (fun info -> info.FileName <- "docker"; info.Arguments <- "images")
+        (TimeSpan.FromMinutes 30.0)
+        true
+        (fun e -> failwith e)
+        (fun l -> lines.Add(l))
+        |> ignore
+
+    lines |> Seq.iter outputProcess
+)
+
+// sends prepared packages to docker nuget server
+Target "PushThirdPartyPackages" (fun _ ->
+    let pushThirdPartyPackage (f: FileInfo) =
+            if (hasExt ".nupkg" f.FullName) then
+                if not (File.Exists (Path.Combine [|packagePushDir; f.Name|])) then
+                    pushPackage f.FullName
+
+    Fake.FileHelper.recursively
+            (fun d -> ())
+            pushThirdPartyPackage
+            (new DirectoryInfo(Path.GetFullPath("./packages")))
+
+)
+
+// sends prepared packages to docker nuget server
+Target "PushLocalPackages" (fun _ ->
+    Directory.GetFiles(packagePushDir)
+        |> Seq.filter (hasExt ".nupkg")
+        |> Seq.iter pushPackage
+)
+
+Target "CreateGlobalSolution"  (fun _ ->
+    BuildUtils.CreateGlobalSolution(BuildUtils.GetProjects());
+)
+
+Target "SwitchToPackageRefs"  (fun _ ->
+    BuildUtils.SwitchToPackageRefs(BuildUtils.GetProjects());
+)
+
+Target "SwitchToProjectRefs"  (fun _ ->
+    BuildUtils.SwitchToProjectRefs(BuildUtils.GetProjects());
+)
+
+// switches nuget and build version from init one, to latest posible on docker nuget server
+Target "SetVersion" (fun _ ->
+    let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" "ClusterKit.Core"
+    if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
+    let version = Regex.Replace((if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"), "((\\d+\\.?)+)(.*)", "$1-local")
+    tracef "New version is %s \n" version
+    BuildUtils.Configure(version, buildDir, packagePushDir, "./packages")
+)
+
+// removes all installed packages and restores them (so this will remove obsolete packages)
+Target "CleanPackageCache" (fun _ ->
+    Directory.GetDirectories(Path.GetFullPath("./packages"))
+        |> Seq.filter (fun d -> not("FAKE".Equals(d.Split(Path.DirectorySeparatorChar) |> Seq.last)))
+        |> Seq.iter (fun d -> try Fake.FileUtils.rm_rf d with e -> tracefn "could not remove %s" d)
+    RestorePackages()
+)
+
+// this was main pure build types. They don't have prerequsits by default, so you can save time on some type of operations
+"Clean" ?=> "Build"
+"SetVersion" ?=> "Build"
+
+"SetVersion" ?=> "CreateNuGet"
+"Build" ?=> "CreateNuGet"
+
+"CreateNuGet" ?=> "RefreshLocalDependencies"
+
+"Build" ?=> "Test"
+
+"Build" ?=> "RefreshLocalDependencies"
+"Build" ?=> "CleanPackageCache"
+"CreateNuGet" ?=> "RefreshLocalDependencies"
+
+"DockerBase" ?=> "CleanDockerImages"
+"DockerContainers" ?=> "CleanDockerImages"
+"DockerBase" ?=> "DockerContainers"
+
+"CleanPackageCache" <=? "CreateNuGet"
+
+"PushLocalPackages" <=? "CreateNuGet"
+"PushThirdPartyPackages" <=? "CleanPackageCache"
+"PushThirdPartyPackages" <=? "CreateNuGet"
+"PushThirdPartyPackages" <=? "Clean"
+
+// from now on this will be end-point targets with respect to build order
+
+//builds current project
+Target "FinalBuild" (fun _ -> ())
+
+"Clean" ==> "FinalBuild"
+"Build" ==> "FinalBuild"
+"CleanPackageCache" ==> "FinalBuild"
+
+//runs all tests
+Target "FinalTest" (fun _ -> ())
+
+"FinalBuild" ==> "FinalTest"
+"Test" ==> "FinalTest"
+
+// creates local nuget packages
+Target "FinalCreateNuGet" (fun _ -> ())
+"FinalBuild" ==> "FinalCreateNuGet"
+"CreateNuGet" ==> "FinalCreateNuGet"
+
+// prepares docker images
+Target "FinalBuildDocker" (fun _ -> ())
+"CleanPackageCache" ==> "FinalBuildDocker"
+"DockerBase" ==> "FinalBuildDocker"
+"DockerContainers" ==> "FinalBuildDocker"
+"CleanDockerImages" ==> "FinalBuildDocker"
+
+// builds local packages and sends them to local cluster nuget server
+Target "FinalPushLocalPackages" (fun _ -> ())
+"SetVersion" ==> "FinalPushLocalPackages"
+"FinalCreateNuGet" ==> "FinalPushLocalPackages"
+"PushLocalPackages" ==> "FinalPushLocalPackages"
+
+// builds local packages and sends them to local cluster nuget server
+Target "FinalPushAllPackages" (fun _ -> ())
+"FinalPushLocalPackages" ==> "FinalPushAllPackages"
+"PushThirdPartyPackages" ==> "FinalPushAllPackages"
+
+// rebuilds current project and reinstall local dependent packages
+Target "FinalRefreshLocalDependencies" (fun _ -> ())
+"RefreshLocalDependencies" ==> "FinalRefreshLocalDependencies"
+"FinalCreateNuGet" ==> "FinalRefreshLocalDependencies"
+"CleanPackageCache" ==> "FinalRefreshLocalDependencies"
+
+RunTargetOrDefault "FinalRefreshLocalDependencies"
