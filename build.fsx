@@ -149,7 +149,7 @@ Target "Test" (fun _ ->
         let runnerLocation = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages")) |> Seq.sortByDescending (fun d -> d) |> Seq.head
         [|testAssembly|]
         |> Fake.Testing.XUnit2.xUnit2 ( fun p -> {p with
-                                                      ForceTeamCity = false;
+                                                      ForceTeamCity = true;
                                                       ToolPath = Path.Combine(runnerLocation, "tools", "xunit.console.exe");
                                                       TimeOut = TimeSpan.FromHours(1.0);
                                                       ErrorLevel = UnitTestCommon.TestRunnerErrorLevel.DontFailBuild;

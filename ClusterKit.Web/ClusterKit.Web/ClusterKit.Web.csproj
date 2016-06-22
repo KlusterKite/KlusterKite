@@ -193,7 +193,6 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <Compile Include="ConfigurationUtils.cs" />
     <Compile Include="WindsorDependencyResolver.cs" />
     <Compile Include="WindsorDependencyScope.cs" />
   </ItemGroup>

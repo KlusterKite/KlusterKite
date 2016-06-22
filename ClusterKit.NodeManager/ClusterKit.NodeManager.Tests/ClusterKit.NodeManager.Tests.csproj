@@ -278,6 +278,26 @@
       <HintPath>..\..\packages\ClusterKit.Core.EF.Npgsql.0.0.0-local\lib\ClusterKit.Core.EF.Npgsql.dll</HintPath>
       <Private>True</Private>
 </Reference>
+    <Reference Include="ClusterKit.Web.Client, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Web.Client.0.0.0-local\lib\ClusterKit.Web.Client.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Web.Descriptor, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Web.Descriptor.0.0.0-local\lib\ClusterKit.Web.Descriptor.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Web, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Web.0.0.0-local\lib\ClusterKit.Web.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Web.CRUDS, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Web.CRUDS.0.0.0-local\lib\ClusterKit.Web.CRUDS.dll</HintPath>
+      <Private>True</Private>
+</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationSourceTests.cs" />

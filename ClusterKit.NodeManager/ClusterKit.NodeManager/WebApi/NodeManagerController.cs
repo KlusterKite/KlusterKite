@@ -18,11 +18,11 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
+    using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Web;
     using ClusterKit.Web.CRUDS;
 
     using JetBrains.Annotations;

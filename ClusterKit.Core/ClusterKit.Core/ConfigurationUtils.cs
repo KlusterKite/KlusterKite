@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web
+namespace ClusterKit.Core
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace ClusterKit.Web
         /// <returns>Default timeout</returns>
         public static TimeSpan GetRestTimeout(Config config)
         {
-            return config.GetTimeSpan("ClusterKit.Web.RestTimeout", TimeSpan.FromSeconds(10), false);
+            return config.GetTimeSpan("ClusterKit.Core.RestTimeout", TimeSpan.FromSeconds(10), false);
         }
     }
 }

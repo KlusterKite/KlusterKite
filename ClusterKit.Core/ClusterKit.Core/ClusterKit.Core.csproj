@@ -148,6 +148,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
+    <Compile Include="ConfigurationUtils.cs" />
     <Compile Include="EnActorType.cs" />
     <Compile Include="IMessageRouter.cs" />
     <Compile Include="MessageRouter.cs" />

@@ -17,6 +17,7 @@ namespace ClusterKit.Web.CRUDS
 
     using Akka.Actor;
 
+    using ClusterKit.Core;
     using ClusterKit.Core.Monads;
     using ClusterKit.Core.Rest.ActionMessages;
 
