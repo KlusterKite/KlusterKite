@@ -148,18 +148,21 @@
       <HintPath>..\..\packages\Wire.0.0.6\lib\Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
-      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
-      <Name>ClusterKit.Core</Name>
-</ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.EF/ClusterKit.Core.EF.csproj">
-      <Project>{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}</Project>
-      <Name>ClusterKit.Core.EF</Name>
-</ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.Data/ClusterKit.Core.Data.csproj">
-      <Project>{0D6871D1-5A69-4533-BA4B-073B876232C5}</Project>
-      <Name>ClusterKit.Core.Data</Name>
-</ProjectReference>
+    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Core.EF, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.EF.0.0.0-local\lib\ClusterKit.Core.EF.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Core.Data, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.Data.0.0.0-local\lib\ClusterKit.Core.Data.dll</HintPath>
+      <Private>True</Private>
+</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationContext.cs" />

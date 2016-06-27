@@ -280,22 +280,32 @@ namespace ClusterKit.Build
         {
             using (var writer = File.CreateText(Path.Combine(BuildDirectory, "global.sln")))
             {
+                /*
+        ..\build.config.fsx = ..\build.config.fsx
+		..\BuildScript.md = ..\BuildScript.md
+		..\nuget.config = ..\nuget.config
+		..\Readme.md = ..\Readme.md
+		..\Settings.StyleCop = ..\Settings.StyleCop
+
+                 */
+
                 writer.Write($@"
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""_Solution Items"", ""_Solution Items"", ""{{{Guid.NewGuid()}}}""
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""_Solution Items"", ""_Solution Items"", ""{{{Guid.NewGuid().ToString().ToUpper()}}}""
 	ProjectSection(SolutionItems) = preProject
-		..\build.fsx = ..\build.fsx
-        ..\build.config.fsx = ..\build.config.fsx
-		..\BuildScript.md = ..\BuildScript.md
-		..\nuget.config = ..\nuget.config
-		Readme.md = Readme.md
-		..\Settings.StyleCop = ..\Settings.StyleCop
-	EndProjectSection
-EndProject
+");
 
+                foreach (var filePath in Directory.GetFiles(Path.Combine(BuildDirectory, "..")))
+                {
+                    var file = Path.GetFileName(filePath);
+                    writer.WriteLine($"\t\t..\\{file} = ..\\{file}");
+                }
+
+                writer.Write($@"	EndProjectSection
+EndProject
                 ");
 
                 var folders = new List<string>();
