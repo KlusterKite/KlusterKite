@@ -12,6 +12,7 @@ namespace ClusterKit.Core.EF
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
+    using System.Data.Entity.Infrastructure;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
@@ -67,7 +68,7 @@ namespace ClusterKit.Core.EF
         /// <returns>Async execution task</returns>
         public override async Task<Maybe<TObject>> Get(TId id)
         {
-            return await this.GetDbSet().FirstOrDefaultAsync(this.GetIdValidationExpression(id));
+            return await this.GetDbQuery().FirstOrDefaultAsync(this.GetIdValidationExpression(id));
         }
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace ClusterKit.Core.EF
         /// <returns>The list of objects from datasource</returns>
         public override async Task<List<TObject>> GetList(int skip, int? count)
         {
-            var query = this.GetSortFunction(this.GetDbSet()).Skip(skip);
+            var query = this.GetSortFunction(this.GetDbQuery()).Skip(skip);
             if (count.HasValue)
             {
                 query = query.Take(count.Value);
@@ -125,6 +126,12 @@ namespace ClusterKit.Core.EF
             this.Context.Entry(oldData).CurrentValues.SetValues(newData);
             await this.Context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Gets the query to receive all objects
+        /// </summary>
+        /// <returns>The query</returns>
+        protected virtual DbQuery<TObject> GetDbQuery() => this.GetDbSet();
 
         /// <summary>
         /// Gets the dataset from current context
