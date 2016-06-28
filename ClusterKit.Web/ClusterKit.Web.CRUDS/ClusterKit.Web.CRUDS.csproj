@@ -177,16 +177,14 @@
       <HintPath>..\..\packages\Wire.0.0.6\lib\Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
-      <Private>True</Private>
-</Reference>
-    <Reference Include="ClusterKit.Core.Rest, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.Rest.0.0.0-local\lib\ClusterKit.Core.Rest.dll</HintPath>
-      <Private>True</Private>
-</Reference>
+    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
+      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
+      <Name>ClusterKit.Core</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.Rest/ClusterKit.Core.Rest.csproj">
+      <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
+      <Name>ClusterKit.Core.Rest</Name>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseCrudController.cs" />

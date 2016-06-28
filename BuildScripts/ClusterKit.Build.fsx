@@ -83,62 +83,6 @@ Target "Test" (fun _ ->
 
 )
 
-// builds base (system) docker images
-Target "DockerBase" (fun _ ->
-    buildDocker "clusterkit/baseworker" "Docker/ClusterKitBaseWorkerNode"
-    buildDocker "clusterkit/baseweb" "Docker/ClusterKitBaseWebNode"
-    buildDocker "clusterkit/nuget" "Docker/ClusterKitNuget"
-    buildDocker "clusterkit/postgres" "Docker/ClusterKitPostgres"
-    buildDocker "clusterkit/entry" "Docker/ClusterKitEntry"
-)
-
-// builds standard docker images
-Target "DockerContainers" (fun _ ->
-    RestorePackages |> ignore
-    MSBuildRelease "./build/launcher" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"|] |> ignore
-    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"|] |> ignore
-
-    let copyLauncherData (path : string) =
-        let fullPath = Path.GetFullPath(path)
-        let buildDir = Path.Combine ([|fullPath; "build"|])
-        let packageCacheDir = Path.Combine ([|fullPath; "packageCache"|])
-
-        Fake.FileHelper.CleanDirs [|buildDir; packageCacheDir|]
-        Fake.FileHelper.CopyDir buildDir "./build/launcher" (fun file -> true)
-        Fake.FileHelper.CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
-
-        let copyThirdPartyPackage (f: FileInfo) =
-            if (hasExt ".nupkg" f.FullName) then
-                if not (File.Exists (Path.Combine [|(Path.GetFullPath("./packageOut/")); f.Name|])) then
-                    Fake.FileHelper.Copy packageCacheDir [|f.FullName|]
-
-        Fake.FileHelper.recursively
-            (fun d -> ())
-            copyThirdPartyPackage
-            (new DirectoryInfo(Path.GetFullPath("./packages")))
-
-    let copyWebContent source dest =
-        let fullPathSource = Path.GetFullPath(source)
-        let fullPathDest = Path.GetFullPath(dest)
-        Fake.FileHelper.CleanDirs [|fullPathDest|]
-        let matcher name = Regex.IsMatch(name, "(.*)((\.jpg)|(\.gif)|(\.png)|(\.jpeg)|(\.html)|(\.html)|(\.js)|(\.css))$", RegexOptions.IgnoreCase)
-        Fake.FileHelper.CopyDir fullPathDest fullPathSource matcher
-
-    Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeed/build"|]
-    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seed" (fun file -> true)
-    buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
-
-    copyLauncherData "./Docker/ClusterKitWorker" |> ignore
-    copyLauncherData "./Docker/ClusterKitPublisher" |> ignore
-    buildDocker "clusterkit/worker" "Docker/ClusterKitWorker"
-    buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
-
-    copyWebContent "./ClusterKit.Monitoring/ClusterKit.Monitoring.Web" "./Docker/ClusterKitPublisher/web/monitoring"
-    buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
-
-    buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
-)
-
 // removes unnamed dockaer images
 Target "CleanDockerImages" (fun _ ->
 
@@ -226,10 +170,6 @@ Target "CleanPackageCache" (fun _ ->
 "Build" ?=> "CleanPackageCache"
 "CreateNuGet" ?=> "RefreshLocalDependencies"
 
-"DockerBase" ?=> "CleanDockerImages"
-"DockerContainers" ?=> "CleanDockerImages"
-"DockerBase" ?=> "DockerContainers"
-
 "CleanPackageCache" <=? "CreateNuGet"
 
 "PushLocalPackages" <=? "CreateNuGet"
@@ -257,13 +197,6 @@ Target "FinalCreateNuGet" (fun _ -> ())
 "FinalBuild" ==> "FinalCreateNuGet"
 "CreateNuGet" ==> "FinalCreateNuGet"
 
-// prepares docker images
-Target "FinalBuildDocker" (fun _ -> ())
-"CleanPackageCache" ==> "FinalBuildDocker"
-"DockerBase" ==> "FinalBuildDocker"
-"DockerContainers" ==> "FinalBuildDocker"
-"CleanDockerImages" ==> "FinalBuildDocker"
-
 // builds local packages and sends them to local cluster nuget server
 Target "FinalPushLocalPackages" (fun _ -> ())
 "SetVersion" ==> "FinalPushLocalPackages"
@@ -280,5 +213,3 @@ Target "FinalRefreshLocalDependencies" (fun _ -> ())
 "RefreshLocalDependencies" ==> "FinalRefreshLocalDependencies"
 "FinalCreateNuGet" ==> "FinalRefreshLocalDependencies"
 "CleanPackageCache" ==> "FinalRefreshLocalDependencies"
-
-RunTargetOrDefault "FinalRefreshLocalDependencies"
