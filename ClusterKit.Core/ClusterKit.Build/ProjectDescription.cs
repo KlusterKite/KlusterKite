@@ -120,7 +120,7 @@ namespace ClusterKit.Build
         public string[] InternalDependencies { get; }
 
         /// <summary>
-        /// Gets or sets the name of projects bucket (all projects with the same package name are usually in one local solution
+        /// Gets or sets the name of projects bucket (all projects with the same package name are usually in one local solution)
         /// </summary>
         public string PackageName { get; set; }
 
