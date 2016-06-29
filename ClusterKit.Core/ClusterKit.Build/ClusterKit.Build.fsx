@@ -140,7 +140,10 @@ Target "SwitchToProjectRefs"  (fun _ ->
 
 // switches nuget and build version from init one, to latest posible on docker nuget server
 Target "SetVersion" (fun _ ->
-    let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" "ClusterKit.Core"
+
+    let packageName = BuildUtils.GetProjects() |> Seq.choose (fun p -> Some p.PackageName) |> Seq.head
+
+    let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" packageName
     if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
     let version = Regex.Replace((if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"), "((\\d+\\.?)+)(.*)", "$1-local")
     tracef "New version is %s \n" version
