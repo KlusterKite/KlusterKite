@@ -41,7 +41,7 @@ let pushPackage package =
 Target "Clean" (fun _ ->
     trace "PreClean..."
     Fake.FileHelper.CleanDirs [|
-        packageDir
+        BuildUtils.PackageOutputDirectory
         buildDir
         Path.Combine(buildDir, "tmp")
         Path.Combine(buildDir, "clean")
@@ -55,7 +55,7 @@ Target "Build"  (fun _ ->
 
 // creates nuget package for every project
 Target "CreateNuGet" (fun _ ->
-    Fake.FileHelper.CleanDirs [|packageDir|]
+    Fake.FileHelper.CleanDirs [|BuildUtils.PackageOutputDirectory|]
     BuildUtils.CreateNuget(BuildUtils.GetProjects());
 )
 

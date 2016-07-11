@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Core.Service
 {
+    using System;
     using System.Collections.Generic;
 
     using Castle.Windsor;
@@ -37,7 +38,7 @@ namespace ClusterKit.Core.Service
         {
             Container = new WindsorContainer();
 
-            var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.ColoredConsole();
+            var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.TextWriter(Console.Out);
 
             var logger = loggerConfig.CreateLogger();
             Log.Logger = logger;

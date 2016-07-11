@@ -230,7 +230,7 @@
         </member>
         <member name="P:ClusterKit.Build.ProjectDescription.PackageName">
             <summary>
-            Gets or sets the name of projects bucket (all projects with the same package name are usually in one local solution
+            Gets or sets the name of projects bucket (all projects with the same package name are usually in one local solution)
             </summary>
         </member>
         <member name="P:ClusterKit.Build.ProjectDescription.ProjectDirectory">
