@@ -38,7 +38,7 @@ namespace ClusterKit.Core.Service
         {
             Container = new WindsorContainer();
 
-            var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.TextWriter(Console.Out);
+            var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.ColoredConsole();
 
             var logger = loggerConfig.CreateLogger();
             Log.Logger = logger;
@@ -70,8 +70,6 @@ namespace ClusterKit.Core.Service
                                             });
                                 });
 
-                        //Version incompatibility. Should remove after Topshelf introduces support for Serilog 2
-                        //x.UseSerilog(loggerConfig);
                         x.StartAutomatically();
                         x.RunAsLocalSystem();
                         x.SetDescription("ClusterKit Node service");

@@ -41,7 +41,7 @@ let pushPackage package =
 Target "Clean" (fun _ ->
     trace "PreClean..."
     Fake.FileHelper.CleanDirs [|
-        packageDir
+        BuildUtils.PackageOutputDirectory
         buildDir
         Path.Combine(buildDir, "tmp")
         Path.Combine(buildDir, "clean")
@@ -55,7 +55,7 @@ Target "Build"  (fun _ ->
 
 // creates nuget package for every project
 Target "CreateNuGet" (fun _ ->
-    Fake.FileHelper.CleanDirs [|packageDir|]
+    Fake.FileHelper.CleanDirs [|BuildUtils.PackageOutputDirectory|]
     BuildUtils.CreateNuget(BuildUtils.GetProjects());
 )
 
@@ -141,7 +141,7 @@ Target "SwitchToProjectRefs"  (fun _ ->
 // switches nuget and build version from init one, to latest posible on docker nuget server
 Target "SetVersion" (fun _ ->
 
-    let packageName = BuildUtils.GetProjects() |> Seq.choose (fun p -> Some p.PackageName) |> Seq.head
+    let packageName = BuildUtils.GetProjects() |> Seq.choose (fun p -> Some p.ProjectName) |> Seq.head
 
     let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" packageName
     if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
