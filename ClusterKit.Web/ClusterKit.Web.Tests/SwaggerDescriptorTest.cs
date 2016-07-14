@@ -57,7 +57,7 @@ namespace ClusterKit.Web.Tests
             descriptor
                 .Tell(
                     new ClusterEvent.MemberUp(
-                        Member.Create(
+                        ClusterExtensions.MemberCreate(
                             Cluster.Get(this.Sys).SelfUniqueAddress,
                             1,
                             MemberStatus.Up,
@@ -94,18 +94,14 @@ namespace ClusterKit.Web.Tests
                     akka.actor.deployment {
                         /Web/Swagger {
                             type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
-                        }                       
+                        }
 
                         /Web/Swagger/Monitor {
                             type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
                         }
- 		                 
-
                     }
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }
-
-
 
             /// <summary>
             /// Gets list of all used plugin installers

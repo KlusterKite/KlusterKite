@@ -92,7 +92,7 @@ namespace ClusterKit.Core.Utils
             if (childConfig == null)
             {
                 system.Log.Warning("{Type}: there is no router config for path {ActorPath}", typeof(AkkaUtils).Name, actorPath);
-                return RouterConfig.NoRouter;
+                return NoRouter.Instance;
             }
 
             string routerName = childConfig.GetString("router");
@@ -114,7 +114,7 @@ namespace ClusterKit.Core.Utils
                     return new ConsistentHashingPool(childConfig);
 
                 default:
-                    return RouterConfig.NoRouter;
+                    return NoRouter.Instance;
             }
         }
 

@@ -72,10 +72,10 @@ namespace ClusterKit.Web.Tests
             Assert.Equal("test2", response.First());
 
             this.ExpectNoMsg();
-            this.ActorSelection("/user/collector/$b")
+            this.ActorSelection("/user/collector/$a")
                 .Tell(
                     new ClusterEvent.MemberUp(
-                        Member.Create(
+                        ClusterExtensions.MemberCreate(
                             Cluster.Get(this.Sys).SelfUniqueAddress,
                             1,
                             MemberStatus.Up,

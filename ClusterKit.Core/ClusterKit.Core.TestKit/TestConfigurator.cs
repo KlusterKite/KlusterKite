@@ -35,10 +35,7 @@ namespace ClusterKit.Core.TestKit
                 @"
                 akka.actor.serialize-messages = on
                 akka.actor.serialize-creators = on
-                akka.actor.serializers.wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
-                akka.actor.serialization-bindings {
-                  ""System.Object"" = wire
-                }");
+            ");
 
             return BaseInstaller.GetStackedConfig(windsorContainer, config);
         }

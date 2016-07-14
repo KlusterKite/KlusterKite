@@ -84,6 +84,7 @@ namespace ClusterKit.Core.Tests.Configuration
             */
 
             this.Sys.StartNameSpaceActorsFromConfiguration();
+            this.ExpectNoMsg();
             this.Sys.ActorSelection("/user/testNameSpace/forwarder").Tell("Hello world");
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/testNameSpace/forwarder"));
             this.Sys.ActorSelection("/user/testNameSpace/second/forwarder").Tell("Hello world");

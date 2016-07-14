@@ -24,14 +24,16 @@
 
         serializers {
 		      wire = "Akka.Serialization.WireSerializer, Akka.Serialization.Wire"
-          akka-singleton = "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"
+          //akka-singleton = "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"
         }
+
         serialization-bindings {
 		      "System.Object" = wire
-          "Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools" = akka-singleton
+          //"Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools" = akka-singleton
         }
+
         serialization-identifiers {
-          "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools" = 14
+          //"Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools" = 14
         }
 
 
@@ -46,7 +48,7 @@
 
       cluster: {
         auto-down-unreachable-after = 15s
-		min-nr-of-members = 3
+		    min-nr-of-members = 3
         seed-nodes = []
         singleton {
             # The number of retries are derived from hand-over-retry-interval and

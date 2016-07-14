@@ -74,7 +74,7 @@ namespace ClusterKit.NodeManager.Tests
         public async Task ActorStartTest()
         {
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-            var response = await testActor.Ask<PongMessage>(new PingMessage(), TimeSpan.FromSeconds(1));
+            var response = await testActor.Ask<PongMessage>(new PingMessage(), TimeSpan.FromSeconds(600));
             Assert.NotNull(response);
         }
 
@@ -136,6 +136,7 @@ namespace ClusterKit.NodeManager.Tests
             ((TestPackage)packageFactory.Storage["TestModule-1"]).Version = new SemanticVersion(0, 2, 0, 0);
 
             testActor.Tell(new ReloadPackageListRequest());
+            this.ExpectNoMsg();
             descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
 
             Assert.NotNull(descriptions);
@@ -214,10 +215,11 @@ namespace ClusterKit.NodeManager.Tests
 
                             return AutoPilot.KeepRunning;
                         }));
-
+            this.ExpectNoMsg();
             testActor.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+                    ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+
             this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
             this.ExpectMsg<NodeDescriptionRequest>();
 
@@ -299,7 +301,7 @@ namespace ClusterKit.NodeManager.Tests
 
             testActor.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+                    ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
             this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
             this.ExpectMsg<NodeDescriptionRequest>();
 
@@ -390,9 +392,10 @@ namespace ClusterKit.NodeManager.Tests
                         return AutoPilot.KeepRunning;
                     }));
 
+            this.ExpectNoMsg();
             testActor.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+                    ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
             this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
             this.ExpectMsg<NodeDescriptionRequest>();
 
@@ -440,7 +443,7 @@ namespace ClusterKit.NodeManager.Tests
                         MininmumRequiredInstances = 1
                     });
 
-            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>().WithDispatcher("akka.test.calling-thread-dispatcher"), "nodemanager");
 
             var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
             this.SetAutoPilot(
@@ -479,9 +482,11 @@ namespace ClusterKit.NodeManager.Tests
                         return AutoPilot.KeepRunning;
                     }));
 
+            this.ExpectNoMsg();
+
             testActor.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+                    ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
             this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
             this.ExpectMsg<NodeDescriptionRequest>();
 
@@ -838,6 +843,9 @@ namespace ClusterKit.NodeManager.Tests
                   actor: {
                     provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
                     deployment {
+                        /nodemanager {
+                            dispatcher = akka.test.calling-thread-dispatcher
+                        }
                         /nodemanager/workers {
                             router = consistent-hashing-pool
                             nr-of-instances = 5
@@ -847,39 +855,30 @@ namespace ClusterKit.NodeManager.Tests
 
                     serializers {
 		                wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
-                        akka-singleton = ""Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools""
                     }
                     serialization-bindings {
 		                ""System.Object"" = wire
-                        ""Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools"" = akka-singleton
-                    }
-                    serialization-identifiers {
-                        ""Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"" = 14
-                    }
-
-                    default-dispatcher : {
-                      type : ""Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit""
-                      throughput = 2147483647
                     }
                   }
 
-                remote : {
-                    helios.tcp : {
-                      hostname = 127.0.0.1
-                      port = 0
-                    }
-                  }
+                 remote : {
+                        helios.tcp : {
+                          hostname = 127.0.0.1
+                          port = 0
+                        }
+                      }
 
-                  cluster: {
-                    auto-down-unreachable-after = 15s
-                    seed-nodes = []
-                    singleton {
-                        # The number of retries are derived from hand-over-retry-interval and
-                        # akka.cluster.down-removal-margin (or ClusterSingletonManagerSettings.removalMargin),
-                        # but it will never be less than this property.
-                        min-number-of-hand-over-retries = 10
-                    }
-                  }
+                      cluster: {
+                        auto-down-unreachable-after = 15s
+		                min-nr-of-members = 3
+                        seed-nodes = []
+                        singleton {
+                            # The number of retries are derived from hand-over-retry-interval and
+                            # akka.cluster.down-removal-margin (or ClusterSingletonManagerSettings.removalMargin),
+                            # but it will never be less than this property.
+                            min-number-of-hand-over-retries = 10
+                        }
+                      }
                 }
             }");
 
@@ -1039,7 +1038,7 @@ namespace ClusterKit.NodeManager.Tests
 
                 this.nodeManager.Tell(
                     new ClusterEvent.MemberRemoved(
-                        Member.Create(this.Address, 1, MemberStatus.Removed, ImmutableHashSet<string>.Empty), MemberStatus.Up));
+                        ClusterExtensions.MemberCreate(this.Address, 1, MemberStatus.Removed, ImmutableHashSet<string>.Empty), MemberStatus.Up));
                 this.IsUp = false;
             }
 
@@ -1052,7 +1051,7 @@ namespace ClusterKit.NodeManager.Tests
 
                 this.nodeManager.Tell(
                     new ClusterEvent.MemberUp(
-                        Member.Create(this.Address, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+                        ClusterExtensions.MemberCreate(this.Address, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
                 this.IsUp = true;
             }
 

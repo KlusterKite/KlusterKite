@@ -181,7 +181,6 @@ namespace ClusterKit.NodeManager
             this.newNodeRequestDescriptionNotificationMaxRequests = Context.System.Settings.Config.GetInt("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
             this.upgradablePart = Context.System.Settings.Config.GetDecimal("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
 
-            this.Self.Tell(new InitializationMessage());
             this.Receive<InitializationMessage>(m => this.Initialize());
             this.Receive<object>(m => this.Stash.Stash());
             // ReSharper disable FormatStringProblem
@@ -189,6 +188,7 @@ namespace ClusterKit.NodeManager
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
             // ReSharper restore RedundantToStringCall
             // ReSharper restore FormatStringProblem
+            this.Self.Tell(new InitializationMessage());
         }
 
         /// <summary>
@@ -199,6 +199,12 @@ namespace ClusterKit.NodeManager
         /// The stash.
         /// </value>
         public IStash Stash { get; set; }
+
+        protected override bool AroundReceive(Receive receive, object message)
+        {
+            Context.GetLogger().Info("{Type}: received {MessageType}", this.GetType().Name, message.GetType().Name);
+            return base.AroundReceive(receive, message);
+        }
 
         /// <summary>
         /// Is called when a message isn't handled by the current behavior of the actor
@@ -379,13 +385,20 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
+            /*
             this.workers =
                 Context.ActorOf(
                     Props.Create(() => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
                         .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                     "workers");
+            */
 
             this.Become(this.Start);
+            // ReSharper disable FormatStringProblem
+            // ReSharper disable RedundantToStringCall
+            Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+            // ReSharper restore RedundantToStringCall
+            // ReSharper restore FormatStringProblem
             this.Stash.UnstashAll();
         }
 
@@ -894,7 +907,16 @@ namespace ClusterKit.NodeManager
                 this.CheckNodeIsObsolete(node);
             }
 
+            // todo: there is strange error in akka, that prevents immediate self sending
             this.Self.Tell(new UpgradeMessage());
+            /*
+            Context.System.Scheduler.ScheduleTellOnce(
+                TimeSpan.FromMilliseconds(100),
+                this.Self,
+                new UpgradeMessage(),
+                this.Self
+                );
+            */
         }
 
         /// <summary>
@@ -902,17 +924,11 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void Start()
         {
-            // ReSharper disable FormatStringProblem
-            // ReSharper disable RedundantToStringCall
-            Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
-            // ReSharper restore RedundantToStringCall
-            // ReSharper restore FormatStringProblem
-
             Cluster.Get(Context.System)
-                               .Subscribe(
-                                   this.Self,
-                                   ClusterEvent.InitialStateAsEvents,
-                                   new[] { typeof(ClusterEvent.MemberRemoved), typeof(ClusterEvent.MemberUp) });
+               .Subscribe(
+                   this.Self,
+                   ClusterEvent.InitialStateAsEvents,
+                   new[] { typeof(ClusterEvent.MemberRemoved), typeof(ClusterEvent.MemberUp) });
 
             // ping message will indicate that actor started and ready to work
             this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
@@ -1006,6 +1022,10 @@ namespace ClusterKit.NodeManager
             /// Gets or sets code of <seealso cref="NodeTemplate"/> assigned to request
             /// </summary>
             public string TemplateCode { get; set; }
+        }
+
+        private class TestClass
+        {
         }
 
         /// <summary>

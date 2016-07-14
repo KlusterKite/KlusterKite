@@ -27,7 +27,8 @@
       default-timeout = 500ms
 
       calling-thread-dispatcher {
-        type = "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+        #type = "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+        type = "TaskDispatcher"
         throughput = 2147483647
       }
 

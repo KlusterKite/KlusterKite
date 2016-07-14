@@ -59,19 +59,18 @@ namespace ClusterKit.Web.Tests
 
             this.ActorOfAsTestActorRef<NameSpaceActor>(this.Sys.DI().Props<NameSpaceActor>(), "Web");
 
-           
             var address = Cluster.Get(this.Sys).SelfAddress;
             configurator.Tell(
                 new ClusterEvent.MemberUp(
-                    Member.Create(new UniqueAddress(address, 1), 1, MemberStatus.Up, ImmutableHashSet.Create("Web"))));
+                    ClusterExtensions.MemberCreate(new UniqueAddress(address, 1), 1, MemberStatus.Up, ImmutableHashSet.Create("Web"))));
             this.ExpectTestMsg<WebDescriptionRequest>();
 
             Assert.Equal(1, configurator.UnderlyingActor.KnownActiveNodes.Count);
 
             configurator.Tell(
                 new WebDescriptionResponse
-                    {
-                        Services =
+                {
+                    Services =
                             new List<ServiceDescription>
                                 {
                                     new ServiceDescription
@@ -94,7 +93,7 @@ namespace ClusterKit.Web.Tests
                                         }
                                 }
                             .AsReadOnly()
-                    });
+                });
 
             Assert.Equal(1, configurator.UnderlyingActor.NodePublishUrls.Count);
             Assert.Equal(
@@ -148,7 +147,7 @@ namespace ClusterKit.Web.Tests
                                 }
                             }
                         }
-                
+
             akka.actor.deployment {
                     /Web {
                         IsNameSpace = true
@@ -159,9 +158,7 @@ namespace ClusterKit.Web.Tests
                         type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
                         dispatcher = akka.test.calling-thread-dispatcher
                     }
-
                 }
-                    
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }
 

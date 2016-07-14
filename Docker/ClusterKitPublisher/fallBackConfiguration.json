@@ -96,12 +96,12 @@
     {
       "BuildDate": null,
       "Id": "CommonServiceLocator",
-      "Version": "1.3"
+      "Version": "1.3.0"
     },
     {
       "BuildDate": null,
       "Id": "CommonServiceLocator.WindsorAdapter",
-      "Version": "1.0"
+      "Version": "1.0.0"
     },
     {
       "BuildDate": null,
@@ -125,23 +125,33 @@
     },
     {
       "BuildDate": null,
+      "Id": "Microsoft.Web.Xdt",
+      "Version": "2.1.1"
+    },
+    {
+      "BuildDate": null,
       "Id": "Newtonsoft.Json",
       "Version": "8.0.3"
     },
     {
       "BuildDate": null,
+      "Id": "NuGet.Core",
+      "Version": "2.11.1"
+    },
+    {
+      "BuildDate": null,
       "Id": "Serilog",
-      "Version": "2.0.0-beta-541"
+      "Version": "2.0.0"
     },
     {
       "BuildDate": null,
       "Id": "Serilog.Sinks.ColoredConsole",
-      "Version": "2.0.0-beta-700"
+      "Version": "2.0.0"
     },
     {
       "BuildDate": null,
       "Id": "Serilog.Sinks.TextWriter",
-      "Version": "2.0.0-beta-700"
+      "Version": "2.0.0"
     },
     {
       "BuildDate": null,

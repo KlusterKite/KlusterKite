@@ -1311,7 +1311,7 @@
 </member>
 <member name="M:Fake.Azure.Kudu.kuduSync">
 <summary>
- Synchronises all stages files from the temporary deployment to the actual deployment, removing
+ Synchronises all staged files from the temporary deployment to the actual deployment, removing
  any obsolete files, updating changed files and adding new files.
 </summary>
 </member>
@@ -1354,7 +1354,7 @@
 </member>
 <member name="P:Fake.Azure.Kudu.deploymentTemp">
 <summary>
- Location where staged outputs should go before before synced up to the site.
+ Location where staged outputs should go before synced up to the site.
 </summary>
 </member>
 <member name="T:Fake.Azure.Kudu">
@@ -8443,7 +8443,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 </member>
 <member name="T:Fake.PicklesHelper">
 <summary>
- Contains tasks to run the [Pickles](http://http://www.picklesdoc.com/) living documentation generator
+ Contains tasks to run the [Pickles](http://www.picklesdoc.com/) living documentation generator
 </summary>
 </member>
 <member name="M:Fake.ProcessHelper.Shell.Exec(System.String,Microsoft.FSharp.Core.FSharpOption{System.String},Microsoft.FSharp.Core.FSharpOption{System.String})">
