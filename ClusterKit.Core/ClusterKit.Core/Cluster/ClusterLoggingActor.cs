@@ -9,13 +9,18 @@
 
 namespace ClusterKit.Core.Cluster
 {
+    using System.Linq;
+
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Event;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Logging cluster system events
     /// </summary>
+    [UsedImplicitly]
     public class ClusterLoggingActor : UntypedActor
     {
         /// <summary>
@@ -51,7 +56,7 @@ namespace ClusterKit.Core.Cluster
             else
             {
                 Context.System.Log.Debug(
-                    "{Address} {Type}: Cluster log {ClustreLogMessage}",
+                    "{Address} {Type}: Cluster log {ClusterLogMessage}",
                     this.cluster.SelfAddress.ToString(),
                     this.GetType().Name,
                     message.GetType().Name);
@@ -80,6 +85,17 @@ namespace ClusterKit.Core.Cluster
             Context.GetLogger().Debug(
                 "{Type}: Cluster log up",
                 this.GetType().Name);
+
+            var seeds = Context.System.Settings.Config.GetStringList("akka.cluster.seed-nodes");
+            if (seeds != null && seeds.Count > 0)
+            {
+                Context.GetLogger().Debug(
+                "{Type}: Joining cluster",
+                this.GetType().Name);
+                this.cluster.JoinSeedNodes(seeds.Select(Address.Parse));
+            }
+
+            
 
             this.cluster.RegisterOnMemberUp(
                 () =>

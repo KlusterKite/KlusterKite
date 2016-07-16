@@ -36,22 +36,22 @@
     {
       "BuildDate": null,
       "Id": "Akka",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Sharding",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Tools",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
@@ -61,27 +61,27 @@
     {
       "BuildDate": null,
       "Id": "Akka.DI.Core",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Logger.Serilog",
-      "Version": "1.0.8.7-beta"
+      "Version": "1.0.8.8-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Persistence",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Remote",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Serialization.Wire",
-      "Version": "1.0.9.204-beta"
+      "Version": "1.1.1.248-beta"
     },
     {
       "BuildDate": null,
@@ -111,7 +111,7 @@
     {
       "BuildDate": null,
       "Id": "Helios",
-      "Version": "2.1.0"
+      "Version": "2.1.2"
     },
     {
       "BuildDate": null,

@@ -128,6 +128,9 @@ namespace ClusterKit.NodeManager.Tests
                     });
 
             this.ExpectNoMsg();
+            this.Log.Warning("!!!!!!!!!!! Nodes started");
+
+
             var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(3, descriptions.Count);
@@ -136,7 +139,10 @@ namespace ClusterKit.NodeManager.Tests
             ((TestPackage)packageFactory.Storage["TestModule-1"]).Version = new SemanticVersion(0, 2, 0, 0);
 
             testActor.Tell(new ReloadPackageListRequest());
+            this.ExpectMsg(true);
             this.ExpectNoMsg();
+            this.Log.Warning("!!!!!!!!!!! Packages reloaded");
+
             descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
 
             Assert.NotNull(descriptions);

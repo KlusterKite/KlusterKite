@@ -384,14 +384,13 @@ namespace ClusterKit.NodeManager
                     this.Self);
                 return;
             }
-
-            /*
+            
             this.workers =
                 Context.ActorOf(
                     Props.Create(() => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
                         .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                     "workers");
-            */
+            
 
             this.Become(this.Start);
             // ReSharper disable FormatStringProblem
@@ -690,10 +689,6 @@ namespace ClusterKit.NodeManager
             }
 
             this.router.Tell(address, "/user/NodeManager/Receiver", new ShutdownMessage(), this.Self);
-
-            // experimental node force removal from cluster t speed up process
-            Cluster.Get(Context.System).Leave(address);
-            Cluster.Get(Context.System).Down(address);
             this.Sender.Tell(true);
         }
 
@@ -907,16 +902,7 @@ namespace ClusterKit.NodeManager
                 this.CheckNodeIsObsolete(node);
             }
 
-            // todo: there is strange error in akka, that prevents immediate self sending
             this.Self.Tell(new UpgradeMessage());
-            /*
-            Context.System.Scheduler.ScheduleTellOnce(
-                TimeSpan.FromMilliseconds(100),
-                this.Self,
-                new UpgradeMessage(),
-                this.Self
-                );
-            */
         }
 
         /// <summary>
