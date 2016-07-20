@@ -1803,6 +1803,20 @@
             <returns>Configuration object allowing method chaining.</returns>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="M:Serilog.Configuration.LoggerDestructuringConfiguration.ByTransformingWhere``1(System.Func{System.Type,System.Boolean},System.Func{``0,System.Object})">
+            <summary>
+            When destructuring objects, transform instances of the specified type with
+            the provided function, if the predicate returns true. Be careful to avoid any
+            intensive work in the predicate, as it can slow down the pipeline significantly.
+            </summary>
+            <param name="predicate">A predicate used to determine if the transform applies to
+            a specific type of value</param>
+            <param name="transformation">Function mapping instances of <typeparamref name="TValue"/>
+            to an alternative representation.</param>
+            <typeparam name="TValue">Type of values to transform.</typeparam>
+            <returns>Configuration object allowing method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
         <member name="M:Serilog.Configuration.LoggerDestructuringConfiguration.ToMaximumDepth(System.Int32)">
             <summary>
             When destructuring objects, depth will be limited to 5 property traversals deep to

@@ -14,7 +14,7 @@ module.exports = Object.assign({
   port: process.env.PORT,
   apiHost: process.env.APIHOST || 'localhost',
   apiPort: process.env.APIPORT,
-  serverApiHost: '192.168.99.100',
+  serverApiHost: 'entry',
   serverApiPort: '80',
   app: {
     title: 'ClusterKit.Monitoring',

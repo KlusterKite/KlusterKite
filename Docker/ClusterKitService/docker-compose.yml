@@ -1,4 +1,9 @@
 version: '2'
+networks:
+  default:
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"  
+
 services:
   #set of abstract utility servers
   nuget:
@@ -18,7 +23,6 @@ services:
      - "publisher2"
     ports:
      - "80:80"
-     - "443:443"
 
   #Cluster servers
   seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes

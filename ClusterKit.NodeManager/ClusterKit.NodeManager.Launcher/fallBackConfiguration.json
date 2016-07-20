@@ -14,7 +14,7 @@
   ],
   "PackageSources": [
     "/opt/packageCache",
-    "http://192.168.99.100:81/"
+    "http://nuget/"
   ],
   "RequestId": "e49705ca-9d3c-42c0-98f1-ed55fe1d7f1a",
   "Seeds": [

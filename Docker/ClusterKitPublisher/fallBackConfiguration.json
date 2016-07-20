@@ -1,5 +1,5 @@
 {
-  "Configuration": "{\n    akka.remote.helios.tcp.port = 0\n    ClusterKit {\n      Web {   \n       Nginx { \n            PathToConfig = \"/etc/nginx/sites-enabled/clusterkit.config\"\n            ReloadCommand {\n              Command = /etc/init.d/nginx\n              Arguments = reload\n            } \n            Configuration {\n              default {\n                \"location /\" { // you can define static content. This part will be just inserted into nginx config\n                  root = /opt/web/monitoring/\n                  index = index.html\n                }\n                \"location /signalr\" {\n                    proxy_set_header = [\"Upgrade $http_upgrade\", \"Connection \\\"upgrade\\\"\"] \n  }\n              }\n              }\n            }\n          }\n        }\n      }\n    }",
+  "Configuration": "{\n    ClusterKit {\n      Web {   \n       Nginx { \n            PathToConfig = \"/etc/nginx/sites-enabled/clusterkit.config\"\n            ReloadCommand {\n              Command = /etc/init.d/nginx\n              Arguments = reload\n            } \n            Configuration {\n              default {\n                \"location /\" { // you can define static content. This part will be just inserted into nginx config\n                  root = /opt/web/monitoring/\n                  index = index.html\n                }\n                \"location /signalr\" {\n                    proxy_set_header = [\"Upgrade $http_upgrade\", \"Connection \\\"upgrade\\\"\"] \n  }\n              }\n              }\n            }\n          }\n        }\n      }\n    }",
   "NodeTemplate": "publisher",
   "NodeTemplateVersion": 0,
   "Packages": [
@@ -36,22 +36,22 @@
     {
       "BuildDate": null,
       "Id": "Akka",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Sharding",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Tools",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
@@ -61,27 +61,27 @@
     {
       "BuildDate": null,
       "Id": "Akka.DI.Core",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Logger.Serilog",
-      "Version": "1.0.8.8-beta"
+      "Version": "1.1.1.9-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Persistence",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Remote",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Serialization.Wire",
-      "Version": "1.1.1.248-beta"
+      "Version": "1.1.2.250-beta"
     },
     {
       "BuildDate": null,
@@ -111,7 +111,7 @@
     {
       "BuildDate": null,
       "Id": "Helios",
-      "Version": "2.1.2"
+      "Version": "2.1.2.1-beta"
     },
     {
       "BuildDate": null,
@@ -141,7 +141,7 @@
     {
       "BuildDate": null,
       "Id": "Serilog",
-      "Version": "2.0.0"
+      "Version": "2.1.0-dev-00670"
     },
     {
       "BuildDate": null,
@@ -221,7 +221,7 @@
   ],
   "PackageSources": [
     "/opt/packageCache",
-    "http://192.168.99.100:81/"
+    "http://nuget/"
   ],
   "Seeds": [
     "akka.tcp://ClusterKit@seed:3090"

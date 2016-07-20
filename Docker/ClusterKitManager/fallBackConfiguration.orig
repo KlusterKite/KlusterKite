@@ -101,7 +101,7 @@
   ],
   "PackageSources": [
     "/opt/packageCache",
-    "http://192.168.99.100:81/"
+    "http://nuget/"
   ],
   "Seeds": [
     "akka.tcp://ClusterKit@seed:3090"

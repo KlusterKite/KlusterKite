@@ -65,6 +65,12 @@ namespace ClusterKit.Core.Service
             Log.Debug($"Cluster configuration: seed-nodes { string.Join(", ", config.GetStringList("akka.cluster.seed-nodes") ?? new List<string>())}");
             Log.Debug($"Cluster configuration: min-nr-of-members { config.GetInt("akka.cluster.min-nr-of-members")}");
             Log.Debug($"Cluster configuration: roles { string.Join(", ", config.GetStringList("akka.cluster.roles") ?? new List<string>())}");
+            Log.Debug($"Cluster node hostname: { config.GetString("akka.remote.helios.tcp.hostname") }");
+            var publicHostName = config.GetString("akka.remote.helios.tcp.public-hostname");
+            if (!string.IsNullOrWhiteSpace(publicHostName))
+            {
+                Log.Debug($"Cluster node public hostname: { publicHostName }");
+            }
 
             container.Register(Component.For<Config>().Instance(config));
             Console.WriteLine(@"Config created");
@@ -110,7 +116,7 @@ namespace ClusterKit.Core.Service
             var networkName = Environment.GetEnvironmentVariable("NETWORK_NAME");
             if (!string.IsNullOrEmpty(networkName))
             {
-                config = config.WithFallback(ConfigurationFactory.ParseString($"{{ akka.remote.helios.tcp.hostname = \"{networkName.Replace("\"", "\\\"")}\" }}"));
+                config = config.WithFallback(ConfigurationFactory.ParseString($"{{ akka.remote.helios.tcp.public-hostname = \"{networkName.Replace("\"", "\\\"")}\" }}"));
             }
 
             var hoconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "akka.hocon");

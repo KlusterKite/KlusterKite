@@ -33,7 +33,7 @@ let pushPackage package =
     trace packageLocal
     ExecProcess (fun info ->
         info.FileName <- "nuget.exe";
-        info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" packageLocal "http://192.168.99.100:81/" "ClusterKit")
+        info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" packageLocal "http://docker:81/" "ClusterKit")
         (TimeSpan.FromMinutes 30.0)
         |> ignore
 
@@ -143,7 +143,7 @@ Target "SetVersion" (fun _ ->
 
     let packageName = BuildUtils.GetProjects() |> Seq.choose (fun p -> Some p.ProjectName) |> Seq.head
 
-    let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://192.168.99.100:81" packageName
+    let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://docker:81" packageName
     if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
     let version = Regex.Replace((if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"), "((\\d+\\.?)+)(.*)", "$1-local")
     tracef "New version is %s \n" version

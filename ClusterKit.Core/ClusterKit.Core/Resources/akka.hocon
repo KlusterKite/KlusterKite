@@ -1,10 +1,10 @@
 ﻿{
     akka : {
       
-      stdout-loglevel : DEBUG
+      stdout-loglevel : INFO
       loggers : ["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
       log-config-on-start : off
-      loglevel : DEBUG
+      loglevel : INFO
 
       actor : {
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"
@@ -28,31 +28,27 @@
 
         serializers {
 		      wire = "Akka.Serialization.WireSerializer, Akka.Serialization.Wire"
-          //akka-singleton = "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"
         }
 
         serialization-bindings {
 		      "System.Object" = wire
-          //"Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools" = akka-singleton
         }
-
-        serialization-identifiers {
-          //"Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools" = 14
-        }
-
 
       }
 
       remote : {
         helios.tcp : {
           hostname = 0.0.0.0
-          port = 0
+          port = 3090         
         }
       }
 
       cluster: {
         auto-down-unreachable-after = 15s
-		    min-nr-of-members = 3
+		    min-nr-of-members = 1
+        seed-node-timeout = 5s
+        retry-unsuccessful-join-after = 10s
+
         seed-nodes = []
         singleton {
             # The number of retries are derived from hand-over-retry-interval and

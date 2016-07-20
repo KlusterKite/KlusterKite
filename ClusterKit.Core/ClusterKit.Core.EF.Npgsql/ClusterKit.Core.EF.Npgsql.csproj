@@ -34,19 +34,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Akka">
-      <HintPath>..\..\packages\Akka.1.1.1.248-beta\lib\net45\Akka.dll</HintPath>
+      <HintPath>..\..\packages\Akka.1.1.2.250-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Cluster">
-      <HintPath>..\..\packages\Akka.Cluster.1.1.1.248-beta\lib\net45\Akka.Cluster.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Cluster.1.1.2.250-beta\lib\net45\Akka.Cluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Cluster.Sharding">
-      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.1.1.248-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.1.2.250-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Cluster.Tools">
-      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.1.248-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.2.250-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.DI.CastleWindsor, Version=1.0.8.191, Culture=neutral, processorArchitecture=MSIL">
@@ -55,23 +55,24 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.DI.Core">
-      <HintPath>..\..\packages\Akka.DI.Core.1.1.1.248-beta\lib\net45\Akka.DI.Core.dll</HintPath>
+      <HintPath>..\..\packages\Akka.DI.Core.1.1.2.250-beta\lib\net45\Akka.DI.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Logger.Serilog">
-      <HintPath>..\..\packages\Akka.Logger.Serilog.1.0.8.8-beta\lib\net45\Akka.Logger.Serilog.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Logger.Serilog.1.1.1.9-beta\lib\net45\Akka.Logger.Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Persistence">
-      <HintPath>..\..\packages\Akka.Persistence.1.1.1.248-beta\lib\net45\Akka.Persistence.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Persistence.1.1.2.250-beta\lib\net45\Akka.Persistence.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Remote">
-      <HintPath>..\..\packages\Akka.Remote.1.1.1.248-beta\lib\net45\Akka.Remote.dll</HintPath>
+    <Reference Include="Akka.Remote, Version=1.1.2.250, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Remote.1.1.2.250-beta\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.Serialization.Wire">
-      <HintPath>..\..\packages\Akka.Serialization.Wire.1.1.1.248-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Serialization.Wire.1.1.2.250-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
@@ -106,8 +107,9 @@
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Helios">
-      <HintPath>..\..\packages\Helios.2.1.2\lib\net45\Helios.dll</HintPath>
+    <Reference Include="Helios, Version=2.1.2.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Helios.2.1.2.1-beta\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.1.4.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -125,9 +127,8 @@
       <HintPath>..\..\packages\Npgsql.3.0.7\lib\net45\Npgsql.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.2.0.0\lib\net45\Serilog.dll</HintPath>
+    <Reference Include="Serilog">
+      <HintPath>..\..\packages\Serilog.2.1.0-dev-00670\lib\net45\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
