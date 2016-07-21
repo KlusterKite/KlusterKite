@@ -33,33 +33,39 @@
     <DocumentationFile>bin\Release\ClusterKit.Core.Rest.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka">
-      <HintPath>..\..\packages\Akka.1.1.2.250-beta\lib\net45\Akka.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Akka.Cluster">
-      <HintPath>..\..\packages\Akka.Cluster.1.1.2.250-beta\lib\net45\Akka.Cluster.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Akka.Cluster.Sharding">
-      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.1.2.250-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Akka.Cluster.Tools">
-      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.2.250-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Akka.Persistence">
-      <HintPath>..\..\packages\Akka.Persistence.1.1.2.250-beta\lib\net45\Akka.Persistence.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Akka.Remote, Version=1.1.2.250, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka, Version=1.1.2.251, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Remote.1.1.2.250-beta\lib\net45\Akka.Remote.dll</HintPath>
+      <HintPath>..\..\packages\Akka.1.1.2.251-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Serialization.Wire">
-      <HintPath>..\..\packages\Akka.Serialization.Wire.1.1.2.250-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
+    <Reference Include="Akka.Cluster, Version=1.1.2.251, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.1.1.2.251-beta\lib\net45\Akka.Cluster.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Cluster.Sharding, Version=1.1.2.251, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.1.2.251-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Cluster.Tools, Version=1.1.2.251, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.2.251-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Persistence, Version=1.1.2.251, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Persistence.1.1.2.251-beta\lib\net45\Akka.Persistence.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Remote, Version=1.1.2.251, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Remote.1.1.2.251-beta\lib\net45\Akka.Remote.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.Serialization.Wire, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Serialization.Wire.1.1.2.251-beta\lib\net45\Akka.Serialization.Wire.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers">

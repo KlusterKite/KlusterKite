@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Monitoring", "ClusterKit.Monitoring\ClusterKit.Monitoring.csproj", "{C35EB6FF-0181-41DB-913C-87CE02A4382D}"
 EndProject
@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\nuget.config = ..\nuget.config
 		..\Settings.StyleCop = ..\Settings.StyleCop
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Monitoring.Tests", "ClusterKit.Monitoring.Tests\ClusterKit.Monitoring.Tests.csproj", "{AAE36571-CFF9-42BD-A3FA-7BB352FA02BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Monitoring.Web", "ClusterKit.Monitoring.Web\ClusterKit.Monitoring.Web.csproj", "{B6F42E59-CA82-4899-A3B9-532CF8E2A747}"
 EndProject
@@ -26,10 +24,6 @@ Global
 		{C35EB6FF-0181-41DB-913C-87CE02A4382D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C35EB6FF-0181-41DB-913C-87CE02A4382D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C35EB6FF-0181-41DB-913C-87CE02A4382D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AAE36571-CFF9-42BD-A3FA-7BB352FA02BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAE36571-CFF9-42BD-A3FA-7BB352FA02BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAE36571-CFF9-42BD-A3FA-7BB352FA02BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAE36571-CFF9-42BD-A3FA-7BB352FA02BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B6F42E59-CA82-4899-A3B9-532CF8E2A747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B6F42E59-CA82-4899-A3B9-532CF8E2A747}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6F42E59-CA82-4899-A3B9-532CF8E2A747}.Release|Any CPU.ActiveCfg = Release|Any CPU

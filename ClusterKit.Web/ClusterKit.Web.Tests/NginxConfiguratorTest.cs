@@ -97,13 +97,13 @@ namespace ClusterKit.Web.Tests
 
             Assert.Equal(1, configurator.UnderlyingActor.NodePublishUrls.Count);
             Assert.Equal(
-                "[::]:8080",
+                "0.0.0.0:8080",
                 configurator.UnderlyingActor.Configuration["web1"]["/TestWebService"].ActiveNodes[0].NodeUrl);
             Assert.Equal(
-                "[::]:8080",
+                "0.0.0.0:8080",
                 configurator.UnderlyingActor.Configuration["web1"]["/test/TestWebService2"].ActiveNodes[0].NodeUrl);
             Assert.Equal(
-                "[::]:8080",
+                "0.0.0.0:8080",
                 configurator.UnderlyingActor.Configuration["web2"]["/Api"].ActiveNodes[0].NodeUrl);
 
             var config = File.ReadAllText("./nginx.conf");
