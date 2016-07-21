@@ -65,7 +65,6 @@ Target "DockerContainers" (fun _ ->
     buildDocker "clusterkit/worker" "Docker/ClusterKitWorker"
     buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
 
-    copyWebContent "./ClusterKit.Monitoring/ClusterKit.Monitoring.Web" "./Docker/ClusterKitPublisher/web/monitoring"
     buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
 
     buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"

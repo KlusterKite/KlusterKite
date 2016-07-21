@@ -102,6 +102,7 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
                 .Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() })
                 .OrderBy(p => p.Id)
                 .Union(dependencies)
+                .Distinct()
                 .ToList();
 
             Console.WriteLine("Packages: ");
