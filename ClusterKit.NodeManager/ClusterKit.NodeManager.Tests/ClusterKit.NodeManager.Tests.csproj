@@ -163,9 +163,9 @@
       <HintPath>..\..\packages\Npgsql.3.0.7\lib\net45\Npgsql.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NuGet.Core, Version=2.11.1.812, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Core, Version=2.12.0.815, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Core.2.11.1\lib\net40-Client\NuGet.Core.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Core.2.12.0-rtm-815\lib\net40-Client\NuGet.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin">

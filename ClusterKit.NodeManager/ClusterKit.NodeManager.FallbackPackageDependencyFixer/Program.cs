@@ -11,14 +11,20 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
 {
     using System;
     using System.IO;
+    using System.IO.Compression;
     using System.Linq;
     using System.Reflection;
+    using System.Xml;
+    using System.Xml.Serialization;
 
     using ClusterKit.NodeManager.Launcher.Messages;
+
 
     using Newtonsoft.Json;
 
     using NuGet;
+
+    using Formatting = Newtonsoft.Json.Formatting;
 
     /// <summary>
     /// Fixes the list of packages for dependencies in fall-back files
@@ -50,27 +56,32 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
                 return;
             }
 
-            NodeStartUpConfiguration description;
 
-            using (var reader = File.OpenText(fileName))
-            using (var jsonReader = new JsonTextReader(reader))
-            {
-                description = JsonSerializer.Create().Deserialize<NodeStartUpConfiguration>(jsonReader);
-            }
 
-            var getPackage = typeof(LocalPackageRepository).GetMethod("OpenPackage", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            var generatedPackages = args.Skip(1)
-                .SelectMany(d => Directory.GetFiles(d, "*.nupkg"))
-                .Select(directory => new LocalPackageRepository(Path.GetFullPath(directory), false))
-                .Select(nugetRepository => (IPackage)getPackage.Invoke(nugetRepository, new object[] { nugetRepository.Source }))
-                .Where(p => p != null)
-                .ToList();
+            var description = JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(fileName));
 
-            var localPackages = generatedPackages
+
+            var installedMetadata = 
+                args
+                .Skip(1)
+                .SelectMany(d => Directory.GetFiles(d, "*.nupkg", SearchOption.AllDirectories))
+                .Select(GetMetadata)
+                .Where(m => m!= null).ToList();
+
+
+
+            var localPackages = installedMetadata
                 .Where(rp => description.Packages.Any(lp => lp.Id == rp.Id))
-                .Where(rp => rp.Version == generatedPackages.Where(p => p.Id == rp.Id).Max(p => p.Version))
+                .Where(rp => rp.Version == installedMetadata.Where(p => p.Id == rp.Id).Max(p => p.Version))
                 .ToList();
+
+            Console.WriteLine("Packages found: ");
+            foreach (var package in localPackages)
+            {
+                Console.WriteLine($"\t{package.Id} {package.Version}");
+            }
+            Console.WriteLine("");
 
             var allDependencies = localPackages
                 .SelectMany(p => p.DependencySets)
@@ -84,7 +95,7 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
                 .Select(id => new PackageDescription
                 {
                     Id = id,
-                    Version = allDependencies.Where(dd => dd.Id == id).Max(dd => SemanticVersion.Parse(dd.VersionSpec.ToString())).ToString()
+                    Version = allDependencies.Where(dd => dd.Id == id).Max(dd => SemanticVersion.Parse(dd.Version)).ToString()
                 }).ToList();
 
             var result = localPackages
@@ -100,15 +111,27 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
             }
 
             description.Packages = result;
+            File.WriteAllText(fileName, JsonConvert.SerializeObject(description, Formatting.Indented));
+        }
 
-            using (var writer = File.OpenWrite(fileName))
-            using (var textWriter = new StreamWriter(writer))
-            using (var jsonReader = new JsonTextWriter(textWriter))
+        private static ManifestMetadata GetMetadata(string packageName)
+        {
+            using (var file = File.OpenRead(packageName))
+            using (var zip = new ZipArchive(file, ZipArchiveMode.Read))
             {
-                var jsonSerializer = JsonSerializer.Create();
-                jsonSerializer.Formatting = Formatting.Indented;
-                jsonSerializer.Serialize(jsonReader, description);
+                var nuspecFile = zip.Entries.FirstOrDefault(e => e.Name.EndsWith(".nuspec"));
+                if (nuspecFile == null)
+                {
+                    Console.WriteLine($"Could not find metadata for package {packageName}");
+                    return null;
+                }
+                using (var stream = nuspecFile.Open())
+                {
+                    return Manifest.ReadFrom(stream, false).Metadata;
+                }
             }
         }
+
+
     }
 }
