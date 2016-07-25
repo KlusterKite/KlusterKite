@@ -2971,6 +2971,148 @@
  Contains a task which can be used to run [DotCover](http://www.jetbrains.com/dotcover/) on .NET assemblies.
 </summary>
 </member>
+<member name="P:Fake.DotNet.PackParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNet.PackParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNet.PackParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNet.PackParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNet.PackParams">
+<summary>
+ DotNet pack parameters
+</summary>
+</member>
+<member name="P:Fake.DotNet.TestParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNet.TestParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNet.TestParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNet.TestParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNet.TestParams">
+<summary>
+ DotNet test parameters
+</summary>
+</member>
+<member name="P:Fake.DotNet.RestoreParams.NoCache">
+<summary>
+ Whether to use the NuGet cache.
+</summary>
+</member>
+<member name="P:Fake.DotNet.RestoreParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNet.RestoreParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNet.RestoreParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNet.RestoreParams">
+<summary>
+ DotNet restore parameters
+</summary>
+</member>
+<member name="M:Fake.DotNet.Pack(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNet.PackParams,Fake.DotNet.PackParams},System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Runs the dotnet &quot;pack&quot; command.
+ ## Parameters
+
+  - `setPackParams` - Function used to overwrite the pack default parameters.
+
+ ## Sample
+
+     !! &quot;src/test/project.json&quot;
+     |&gt; DotNet.Pack
+         (fun p -&gt; 
+              { p with 
+                   Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNet.Test(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNet.TestParams,Fake.DotNet.TestParams},System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Runs the dotnet &quot;test&quot; command.
+ ## Parameters
+
+  - `setTestParams` - Function used to overwrite the test default parameters.
+
+ ## Sample
+
+     !! &quot;src/test/project.json&quot;
+     |&gt; DotNet.Test
+         (fun p -&gt; 
+              { p with 
+                   Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNet.Restore(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNet.RestoreParams,Fake.DotNet.RestoreParams})">
+<summary>
+ Runs the dotnet &quot;restore&quot; command.
+ ## Parameters
+
+  - `setRestoreParams` - Function used to overwrite the restore default parameters.
+
+ ## Sample
+
+     DotNet.Restore 
+         (fun p -&gt; 
+              { p with 
+                   NoCache = true })
+</summary>
+</member>
+<member name="M:Fake.DotNet.isInstalled">
+<summary>
+ Checks wether the dotnet CLI is installed
+</summary>
+</member>
+<member name="M:Fake.DotNet.getVersion">
+<summary>
+ Gets the installed dotnet version
+</summary>
+</member>
+<member name="P:Fake.DotNet.commandName">
+<summary>
+ The dotnet command name
+</summary>
+</member>
+<member name="T:Fake.DotNet">
+<summary>
+ Contains a task which can be used to run dotnet CLI commands.
+</summary>
+</member>
 <member name="P:Fake.DynamicsCRMHelper.SolutionPackagerParams.Folder">
 <summary>
  Folder for output of calls
@@ -10281,6 +10423,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Type of action to execute. Defaults to Deploy.
 </summary>
 </member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.SqlPackageToolPath">
+<summary>
+ The path to SqlPackage.exe.
+</summary>
+</member>
 <member name="T:Fake.Sql.DacPac.DeployDbArgs">
 <summary>
  Configuration arguments for DacPac deploy
@@ -10298,7 +10445,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 </member>
 <member name="T:Fake.Sql.DacPac.DeployAction.Deploy">
 <summary>
- Generate and apply a synchronisation between two databases.
+ Generate and apply a synchronisation script between two databases.
 </summary>
 </member>
 <member name="T:Fake.Sql.DacPac.DeployAction">

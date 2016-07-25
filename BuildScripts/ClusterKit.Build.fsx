@@ -187,7 +187,6 @@ Target "FinalBuild" (fun _ -> ())
 
 "Clean" ==> "FinalBuild"
 "Build" ==> "FinalBuild"
-"CleanPackageCache" ==> "FinalBuild"
 
 //runs all tests
 Target "FinalTest" (fun _ -> ())
@@ -208,6 +207,7 @@ Target "FinalPushLocalPackages" (fun _ -> ())
 
 // builds local packages and sends them to local cluster nuget server
 Target "FinalPushAllPackages" (fun _ -> ())
+"CleanPackageCache" ==> "FinalPushAllPackages"
 "FinalPushLocalPackages" ==> "FinalPushAllPackages"
 "PushThirdPartyPackages" ==> "FinalPushAllPackages"
 
