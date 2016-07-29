@@ -101,22 +101,22 @@
     {
       "BuildDate": null,
       "Id": "Akka",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Sharding",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Tools",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
@@ -126,7 +126,7 @@
     {
       "BuildDate": null,
       "Id": "Akka.DI.Core",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
@@ -136,17 +136,17 @@
     {
       "BuildDate": null,
       "Id": "Akka.Persistence",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Remote",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Serialization.Wire",
-      "Version": "1.1.2.251-beta"
+      "Version": "1.1.2.254-beta"
     },
     {
       "BuildDate": null,
