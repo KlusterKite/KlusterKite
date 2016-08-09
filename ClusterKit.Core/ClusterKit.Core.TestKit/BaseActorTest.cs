@@ -216,11 +216,7 @@ namespace ClusterKit.Core.TestKit
         /// </remarks>
         protected TestMessage<T> ExpectTestMsg<T>(TimeSpan timeout)
         {
-            this.ExpectNoTestMsg();
-            ((TestScheduler)this.Sys.Scheduler).Advance(timeout - TimeSpan.FromMilliseconds(1));
-            this.ExpectNoTestMsg();
-            ((TestScheduler)this.Sys.Scheduler).Advance(TimeSpan.FromMilliseconds(1));
-            return this.ExpectTestMsg<T>();
+            return this.ExpectMsg<TestMessage<T>>(timeout);
         }
 
         /// <summary>
@@ -232,6 +228,7 @@ namespace ClusterKit.Core.TestKit
         /// <param name="generator">
         /// Component generation factory
         /// </param>
+        [UsedImplicitly]
         protected void WinsorBind<T>(Func<T> generator)
         {
             this.WindsorContainer.Register(Component.For(typeof(T)).UsingFactoryMethod(generator).LifestyleTransient());
