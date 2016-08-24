@@ -44,7 +44,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                 {
                                     "ClusterKit.Core.Service",
                                     "ClusterKit.Web.NginxConfigurator",
-                                    "ClusterKit.NodeManager.Client"
+                                    "ClusterKit.NodeManager.Client",
+                                    "ClusterKit.Log.Console",
+                                    "ClusterKit.Log.Console",
+                                    "ClusterKit.Log.ElasticSearch"
                                 },
                     Configuration = Configurations.Publisher,
                     Version = 0
@@ -68,7 +71,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.NodeManager",
                                     "ClusterKit.Core.EF.Npgsql",
                                     "ClusterKit.Web.Swagger.Monitor",
-                                    "ClusterKit.Web.Swagger"
+                                    "ClusterKit.Web.Swagger",
+                                    "ClusterKit.Log.Console",
+                                    "ClusterKit.Log.ElasticSearch"
                                 },
                     Configuration = Configurations.ClusterManager,
                     Version = 0

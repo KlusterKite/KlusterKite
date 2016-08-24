@@ -35,6 +35,16 @@
     },
     {
       "BuildDate": null,
+      "Id": "ClusterKit.Log.Console",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Log.ElasticSearch",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
       "Id": "ClusterKit.Monitoring",
       "Version": "0.0.0-local"
     },
@@ -167,6 +177,11 @@
       "BuildDate": null,
       "Id": "CommonServiceLocator.WindsorAdapter",
       "Version": "1.0.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Elasticsearch.Net",
+      "Version": "2.4.2"
     },
     {
       "BuildDate": null,
@@ -316,6 +331,26 @@
     {
       "BuildDate": null,
       "Id": "Serilog.Sinks.ColoredConsole",
+      "Version": "2.0.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.Elasticsearch",
+      "Version": "4.1.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.File",
+      "Version": "2.0.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.PeriodicBatching",
+      "Version": "2.0.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.RollingFile",
       "Version": "2.0.0"
     },
     {

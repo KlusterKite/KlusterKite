@@ -8,9 +8,11 @@
 
       actor : {
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"
-        default-dispatcher {
-          type = TaskDispatcher
-        }
+        
+        #default-dispatcher {
+        #  type = TaskDispatcher
+		    #  executor= "task-executor"
+        #}
 
         deployment {
           /Core {

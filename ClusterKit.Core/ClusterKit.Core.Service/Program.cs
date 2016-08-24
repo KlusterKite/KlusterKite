@@ -9,10 +9,11 @@
 
 namespace ClusterKit.Core.Service
 {
-    using System;
     using System.Collections.Generic;
 
     using Castle.Windsor;
+
+    using JetBrains.Annotations;
 
     using Serilog;
 
@@ -21,12 +22,13 @@ namespace ClusterKit.Core.Service
     /// <summary>
     /// Service main entry point
     /// </summary>
+    [UsedImplicitly]
     public class Program
     {
         /// <summary>
         /// Gets the dependency injection container
         /// </summary>
-        public static IWindsorContainer Container { get; private set; }
+        private static IWindsorContainer Container { get; set; }
 
         /// <summary>
         /// Service main entry point
@@ -38,18 +40,19 @@ namespace ClusterKit.Core.Service
         {
             Container = new WindsorContainer();
 
-            var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.ColoredConsole();
-
-            var logger = loggerConfig.CreateLogger();
-            Log.Logger = logger;
-
             HostFactory.Run(
                 x =>
                     {
                         var configurations = new List<string>();
-
                         x.AddCommandLineDefinition("config", fileName => configurations.Add(fileName));
                         x.ApplyCommandLine();
+                        
+
+                        // preset logger
+                        var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.ColoredConsole();
+                        var logger = loggerConfig.CreateLogger();
+                        Log.Logger = logger;
+
                         Bootstrapper.Configure(Container, configurations.ToArray());
 
                         x.Service<Controller>(
@@ -57,10 +60,7 @@ namespace ClusterKit.Core.Service
                                 {
                                     s.ConstructUsing(name => Container.Resolve<Controller>());
                                     s.WhenStarted(
-                                        (tc, hc) =>
-                                            {
-                                                return tc.Start(Container, hc);
-                                            });
+                                        (tc, hc) => tc.Start(Container, hc));
                                     s.WhenStopped(
                                         tc =>
                                             {
@@ -78,5 +78,6 @@ namespace ClusterKit.Core.Service
                         x.UseLinuxIfAvailable();
                     });
         }
+
     }
 }

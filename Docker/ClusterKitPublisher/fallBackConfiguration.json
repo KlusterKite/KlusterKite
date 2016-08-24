@@ -15,6 +15,16 @@
     },
     {
       "BuildDate": null,
+      "Id": "ClusterKit.Log.Console",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Log.ElasticSearch",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
       "Id": "ClusterKit.NodeManager.Client",
       "Version": "0.0.0-local"
     },
@@ -105,6 +115,11 @@
     },
     {
       "BuildDate": null,
+      "Id": "Elasticsearch.Net",
+      "Version": "2.4.2"
+    },
+    {
+      "BuildDate": null,
       "Id": "Google.ProtocolBuffers",
       "Version": "2.4.1.555"
     },
@@ -146,6 +161,26 @@
     {
       "BuildDate": null,
       "Id": "Serilog.Sinks.ColoredConsole",
+      "Version": "2.0.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.Elasticsearch",
+      "Version": "4.1.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.File",
+      "Version": "2.0.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.PeriodicBatching",
+      "Version": "2.0.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "Serilog.Sinks.RollingFile",
       "Version": "2.0.0"
     },
     {

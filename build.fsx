@@ -22,12 +22,17 @@ Target "DockerBase" (fun _ ->
     buildDocker "clusterkit/nuget" "Docker/ClusterKitNuget"
     buildDocker "clusterkit/postgres" "Docker/ClusterKitPostgres"
     buildDocker "clusterkit/entry" "Docker/ClusterKitEntry"
+    buildDocker "clusterkit/vpn" "Docker/ClusterKitVpn"
+    buildDocker "clusterkit/elk" "Docker/ClusterKitELK"
 )
 
 // builds standard docker images
 Target "DockerContainers" (fun _ ->
     RestorePackages |> ignore
     MSBuildRelease "./build/launcher" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"|] |> ignore
+
+    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.Console/ClusterKit.Log.Console.csproj"|] |> ignore
+    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.ElasticSearch/ClusterKit.Log.ElasticSearch.csproj"|] |> ignore
     MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"|] |> ignore
 
     let copyLauncherData (path : string) =

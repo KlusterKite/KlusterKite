@@ -11,6 +11,7 @@ namespace ClusterKit.Core.Service
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Configuration;
     using System.IO;
     using System.Linq;
@@ -21,9 +22,9 @@ namespace ClusterKit.Core.Service
     using Akka.Configuration.Hocon;
     using Akka.DI.CastleWindsor;
     using Akka.DI.Core;
+    using Akka.Util.Internal;
 
     using Castle.Facilities.TypedFactory;
-    using Castle.MicroKernel.Registration;
     using Castle.MicroKernel.Resolvers.SpecializedResolvers;
     using Castle.Windsor;
 
@@ -34,6 +35,9 @@ namespace ClusterKit.Core.Service
     using Microsoft.Practices.ServiceLocation;
 
     using Serilog;
+    using Serilog.Events;
+
+    using Component = Castle.MicroKernel.Registration.Component;
 
     /// <summary>
     /// Dependency injection configuration
@@ -75,6 +79,27 @@ namespace ClusterKit.Core.Service
             container.Register(Component.For<Config>().Instance(config));
             Console.WriteLine(@"Config created");
 
+            // log configuration
+            LogEventLevel level;
+            if (!Enum.TryParse(config.GetString("ClusterKit.Log.minimumLevel"), true, out level))
+            {
+                level = LogEventLevel.Information;
+            }
+
+            var loggerConfig = new LoggerConfiguration().MinimumLevel.Is(level);
+            var configurators = container.ResolveAll<ILoggerConfigurator>();
+
+            configurators.ForEach(c => Log.Information("Using log configurator {TypeName}", c.GetType().FullName));
+
+            loggerConfig = configurators.Aggregate(
+                loggerConfig,
+                (current, loggerConfigurator) => loggerConfigurator.Configure(current, config));
+
+            var logger = loggerConfig.CreateLogger();
+            Log.Logger = logger;
+            // log configuration finished
+
+
             // performing prestart checks
             BaseInstaller.RunPrecheck(container, config);
 
@@ -85,6 +110,8 @@ namespace ClusterKit.Core.Service
 
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
+
+
             Console.WriteLine(@"Bootstrapper start finished");
         }
 
@@ -105,27 +132,28 @@ namespace ClusterKit.Core.Service
             var config = ConfigurationFactory.Empty;
             if (args != null)
             {
-                Console.WriteLine($"loading config from command line parameters");
+                Console.WriteLine(@"loading config from command line parameters");
                 config = args
                     .Where(File.Exists)
                     .Select(File.ReadAllText)
                     .Aggregate(config, (current, configText) => current.WithFallback(ConfigurationFactory.ParseString(configText)));
             }
 
-            Console.WriteLine($"loading config from environment");
+            Console.WriteLine(@"loading config from environment");
             var networkName = Environment.GetEnvironmentVariable("NETWORK_NAME");
             if (!string.IsNullOrEmpty(networkName))
             {
                 config = config.WithFallback(ConfigurationFactory.ParseString($"{{ akka.remote.helios.tcp.public-hostname = \"{networkName.Replace("\"", "\\\"")}\" }}"));
             }
 
+            // ReSharper disable once AssignNullToNotNullAttribute
             var hoconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "akka.hocon");
-            Console.WriteLine($"loading akka.hocon ({hoconPath})");
+            Console.WriteLine($@"loading akka.hocon ({hoconPath})");
             if (File.Exists(hoconPath))
             {
-                Console.WriteLine($"reading file ({hoconPath})");
+                Console.WriteLine($@"reading file ({hoconPath})");
                 var hoconConfig = File.ReadAllText(hoconPath);
-                Console.WriteLine($"file loaded in memory");
+                Console.WriteLine(@"file loaded in memory");
                 config = config.WithFallback(ConfigurationFactory.ParseString(hoconConfig));
             }
             else
@@ -133,7 +161,7 @@ namespace ClusterKit.Core.Service
                 Log.Warning("File {fileName} was not found", hoconPath);
             }
 
-            Console.WriteLine($"loading aplication configuration");
+            Console.WriteLine(@"loading aplication configuration");
             var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
             if (section?.AkkaConfig != null)
             {
