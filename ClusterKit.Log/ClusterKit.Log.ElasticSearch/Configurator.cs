@@ -38,7 +38,7 @@
 
             var nodes = config.GetStringList("ClusterKit.Log.ElasticSearch.nodes");
 
-            var indexFormat = config.GetString("ClusterKit.Log.ElasticSearch.indexFormat", "clusterkit-{0:yyyy.MM.dd}").ToLower();
+            var indexFormat = config.GetString("ClusterKit.Log.ElasticSearch.indexFormat", "logstash-{0:yyyy.MM.dd}");
 
             Log.Information(
                 "{Type}: \n\tMinimum level: {MinimumLevel}\n\tIndex format: {IndexFormat}\n\tNodes:\n\t\t{NodeList}\n",

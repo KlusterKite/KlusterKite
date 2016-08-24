@@ -32,6 +32,7 @@ namespace ClusterKit.Web
         /// The Owin service configuration
         /// </summary>
         /// <param name="appBuilder">The builder</param>
+        [UsedImplicitly]
         public void Configuration(IAppBuilder appBuilder)
         {
             var owinStartupConfigurators = ServiceLocator.Current.GetAllInstances<IOwinStartupConfigurator>().ToList();

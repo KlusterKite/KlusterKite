@@ -200,12 +200,6 @@ namespace ClusterKit.NodeManager
         /// </value>
         public IStash Stash { get; set; }
 
-        protected override bool AroundReceive(Receive receive, object message)
-        {
-            Context.GetLogger().Info("{Type}: received {MessageType}", this.GetType().Name, message.GetType().Name);
-            return base.AroundReceive(receive, message);
-        }
-
         /// <summary>
         /// Is called when a message isn't handled by the current behavior of the actor
         ///             by default it fails with either a <see cref="T:Akka.Actor.DeathPactException"/> (in

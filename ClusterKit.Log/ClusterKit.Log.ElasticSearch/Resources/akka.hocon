@@ -9,6 +9,6 @@
 
 		typeName = "ClusterKitLog"
 
-		indexFormat = "clusterkit-{0:yyyy.MM.dd}"
+		indexFormat = "logstash-{0:yyyy.MM.dd}"
 	}	
 }
