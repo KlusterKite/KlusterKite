@@ -51,9 +51,9 @@ namespace ClusterKit.Web
             config.DependencyResolver = dependencyResolver;
 
             config.EnsureInitialized();
-            appBuilder.UseWebApi(config);
 
             owinStartupConfigurators.ForEach(c => c.ConfigureApp(appBuilder));
+            appBuilder.UseWebApi(config);
         }
 
         /// <summary>
