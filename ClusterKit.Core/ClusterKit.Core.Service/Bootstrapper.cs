@@ -68,7 +68,8 @@ namespace ClusterKit.Core.Service
 
             Log.Debug($"Cluster configuration: seed-nodes { string.Join(", ", config.GetStringList("akka.cluster.seed-nodes") ?? new List<string>())}");
             Log.Debug($"Cluster configuration: min-nr-of-members { config.GetInt("akka.cluster.min-nr-of-members")}");
-            Log.Debug($"Cluster configuration: roles { string.Join(", ", config.GetStringList("akka.cluster.roles") ?? new List<string>())}");
+            var roles = string.Join(", ", config.GetStringList("akka.cluster.roles") ?? new List<string>());
+            Log.Debug($"Cluster configuration: roles { roles}");
             Log.Debug($"Cluster node hostname: { config.GetString("akka.remote.helios.tcp.hostname") }");
             var publicHostName = config.GetString("akka.remote.helios.tcp.public-hostname");
             if (!string.IsNullOrWhiteSpace(publicHostName))
@@ -94,6 +95,13 @@ namespace ClusterKit.Core.Service
             loggerConfig = configurators.Aggregate(
                 loggerConfig,
                 (current, loggerConfigurator) => loggerConfigurator.Configure(current, config));
+
+            var hostName = string.IsNullOrWhiteSpace(publicHostName)
+                               ? config.GetString("akka.remote.helios.tcp.hostname")
+                               : publicHostName;
+
+            loggerConfig = loggerConfig.Enrich.WithProperty("hostName", hostName);
+            loggerConfig = loggerConfig.Enrich.WithProperty("roles", roles);
 
             var logger = loggerConfig.CreateLogger();
             Log.Logger = logger;

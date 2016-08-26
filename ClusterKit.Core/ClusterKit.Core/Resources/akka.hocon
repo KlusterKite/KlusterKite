@@ -40,6 +40,7 @@
 
       remote : {
         helios.tcp : {
+          enforce-ip-family = true
           hostname = 0.0.0.0
           port = 0         
         }
