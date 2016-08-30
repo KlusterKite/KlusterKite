@@ -78,15 +78,18 @@ Target "Test" (fun _ ->
         |> Seq.head)
 
     
-    
+    ensureDirectory Path.Combine(buildDir, "testResults")
+
     testAssemblies |> Fake.Testing.XUnit2.xUnit2 ( fun p -> {p with
                                                       ForceTeamCity = true;
                                                       ToolPath = Path.Combine(runnerLocation, "tools", "xunit.console.exe");
                                                       TimeOut = TimeSpan.FromHours(1.0);
-                                                      Parallel =  Fake.Testing.XUnit2.ParallelMode.NoParallelization;} )
+                                                      Parallel =  Fake.Testing.XUnit2.ParallelMode.NoParallelization;
+                                                      HtmlOutputPath = Some Path.Combine(buildDir, "testResults", "result.html");
+                                                      } )
                                                       
 
-    //BuildUtils.RunXUnitTest(projects);
+    
 
 )
 
