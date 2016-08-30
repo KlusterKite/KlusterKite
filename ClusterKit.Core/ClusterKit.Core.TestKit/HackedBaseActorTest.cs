@@ -38,6 +38,7 @@ namespace ClusterKit.Core.TestKit
             description.Container.Register(Component.For<ActorSystem>().Instance(this.Sys).LifestyleSingleton());
             description.Container.Register(Component.For<Config>().Instance(this.Sys.Settings.Config).LifestyleSingleton());
             this.WindsorContainer = description.Container;
+            description.System.Log.Info("!!!!Pre servicelocator");
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(this.WindsorContainer));
         }
 

@@ -66,19 +66,26 @@ Target "RefreshLocalDependencies" (fun _ ->
 
 // runs all xunit tests
 Target "Test" (fun _ ->
-    let runTest (project : ProjectDescription) =
-        printfn "%s" project.ProjectName
-        let testAssembly = Path.Combine(project.TempBuildDirectory, project.ProjectName + ".dll");
-        let runnerLocation = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages")) |> Seq.sortByDescending (fun d -> d) |> Seq.head
-        [|testAssembly|]
-        |> Fake.Testing.XUnit2.xUnit2 ( fun p -> {p with
+   
+   
+    let testAssemblies = (BuildUtils.GetProjects() 
+        |> Seq.where (fun p -> p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests))
+        |> Seq.map(fun project -> Path.Combine(project.TempBuildDirectory, project.ProjectName + ".dll")))
+
+    let runnerLocation = (Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages")) 
+        |> Seq.filter(fun d -> d.IndexOf("xunit.runner.console") > 0)
+        |> Seq.sortByDescending (fun d -> d) 
+        |> Seq.head)
+
+    
+    
+    testAssemblies |> Fake.Testing.XUnit2.xUnit2 ( fun p -> {p with
                                                       ForceTeamCity = true;
                                                       ToolPath = Path.Combine(runnerLocation, "tools", "xunit.console.exe");
                                                       TimeOut = TimeSpan.FromHours(1.0);
-                                                      ErrorLevel = UnitTestCommon.TestRunnerErrorLevel.DontFailBuild;
                                                       Parallel =  Fake.Testing.XUnit2.ParallelMode.NoParallelization;} )
+                                                      
 
-    BuildUtils.GetProjects() |> Seq.where (fun p -> p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests)) |> Seq.iter runTest
     //BuildUtils.RunXUnitTest(projects);
 
 )
