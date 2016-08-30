@@ -10,6 +10,7 @@
 namespace ClusterKit.NodeManager.Client
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
@@ -18,7 +19,6 @@ namespace ClusterKit.NodeManager.Client
     using Akka.Event;
 
     using ClusterKit.Core;
-    using ClusterKit.Core.Utils;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Launcher.Messages;
 
@@ -42,7 +42,8 @@ namespace ClusterKit.NodeManager.Client
         /// </summary>
         public NodeManagerReceiverActor()
         {
-            var nodeIdString = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.NodeId");
+            var config = Context.System.Settings.Config;
+            var nodeIdString = config.GetString("ClusterKit.NodeManager.NodeId");
             Guid nodeId;
             if (!Guid.TryParse(nodeIdString, out nodeId))
             {
@@ -53,35 +54,28 @@ namespace ClusterKit.NodeManager.Client
             {
                 this.description = new NodeDescription
                 {
+                    IsInitialized = true,
                     NodeAddress = Cluster.Get(Context.System).SelfAddress,
-                    NodeTemplate =
-                                               Context.System.Settings.Config.GetString(
-                                                   "ClusterKit.NodeManager.NodeTemplate"),
-                    ContainerType =
-                                               Context.System.Settings.Config.GetString(
-                                                   "ClusterKit.NodeManager.ContainerType"),
-                    NodeTemplateVersion =
-                                               Context.System.Settings.Config.GetInt(
-                                                   "ClusterKit.NodeManager.NodeTemplateVersion"),
+                    NodeTemplate = config.GetString("ClusterKit.NodeManager.NodeTemplate"),
+                    ContainerType = config.GetString("ClusterKit.NodeManager.ContainerType"),
+                    NodeTemplateVersion = config.GetInt("ClusterKit.NodeManager.NodeTemplateVersion"),
                     NodeId = nodeId,
                     StartTimeStamp = this.startTimeStamp,
-                    Modules =
-                                               AppDomain.CurrentDomain.GetAssemblies()
-                                               .Where(
-                                                   a =>
-                                                   a.GetTypes()
-                                                       .Any(t => t.IsSubclassOf(typeof(BaseInstaller))))
-                                               .Select(
-                                                   a =>
-                                                   new PackageDescription()
-                                                   {
-                                                       Id = a.GetName().Name,
-                                                       Version =
-                                                               a.GetName()
-                                                               .Version.ToString(),
-                                                       BuildDate = a.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(attr => attr.Key == "BuildDate")?.Value
-                                                   })
-                                               .ToList()
+                    Roles = config.GetStringList("akka.cluster.roles")?.ToList() ?? new List<string>(),
+                    Modules = AppDomain.CurrentDomain.GetAssemblies()
+                                .Where(a => a.GetTypes().Any(t => t.IsSubclassOf(typeof(BaseInstaller))))
+                                .Select(
+                                    a =>
+                                        new PackageDescription
+                                        {
+                                            Id = a.GetName().Name,
+                                            Version = a.GetName().Version.ToString(),
+                                            BuildDate = a.GetCustomAttributes<AssemblyMetadataAttribute>()
+                                                        .FirstOrDefault(attr => attr.Key == "BuildDate")?
+                                                        .Value
+                                        })
+                                .OrderBy(a => a.Id)
+                                .ToList()
                 };
             }
             catch (ReflectionTypeLoadException exception)

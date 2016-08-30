@@ -18,7 +18,7 @@
     /// </summary>
     public class Installer : BaseInstaller
     {
-        /// <summary>
+        /// <summary> 
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>

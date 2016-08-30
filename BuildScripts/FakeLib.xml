@@ -1122,7 +1122,7 @@
 <summary>
  Update a set of attributes in an AssemblyInfo file. Fails if any attribute is not found.
  ## Parameters
-  - `assemblyInfoFile` - The file to update. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to update. Language C#, F#, VB or C++ is determined from the extension.
   - `attributes` - The Attributes that should be updated matched on Name (Namespace is not used).
 </summary>
 </member>
@@ -1131,7 +1131,7 @@
  Read the value of a single attribute from an AssemblyInfo file. Note that string values are returned with surrounding &quot;&quot;.
  ## Parameters
   - `attrName` - Name of the attribute without &quot;Attribute&quot; at the end.
-  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension.
 </summary>
 </member>
 <member name="M:Fake.AssemblyInfoFile.GetAttribute(System.String,System.String)">
@@ -1139,14 +1139,14 @@
  Read a single attribute from an AssemblyInfo file.
  ## Parameters
   - `attrName` - Name of the attribute without &quot;Attribute&quot; at the end.
-  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension.
 </summary>
 </member>
 <member name="M:Fake.AssemblyInfoFile.GetAttributes(System.String)">
 <summary>
  Read attributes from an AssemblyInfo file and return as a sequence of Attribute.
  ## Parameters
-  - `assemblyInfoFile` - The file to read attributes from. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to read attributes from. Language C#, F#, VB or C++ is determined from the extension.
 </summary>
 </member>
 <member name="M:Fake.AssemblyInfoFile.CreateCppCliAssemblyInfo(System.String,System.Collections.Generic.IEnumerable{Fake.AssemblyInfoFile.Attribute})">
@@ -2971,6 +2971,11 @@
  Contains a task which can be used to run [DotCover](http://www.jetbrains.com/dotcover/) on .NET assemblies.
 </summary>
 </member>
+<member name="P:Fake.DotNet.PackParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
 <member name="P:Fake.DotNet.PackParams.Configuration">
 <summary>
  The build configuration.
@@ -2986,6 +2991,16 @@
  Working directory (optional).
 </summary>
 </member>
+<member name="P:Fake.DotNet.PackParams.VersionSuffix">
+<summary>
+ Optional version suffix.
+</summary>
+</member>
+<member name="P:Fake.DotNet.PackParams.OutputPath">
+<summary>
+ Optional output path.
+</summary>
+</member>
 <member name="P:Fake.DotNet.PackParams.ToolPath">
 <summary>
  ToolPath - usually just &quot;dotnet&quot;
@@ -2994,6 +3009,21 @@
 <member name="T:Fake.DotNet.PackParams">
 <summary>
  DotNet pack parameters
+</summary>
+</member>
+<member name="P:Fake.DotNet.TestParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNet.TestParams.Runtime">
+<summary>
+ Allows to test a specific runtime
+</summary>
+</member>
+<member name="P:Fake.DotNet.TestParams.Framework">
+<summary>
+ Allows to test a specific framework
 </summary>
 </member>
 <member name="P:Fake.DotNet.TestParams.Configuration">
@@ -3021,6 +3051,56 @@
  DotNet test parameters
 </summary>
 </member>
+<member name="P:Fake.DotNet.BuildParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNet.BuildParams.Runtime">
+<summary>
+ Allows to build for a specific runtime
+</summary>
+</member>
+<member name="P:Fake.DotNet.BuildParams.Framework">
+<summary>
+ Allows to build for a specific framework
+</summary>
+</member>
+<member name="P:Fake.DotNet.BuildParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNet.BuildParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNet.BuildParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNet.BuildParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNet.BuildParams">
+<summary>
+ DotNet build parameters
+</summary>
+</member>
+<member name="P:Fake.DotNet.RestoreParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNet.RestoreParams.Verbosity">
+<summary>
+ Log Verbosity.
+</summary>
+</member>
 <member name="P:Fake.DotNet.RestoreParams.NoCache">
 <summary>
  Whether to use the NuGet cache.
@@ -3044,6 +3124,36 @@
 <member name="T:Fake.DotNet.RestoreParams">
 <summary>
  DotNet restore parameters
+</summary>
+</member>
+<member name="P:Fake.DotNet.CommandParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNet.CommandParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNet.CommandParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNet.CommandParams">
+<summary>
+ DotNet parameters
+</summary>
+</member>
+<member name="T:Fake.DotNet.Verbosity">
+<summary>
+ DotNet logger verbosity
+</summary>
+</member>
+<member name="M:Fake.DotNet.SetVersionInProjectJson(System.String,System.String)">
+<summary>
+ Sets version in project.json
 </summary>
 </member>
 <member name="M:Fake.DotNet.Pack(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNet.PackParams,Fake.DotNet.PackParams},System.Collections.Generic.IEnumerable{System.String})">
@@ -3078,6 +3188,22 @@
                    Configuration = &quot;Release&quot; })
 </summary>
 </member>
+<member name="M:Fake.DotNet.Build(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNet.BuildParams,Fake.DotNet.BuildParams},System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Runs the dotnet &quot;build&quot; command.
+ ## Parameters
+
+  - `setBuildParams` - Function used to overwrite the build default parameters.
+
+ ## Sample
+
+     !! &quot;src/test/project.json&quot;
+     |&gt; DotNet.Build
+         (fun p -&gt; 
+              { p with 
+                   Configuration = &quot;Release&quot; })
+</summary>
+</member>
 <member name="M:Fake.DotNet.Restore(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNet.RestoreParams,Fake.DotNet.RestoreParams})">
 <summary>
  Runs the dotnet &quot;restore&quot; command.
@@ -3093,6 +3219,23 @@
                    NoCache = true })
 </summary>
 </member>
+<member name="M:Fake.DotNet.RunCommand(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNet.CommandParams,Fake.DotNet.CommandParams},System.String)">
+<summary>
+ Runs a dotnet command.
+ ## Parameters
+
+  - `setCommandParams` - Function used to overwrite the default parameters.
+  - `args` - command and additional arguments.
+
+ ## Sample
+
+     DotNet.RunCommand
+         (fun p -&gt; 
+              { p with 
+                   TimeOut = TimeSpan.FromMinutes 10. })
+         &quot;restore&quot;
+</summary>
+</member>
 <member name="M:Fake.DotNet.isInstalled">
 <summary>
  Checks wether the dotnet CLI is installed
@@ -3103,12 +3246,307 @@
  Gets the installed dotnet version
 </summary>
 </member>
+<member name="P:Fake.DotNet.DefaultVerbosity">
+<summary>
+ The default log verbosity
+</summary>
+</member>
 <member name="P:Fake.DotNet.commandName">
 <summary>
  The dotnet command name
 </summary>
 </member>
 <member name="T:Fake.DotNet">
+<summary>
+ Contains a task which can be used to run dotnet CLI commands.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.VersionSuffix">
+<summary>
+ Optional version suffix.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.OutputPath">
+<summary>
+ Optional output path.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.PackParams">
+<summary>
+ DotNet pack parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.Runtime">
+<summary>
+ Allows to test a specific runtime
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.Framework">
+<summary>
+ Allows to test a specific framework
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.TestParams">
+<summary>
+ DotNet test parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.Runtime">
+<summary>
+ Allows to build for a specific runtime
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.Framework">
+<summary>
+ Allows to build for a specific framework
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.BuildParams">
+<summary>
+ DotNet build parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.Verbosity">
+<summary>
+ Log Verbosity.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.NoCache">
+<summary>
+ Whether to use the NuGet cache.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.RestoreParams">
+<summary>
+ DotNet restore parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.CommandParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.CommandParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.CommandParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.CommandParams">
+<summary>
+ DotNet parameters
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.Verbosity">
+<summary>
+ DotNet logger verbosity
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.SetVersionInProjectJson(System.String,System.String)">
+<summary>
+ Sets version in project.json
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Pack(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.PackParams,Fake.DotNetCli.PackParams},System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Runs the dotnet &quot;pack&quot; command.
+ ## Parameters
+
+  - `setPackParams` - Function used to overwrite the pack default parameters.
+
+ ## Sample
+
+     !! &quot;src/test/project.json&quot;
+     |&gt; DotNetCli.Pack
+         (fun p -&gt; 
+              { p with 
+                   Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Test(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.TestParams,Fake.DotNetCli.TestParams},System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Runs the dotnet &quot;test&quot; command.
+ ## Parameters
+
+  - `setTestParams` - Function used to overwrite the test default parameters.
+
+ ## Sample
+
+     !! &quot;src/test/project.json&quot;
+     |&gt; DotNetCli.Test
+         (fun p -&gt; 
+              { p with 
+                   Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Build(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.BuildParams,Fake.DotNetCli.BuildParams},System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Runs the dotnet &quot;build&quot; command.
+ ## Parameters
+
+  - `setBuildParams` - Function used to overwrite the build default parameters.
+
+ ## Sample
+
+     !! &quot;src/test/project.json&quot;
+     |&gt; DotNetCli.Build
+         (fun p -&gt; 
+              { p with 
+                   Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Restore(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.RestoreParams,Fake.DotNetCli.RestoreParams})">
+<summary>
+ Runs the dotnet &quot;restore&quot; command.
+ ## Parameters
+
+  - `setRestoreParams` - Function used to overwrite the restore default parameters.
+
+ ## Sample
+
+     DotNetCli.Restore 
+         (fun p -&gt; 
+              { p with 
+                   NoCache = true })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.RunCommand(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.CommandParams,Fake.DotNetCli.CommandParams},System.String)">
+<summary>
+ Runs a dotnet command.
+ ## Parameters
+
+  - `setCommandParams` - Function used to overwrite the default parameters.
+  - `args` - command and additional arguments.
+
+ ## Sample
+
+     DotNetCli.RunCommand
+         (fun p -&gt; 
+              { p with 
+                   TimeOut = TimeSpan.FromMinutes 10. })
+         &quot;restore&quot;
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.isInstalled">
+<summary>
+ Checks wether the dotnet CLI is installed
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.getVersion">
+<summary>
+ Gets the installed dotnet version
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.DefaultVerbosity">
+<summary>
+ The default log verbosity
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.commandName">
+<summary>
+ The dotnet command name
+</summary>
+</member>
+<member name="T:Fake.DotNetCli">
 <summary>
  Contains a task which can be used to run dotnet CLI commands.
 </summary>
@@ -3652,6 +4090,11 @@
  Determines if the current system is an Unix system
 </summary>
 </member>
+<member name="P:Fake.EnvironmentHelper.isWindows">
+<summary>
+ Determines if the current system is a Windows system
+</summary>
+</member>
 <member name="P:Fake.EnvironmentHelper.SystemRoot">
 <summary>
  The system root environment variable. Typically &quot;C:\Windows&quot;
@@ -3696,17 +4139,17 @@
 </member>
 <member name="M:Fake.EnvironmentHelper.environVarOrNone(System.String)">
 <summary>
- Retrieves the environment variable or None
+ Retrieves the environment variable or None if no value was set
 </summary>
 </member>
 <member name="M:Fake.EnvironmentHelper.getEnvironmentVarAsBool(System.String)">
 <summary>
- Retrieves the environment variable with the given name or returns the false if no value was set
+ Retrieves the environment variable with the given name or returns false if no value was set
 </summary>
 </member>
 <member name="M:Fake.EnvironmentHelper.getEnvironmentVarAsBoolOrDefault(System.String,System.Boolean)">
 <summary>
- Retrieves the environment variable with the given name or returns the default bool if no value was set
+ Retrieves the environment variable with the given name or returns the default value if no value was set
 </summary>
 </member>
 <member name="M:Fake.EnvironmentHelper.environVarOrFail(System.String)">
@@ -5795,6 +6238,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
   - `file` - The file to reset - null means all files.
 </summary>
 </member>
+<member name="M:Fake.Git.Reset.resetOrCheckout(System.String,System.String)">
+<summary>
+ the intent of the &apos;reset&apos; helper is to either set a repo to a certain point, or set a file to a certain point.  Git reset doesn&apos;t take file paths in the hard/mixed/soft modes, and so you have to use checkout instead for that.
+ This function encapsulates caring about that so you don&apos;t have to.      
+</summary>
+</member>
 <member name="T:Fake.Git.Reset">
 <summary>
  Contains helper functions which allow to deal with git reset.
@@ -5932,6 +6381,27 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.Git.Submodule">
 <summary>
  Contains helper functions which allow to deal with git submodules.
+</summary>
+</member>
+<member name="M:Fake.GitVersionHelper.GitVersion(Microsoft.FSharp.Core.FSharpFunc{Fake.GitVersionHelper.GitversionParams,Fake.GitVersionHelper.GitversionParams})">
+<summary>
+ Runs [GitVersion](https://gitversion.readthedocs.io/en/latest/) on a .NET project file.
+ ## Parameters
+
+  - `setParams` - Function used to manipulate the GitversionDefaults value.
+
+ ## Sample
+
+      GitVersion id // Use Defaults
+      GitVersion (fun p -&gt; { p with ToolPath = currentDirectory @@ &quot;tools&quot; }
+</summary>
+</member>
+<member name="T:Fake.GitVersionHelper">
+<summary>
+ Containts helper function for GitVersion - a tool to help you achieve Semantic Versioning on your project.
+
+ To install GitVersion.exe on Windows, start PowerShell as Administrator and run choco install gitversion.portable -s https://chocolatey.org/api/v2&quot;
+ For Mac and Unix, install the NuGet version.
 </summary>
 </member>
 <member name="T:Fake.Globbing">
@@ -6321,6 +6791,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  All files which are in &quot;Compile&quot; sections
 </summary>
 </member>
+<member name="P:Fake.MSBuild.ProjectSystem.ProjectFile.ContentFiles">
+<summary>
+ All files which are in &quot;Content&quot; sections
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.Save(Microsoft.FSharp.Core.FSharpOption{System.String})">
 <summary>
  Saves the project file
@@ -6329,6 +6804,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.RemoveFile(System.String)">
 <summary>
  Removes a file from the Compile nodes
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.RemoveContentFile(System.String)">
+<summary>
+ Removes a file from the Content nodes
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.FromFile(System.String)">
@@ -6341,14 +6821,29 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Finds duplicate files which are in &quot;Compile&quot; sections
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.FindDuplicateContentFiles">
+<summary>
+ Finds duplicate files which are in &quot;Content&quot; sections
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.AddFile(System.String)">
 <summary>
  Add a file to the Compile nodes
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.AddContentFile(System.String)">
+<summary>
+ Add a file to the Content nodes
+</summary>
+</member>
 <member name="T:Fake.MSBuild.ProjectSystem.ProjectFile">
 <summary>
  A small abstraction over MSBuild project files.
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.RemoveContentNodesWithMissingFiles(System.String)">
+<summary>
+ Removes projects Content nodes that have Include attributes pointing to files missing from the file system.  Saves updated projects.
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.RemoveCompileNodesWithMissingFiles(System.String)">
@@ -6362,10 +6857,21 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  For F# projects it is also reporting unordered files.
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.FixProjectContentFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Compares the given projects to the template project and adds all missing content files to the projects if needed.
+ It also removes duplicate files from the project files.
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.FixProjectFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
  Compares the given projects to the template project and adds all missing files to the projects if needed.
  It also removes duplicate files from the project files.
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.RemoveDuplicateContentFiles(System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ It removes duplicate content files from the project files.
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.RemoveDuplicateFiles(System.Collections.Generic.IEnumerable{System.String})">
@@ -6373,9 +6879,20 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  It removes duplicate files from the project files.
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.FixMissingContentFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Compares the given projects to the template project and adds all missing files to the projects if needed.
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.FixMissingFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
  Compares the given projects to the template project and adds all missing files to the projects if needed.
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.findMissingContentFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Compares the given project files againts the template project and returns which files are missing.
+ For F# projects it is also reporting unordered files.
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.findMissingFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
@@ -6401,7 +6918,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 </member>
 <member name="M:Fake.MSBuild.SpecsRemovement.Nothing``2(``0,``1)">
 <summary>
- A Convetion which matches nothing
+ A Convention which matches nothing
 </summary>
 </member>
 <member name="M:Fake.MSBuild.SpecsRemovement.AllSpecAndTestDataFiles(System.String,System.String)">
@@ -7813,6 +8330,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Option type for selecting one command
 </summary>
 </member>
+<member name="P:Fake.OctoTools.PushOptions.ReplaceExisting">
+<summary>
+ if the package already exists, should this package overwrite it?
+</summary>
+</member>
 <member name="P:Fake.OctoTools.DeleteReleaseOptions.MaxVersion">
 <summary>
  Maximum (inclusive) version number for the range of versions to delete
@@ -7977,6 +8499,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="M:Fake.OctoTools.commandLine(Fake.OctoTools.OctoCommand)">
 <summary>
  Maps a command to string input for the octopus tools cli.
+</summary>
+</member>
+<member name="M:Fake.OctoTools.pushCommandLine(Fake.OctoTools.PushOptions)">
+<summary>
+ [omit]
 </summary>
 </member>
 <member name="M:Fake.OctoTools.serverCommandLine(Fake.OctoTools.OctoServerOptions)">
@@ -9934,9 +10461,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 
      parse &quot;1.0.0-rc.1&quot;     &lt; parse &quot;1.0.0&quot;          // true
      parse &quot;1.2.3-alpha&quot;    &gt; parse &quot;1.2.2&quot;          // true
-     parse &quot;1.2.3-alpha2&quot;   &gt; parse &quot;1.2.3-alpha&quot;    // true
-     parse &quot;1.2.3-alpha002&quot; &gt; parse &quot;1.2.3-alpha1&quot;   // true
-     parse &quot;1.5.0-beta.2&quot;   &gt; parse &quot;1.5.0-rc.1&quot;     // false
+     parse &quot;1.2.3-alpha2&quot;   &gt; parse &quot;1.2.3-alpha&quot;    // true, but only because of lexical compare
+     parse &quot;1.2.3-alpha002&quot; &gt; parse &quot;1.2.3-alpha1&quot;   // false, due to lexical compare
+     parse &quot;1.5.0-beta.2&quot;   &gt; parse &quot;1.5.0-rc.1&quot;     // false, due to lexical compare of first prerelease identitifer
+     parse &quot;1.5.0-beta.2&quot;   &gt; parse &quot;1.5.0-beta.3&quot;   // true, due to numeric compare of second prerelease identitifer
+     parse &quot;1.5.0-0123.001&quot; &lt; parse &quot;1.5.0-0123.002&quot; // true, due to numeric compare of second prerelease identifier
+     parse &quot;1.0.0+lol&quot;      = parse &quot;1.0.0&quot;          // true, because build identifiers do not influence comparison
 </summary>
 </member>
 <member name="M:Fake.SemVerHelper.isValidSemVer(System.String)">
@@ -13329,6 +13859,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Nest Components in here
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.Script.DirectoryRefs">
+<summary>
+ You can nest DirectoryRefs in here
+</summary>
+</member>
 <member name="P:Fake.WiXHelper.Script.Directories">
 <summary>
  Nest directories in here
@@ -13915,6 +14450,11 @@ hidden
  WiX parameter type
 </summary>
 </member>
+<member name="T:Fake.WiXHelper.WiXDirectoryRef">
+<summary>
+ Reference to a component for including it in a feature
+</summary>
+</member>
 <member name="T:Fake.WiXHelper.WiXDir">
 <summary>
  WiX Directories define a logical directory which can include components and files
@@ -13928,6 +14468,177 @@ hidden
 <member name="T:Fake.WiXHelper.WiXComponentRef">
 <summary>
  Reference to a component for including it in a feature
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Values">
+<summary>
+ You can nest child registry values here
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Keys">
+<summary>
+ You can nest child registry keys here
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.ForceDeleteOnUninstall">
+<summary>
+ Set this attribute to &apos;yes&apos; to remove the key with all its values and subkeys when the parent component is uninstalled
+ Note that this value is useful only if your program creates additional values or subkeys under this key and you want an uninstall to remove them
+ MSI already removes all values and subkeys that it creates, so this option just adds additional overhead to uninstall. The default is &quot;no&quot;
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.ForceCreateOnInstall">
+<summary>
+ Set this attribute to &apos;yes&apos; to create an empty key, if absent, when the parent component is installed
+ This value is needed only to create an empty key with no subkeys or values.
+ Windows Installer creates keys as needed to store subkeys and values. The default is &quot;no&quot;
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Key">
+<summary>
+ The localizable key for the registry value
+ If the parent element is a RegistryKey, this value may be omitted to use the path of the parent, or if its specified it will be appended to the path of the parent
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Root">
+<summary>
+ The predefined root key for the registry value
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Id">
+<summary>
+ Primary key used to identify this particular entry
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryKey">
+<summary>
+ Parameters for WiX RegistryKey
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Root">
+<summary>
+ The predefined root key for the registry value.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.KeyPath">
+<summary>
+ Set this attribute to &apos;yes&apos; to make this registry key the KeyPath of the parent component
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Key">
+<summary>
+ The localizable key for the registry value
+ If the parent element is a RegistryKey, this value may be omitted to use the path of the parent, or if its specified it will be appended to the path of the parent
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Type">
+<summary>
+ The type of the desired registry key
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Action">
+<summary>
+ The action that will be taken for this registry value
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Value">
+<summary>
+ The localizable registry value. 
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Name">
+<summary>
+ The localizable registry value name. If this attribute is not provided the default value for the registry key will be set instead
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Id">
+<summary>
+ The Id of this value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValue">
+<summary>
+ Parameters for WiX RegistryValue
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.MultiString">
+<summary>
+ The value is interpreted and stored as a multiple strings (REG_MULTI_SZ)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.Expandable">
+<summary>
+ The value is interpreted and stored as an expandable string (REG_EXPAND_SZ)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.Binary">
+<summary>
+ The value is interpreted and stored as a hexadecimal value (REG_BINARY)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.Integer">
+<summary>
+ The value is interpreted and stored as an integer (REG_DWORD)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.String">
+<summary>
+ The value is interpreted and stored as a string (REG_SZ)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType">
+<summary>
+ The desired type of a registry key.
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction.Write">
+<summary>
+ Writes a registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction.Prepend">
+<summary>
+ Prepends the specified value(s) to a multiString registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction.Append">
+<summary>
+ Appends the specified value(s) to a multiString registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction">
+<summary>
+ The action that will be taken for a registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKU">
+<summary>
+ Writes this registry key inside either the HKEY_USers registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKLM">
+<summary>
+ Writes this registry key inside either the HKEY_LOCAL_MACHINE registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKCU">
+<summary>
+ Writes this registry key inside either the HKEY_CURRENT_USER registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKCR">
+<summary>
+ Writes this registry key inside either the HKEY_CLASSES_ROOT registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKMU">
+<summary>
+ Writes this registry key inside either HKEY_LOCAL_MACHINE or HKEY_CURRENT_USER. Wix decides at install time based on wether or not this is an &quot;all users&quot; install
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType">
+<summary>
+ Represents the registry root under which this key should be written
 </summary>
 </member>
 <member name="P:Fake.WiXHelper.WiXServiceInstall.ServiceDependencies">
@@ -14351,6 +15062,7 @@ hidden
                                 UIRefs = uiRef1.ToString() + uiRef2.ToString()
                                 WiXVariables = wiXLicense.ToString()
                                 Directories = directories
+                                DirectoryRefs = directoryrefs
                                 BuildNumber = &quot;1.0.0&quot;
                                 Features = rootFeature.ToString()
                                 CustomActions = action1.ToString() + action2.ToString()
@@ -14562,6 +15274,16 @@ hidden
 get component refs from a directory component hierarchy
 </summary>
 </member>
+<member name="M:Fake.WiXHelper.generateDirectoryRef(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXDirectoryRef,Fake.WiXHelper.WiXDirectoryRef})">
+<summary>
+ Use this for generating component refs
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXDirectoryRefDefaults">
+<summary>
+ Defaults for component ref
+</summary>
+</member>
 <member name="M:Fake.WiXHelper.generateComponentRef(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXComponentRef,Fake.WiXHelper.WiXComponentRef})">
 <summary>
  Use this for generating component refs
@@ -14570,6 +15292,45 @@ get component refs from a directory component hierarchy
 <member name="P:Fake.WiXHelper.WiXComponentRefDefaults">
 <summary>
  Defaults for component ref
+</summary>
+</member>
+<member name="M:Fake.WiXHelper.generateRegistryKey(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXRegistryKey,Fake.WiXHelper.WiXRegistryKey})">
+<summary>
+ Generates a registry key based on the given parameters, use toString on it when embedding it
+ You can pass other registry keys and values into RegistryKeys or RegistryValues for making a hierarchy
+ ## Parameters
+  - `setParams` - Function used to manipulate the WiX default parameters.
+
+ ## Sample
+ let key = generateRegistryKey(fun k -&gt;
+                                 {k with
+                                   Id = &quot;KeyId&quot;
+                                   Key = &quot;SomeKey&quot;
+                                   Root = Some WiXRegistryRootType.HKCR
+                                   ForceCreateOnInstall = YesOrNo.Yes
+                                   ForceDeleteOnUninstall = YesOrNo.No
+                                   Keys = someChildKeys
+                                   Values = someChildValues
+                                 })
+</summary>
+</member>
+<member name="M:Fake.WiXHelper.generateRegistryValue(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXRegistryValue,Fake.WiXHelper.WiXRegistryValue})">
+<summary>
+ Generates a registry value based on the given parameters, use toString on it when embedding it
+ ## Parameters
+  - `setParams` - Function used to manipulate the WiX default parameters.
+
+ ## Sample
+ let registryValue = generateRegistryValue(fun v -&gt; 
+                                               {v with
+                                                   Id = &quot;asdasd&quot;
+                                                   Name = &quot;Something&quot;
+                                                   Key = &quot;Somewhere&quot;
+                                                   Root = Some WiXRegistryRootType.HKU
+                                                   Type = WiXRegistryValueType.Integer
+                                                   KeyPath = YesOrNo.No
+                                                   Value = &quot;2&quot;
+                                               })
 </summary>
 </member>
 <member name="M:Fake.WiXHelper.generateServiceInstall(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXServiceInstall,Fake.WiXHelper.WiXServiceInstall})">

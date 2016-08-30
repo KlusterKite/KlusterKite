@@ -2,6 +2,7 @@
 	ClusterKit.Core.RestTimeout = 10s
  	ClusterKit {
  		Web {
+ 			Debug.Trace = false #outputs to Console every start and finish request events
  			OwinBindAddress = "http://*:8080"
  			Services {
  				//ServiceName { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node

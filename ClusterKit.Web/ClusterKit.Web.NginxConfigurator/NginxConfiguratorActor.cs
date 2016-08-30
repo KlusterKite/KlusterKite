@@ -259,7 +259,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 foreach (var serviceDescription in serviceHost)
                 {
                     var activeNodes = host[serviceDescription.Route].ActiveNodes;
-                    var d = activeNodes.FirstOrDefault(n => n.ServiceDescription == serviceDescription);
+                    var d = activeNodes.FirstOrDefault(n => n.NodeAddress == nodeAddress);
                     if (d != null)
                     {
                         activeNodes.Remove(d);
@@ -316,7 +316,7 @@ namespace ClusterKit.Web.NginxConfigurator
 
                     if (proccess != null && !proccess.WaitForExit(10000))
                     {
-                        Context.GetLogger().Error("{Type}: NGinx reload command timeou", this.GetType().Name);
+                        Context.GetLogger().Error("{Type}: NGinx reload command timeout", this.GetType().Name);
                     }
                 }
             }

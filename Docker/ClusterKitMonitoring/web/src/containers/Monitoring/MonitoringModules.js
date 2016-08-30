@@ -87,9 +87,11 @@ export default class MonitoringModules extends Component {
           <table className="table table-hover">
             <thead>
                 <tr>
-                    <th>Id</th>
                     <th>Address</th>
+                    <th>Leader</th>
                     <th>Modules</th>
+                    <th>Roles</th>
+                    <th>Roles leader</th>
                     <th>Status</th>
                     <th>Template</th>
                     <th>Container</th>
@@ -98,16 +100,30 @@ export default class MonitoringModules extends Component {
             <tbody>
               {data && data.map((module) =>
                 <tr key={module.NodeId}>
-                  <td>
-                    <small>{module.NodeId}</small>
-                  </td>
                   <td>{module.NodeAddress.Host}:{module.NodeAddress.Port}</td>
+                  <td>{module.IsClusterLeader ? <span>*</span> : ""}</td>
                   <td>
                     {module.Modules.map((subModule) =>
                         <span key={module.NodeId + '/' + subModule.Id}>
-                          <span className="label label-default">{subModule.Id}</span>{' '}
+                          <span className="label label-default">{subModule.Id} {subModule.Version}</span>{' '}
                         </span>
                       )
+                    }
+                  </td>
+                  <td>
+                    {module.Roles.map((role) =>
+                      <span key={module.NodeId + '/' + role}>
+                          <span className="label label-default">{role}</span>{' '}
+                        </span>
+                      )
+                    }
+                  </td>
+                  <td>
+                    {module.LeaderInRoles.map((role) =>
+                      <span key={module.NodeId + '/leader/' + role}>
+                          <span className="label label-default">{role}</span>{' '}
+                        </span>
+                    )
                     }
                   </td>
                   <td>

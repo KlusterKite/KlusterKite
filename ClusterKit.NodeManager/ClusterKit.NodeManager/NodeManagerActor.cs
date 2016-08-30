@@ -115,6 +115,11 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications = new Dictionary<Address, Cancelable>();
 
         /// <summary>
+        /// Roles leaders
+        /// </summary>
+        private readonly Dictionary<string, Address> roleLeaders = new Dictionary<string, Address>();
+
+        /// <summary>
         /// The node message router
         /// </summary>
         private readonly IMessageRouter router;
@@ -133,6 +138,11 @@ namespace ClusterKit.NodeManager
         /// List of nodes with upgrade in progress
         /// </summary>
         private readonly Dictionary<Guid, UpgradeData> upgradingNodes = new Dictionary<Guid, UpgradeData>();
+
+        /// <summary>
+        /// The current cluster leader
+        /// </summary>
+        private Address clusterLeader;
 
         /// <summary>
         /// The database connection string
@@ -378,13 +388,12 @@ namespace ClusterKit.NodeManager
                     this.Self);
                 return;
             }
-            
+
             this.workers =
                 Context.ActorOf(
                     Props.Create(() => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
                         .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                     "workers");
-            
 
             this.Become(this.Start);
             // ReSharper disable FormatStringProblem
@@ -404,6 +413,26 @@ namespace ClusterKit.NodeManager
             if ("receiver".Equals(actorIdentity.MessageId as string) && actorIdentity.Subject != null)
             {
                 this.Sender.Tell(new NodeDescriptionRequest());
+            }
+        }
+
+        /// <summary>
+        /// Cluster leader has been changed
+        /// </summary>
+        /// <param name="message">The notification message</param>
+        private void OnLeaderChanged(ClusterEvent.LeaderChanged message)
+        {
+            this.clusterLeader = message.Leader;
+            var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.IsClusterLeader);
+            if (formerLeader != null)
+            {
+                formerLeader.IsClusterLeader = false;
+            }
+
+            NodeDescription leader;
+            if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+            {
+                leader.IsClusterLeader = true;
             }
         }
 
@@ -558,6 +587,9 @@ namespace ClusterKit.NodeManager
             this.requestDescriptionNotifications.Remove(address);
             this.nodeDescriptions[address] = nodeDescription;
 
+            nodeDescription.IsClusterLeader = this.clusterLeader == address;
+            nodeDescription.LeaderInRoles = this.roleLeaders.Where(p => p.Value == address).Select(p => p.Key).ToList();
+
             if (!string.IsNullOrEmpty(nodeDescription.NodeTemplate))
             {
                 List<Address> nodeList;
@@ -668,6 +700,9 @@ namespace ClusterKit.NodeManager
         {
             var cancelable = new Cancelable(Context.System.Scheduler);
             this.requestDescriptionNotifications[address] = cancelable;
+
+            //if (this.nodeDescriptions.TryGetValue(address, out ))
+
             this.OnRequestDescriptionNotification(new RequestDescriptionNotification { Address = address });
         }
 
@@ -833,6 +868,23 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// The role leader has been changed
+        /// </summary>
+        /// <param name="message">The notification message</param>
+        private void OnRoleLeaderChanged(ClusterEvent.RoleLeaderChanged message)
+        {
+            this.roleLeaders[message.Role] = message.Leader;
+            var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.LeaderInRoles.Contains(message.Role));
+            formerLeader?.LeaderInRoles.Remove(message.Role);
+
+            NodeDescription leader;
+            if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+            {
+                leader.LeaderInRoles.Add(message.Role);
+            }
+        }
+
+        /// <summary>
         /// Process the <seealso cref="SeedAddress"/> update event
         /// </summary>
         /// <param name="message"><seealso cref="SeedAddress"/> update notification</param>
@@ -908,13 +960,19 @@ namespace ClusterKit.NodeManager
                .Subscribe(
                    this.Self,
                    ClusterEvent.InitialStateAsEvents,
-                   new[] { typeof(ClusterEvent.MemberRemoved), typeof(ClusterEvent.MemberUp) });
+                   typeof(ClusterEvent.MemberRemoved),
+                   typeof(ClusterEvent.MemberUp),
+                   typeof(ClusterEvent.LeaderChanged),
+                   typeof(ClusterEvent.RoleLeaderChanged));
 
             // ping message will indicate that actor started and ready to work
             this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
 
             this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member.Address));
             this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member.Address));
+
+            this.Receive<ClusterEvent.LeaderChanged>(m => this.OnLeaderChanged(m));
+            this.Receive<ClusterEvent.RoleLeaderChanged>(m => this.OnRoleLeaderChanged(m));
 
             this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
             this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
@@ -1002,10 +1060,6 @@ namespace ClusterKit.NodeManager
             /// Gets or sets code of <seealso cref="NodeTemplate"/> assigned to request
             /// </summary>
             public string TemplateCode { get; set; }
-        }
-
-        private class TestClass
-        {
         }
 
         /// <summary>

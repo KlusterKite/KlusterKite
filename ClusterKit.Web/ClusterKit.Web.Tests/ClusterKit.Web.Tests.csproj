@@ -116,9 +116,8 @@
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Helios, Version=2.1.2.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Helios.2.1.2.1-beta\lib\net45\Helios.dll</HintPath>
+    <Reference Include="Helios, Version=2.1.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Helios.2.1.3\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.1.4.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -197,14 +196,16 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.2.0-beta1-build3239\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
-      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
-      <Name>ClusterKit.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj">
-      <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
-      <Name>ClusterKit.Core.TestKit</Name>
-    </ProjectReference>
+    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ClusterKit.Core.TestKit, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.TestKit.0.0.0-local\lib\ClusterKit.Core.TestKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NginxConfiguratorTest.cs" />
