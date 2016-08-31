@@ -57,6 +57,16 @@ export default class MonitoringModules extends Component {
     upgradeNode(mod.NodeId, mod.NodeAddress);
   }
 
+  drawRole(module, role) {
+    const isLeader = module.LeaderInRoles.indexOf(role) >= 0;
+    return <span key={module.NodeId + '/' + role}>
+                {isLeader && <span className="label label-info" title={role + ' leader'}>{role}</span>}
+                {!isLeader && <span className="label label-default">{role}</span>}
+                {' '}
+           </span>
+
+  }
+
   render() {
     const {loading, loaded, data, upgraded, upgrading, upgradingId} = this.props;
     const styles = require('./Monitoring.scss');
@@ -91,7 +101,6 @@ export default class MonitoringModules extends Component {
                     <th>Leader</th>
                     <th>Modules</th>
                     <th>Roles</th>
-                    <th>Roles leader</th>
                     <th>Status</th>
                     <th>Template</th>
                     <th>Container</th>
@@ -101,7 +110,7 @@ export default class MonitoringModules extends Component {
               {data && data.map((module) =>
                 <tr key={module.NodeId}>
                   <td>{module.NodeAddress.Host}:{module.NodeAddress.Port}</td>
-                  <td>{module.IsClusterLeader ? <span>*</span> : ""}</td>
+                  <td>{module.IsClusterLeader ? <i className="fa fa-check-circle" aria-hidden="true"></i> : ''}</td>
                   <td>
                     {module.Modules.map((subModule) =>
                         <span key={module.NodeId + '/' + subModule.Id}>
@@ -111,33 +120,30 @@ export default class MonitoringModules extends Component {
                     }
                   </td>
                   <td>
-                    {module.Roles.map((role) =>
-                      <span key={module.NodeId + '/' + role}>
-                          <span className="label label-default">{role}</span>{' '}
-                        </span>
-                      )
-                    }
+                    {module.Roles.map((role) => this.drawRole(module, role))}
                   </td>
+                  {module.IsInitialized &&
                   <td>
-                    {module.LeaderInRoles.map((role) =>
-                      <span key={module.NodeId + '/leader/' + role}>
-                          <span className="label label-default">{role}</span>{' '}
-                        </span>
-                    )
-                    }
-                  </td>
-                  <td>
+                    <span className="label">{module.IsInitialized}</span>
                     {!module.IsObsolete &&
-                      <span className="label label-success">Actual</span>
+                    <span className="label label-success">Actual</span>
                     }
                     {module.IsObsolete &&
-                      <span className="label label-warning">Obsolete</span>
+                    <span className="label label-warning">Obsolete</span>
                     }
                     <br />
-                    <button type="button" className={styles.upgrade + ' btn btn-xs'} onClick={() => this.handleUpgrade(module)} disabled={upgrading}>
-                      <i className={upgradingId === module.NodeId ? 'fa fa-refresh fa-spin' : 'fa fa-refresh'}/> {' '} Upgrade Node
+                    <button type="button" className={styles.upgrade + ' btn btn-xs'}
+                            onClick={() => this.handleUpgrade(module)} disabled={upgrading}>
+                      <i className={upgradingId === module.NodeId ? 'fa fa-refresh fa-spin' : 'fa fa-refresh'}/> {' '}
+                      Upgrade Node
                     </button>
                   </td>
+                  }
+                  {!module.IsInitialized &&
+                    <td>
+                      <span className="label label-info">Uncontrolled</span>
+                    </td>
+                  }
                   <td>
                     {module.NodeTemplate}
                   </td>

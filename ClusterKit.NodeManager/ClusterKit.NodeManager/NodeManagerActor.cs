@@ -701,7 +701,25 @@ namespace ClusterKit.NodeManager
             var cancelable = new Cancelable(Context.System.Scheduler);
             this.requestDescriptionNotifications[address] = cancelable;
 
-            //if (this.nodeDescriptions.TryGetValue(address, out ))
+            if (!this.nodeDescriptions.ContainsKey(address))
+            {
+                var nodeDescription = new NodeDescription
+                                          {
+                                              IsInitialized = false,
+                                              NodeAddress = address,
+                                              Modules = new List<PackageDescription>(),
+                                              Roles = new List<string>(),
+                                              LeaderInRoles =
+                                                  this.roleLeaders.Where(p => p.Value == address)
+                                                      .Select(p => p.Key)
+                                                      .ToList(),
+                                              IsClusterLeader = address == this.clusterLeader
+                                          };
+
+
+
+                this.nodeDescriptions.Add(address, nodeDescription);
+            }
 
             this.OnRequestDescriptionNotification(new RequestDescriptionNotification { Address = address });
         }
