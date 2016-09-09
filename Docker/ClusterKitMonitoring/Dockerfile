@@ -6,10 +6,10 @@ ENV PATH $PATH:/nodejs/bin
 
 EXPOSE 8080
 WORKDIR /app
-COPY ./web/package.json /app/
-RUN npm -g install npm@latest
-RUN npm install
-COPY ./web /app
-RUN npm run build
+#COPY ./web/package.json /app/
+#RUN npm -g install npm@latest
+#RUN npm install
+#COPY ./web /app
+#RUN npm run build
 
-ENTRYPOINT ["/nodejs/bin/npm", "run", "start"]
+#ENTRYPOINT ["/nodejs/bin/npm", "run", "start"]

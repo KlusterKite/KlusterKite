@@ -46,7 +46,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Web.NginxConfigurator",
                                     "ClusterKit.NodeManager.Client",
                                     "ClusterKit.Log.Console",
-                                    "ClusterKit.Log.Console",
                                     "ClusterKit.Log.ElasticSearch"
                                 },
                     Configuration = Configurations.Publisher,

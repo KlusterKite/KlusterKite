@@ -1,0 +1,24 @@
+.app {
+}
+
+.brand {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+
+  background: url('./images/logo.png') #f8f7f7 no-repeat center center;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background-size: 80%;
+  margin: 0 10px 0 0;
+  border-radius: 20px;
+}
+
+.brandBack {
+
+}
+
+.appContent {
+  margin-top: 50px;
+}

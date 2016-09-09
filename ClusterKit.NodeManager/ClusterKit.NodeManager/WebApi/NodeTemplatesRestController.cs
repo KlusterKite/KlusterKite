@@ -19,7 +19,7 @@ namespace ClusterKit.NodeManager.WebApi
     /// <summary>
     /// All rest actions with <see cref="NodeTemplate"/>
     /// </summary>
-    [RoutePrefix("nodemanager/templates")]
+    [RoutePrefix("api/1.x/clusterkit/nodemanager/templates")]
     public class NodeTemplatesRestController : BaseCrudController<NodeTemplate, int>
     {
         /// <summary>

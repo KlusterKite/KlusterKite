@@ -235,6 +235,7 @@
     <None Include="Resources\akka.hocon" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\ActorSystemScanRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -242,6 +243,7 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="Installer.cs" />
+    <Compile Include="ScanActor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Configuration.resx">

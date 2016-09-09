@@ -20,6 +20,7 @@ namespace ClusterKit.Monitoring.WebApi
     /// <summary>
     /// Manages web requests to describe current cluster health state
     /// </summary>
+    [RoutePrefix("api/1.x/clusterkit")]
     public class MonitoringController : ApiController
     {
         /// <summary>

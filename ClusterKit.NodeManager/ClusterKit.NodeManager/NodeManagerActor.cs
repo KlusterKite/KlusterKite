@@ -242,6 +242,12 @@ namespace ClusterKit.NodeManager
         {
             nodeDescription.IsObsolete = false;
             NodeTemplate template;
+            if (string.IsNullOrWhiteSpace(nodeDescription.NodeTemplate))
+            {
+                return;
+            }
+
+
             if (!this.nodeTemplates.TryGetValue(nodeDescription.NodeTemplate, out template)
                 || template.Version != nodeDescription.NodeTemplateVersion)
             {
@@ -251,6 +257,23 @@ namespace ClusterKit.NodeManager
             foreach (var module in nodeDescription.Modules)
             {
                 IPackage package;
+                if (string.IsNullOrWhiteSpace(module.Id))
+                {
+                    Context.GetLogger().Error(
+                        // ReSharper disable FormatStringProblem
+                        "{Type}: got module with null id from template {TemplateCode} on container {ContainerCode} on address {NodeAddressString}",
+                        // ReSharper restore FormatStringProblem
+                        this.GetType().Name,
+                        nodeDescription.NodeTemplate,
+                        nodeDescription.ContainerType,
+                        // ReSharper disable RedundantToStringCall
+                        nodeDescription.NodeAddress.ToString()
+                        // ReSharper restore RedundantToStringCall
+                        );
+                    continue;
+                }
+
+
                 if (!this.packages.TryGetValue(module.Id, out package))
                 {
                     Context.GetLogger().Error(

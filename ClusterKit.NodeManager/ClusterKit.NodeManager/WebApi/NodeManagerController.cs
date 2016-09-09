@@ -31,7 +31,7 @@ namespace ClusterKit.NodeManager.WebApi
     /// Serves node management api functions
     /// </summary>
     [UsedImplicitly]
-    [RoutePrefix("nodemanager")]
+    [RoutePrefix("api/1.x/clusterkit/nodemanager")]
     public class NodeManagerController : ApiController
     {
         /// <summary>

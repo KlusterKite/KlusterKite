@@ -12,7 +12,7 @@
     /// <summary>
     /// All rest actions with <see cref="SeedAddress"/>
     /// </summary>
-    [RoutePrefix("nodemanager/nugetFeed")]
+    [RoutePrefix("api/1.x/clusterkit/nodemanager/nugetFeed")]
     [UsedImplicitly]
     public class NugetFeedsRestController : BaseCrudController<NugetFeed, int>
     {

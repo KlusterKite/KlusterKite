@@ -22,6 +22,7 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
     /// Manages request corresponding registered swagger services
     /// </summary>
     [UsedImplicitly]
+    [RoutePrefix("api/1.x/clusterkit")]
     public class SwaggerCollectorController : ApiController
     {
         /// <summary>

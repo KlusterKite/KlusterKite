@@ -19,7 +19,7 @@ namespace ClusterKit.NodeManager.WebApi
     /// <summary>
     /// All rest actions with <see cref="SeedAddress"/>
     /// </summary>
-    [RoutePrefix("nodemanager/seed")]
+    [RoutePrefix("api/1.x/clusterkit/nodemanager/seed")]
     public class SeedAddressesRestController : BaseCrudController<SeedAddress, int>
     {
         /// <summary>
