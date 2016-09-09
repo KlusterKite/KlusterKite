@@ -6,15 +6,17 @@
 
 import { fromJS } from 'immutable';
 import {
-  DEFAULT_ACTION,
+  FEEDS_RECEIVE,
 } from './constants';
 
-const initialState = fromJS({});
+const initialState = fromJS({
+  feeds: []
+});
 
 function feedsListPageReducer(state = initialState, action) {
   switch (action.type) {
-    case DEFAULT_ACTION:
-      return state;
+    case FEEDS_RECEIVE:
+      return state.set('feeds', action.feeds);
     default:
       return state;
   }

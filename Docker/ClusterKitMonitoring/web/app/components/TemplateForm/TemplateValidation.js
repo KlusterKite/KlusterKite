@@ -1,6 +1,6 @@
 import memoize from 'lru-memoize';
 import {createValidator, required, integer, moreThan, lessThan, maxValue, moreOrEqualThan, lessOrEqualThan} from '../Forms/validation';
-// checked, maxLength, email
+
 
 const templateValidation = createValidator({
   Code: required,

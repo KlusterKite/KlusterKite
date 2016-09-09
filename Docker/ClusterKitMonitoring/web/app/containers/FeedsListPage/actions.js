@@ -5,11 +5,19 @@
  */
 
 import {
-  DEFAULT_ACTION,
+  FEEDS_LOAD,
+  FEEDS_RECEIVE,
 } from './constants';
 
-export function defaultAction() {
+export function feedsLoadAction() {
   return {
-    type: DEFAULT_ACTION,
+    type: FEEDS_LOAD,
+  };
+}
+
+export function feedsReceiveAction(feeds) {
+  return {
+    type: FEEDS_RECEIVE,
+    feeds
   };
 }

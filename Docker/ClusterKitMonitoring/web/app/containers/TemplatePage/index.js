@@ -98,7 +98,7 @@ export class TemplatePage extends React.Component { // eslint-disable-line react
       <div className={styles.templatePage}>
         <h1>{name} template</h1>
         {isLoaded && <TemplateForm initialValues={template} onSave={newItem ? this.create : this.update}/>}
-        {!isLoaded && <div className="alert alert-info"><i className="fa fa-refresh fa-spin"/> Loding...</div>}
+        {!isLoaded && <div className="alert alert-info"><i className="fa fa-refresh fa-spin"/> Loading...</div>}
       </div>
     );
   }

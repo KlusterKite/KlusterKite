@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Monitoring.Client.Messages
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Node.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   The actor's description
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Monitoring.Client.Messages
 {
     using System.Xml.Serialization;
 

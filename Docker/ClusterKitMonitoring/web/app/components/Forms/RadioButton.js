@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import Option from './Option';
+import {Field } from 'redux-form/immutable';
 
 export default class RadioButton extends Component {
   static propTypes = {
@@ -9,16 +9,16 @@ export default class RadioButton extends Component {
   }
 
   render() {
-    const {field, label, options} = this.props;
+    const {name, input, meta, label, options} = this.props;
 
     return (
       <div className="form-group">
         <label>{label}</label>
-        <div className={'form-group' + (field.error && field.touched ? ' has-error' : '')}>
-          {options.map((item) =>
-            <Option key={item} field={field} item={item} />
+        <div className={'form-group' + (meta.error && meta.touched ? ' has-error' : '')}>
+          {Object.keys(options).map((key) =>
+            <label><Field name={name} component="input" type="radio" value={key} checked={input.value == key}/> {options[key]}&nbsp;</label>
           )}
-          {field.error && field.touched && <div className="text-danger">{field.error}</div>}
+          {meta.error && meta.touched && <div className="text-danger">{meta.error}</div>}
         </div>
       </div>
     );

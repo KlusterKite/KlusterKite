@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { Link } from 'react-router'
 
 import styles from './styles.css';
 
@@ -31,9 +32,9 @@ export default class TemplatesList extends Component {
           {templates && templates.length && templates.map((item) =>
             <tr key={item.Id}>
               <td>
-                <a href={'/clusterkit/templates/' + item.Id}>
+                <Link to={'/clusterkit/templates/' + item.Id}>
                   {item.Code}
-                </a>
+                </Link>
               </td>
               <td>{item.Name}</td>
               <td>
