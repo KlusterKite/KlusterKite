@@ -20,13 +20,10 @@ export default class FeedList extends Component {
   render() {
     const {feeds} = this.props;
 
-
-
-
     return (
       <div className={styles.feedList}>
         <h2>Nuget feeds list</h2>
-        <a href="/clusterkit/nugetfeeds/create/" className="btn btn-primary" role="button">Add a new feed</a>
+        <Link to="/clusterkit/nugetfeeds/create/" className="btn btn-primary" role="button">Add a new feed</Link>
         <table className="table table-hover">
           <thead>
           <tr>

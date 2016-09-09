@@ -15,7 +15,7 @@ export default class TemplatesList extends Component {
     return (
       <div className={styles.nodesList}>
         <h2>Templates list</h2>
-        <a href="/clusterkit/templates/create/" className="btn btn-primary" role="button">Add a new template</a>
+        <Link to="/clusterkit/templates/create/" className="btn btn-primary" role="button">Add a new template</Link>
         <table className="table table-hover">
           <thead>
           <tr>
