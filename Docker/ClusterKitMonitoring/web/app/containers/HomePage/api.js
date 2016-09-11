@@ -1,11 +1,11 @@
-import axios from 'axios'
+import axios from 'axios';
 
-var instance = axios.create({
+const instance = axios.create({
   timeout: 5000,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 });
 
 export function getNodeDescriptions() {
@@ -16,14 +16,13 @@ export function getNodeDescriptions() {
 
 export function upgradeNode(nodeAddress) {
   return instance.post('/api/1.x/clusterkit/nodemanager/upgradeNode', nodeAddress)
-    .then(r => true)
+    .then(() => true)
     .catch(error => console.error(error) || false);
 }
 
 export function reloadPackages() {
   return instance.post('/api/1.x/clusterkit/nodemanager/reloadPackages')
-    .then(r => true)
+    .then(() => true)
     .catch(error => console.error(error) || false);
 }
-
 

@@ -18,6 +18,6 @@ export function feedsLoadAction() {
 export function feedsReceiveAction(feeds) {
   return {
     type: FEEDS_RECEIVE,
-    feeds
+    feeds,
   };
 }

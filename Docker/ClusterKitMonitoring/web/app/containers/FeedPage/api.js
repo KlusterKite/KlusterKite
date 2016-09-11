@@ -1,11 +1,11 @@
-import axios from 'axios'
+import axios from 'axios';
 
-var instance = axios.create({
+const instance = axios.create({
   timeout: 5000,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 });
 
 export function getFeeds() {
@@ -15,13 +15,13 @@ export function getFeeds() {
 }
 
 export function getFeed(id) {
-  return instance.get('/api/1.x/clusterkit/nodemanager/nugetFeed/' + id)
+  return instance.get(`/api/1.x/clusterkit/nodemanager/nugetFeed/${id}`)
     .then(r => r.data)
     .catch(error => console.error(error) || null);
 }
 
 export function updateFeed(feed) {
-  return instance.patch('/api/1.x/clusterkit/nodemanager/nugetFeed/' + feed.Id, feed)
+  return instance.patch(`/api/1.x/clusterkit/nodemanager/nugetFeed/${feed.Id}`, feed)
     .then(r => r.data);
 }
 

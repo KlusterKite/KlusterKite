@@ -1,28 +1,27 @@
-import { take, call, put, select, race, fork, cancel } from 'redux-saga/effects';
-import { takeEvery, delay } from 'redux-saga';
+import { take, call, put, fork, cancel } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
 
 import {
   TEMPLATE_LOAD,
   TEMPLATE_CREATE,
-  TEMPLATE_UPDATE
+  TEMPLATE_UPDATE,
 } from './constants';
 
 import {
   templateReceiveAction,
-  templateUpdatedAction
+  templateUpdatedAction,
 } from './actions';
 
 import {
   getTemplate,
   createTemplate,
-  updateTemplate
+  updateTemplate,
 } from './api';
 
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 
 function* templateLoadSaga(id) {
-
   const result = yield call(getTemplate, id);
   if (result != null) {
     yield put(templateReceiveAction(result));
@@ -43,8 +42,8 @@ function* templateUpdateSaga(template) {
     const result = yield call(updateTemplate, template);
     yield put(templateUpdatedAction(result, null));
   } catch (error) {
-    console.log('update error', error + '');
-    yield put(templateUpdatedAction(null, error + ''));
+    // console.log('update error', `${error}`);
+    yield put(templateUpdatedAction(null, `${error}`));
   }
 }
 
@@ -59,6 +58,8 @@ function* selectSaga(action) {
     case TEMPLATE_CREATE:
       yield call(templateCreateSaga, action.template, action.onSuccess, action.onError);
       break;
+    default:
+      break;
   }
 }
 
@@ -67,7 +68,7 @@ function* defaultSaga() {
     [
       TEMPLATE_LOAD,
       TEMPLATE_UPDATE,
-      TEMPLATE_CREATE
+      TEMPLATE_CREATE,
     ],
     selectSaga);
 }

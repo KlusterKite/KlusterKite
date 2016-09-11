@@ -4,30 +4,33 @@
  *
  */
 
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import selectPackagesListPage from './selectors';
-import styles from './styles.css';
 
 import {
-  packagesLoadAction
+  packagesLoadAction,
 } from './actions';
 
-import PackageList from '../../components/PackageList'
+import PackageList from '../../components/PackageList';
 
-export class PackagesListPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export class PackagesListPage extends Component { // eslint-disable-line react/prefer-stateless-function
 
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    packages: PropTypes.array.isRequired,
+  }
 
   componentWillMount() {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch(packagesLoadAction());
   }
 
 
   render() {
     return (
-      <div className={styles.packagesListPage}>
-        <PackageList packages={this.props.packages}/>
+      <div>
+        <PackageList packages={this.props.packages} />
       </div>
     );
   }

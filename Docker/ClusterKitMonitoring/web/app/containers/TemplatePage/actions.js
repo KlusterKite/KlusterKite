@@ -7,10 +7,10 @@
 import {
   TEMPLATE_CREATE,
   TEMPLATE_LOAD,
-  TEMPLATE_SET_LOADED,
+  TEMPLATE_NEW,
   TEMPLATE_RECEIVE,
   TEMPLATE_UPDATE,
-  TEMPLATE_UPDATED
+  TEMPLATE_UPDATED,
 } from './constants';
 
 export function templateCreateAction(template) {
@@ -30,20 +30,20 @@ export function templateUpdateAction(template) {
 export function templateLoadAction(id) {
   return {
     type: TEMPLATE_LOAD,
-    id
+    id,
   };
 }
 
 export function templateSetLoadedAction() {
   return {
-    type: TEMPLATE_SET_LOADED
+    type: TEMPLATE_NEW,
   };
 }
 
 export function templateReceiveAction(template) {
   return {
     type: TEMPLATE_RECEIVE,
-    template
+    template,
   };
 }
 
@@ -51,6 +51,6 @@ export function templateUpdatedAction(template, error) {
   return {
     type: TEMPLATE_UPDATED,
     template,
-    error
+    error,
   };
 }

@@ -147,6 +147,7 @@
     "minimist": "1.2.0",
     "moment": "^2.14.1",
     "react": "15.2.1",
+    "react-bootstrap": "^0.30.3",
     "react-dom": "15.2.1",
     "react-immutable-render-mixin": "^0.9.7",
     "react-pure-render": "^1.0.2",

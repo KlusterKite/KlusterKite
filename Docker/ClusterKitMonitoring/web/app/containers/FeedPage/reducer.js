@@ -8,7 +8,8 @@ import { fromJS } from 'immutable';
 import {
   FEED_RECEIVE,
   FEED_UPDATED,
-  FEED_SET_LOADED
+  FEED_NEW,
+  FEED_LOAD,
 } from './constants';
 
 const initialState = fromJS({
@@ -17,23 +18,25 @@ const initialState = fromJS({
     Address: '',
     Password: '',
     UserName: '',
-    Type: []
+    Type: [],
   },
 
   updateError: null,
-  isLoaded: false
+  isLoaded: false,
 });
 
 function feedPageReducer(state = initialState, action) {
   switch (action.type) {
+    case FEED_LOAD:
+      return initialState;
     case FEED_RECEIVE:
       return state.set('feed', action.feed).set('isLoaded', true);
     case FEED_UPDATED:
       return action.feed
         ? state.set('feed', action.feed).set('updateError', null)
         : state.set('updateError', action.error);
-    case FEED_SET_LOADED:
-      return state.set('isLoaded', true);
+    case FEED_NEW:
+      return initialState.set('isLoaded', true);
     default:
       return state;
   }

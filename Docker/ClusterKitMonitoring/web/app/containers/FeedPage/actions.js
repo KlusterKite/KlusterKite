@@ -8,10 +8,10 @@
 import {
   FEED_CREATE,
   FEED_LOAD,
-  FEED_SET_LOADED,
+  FEED_NEW,
   FEED_RECEIVE,
   FEED_UPDATE,
-  FEED_UPDATED
+  FEED_UPDATED,
 } from './constants';
 
 export function feedCreateAction(feed) {
@@ -31,20 +31,20 @@ export function feedUpdateAction(feed) {
 export function feedLoadAction(id) {
   return {
     type: FEED_LOAD,
-    id
+    id,
   };
 }
 
 export function feedSetLoadedAction() {
   return {
-    type: FEED_SET_LOADED
+    type: FEED_NEW,
   };
 }
 
 export function feedReceiveAction(feed) {
   return {
     type: FEED_RECEIVE,
-    feed
+    feed,
   };
 }
 
@@ -52,6 +52,6 @@ export function feedUpdatedAction(feed, error) {
   return {
     type: FEED_UPDATED,
     feed,
-    error
+    error,
   };
 }

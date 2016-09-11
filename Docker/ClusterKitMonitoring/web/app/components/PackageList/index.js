@@ -1,24 +1,24 @@
-import React, {Component} from 'react';
-import { Link } from 'react-router'
+import React, { Component, PropTypes } from 'react';
 
-import styles from './styles.css';
+export default class PackagesList extends Component { // eslint-disable-line react/prefer-stateless-function
 
-
-export default class PackagesList extends Component {
+  static propTypes = {
+    packages: PropTypes.array.isRequired,
+  }
 
   render() {
-    const {packages} = this.props;
+    const { packages } = this.props;
 
     return (
-      <div className={styles.nodesList}>
+      <div>
         <h2>Packages list</h2>
 
         <table className="table table-hover">
           <thead>
-          <tr>
-            <th>Id</th>
-            <th>Version</th>
-          </tr>
+            <tr>
+              <th>Id</th>
+              <th>Version</th>
+            </tr>
           </thead>
           <tbody>
           {packages && packages.length && packages.map((item) =>

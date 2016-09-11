@@ -1,3 +1,4 @@
+/*
 import PackagesListPage from '../index';
 
 import expect from 'expect';
@@ -7,3 +8,4 @@ import React from 'react';
 describe('<PackagesListPage />', () => {
 
 });
+*/

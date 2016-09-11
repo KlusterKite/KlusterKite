@@ -1,3 +1,4 @@
+/*
 import {
   selectTemplatesListPage,
 } from '../selectors';
@@ -9,3 +10,4 @@ const selector = selectTemplatesListPage();
 describe('selectTemplatesListPage', () => {
 
 });
+*/

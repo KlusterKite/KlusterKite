@@ -18,6 +18,6 @@ export function packagesLoadAction() {
 export function packagesReceiveAction(packages) {
   return {
     type: PACKAGES_RECEIVE,
-    packages
+    packages,
   };
 }

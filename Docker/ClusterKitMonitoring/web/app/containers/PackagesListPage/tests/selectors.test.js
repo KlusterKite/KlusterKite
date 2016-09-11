@@ -1,3 +1,4 @@
+/*
 import {
   selectPackagesListPage,
 } from '../selectors';
@@ -9,3 +10,4 @@ const selector = selectPackagesListPage();
 describe('selectPackagesListPage', () => {
 
 });
+*/

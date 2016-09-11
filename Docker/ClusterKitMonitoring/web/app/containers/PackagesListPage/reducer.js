@@ -6,11 +6,11 @@
 
 import { fromJS } from 'immutable';
 import {
-  PACKAGES_RECEIVE
+  PACKAGES_RECEIVE,
 } from './constants';
 
 const initialState = fromJS({
-  packages: []
+  packages: [],
 });
 
 function packagesListPageReducer(state = initialState, action) {

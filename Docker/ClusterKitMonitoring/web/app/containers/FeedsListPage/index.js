@@ -4,28 +4,32 @@
  *
  */
 
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import selectFeedsListPage from './selectors';
-import styles from './styles.css';
 
-import FeedList from '../../components/FeedList'
+import FeedList from '../../components/FeedList';
 
 import {
-  feedsLoadAction
+  feedsLoadAction,
 } from './actions';
 
-export class FeedsListPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export class FeedsListPage extends Component { // eslint-disable-line react/prefer-stateless-function
+
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    feeds: PropTypes.array.isRequired,
+  }
 
   componentWillMount() {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch(feedsLoadAction());
   }
 
   render() {
     return (
-      <div className={styles.feedsListPage}>
-        <FeedList feeds={this.props.feeds}/>
+      <div>
+        <FeedList feeds={this.props.feeds} />
       </div>
     );
   }

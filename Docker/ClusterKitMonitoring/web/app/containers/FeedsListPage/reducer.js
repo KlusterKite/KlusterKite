@@ -10,7 +10,7 @@ import {
 } from './constants';
 
 const initialState = fromJS({
-  feeds: []
+  feeds: [],
 });
 
 function feedsListPageReducer(state = initialState, action) {

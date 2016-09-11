@@ -7,8 +7,7 @@ import { combineReducers } from 'redux-immutable';
 import { fromJS } from 'immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
-import { createStore } from 'redux'
-import { reducer as formReducer } from 'redux-form/immutable'
+import { reducer as formReducer } from 'redux-form/immutable';
 
 /*
  * routeReducer
@@ -36,13 +35,6 @@ function routeReducer(state = routeInitialState, action) {
     default:
       return state;
   }
-}
-
-function newFormReducer(state, action) {
-  let newState = formReducer(state, action);
-  console.log('newFormReducer', state, action, newState);
-  return newState;
-
 }
 
 /**

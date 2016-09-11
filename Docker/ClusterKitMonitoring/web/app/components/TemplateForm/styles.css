@@ -1,7 +1,3 @@
-.templateForm {
-
-}
-
 .name {
   margin-top: 5px;
 }
@@ -26,6 +22,7 @@ select.selectMini {
 .radioLabel {
   margin: 0 25px 0 5px;
 }
+
 .cog {
   position: relative;
   left: 10px;

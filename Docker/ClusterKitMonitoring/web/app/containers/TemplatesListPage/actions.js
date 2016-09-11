@@ -18,6 +18,6 @@ export function templatesLoadAction() {
 export function templatesReceiveAction(templates) {
   return {
     type: TEMPLATES_RECEIVE,
-    templates
+    templates,
   };
 }

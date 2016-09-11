@@ -1,28 +1,27 @@
-import { take, call, put, select, race, fork, cancel } from 'redux-saga/effects';
-import { takeEvery, delay } from 'redux-saga';
+import { take, call, put, fork, cancel } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
 
 import {
   FEED_LOAD,
   FEED_CREATE,
-  FEED_UPDATE
+  FEED_UPDATE,
 } from './constants';
 
 import {
   feedReceiveAction,
-  feedUpdatedAction
+  feedUpdatedAction,
 } from './actions';
 
 import {
   getFeed,
   createFeed,
-  updateFeed
+  updateFeed,
 } from './api';
 
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 
 function* feedLoadSaga(id) {
-
   const result = yield call(getFeed, id);
   if (result != null) {
     yield put(feedReceiveAction(result));
@@ -43,8 +42,8 @@ function* feedUpdateSaga(feed) {
     const result = yield call(updateFeed, feed);
     yield put(feedUpdatedAction(result, null));
   } catch (error) {
-    console.log('update error', error + '');
-    yield put(feedUpdatedAction(null, error + ''));
+    console.log('update error', `${error}`);
+    yield put(feedUpdatedAction(null, `${error}`));
   }
 }
 
@@ -59,6 +58,8 @@ function* selectSaga(action) {
     case FEED_CREATE:
       yield call(feedCreateSaga, action.feed, action.onSuccess, action.onError);
       break;
+    default:
+      break;
   }
 }
 
@@ -67,7 +68,7 @@ function* defaultSaga() {
     [
       FEED_LOAD,
       FEED_UPDATE,
-      FEED_CREATE
+      FEED_CREATE,
     ],
     selectSaga);
 }

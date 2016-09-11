@@ -6,11 +6,11 @@
 
 import { fromJS } from 'immutable';
 import {
-  TEMPLATES_RECEIVE
+  TEMPLATES_RECEIVE,
 } from './constants';
 
 const initialState = fromJS({
-  templates: []
+  templates: [],
 });
 
 function templatesListPageReducer(state = initialState, action) {

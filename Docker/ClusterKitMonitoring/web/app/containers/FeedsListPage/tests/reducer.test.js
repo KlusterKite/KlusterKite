@@ -1,3 +1,4 @@
+/*
 import expect from 'expect';
 import feedsListPageReducer from '../reducer';
 import { fromJS } from 'immutable';
@@ -7,3 +8,4 @@ describe('feedsListPageReducer', () => {
     expect(feedsListPageReducer(undefined, {})).toEqual(fromJS({}));
   });
 });
+*/

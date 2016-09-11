@@ -10,7 +10,7 @@ import {
 } from './constants';
 
 const initialState = fromJS({
-  nodeDescriptions: []
+  nodeDescriptions: [],
 });
 
 function homePageReducer(state = initialState, action) {

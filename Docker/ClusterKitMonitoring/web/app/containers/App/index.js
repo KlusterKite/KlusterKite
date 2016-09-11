@@ -13,7 +13,6 @@
 
 import React from 'react';
 
-import { connect } from 'react-redux';
 import { IndexLink } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 import Navbar from 'react-bootstrap/lib/Navbar';
@@ -37,12 +36,12 @@ export default class App extends React.Component { // eslint-disable-line react/
         <Navbar fixedTop>
           <Navbar.Header>
             <Navbar.Brand>
-              <IndexLink to="/clusterkit/" activeStyle={{color: '#333'}}>
+              <IndexLink to="/clusterkit/" activeStyle={{ color: '#333' }}>
                 <div className={styles.brand} />
                 <span>{config.app.title}</span>
               </IndexLink>
             </Navbar.Brand>
-            <Navbar.Toggle/>
+            <Navbar.Toggle />
           </Navbar.Header>
 
           <Navbar.Collapse eventKey={0}>
@@ -56,11 +55,11 @@ export default class App extends React.Component { // eslint-disable-line react/
               <LinkContainer to="/clusterkit/packages">
                 <NavItem eventKey={3}>Packages</NavItem>
               </LinkContainer>
-              </Nav>
+            </Nav>
           </Navbar.Collapse>
         </Navbar>
 
-        <div className={styles.appContent + ' container'}>
+        <div className={`${styles.appContent} container`}>
           {this.props.children}
         </div>
       </div>

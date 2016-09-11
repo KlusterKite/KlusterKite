@@ -14,9 +14,9 @@ const app = express();
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 
 
-app.use('/api', proxy({target: 'http://docker'}));
-app.use('/ThirdParty', express.static(__dirname + '/../app/ThirdParty' ));
-app.use('/Images', express.static(__dirname + '/../app/Images' ));
+app.use('/api', proxy({ target: 'http://docker' }));
+app.use('/ThirdParty', express.static(`${__dirname}/../ThirdParty`));
+app.use('/Images', express.static(`${__dirname}/../app/Images`));
 
 
 // In production we need to pass these values in instead of relying on webpack
@@ -24,8 +24,6 @@ setup(app, {
   outputPath: resolve(process.cwd(), 'build'),
   publicPath: '/',
 });
-
-
 
 // get the intended port number, use port 3000 if not provided
 const port = argv.port || process.env.PORT || 3000;

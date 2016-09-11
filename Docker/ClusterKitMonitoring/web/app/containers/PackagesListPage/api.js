@@ -1,11 +1,11 @@
-import axios from 'axios'
+import axios from 'axios';
 
-var instance = axios.create({
+const instance = axios.create({
   timeout: 5000,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 });
 
 export function getPackages() {

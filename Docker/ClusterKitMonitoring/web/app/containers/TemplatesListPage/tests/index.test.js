@@ -1,3 +1,4 @@
+/*
 import TemplatesListPage from '../index';
 
 import expect from 'expect';
@@ -7,3 +8,4 @@ import React from 'react';
 describe('<TemplatesListPage />', () => {
 
 });
+*/

@@ -1,3 +1,4 @@
+/*
 import {
   selectFeedsListPage,
 } from '../selectors';
@@ -9,3 +10,4 @@ const selector = selectFeedsListPage();
 describe('selectFeedsListPage', () => {
 
 });
+*/

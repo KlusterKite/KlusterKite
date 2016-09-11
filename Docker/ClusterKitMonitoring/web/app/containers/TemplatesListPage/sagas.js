@@ -1,23 +1,22 @@
-import { take, call, put, select, race, fork, cancel } from 'redux-saga/effects';
-import { takeEvery, delay } from 'redux-saga';
+import { take, call, put, cancel, fork } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
 
 import {
- TEMPLATES_LOAD
+ TEMPLATES_LOAD,
 } from './constants';
 
 import {
-  templatesReceiveAction
+  templatesReceiveAction,
 } from './actions';
 
 import {
-  getTemplates
+  getTemplates,
 } from '../TemplatePage/api';
 
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 
 function* templatesLoadSaga() {
-
   const result = yield call(getTemplates);
   if (result != null) {
     yield put(templatesReceiveAction(result));
@@ -29,6 +28,9 @@ function* selectSaga(action) {
   switch (action.type) {
     case TEMPLATES_LOAD:
       yield call(templatesLoadSaga);
+      break;
+    default:
+      // console.warn(`TemplateListPage sagas - unexpected action ${action.type}`);
       break;
   }
 }

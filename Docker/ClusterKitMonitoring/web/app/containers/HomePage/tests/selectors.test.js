@@ -1,3 +1,4 @@
+/*
 import {
   selectHomePage,
 } from '../selectors';
@@ -9,3 +10,4 @@ const selector = selectHomePage();
 describe('selectHomePage', () => {
 
 });
+*/

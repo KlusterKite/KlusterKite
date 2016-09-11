@@ -8,7 +8,7 @@ import {
   NODE_DESCRIPTIONS_LOAD,
   NODE_DESCRIPTIONS_RECEIVE,
   NODE_UPGRADE,
-  NODE_RELOAD_PACKAGES
+  NODE_RELOAD_PACKAGES,
 } from './constants';
 
 export function nodeDescriptionsLoadAction() {
@@ -20,19 +20,19 @@ export function nodeDescriptionsLoadAction() {
 export function nodeDescriptionsReceiveAction(nodeDescriptions) {
   return {
     type: NODE_DESCRIPTIONS_RECEIVE,
-    nodeDescriptions
+    nodeDescriptions,
   };
 }
 
 export function nodeUpgradeAction(node) {
   return {
     type: NODE_UPGRADE,
-    node
+    node,
   };
 }
 
-export function nodeReloadPackagesAction(node) {
+export function nodeReloadPackagesAction() {
   return {
-    type: NODE_RELOAD_PACKAGES
+    type: NODE_RELOAD_PACKAGES,
   };
 }

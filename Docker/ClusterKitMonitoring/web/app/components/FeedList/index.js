@@ -1,10 +1,12 @@
-import React, {Component} from 'react';
-import { Link } from 'react-router'
-import styles from './styles.css';
+import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 
 
 export default class FeedList extends Component {
 
+  static propTypes = {
+    feeds: PropTypes.array.isRequired,
+  }
 
   getTypeName(type) {
     switch (type) {
@@ -18,24 +20,24 @@ export default class FeedList extends Component {
   }
 
   render() {
-    const {feeds} = this.props;
+    const { feeds } = this.props;
 
     return (
-      <div className={styles.feedList}>
+      <div>
         <h2>Nuget feeds list</h2>
         <Link to="/clusterkit/nugetfeeds/create/" className="btn btn-primary" role="button">Add a new feed</Link>
         <table className="table table-hover">
           <thead>
-          <tr>
-            <th>Address</th>
-            <th>Type</th>
-          </tr>
+            <tr>
+              <th>Address</th>
+              <th>Type</th>
+            </tr>
           </thead>
           <tbody>
           {feeds && feeds.length && feeds.map((item) =>
             <tr key={item.Id}>
               <td>
-                <Link to={'/clusterkit/nugetfeeds/' + item.Id}>
+                <Link to={`/clusterkit/nugetfeeds/${item.Id}`}>
                 {item.Address}
                 </Link>
               </td>

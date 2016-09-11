@@ -4,30 +4,33 @@
  *
  */
 
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import selectTemplatesListPage from './selectors';
-import styles from './styles.css';
 
 import {
-  templatesLoadAction
+  templatesLoadAction,
 } from './actions';
 
-import TemplatesList from '../../components/TemplatesList'
+import TemplatesList from '../../components/TemplatesList';
 
-export class TemplatesListPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export class TemplatesListPage extends Component { // eslint-disable-line react/prefer-stateless-function
 
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    templates: PropTypes.array.isRequired,
+  }
 
   componentWillMount() {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch(templatesLoadAction());
   }
 
 
   render() {
     return (
-      <div className={styles.templatesListPage}>
-        <TemplatesList templates={this.props.templates}/>
+      <div>
+        <TemplatesList templates={this.props.templates} />
       </div>
     );
   }

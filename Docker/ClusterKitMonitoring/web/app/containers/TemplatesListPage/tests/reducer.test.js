@@ -1,3 +1,4 @@
+/*
 import expect from 'expect';
 import templatesListPageReducer from '../reducer';
 import { fromJS } from 'immutable';
@@ -7,3 +8,4 @@ describe('templatesListPageReducer', () => {
     expect(templatesListPageReducer(undefined, {})).toEqual(fromJS({}));
   });
 });
+*/

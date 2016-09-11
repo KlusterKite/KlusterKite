@@ -1,5 +1,5 @@
 import memoize from 'lru-memoize';
-import {createValidator, required, integer, moreThan, lessThan, maxValue, moreOrEqualThan, lessOrEqualThan} from '../Forms/validation';
+import { createValidator, required, integer, moreThan, maxValue, moreOrEqualThan, lessOrEqualThan } from '../Forms/validation';
 
 
 const templateValidation = createValidator({
