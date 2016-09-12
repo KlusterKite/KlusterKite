@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="NodeServiceConfiguration.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Node service description
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Web.NginxConfigurator
 {
     using Akka.Actor;
@@ -12,7 +21,7 @@ namespace ClusterKit.Web.NginxConfigurator
     public class NodeServiceConfiguration
     {
         /// <summary>
-        /// Node address
+        /// Gets or sets the node address
         /// </summary>
         [UsedImplicitly]
         public Address NodeAddress { get; set; }
@@ -23,7 +32,7 @@ namespace ClusterKit.Web.NginxConfigurator
         public string NodeUrl => $"{this.NodeAddress.Host}:{this.ServiceDescription.ListeningPort}";
 
         /// <summary>
-        /// Local node service description
+        /// Gets or sets the local node service description
         /// </summary>
         public ServiceDescription ServiceDescription { get; set; }
 
@@ -35,7 +44,8 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <returns>Whether two <seealso cref="NodeServiceConfiguration"/> are not equal</returns>
         public static bool operator !=(NodeServiceConfiguration left, NodeServiceConfiguration right)
         {
-            return !Equals(left, right);
+            // ReSharper disable once ArrangeStaticMemberQualifier
+            return !NodeServiceConfiguration.Equals(left, right);
         }
 
         /// <summary>
@@ -46,7 +56,8 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <returns>Whether two <seealso cref="NodeServiceConfiguration"/> are equal</returns>
         public static bool operator ==(NodeServiceConfiguration left, NodeServiceConfiguration right)
         {
-            return Equals(left, right);
+            // ReSharper disable once ArrangeStaticMemberQualifier
+            return NodeServiceConfiguration.Equals(left, right);
         }
 
         /// <summary>Determines whether the specified object is equal to the current object.</summary>
@@ -58,14 +69,17 @@ namespace ClusterKit.Web.NginxConfigurator
             {
                 return false;
             }
+
             if (ReferenceEquals(this, obj))
             {
                 return true;
             }
+
             if (obj.GetType() != this.GetType())
             {
                 return false;
             }
+
             return this.Equals((NodeServiceConfiguration)obj);
         }
 
@@ -84,7 +98,8 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <param name="other">The object to compare with the current object. </param>
         private bool Equals(NodeServiceConfiguration other)
         {
-            return Equals(this.NodeAddress, other.NodeAddress) && this.ServiceDescription.Equals(other.ServiceDescription);
+            // ReSharper disable once ArrangeStaticMemberQualifier
+            return NodeServiceConfiguration.Equals(this.NodeAddress, other.NodeAddress) && this.ServiceDescription.Equals(other.ServiceDescription);
         }
     }
 }

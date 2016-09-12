@@ -3,6 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 
 // PostCSS plugins
@@ -107,5 +108,10 @@ module.exports = require('./webpack.base.babel')({
         caches: ['main', 'additional'],
       },
     }),
+
+    new CopyWebpackPlugin([{
+      from: 'app/ThirdParty',
+      to: 'ThirdParty',
+    }]),
   ],
 });

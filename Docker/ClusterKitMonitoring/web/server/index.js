@@ -15,7 +15,7 @@ const app = express();
 
 
 app.use('/api', proxy({ target: 'http://docker' }));
-app.use('/ThirdParty', express.static(`${__dirname}/../ThirdParty`));
+app.use('/clusterkit/ThirdParty', express.static(`${__dirname}/../app/ThirdParty`));
 app.use('/Images', express.static(`${__dirname}/../app/Images`));
 
 

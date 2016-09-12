@@ -28,7 +28,9 @@ Target "DockerBase" (fun _ ->
 
 // builds standard docker images
 Target "DockerContainers" (fun _ ->
+    
     RestorePackages |> ignore
+    
     MSBuildRelease "./build/launcher" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"|] |> ignore
 
     MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.Console/ClusterKit.Log.Console.csproj"|] |> ignore
@@ -71,6 +73,19 @@ Target "DockerContainers" (fun _ ->
     buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
 
     buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
+    
+
+    if not (directoryExists "./packages/Npm.js") then
+        "Npm.js" |> RestorePackageId(fun p-> 
+            { p with
+                OutputPath = "./packages"
+                ExcludeVersion = true})
+
+    NpmHelper.Npm(fun p ->
+            { p with
+                Command = (NpmHelper.Run "build")
+                WorkingDirectory = "./Docker/ClusterKitMonitoring/web"
+            })
 
     buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
 )
