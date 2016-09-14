@@ -6,6 +6,7 @@
 
 import {
   NODE_DESCRIPTIONS_LOAD,
+  NODE_DESCRIPTIONS_LOAD_ERROR,
   NODE_DESCRIPTIONS_RECEIVE,
   NODE_UPGRADE,
   NODE_RELOAD_PACKAGES,
@@ -14,6 +15,12 @@ import {
 export function nodeDescriptionsLoadAction() {
   return {
     type: NODE_DESCRIPTIONS_LOAD,
+  };
+}
+
+export function nodeDescriptionsLoadErrorAction() {
+  return {
+    type: NODE_DESCRIPTIONS_LOAD_ERROR,
   };
 }
 

@@ -35,7 +35,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 {
                     Code = "publisher",
                     Name = "Cluster Nginx configurator",
-                    MininmumRequiredInstances = 1,
+                    MinimumRequiredInstances = 1,
                     MaximumNeededInstances = null,
                     ContainerTypes = new List<string> { "publisher" },
                     Priority = 1000.0,
@@ -46,7 +46,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Web.NginxConfigurator",
                                     "ClusterKit.NodeManager.Client",
                                     "ClusterKit.Log.Console",
-                                    "ClusterKit.Log.ElasticSearch"
+                                    "ClusterKit.Log.ElasticSearch",
+                                    "ClusterKit.Monitoring.Client"
                                 },
                     Configuration = Configurations.Publisher,
                     Version = 0
@@ -57,7 +58,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 {
                     Code = "clusterManager",
                     Name = "Cluster manager (cluster monitoring and managing)",
-                    MininmumRequiredInstances = 1,
+                    MinimumRequiredInstances = 1,
                     MaximumNeededInstances = 3,
                     ContainerTypes = new List<string> { "manager", "worker" },
                     Priority = 100.0,
@@ -66,6 +67,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                 {
                                     "ClusterKit.Core.Service",
                                     "ClusterKit.NodeManager.Client",
+                                    "ClusterKit.Monitoring.Client",
                                     "ClusterKit.Monitoring",
                                     "ClusterKit.NodeManager",
                                     "ClusterKit.Core.EF.Npgsql",
@@ -83,12 +85,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 {
                     Code = "empty",
                     Name = "Cluster empty instance, just for demo",
-                    MininmumRequiredInstances = 0,
+                    MinimumRequiredInstances = 0,
                     MaximumNeededInstances = null,
                     ContainerTypes = new List<string> { "worker" },
                     Priority = 1.0,
                     Packages =
-                            new List<string> { "ClusterKit.Core.Service", "ClusterKit.NodeManager.Client" },
+                            new List<string> { "ClusterKit.Core.Service", "ClusterKit.NodeManager.Client", "ClusterKit.Monitoring.Client" },
                     Configuration = Configurations.Empty,
                     Version = 0
                 });

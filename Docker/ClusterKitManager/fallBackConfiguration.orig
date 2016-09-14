@@ -5,32 +5,17 @@
   "Packages": [
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Core",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core.Data",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core.EF",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core.EF.Npgsql",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Core.Rest",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
       "Id": "ClusterKit.Core.Service",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.NodeManager.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Monitoring.Client",
       "Version": "0.0.0-local"
     },
     {
@@ -45,57 +30,17 @@
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.NodeManager.Client",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.NodeManager.ConfigurationSource",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.NodeManager.Launcher.Messages",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Client",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.CRUDS",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Descriptor",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.SignalR",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Swagger",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Swagger.Messages",
+      "Id": "ClusterKit.Core.EF.Npgsql",
       "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
       "Id": "ClusterKit.Web.Swagger.Monitor",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.Swagger",
       "Version": "0.0.0-local"
     },
     {
@@ -107,7 +52,8 @@
       "BuildDate": null,
       "Id": "ClusterKit.Log.ElasticSearch",
       "Version": "0.0.0-local"
-    }
+    },
+
   ],
   "PackageSources": [
     "/opt/packageCache",

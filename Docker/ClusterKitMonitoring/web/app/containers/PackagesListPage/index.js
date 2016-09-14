@@ -29,7 +29,7 @@ export class PackagesListPage extends Component { // eslint-disable-line react/p
 
   render() {
     return (
-      <div>
+      <div className="container">
         <PackageList packages={this.props.packages} />
       </div>
     );

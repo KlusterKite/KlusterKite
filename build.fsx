@@ -35,7 +35,9 @@ Target "DockerContainers" (fun _ ->
 
     MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.Console/ClusterKit.Log.Console.csproj"|] |> ignore
     MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.ElasticSearch/ClusterKit.Log.ElasticSearch.csproj"|] |> ignore
+    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj"|] |> ignore
     MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"|] |> ignore
+    
 
     let copyLauncherData (path : string) =
         let fullPath = Path.GetFullPath(path)
@@ -55,13 +57,6 @@ Target "DockerContainers" (fun _ ->
             (fun d -> ())
             copyThirdPartyPackage
             (new DirectoryInfo(Path.GetFullPath("./packages")))
-
-    let copyWebContent source dest =
-        let fullPathSource = Path.GetFullPath(source)
-        let fullPathDest = Path.GetFullPath(dest)
-        Fake.FileHelper.CleanDirs [|fullPathDest|]
-        let matcher name = Regex.IsMatch(name, "(.*)((\.jpg)|(\.gif)|(\.png)|(\.jpeg)|(\.html)|(\.html)|(\.js)|(\.css))$", RegexOptions.IgnoreCase)
-        Fake.FileHelper.CopyDir fullPathDest fullPathSource matcher
 
     Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeed/build"|]
     Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seed" (fun file -> true)

@@ -41,7 +41,7 @@ export default class TemplateForm extends Component { // eslint-disable-line rea
           <Field component={Hidden} name="Version" />
           <Field component={Input} name="Code" label="Code" size="medium" />
           <Field component={Input} name="Name" label="Name" />
-          <Field component={Input} name="MininmumRequiredInstances" label="Minimum Needed Instances" size="small" />
+          <Field component={Input} name="MinimumRequiredInstances" label="Minimum Needed Instances" size="small" />
           <Field component={Input} name="MaximumNeededInstances" label="Maximum Needed Instances" size="small" />
           <Field component={Input} name="Priority" label="Priority" size="small" />
           <FieldArray component={MultipleInput} name="Packages" label="Packages" size="medium" />

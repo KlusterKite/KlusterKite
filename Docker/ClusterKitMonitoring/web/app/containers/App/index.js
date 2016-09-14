@@ -55,11 +55,14 @@ export default class App extends React.Component { // eslint-disable-line react/
               <LinkContainer to="/clusterkit/packages">
                 <NavItem eventKey={3}>Packages</NavItem>
               </LinkContainer>
+              <LinkContainer to="/clusterkit/actorsTree">
+                <NavItem eventKey={4}>Actors tree</NavItem>
+              </LinkContainer>
             </Nav>
           </Navbar.Collapse>
         </Navbar>
 
-        <div className={`${styles.appContent} container`}>
+        <div className={styles.appContent}>
           {this.props.children}
         </div>
       </div>

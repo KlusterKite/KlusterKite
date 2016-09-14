@@ -108,7 +108,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 1
+                        MinimumRequiredInstances = 1
                     });
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
@@ -263,7 +263,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 1
+                        MinimumRequiredInstances = 1
                     });
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
@@ -356,7 +356,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 1
+                        MinimumRequiredInstances = 1
                     });
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
@@ -446,7 +446,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 1
+                        MinimumRequiredInstances = 1
                     });
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>().WithDispatcher("akka.test.calling-thread-dispatcher"), "nodemanager");
@@ -560,7 +560,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 1,
+                        MinimumRequiredInstances = 1,
                         MaximumNeededInstances = 2
                     });
 
@@ -574,7 +574,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 0,
+                        MinimumRequiredInstances = 0,
                         MaximumNeededInstances = null
                     });
 
@@ -680,7 +680,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 1,
+                        MinimumRequiredInstances = 1,
                         MaximumNeededInstances = 2
                     });
 
@@ -694,7 +694,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 0,
+                        MinimumRequiredInstances = 0,
                         MaximumNeededInstances = null
                     });
 
@@ -784,7 +784,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 0,
+                        MinimumRequiredInstances = 0,
                         MaximumNeededInstances = null,
                         Priority = 1000000
                     });
@@ -799,7 +799,7 @@ namespace ClusterKit.NodeManager.Tests
                         Version = 0,
                         ContainerTypes = new List<string> { "test" },
                         Packages = new List<string> { "TestModule-1" },
-                        MininmumRequiredInstances = 0,
+                        MinimumRequiredInstances = 0,
                         MaximumNeededInstances = null,
                         Priority = 1
                     });

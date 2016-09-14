@@ -19,7 +19,7 @@ const initialState = fromJS({
     Configuration: '{\n}',
     ContainerTypes: [],
     MaximumNeededInstances: null,
-    MininmumRequiredInstances: 1,
+    MinimumRequiredInstances: 1,
     Name: '',
     Packages: [],
     Priority: 1.0,

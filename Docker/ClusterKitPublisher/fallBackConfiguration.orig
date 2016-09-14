@@ -5,32 +5,17 @@
   "Packages": [
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Core",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
       "Id": "ClusterKit.Core.Service",
       "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.NodeManager.Client",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.NodeManager.Launcher.Messages",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.Client",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
       "Id": "ClusterKit.Web.NginxConfigurator",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.NodeManager.Client",
       "Version": "0.0.0-local"
     },
     {
@@ -41,6 +26,11 @@
     {
       "BuildDate": null,
       "Id": "ClusterKit.Log.ElasticSearch",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Monitoring.Client",
       "Version": "0.0.0-local"
     }
   ],

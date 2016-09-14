@@ -28,7 +28,7 @@ export class FeedsListPage extends Component { // eslint-disable-line react/pref
 
   render() {
     return (
-      <div>
+      <div className="container">
         <FeedList feeds={this.props.feeds} />
       </div>
     );

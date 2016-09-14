@@ -15,7 +15,9 @@ export default class NotFound extends React.Component { // eslint-disable-line r
 
   render() {
     return (
-      <h1>Page Not Found</h1>
+      <div className="container">
+        <h1>Page Not Found</h1>
+      </div>
     );
   }
 }

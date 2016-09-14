@@ -1,2 +1,13 @@
 {
+    ClusterKit.Monitoring.ScanMemoize = 10s
+	akka.actor.deployment {
+
+		/Monitoring {
+			IsNameSpace = true
+		}
+
+		/Monitoring/Scanner {
+            type = "ClusterKit.Monitoring.Client.ScanActor, ClusterKit.Monitoring.Client"
+        }
+	}
 }

@@ -2,6 +2,21 @@
 <doc>
 <assembly><name>FakeLib</name></assembly>
 <members>
+<member name="M:Fake.Checksum.CheckFileHash(System.String,System.String,Microsoft.FSharp.Core.FSharpOption{Fake.ChecksumHashAlgorithm})">
+<summary>
+ Check if the hash in parameter is the valid hash of the file
+</summary>
+</member>
+<member name="M:Fake.Checksum.CalculateFileHash(System.String,Microsoft.FSharp.Core.FSharpOption{Fake.ChecksumHashAlgorithm})">
+<summary>
+ Calculate the hash of a file. Default hash algorithm used: SHA256
+</summary>
+</member>
+<member name="T:Fake.Checksum">
+<summary>
+ Allow to calculate checksum
+</summary>
+</member>
 <member name="M:Fake.AdditionalSyntax.op_EqualsQmarkGreater(System.String,System.String,System.Boolean)">
 <summary>
  Defines a conditional dependency - y is dependent on x if the condition is true
@@ -2119,6 +2134,34 @@
  The choco push parameter type.
 </summary>
 </member>
+<member name="P:Fake.Choco.ChocoPackParams.Checksum64Type">
+<summary>
+ The type of checksum that the file is validated with. Default: Sha256
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.ChecksumType">
+<summary>
+ The type of checksum that the file is validated with. Default: Sha256
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Checksum64">
+<summary>
+ The checksum hash value of the PackageDownload64Url resource
+ This allows a checksum to be validated for files that are not local. The checksum type is covered by ChecksumType64.
+ Equivalent to the `--checksum &lt;string&gt;` option of Install-Chocolatey[Zip]Package functions.
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Checksum">
+<summary>
+ The checksum hash value of the PackageDownloadUrl resource
+ This allows a checksum to be validated for files that are not local. The checksum type is covered by ChecksumType.
+ Equivalent to the `--checksum &lt;string&gt;` option of Install-Chocolatey[Zip]Package functions.
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
 <member name="P:Fake.Choco.ChocoPackParams.UninstallPath">
 <summary>
  Either:
@@ -2521,7 +2564,7 @@
 </member>
 <member name="P:Fake.Choco.ChocoPushDefaults">
 <summary>
- The default option set given to choco pack.
+ The default option set given to choco push.
 </summary>
 </member>
 <member name="P:Fake.Choco.ChocoPackDefaults">
@@ -4845,6 +4888,11 @@
 <member name="M:Fake.FileSystemHelper.TryFindFirstMatchingFile(System.String,System.String)">
 <summary>
  Gets the first file in the directory matching the search pattern as an option value.
+</summary>
+</member>
+<member name="M:Fake.FileSystemHelper.filesInDirMatchingRecursive(System.String,System.IO.DirectoryInfo)">
+<summary>
+ Finds all the files in the directory and in all subdirectories matching the search pattern.
 </summary>
 </member>
 <member name="M:Fake.FileSystemHelper.filesInDirMatching(System.String,System.IO.DirectoryInfo)">
@@ -10921,6 +10969,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.SpecFlowHelper">
 <summary>
  Contains a task which allows to run [SpecFlow](http://www.specflow.org/) tests.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.RecreateDb">
+<summary>
+ Recreates the database from scratch on publish (rather than an in-place update). Defaults to false.
 </summary>
 </member>
 <member name="P:Fake.Sql.DacPac.DeployDbArgs.DropObjectsNotInSource">

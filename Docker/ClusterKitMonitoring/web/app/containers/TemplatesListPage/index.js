@@ -29,7 +29,7 @@ export class TemplatesListPage extends Component { // eslint-disable-line react/
 
   render() {
     return (
-      <div>
+      <div className="container">
         <TemplatesList templates={this.props.templates} />
       </div>
     );

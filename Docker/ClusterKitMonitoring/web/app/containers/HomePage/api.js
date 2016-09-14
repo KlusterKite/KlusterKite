@@ -10,8 +10,7 @@ const instance = axios.create({
 
 export function getNodeDescriptions() {
   return instance.get('/api/1.x/clusterkit/nodemanager/getDescriptions')
-    .then(r => r.data)
-    .catch(error => console.error(error) || null);
+    .then(r => r.data);
 }
 
 export function upgradeNode(nodeAddress) {

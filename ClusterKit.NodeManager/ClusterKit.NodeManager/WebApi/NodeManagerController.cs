@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Serves node managment api functions
+//   Serves node management api functions
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,6 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Web.CRUDS;
 
     using JetBrains.Annotations;
 
@@ -35,7 +34,7 @@ namespace ClusterKit.NodeManager.WebApi
     public class NodeManagerController : ApiController
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseCrudController{TObject,TId}"/> class.
+        /// Initializes a new instance of the <see cref="NodeManagerController"/> class.
         /// </summary>
         /// <param name="system">
         /// The system.
@@ -69,7 +68,12 @@ namespace ClusterKit.NodeManager.WebApi
         /// <summary>
         /// Gets list of available templates for specified container type for current cluster state
         /// </summary>
-        /// <returns>The list of available templates</returns>
+        /// <param name="containerType">
+        /// The container type.
+        /// </param>
+        /// <returns>
+        /// The list of available templates
+        /// </returns>
         [Route("availableTemplates/{containerType}")]
         [HttpGet]
         public async Task<List<NodeTemplate>> GetAvailableTemplates(string containerType)

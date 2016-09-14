@@ -11,7 +11,7 @@
                 /NodeManager/NodeManagerProxy {
         	       actor-type = SingletonProxy
         	       singleton-name = NodeManager
-        	       singleton-path = "user/NodeManager/Manager"
+        	       singleton-path = "/user/NodeManager/Manager"
         	       singleton-node-role = NodeManager            
                 }
  	}

@@ -5,8 +5,8 @@ import { createValidator, required, integer, moreThan, maxValue, moreOrEqualThan
 const templateValidation = createValidator({
   Code: required,
   Name: required,
-  MininmumRequiredInstances: [integer, lessOrEqualThan('MaximumNeededInstances'), required, moreThan(0)],
-  MaximumNeededInstances: [integer, moreOrEqualThan('MininmumRequiredInstances')],
+  MinimumRequiredInstances: [integer, lessOrEqualThan('MaximumNeededInstances'), required, moreThan(0)],
+  MaximumNeededInstances: [integer, moreOrEqualThan('MinimumRequiredInstances')],
   Priority: [integer, maxValue(100)],
   Version: integer,
 });

@@ -97,7 +97,7 @@ export class TemplatePage extends Component { // eslint-disable-line react/prefe
     const name = newItem ? 'Create' : 'Edit';
 
     return (
-      <div>
+      <div className="container">
         <h1>{name} template</h1>
         {isLoaded && <TemplateForm initialValues={template} onSave={newItem ? this.create : this.update} />}
         {!isLoaded && <div className="alert alert-info"><i className="fa fa-refresh fa-spin" /> Loading...</div>}

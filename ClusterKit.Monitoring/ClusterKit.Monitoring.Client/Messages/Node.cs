@@ -67,7 +67,7 @@ namespace ClusterKit.Monitoring.Client.Messages
         /// Gets or sets the actor's children
         /// </summary>
         [XmlArray("children")]
-        public Node[] ZChildren { get; set; }
+        public Node[] Children { get; set; }
     }
 
 }

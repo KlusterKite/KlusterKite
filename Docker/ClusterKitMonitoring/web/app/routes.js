@@ -144,6 +144,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     },
+    {
+      path: '/clusterkit/actorsTree',
+      name: 'actorsTreePage',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          System.import('containers/ActorsTreePage/reducer'),
+          System.import('containers/ActorsTreePage/sagas'),
+          System.import('containers/ActorsTreePage'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('actorsTreePage', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    },
 
 
     {

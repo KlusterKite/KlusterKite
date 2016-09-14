@@ -13,6 +13,7 @@ export default class NodesList extends Component { // eslint-disable-line react/
   static propTypes = {
     nodes: PropTypes.array.isRequired,
     onManualUpgrade: PropTypes.func.isRequired,
+    hasError: PropTypes.bool.isRequired,
   }
 
   drawRole(node, role) {
@@ -25,12 +26,18 @@ export default class NodesList extends Component { // eslint-disable-line react/
   }
 
   render() {
-    const { nodes, onManualUpgrade } = this.props;
+    const { nodes, onManualUpgrade, hasError } = this.props;
 
 
     return (
       <div className={styles.nodesList}>
         <h2>Nodes list</h2>
+        {hasError &&
+          <div className="alert alert-danger" role="alert">
+            <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span> Could not connect to the server</span>
+          </div>
+        }
         <table className="table table-hover">
           <thead>
             <tr>
@@ -45,7 +52,7 @@ export default class NodesList extends Component { // eslint-disable-line react/
           </thead>
           <tbody>
           {nodes && nodes.map((node) =>
-            <tr key={node.NodeId}>
+            <tr key={`${node.NodeAddress.Host}:${node.NodeAddress.Port}`}>
               <td>{node.NodeAddress.Host}:{node.NodeAddress.Port}</td>
               <td>{node.IsClusterLeader ? <i className="fa fa-check-circle" aria-hidden="true"></i> : ''}</td>
               <td>

@@ -7,13 +7,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class NodeTemplateVersion : IMigrationMetadata
+    public sealed partial class Init : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(NodeTemplateVersion));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Init));
         
         string IMigrationMetadata.Id
         {
-            get { return "201603121619169_NodeTemplateVersion"; }
+            get { return "201609131410062_Init"; }
         }
         
         string IMigrationMetadata.Source

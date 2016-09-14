@@ -97,7 +97,7 @@ export class FeedPage extends Component { // eslint-disable-line react/prefer-st
     const name = newItem ? 'Create' : 'Edit';
 
     return (
-      <div>
+      <div className="container">
         <h1>{name} feed</h1>
         {isLoaded && <FeedForm initialValues={feed} onSave={newItem ? this.create : this.update} />}
         {!isLoaded && <div className="alert alert-info"><i className="fa fa-refresh fa-spin" /> Loading...</div>}

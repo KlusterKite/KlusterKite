@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationDbWorker.cs" company="ClusterKit">
+// <copyright file="NodeManagerActor.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Singleton actor performing all node configuration related database working
+//   Singleton actor performing all node configuration related work
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -231,6 +231,7 @@ namespace ClusterKit.NodeManager
                 Context.GetLogger().Warning("{Type}: received unsupported message of type {MessageTypeName}", this.GetType().Name, message.GetType().Name);
                 // ReSharper restore FormatStringProblem
             }
+
             base.Unhandled(message);
         }
 
@@ -246,7 +247,6 @@ namespace ClusterKit.NodeManager
             {
                 return;
             }
-
 
             if (!this.nodeTemplates.TryGetValue(nodeDescription.NodeTemplate, out template)
                 || template.Version != nodeDescription.NodeTemplateVersion)
@@ -266,13 +266,9 @@ namespace ClusterKit.NodeManager
                         this.GetType().Name,
                         nodeDescription.NodeTemplate,
                         nodeDescription.ContainerType,
-                        // ReSharper disable RedundantToStringCall
-                        nodeDescription.NodeAddress.ToString()
-                        // ReSharper restore RedundantToStringCall
-                        );
+                        nodeDescription.NodeAddress.ToString());
                     continue;
                 }
-
 
                 if (!this.packages.TryGetValue(module.Id, out package))
                 {
@@ -329,7 +325,7 @@ namespace ClusterKit.NodeManager
             // first we choose among templates that have nodes less then minimum required
             var templates =
                 availableTmplates.Where(
-                    t => t.Template.MininmumRequiredInstances > 0 && t.NodesCount < t.Template.MininmumRequiredInstances)
+                    t => t.Template.MinimumRequiredInstances > 0 && t.NodesCount < t.Template.MinimumRequiredInstances)
                     .Select(t => t.Template)
                     .ToList();
 
@@ -343,6 +339,7 @@ namespace ClusterKit.NodeManager
                         || (t.Template.MaximumNeededInstances.Value > 0
                             && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template).ToList();
             }
+
             return templates;
         }
 
@@ -460,9 +457,9 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// There is new node going to be up and we need to decide wich template should be applied
+        /// There is new node going to be up and we need to decide what template should be applied
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">The node template request</param>
         private void OnNewNodeTemplateRequest(NewNodeTemplateRequest request)
         {
             var templates = this.GetPossibleTemplatesForContainer(request.ContainerType);
@@ -481,7 +478,7 @@ namespace ClusterKit.NodeManager
             NodeTemplate selectedTemplate = null;
             foreach (var template in templates)
             {
-                check += (template.Priority / sumWeight);
+                check += template.Priority / sumWeight;
                 if (dice <= check)
                 {
                     selectedTemplate = template;
@@ -510,7 +507,7 @@ namespace ClusterKit.NodeManager
                     .Distinct()
                     .Where(id => packageDescriptions.All(p => p.Id != id))
                     .Select(
-                        delegate (string id)
+                        delegate(string id)
                             {
                                 IPackage package;
                                 if (this.packages.TryGetValue(id, out package))
@@ -663,9 +660,10 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Processes node removed cluster event
         /// </summary>
-        /// <param name="address">Obsolete node address</param>
-        private void OnNodeDown(Address address)
+        /// <param name="member">Obsolete node</param>
+        private void OnNodeDown(Member member)
         {
+            var address = member.Address;
             Cancelable cancelable;
             if (this.requestDescriptionNotifications.TryGetValue(address, out cancelable))
             {
@@ -718,9 +716,10 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Processes new node cluster event
         /// </summary>
-        /// <param name="address">New node address</param>
-        private void OnNodeUp(Address address)
+        /// <param name="member">New node</param>
+        private void OnNodeUp(Member member)
         {
+            var address = member.Address;
             var cancelable = new Cancelable(Context.System.Scheduler);
             this.requestDescriptionNotifications[address] = cancelable;
 
@@ -731,15 +730,13 @@ namespace ClusterKit.NodeManager
                                               IsInitialized = false,
                                               NodeAddress = address,
                                               Modules = new List<PackageDescription>(),
-                                              Roles = new List<string>(),
+                                              Roles = new List<string>(member.Roles),
                                               LeaderInRoles =
                                                   this.roleLeaders.Where(p => p.Value == address)
                                                       .Select(p => p.Key)
                                                       .ToList(),
                                               IsClusterLeader = address == this.clusterLeader
                                           };
-
-
 
                 this.nodeDescriptions.Add(address, nodeDescription);
             }
@@ -750,7 +747,7 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Process of manual node upgrade request
         /// </summary>
-        /// <param name="address">Address of the node tu upgrade</param>
+        /// <param name="address">Address of the node to upgrade</param>
         private void OnNodeUpdateRequest(Address address)
         {
             if (!this.nodeDescriptions.ContainsKey(address))
@@ -770,6 +767,7 @@ namespace ClusterKit.NodeManager
             this.upgradeMessageSchedule?.Cancel();
 
             var upgradeTimeOut = this.newNodeJoinTimeout + this.newNodeRequestDescriptionNotificationTimeout;
+            
             // removing lost nodes
             var obsoleteUpgrades =
                 this.upgradingNodes.Values.Where(
@@ -801,7 +799,7 @@ namespace ClusterKit.NodeManager
                     continue;
                 }
 
-                if (nodeGroup.Count() <= nodeTemplate.MininmumRequiredInstances)
+                if (nodeGroup.Count() <= nodeTemplate.MinimumRequiredInstances)
                 {
                     // node upgrade is blocked if it can cause cluster malfunction
                     continue;
@@ -957,7 +955,7 @@ namespace ClusterKit.NodeManager
                         new TemplatesUsageStatistics.TemplateUsageStatistics
                         {
                             MaximumRequiredNodes = t.MaximumNeededInstances,
-                            MinimumRequiredNodes = t.MininmumRequiredInstances,
+                            MinimumRequiredNodes = t.MinimumRequiredInstances,
                             Name = t.Code,
                             ActiveNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
                                 ? this.activeNodesByTemplate[t.Code].Count
@@ -1009,8 +1007,8 @@ namespace ClusterKit.NodeManager
             // ping message will indicate that actor started and ready to work
             this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
 
-            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member.Address));
-            this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member.Address));
+            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member));
+            this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member));
 
             this.Receive<ClusterEvent.LeaderChanged>(m => this.OnLeaderChanged(m));
             this.Receive<ClusterEvent.RoleLeaderChanged>(m => this.OnRoleLeaderChanged(m));
@@ -1136,6 +1134,9 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private class Worker : BaseCrudActorWithNotifications<ConfigurationContext>
         {
+            /// <summary>
+            /// The database connection string
+            /// </summary>
             private readonly string connectionString;
 
             /// <summary>
@@ -1143,6 +1144,9 @@ namespace ClusterKit.NodeManager
             /// </summary>
             private readonly IContextFactory<ConfigurationContext> contextFactory;
 
+            /// <summary>
+            /// The database name
+            /// </summary>
             private readonly string databaseName;
 
             /// <summary>
@@ -1167,11 +1171,8 @@ namespace ClusterKit.NodeManager
                 IActorRef parent) : base(parent)
             {
                 // ReSharper disable FormatStringProblem
-                // ReSharper disable RedundantToStringCall
                 Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
-                // ReSharper restore RedundantToStringCall
                 // ReSharper restore FormatStringProblem
-
                 this.connectionString = connectionString;
                 this.databaseName = databaseName;
                 this.contextFactory = contextFactory;
@@ -1191,9 +1192,9 @@ namespace ClusterKit.NodeManager
             /// <summary>
             /// Method called before object modification in database
             /// </summary>
-            /// <param name="newObject">The new Object.
-            ///             </param><param name="oldObject">The old Object.
-            ///             </param>
+            /// <typeparam name="TObject">The type of object</typeparam>
+            /// <param name="newObject">The new Object.</param>
+            /// <param name="oldObject">The old Object.</param>
             /// <returns>
             /// The new version of object or null to prevent update
             /// </returns>

@@ -44,7 +44,7 @@ export default class TemplatesList extends Component { // eslint-disable-line re
                 )
                 }
               </td>
-              <td>{item.MininmumRequiredInstances}</td>
+              <td>{item.MinimumRequiredInstances}</td>
               <td>{item.MaximumNeededInstances}</td>
               <td>{item.Priority}</td>
               <td>{item.Version}</td>

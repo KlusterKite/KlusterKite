@@ -9,6 +9,7 @@ import {
 
 import {
   nodeDescriptionsReceiveAction,
+  nodeDescriptionsLoadErrorAction,
 } from './actions';
 
 import {
@@ -23,10 +24,11 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 function* nodeDescriptionsLoadSaga() {
   let cont = true;
   while (cont) {
-    const result = yield call(getNodeDescriptions);
-
-    if (result != null) {
+    try {
+      const result = yield call(getNodeDescriptions);
       yield put(nodeDescriptionsReceiveAction(result));
+    } catch (exception) {
+      yield put(nodeDescriptionsLoadErrorAction());
     }
 
     const { cancel: isCancel } = yield race({

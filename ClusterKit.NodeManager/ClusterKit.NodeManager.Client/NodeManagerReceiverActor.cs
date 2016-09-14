@@ -71,8 +71,7 @@ namespace ClusterKit.NodeManager.Client
                                             Id = a.GetName().Name,
                                             Version = a.GetName().Version.ToString(),
                                             BuildDate = a.GetCustomAttributes<AssemblyMetadataAttribute>()
-                                                        .FirstOrDefault(attr => attr.Key == "BuildDate")?
-                                                        .Value
+                                                        .FirstOrDefault(attr => attr.Key == "BuildDate")?.Value
                                         })
                                 .OrderBy(a => a.Id)
                                 .ToList()
