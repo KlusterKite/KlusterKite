@@ -29,7 +29,7 @@ export default class SwaggerLinksList extends Component { // eslint-disable-line
           <tbody>
           {links && links.map((link, index) =>
             <tr key={`link${index}`}>
-              <td><a href={`/${link}/index`} target="_blanc" >{link}</a></td>
+              <td><a href={`/${link}/index`} target="_blank" >{link}</a></td>
             </tr>
           )
           }
