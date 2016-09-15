@@ -28,7 +28,7 @@ export default class TemplatesList extends Component { // eslint-disable-line re
             </tr>
           </thead>
           <tbody>
-          {templates && templates.length && templates.map((item) =>
+          {templates && templates.length > 0 && templates.map((item) =>
             <tr key={item.Id}>
               <td>
                 <Link to={`/clusterkit/templates/${item.Id}`}>

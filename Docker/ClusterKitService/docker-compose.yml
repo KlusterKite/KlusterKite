@@ -63,11 +63,10 @@ services:
       default:
         ipv4_address: 172.18.0.6               
 
-  publisher1: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+  publisher1: 
     image: clusterkit/publisher
     environment:
      - NETWORK_NAME=publisher1
-     - SELF_JOIN=true
     logging:
         driver: json-file
         options:
@@ -77,7 +76,7 @@ services:
         ipv4_address: 172.18.0.7               
 
 
-  publisher2: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+  publisher2: 
     image: clusterkit/publisher
     environment:
      - NETWORK_NAME=publisher2

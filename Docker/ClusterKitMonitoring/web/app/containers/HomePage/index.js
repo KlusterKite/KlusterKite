@@ -16,6 +16,7 @@ import {
 } from './actions';
 
 import NodesList from '../../components/NodesList';
+import SwaggerLinksList from '../../components/SwaggerLinksList';
 
 
 export class HomePage extends Component { // eslint-disable-line react/prefer-stateless-function
@@ -23,6 +24,7 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     nodeDescriptions: PropTypes.array.isRequired,
+    swaggerLinks: PropTypes.array.isRequired,
     hasError: PropTypes.bool.isRequired,
   }
 
@@ -52,6 +54,7 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
         </button>
 
         <NodesList nodes={this.props.nodeDescriptions} hasError={this.props.hasError} onManualUpgrade={this.onNodeUpgradeClick} />
+        <SwaggerLinksList links={this.props.swaggerLinks} />
       </div>
     );
   }

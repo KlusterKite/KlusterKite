@@ -12,13 +12,17 @@ import {
 
 const initialState = fromJS({
   nodeDescriptions: [],
+  swaggerLinks: [],
   hasError: false,
 });
 
 function homePageReducer(state = initialState, action) {
   switch (action.type) {
     case NODE_DESCRIPTIONS_RECEIVE:
-      return state.set('nodeDescriptions', action.nodeDescriptions).set('hasError', false);
+      return state
+        .set('nodeDescriptions', action.nodeDescriptions)
+        .set('swaggerLinks', action.swaggerLinks)
+        .set('hasError', false);
     case NODE_DESCRIPTIONS_LOAD_ERROR:
       return state.set('hasError', true);
     default:

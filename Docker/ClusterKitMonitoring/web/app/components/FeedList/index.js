@@ -34,7 +34,7 @@ export default class FeedList extends Component {
             </tr>
           </thead>
           <tbody>
-          {feeds && feeds.length && feeds.map((item) =>
+          {feeds && feeds.length > 0 && feeds.map((item) =>
             <tr key={item.Id}>
               <td>
                 <Link to={`/clusterkit/nugetfeeds/${item.Id}`}>

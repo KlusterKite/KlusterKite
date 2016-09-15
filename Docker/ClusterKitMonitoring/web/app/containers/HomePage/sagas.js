@@ -16,6 +16,7 @@ import {
   getNodeDescriptions,
   upgradeNode,
   reloadPackages,
+  getSwaggerList,
 } from './api';
 
 import { LOCATION_CHANGE } from 'react-router-redux';
@@ -25,8 +26,9 @@ function* nodeDescriptionsLoadSaga() {
   let cont = true;
   while (cont) {
     try {
-      const result = yield call(getNodeDescriptions);
-      yield put(nodeDescriptionsReceiveAction(result));
+      const nodes = yield call(getNodeDescriptions);
+      const swaggerLinks = yield call(getSwaggerList);
+      yield put(nodeDescriptionsReceiveAction(nodes, swaggerLinks));
     } catch (exception) {
       yield put(nodeDescriptionsLoadErrorAction());
     }

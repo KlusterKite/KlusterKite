@@ -25,3 +25,8 @@ export function reloadPackages() {
     .catch(error => console.error(error) || false);
 }
 
+
+export function getSwaggerList() {
+  return instance.get('/api/1.x/clusterkit/swagger/monitor/getList')
+    .then(r => r.data);
+}
