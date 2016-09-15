@@ -86,7 +86,7 @@ namespace ClusterKit.NodeManager.Client
                     if (loaderException.InnerException != null)
                     {
                         Context.GetLogger()
-                            .Error(loaderException.InnerException, "{Type}: Innerxception", this.GetType().Name);
+                            .Error(loaderException.InnerException, "{Type}: Inner exception", this.GetType().Name);
                     }
                 }
 
@@ -94,7 +94,15 @@ namespace ClusterKit.NodeManager.Client
             }
 
             this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(this.description));
-            this.Receive<ShutdownMessage>(m => { Context.System.Terminate(); });
+            this.Receive<ShutdownMessage>(
+                m =>
+                    {
+                        // todo: remove or modify after https://github.com/akkadotnet/akka.net/issues/2280 fixed
+                        var cluster = Cluster.Get(Context.System);
+                        var system = Context.System;
+                        cluster.RegisterOnMemberRemoved(() => system.Terminate());
+                        cluster.Leave(cluster.SelfAddress);
+                    });
         }
     }
 }
