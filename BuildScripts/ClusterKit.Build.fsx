@@ -22,7 +22,7 @@ let buildDocker (containerName:string) (path:string) =
     if (ExecProcess (fun info ->
         info.FileName <- "docker"
         info.Arguments <- (sprintf "build -t %s:latest %s" containerName path)
-    )  (TimeSpan.FromMinutes 30.0) <> 0) then
+    )  (TimeSpan.FromDays 2.0) <> 0) then
         failwithf "Error while building %s" path
 
 let pushPackage package =
