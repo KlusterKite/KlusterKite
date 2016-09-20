@@ -7,7 +7,7 @@ const templateValidation = createValidator({
   Name: required,
   MinimumRequiredInstances: [integer, lessOrEqualThan('MaximumNeededInstances'), required, moreThan(0)],
   MaximumNeededInstances: [integer, moreOrEqualThan('MinimumRequiredInstances')],
-  Priority: [integer, maxValue(100)],
+  Priority: [integer],
   Version: integer,
 });
 export default memoize(10)(templateValidation);

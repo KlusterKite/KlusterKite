@@ -1,30 +1,24 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Configurator.cs" company="ClusterKit">
+// <copyright file="LoggerConfigurator.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Colored consoled configuration
+//   Logger configuration, that enriches logs with template name
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Log.Console
+namespace ClusterKit.NodeManager.Client
 {
-    using System;
-
     using Akka.Configuration;
 
     using ClusterKit.Core;
 
-    using JetBrains.Annotations;
-
     using Serilog;
-    using Serilog.Events;
 
     /// <summary>
-    /// Colored consoled configuration
+    /// Logger configuration, that enriches logs with template name
     /// </summary>
-    [UsedImplicitly]
-    public class Configurator : ILoggerConfigurator
+    public class LoggerConfigurator : ILoggerConfigurator
     {
         /// <summary>
         /// Performs configuration
@@ -34,15 +28,10 @@ namespace ClusterKit.Log.Console
         /// <returns>Updated configuration</returns>
         public LoggerConfiguration Configure(LoggerConfiguration configuration, Config config)
         {
-            var minimumLevel = config.GetString("ClusterKit.Log.Console.minimumLevel", "none")?.Trim();
-
-            LogEventLevel level;
-            if (!Enum.TryParse(minimumLevel, true, out level))
-            {
-                return configuration;
-            }
-
-            return configuration.WriteTo.ColoredConsole(LogEventLevel.Debug);
+            var templateName = config.GetString("ClusterKit.NodeManager.NodeTemplate");
+            return string.IsNullOrWhiteSpace(templateName)
+                       ? configuration
+                       : configuration.Enrich.WithProperty("nodeTemplate", templateName);
         }
     }
 }

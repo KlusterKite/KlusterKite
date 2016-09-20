@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Log.ElasticSearch
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Configurator.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Elastic search configuration
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Log.ElasticSearch
 {
     using System;
     using System.Linq;
@@ -21,7 +30,7 @@
     public class Configurator : ILoggerConfigurator
     {
         /// <summary>
-        /// Perfoms configuration
+        /// Performs configuration
         /// </summary>
         /// <param name="configuration">Previous configuration</param>
         /// <param name="config">Akka configuration</param>
@@ -53,9 +62,7 @@
                               {
                                   MinimumLogEventLevel = level,
                                   AutoRegisterTemplate = true,
-                                  IndexFormat = indexFormat,
-                                  //CustomFormatter = new ExceptionAsJsonObjectFormatter(renderMessage: true)
-
+                                  IndexFormat = indexFormat
                               };
 
             return configuration.WriteTo.Elasticsearch(options);

@@ -63,7 +63,7 @@ namespace ClusterKit.Monitoring.Client
 
             this.nodeTemplateName = string.IsNullOrWhiteSpace(templateName)
                                         ? null
-                                        : $"{templateName}v{nodeTemplateVersion}";
+                                        : $"{templateName}-v{nodeTemplateVersion}";
 
             this.scanMemoize = Context.System.Settings.Config.GetTimeSpan(
                 "ClusterKit.Monitoring.ScanMemoize",

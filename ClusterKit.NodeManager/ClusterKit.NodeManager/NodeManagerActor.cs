@@ -671,12 +671,24 @@ namespace ClusterKit.NodeManager
                 this.requestDescriptionNotifications.Remove(address);
             }
 
-            var nodeDescription = this.nodeDescriptions[address];
-            this.nodeDescriptions.Remove(address);
+            NodeDescription nodeDescription;
 
-            if (!string.IsNullOrWhiteSpace(nodeDescription?.NodeTemplate))
+            if (this.nodeDescriptions.TryGetValue(address, out nodeDescription))
             {
-                this.activeNodesByTemplate[nodeDescription.NodeTemplate].Remove(address);
+                nodeDescription = this.nodeDescriptions[address];
+                this.nodeDescriptions.Remove(address);
+
+                if (!string.IsNullOrWhiteSpace(nodeDescription?.NodeTemplate))
+                {
+                    this.activeNodesByTemplate[nodeDescription.NodeTemplate].Remove(address);
+                }
+            }
+            else
+            {
+                Context.GetLogger().Warning(
+                    "{Type}: received node down for unknown node with address {NodeAddress}",
+                    this.GetType().ToString(),
+                    address.ToString());
             }
         }
 
@@ -912,6 +924,22 @@ namespace ClusterKit.NodeManager
         /// <param name="message">The notification message</param>
         private void OnRoleLeaderChanged(ClusterEvent.RoleLeaderChanged message)
         {
+            if (string.IsNullOrWhiteSpace(message.Role))
+            {
+                Context.GetLogger().Warning(
+                    "{Type}: received RoleLeaderChanged message with empty role",
+                    this.GetType().ToString());
+                return;
+            }
+
+            if (message.Leader == null)
+            {
+                Context.GetLogger().Warning(
+                    "{Type}: received RoleLeaderChanged message with null leader",
+                    this.GetType().ToString());
+                return;
+            }
+
             this.roleLeaders[message.Role] = message.Leader;
             var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.LeaderInRoles.Contains(message.Role));
             formerLeader?.LeaderInRoles.Remove(message.Role);

@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Core
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ILoggerConfigurator.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   The logger configurator
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Core
 {
     using Akka.Configuration;
 
@@ -10,7 +19,7 @@
     public interface ILoggerConfigurator
     {
         /// <summary>
-        /// Perfoms configuration
+        /// Performs configuration
         /// </summary>
         /// <param name="configuration">Previous configuration</param>
         /// <param name="config">Akka configuration</param>
