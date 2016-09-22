@@ -91,7 +91,6 @@ class ActorsTree extends Component {
   @autobind
   renderTreeGraf(tree, treeSvg) {
     if (!tree || !tree.Nodes) {
-      console.log('no tree');
       return;
     }
 
@@ -203,21 +202,6 @@ class ActorsTree extends Component {
         }
 
         tooltipY += containerOffsetY;
-
-        console.log('tooltip', {
-          offsetX,
-          offsetY,
-          positionX,
-          positionY,
-          tooltipWidth,
-          tooltipHeight,
-          containerWidth,
-          containerHeight,
-          containerOffsetX,
-          containerOffsetY,
-          d3Event,
-          parent: d3Event.path[4],
-        });
 
         div
           .style('left', `${tooltipX}px`)

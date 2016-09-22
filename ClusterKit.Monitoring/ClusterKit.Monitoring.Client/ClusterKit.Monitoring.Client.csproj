@@ -33,6 +33,14 @@
     <DocumentationFile>bin\Release\ClusterKit.Monitoring.Client.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj">
+      <Project>{7de19efc-58c5-4dbf-8a2a-e81e54af5623}</Project>
+      <Name>ClusterKit.LargeObjects.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj">
+      <Project>{261dfdc5-5107-41b5-a8f4-a34f84d22931}</Project>
+      <Name>ClusterKit.LargeObjects</Name>
+    </ProjectReference>
     <Reference Include="Akka, Version=1.1.2.258, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Akka.1.1.2.258-beta\lib\net45\Akka.dll</HintPath>
@@ -211,19 +219,7 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-</ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj">
-      <Project>{8E543EA4-65DE-475F-8045-C094CDE58E29}</Project>
-      <Name>ClusterKit.Web.Client</Name>
-</ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj">
-      <Project>{477B201A-A30C-4360-B56A-6F61C049BB04}</Project>
-      <Name>ClusterKit.Web</Name>
-</ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.SignalR/ClusterKit.Web.SignalR.csproj">
-      <Project>{1158612D-1E02-4CC2-85A1-323AE272C2E3}</Project>
-      <Name>ClusterKit.Web.SignalR</Name>
-</ProjectReference>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

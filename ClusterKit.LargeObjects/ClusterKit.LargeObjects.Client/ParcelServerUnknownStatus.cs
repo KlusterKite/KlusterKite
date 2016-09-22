@@ -1,20 +1,21 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MonitoringHub.cs" company="ClusterKit">
+// <copyright file="ParcelServerUnknownStatus.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Hub for signalR communication
+//   Parcel server returned unknown status response
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring
+namespace ClusterKit.LargeObjects.Client
 {
-    using Microsoft.AspNet.SignalR;
+    using System;
 
     /// <summary>
-    /// Hub for signalR communication
+    /// Parcel server returned unknown status response
     /// </summary>
-    public class MonitoringHub : Hub
+    public class ParcelServerUnknownStatus : Exception
     {
+        
     }
 }

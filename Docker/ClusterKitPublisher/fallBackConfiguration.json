@@ -100,22 +100,22 @@
     },
     {
       "BuildDate": null,
+      "Id": "ClusterKit.LargeObjects",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.LargeObjects.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
       "Id": "ClusterKit.NodeManager.Launcher.Messages",
       "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Web",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
       "Id": "ClusterKit.Web.Client",
-      "Version": "0.0.0-local"
-    },
-    {
-      "BuildDate": null,
-      "Id": "ClusterKit.Web.SignalR",
       "Version": "0.0.0-local"
     },
     {

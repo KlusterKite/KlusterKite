@@ -15,10 +15,12 @@
       <Value>Sharding</Value>
       <Value>Owin</Value>
       <Value>postgres</Value>
+      <Value>tcp</Value>
       <Value>nginx</Value>
       <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>ui</Value>
+      <Value>uid</Value>
       <Value>urls</Value>
     </CollectionProperty>
   </GlobalSettings>

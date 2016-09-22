@@ -17,6 +17,7 @@ namespace ClusterKit.Monitoring.Client
     using Akka.Cluster;
     using Akka.Cluster.Tools.PublishSubscribe;
 
+    using ClusterKit.LargeObjects;
     using ClusterKit.Monitoring.Client.Messages;
 
     using JetBrains.Annotations;
@@ -155,7 +156,7 @@ namespace ClusterKit.Monitoring.Client
                 Context.System.Log.Info("{Type}: Sending scan cache", this.GetType().Name);
             }
 
-            this.Sender.Tell(result);
+            Context.GetParcelManager().Tell(new Parcel { Payload = result, Recipient = this.Sender }, this.Self);
         }
 
         /// <summary>
