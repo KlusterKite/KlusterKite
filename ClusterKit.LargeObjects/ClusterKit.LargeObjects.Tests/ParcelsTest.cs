@@ -62,6 +62,7 @@ namespace ClusterKit.LargeObjects.Tests
 
             var notification = this.ExpectMsg<ParcelNotification>();
             Assert.Equal(typeof(string), notification.GetPayloadType());
+            this.ExpectNoMsg(TimeSpan.FromSeconds(1));
 
             var receivedPayload = await notification.Receive(this.Sys) as string;
             Assert.Equal(payload, receivedPayload);

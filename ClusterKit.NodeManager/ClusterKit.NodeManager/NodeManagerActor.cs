@@ -932,22 +932,21 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            if (message.Leader == null)
-            {
-                Context.GetLogger().Warning(
-                    "{Type}: received RoleLeaderChanged message with null leader",
-                    this.GetType().ToString());
-                return;
-            }
-
-            this.roleLeaders[message.Role] = message.Leader;
             var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.LeaderInRoles.Contains(message.Role));
             formerLeader?.LeaderInRoles.Remove(message.Role);
 
-            NodeDescription leader;
-            if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+            if (message.Leader == null)
             {
-                leader.LeaderInRoles.Add(message.Role);
+                this.roleLeaders.Remove(message.Role);
+            }
+            else
+            {
+                this.roleLeaders[message.Role] = message.Leader;
+                NodeDescription leader;
+                if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+                {
+                    leader.LeaderInRoles.Add(message.Role);
+                }
             }
         }
 

@@ -529,6 +529,7 @@ namespace ClusterKit.NodeManager.Launcher
                         {
                             this.ConfigureNode();
                             this.LaunchNode();
+                            Thread.Sleep(TimeSpan.FromSeconds(30));
                         }
                         catch (ThreadAbortException)
                         {

@@ -70,9 +70,6 @@ namespace ClusterKit.Monitoring.Client
                 "ClusterKit.Monitoring.ScanMemoize",
                 TimeSpan.FromSeconds(10));
             this.Receive<ActorSystemScanRequest>(m => this.OnScanRequest());
-
-            var mediator = DistributedPubSub.Get(Context.System).Mediator;
-            mediator.Tell(new Put(this.Self));
         }
 
         /// <summary>

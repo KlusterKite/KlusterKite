@@ -15,6 +15,7 @@ namespace ClusterKit.Monitoring.WebApi
 
     using Akka.Actor;
 
+    using ClusterKit.LargeObjects.Client;
     using ClusterKit.Monitoring.Messages;
 
     /// <summary>
@@ -55,10 +56,11 @@ namespace ClusterKit.Monitoring.WebApi
         {
             try
             {
-                return
-                    await
-                        this.system.ActorSelection("/user/Monitoring/ClusterScannerProxy")
-                            .Ask<ClusterTree>(new ClusterScanResultRequest(), this.systemTimeout);
+                var notification = await this.system
+                            .ActorSelection("/user/Monitoring/ClusterScannerProxy")
+                            .Ask<ParcelNotification>(new ClusterScanResultRequest(), this.systemTimeout);
+
+                return await notification.Receive(this.system) as ClusterTree;
             }
             catch (Exception exception)
             {
