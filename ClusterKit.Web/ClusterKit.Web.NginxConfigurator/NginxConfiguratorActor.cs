@@ -118,7 +118,7 @@ namespace ClusterKit.Web.NginxConfigurator
             foreach (var pair in config.AsEnumerable())
             {
                 var hostName = pair.Key;
-                this.InitHostFromConfiguration(hostName, config.GetConfig(hostName));
+                this.InitHostFromConfiguration(hostName, pair.Value.AtKey("Key").GetConfig("Key"));
             }
         }
 
@@ -144,7 +144,7 @@ namespace ClusterKit.Web.NginxConfigurator
                     this.InitServiceFromConfiguration(
                         this.Configuration[hostName],
                         serviceName,
-                        config.GetConfig(parameter.Key));
+                        parameter.Value.AtKey("Key").GetConfig("Key"));
                 }
             }
 

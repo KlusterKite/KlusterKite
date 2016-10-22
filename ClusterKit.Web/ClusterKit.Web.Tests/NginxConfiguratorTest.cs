@@ -135,6 +135,9 @@ namespace ClusterKit.Web.Tests
                                         Configuration {
                                             web1 {
                                                listen: 8081
+                                               ""location /api/1.x/external"" {
+                                                    proxy_pass = ""http://external/api/1.x/external""
+                                               }
                                             }
                                             web2 {
                                                listen: 8082
@@ -143,6 +146,9 @@ namespace ClusterKit.Web.Tests
                                                          root = /var/www/example/
                                                 }
                                             }
+                                           ""web.3"" {
+                                             server_name: ""www.example2.com""
+                                           }
                                         }
                                 }
                             }
@@ -159,6 +165,7 @@ namespace ClusterKit.Web.Tests
                         dispatcher = akka.test.calling-thread-dispatcher
                     }
                 }
+
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }
 
