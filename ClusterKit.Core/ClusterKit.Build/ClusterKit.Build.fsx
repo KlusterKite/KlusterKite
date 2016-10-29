@@ -171,6 +171,7 @@ Target "CleanPackageCache" (fun _ ->
 // this was main pure build types. They don't have prerequsits by default, so you can save time on some type of operations
 "Clean" ?=> "Build"
 "SetVersion" ?=> "Build"
+"SetVersion" ?=> "Clean"
 
 "SetVersion" ?=> "CreateNuGet"
 "Build" ?=> "CreateNuGet"
