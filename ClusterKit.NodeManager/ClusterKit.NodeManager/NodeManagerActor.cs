@@ -20,10 +20,10 @@ namespace ClusterKit.NodeManager
     using Akka.Util.Internal;
 
     using ClusterKit.Core;
-    using ClusterKit.Core.Data;
     using ClusterKit.Core.Ping;
-    using ClusterKit.Core.Rest.ActionMessages;
     using ClusterKit.Core.Utils;
+    using ClusterKit.Data;
+    using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;

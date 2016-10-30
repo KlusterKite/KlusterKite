@@ -1,14 +1,23 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ConfigurationContextFactory.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   The <seealso cref="ConfigurationContext" /> creation factory
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     using Akka.Actor;
     using Akka.Cluster;
 
-    using ClusterKit.Core.Data;
-    using ClusterKit.Core.EF;
+    using ClusterKit.Data;
+    using ClusterKit.Data.EF;
 
     using JetBrains.Annotations;
 
@@ -18,6 +27,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     [UsedImplicitly]
     public class ConfigurationContextFactory : BaseContextFactory<ConfigurationContext, Migrations.Configuration>
     {
+        /// <summary>
+        /// The actor system
+        /// </summary>
         private readonly ActorSystem akkaSystem;
 
         /// <summary>

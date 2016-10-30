@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core", "ClusterKit.Core\ClusterKit.Core.csproj", "{BA97BEED-B078-499D-8C00-6A3D4A0635F2}"
 EndProject
@@ -22,18 +22,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Service", "ClusterKit.Core.Service\ClusterKit.Core.Service.csproj", "{013ABB32-F68B-4EFF-9CD7-8FE8B1688C4C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Build", "ClusterKit.Build\ClusterKit.Build.csproj", "{30EE4EE5-28F9-48D3-B45B-758B08093D67}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.EF", "ClusterKit.Core.EF\ClusterKit.Core.EF.csproj", "{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.EF.Npgsql", "ClusterKit.Core.EF.Npgsql\ClusterKit.Core.EF.Npgsql.csproj", "{452AA14F-7657-49D2-8DA5-6A3058821217}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Rest", "ClusterKit.Core.Rest\ClusterKit.Core.Rest.csproj", "{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Data", "ClusterKit.Core.Data\ClusterKit.Core.Data.csproj", "{0D6871D1-5A69-4533-BA4B-073B876232C5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.Data.TestKit", "ClusterKit.Core.Data.TestKit\ClusterKit.Core.Data.TestKit.csproj", "{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Core.EF.TestKit", "ClusterKit.Core.EF.TestKit\ClusterKit.Core.EF.TestKit.csproj", "{6D78C999-7A74-488B-A55D-919C593197CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,30 +49,6 @@ Global
 		{30EE4EE5-28F9-48D3-B45B-758B08093D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30EE4EE5-28F9-48D3-B45B-758B08093D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30EE4EE5-28F9-48D3-B45B-758B08093D67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{452AA14F-7657-49D2-8DA5-6A3058821217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{452AA14F-7657-49D2-8DA5-6A3058821217}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{452AA14F-7657-49D2-8DA5-6A3058821217}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{452AA14F-7657-49D2-8DA5-6A3058821217}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0D6871D1-5A69-4533-BA4B-073B876232C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D6871D1-5A69-4533-BA4B-073B876232C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D6871D1-5A69-4533-BA4B-073B876232C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D6871D1-5A69-4533-BA4B-073B876232C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6D78C999-7A74-488B-A55D-919C593197CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D78C999-7A74-488B-A55D-919C593197CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D78C999-7A74-488B-A55D-919C593197CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D78C999-7A74-488B-A55D-919C593197CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

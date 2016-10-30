@@ -14,8 +14,8 @@ namespace ClusterKit.NodeManager
     using System.Linq;
     using System.Threading.Tasks;
 
-    using ClusterKit.Core.Data;
     using ClusterKit.Core.Monads;
+    using ClusterKit.Data;
 
     using JetBrains.Annotations;
 

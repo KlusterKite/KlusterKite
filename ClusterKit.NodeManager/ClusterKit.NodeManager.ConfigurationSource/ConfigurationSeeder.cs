@@ -12,7 +12,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.Core.Data;
+    using ClusterKit.Data;
 
     /// <summary>
     /// Initializes empty configuration database with start data
@@ -70,7 +70,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Monitoring.Client",
                                     "ClusterKit.Monitoring",
                                     "ClusterKit.NodeManager",
-                                    "ClusterKit.Core.EF.Npgsql",
+                                    "ClusterKit.Data.EF.Npgsql",
                                     "ClusterKit.Web.Swagger.Monitor",
                                     "ClusterKit.Web.Swagger",
                                     "ClusterKit.Log.Console",
@@ -90,7 +90,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     ContainerTypes = new List<string> { "worker" },
                     Priority = 1.0,
                     Packages =
-                            new List<string> { "ClusterKit.Core.Service", "ClusterKit.NodeManager.Client", "ClusterKit.Monitoring.Client" },
+                            new List<string>
+                                {
+                                    "ClusterKit.Core.Service",
+                                    "ClusterKit.NodeManager.Client",
+                                    "ClusterKit.Monitoring.Client"
+                                },
                     Configuration = Configurations.Empty,
                     Version = 0
                 });

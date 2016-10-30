@@ -31,13 +31,13 @@ namespace ClusterKit.NodeManager.Tests
     using Castle.Windsor;
 
     using ClusterKit.Core;
-    using ClusterKit.Core.Data;
-    using ClusterKit.Core.Data.TestKit;
-    using ClusterKit.Core.EF;
-    using ClusterKit.Core.EF.TestKit;
     using ClusterKit.Core.Ping;
-    using ClusterKit.Core.Rest.ActionMessages;
     using ClusterKit.Core.TestKit;
+    using ClusterKit.Data;
+    using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.Data.EF;
+    using ClusterKit.Data.EF.TestKit;
+    using ClusterKit.Data.TestKit;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -493,7 +493,7 @@ namespace ClusterKit.NodeManager.Tests
             testActor.Tell(
                 new ClusterEvent.MemberUp(
                     ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
-            this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
+            this.ExpectMsg<Identify>("/user/NodeManager/Receiver", TimeSpan.FromSeconds(1));
             this.ExpectMsg<NodeDescriptionRequest>();
 
             var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));

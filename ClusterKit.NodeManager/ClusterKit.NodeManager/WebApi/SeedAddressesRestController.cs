@@ -15,12 +15,13 @@ namespace ClusterKit.NodeManager.WebApi
 
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.Web.CRUDS;
+    using ClusterKit.Web.Rest;
 
     /// <summary>
     /// All rest actions with <see cref="SeedAddress"/>
     /// </summary>
     [RoutePrefix("api/1.x/clusterkit/nodemanager/seed")]
-    public class SeedAddressesRestController : BaseCrudController<SeedAddress, int>
+    public class SeedAddressesRestController : BaseRestController<SeedAddress, int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SeedAddressesRestController"/> class.

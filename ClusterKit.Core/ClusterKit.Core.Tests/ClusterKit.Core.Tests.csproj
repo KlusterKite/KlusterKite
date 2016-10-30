@@ -197,7 +197,6 @@
     <Compile Include="AkkaTest\DeployerFallbackTest.cs" />
     <Compile Include="ConceptProof\AkkaClusterTest.cs" />
     <Compile Include="Configuration\ConfigurationTest.cs" />
-    <Compile Include="Data\ContextFactoryTest.cs" />
     <Compile Include="Monads\MaybeTests.cs" />
     <Compile Include="Ping\PingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -210,22 +209,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.Core.Data\ClusterKit.Core.Data.csproj">
-      <Project>{0d6871d1-5a69-4533-ba4b-073b876232c5}</Project>
-      <Name>ClusterKit.Core.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Core.EF.Npgsql\ClusterKit.Core.EF.Npgsql.csproj">
-      <Project>{452aa14f-7657-49d2-8da5-6a3058821217}</Project>
-      <Name>ClusterKit.Core.EF.Npgsql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Core.EF\ClusterKit.Core.EF.csproj">
-      <Project>{17c1fc2c-f8e3-4d0c-9446-5fa6e4f4d71f}</Project>
-      <Name>ClusterKit.Core.EF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Core.Rest\ClusterKit.Core.Rest.csproj">
-      <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
-      <Name>ClusterKit.Core.Rest</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj">
       <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
       <Name>ClusterKit.Core.TestKit</Name>
@@ -235,6 +218,7 @@
       <Name>ClusterKit.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

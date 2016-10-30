@@ -5,12 +5,12 @@
   "Packages": [
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Core.EF.Npgsql",
+      "Id": "ClusterKit.Core.Service",
       "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Core.Service",
+      "Id": "ClusterKit.Data.EF.Npgsql",
       "Version": "0.0.0-local"
     },
     {
@@ -120,17 +120,17 @@
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Core.Data",
+      "Id": "ClusterKit.Data",
       "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Core.EF",
+      "Id": "ClusterKit.Data.CRUD",
       "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Core.Rest",
+      "Id": "ClusterKit.Data.EF",
       "Version": "0.0.0-local"
     },
     {
@@ -165,12 +165,12 @@
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Web.CRUDS",
+      "Id": "ClusterKit.Web.Descriptor",
       "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Web.Descriptor",
+      "Id": "ClusterKit.Web.Rest",
       "Version": "0.0.0-local"
     },
     {
