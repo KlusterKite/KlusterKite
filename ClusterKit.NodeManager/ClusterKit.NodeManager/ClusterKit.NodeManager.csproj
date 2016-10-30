@@ -203,6 +203,14 @@
       <Project>{477B201A-A30C-4360-B56A-6F61C049BB04}</Project>
       <Name>ClusterKit.Web</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj">
+      <Project>{7de19efc-58c5-4dbf-8a2a-e81e54af5623}</Project>
+      <Name>ClusterKit.LargeObjects.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj">
+      <Project>{261dfdc5-5107-41b5-a8f4-a34f84d22931}</Project>
+      <Name>ClusterKit.LargeObjects</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.Rest\ClusterKit.Web.Rest.csproj">
       <Project>{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}</Project>
       <Name>ClusterKit.Web.Rest</Name>

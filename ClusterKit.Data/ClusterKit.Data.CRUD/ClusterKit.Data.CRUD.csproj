@@ -117,11 +117,23 @@
     <Compile Include="ActionMessages\EnActionType.cs" />
     <Compile Include="ActionMessages\RestActionMessage.cs" />
     <Compile Include="ActionMessages\RestActionResponse.cs" />
+    <Compile Include="Exceptions\BeforeActionException.cs" />
+    <Compile Include="Exceptions\DatasourceInnerExceptin.cs" />
+    <Compile Include="Exceptions\EntityNotFoundException.cs" />
+    <Compile Include="Exceptions\InsertDuplicateIdException.cs" />
+    <Compile Include="Exceptions\ParcelException.cs" />
+    <Compile Include="Exceptions\RequestEmptyException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj">
+      <Project>{7de19efc-58c5-4dbf-8a2a-e81e54af5623}</Project>
+      <Name>ClusterKit.LargeObjects.Client</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

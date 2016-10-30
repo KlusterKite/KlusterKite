@@ -10,13 +10,14 @@
 namespace ClusterKit.Data
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using Akka.Actor;
-    using Akka.Event;
 
     using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.Data.CRUD.Exceptions;
+    using ClusterKit.LargeObjects;
+    using ClusterKit.LargeObjects.Client;
 
     using JetBrains.Annotations;
 
@@ -26,8 +27,7 @@ namespace ClusterKit.Data
     /// <typeparam name="TContext">
     /// The database context
     /// </typeparam>
-    public abstract class BaseCrudActor<TContext>
-        : ReceiveActor
+    public abstract class BaseCrudActor<TContext> : ReceiveActor
         where TContext : IDisposable
     {
         /// <summary>
@@ -87,11 +87,11 @@ namespace ClusterKit.Data
         /// <typeparam name="TObject">
         /// The type of ef object
         /// </typeparam>
-        /// <param name="deletedObjects">Object intended to be removed</param>
+        /// <param name="oldObject">Object intended to be removed</param>
         /// <returns>Object that will be removed</returns>
-        protected virtual List<TObject> BeforeDelete<TObject>(List<TObject> deletedObjects) where TObject : class
+        protected virtual TObject BeforeDelete<TObject>(TObject oldObject) where TObject : class
         {
-            return deletedObjects;
+            return oldObject;
         }
 
         /// <summary>
@@ -137,8 +137,60 @@ namespace ClusterKit.Data
             using (var ds = await this.GetContext())
             {
                 var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
-                this.Sender.Tell(await factory.GetList(collectionRequest.Skip, collectionRequest.Count));
+                var objects = await factory.GetList(collectionRequest.Skip, collectionRequest.Count);
+
+                if (collectionRequest.AcceptAsParcel)
+                {
+                    Context.GetParcelManager().Tell(new Parcel { Payload = objects, Recipient = this.Sender }, this.Self);
+                }
+                else
+                {
+                    this.Sender.Tell(objects);
+                }
             }
+        }
+
+        /// <summary>
+        /// Request process method. In case request was sent via large object message system. The response will be sent also via large object message system.
+        /// </summary>
+        /// <param name="notification">
+        /// The request parcel notification.
+        /// </param>
+        /// <typeparam name="TObject">
+        /// The type of ef object
+        /// </typeparam>
+        /// <typeparam name="TId">
+        /// The type of object identity field
+        /// </typeparam>
+        /// <returns>
+        /// Execution task
+        /// </returns>
+        protected virtual async Task OnParcel<TObject, TId>(ParcelNotification notification)
+            where TObject : class
+        {
+            RestActionMessage<TObject, TId> request;
+            RestActionResponse<TObject> response = null;
+
+            try
+            {
+                request = await notification.Receive(Context.System) as RestActionMessage<TObject, TId>;
+                if (request == null)
+                {
+                    response = RestActionResponse<TObject>.Error(new ParcelException("Parcel is empty or with unexpected type"), null);
+                }
+            }
+            catch (Exception exception)
+            {
+                request = null;
+                response = RestActionResponse<TObject>.Error(new ParcelException("Could not receive request parcel", exception), null);
+            }
+
+            if (request != null)
+            {
+                response = await this.ProcessRequest(request);
+            }
+
+            Context.GetParcelManager().Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
         }
 
         /// <summary>
@@ -160,192 +212,7 @@ namespace ClusterKit.Data
         protected virtual async Task OnRequest<TObject, TId>(RestActionMessage<TObject, TId> request)
             where TObject : class
         {
-            // TODO: @Kantora Create and use individual exceptions in response
-            using (var ds = await this.GetContext())
-            {
-                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
-                switch (request.ActionType)
-                {
-                    case EnActionType.Get:
-                        this.Sender.Tell(RestActionResponse<TObject>.Success(this.OnSelect(await factory.Get(request.Id)), request.ExtraData));
-                        break;
-
-                    case EnActionType.Create:
-                        {
-                            var entity = request.Data;
-                            if (entity == null)
-                            {
-                                // ReSharper disable FormatStringProblem
-                                Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
-                                // ReSharper restore FormatStringProblem
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(new Exception("Not found"), request.ExtraData));
-                                return;
-                            }
-
-                            var oldObject = await factory.Get(factory.GetId(entity));
-                            if (oldObject != null)
-                            {
-                                Context.GetLogger()
-                                    .Error(
-                                        // ReSharper disable FormatStringProblem
-                                        "{Type}: create failed, there is already object with id {Id}",
-                                        // ReSharper restore FormatStringProblem
-                                        this.GetType().Name,
-                                        factory.GetId(entity).ToString());
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(
-                                    new Exception( "Create failed, there is already object with such id"), 
-                                    request.ExtraData));
-                                return;
-                            }
-
-                            entity = this.BeforeCreate(entity);
-
-                            if (entity == null)
-                            {
-                                Context.GetLogger()
-                                    // ReSharper disable FormatStringProblem
-                                    .Error("{Type}: create failed, prevented by BeforeCreate", this.GetType().Name);
-                                // ReSharper restore FormatStringProblem
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(new Exception("Create failed, prevented by BeforeCreate"), request.ExtraData));
-                                return;
-                            }
-
-                            try
-                            {
-                                await factory.Insert(entity);
-                                this.Sender.Tell(RestActionResponse<TObject>.Success(entity, request.ExtraData));
-                                this.AfterCreate(entity);
-                                return;
-                            }
-                            catch (Exception exception)
-                            {
-                                Context.GetLogger()
-                                    .Error(
-                                        exception,
-                                        // ReSharper disable FormatStringProblem
-                                        "{Type}: create failed, error while creating object with id {Id}",
-                                        // ReSharper restore FormatStringProblem
-                                        this.GetType().Name,
-                                        factory.GetId(entity).ToString());
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(
-                                    exception, 
-                                    request.ExtraData));
-                                return;
-                            }
-                        }
-
-                    case EnActionType.Update:
-                        {
-                            var entity = request.Data;
-                            if (entity == null)
-                            {
-                                // ReSharper disable FormatStringProblem
-                                Context.GetLogger().Error("{Type}: create failed, no data", this.GetType().Name);
-                                // ReSharper restore FormatStringProblem
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(new Exception("create failed, no data"), request.ExtraData));
-                                return;
-                            }
-
-                            var oldObject = await factory.Get(request.Id);
-                            if (oldObject == null)
-                            {
-                                Context.GetLogger()
-                                    .Error(
-                                        // ReSharper disable FormatStringProblem
-                                        "{Type}: update failed, there is no object with id {Id}",
-                                        // ReSharper restore FormatStringProblem
-                                        this.GetType().Name,
-                                        // ReSharper disable RedundantToStringCallForValueType
-                                        request.Id.ToString());
-                                // ReSharper restore RedundantToStringCallForValueType
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(new Exception("update failed, there is no object with id"), request.ExtraData));
-                                return;
-                            }
-
-                            entity = this.BeforeUpdate<TObject>(entity, oldObject);
-                            if (entity == null)
-                            {
-                                Context.GetLogger()
-                                    .Error(
-                                        // ReSharper disable FormatStringProblem
-                                        "{Type}: update of object with id {Id} failed, prevented by BeforeUpdate",
-                                        // ReSharper restore FormatStringProblem
-                                        this.GetType().Name,
-                                        // ReSharper disable RedundantToStringCallForValueType
-                                       request.Id.ToString());
-                                // ReSharper restore RedundantToStringCallForValueType
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(new Exception("update of object failed, prevented by BeforeUpdate"), request.ExtraData));
-                                return;
-                            }
-
-                            try
-                            {
-                                await factory.Update(entity, oldObject);
-                                this.Sender.Tell(RestActionResponse<TObject>.Success(entity, request.ExtraData));
-                                this.AfterUpdate<TObject>(entity, oldObject);
-                                return;
-                            }
-                            catch (Exception exception)
-                            {
-                                Context.GetLogger()
-                                    .Error(
-                                        exception,
-                                        // ReSharper disable FormatStringProblem
-                                        "{Type}: update failed, error while updating object with id {Id}",
-                                        // ReSharper restore FormatStringProblem
-                                        this.GetType().Name,
-                                        // ReSharper disable RedundantToStringCallForValueType
-                                        factory.GetId(entity).ToString());
-                                // ReSharper restore RedundantToStringCallForValueType
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(exception, request.ExtraData));
-                                return;
-                            }
-                        }
-
-                    case EnActionType.Delete:
-                        {
-                            try
-                            {
-                                var oldObject = await factory.Delete(request.Id);
-                                if (oldObject == null)
-                                {
-                                    Context.GetLogger()
-                                        .Error(
-                                            // ReSharper disable FormatStringProblem
-                                            "{Type}: delete failed, there is no object with id {Id}",
-                                            // ReSharper restore FormatStringProblem
-                                            this.GetType().Name,
-                                            // ReSharper disable RedundantToStringCallForValueType
-                                            request.Id.ToString());
-                                    // ReSharper restore RedundantToStringCallForValueType
-                                    this.Sender.Tell(RestActionResponse<TObject>.Error(new Exception("delete failed, there is no object with such id"), request.ExtraData));
-                                }
-
-                                this.AfterDelete<TObject>(oldObject);
-                                this.Sender.Tell(RestActionResponse<TObject>.Success(oldObject, request.ExtraData));
-                                return;
-                            }
-                            catch (Exception exception)
-                            {
-                                Context.GetLogger()
-                                    .Error(
-                                        exception,
-                                        // ReSharper disable FormatStringProblem
-                                        "{Type}: delete failed, error while deleting object with id {Id}",
-                                        // ReSharper restore FormatStringProblem
-                                        this.GetType().Name,
-                                        // ReSharper disable RedundantToStringCallForValueType
-                                        request.Id.ToString());
-                                // ReSharper restore RedundantToStringCallForValueType
-                                this.Sender.Tell(RestActionResponse<TObject>.Error(exception, request.ExtraData));
-                                return;
-                            }
-                        }
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+            this.Sender.Tell(await this.ProcessRequest(request));
         }
 
         /// <summary>
@@ -359,6 +226,173 @@ namespace ClusterKit.Data
         protected virtual TObject OnSelect<TObject>(TObject result)
         {
             return result;
+        }
+
+        /// <summary>
+        /// Request process method
+        /// </summary>
+        /// <typeparam name="TObject">
+        /// The type of ef object
+        /// </typeparam>
+        /// <typeparam name="TId">
+        /// The type of object identity field
+        /// </typeparam>
+        /// <param name="request">
+        /// The action request
+        /// </param>
+        /// <returns>
+        /// Execution task
+        /// </returns>
+        [UsedImplicitly]
+        protected virtual async Task<RestActionResponse<TObject>> ProcessRequest<TObject, TId>(
+            RestActionMessage<TObject, TId> request) where TObject : class
+        {
+            using (var ds = await this.GetContext())
+            {
+                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+                switch (request.ActionType)
+                {
+                    case EnActionType.Get:
+                        try
+                        {
+                            var result = await factory.Get(request.Id);
+                            if (result.HasValue)
+                            {
+                                result = this.OnSelect(result.Value);
+                            }
+
+                            return result.HasValue
+                                       ? RestActionResponse<TObject>.Success(result, request.ExtraData)
+                                       : RestActionResponse<TObject>.Error(
+                                           new EntityNotFoundException(),
+                                           request.ExtraData);
+                        }
+                        catch (Exception exception)
+                        {
+                            return
+                                RestActionResponse<TObject>.Error(
+                                    new DatasourceInnerExceptin("Exception on Get operation", exception),
+                                    request.ExtraData);
+                        }
+
+                    case EnActionType.Create:
+                        {
+                            var entity = request.Data;
+                            if (entity == null)
+                            {
+                                return RestActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
+                            }
+
+                            entity = this.BeforeCreate(entity);
+                            var oldObject = await factory.Get(factory.GetId(entity));
+                            if (oldObject != null)
+                            {
+                                return RestActionResponse<TObject>.Error(
+                                    new InsertDuplicateIdException(),
+                                    request.ExtraData);
+                            }
+
+                            if (entity == null)
+                            {
+                                return RestActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                            }
+
+                            try
+                            {
+                                await factory.Insert(entity);
+                                this.AfterCreate(entity);
+                                return RestActionResponse<TObject>.Success(entity, request.ExtraData);
+                            }
+                            catch (Exception exception)
+                            {
+                                return
+                                    RestActionResponse<TObject>.Error(
+                                        new DatasourceInnerExceptin("Exception on Insert operation", exception),
+                                        request.ExtraData);
+                            }
+                        }
+
+                    case EnActionType.Update:
+                        {
+                            var entity = request.Data;
+                            if (entity == null)
+                            {
+                                return RestActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
+                            }
+
+                            var oldObject = await factory.Get(request.Id);
+                            if (oldObject == null)
+                            {
+                                return RestActionResponse<TObject>.Error(
+                                    new EntityNotFoundException(),
+                                    request.ExtraData);
+                            }
+
+                            entity = this.BeforeUpdate<TObject>(entity, oldObject);
+                            if (entity == null)
+                            {
+                                return RestActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                            }
+
+                            try
+                            {
+                                await factory.Update(entity, oldObject);
+                                this.AfterUpdate<TObject>(entity, oldObject);
+                                return RestActionResponse<TObject>.Success(entity, request.ExtraData);
+                            }
+                            catch (Exception exception)
+                            {
+                                return
+                                    RestActionResponse<TObject>.Error(
+                                        new DatasourceInnerExceptin("Exception on Update operation", exception),
+                                        request.ExtraData);
+                            }
+                        }
+
+                    case EnActionType.Delete:
+                        {
+                            var oldObject = await factory.Get(request.Id);
+                            if (oldObject == null)
+                            {
+                                return RestActionResponse<TObject>.Error(
+                                    new EntityNotFoundException(),
+                                    request.ExtraData);
+                            }
+
+                            oldObject = this.BeforeDelete(oldObject.Value);
+                            if (oldObject == null)
+                            {
+                                return RestActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                            }
+
+                            try
+                            {
+                                oldObject = await factory.Delete(factory.GetId(oldObject));
+                            }
+                            catch (Exception exception)
+                            {
+                                return
+                                    RestActionResponse<TObject>.Error(
+                                        new DatasourceInnerExceptin("Exception on Delete operation", exception),
+                                        request.ExtraData);
+                            }
+
+                            if (oldObject == null)
+                            {
+                                return
+                                    RestActionResponse<TObject>.Error(
+                                        new EntityNotFoundException("After \"Before\" action modification"),
+                                        request.ExtraData);
+                            }
+
+                            this.AfterDelete<TObject>(oldObject);
+                            return RestActionResponse<TObject>.Success(oldObject, request.ExtraData);
+                        }
+
+                    default:
+                        return RestActionResponse<TObject>.Error(new ArgumentOutOfRangeException(nameof(request.ActionType)), request.ExtraData);
+                }
+            }
         }
     }
 }

@@ -169,6 +169,14 @@
       <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
       <Name>ClusterKit.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj">
+      <Project>{7de19efc-58c5-4dbf-8a2a-e81e54af5623}</Project>
+      <Name>ClusterKit.LargeObjects.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj">
+      <Project>{261dfdc5-5107-41b5-a8f4-a34f84d22931}</Project>
+      <Name>ClusterKit.LargeObjects</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Data.EF\ClusterKit.Data.EF.csproj">
       <Project>{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}</Project>
       <Name>ClusterKit.Data.EF</Name>

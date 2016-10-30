@@ -14,7 +14,6 @@ namespace ClusterKit.NodeManager.WebApi
     using Akka.Actor;
 
     using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.Web.CRUDS;
     using ClusterKit.Web.Rest;
 
     /// <summary>
@@ -33,6 +32,9 @@ namespace ClusterKit.NodeManager.WebApi
                     : base(system)
         {
         }
+
+        /// <inheritdoc />
+        protected override bool DataIsLarge => true;
 
         /// <summary>
         /// Gets akka actor path for database worker

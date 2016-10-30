@@ -152,6 +152,14 @@
     <Compile Include="UpdateMessage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj">
+      <Project>{7de19efc-58c5-4dbf-8a2a-e81e54af5623}</Project>
+      <Name>ClusterKit.LargeObjects.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj">
+      <Project>{261dfdc5-5107-41b5-a8f4-a34f84d22931}</Project>
+      <Name>ClusterKit.LargeObjects</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj">
       <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
       <Name>ClusterKit.Data.CRUD</Name>

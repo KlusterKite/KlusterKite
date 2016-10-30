@@ -65,7 +65,7 @@ namespace ClusterKit.LargeObjects.Client
         /// <exception cref="ParcelNotFoundException">The parcel was already removed from the server</exception>
         /// <exception cref="ParcelServerErrorException">The server could not be contacted or some other error</exception>
         /// <exception cref="ParcelServerUnknownStatus">The server returned unknown status</exception>
-        public async Task<object> Receive(ActorSystem system)
+        public virtual async Task<object> Receive(ActorSystem system)
         {
             var timeOut = TimeSpan.FromSeconds(2);
             var payloadType = this.GetPayloadType();

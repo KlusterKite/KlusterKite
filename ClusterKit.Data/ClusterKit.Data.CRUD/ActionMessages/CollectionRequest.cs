@@ -45,6 +45,12 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// </summary>
         [UsedImplicitly]
         public object ExtraData { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the response is acceptable as parcel.
+        /// </summary>
+        [UsedImplicitly]
+        public bool AcceptAsParcel { get; set; } = true;
     }
 
     /// <summary>

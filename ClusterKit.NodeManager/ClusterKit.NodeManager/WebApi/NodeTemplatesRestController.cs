@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeTemplateCrudsController.cs" company="ClusterKit">
+// <copyright file="NodeTemplatesRestController.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>

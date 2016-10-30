@@ -19,6 +19,9 @@ namespace ClusterKit.Web.Rest
 
     using ClusterKit.Core;
     using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.Data.CRUD.Exceptions;
+    using ClusterKit.LargeObjects;
+    using ClusterKit.LargeObjects.Client;
 
     using JetBrains.Annotations;
 
@@ -52,84 +55,67 @@ namespace ClusterKit.Web.Rest
         protected virtual TimeSpan AkkaTimeout { get; }
 
         /// <summary>
+        /// The data is large.
+        /// </summary>
+        /// <remarks>
+        /// Large data will be sent and received via parcels pipe. This will have impact on performance, but does not have message size limitations
+        /// </remarks>
+        protected virtual bool DataIsLarge => false;
+
+        /// <summary>
+        /// The list of returned objects is large.
+        /// </summary>
+        /// <remarks>
+        /// Large data will be sent and received via parcels pipe. This will have impact on performance, but does not have message size limitations
+        /// </remarks>
+        protected virtual bool DataListIsLarge => true;
+
+        /// <summary>
         /// Gets the actor system
         /// </summary>
         [UsedImplicitly]
         protected ActorSystem System { get; }
 
         /// <summary>
-        /// Updates or creates new Node template
+        /// Creates the object
         /// </summary>
-        /// <param name="request">Node template data</param>
-        /// <returns>Updated node template</returns>
+        /// <param name="data">The object data</param>
+        /// <returns>The new object, as it was created in datasource</returns>
         [HttpPut]
         [Route("")]
         [UsedImplicitly]
-        public virtual async Task<TObject> Create(TObject request)
+        public virtual async Task<TObject> Create(TObject data)
         {
-            var result =
-               await
-               this.System.ActorSelection(this.GetDbActorProxyPath())
-                   .Ask<RestActionResponse<TObject>>(
-                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Create, Data = request },
-                       this.AkkaTimeout);
-
-            if (result?.Data == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return result.Data;
+            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Create, Data = data };
+            return await this.SendRequest(request);
         }
 
         /// <summary>
-        /// Removes Node template
+        /// Removes object
         /// </summary>
-        /// <param name="id">Node template unique id</param>
-        /// <returns>Execution task</returns>
+        /// <param name="id">The object's unique id</param>
+        /// <returns>The removed object</returns>
         [HttpDelete]
         [Route("{id}/")]
         [UsedImplicitly]
         public virtual async Task<TObject> Delete(TId id)
         {
-            var result =
-                await
-                this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<RestActionResponse<TObject>>(
-                        new RestActionMessage<TObject, TId> { ActionType = EnActionType.Delete, Id = id },
-                        this.AkkaTimeout);
-
-            if (result?.Data == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return result.Data;
+            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Delete, Id = id };
+            return await this.SendRequest(request);
         }
 
         /// <summary>
-        /// Gets node template by its id
+        /// Gets an object by it's id
         /// </summary>
-        /// <param name="id">Node template unique id</param>
-        /// <returns>Node template</returns>
+        /// <param name="id">The object's unique id</param>
+        /// <returns>The object</returns>
         [HttpGet]
         [Route("{id}/")]
         [UsedImplicitly]
         public virtual async Task<TObject> Get(TId id)
         {
-            var template =
-                await
-                this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<RestActionResponse<TObject>>(
-                        new RestActionMessage<TObject, TId> { ActionType = EnActionType.Get, Id = id },
-                        this.AkkaTimeout);
-
-            if (template?.Data == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return template.Data;
+            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Get, Id = id };
+            return await this.SendRequest(request);
         }
 
         /// <summary>
@@ -149,40 +135,41 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<List<TObject>> GetList(int count = 100, int skip = 0)
         {
+            var collectionRequest = new CollectionRequest<TObject> { Count = count, Skip = skip };
+
+            if (this.DataListIsLarge || this.DataIsLarge)
+            {
+                collectionRequest.AcceptAsParcel = true;
+                var notification =
+                    await
+                        this.System.ActorSelection(this.GetDbActorProxyPath())
+                            .Ask<ParcelNotification>(collectionRequest, this.AkkaTimeout);
+
+                return (List<TObject>)await notification.Receive(this.System);
+            }
+
+            collectionRequest.AcceptAsParcel = false;
             return
                 await
-                this.System.ActorSelection(this.GetDbActorProxyPath())
-                    .Ask<List<TObject>>(new CollectionRequest<TObject> { Count = count, Skip = skip }, this.AkkaTimeout);
+                    this.System.ActorSelection(this.GetDbActorProxyPath())
+                        .Ask<List<TObject>>(collectionRequest, this.AkkaTimeout);
         }
 
         /// <summary>
-        /// Updates or creates new Node template
+        /// Updates the object data
         /// </summary>
-        /// <param name="id">Node template unique id</param>
-        /// <param name="request">
-        /// Node template data
-        /// </param>
+        /// <param name="id">The object's unique id</param>
+        /// <param name="data">The object data</param>
         /// <returns>
-        /// Updated node template
+        /// The updated object
         /// </returns>
         [HttpPatch]
         [Route("{id}/")]
         [UsedImplicitly]
-        public virtual async Task<TObject> Update([FromUri] TId id, [FromBody] TObject request)
+        public virtual async Task<TObject> Update([FromUri] TId id, [FromBody] TObject data)
         {
-            var template =
-               await
-               this.System.ActorSelection(this.GetDbActorProxyPath())
-                   .Ask<RestActionResponse<TObject>>(
-                       new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Data = request, Id = id },
-                       this.AkkaTimeout);
-
-            if (template?.Data == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return template.Data;
+            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Data = data, Id = id };
+            return await this.SendRequest(request);
         }
 
         /// <summary>
@@ -190,5 +177,49 @@ namespace ClusterKit.Web.Rest
         /// </summary>
         /// <returns>Akka actor path</returns>
         protected abstract string GetDbActorProxyPath();
+
+        /// <summary>
+        /// Creates request to actor system and accepts response
+        /// </summary>
+        /// <param name="request">The request to the actor system</param>
+        /// <returns>The object</returns>
+        protected virtual async Task<TObject> SendRequest(RestActionMessage<TObject, TId> request)
+        {
+            RestActionResponse<TObject> result;
+            if (this.DataIsLarge)
+            {
+                var notification =
+                    await
+                        this.System.GetParcelManager()
+                            .Ask<ParcelNotification>(
+                                new Parcel
+                                {
+                                    Payload = request,
+                                    Recipient = this.System.ActorSelection(this.GetDbActorProxyPath())
+                                },
+                                this.AkkaTimeout);
+
+                result = (RestActionResponse<TObject>)await notification.Receive(this.System);
+            }
+            else
+            {
+                result =
+                    await
+                        this.System.ActorSelection(this.GetDbActorProxyPath())
+                            .Ask<RestActionResponse<TObject>>(request, this.AkkaTimeout);
+            }
+
+            if (result.Exception != null && result.Exception.GetType() != typeof(EntityNotFoundException))
+            {
+                throw result.Exception;
+            }
+
+            if (result.Exception?.GetType() == typeof(EntityNotFoundException) || result.Data == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return result.Data;
+        }
     }
 }
