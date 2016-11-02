@@ -13,6 +13,7 @@
       <Value>redis</Value>
       <Value>serilog</Value>
       <Value>Sharding</Value>
+      <Value>sharded</Value>
       <Value>Owin</Value>
       <Value>postgres</Value>
       <Value>precompiled</Value>

@@ -15,13 +15,17 @@ namespace ClusterKit.LargeObjects.Client
     using System.Threading.Tasks;
 
     using Akka.Actor;
+    using Akka.Routing;
+
+    using ClusterKit.Core;
 
     using JetBrains.Annotations;
 
     /// <summary>
     /// Notification about awaiting large object parcel
     /// </summary>
-    public class ParcelNotification
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
+    public class ParcelNotification : IShardedMessage, IConsistentHashable
     {
         /// <summary>
         /// Gets or sets the host name of parcel server
@@ -40,6 +44,21 @@ namespace ClusterKit.LargeObjects.Client
         /// </summary>
         [UsedImplicitly]
         public Guid Uid { get; set; }
+
+        /// <summary>
+        /// Gets or sets the entity id of the end-point receiver, if applicable
+        /// </summary>
+        public string EntityId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the shard id of the end-point receiver, if applicable
+        /// </summary>
+        public string ShardId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the consistent hash key  of the end-point receiver, if applicable
+        /// </summary>
+        public object ConsistentHashKey { get; set; }
 
         /// <summary>
         /// Gets or sets the parcel payload type name

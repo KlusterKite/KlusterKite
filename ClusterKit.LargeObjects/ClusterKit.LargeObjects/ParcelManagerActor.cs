@@ -21,8 +21,10 @@ namespace ClusterKit.LargeObjects
 
     using Akka.Actor;
     using Akka.Event;
+    using Akka.Routing;
     using Akka.Util.Internal;
 
+    using ClusterKit.Core;
     using ClusterKit.Core.Utils;
     using ClusterKit.LargeObjects.Client;
 
@@ -283,7 +285,10 @@ namespace ClusterKit.LargeObjects
                 Host = this.host,
                 Port = this.port,
                 Uid = parcel.Uid,
-                PayloadTypeName = parcel.Payload.GetType().AssemblyQualifiedName
+                PayloadTypeName = parcel.Payload.GetType().AssemblyQualifiedName,
+                ConsistentHashKey = parcel.ConsistentHashKey ?? (parcel.Payload as IConsistentHashable)?.ConsistentHashKey,
+                EntityId = parcel.EntityId ?? (parcel.Payload as IShardedMessage)?.EntityId,
+                ShardId = parcel.ShardId ?? (parcel.Payload as IShardedMessage)?.ShardId,
             };
 
             parcel.Recipient.Tell(notification, this.Sender);
