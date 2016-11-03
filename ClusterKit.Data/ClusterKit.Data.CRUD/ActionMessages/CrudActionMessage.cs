@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RestActionMessage.cs" company="ClusterKit">
+// <copyright file="CrudActionMessage.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -9,16 +9,17 @@
 
 namespace ClusterKit.Data.CRUD.ActionMessages
 {
+    using System;
     using Akka.Routing;
 
     using JetBrains.Annotations;
 
     /// <summary>
-    /// Request to process some action
+    /// Request to process some data action
     /// </summary>
     /// <typeparam name="TData">The type of data object</typeparam>
     /// <typeparam name="TId">The type of data object identification</typeparam>
-    public class RestActionMessage<TData, TId> : IConsistentHashable
+    public class CrudActionMessage<TData, TId> : IConsistentHashable, ICrudActionMessage
     {
         /// <summary>
         /// Gets or sets the type of request
@@ -48,5 +49,16 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         [UsedImplicitly]
         public object ExtraData { get; set; }
 
+        /// <inheritdoc />
+        EnActionType ICrudActionMessage.ActionType => this.ActionType;
+
+        /// <inheritdoc />
+        object ICrudActionMessage.Id => this.Id;
+
+        /// <inheritdoc />
+        object ICrudActionMessage.Data => this.Data;
+
+        /// <inheritdoc />
+        object ICrudActionMessage.ExtraData => this.ExtraData;
     }
 }

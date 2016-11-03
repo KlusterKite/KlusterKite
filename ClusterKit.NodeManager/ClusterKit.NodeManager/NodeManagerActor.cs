@@ -1082,11 +1082,11 @@ namespace ClusterKit.NodeManager
             this.Receive<TemplatesStatisticsRequest>(m => this.OnTemplatesStatisticsRequest());
 
             this.Receive<CollectionRequest<NodeTemplate>>(m => this.workers.Forward(m));
-            this.Receive<RestActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<SeedAddress>>(m => this.workers.Forward(m));
-            this.Receive<RestActionMessage<SeedAddress, int>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<SeedAddress, int>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<NugetFeed>>(m => this.workers.Forward(m));
-            this.Receive<RestActionMessage<NugetFeed, int>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<NugetFeed, int>>(m => this.workers.Forward(m));
         }
 
         /// <summary>
@@ -1204,11 +1204,11 @@ namespace ClusterKit.NodeManager
                 this.databaseName = databaseName;
                 this.contextFactory = contextFactory;
 
-                this.ReceiveAsync<RestActionMessage<NodeTemplate, int>>(
+                this.ReceiveAsync<CrudActionMessage<NodeTemplate, int>>(
                     this.OnRequest);
-                this.ReceiveAsync<RestActionMessage<SeedAddress, int>>(
+                this.ReceiveAsync<CrudActionMessage<SeedAddress, int>>(
                     this.OnRequest);
-                this.ReceiveAsync<RestActionMessage<NugetFeed, int>>(
+                this.ReceiveAsync<CrudActionMessage<NugetFeed, int>>(
                     this.OnRequest);
 
                 this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);

@@ -115,8 +115,9 @@
   <ItemGroup>
     <Compile Include="ActionMessages\CollectionRequest.cs" />
     <Compile Include="ActionMessages\EnActionType.cs" />
-    <Compile Include="ActionMessages\RestActionMessage.cs" />
-    <Compile Include="ActionMessages\RestActionResponse.cs" />
+    <Compile Include="ActionMessages\ICrudActionMessage.cs" />
+    <Compile Include="ActionMessages\CrudActionMessage.cs" />
+    <Compile Include="ActionMessages\CrudActionResponse.cs" />
     <Compile Include="Exceptions\BeforeActionException.cs" />
     <Compile Include="Exceptions\DatasourceInnerExceptin.cs" />
     <Compile Include="Exceptions\EntityNotFoundException.cs" />

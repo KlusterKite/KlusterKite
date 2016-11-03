@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RestActionResponse.cs" company="ClusterKit">
+// <copyright file="CrudActionResponse.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -14,16 +14,16 @@ namespace ClusterKit.Data.CRUD.ActionMessages
     using JetBrains.Annotations;
 
     /// <summary>
-    /// Standard response from the <seealso cref="RestActionMessage{TData,TId}"/> request
+    /// Standard response from the <seealso cref="CrudActionMessage{TData,TId}"/> request
     /// </summary>
     /// <typeparam name="TData">The type of entity</typeparam>
-    public class RestActionResponse<TData>
+    public class CrudActionResponse<TData>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RestActionResponse{TData}"/> class.
+        /// Initializes a new instance of the <see cref="CrudActionResponse{TData}"/> class.
         /// </summary>
         [UsedImplicitly]
-        public RestActionResponse()
+        public CrudActionResponse()
         {
         }
 
@@ -51,9 +51,9 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// <param name="exception">The failure exception</param>
         /// <param name="extraData">Some extra data, that was sent with the request</param>
         /// <returns>The new response</returns>
-        public static RestActionResponse<TData> Error(Exception exception, object extraData)
+        public static CrudActionResponse<TData> Error(Exception exception, object extraData)
         {
-            return new RestActionResponse<TData>
+            return new CrudActionResponse<TData>
             {
                 Exception = exception,
                 ExtraData = extraData
@@ -66,9 +66,9 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// <param name="data">The actual entity data</param>
         /// <param name="extraData">Some extra data, that was sent with the request</param>
         /// <returns>The new response</returns>
-        public static RestActionResponse<TData> Success(TData data, object extraData)
+        public static CrudActionResponse<TData> Success(TData data, object extraData)
         {
-            return new RestActionResponse<TData>
+            return new CrudActionResponse<TData>
             {
                 Data = data,
                 ExtraData = extraData

@@ -86,7 +86,7 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Create(TObject data)
         {
-            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Create, Data = data };
+            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Create, Data = data };
             return await this.SendRequest(request);
         }
 
@@ -100,7 +100,7 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Delete(TId id)
         {
-            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Delete, Id = id };
+            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Delete, Id = id };
             return await this.SendRequest(request);
         }
 
@@ -114,7 +114,7 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Get(TId id)
         {
-            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Get, Id = id };
+            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Get, Id = id };
             return await this.SendRequest(request);
         }
 
@@ -168,7 +168,7 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Update([FromUri] TId id, [FromBody] TObject data)
         {
-            var request = new RestActionMessage<TObject, TId> { ActionType = EnActionType.Update, Data = data, Id = id };
+            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Update, Data = data, Id = id };
             return await this.SendRequest(request);
         }
 
@@ -183,9 +183,9 @@ namespace ClusterKit.Web.Rest
         /// </summary>
         /// <param name="request">The request to the actor system</param>
         /// <returns>The object</returns>
-        protected virtual async Task<TObject> SendRequest(RestActionMessage<TObject, TId> request)
+        protected virtual async Task<TObject> SendRequest(CrudActionMessage<TObject, TId> request)
         {
-            RestActionResponse<TObject> result;
+            CrudActionResponse<TObject> result;
             if (this.DataIsLarge)
             {
                 var notification =
@@ -199,14 +199,14 @@ namespace ClusterKit.Web.Rest
                                 },
                                 this.AkkaTimeout);
 
-                result = (RestActionResponse<TObject>)await notification.Receive(this.System);
+                result = (CrudActionResponse<TObject>)await notification.Receive(this.System);
             }
             else
             {
                 result =
                     await
                         this.System.ActorSelection(this.GetDbActorProxyPath())
-                            .Ask<RestActionResponse<TObject>>(request, this.AkkaTimeout);
+                            .Ask<CrudActionResponse<TObject>>(request, this.AkkaTimeout);
             }
 
             if (result.Exception != null && result.Exception.GetType() != typeof(EntityNotFoundException))

@@ -168,21 +168,21 @@ namespace ClusterKit.Data
         protected virtual async Task OnParcel<TObject, TId>(ParcelNotification notification)
             where TObject : class
         {
-            RestActionMessage<TObject, TId> request;
-            RestActionResponse<TObject> response = null;
+            CrudActionMessage<TObject, TId> request;
+            CrudActionResponse<TObject> response = null;
 
             try
             {
-                request = await notification.Receive(Context.System) as RestActionMessage<TObject, TId>;
+                request = await notification.Receive(Context.System) as CrudActionMessage<TObject, TId>;
                 if (request == null)
                 {
-                    response = RestActionResponse<TObject>.Error(new ParcelException("Parcel is empty or with unexpected type"), null);
+                    response = CrudActionResponse<TObject>.Error(new ParcelException("Parcel is empty or with unexpected type"), null);
                 }
             }
             catch (Exception exception)
             {
                 request = null;
-                response = RestActionResponse<TObject>.Error(new ParcelException("Could not receive request parcel", exception), null);
+                response = CrudActionResponse<TObject>.Error(new ParcelException("Could not receive request parcel", exception), null);
             }
 
             if (request != null)
@@ -209,7 +209,7 @@ namespace ClusterKit.Data
         /// Execution task
         /// </returns>
         [UsedImplicitly]
-        protected virtual async Task OnRequest<TObject, TId>(RestActionMessage<TObject, TId> request)
+        protected virtual async Task OnRequest<TObject, TId>(CrudActionMessage<TObject, TId> request)
             where TObject : class
         {
             this.Sender.Tell(await this.ProcessRequest(request));
@@ -244,8 +244,8 @@ namespace ClusterKit.Data
         /// Execution task
         /// </returns>
         [UsedImplicitly]
-        protected virtual async Task<RestActionResponse<TObject>> ProcessRequest<TObject, TId>(
-            RestActionMessage<TObject, TId> request) where TObject : class
+        protected virtual async Task<CrudActionResponse<TObject>> ProcessRequest<TObject, TId>(
+            CrudActionMessage<TObject, TId> request) where TObject : class
         {
             using (var ds = await this.GetContext())
             {
@@ -262,15 +262,15 @@ namespace ClusterKit.Data
                             }
 
                             return result.HasValue
-                                       ? RestActionResponse<TObject>.Success(result, request.ExtraData)
-                                       : RestActionResponse<TObject>.Error(
+                                       ? CrudActionResponse<TObject>.Success(result, request.ExtraData)
+                                       : CrudActionResponse<TObject>.Error(
                                            new EntityNotFoundException(),
                                            request.ExtraData);
                         }
                         catch (Exception exception)
                         {
                             return
-                                RestActionResponse<TObject>.Error(
+                                CrudActionResponse<TObject>.Error(
                                     new DatasourceInnerExceptin("Exception on Get operation", exception),
                                     request.ExtraData);
                         }
@@ -280,33 +280,33 @@ namespace ClusterKit.Data
                             var entity = request.Data;
                             if (entity == null)
                             {
-                                return RestActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
                             }
 
                             entity = this.BeforeCreate(entity);
                             var oldObject = await factory.Get(factory.GetId(entity));
                             if (oldObject != null)
                             {
-                                return RestActionResponse<TObject>.Error(
+                                return CrudActionResponse<TObject>.Error(
                                     new InsertDuplicateIdException(),
                                     request.ExtraData);
                             }
 
                             if (entity == null)
                             {
-                                return RestActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
                             }
 
                             try
                             {
                                 await factory.Insert(entity);
                                 this.AfterCreate(entity);
-                                return RestActionResponse<TObject>.Success(entity, request.ExtraData);
+                                return CrudActionResponse<TObject>.Success(entity, request.ExtraData);
                             }
                             catch (Exception exception)
                             {
                                 return
-                                    RestActionResponse<TObject>.Error(
+                                    CrudActionResponse<TObject>.Error(
                                         new DatasourceInnerExceptin("Exception on Insert operation", exception),
                                         request.ExtraData);
                             }
@@ -317,13 +317,13 @@ namespace ClusterKit.Data
                             var entity = request.Data;
                             if (entity == null)
                             {
-                                return RestActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
                             }
 
                             var oldObject = await factory.Get(request.Id);
                             if (oldObject == null)
                             {
-                                return RestActionResponse<TObject>.Error(
+                                return CrudActionResponse<TObject>.Error(
                                     new EntityNotFoundException(),
                                     request.ExtraData);
                             }
@@ -331,19 +331,19 @@ namespace ClusterKit.Data
                             entity = this.BeforeUpdate<TObject>(entity, oldObject);
                             if (entity == null)
                             {
-                                return RestActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
                             }
 
                             try
                             {
                                 await factory.Update(entity, oldObject);
                                 this.AfterUpdate<TObject>(entity, oldObject);
-                                return RestActionResponse<TObject>.Success(entity, request.ExtraData);
+                                return CrudActionResponse<TObject>.Success(entity, request.ExtraData);
                             }
                             catch (Exception exception)
                             {
                                 return
-                                    RestActionResponse<TObject>.Error(
+                                    CrudActionResponse<TObject>.Error(
                                         new DatasourceInnerExceptin("Exception on Update operation", exception),
                                         request.ExtraData);
                             }
@@ -354,7 +354,7 @@ namespace ClusterKit.Data
                             var oldObject = await factory.Get(request.Id);
                             if (oldObject == null)
                             {
-                                return RestActionResponse<TObject>.Error(
+                                return CrudActionResponse<TObject>.Error(
                                     new EntityNotFoundException(),
                                     request.ExtraData);
                             }
@@ -362,7 +362,7 @@ namespace ClusterKit.Data
                             oldObject = this.BeforeDelete(oldObject.Value);
                             if (oldObject == null)
                             {
-                                return RestActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
                             }
 
                             try
@@ -372,7 +372,7 @@ namespace ClusterKit.Data
                             catch (Exception exception)
                             {
                                 return
-                                    RestActionResponse<TObject>.Error(
+                                    CrudActionResponse<TObject>.Error(
                                         new DatasourceInnerExceptin("Exception on Delete operation", exception),
                                         request.ExtraData);
                             }
@@ -380,17 +380,17 @@ namespace ClusterKit.Data
                             if (oldObject == null)
                             {
                                 return
-                                    RestActionResponse<TObject>.Error(
+                                    CrudActionResponse<TObject>.Error(
                                         new EntityNotFoundException("After \"Before\" action modification"),
                                         request.ExtraData);
                             }
 
                             this.AfterDelete<TObject>(oldObject);
-                            return RestActionResponse<TObject>.Success(oldObject, request.ExtraData);
+                            return CrudActionResponse<TObject>.Success(oldObject, request.ExtraData);
                         }
 
                     default:
-                        return RestActionResponse<TObject>.Error(new ArgumentOutOfRangeException(nameof(request.ActionType)), request.ExtraData);
+                        return CrudActionResponse<TObject>.Error(new ArgumentOutOfRangeException(nameof(request.ActionType)), request.ExtraData);
                 }
             }
         }
