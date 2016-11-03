@@ -84,6 +84,43 @@ namespace ClusterKit.LargeObjects.Tests
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
+        [Fact(DisplayName = "ParcelManagerActor test of envelopers")]
+        public async Task EnveloperFlowTest()
+        {
+            var actor = this.Sys.ActorOf(this.Sys.DI().Props<ParcelManagerActor>(), "parcelManager");
+            this.ExpectNoMsg(TimeSpan.FromSeconds(1));
+
+            object payload = 5;
+            actor.Tell(new Parcel { Payload = payload, Recipient = this.TestActor });
+
+            var envelope = this.ExpectMsg<NotificationEnvelope>();
+            Assert.Equal("int", envelope.Tag);
+            var notification = envelope.Notification;
+            Assert.Equal(typeof(int), notification.GetPayloadType());
+            this.ExpectNoMsg(TimeSpan.FromSeconds(1));
+
+            object receivedPayload = (int)await notification.Receive(this.Sys);
+            Assert.Equal(payload, receivedPayload);
+
+            payload = 5.5;
+            actor.Tell(new Parcel { Payload = payload, Recipient = this.TestActor });
+
+            envelope = this.ExpectMsg<NotificationEnvelope>();
+            Assert.Equal("double", envelope.Tag);
+            notification = envelope.Notification;
+            Assert.Equal(typeof(double), notification.GetPayloadType());
+            this.ExpectNoMsg(TimeSpan.FromSeconds(1));
+
+            receivedPayload = (double)await notification.Receive(this.Sys);
+            Assert.Equal(payload, receivedPayload);
+        }
+
+        /// <summary>
+        /// Just testing that everything is ok
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         [Fact(DisplayName = "ParcelManagerActor testing that abandoned parcels are removed from store")]
         public async Task CleanUpTest()
         {
@@ -161,6 +198,56 @@ namespace ClusterKit.LargeObjects.Tests
             {
                 container.Register(Classes.FromAssemblyContaining<ParcelManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
                 container.Register(Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+
+                container.Register(
+                    Component.For<INotificationEnveloper>().ImplementedBy<TestIntEnveloper>().LifestyleTransient());
+                container.Register(
+                    Component.For<INotificationEnveloper>().ImplementedBy<TestDoubleEnveloper>().LifestyleTransient());
+            }
+        }
+
+        /// <summary>
+        /// The test notification envelope
+        /// </summary>
+        private class NotificationEnvelope
+        {
+            /// <summary>
+            /// Gets or sets the notification
+            /// </summary>
+            public ParcelNotification Notification { get; set; }
+
+            /// <summary>
+            /// Gets or sets the mark of enveloper
+            /// </summary>
+            public string Tag { get; set; }
+       
+        }
+
+        /// <summary>
+        /// The test notification enveloper
+        /// </summary>
+        private class TestIntEnveloper : INotificationEnveloper
+        {
+            /// <inheritdoc />
+            public object Envelope(Parcel parcel, ParcelNotification notification)
+            {
+                return parcel.Payload is int 
+                    ? new NotificationEnvelope { Notification = notification, Tag = "int"} 
+                    : null;
+            }
+        }
+
+        /// <summary>
+        /// The test notification enveloper
+        /// </summary>
+        private class TestDoubleEnveloper : INotificationEnveloper
+        {
+            /// <inheritdoc />
+            public object Envelope(Parcel parcel, ParcelNotification notification)
+            {
+                return parcel.Payload is double
+                    ? new NotificationEnvelope { Notification = notification, Tag = "double" }
+                    : null;
             }
         }
     }

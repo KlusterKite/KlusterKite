@@ -12,14 +12,11 @@ namespace ClusterKit.LargeObjects
     using System;
 
     using Akka.Actor;
-    using Akka.Routing;
-
-    using ClusterKit.Core;
 
     /// <summary>
     /// Creates message with large payload
     /// </summary>
-    public class Parcel : IShardedMessage, IConsistentHashable
+    public class Parcel
     {
         /// <summary>
         /// Gets or sets the message payload
@@ -51,20 +48,5 @@ namespace ClusterKit.LargeObjects
         /// Gets the parcel unique identification number
         /// </summary>
         public Guid Uid { get; } = Guid.NewGuid();
-
-        /// <summary>
-        /// Gets or sets the entity id of the end-point receiver, if applicable
-        /// </summary>
-        public string EntityId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the shard id of the end-point receiver, if applicable
-        /// </summary>
-        public string ShardId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the consistent hash key  of the end-point receiver, if applicable
-        /// </summary>
-        public object ConsistentHashKey { get; set; }
     }
 }

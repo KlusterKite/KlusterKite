@@ -150,7 +150,6 @@
     <Compile Include="EnActorType.cs" />
     <Compile Include="IMessageRouter.cs" />
     <Compile Include="ILoggerConfigurator.cs" />
-    <Compile Include="IShardedMessage.cs" />
     <Compile Include="MessageRouter.cs" />
     <Compile Include="Monads\Maybe.cs" />
     <Compile Include="NameSpaceActor.cs" />

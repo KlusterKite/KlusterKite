@@ -13,6 +13,7 @@ namespace ClusterKit.LargeObjects
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
@@ -21,10 +22,10 @@ namespace ClusterKit.LargeObjects
 
     using Akka.Actor;
     using Akka.Event;
-    using Akka.Routing;
     using Akka.Util.Internal;
 
-    using ClusterKit.Core;
+    using Castle.Windsor;
+
     using ClusterKit.Core.Utils;
     using ClusterKit.LargeObjects.Client;
 
@@ -72,10 +73,19 @@ namespace ClusterKit.LargeObjects
         private Task listenerTask;
 
         /// <summary>
+        /// The list of parcel notification envelopers
+        /// </summary>
+        private List<INotificationEnveloper> envelopers;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParcelManagerActor"/> class.
         /// </summary>
-        public ParcelManagerActor()
+        /// <param name="container">
+        /// The DI container.
+        /// </param>
+        public ParcelManagerActor(IWindsorContainer container)
         {
+            this.envelopers = container.ResolveAll(typeof(INotificationEnveloper)).Cast<INotificationEnveloper>().ToList();
             this.Receive<Parcel>(m => this.OnSetLargeObjectMessage(m));
             this.Receive<CleanUpMessage>(m => this.CleanUp());
         }
@@ -285,13 +295,20 @@ namespace ClusterKit.LargeObjects
                 Host = this.host,
                 Port = this.port,
                 Uid = parcel.Uid,
-                PayloadTypeName = parcel.Payload.GetType().AssemblyQualifiedName,
-                ConsistentHashKey = parcel.ConsistentHashKey ?? (parcel.Payload as IConsistentHashable)?.ConsistentHashKey,
-                EntityId = parcel.EntityId ?? (parcel.Payload as IShardedMessage)?.EntityId,
-                ShardId = parcel.ShardId ?? (parcel.Payload as IShardedMessage)?.ShardId,
+                PayloadTypeName = parcel.Payload.GetType().AssemblyQualifiedName
             };
 
-            parcel.Recipient.Tell(notification, this.Sender);
+            object envelope = null;
+            foreach (var notificationEnveloper in this.envelopers)
+            {
+                envelope = notificationEnveloper.Envelope(parcel, notification);
+                if (envelope != null)
+                {
+                    break;
+                }
+            }
+
+            parcel.Recipient.Tell(envelope ?? notification, this.Sender);
         }
 
         /// <summary>
