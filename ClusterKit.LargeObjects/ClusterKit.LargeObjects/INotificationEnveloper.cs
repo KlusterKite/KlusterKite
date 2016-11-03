@@ -17,6 +17,11 @@ namespace ClusterKit.LargeObjects
     public interface INotificationEnveloper
     {
         /// <summary>
+        /// Gets the enveloper priority. If two envelopers can handle the same parcel, then enveloper with highest priority will be used
+        /// </summary>
+        decimal Priority { get; }
+
+        /// <summary>
         /// Envelopes <see cref="ParcelNotification"/> for proper delivery
         /// </summary>
         /// <param name="parcel">The original parcel</param>

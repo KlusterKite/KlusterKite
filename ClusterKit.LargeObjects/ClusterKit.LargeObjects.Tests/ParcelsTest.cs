@@ -202,6 +202,8 @@ namespace ClusterKit.LargeObjects.Tests
                 container.Register(
                     Component.For<INotificationEnveloper>().ImplementedBy<TestIntEnveloper>().LifestyleTransient());
                 container.Register(
+                    Component.For<INotificationEnveloper>().ImplementedBy<TestInt2Enveloper>().LifestyleTransient());
+                container.Register(
                     Component.For<INotificationEnveloper>().ImplementedBy<TestDoubleEnveloper>().LifestyleTransient());
             }
         }
@@ -229,10 +231,30 @@ namespace ClusterKit.LargeObjects.Tests
         private class TestIntEnveloper : INotificationEnveloper
         {
             /// <inheritdoc />
+            public decimal Priority => 1M;
+
+            /// <inheritdoc />
             public object Envelope(Parcel parcel, ParcelNotification notification)
             {
                 return parcel.Payload is int 
-                    ? new NotificationEnvelope { Notification = notification, Tag = "int"} 
+                    ? new NotificationEnvelope { Notification = notification, Tag = "int" } 
+                    : null;
+            }
+        }
+
+        /// <summary>
+        /// The test notification enveloper
+        /// </summary>
+        private class TestInt2Enveloper : INotificationEnveloper
+        {
+            /// <inheritdoc />
+            public decimal Priority => 0M;
+
+            /// <inheritdoc />
+            public object Envelope(Parcel parcel, ParcelNotification notification)
+            {
+                return parcel.Payload is int
+                    ? new NotificationEnvelope { Notification = notification, Tag = "int2" }
                     : null;
             }
         }
@@ -242,6 +264,9 @@ namespace ClusterKit.LargeObjects.Tests
         /// </summary>
         private class TestDoubleEnveloper : INotificationEnveloper
         {
+            /// <inheritdoc />
+            public decimal Priority => 0M;
+
             /// <inheritdoc />
             public object Envelope(Parcel parcel, ParcelNotification notification)
             {

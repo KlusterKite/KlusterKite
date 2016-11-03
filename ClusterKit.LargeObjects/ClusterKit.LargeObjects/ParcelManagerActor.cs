@@ -85,7 +85,10 @@ namespace ClusterKit.LargeObjects
         /// </param>
         public ParcelManagerActor(IWindsorContainer container)
         {
-            this.envelopers = container.ResolveAll(typeof(INotificationEnveloper)).Cast<INotificationEnveloper>().ToList();
+            this.envelopers = container.ResolveAll(typeof(INotificationEnveloper))
+                .Cast<INotificationEnveloper>()
+                .OrderByDescending(e => e.Priority)
+                .ToList();
             this.Receive<Parcel>(m => this.OnSetLargeObjectMessage(m));
             this.Receive<CleanUpMessage>(m => this.CleanUp());
         }
