@@ -30,7 +30,7 @@ namespace ClusterKit.NodeManager.Client.Messages
         public string ContainerType { get; set; }
 
         /// <summary>
-        /// Gets or sets the value, indicating whether the current nde is cluster leader
+        /// Gets or sets a value indicating whether the current node is cluster leader
         /// </summary>
         public bool IsClusterLeader { get; set; }
 
@@ -42,10 +42,11 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// <summary>
         /// Gets or sets a value indicating whether this is complete description
         /// </summary>
+        [UsedImplicitly]
         public bool IsInitialized { get; set; }
 
         /// <summary>
-        /// Gets the list of roles, where current nod is leader
+        /// Gets or sets the list of roles, where current node is leader
         /// </summary>
         public List<string> LeaderInRoles { get; set; } = new List<string>();
 

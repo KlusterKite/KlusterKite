@@ -14,6 +14,7 @@ namespace ClusterKit.Data
 
     using Akka.Actor;
 
+    using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects;
@@ -30,6 +31,20 @@ namespace ClusterKit.Data
     public abstract class BaseCrudActor<TContext> : ReceiveActor
         where TContext : IDisposable
     {
+        /// <inheritdoc />
+        protected override bool AroundReceive(Receive receive, object message)
+        {
+            var parcel = message as ParcelNotification;
+
+            if (parcel != null)
+            {
+                parcel.Receive(ActorBase.Context.System).PipeTo(this.Self, this.Sender);
+                return true;
+            }
+
+            return base.AroundReceive(receive, message);
+        }
+
         /// <summary>
         /// Method called after successful object creation in database
         /// </summary>
@@ -151,49 +166,6 @@ namespace ClusterKit.Data
         }
 
         /// <summary>
-        /// Request process method. In case request was sent via large object message system. The response will be sent also via large object message system.
-        /// </summary>
-        /// <param name="notification">
-        /// The request parcel notification.
-        /// </param>
-        /// <typeparam name="TObject">
-        /// The type of ef object
-        /// </typeparam>
-        /// <typeparam name="TId">
-        /// The type of object identity field
-        /// </typeparam>
-        /// <returns>
-        /// Execution task
-        /// </returns>
-        protected virtual async Task OnParcel<TObject, TId>(ParcelNotification notification)
-            where TObject : class
-        {
-            CrudActionMessage<TObject, TId> request;
-            CrudActionResponse<TObject> response = null;
-
-            try
-            {
-                request = await notification.Receive(Context.System) as CrudActionMessage<TObject, TId>;
-                if (request == null)
-                {
-                    response = CrudActionResponse<TObject>.Error(new ParcelException("Parcel is empty or with unexpected type"), null);
-                }
-            }
-            catch (Exception exception)
-            {
-                request = null;
-                response = CrudActionResponse<TObject>.Error(new ParcelException("Could not receive request parcel", exception), null);
-            }
-
-            if (request != null)
-            {
-                response = await this.ProcessRequest(request);
-            }
-
-            Context.GetParcelManager().Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
-        }
-
-        /// <summary>
         /// Request process method
         /// </summary>
         /// <typeparam name="TObject">
@@ -212,7 +184,15 @@ namespace ClusterKit.Data
         protected virtual async Task OnRequest<TObject, TId>(CrudActionMessage<TObject, TId> request)
             where TObject : class
         {
-            this.Sender.Tell(await this.ProcessRequest(request));
+            var response = await this.ProcessRequest(request);
+            if (typeof(ILargeObject).IsAssignableFrom(typeof(TObject)))
+            {
+                Context.GetParcelManager().Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
+            }
+            else
+            {
+                this.Sender.Tell(response);
+            }
         }
 
         /// <summary>

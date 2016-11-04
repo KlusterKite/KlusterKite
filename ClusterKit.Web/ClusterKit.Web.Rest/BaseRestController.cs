@@ -18,6 +18,7 @@ namespace ClusterKit.Web.Rest
     using Akka.Actor;
 
     using ClusterKit.Core;
+    using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects;
@@ -38,6 +39,14 @@ namespace ClusterKit.Web.Rest
     public abstract class BaseRestController<TObject, TId> : ApiController where TObject : class
     {
         /// <summary>
+        /// Initializes static members of the <see cref="BaseRestController{TObject,TId}"/> class.
+        /// </summary>
+        static BaseRestController()
+        {
+            DataIsLarge = typeof(ILargeObject).IsAssignableFrom(typeof(TObject));
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BaseRestController{TObject,TId}"/> class.
         /// </summary>
         /// <param name="system">
@@ -50,23 +59,23 @@ namespace ClusterKit.Web.Rest
         }
 
         /// <summary>
+        /// Gets a value indicating whether the individual data stored in entity is large enough to be send via parcels.
+        /// </summary>
+        [UsedImplicitly]
+        // ReSharper disable once StaticMemberInGenericType
+        protected static bool DataIsLarge { get; private set; }
+
+        /// <summary>
         /// Gets timeout for actor system requests
         /// </summary>
         protected virtual TimeSpan AkkaTimeout { get; }
 
         /// <summary>
-        /// The data is large.
-        /// </summary>
-        /// <remarks>
-        /// Large data will be sent and received via parcels pipe. This will have impact on performance, but does not have message size limitations
-        /// </remarks>
-        protected virtual bool DataIsLarge => false;
-
-        /// <summary>
         /// The list of returned objects is large.
         /// </summary>
         /// <remarks>
-        /// Large data will be sent and received via parcels pipe. This will have impact on performance, but does not have message size limitations
+        /// Large data will be sent and received via parcels pipe. This will have impact on performance, but does not have message size limitations.
+        /// In case of <see cref="DataIsLarge"/> this property will be ignored
         /// </remarks>
         protected virtual bool DataListIsLarge => true;
 
@@ -137,7 +146,7 @@ namespace ClusterKit.Web.Rest
         {
             var collectionRequest = new CollectionRequest<TObject> { Count = count, Skip = skip };
 
-            if (this.DataListIsLarge || this.DataIsLarge)
+            if (this.DataListIsLarge || DataIsLarge)
             {
                 collectionRequest.AcceptAsParcel = true;
                 var notification =
@@ -186,10 +195,13 @@ namespace ClusterKit.Web.Rest
         protected virtual async Task<TObject> SendRequest(CrudActionMessage<TObject, TId> request)
         {
             CrudActionResponse<TObject> result;
-            if (this.DataIsLarge)
+            if (DataIsLarge)
             {
-                var notification =
-                    await
+                var notification = request.ActionType == EnActionType.Get
+                    ? await 
+                        this.System.ActorSelection(this.GetDbActorProxyPath())
+                            .Ask<ParcelNotification>(request, this.AkkaTimeout)
+                    : await
                         this.System.GetParcelManager()
                             .Ask<ParcelNotification>(
                                 new Parcel

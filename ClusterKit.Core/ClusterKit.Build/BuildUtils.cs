@@ -11,12 +11,9 @@ namespace ClusterKit.Build
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
-    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Xml;
@@ -90,7 +87,7 @@ namespace ClusterKit.Build
 
             if (Directory.Exists(tempSrc))
             {
-                var attmept = 0;
+                var attempt = 0;
                 while (true)
                 {
                     try
@@ -101,13 +98,14 @@ namespace ClusterKit.Build
                     catch (IOException)
                     {
                         ConsoleLog("Src directory is blocked. Retrying...");
-                        attmept++;
+                        attempt++;
                         Thread.Sleep(100);
-                        if (attmept >= 10)
+                        if (attempt >= 10)
                         {
                             throw;
                         }
                     }
+
                     break;
                 }
             }

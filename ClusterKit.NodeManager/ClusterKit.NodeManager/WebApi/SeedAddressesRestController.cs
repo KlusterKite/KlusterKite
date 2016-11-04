@@ -33,9 +33,6 @@ namespace ClusterKit.NodeManager.WebApi
         {
         }
 
-        /// <inheritdoc />
-        protected override bool DataIsLarge => true;
-
         /// <summary>
         /// Gets akka actor path for database worker
         /// </summary>
