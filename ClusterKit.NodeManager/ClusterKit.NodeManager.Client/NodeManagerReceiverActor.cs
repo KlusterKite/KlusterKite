@@ -94,14 +94,13 @@ namespace ClusterKit.NodeManager.Client
             }
 
             this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(this.description));
-            this.Receive<ShutdownMessage>(
-                m =>
+            this.ReceiveAsync<ShutdownMessage>(
+                async m =>
                     {
-                        // todo: remove or modify after https://github.com/akkadotnet/akka.net/issues/2280 fixed
                         var cluster = Cluster.Get(Context.System);
                         var system = Context.System;
-                        cluster.RegisterOnMemberRemoved(() => system.Terminate());
-                        cluster.Leave(cluster.SelfAddress);
+                        await cluster.LeaveAsync();
+                        await system.Terminate();
                     });
         }
     }

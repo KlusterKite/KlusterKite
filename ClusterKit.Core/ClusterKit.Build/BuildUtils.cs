@@ -7,6 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable ArrangeStaticMemberQualifier
 namespace ClusterKit.Build
 {
     using System;
@@ -117,6 +118,7 @@ namespace ClusterKit.Build
 
             Func<string, bool> filter = s => true;
             FileHelper.CopyDir(tempSrc, project.ProjectDirectory, filter.ToFSharpFunc());
+            // ReSharper disable once AssignNullToNotNullAttribute
             var projectFileName = Path.Combine(tempSrc, Path.GetFileName(project.ProjectFileName));
 
             // modifying project file to substitute internal nute-through dependencies to currently built files
@@ -126,19 +128,26 @@ namespace ClusterKit.Build
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
             namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
 
-            var refItemGroup = projDoc.DocumentElement.SelectSingleNode("//def:ItemGroup[def:Reference]", namespaceManager);
+            var rootNode = projDoc.DocumentElement;
+            if (rootNode == null)
+            {
+                ConsoleLog($"Could not read xml from {projectFileName}");
+                return;
+            }
+
+            var refItemGroup = rootNode.SelectSingleNode("//def:ItemGroup[def:Reference]", namespaceManager);
 
             foreach (var dependency in project.InternalDependencies)
             {
                 var refNode =
-                    projDoc.DocumentElement.SelectNodes("//def:Reference", namespaceManager)
-                        .Cast<XmlElement>()
+                    rootNode.SelectNodes("//def:Reference", namespaceManager)
+                        ?.Cast<XmlElement>()
                         .FirstOrDefault(
                             e =>
                             e.HasAttribute("Include")
                             && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
-                    ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
-                        .Cast<XmlElement>()
+                    ?? rootNode.SelectNodes("//def:ProjectReference", namespaceManager)
+                        ?.Cast<XmlElement>()
                         .FirstOrDefault(
                             e =>
                             e.HasAttribute("Include")
@@ -146,19 +155,22 @@ namespace ClusterKit.Build
 
                 if (refNode == null)
                 {
-                    var pr = projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager).Cast<XmlElement>().Where(e => e.HasAttribute("Include"));
-                    foreach (var refel in pr)
+                    var projectReference = rootNode.SelectNodes("//def:ProjectReference", namespaceManager)?.Cast<XmlElement>().Where(e => e.HasAttribute("Include"));
+                    if (projectReference != null)
                     {
-                        ConsoleLog($"Comparing {refel.Attributes["Include"].Value} and {dependency}");
+                        foreach (var element in projectReference)
+                        {
+                            ConsoleLog($"Comparing {element.Attributes["Include"].Value} and {dependency}");
+                        }
                     }
                 }
 
                 if (refNode != null)
                 {
                     var libPath = Path.Combine(Path.GetFullPath(BuildClean), dependency, $"{dependency}.dll");
-                    refNode.ParentNode.RemoveChild(refNode);
+                    refNode.ParentNode?.RemoveChild(refNode);
                     refNode = projDoc.CreateElement("Reference", "http://schemas.microsoft.com/developer/msbuild/2003");
-                    refItemGroup.AppendChild(refNode);
+                    refItemGroup?.AppendChild(refNode);
                     refNode.SetAttribute("Include", dependency);
                     refNode.InnerXml = $"<SpecificVersion>False</SpecificVersion><HintPath>{libPath}</HintPath><Private>True</Private>";
                     ConsoleLog($"ref linked to {dependency} was updated");
@@ -174,7 +186,6 @@ namespace ClusterKit.Build
             }
 
             // todo: @kantora update NuGet package references in case of directory structure change
-
             ConsoleLog($"Writing modified {projectFileName}");
             projDoc.Save(projectFileName);
 
@@ -278,15 +289,6 @@ namespace ClusterKit.Build
         {
             using (var writer = File.CreateText(Path.Combine(BuildDirectory, "global.sln")))
             {
-                /*
-        ..\build.config.fsx = ..\build.config.fsx
-		..\BuildScript.md = ..\BuildScript.md
-		..\nuget.config = ..\nuget.config
-		..\Readme.md = ..\Readme.md
-		..\Settings.StyleCop = ..\Settings.StyleCop
-
-                 */
-
                 writer.Write($@"
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
@@ -322,16 +324,15 @@ EndProject
                         try
                         {
                             var uid = GetProjectUid(project);
-
                             if (string.IsNullOrEmpty(uid))
                             {
                                 throw new Exception("Could not parse project uid");
                             }
 
+
                             writer.Write(
                                 $@"
-Project(""{{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}}"") = ""{project.ProjectName}"", ""../{project
-                                    .ProjectFileName}"", ""{uid}""
+Project(""{{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}}"") = ""{project.ProjectName}"", ""../{project.ProjectFileName}"", ""{uid}""
 EndProject
 
 ");

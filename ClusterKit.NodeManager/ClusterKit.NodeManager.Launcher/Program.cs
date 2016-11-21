@@ -98,7 +98,7 @@ namespace ClusterKit.NodeManager.Launcher
                 this.IsValid = false;
             }
 
-            this.ContainerType = ConfigurationManager.AppSettings["containerType"];
+            this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE") ?? ConfigurationManager.AppSettings["containerType"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
                 Console.WriteLine(@"containerType is not configured");
@@ -123,22 +123,22 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
-        /// Url of cluster configuration service
+        /// Gets the url of cluster configuration service
         /// </summary>
         private Uri ConfigurationUrl { get; }
 
         /// <summary>
-        /// Type of container assigned to current machine
+        /// Gets the type of container assigned to current machine
         /// </summary>
         private string ContainerType { get; }
 
         /// <summary>
-        /// Gets the value indicating that configuration is correct
+        /// Gets a value indicating whether that configuration is correct
         /// </summary>
         private bool IsValid { get; } = true;
 
         /// <summary>
-        /// Action to be done after node stops
+        /// Gets the action to be done after node stops
         /// </summary>
         private EnStopMode StopMode { get; } = EnStopMode.CleanRestart;
 
@@ -148,7 +148,7 @@ namespace ClusterKit.NodeManager.Launcher
         private Guid Uid { get; } = Guid.NewGuid();
 
         /// <summary>
-        /// Current working directory. All packages and new service will be stored here.
+        /// Gets the current working directory. All packages and new service will be stored here.
         /// </summary>
         private string WorkingDirectory { get; }
 
@@ -297,7 +297,7 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
-        /// Createst runnable service from installed packages
+        /// Creates the runnable service from installed packages
         /// </summary>
         /// <param name="configuration">Current node configuration</param>
         private void CreateService(NodeStartUpConfiguration configuration)
@@ -390,8 +390,8 @@ namespace ClusterKit.NodeManager.Launcher
             {
                 var parameters = AssemblyName.GetAssemblyName(lib);
                 var dependentNode =
-                    assemblyBindingNode.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
-                    ?? assemblyBindingNode.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
+                    assemblyBindingNode?.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
+                    ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
 
                 dependentNode.RemoveAll();
                 var assemblyIdentityNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
