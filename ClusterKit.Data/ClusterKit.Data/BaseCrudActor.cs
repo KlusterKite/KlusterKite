@@ -267,9 +267,12 @@ namespace ClusterKit.Data
                             var oldObject = await factory.Get(factory.GetId(entity));
                             if (oldObject != null)
                             {
-                                return CrudActionResponse<TObject>.Error(
+                                var crudActionResponse = CrudActionResponse<TObject>.Error(
                                     new InsertDuplicateIdException(),
                                     request.ExtraData);
+                                crudActionResponse.Data = oldObject;
+
+                                return crudActionResponse;
                             }
 
                             if (entity == null)
