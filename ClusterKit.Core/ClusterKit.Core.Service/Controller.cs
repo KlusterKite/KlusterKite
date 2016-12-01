@@ -2,16 +2,18 @@
 // <copyright file="Controller.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
+// <summary>
+//   Service controller
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.Core.Service
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-
     using Akka.Actor;
-    using Akka.Event;
+
     using Castle.Windsor;
+
+    using JetBrains.Annotations;
 
     using Serilog;
 
@@ -20,6 +22,7 @@ namespace ClusterKit.Core.Service
     /// <summary>
     /// Service controller
     /// </summary>
+    [UsedImplicitly]
     public class Controller
     {
         /// <summary>

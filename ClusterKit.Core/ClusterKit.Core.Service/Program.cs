@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Core.Service
 {
+    using System;
     using System.Collections.Generic;
 
     using Castle.Windsor;
@@ -39,7 +40,6 @@ namespace ClusterKit.Core.Service
         public static void Main(string[] args)
         {
             Container = new WindsorContainer();
-
             HostFactory.Run(
                 x =>
                     {
@@ -81,6 +81,7 @@ namespace ClusterKit.Core.Service
                         x.SetServiceName("ClusterKitNode");
                         x.UseLinuxIfAvailable();
                         x.OnException(e => Log.Logger.Error(e, "{Type}: exception", "Topshelf"));
+                        x.UseSerilog();
                     });
         }
     }
