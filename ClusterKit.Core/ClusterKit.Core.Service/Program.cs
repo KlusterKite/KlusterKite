@@ -26,7 +26,7 @@ namespace ClusterKit.Core.Service
     public class Program
     {
         /// <summary>
-        /// Gets the dependency injection container
+        /// Gets or sets the dependency injection container
         /// </summary>
         private static IWindsorContainer Container { get; set; }
 
@@ -47,7 +47,6 @@ namespace ClusterKit.Core.Service
                         x.AddCommandLineDefinition("config", fileName => configurations.Add(fileName));
                         x.ApplyCommandLine();
                         
-
                         // preset logger
                         var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.ColoredConsole();
                         var logger = loggerConfig.CreateLogger();
@@ -60,10 +59,15 @@ namespace ClusterKit.Core.Service
                                 {
                                     s.ConstructUsing(name => Container.Resolve<Controller>());
                                     s.WhenStarted(
-                                        (tc, hc) => tc.Start(Container, hc));
+                                        (tc, hc) =>
+                                            {
+                                                Log.Logger.Warning("{Type}: Service started", "Topshelf");
+                                                return tc.Start(Container, hc);
+                                            });
                                     s.WhenStopped(
                                         tc =>
                                             {
+                                                Log.Logger.Warning("{Type}: Service stopped", "Topshelf");
                                                 tc.Stop();
                                                 Container.Release(tc);
                                                 Container.Dispose();
@@ -76,8 +80,8 @@ namespace ClusterKit.Core.Service
                         x.SetDisplayName("ClusterKitNode");
                         x.SetServiceName("ClusterKitNode");
                         x.UseLinuxIfAvailable();
+                        x.OnException(e => Log.Logger.Error(e, "{Type}: exception", "Topshelf"));
                     });
         }
-
     }
 }
