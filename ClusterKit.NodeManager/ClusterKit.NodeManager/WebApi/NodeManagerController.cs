@@ -11,6 +11,7 @@ namespace ClusterKit.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -62,7 +63,17 @@ namespace ClusterKit.NodeManager.WebApi
         [Route("getDescriptions")]
         public async Task<List<NodeDescription>> GetActiveNodeDescriptions()
         {
-            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
+            var activeNodeDescriptions =
+                await
+                    this.System.ActorSelection(this.GetManagerActorProxyPath())
+                        .Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
+
+
+            return activeNodeDescriptions
+                .OrderBy(n => n.NodeTemplate)
+                .ThenBy(n => n.ContainerType)
+                .ThenBy(n => n.NodeAddress.ToString())
+                .ToList();
         }
 
         /// <summary>

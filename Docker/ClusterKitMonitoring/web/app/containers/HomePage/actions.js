@@ -24,11 +24,12 @@ export function nodeDescriptionsLoadErrorAction() {
   };
 }
 
-export function nodeDescriptionsReceiveAction(nodeDescriptions, swaggerLinks) {
+export function nodeDescriptionsReceiveAction(nodeDescriptions, swaggerLinks, templates) {
   return {
     type: NODE_DESCRIPTIONS_RECEIVE,
     nodeDescriptions,
     swaggerLinks,
+    templates,
   };
 }
 

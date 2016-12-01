@@ -5,6 +5,8 @@
 */
 
 import React, { Component, PropTypes } from 'react';
+import { autobind } from 'core-decorators';
+import { Popover, OverlayTrigger, Button } from 'react-bootstrap';
 
 import styles from './styles.css';
 
@@ -25,6 +27,20 @@ export default class NodesList extends Component { // eslint-disable-line react/
     </span>);
   }
 
+  @autobind
+  nodePopover(node) {
+    return (
+      <Popover title={`${node.NodeAddress.Host}:${node.NodeAddress.Port}`} id={`${node.NodeAddress.Host}:${node.NodeAddress.Port}`}>
+        {node.Modules.map((subModule) =>
+          <span key={`${node.NodeId}/${subModule.Id}`}>
+            <span className="label label-default">{subModule.Id}&nbsp;{subModule.Version}</span>{' '}
+          </span>
+        )
+        }
+      </Popover>
+    );
+  }
+
   render() {
     const { nodes, onManualUpgrade, hasError } = this.props;
 
@@ -41,26 +57,33 @@ export default class NodesList extends Component { // eslint-disable-line react/
         <table className="table table-hover">
           <thead>
             <tr>
-              <th>Address</th>
               <th>Leader</th>
+              <th>Address</th>
+              <th>Template</th>
+              <th>Container</th>
               <th>Modules</th>
               <th>Roles</th>
               <th>Status</th>
-              <th>Template</th>
-              <th>Container</th>
             </tr>
           </thead>
           <tbody>
           {nodes && nodes.map((node) =>
             <tr key={`${node.NodeAddress.Host}:${node.NodeAddress.Port}`}>
-              <td>{node.NodeAddress.Host}:{node.NodeAddress.Port}</td>
               <td>{node.IsClusterLeader ? <i className="fa fa-check-circle" aria-hidden="true"></i> : ''}</td>
+              <td>{node.NodeAddress.Host}:{node.NodeAddress.Port}</td>
               <td>
-                {node.Modules.map((subModule) =>
-                  <span key={`${node.NodeId}/${subModule.Id}`}>
-                    <span className="label label-default">{subModule.Id}&nbsp;{subModule.Version}</span>{' '}
-                  </span>
-                )
+                {node.NodeTemplate}
+              </td>
+              <td>
+                {node.ContainerType}
+              </td>
+              <td>
+                {node.IsInitialized &&
+                  <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={this.nodePopover(node)}>
+                    <Button className="btn-info btn-xs">
+                      <span className="fa fa-search"></span>
+                    </Button>
+                  </OverlayTrigger>
                 }
               </td>
               <td>
@@ -70,19 +93,21 @@ export default class NodesList extends Component { // eslint-disable-line react/
                 <td>
                   <span className="label">{node.IsInitialized}</span>
                   {!node.IsObsolete &&
-                    <span className="label label-success">Actual</span>
+                    <button
+                      type="button" className={`${styles.upgrade} btn btn-xs btn-success`}
+                      title="Upgrade Node"
+                      onClick={() => onManualUpgrade && onManualUpgrade(node)}>
+                      <i className="fa fa-refresh" /> Actual
+                    </button>
                   }
                   {node.IsObsolete &&
-                    <span className="label label-warning">Obsolete</span>
+                    <button
+                      type="button" className={`${styles.upgrade} btn btn-xs btn-warning`}
+                      title="Upgrade Node"
+                      onClick={() => onManualUpgrade && onManualUpgrade(node)}>
+                      <i className="fa fa-refresh" /> Obsolete
+                    </button>
                   }
-                  <br />
-                  <button
-                    type="button" className={`${styles.upgrade} btn btn-xs`}
-                    onClick={() => onManualUpgrade && onManualUpgrade(node)}
-                  >
-                    <i className="fa fa-refresh" /> {' '}
-                    Upgrade Node
-                  </button>
                 </td>
               }
               {!node.IsInitialized &&
@@ -90,12 +115,6 @@ export default class NodesList extends Component { // eslint-disable-line react/
                   <span className="label label-info">Uncontrolled</span>
                 </td>
               }
-              <td>
-                {node.NodeTemplate}
-              </td>
-              <td>
-                {node.ContainerType}
-              </td>
             </tr>
           )
           }

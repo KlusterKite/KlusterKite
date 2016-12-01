@@ -19,6 +19,10 @@ import {
   getSwaggerList,
 } from './api';
 
+import {
+  getTemplates
+} from '../TemplatePage/api';
+
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 
@@ -27,8 +31,9 @@ function* nodeDescriptionsLoadSaga() {
   while (cont) {
     try {
       const nodes = yield call(getNodeDescriptions);
+      const templates = yield call(getTemplates);
       const swaggerLinks = yield call(getSwaggerList);
-      yield put(nodeDescriptionsReceiveAction(nodes, swaggerLinks));
+      yield put(nodeDescriptionsReceiveAction(nodes, swaggerLinks, templates));
     } catch (exception) {
       yield put(nodeDescriptionsLoadErrorAction());
     }

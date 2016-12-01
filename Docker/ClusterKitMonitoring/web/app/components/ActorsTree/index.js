@@ -50,7 +50,7 @@ class ActorsTree extends Component {
   getActorToolTip(node) {
     const result = (
       <div className={`${styles.wellTooltip} well well-sm`}>
-        <p><strong>{node.Name}</strong></p>
+        <p><strong>{decodeURIComponent(node.Name)}</strong></p>
         {node.ActorType && (<small>Type: {node.ActorType}<br /></small>)}
         {node.DispatcherType && (<small>DispatcherType: {node.DispatcherType}<br /></small>)}
         {node.CurrentMessage && <small>CurrentMessage: {node.CurrentMessage}<br /></small>}

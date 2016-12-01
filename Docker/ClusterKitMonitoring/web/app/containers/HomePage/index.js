@@ -17,6 +17,7 @@ import {
 
 import NodesList from '../../components/NodesList';
 import SwaggerLinksList from '../../components/SwaggerLinksList';
+import NodesWithTemplates from '../../components/NodesWithTemplates';
 
 
 export class HomePage extends Component { // eslint-disable-line react/prefer-stateless-function
@@ -25,6 +26,7 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
     dispatch: PropTypes.func.isRequired,
     nodeDescriptions: PropTypes.array.isRequired,
     swaggerLinks: PropTypes.array.isRequired,
+    templates: PropTypes.array.isRequired,
     hasError: PropTypes.bool.isRequired,
   }
 
@@ -53,6 +55,7 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
           <i className="fa fa-refresh" /> {' '} Reload packages
         </button>
 
+        <NodesWithTemplates nodes={this.props.nodeDescriptions} templates={this.props.templates} />
         <NodesList nodes={this.props.nodeDescriptions} hasError={this.props.hasError} onManualUpgrade={this.onNodeUpgradeClick} />
         <SwaggerLinksList links={this.props.swaggerLinks} />
       </div>

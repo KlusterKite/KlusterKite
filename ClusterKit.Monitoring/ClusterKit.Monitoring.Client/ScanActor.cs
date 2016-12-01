@@ -15,7 +15,6 @@ namespace ClusterKit.Monitoring.Client
 
     using Akka.Actor;
     using Akka.Cluster;
-    using Akka.Cluster.Tools.PublishSubscribe;
 
     using ClusterKit.LargeObjects;
     using ClusterKit.Monitoring.Client.Messages;
@@ -123,6 +122,7 @@ namespace ClusterKit.Monitoring.Client
 
                         return node;
                     })
+                .OrderBy(n => n.Name)
                 .ToArray();
 
             return nodes;
