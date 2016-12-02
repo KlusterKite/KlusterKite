@@ -102,53 +102,6 @@ namespace ClusterKit.Core.Service
             system.WhenTerminated.ContinueWith(task => waitedTask.SetResult(true));
             waitedTask.Task.Wait();
             Log.Logger.Warning("{Type}: Stopped", "System");
-
-            /*
-            
-            HostFactory.Run(
-                x =>
-                    {
-                        var configurations = new List<string>();
-                        x.AddCommandLineDefinition("config", fileName => configurations.Add(fileName));
-                        x.ApplyCommandLine();
-                        
-                        // preset logger
-                        var loggerConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.ColoredConsole();
-                        var logger = loggerConfig.CreateLogger();
-                        Log.Logger = logger;
-
-                        Bootstrapper.ConfigureAndStart(Container, configurations.ToArray());
-
-                        x.Service<Controller>(
-                            s =>
-                                {
-                                    s.ConstructUsing(name => Container.Resolve<Controller>());
-                                    s.WhenStarted(
-                                        (tc, hc) =>
-                                            {
-                                                Log.Logger.Warning("{Type}: Service started", "Topshelf");
-                                                return tc.Start(Container, hc);
-                                            });
-                                    s.WhenStopped(
-                                        tc =>
-                                            {
-                                                Log.Logger.Warning("{Type}: Service stopped", "Topshelf");
-                                                tc.Stop();
-                                                Container.Release(tc);
-                                                Container.Dispose();
-                                            });
-                                });
-
-                        x.StartAutomatically();
-                        x.RunAsLocalSystem();
-                        x.SetDescription("ClusterKit Node service");
-                        x.SetDisplayName("ClusterKitNode");
-                        x.SetServiceName("ClusterKitNode");
-                        x.UseLinuxIfAvailable();
-                        x.OnException(e => Log.Logger.Error(e, "{Type}: exception", "Topshelf"));
-                        x.UseSerilog();
-                    });
-                    */
         }
     }
 }

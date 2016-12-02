@@ -11,7 +11,6 @@ namespace ClusterKit.Core.Service
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Configuration;
     using System.IO;
     using System.Linq;
@@ -52,13 +51,13 @@ namespace ClusterKit.Core.Service
         /// <param name="args">
         /// Startup parameters
         /// </param>
+        /// <returns>The actor system</returns>
         public static ActorSystem ConfigureAndStart(IWindsorContainer container, string[] args)
         {
             Console.WriteLine(@"Starting bootstrapper");
 
             container.AddFacility<TypedFactoryFacility>();
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
-            container.Register(Component.For<Controller>().LifestyleTransient());
             container.Register(Component.For<IWindsorContainer>().Instance(container));
 
             container.RegisterWindsorInstallers();
@@ -108,7 +107,6 @@ namespace ClusterKit.Core.Service
 
             // log configuration finished
 
-
             // performing prestart checks
             BaseInstaller.RunPrecheck(container, config);
 
@@ -119,7 +117,6 @@ namespace ClusterKit.Core.Service
 
             container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
-
 
             Console.WriteLine(@"Bootstrapper start finished");
 
