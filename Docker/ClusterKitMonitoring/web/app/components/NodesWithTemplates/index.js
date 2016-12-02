@@ -27,7 +27,7 @@ export default class NodesWithTemplates extends Component {
     }
 
     return (
-      <span title={template.Name} className={'label ' + color }>{template.Code}: {nodesCount} / {template.MinimumRequiredInstances}</span>
+      <span title={template.Name} className={`label ${color}`}>{template.Code}: {nodesCount} / {template.MinimumRequiredInstances}</span>
     );
   }
 

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿ // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -476,7 +476,7 @@ namespace ClusterKit.NodeManager.Launcher
                                                   Path.GetFullPath(this.WorkingDirectory),
                                                   "service",
                                                   "ClusterKit.Core.Service.exe"),
-                                          Arguments = "-config:start.hocon"
+                                          Arguments = "--config=start.hocon"
                                       }
                               };
             process.Start();

@@ -52,7 +52,7 @@ namespace ClusterKit.Core.Service
         /// <param name="args">
         /// Startup parameters
         /// </param>
-        public static void Configure(IWindsorContainer container, string[] args)
+        public static ActorSystem ConfigureAndStart(IWindsorContainer container, string[] args)
         {
             Console.WriteLine(@"Starting bootstrapper");
 
@@ -105,13 +105,14 @@ namespace ClusterKit.Core.Service
 
             var logger = loggerConfig.CreateLogger();
             Log.Logger = logger;
+
             // log configuration finished
 
 
             // performing prestart checks
             BaseInstaller.RunPrecheck(container, config);
 
-            // starting akka system
+            // starting Akka system
             Console.WriteLine(@"starting akka system");
             var actorSystem = ActorSystem.Create("ClusterKit", config);
             actorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, actorSystem));
@@ -121,6 +122,8 @@ namespace ClusterKit.Core.Service
 
 
             Console.WriteLine(@"Bootstrapper start finished");
+
+            return actorSystem;
         }
 
         /// <summary>

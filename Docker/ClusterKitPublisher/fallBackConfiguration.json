@@ -130,6 +130,11 @@
     },
     {
       "BuildDate": null,
+      "Id": "docopt.net",
+      "Version": "0.6.1.9"
+    },
+    {
+      "BuildDate": null,
       "Id": "Elasticsearch.Net",
       "Version": "2.4.2"
     },
