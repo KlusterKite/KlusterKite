@@ -10,7 +10,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-#pragma warning disable 1998
 namespace ClusterKit.Data.EF
 {
     using System;
@@ -72,9 +71,9 @@ namespace ClusterKit.Data.EF
         /// </summary>
         /// <param name="id">The object's identification</param>
         /// <returns>Async execution task</returns>
-        public override async Task<Maybe<TObject>> Get(TId id)
+        public override Task<Maybe<TObject>> Get(TId id)
         {
-            return this.GetDbQuery().FirstOrDefault(this.GetIdValidationExpression(id));
+            return Task.FromResult<Maybe<TObject>>(this.GetDbQuery().FirstOrDefault(this.GetIdValidationExpression(id)));
         }
 
         /// <summary>
@@ -91,7 +90,7 @@ namespace ClusterKit.Data.EF
         /// <param name="skip">The number of objects to skip from select</param>
         /// <param name="count">The maximum number of objects to return. Returns all on null.</param>
         /// <returns>The list of objects from datasource</returns>
-        public override async Task<List<TObject>> GetList(int skip, int? count)
+        public override Task<List<TObject>> GetList(int skip, int? count)
         {
             var query = this.GetSortFunction(this.GetDbQuery()).Skip(skip);
             if (count.HasValue)
@@ -99,7 +98,7 @@ namespace ClusterKit.Data.EF
                 query = query.Take(count.Value);
             }
 
-            return query.ToList();
+            return Task.FromResult(query.ToList());
         }
 
         /// <summary>
@@ -115,10 +114,11 @@ namespace ClusterKit.Data.EF
         /// </summary>
         /// <param name="obj">The object to add</param>
         /// <returns>Async execution task</returns>
-        public override async Task Insert(TObject obj)
+        public override Task Insert(TObject obj)
         {
             this.GetDbSet().Add(obj);
             this.Context.SaveChanges();
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -127,10 +127,11 @@ namespace ClusterKit.Data.EF
         /// <param name="newData">The new object's data</param>
         /// <param name="oldData">The old object's data</param>
         /// <returns>Async execution task</returns>
-        public override async Task Update(TObject newData, TObject oldData)
+        public override Task Update(TObject newData, TObject oldData)
         {
             this.Context.Entry(oldData).CurrentValues.SetValues(newData);
             this.Context.SaveChanges();
+            return Task.CompletedTask;
         }
 
         /// <summary>
