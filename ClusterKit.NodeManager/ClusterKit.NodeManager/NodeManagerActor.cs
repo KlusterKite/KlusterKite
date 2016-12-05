@@ -495,6 +495,19 @@ namespace ClusterKit.NodeManager
                 selectedTemplate = templates.Last();
             }
 
+            var missedPackages = selectedTemplate.Packages.Where(p => !this.packages.ContainsKey(p)).ToList();
+            if (missedPackages.Count > 0)
+            {
+                Context.GetLogger()
+                    .Error(
+                        "{Type}: Packages {MissedPackageNames} are missing for {TemplateName}",
+                        this.GetType().Name,
+                        string.Join(", ", missedPackages),
+                        selectedTemplate.Name);
+                this.Sender.Tell(new NodeStartupWaitMessage { WaitTime = this.fullClusterWaitTimeout });
+                return;
+            }
+
             // todo: @kantora create and keep update cache of template packages
             var packageDescriptions = selectedTemplate.Packages
                 .Select(name => this.packages.ContainsKey(name) ? this.packages[name] : null)
