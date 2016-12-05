@@ -37,6 +37,6 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// Gets some extra data, that will be returned with the response
         /// </summary>
         [UsedImplicitly]
-        object ExtraData { get; }
+        byte[] ExtraData { get; }
     }
 }

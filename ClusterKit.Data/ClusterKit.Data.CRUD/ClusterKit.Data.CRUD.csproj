@@ -123,7 +123,9 @@
     <Compile Include="Exceptions\EntityNotFoundException.cs" />
     <Compile Include="Exceptions\InsertDuplicateIdException.cs" />
     <Compile Include="Exceptions\RequestEmptyException.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="ILargeObject.cs" />
+    <Compile Include="IMessageWithExtraData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +133,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj">
+      <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
+      <Name>ClusterKit.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj">
       <Project>{7de19efc-58c5-4dbf-8a2a-e81e54af5623}</Project>
       <Name>ClusterKit.LargeObjects.Client</Name>

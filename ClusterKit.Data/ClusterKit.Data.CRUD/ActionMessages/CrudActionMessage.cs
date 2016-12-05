@@ -19,7 +19,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
     /// </summary>
     /// <typeparam name="TData">The type of data object</typeparam>
     /// <typeparam name="TId">The type of data object identification</typeparam>
-    public class CrudActionMessage<TData, TId> : IConsistentHashable, ICrudActionMessage
+    public class CrudActionMessage<TData, TId> : IConsistentHashable, ICrudActionMessage, IMessageWithExtraData
     {
         /// <summary>
         /// Gets or sets the type of request
@@ -47,7 +47,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// Gets or sets some extra data, that will be returned with the response
         /// </summary>
         [UsedImplicitly]
-        public object ExtraData { get; set; }
+        public byte[] ExtraData { get; set; }
 
         /// <inheritdoc />
         EnActionType ICrudActionMessage.ActionType => this.ActionType;
@@ -59,6 +59,6 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         object ICrudActionMessage.Data => this.Data;
 
         /// <inheritdoc />
-        object ICrudActionMessage.ExtraData => this.ExtraData;
+        byte[] ICrudActionMessage.ExtraData => this.ExtraData;
     }
 }

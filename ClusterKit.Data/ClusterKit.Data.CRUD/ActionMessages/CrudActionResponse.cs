@@ -17,7 +17,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
     /// Standard response from the <seealso cref="CrudActionMessage{TData,TId}"/> request
     /// </summary>
     /// <typeparam name="TData">The type of entity</typeparam>
-    public class CrudActionResponse<TData>
+    public class CrudActionResponse<TData> : IMessageWithExtraData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CrudActionResponse{TData}"/> class.
@@ -43,7 +43,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// Gets or sets some extra data, that was sent with the request
         /// </summary>
         [UsedImplicitly]
-        public object ExtraData { get; set; }
+        public byte[] ExtraData { get; set; }
 
         /// <summary>
         /// Creates a failed response
@@ -51,7 +51,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// <param name="exception">The failure exception</param>
         /// <param name="extraData">Some extra data, that was sent with the request</param>
         /// <returns>The new response</returns>
-        public static CrudActionResponse<TData> Error(Exception exception, object extraData)
+        public static CrudActionResponse<TData> Error(Exception exception, byte[] extraData)
         {
             return new CrudActionResponse<TData>
             {
@@ -66,7 +66,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// <param name="data">The actual entity data</param>
         /// <param name="extraData">Some extra data, that was sent with the request</param>
         /// <returns>The new response</returns>
-        public static CrudActionResponse<TData> Success(TData data, object extraData)
+        public static CrudActionResponse<TData> Success(TData data, byte[] extraData)
         {
             return new CrudActionResponse<TData>
             {

@@ -18,7 +18,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
     /// <summary>
     /// Collection of objects request
     /// </summary>
-    public class CollectionRequest : IConsistentHashable
+    public class CollectionRequest : IConsistentHashable, IMessageWithExtraData
     {
         /// <summary>
         /// The consistent hash key of the marked class.
@@ -44,7 +44,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// Gets or sets some extra data, that will be returned with the response
         /// </summary>
         [UsedImplicitly]
-        public object ExtraData { get; set; }
+        public byte[] ExtraData { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the response is acceptable as parcel.
