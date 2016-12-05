@@ -1232,7 +1232,8 @@ namespace ClusterKit.NodeManager
                     ((NodeTemplate)(object)newObject).Version = ((NodeTemplate)(object)oldObject).Version + 1;
                 }
 
-                return base.BeforeUpdate(newObject, oldObject);
+                // ReSharper disable once RedundantTypeArgumentsOfMethod
+                return base.BeforeUpdate<TObject>(newObject, oldObject);
             }
 
             /// <summary>

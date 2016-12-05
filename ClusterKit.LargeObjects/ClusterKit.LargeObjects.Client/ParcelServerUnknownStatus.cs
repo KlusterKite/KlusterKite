@@ -9,13 +9,10 @@
 
 namespace ClusterKit.LargeObjects.Client
 {
-    using System;
-
     /// <summary>
     /// Parcel server returned unknown status response
     /// </summary>
-    public class ParcelServerUnknownStatus : Exception
+    public class ParcelServerUnknownStatus : ParcelException
     {
-        
     }
 }

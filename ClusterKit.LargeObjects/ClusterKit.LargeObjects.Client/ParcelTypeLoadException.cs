@@ -1,18 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelNotFoundException.cs" company="ClusterKit">
+// <copyright file="ParcelTypeLoadException.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The parcel was already removed from the server
+//   Could not load type for parcel's payload
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.LargeObjects.Client
 {
     /// <summary>
-    /// The parcel was already removed from the server
+    /// Could not load type for parcel's payload
     /// </summary>
-    public class ParcelNotFoundException : ParcelException
+    public class ParcelTypeLoadException : ParcelException
     {
     }
 }

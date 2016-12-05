@@ -122,7 +122,6 @@
     <Compile Include="Exceptions\DatasourceInnerExceptin.cs" />
     <Compile Include="Exceptions\EntityNotFoundException.cs" />
     <Compile Include="Exceptions\InsertDuplicateIdException.cs" />
-    <Compile Include="Exceptions\ParcelException.cs" />
     <Compile Include="Exceptions\RequestEmptyException.cs" />
     <Compile Include="ILargeObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

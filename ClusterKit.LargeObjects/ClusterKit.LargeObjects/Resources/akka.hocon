@@ -1,4 +1,6 @@
 ﻿{
+	ClusterKit.LargeObjects.TcpReadTimeout = 10s
+	
 	akka.actor.deployment {
 
           /ClusterKit {

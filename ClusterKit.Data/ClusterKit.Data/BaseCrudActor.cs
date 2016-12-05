@@ -6,13 +6,13 @@
 //   Generic actor to perform basic crud operation on EF objects
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace ClusterKit.Data
 {
     using System;
     using System.Threading.Tasks;
 
     using Akka.Actor;
+    using Akka.Event;
 
     using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
@@ -32,17 +32,9 @@ namespace ClusterKit.Data
         where TContext : IDisposable
     {
         /// <inheritdoc />
-        protected override bool AroundReceive(Receive receive, object message)
+        protected BaseCrudActor()
         {
-            var parcel = message as ParcelNotification;
-
-            if (parcel != null)
-            {
-                parcel.Receive(ActorBase.Context.System).PipeTo(this.Self, this.Sender);
-                return true;
-            }
-
-            return base.AroundReceive(receive, message);
+            this.Receive<ParcelException>(m => this.OnParcelException(m));
         }
 
         /// <summary>
@@ -81,6 +73,20 @@ namespace ClusterKit.Data
         /// </param>
         protected virtual void AfterUpdate<TObject>(TObject newObject, TObject oldObject) where TObject : class
         {
+        }
+
+        /// <inheritdoc />
+        protected override bool AroundReceive(Receive receive, object message)
+        {
+            var parcel = message as ParcelNotification;
+
+            if (parcel != null)
+            {
+                parcel.ReceiveWithPipeTo(ActorBase.Context.System, this.Self, this.Sender);
+                return true;
+            }
+
+            return base.AroundReceive(receive, message);
         }
 
         /// <summary>
@@ -156,13 +162,28 @@ namespace ClusterKit.Data
 
                 if (collectionRequest.AcceptAsParcel)
                 {
-                    Context.GetParcelManager().Tell(new Parcel { Payload = objects, Recipient = this.Sender }, this.Self);
+                    Context.GetParcelManager()
+                        .Tell(new Parcel { Payload = objects, Recipient = this.Sender }, this.Self);
                 }
                 else
                 {
                     this.Sender.Tell(objects);
                 }
             }
+        }
+
+        /// <summary>
+        /// Handling the parcel receive exceptions
+        /// </summary>
+        /// <param name="message">The parcel receive exception</param>
+        protected virtual void OnParcelException(ParcelException message)
+        {
+            var errorMessage = message.Message;
+            var logTemplate = string.IsNullOrWhiteSpace(errorMessage)
+                                  ? "{Type}: Parcel receive error"
+                                  : "{Type}: Parcel receive error: {ErrorMessage}";
+
+            Context.GetLogger().Error(message, logTemplate, this.GetType().Name, errorMessage);
         }
 
         /// <summary>
@@ -267,9 +288,10 @@ namespace ClusterKit.Data
                             var oldObject = await factory.Get(factory.GetId(entity));
                             if (oldObject != null)
                             {
-                                var crudActionResponse = CrudActionResponse<TObject>.Error(
-                                    new InsertDuplicateIdException(),
-                                    request.ExtraData);
+                                var crudActionResponse =
+                                    CrudActionResponse<TObject>.Error(
+                                        new InsertDuplicateIdException(),
+                                        request.ExtraData);
                                 crudActionResponse.Data = oldObject;
 
                                 return crudActionResponse;
@@ -373,7 +395,10 @@ namespace ClusterKit.Data
                         }
 
                     default:
-                        return CrudActionResponse<TObject>.Error(new ArgumentOutOfRangeException(nameof(request.ActionType)), request.ExtraData);
+                        return
+                            CrudActionResponse<TObject>.Error(
+                                new ArgumentOutOfRangeException(nameof(request.ActionType)),
+                                request.ExtraData);
                 }
             }
         }

@@ -146,11 +146,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Installer.cs" />
+    <Compile Include="ParcelException.cs" />
     <Compile Include="ParcelNotFoundException.cs" />
     <Compile Include="ParcelNotification.cs" />
     <Compile Include="EnParcelServerResponseCode.cs" />
     <Compile Include="ParcelServerErrorException.cs" />
     <Compile Include="ParcelServerUnknownStatus.cs" />
+    <Compile Include="ParcelTimeoutException.cs" />
+    <Compile Include="ParcelTypeLoadException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>

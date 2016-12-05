@@ -1,2 +1,10 @@
 ﻿{
+	# The timeout on socket read operation
+	ClusterKit.LargeObjects.TcpReadTimeout = 10s
+
+	# The maximum number of parcel receive attmets on read timeouts
+	ClusterKit.LargeObjects.MaxReadAttempts = 5
+
+	# The time intervasl between read attempts
+	ClusterKit.LargeObjects.RereadInterval = 5s
 }

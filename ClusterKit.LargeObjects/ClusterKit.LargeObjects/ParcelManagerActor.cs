@@ -31,6 +31,8 @@ namespace ClusterKit.LargeObjects
 
     using JetBrains.Annotations;
 
+    using Serilog;
+
     /// <summary>
     /// Manager that handles sending parcels
     /// </summary>
@@ -46,6 +48,11 @@ namespace ClusterKit.LargeObjects
         /// The global parcel storage
         /// </summary>
         private static readonly ConcurrentDictionary<Guid, Parcel> Parcels = new ConcurrentDictionary<Guid, Parcel>();
+
+        /// <summary>
+        /// The tcp stream read timeout
+        /// </summary>
+        private readonly TimeSpan readTimeout;
 
         /// <summary>
         /// The local server host
@@ -85,6 +92,7 @@ namespace ClusterKit.LargeObjects
         /// </param>
         public ParcelManagerActor(IWindsorContainer container)
         {
+            this.readTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.LargeObjects.TcpReadTimeout", TimeSpan.FromSeconds(10));
             this.envelopers = container.ResolveAll(typeof(INotificationEnveloper))
                 .Cast<INotificationEnveloper>()
                 .OrderByDescending(e => e.Priority)
@@ -202,13 +210,12 @@ namespace ClusterKit.LargeObjects
         // ReSharper disable once UnusedMethodReturnValue.Local
         private async Task HandleConnection(TcpClient connection)
         {
-            var timeOut = TimeSpan.FromSeconds(1);
             try
             {
                 using (var stream = connection.GetStream())
                 {
                     var guidBytes = new byte[16];
-                    var readBytes = await this.ReadWithTimeout(stream, guidBytes, 0, 16, timeOut);
+                    var readBytes = await this.ReadWithTimeout(stream, guidBytes, 0, 16, this.readTimeout);
                     if (readBytes != 16)
                     {
                         await stream.WriteAsync(new[] { (byte)EnParcelServerResponseCode.BadRequest }, 0, 1);
@@ -239,6 +246,10 @@ namespace ClusterKit.LargeObjects
                     await stream.WriteAsync(data, 0, data.Length);
                 }
             }
+            catch (Exception e)
+            {
+                Log.Logger.Error(e, "{Type}: error while handling connection", this.GetType().Name);
+            }
             finally
             {
                 connection.Close();
@@ -266,9 +277,9 @@ namespace ClusterKit.LargeObjects
 
             var task = stream.ReadAsync(buffer, offset, length, ct);
             
-            // ReSharper disable once MethodSupportsCancellation
-            if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
+            if (await Task.WhenAny(task, Task.Delay(timeout, ct)) == task)
             {
+                tokenSource.Cancel();
                 return task.Result;
             }
 

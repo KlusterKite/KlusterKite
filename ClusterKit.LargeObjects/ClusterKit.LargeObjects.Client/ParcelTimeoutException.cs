@@ -1,18 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelNotFoundException.cs" company="ClusterKit">
+// <copyright file="ParcelTimeoutException.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The parcel was already removed from the server
+//   Timeout happened in parcel receive process
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.LargeObjects.Client
 {
     /// <summary>
-    /// The parcel was already removed from the server
+    /// Timeout happened in parcel receive process
     /// </summary>
-    public class ParcelNotFoundException : ParcelException
+    public class ParcelTimeoutException : ParcelException
     {
     }
 }

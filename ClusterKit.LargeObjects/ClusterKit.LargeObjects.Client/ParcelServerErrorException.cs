@@ -14,7 +14,7 @@ namespace ClusterKit.LargeObjects.Client
     /// <summary>
     /// The server could not be contacted or some other error
     /// </summary>
-    public class ParcelServerErrorException : Exception
+    public class ParcelServerErrorException : ParcelException
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ParcelServerErrorException"/> class.
