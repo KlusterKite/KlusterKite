@@ -67,10 +67,11 @@ namespace ClusterKit.Core.Service
                 {
                     Log.Logger.Error(
                         eventArgs.ExceptionObject as Exception,
-                        "{Type}: Unhandled domain exception from {SenderType}, terminating: {IsTerminating}", 
+                        "{Type}: Unhandled domain exception from {SenderType}, terminating: {IsTerminating}\n{StackTrace}", 
                         "System",
                         sender?.GetType().Name ?? "unknown",
-                        eventArgs.IsTerminating);
+                        eventArgs.IsTerminating,
+                        (eventArgs.ExceptionObject as Exception)?.StackTrace);
                 };
 
             var system = Bootstrapper.ConfigureAndStart(Container, configurations.ToArray());
