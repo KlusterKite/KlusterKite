@@ -100,5 +100,5 @@ Creates special global solution(`global.sln`) in build directory with all define
 #### SwitchToPackageRefs
 Updates all `csproj` files to reference local dependencies (that goes to project, not in local solution) via locally built NuGet packages
 
-#### SwitchToPackageRefs
+#### SwitchToProjectRefs
 Updates all `csproj` files to reference local dependencies (that goes to project, not in local solution) as project reference (especially useful while working with global solution)
