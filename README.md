@@ -25,3 +25,4 @@ Collecting diagnostics and monitoring information from cluster nodes.
 ## [ClusterKit.NodeManager] (./ClusterKit.NodeManager/Readme.md)
 Cluster orchestration, remote node configuration, managing and updating.
 
+## [Sources build instructions] (./BuildScript.md)
