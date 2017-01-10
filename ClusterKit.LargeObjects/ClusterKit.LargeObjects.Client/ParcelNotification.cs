@@ -77,6 +77,12 @@ namespace ClusterKit.LargeObjects.Client
         {
             this.ReceiveAttempt++;
             var timeOut = system.Settings.Config.GetTimeSpan("ClusterKit.LargeObjects.TcpReadTimeout", TimeSpan.FromSeconds(10));
+
+            if (system.Settings.Config.GetBoolean("ClusterKit.LargeObjects.LogReceive"))
+            {
+                system.Log.Info("{Type}: Receiving {PayloadType} payload", this.GetType().Name, this.PayloadTypeName);
+            }
+
             var payloadType = this.GetPayloadType();
             if (payloadType == null)
             {

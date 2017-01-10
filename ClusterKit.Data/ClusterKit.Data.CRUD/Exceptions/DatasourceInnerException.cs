@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DatasourceInnerExceptin.cs" company="ClusterKit">
+// <copyright file="DatasourceInnerException.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -14,28 +14,28 @@ namespace ClusterKit.Data.CRUD.Exceptions
     /// <summary>
     /// There was internal datasource exception during operation
     /// </summary>
-    public class DatasourceInnerExceptin : Exception
+    public class DatasourceInnerException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatasourceInnerExceptin"/> class.
+        /// Initializes a new instance of the <see cref="DatasourceInnerException"/> class.
         /// </summary>
-        public DatasourceInnerExceptin()
+        public DatasourceInnerException()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatasourceInnerExceptin"/> class.
+        /// Initializes a new instance of the <see cref="DatasourceInnerException"/> class.
         /// </summary>
         /// <param name="message">
         /// The message.
         /// </param>
-        public DatasourceInnerExceptin(string message)
+        public DatasourceInnerException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatasourceInnerExceptin"/> class.
+        /// Initializes a new instance of the <see cref="DatasourceInnerException"/> class.
         /// </summary>
         /// <param name="message">
         /// The message.
@@ -43,7 +43,7 @@ namespace ClusterKit.Data.CRUD.Exceptions
         /// <param name="innerException">
         /// The inner exception.
         /// </param>
-        public DatasourceInnerExceptin(string message, Exception innerException)
+        public DatasourceInnerException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

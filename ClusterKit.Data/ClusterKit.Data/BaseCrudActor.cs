@@ -272,7 +272,7 @@ namespace ClusterKit.Data
                         {
                             return
                                 CrudActionResponse<TObject>.Error(
-                                    new DatasourceInnerExceptin("Exception on Get operation", exception),
+                                    new DatasourceInnerException("Exception on Get operation", exception),
                                     request.ExtraData);
                         }
 
@@ -312,7 +312,7 @@ namespace ClusterKit.Data
                             {
                                 return
                                     CrudActionResponse<TObject>.Error(
-                                        new DatasourceInnerExceptin("Exception on Insert operation", exception),
+                                        new DatasourceInnerException("Exception on Insert operation", exception),
                                         request.ExtraData);
                             }
                         }
@@ -349,7 +349,7 @@ namespace ClusterKit.Data
                             {
                                 return
                                     CrudActionResponse<TObject>.Error(
-                                        new DatasourceInnerExceptin("Exception on Update operation", exception),
+                                        new DatasourceInnerException("Exception on Update operation", exception),
                                         request.ExtraData);
                             }
                         }
@@ -378,7 +378,7 @@ namespace ClusterKit.Data
                             {
                                 return
                                     CrudActionResponse<TObject>.Error(
-                                        new DatasourceInnerExceptin("Exception on Delete operation", exception),
+                                        new DatasourceInnerException("Exception on Delete operation", exception),
                                         request.ExtraData);
                             }
 
