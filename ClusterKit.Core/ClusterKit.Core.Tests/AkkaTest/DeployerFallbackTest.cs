@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DeployerFallbackTest.cs" company="Kantora">
+// <copyright file="DeployerFallbackTest.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Proof of https://github.com/akkadotnet/akka.net/issues/1321
+//   Proof of <see href="https://github.com/akkadotnet/akka.net/issues/1321" />
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,20 +17,27 @@ namespace ClusterKit.Core.Tests.AkkaTest
     using Akka.Configuration;
     using Akka.Routing;
 
-    using ClusterKit.Core.TestKit;
-
     using Serilog;
 
     using Xunit;
     using Xunit.Abstractions;
 
     /// <summary>
-    /// Proof of https://github.com/akkadotnet/akka.net/issues/1321
+    /// Proof of <see href="https://github.com/akkadotnet/akka.net/issues/1321"/> 
     /// </summary>
     public class DeployerFallbackTest
     {
+        /// <summary>
+        /// The xunit output
+        /// </summary>
         private ITestOutputHelper output;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeployerFallbackTest"/> class.
+        /// </summary>
+        /// <param name="output">
+        /// The output.
+        /// </param>
         public DeployerFallbackTest(ITestOutputHelper output)
         {
             this.output = output;
@@ -39,7 +46,7 @@ namespace ClusterKit.Core.Tests.AkkaTest
         /// <summary>
         /// This test is failing
         /// </summary>
-        //[Fact]
+        /// [Fact]
         public void FailingTest()
         {
             var loggerConfig = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new LocalXunitOutputWriter(this.output));
@@ -125,17 +132,32 @@ namespace ClusterKit.Core.Tests.AkkaTest
         /// </summary>
         public class LocalXunitOutputWriter : TextWriter
         {
+            /// <summary>
+            /// The line to build
+            /// </summary>
             private readonly StringBuilder line;
+
+            /// <summary>
+            /// The xunit output
+            /// </summary>
             private readonly ITestOutputHelper output;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="LocalXunitOutputWriter"/> class.
+            /// </summary>
+            /// <param name="output">
+            /// The output.
+            /// </param>
             public LocalXunitOutputWriter(ITestOutputHelper output)
             {
                 this.output = output;
                 this.line = new StringBuilder();
             }
 
+            /// <inheritdoc />
             public override Encoding Encoding => Encoding.UTF8;
 
+            /// <inheritdoc />
             public override void Write(char[] buffer)
             {
                 var str = new string(buffer);
@@ -150,6 +172,7 @@ namespace ClusterKit.Core.Tests.AkkaTest
                 this.line.Clear();
             }
 
+            /// <inheritdoc />
             public override void WriteLine()
             {
                 this.output.WriteLine(this.line.ToString());
@@ -157,18 +180,25 @@ namespace ClusterKit.Core.Tests.AkkaTest
             }
         }
 
+        /// <summary>
+        /// Mock actor
+        /// </summary>
         public class MyActor : ReceiveActor
         {
-            private IActorRef workers;
-
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MyActor"/> class.
+            /// </summary>
             public MyActor()
             {
-                this.workers = Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(FromConfig.Instance), "workers");
+                Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(FromConfig.Instance), "workers");
 
-                //just simple bouncer
+                // just simple bouncer
                 this.Receive<object>(m => this.Sender.Tell(m));
             }
 
+            /// <summary>
+            /// The mock actor worker
+            /// </summary>
             private class Worker : ReceiveActor
             {
             }

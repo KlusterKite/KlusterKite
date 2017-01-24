@@ -11,13 +11,9 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
 
     using Akka.Configuration;
-    using Akka.Configuration.Hocon;
 
     using Castle.MicroKernel.Registration;
     using Castle.MicroKernel.SubSystems.Configuration;
@@ -194,7 +190,7 @@ namespace ClusterKit.Core
         }
 
         /// <summary>
-        /// Should check the config and environment for possible erorrs.
+        /// Should check the config and environment for possible errors.
         /// If any found, shod throw the exception to prevent node from starting.
         /// </summary>
         /// <param name="config">Full akka config</param>

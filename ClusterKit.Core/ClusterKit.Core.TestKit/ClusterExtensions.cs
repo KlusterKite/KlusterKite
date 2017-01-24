@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Core.TestKit
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ClusterExtensions.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Bundle of extension methods to fake cluster internal messages
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Core.TestKit
 {
     using System.Collections.Immutable;
     using System.Linq;
@@ -14,7 +23,22 @@
         /// <summary>
         /// Creates a member from internal Akka method
         /// </summary>
-        /// <returns>The new member</returns>
+        /// <param name="uniqueAddress">
+        /// The unique Address.
+        /// </param>
+        /// <param name="upNumber">
+        /// The up number of gossip message.
+        /// </param>
+        /// <param name="status">
+        /// The member status.
+        /// </param>
+        /// <param name="roles">
+        /// The list of roles.
+        /// </param>
+        /// <returns>
+        /// The new member
+        /// </returns>
+        // ReSharper disable once StyleCop.SA1305
         public static Member MemberCreate(UniqueAddress uniqueAddress, int upNumber, MemberStatus status, ImmutableHashSet<string> roles)
         {
             var createMethod =

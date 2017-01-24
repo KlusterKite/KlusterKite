@@ -1,4 +1,14 @@
-﻿namespace ClusterKit.Core.TestKit
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+// ReSharper disable ArrangeStaticMemberQualifier
+namespace ClusterKit.Core.TestKit
 {
     using Akka.Actor;
     using Akka.Configuration;

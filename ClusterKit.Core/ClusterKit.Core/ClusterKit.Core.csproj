@@ -161,7 +161,6 @@
     <Compile Include="ShardingWrappperActor.cs" />
     <Compile Include="Tools\CurrentLocale.cs" />
     <Compile Include="Utils\AkkaUtils.cs" />
-    <Compile Include="Utils\DateTimeWrapper.cs" />
     <Compile Include="Installer.cs" />
   </ItemGroup>
   <ItemGroup>

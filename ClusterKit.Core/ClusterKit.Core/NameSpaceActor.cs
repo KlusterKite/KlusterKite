@@ -25,7 +25,10 @@ namespace ClusterKit.Core
     [UsedImplicitly]
     public class NameSpaceActor : UntypedActor
     {
-        private readonly IWindsorContainer container;
+        /// <summary>
+        /// The dependency injection container
+        /// </summary>
+        private readonly IWindsorContainer windsorContainer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NameSpaceActor"/> class.
@@ -35,7 +38,7 @@ namespace ClusterKit.Core
         /// </param>
         public NameSpaceActor(IWindsorContainer windsorContainer)
         {
-            this.container = windsorContainer;
+            this.windsorContainer = windsorContainer;
         }
 
         /// <summary>
@@ -43,15 +46,15 @@ namespace ClusterKit.Core
         /// </summary>
         /// <param name="context">Current actor context (will create child actor)</param>
         /// <param name="actorConfig">Configuration to create from</param>
-        /// <param name="windsorContainer">Dependency resolver</param>
+        /// <param name="container">Dependency resolver</param>
         /// <param name="pathName">New actor's path name</param>
         protected virtual void CreateShardingActor(
             IActorContext context,
             Config actorConfig,
-            IWindsorContainer windsorContainer,
+            IWindsorContainer container,
             string pathName)
         {
-            context.ActorOf(Props.Create(() => new ShardingWrappperActor(windsorContainer, actorConfig)), pathName);
+            context.ActorOf(Props.Create(() => new ShardingWrappperActor(container, actorConfig)), pathName);
         }
 
         /// <summary>
@@ -59,15 +62,15 @@ namespace ClusterKit.Core
         /// </summary>
         /// <param name="context">Current actor context (will create child actor)</param>
         /// <param name="actorConfig">Configuration to create from</param>
-        /// <param name="windsorContainer">Dependency resolver</param>
+        /// <param name="container">Dependency resolver</param>
         /// <param name="pathName">New actor's path name</param>
         protected virtual void CreateShardingProxyActor(
             IActorContext context,
             Config actorConfig,
-            IWindsorContainer windsorContainer,
+            IWindsorContainer container,
             string pathName)
         {
-            context.ActorOf(Props.Create(() => new ShardingProxyWrappperActor(windsorContainer, actorConfig)), pathName);
+            context.ActorOf(Props.Create(() => new ShardingProxyWrappperActor(container, actorConfig)), pathName);
         }
 
         /// <summary>
@@ -75,13 +78,13 @@ namespace ClusterKit.Core
         /// </summary>
         /// <param name="context">Current actor context (will create child actor)</param>
         /// <param name="actorConfig">Configuration to create from</param>
-        /// <param name="windsorContainer">Dependency resolver</param>
+        /// <param name="container">Dependency resolver</param>
         /// <param name="currentPath">Parent (current) actor path</param>
         /// <param name="pathName">New actor's path name</param>
         protected virtual void CreateSimpleActor(
             IActorContext context,
             Config actorConfig,
-            IWindsorContainer windsorContainer,
+            IWindsorContainer container,
             string currentPath,
             string pathName)
         {
@@ -105,7 +108,7 @@ namespace ClusterKit.Core
                 if (type == typeof(NameSpaceActor))
                 {
                     // this is done for tests, otherwise it would lead to CircularDependencyException
-                    context.ActorOf(Props.Create(() => new NameSpaceActor(windsorContainer)), pathName);
+                    context.ActorOf(Props.Create(() => new NameSpaceActor(container)), pathName);
                 }
                 else
                 {
@@ -281,10 +284,11 @@ namespace ClusterKit.Core
             this.Unhandled(message);
         }
 
+        /// <inheritdoc />
         protected override void PreStart()
         {
             base.PreStart();
-            this.InitChildActorsFromConfig(Context, this.Self.Path, this.container);
+            this.InitChildActorsFromConfig(ActorBase.Context, this.Self.Path, this.windsorContainer);
         }
 
         /// <summary>

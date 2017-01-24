@@ -7,6 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable ArrangeStaticMemberQualifier
 namespace ClusterKit.Core
 {
     using Akka.Actor;

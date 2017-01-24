@@ -24,6 +24,7 @@
       <Value>ui</Value>
       <Value>uid</Value>
       <Value>urls</Value>
+      <Value>untyped</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

@@ -195,7 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AkkaTest\DeployerFallbackTest.cs" />
-    <Compile Include="ConceptProof\AkkaClusterTest.cs" />
     <Compile Include="Configuration\ConfigurationTest.cs" />
     <Compile Include="Monads\MaybeTests.cs" />
     <Compile Include="Ping\PingTest.cs" />

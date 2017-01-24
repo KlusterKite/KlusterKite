@@ -95,8 +95,6 @@ namespace ClusterKit.Core.Cluster
                 this.cluster.JoinSeedNodes(seeds.Select(Address.Parse));
             }
 
-            
-
             this.cluster.RegisterOnMemberUp(
                 () =>
                     {
