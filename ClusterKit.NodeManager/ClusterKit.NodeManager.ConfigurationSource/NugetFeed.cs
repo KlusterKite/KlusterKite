@@ -25,12 +25,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             /// <summary>
             /// Public feed used to download third party packages
             /// </summary>
-            Public,
+            Public = 0,
 
             /// <summary>
             /// Private feed is checked against updates and can be source of cluster update events
             /// </summary>
-            Private
+            Private = 1
         }
 
         /// <summary>

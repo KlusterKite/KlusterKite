@@ -11,7 +11,6 @@
 namespace ClusterKit.Monitoring
 {
     using System.Web.Http;
-    using System.Web.Http.Routing;
 
     using ClusterKit.Web;
 

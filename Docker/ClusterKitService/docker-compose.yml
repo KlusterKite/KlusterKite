@@ -1,6 +1,26 @@
 version: '2'
+networks:
+  default:
+    ipam:
+      config:
+       - subnet: 172.18.0.0/24
+         ip_range: 172.18.0.0/24
+         gateway: 172.18.0.1 
+
 services:
   #set of abstract utility servers
+  vpn:
+    image: clusterkit/vpn
+    networks:
+      default:
+        ipv4_address: 172.18.0.253
+    privileged: true
+    ports:
+     - "1194:1194"
+    environment:
+     - DEBUG=1
+
+
   nuget:
     #image: sunside/simple-nuget-server
     image: clusterkit/nuget
@@ -8,8 +28,15 @@ services:
      - "81:80"
     environment:
      - NUGET_API_KEY=ClusterKit
+    networks:
+      default:
+        ipv4_address: 172.18.0.2 
+
   configDb:
     image: clusterkit/postgres
+    networks:
+      default:
+        ipv4_address: 172.18.0.3     
   entry:
     image: clusterkit/entry
     links:
@@ -18,7 +45,9 @@ services:
      - "publisher2"
     ports:
      - "80:80"
-     - "443:443"
+    networks:
+      default:
+        ipv4_address: 172.18.0.5     
 
   #Cluster servers
   seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes
@@ -30,19 +59,24 @@ services:
         driver: json-file
         options:
             max-size: "1m"
+    networks:
+      default:
+        ipv4_address: 172.18.0.6               
 
-  publisher1: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+  publisher1: 
     image: clusterkit/publisher
     environment:
      - NETWORK_NAME=publisher1
-     - SELF_JOIN=true
     logging:
         driver: json-file
         options:
             max-size: "1m"
+    networks:
+      default:
+        ipv4_address: 172.18.0.7               
 
 
-  publisher2: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+  publisher2: 
     image: clusterkit/publisher
     environment:
      - NETWORK_NAME=publisher2
@@ -50,13 +84,16 @@ services:
         driver: json-file
         options:
             max-size: "1m"
+    networks:
+      default:
+        ipv4_address: 172.18.0.8             
 
   manager:
     image: clusterkit/manager
     links:
      - "seed"
      - "configDb"
-     - "nuget"   
+     - "nuget"
     logging:
         driver: json-file
         options:
@@ -70,16 +107,28 @@ services:
         driver: json-file
         options:
             max-size: "1m"
+    networks:
+      default:
+        ipv4_address: 172.18.0.9 
+  
+  elk:
+    image: clusterkit/elk
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
+    networks:
+      default:
+        ipv4_address: 172.18.0.12         
+
   worker:
-    image: clusterkit/worker    
+    image: clusterkit/worker
     links:
      - "seed"
      - "manager"
-     - "nuget"    
+     - "nuget"
      - "configDb"
     logging:
         driver: json-file
         options:
             max-size: "1m"
-
-

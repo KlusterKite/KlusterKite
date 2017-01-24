@@ -5,13 +5,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace ClusterKit.Core.Tests.Configuration
 {
+    using System.Collections.Generic;
     using System.Linq;
 
+    using Akka.Actor;
+    using Akka.Cluster.Sharding;
     using Akka.Configuration;
 
+    using Castle.MicroKernel.Registration;
+    using Castle.MicroKernel.SubSystems.Configuration;
     using Castle.Windsor;
 
     using ClusterKit.Core.TestKit;
+
+    using JetBrains.Annotations;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -70,9 +77,30 @@ namespace ClusterKit.Core.Tests.Configuration
         [Fact]
         public void NameSpaceActorTest()
         {
+            // todo: fix test cluster joining and add all types of actors to test
+            /*
+            var cluster = Akka.Cluster.Cluster.Get(this.Sys);
+            cluster.Join(cluster.SelfAddress);
+            */
+
             this.Sys.StartNameSpaceActorsFromConfiguration();
+            this.ExpectNoMsg();
             this.Sys.ActorSelection("/user/testNameSpace/forwarder").Tell("Hello world");
             Assert.Equal("Hello world", this.ExpectMsg<string>("/user/testNameSpace/forwarder"));
+            this.Sys.ActorSelection("/user/testNameSpace/second/forwarder").Tell("Hello world");
+            Assert.Equal("Hello world", this.ExpectMsg<string>("/user/testNameSpace/second/forwarder"));
+
+            /*
+            var shardingActor = this.Sys.ActorSelection("/user/testNameSpace/sharding");
+            var shardingState = await shardingActor.Ask<ClusterShardingStats>(
+                new GetClusterShardingStats(TimeSpan.FromMilliseconds(100)),
+                TimeSpan.FromMilliseconds(2000));
+
+            shardingActor.Tell("Hello sharding world");
+            var shardMessage = this.ExpectMsg<TestMessage<string>>();
+            Assert.Equal("Hello sharding world", shardMessage.Message);
+            this.Sys.Log.Info(shardMessage.ReceiverPath);
+            */
         }
 
         /// <summary>
@@ -95,7 +123,7 @@ namespace ClusterKit.Core.Tests.Configuration
                 akka.actor.deployment {
                     /testNameSpace {
                         IsNameSpace = true
-                        dispatcher = ClusterKit.test-dispatcher
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /somethingElse {
@@ -103,11 +131,84 @@ namespace ClusterKit.Core.Tests.Configuration
 
                     /testNameSpace/forwarder {
                         type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
-                        dispatcher = ClusterKit.test-dispatcher
+                        dispatcher = akka.test.calling-thread-dispatcher
+                    }
+
+                    /testNameSpace/second {
+                        type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
+                        dispatcher = akka.test.calling-thread-dispatcher
+                    }
+
+                    /testNameSpace/second/forwarder {
+                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        dispatcher = akka.test.calling-thread-dispatcher
+                    }
+
+                    /testNameSpace/sharding {
+                        actor-type = Sharding
+                        type-name = test-shard
+                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        role = test
+                        message-extractor = ""ClusterKit.Core.Tests.Configuration.ConfigurationTest+TestMessageExtractor, ClusterKit.Core.Tests""
+                        dispatcher = akka.test.calling-thread-dispatcher
                     }
                  }
             }").WithFallback(base.GetAkkaConfig(windsorContainer));
             }
+
+            /// <summary>
+            /// Gets list of all used plugin installers
+            /// </summary>
+            /// <returns>The list of installers</returns>
+            public override List<BaseInstaller> GetPluginInstallers()
+            {
+                var pluginInstallers = base.GetPluginInstallers();
+                pluginInstallers.Add(new TestInstaller());
+                return pluginInstallers;
+            }
+        }
+
+        public class TestInstaller : BaseInstaller
+        {
+            protected override decimal AkkaConfigLoadPriority => -1M;
+
+            protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
+
+            protected override IEnumerable<string> GetRoles() => new[] { "test" };
+
+            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            {
+                container.Register(Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+                container.Register(Classes.From(typeof(TestMessageExtractor)).Where(t => true).LifestyleTransient());
+            }
+        }
+
+        /// <summary>
+        /// Test message extractor
+        /// </summary>
+        [UsedImplicitly]
+        public class TestMessageExtractor : IMessageExtractor
+        {
+            /// <summary>
+            /// Extract the entity id from an incoming <paramref name="message"/>.
+            ///             If `null` is returned the message will be `unhandled`, i.e. posted as `Unhandled`
+            ///              messages on the event stream
+            /// </summary>
+            public string EntityId(object message) => message.GetType().Name;
+
+            /// <summary>
+            /// Extract the message to send to the entity from an incoming <paramref name="message"/>.
+            ///             Note that the extracted message does not have to be the same as the incoming
+            ///             message to support wrapping in message envelope that is unwrapped before
+            ///             sending to the entity actor.
+            /// </summary>
+            public object EntityMessage(object message) => message;
+
+            /// <summary>
+            /// Extract the entity id from an incoming <paramref name="message"/>. Only messages that
+            ///             passed the <see cref="M:Akka.Cluster.Sharding.IMessageExtractor.EntityId(System.Object)"/> method will be used as input to this method.
+            /// </summary>
+            public string ShardId(object message) => message.GetType().Assembly.FullName;
         }
     }
 }

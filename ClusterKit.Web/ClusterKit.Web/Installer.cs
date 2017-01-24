@@ -95,6 +95,9 @@
             this.currentContainer = container;
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+
+            container.Register(
+                Component.For<IOwinStartupConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
         }
     }
 }

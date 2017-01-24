@@ -8,9 +8,11 @@
 
       actor : {
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"
-        default-dispatcher {
-          type = TaskDispatcher
-        }
+        
+        #default-dispatcher {
+        #  type = TaskDispatcher
+		    #  executor= "task-executor"
+        #}
 
         deployment {
           /Core {
@@ -20,33 +22,54 @@
           /Core/Ping {
             type = "ClusterKit.Core.Ping.PingActor, ClusterKit.Core"
           }
+
+          /Core/ClusterLog {
+            type = "ClusterKit.Core.Cluster.ClusterLoggingActor, ClusterKit.Core"
+          }          
         }
 
         serializers {
-		  wire = "Akka.Serialization.WireSerializer, Akka.Serialization.Wire"
-          akka-singleton = "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools"
-        }
-        serialization-bindings {
-		  "System.Object" = wire
-          "Akka.Cluster.Tools.Singleton.ClusterSingletonMessage, Akka.Cluster.Tools" = akka-singleton
-        }
-        serialization-identifiers {
-          "Akka.Cluster.Tools.Singleton.Serialization.ClusterSingletonMessageSerializer, Akka.Cluster.Tools" = 14
+		      wire = "Akka.Serialization.WireSerializer, Akka.Serialization.Wire"
         }
 
+        serialization-bindings {
+		      "System.Object" = wire
+        }
 
       }
 
       remote : {
         helios.tcp : {
-          hostname = 127.0.0.1
-          port = 0
+          enforce-ip-family = true
+          dns-use-ipv6 = false
+          hostname = 0.0.0.0
+          port = 0   
+
+          # Sets the send buffer size of the Sockets,
+          # set to 0b for platform default
+          send-buffer-size = 2560000b
+
+          # Sets the receive buffer size of the Sockets,
+          # set to 0b for platform default
+          receive-buffer-size = 2560000b
+
+          # Maximum message size the transport will accept, but at least
+          # 32000 bytes.
+          # Please note that UDP does not support arbitrary large datagrams,
+          # so this setting has to be chosen carefully when using UDP.
+          # Both send-buffer-size and receive-buffer-size settings has to
+          # be adjusted to be able to buffer messages of maximum size.
+          maximum-frame-size = 1280000b
+
         }
       }
 
       cluster: {
         auto-down-unreachable-after = 15s
-		min-nr-of-members = 3
+		    min-nr-of-members = 1
+        seed-node-timeout = 5s
+        retry-unsuccessful-join-after = 10s
+
         seed-nodes = []
         singleton {
             # The number of retries are derived from hand-over-retry-interval and

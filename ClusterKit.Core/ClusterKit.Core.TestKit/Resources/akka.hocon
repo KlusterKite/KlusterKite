@@ -1,105 +1,69 @@
-﻿            {
-              ClusterKit : {
-                test-dispatcher {
-					type : "ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit"
-                    throughput : 100
-                    throughput-deadline-time : 0ms
-                }
-              }
+﻿{
+  akka {
+    stdout-loglevel : DEBUG
+    loggers : ["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
+    log-config-on-start : off
+    loglevel : DEBUG
 
-              akka : {
-                stdout-loglevel : DEBUG
-                loggers : ["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
-                log-config-on-start : off
-                loglevel : DEBUG
+    scheduler {
+      implementation = "Akka.TestKit.TestScheduler, Akka.TestKit" 
+    }
 
-                test : {
-                  timefactor : 1.0
-                  filter-leeway : 3s
-                  single-expect-default : 100ms
-                  default-timeout : 5s
+    test {
+      # factor by which to scale timeouts during tests, e.g. to account for shared
+      # build system load
+      timefactor =  1.0
 
-                  calling-thread-dispatcher : {
-                    type : "ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit"
-                    throughput : 2147483647
-                  }
-                  test-actor : {
-                    dispatcher : {
-                      type : "ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit"
-                      throughput : 2147483647
-                    }
-                  }
+      # duration of EventFilter.intercept waits after the block is finished until
+      # all required messages are received
+      filter-leeway = 3s
 
-                }
+      # duration to wait in expectMsg and friends outside of within() block
+      # by default
+      single-expect-default = 500ms
 
-                actor : {
-                  debug {
-                    receive = on
-                    autoreceive = on
-                    lifecycle = on
-                    event-stream = on
-                    unhandled = on
-                  }
+      # The timeout that is added as an implicit by DefaultTimeout trait 
+      # This is used for Ask-pattern
+      default-timeout = 500ms
 
-                  deployment {
-                    "/*" {
-                       dispatcher = ClusterKit.test-dispatcher
-                    }
+      calling-thread-dispatcher {
+        #type = "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+        type = "TaskDispatcher"
+        throughput = 2147483647
+      }
 
-                    "/*/*" {
-                       dispatcher = ClusterKit.test-dispatcher
-                    }
+      test-actor.dispatcher {
+        type = "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+        throughput = 2147483647
+      }
+    }
+    actor : {
+      debug {
+        receive = on
+        autoreceive = on
+        lifecycle = on
+        event-stream = on
+        unhandled = on
+      }
 
-                     "/*/*/*" {
-                        dispatcher = ClusterKit.test-dispatcher
-                    }
-                  }
+      deployment {
+        "/*" {
+          dispatcher = akka.test.calling-thread-dispatcher
+        }
 
-                  #default-dispatcher : {
-                  #  type : "ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit"
-                  #  throughput : 100
-                  #  throughput-deadline-time : 0ms
-                  #}
+        "/*/*" {
+          dispatcher = akka.test.calling-thread-dispatcher
+        }
 
-                  default-mailbox {
-                    mailbox-type = "ClusterKit.Core.TestKit.TestMailbox, ClusterKit.Core.TestKit"
-                  }
+        "/*/*/*" {
+          dispatcher = akka.test.calling-thread-dispatcher
+        }
+      }
 
-                }
-
-                scheduler {
-                   # The LightArrayRevolverScheduler is used as the default scheduler in the
-                   # system. It does not execute the scheduled tasks on exact time, but on every
-                   # tick, it will run everything that is (over)due. You can increase or decrease
-                   # the accuracy of the execution timing by specifying smaller or larger tick
-                   # duration. If you are scheduling a lot of tasks you should consider increasing
-                   # the ticks per wheel.
-                   # Note that it might take up to 1 tick to stop the Timer, so setting the
-                   # tick-duration to a high value will make shutting down the actor system
-                   # take longer.
-                   tick-duration = 10ms
-
-                   # The timer uses a circular wheel of buckets to store the timer tasks.
-                   # This should be set such that the majority of scheduled timeouts (for high
-                   # scheduling frequency) will be shorter than one rotation of the wheel
-                   # (ticks-per-wheel * ticks-duration)
-                   # THIS MUST BE A POWER OF TWO!
-                   ticks-per-wheel = 512
-
-                   # This setting selects the timer implementation which shall be loaded at
-                   # system start-up.
-                   # The class given here must implement the akka.actor.Scheduler interface
-                   # and offer a public constructor which takes three arguments:
-                   #  1) com.typesafe.config.Config
-                   #  2) akka.event.LoggingAdapter
-                   #  3) java.util.concurrent.ThreadFactory
-                   implementation = "ClusterKit.Core.TestKit.TimeMachineScheduler, ClusterKit.Core.TestKit"
-
-                   # When shutting down the scheduler, there will typically be a thread which
-                   # needs to be stopped, and this timeout determines how long to wait for
-                   # that to happen. In case of timeout the shutdown of the actor system will
-                   # proceed without running possibly still enqueued tasks.
-                   shutdown-timeout = 5s
-                 }
-              }
-            }
+      #default-dispatcher : {
+      #  type : "Akka.TestKit.CallingThreadDispatcherConfigurator, Akka.TestKit"
+      #  throughput = 2147483647
+      #}
+    }
+  }
+}

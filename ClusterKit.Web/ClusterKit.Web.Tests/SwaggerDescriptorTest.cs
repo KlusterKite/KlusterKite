@@ -11,6 +11,7 @@ namespace ClusterKit.Web.Tests
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
+    using Akka.DI.Core;
 
     using Castle.Windsor;
 
@@ -56,10 +57,12 @@ namespace ClusterKit.Web.Tests
             descriptor
                 .Tell(
                     new ClusterEvent.MemberUp(
-                        Member.Create(
+                        ClusterExtensions.MemberCreate(
                             Cluster.Get(this.Sys).SelfUniqueAddress,
+                            1,
                             MemberStatus.Up,
                             ImmutableHashSet.Create("Web.Swagger.Monitor"))));
+
             this.ExpectMsg<SwaggerPublishDescription>("/user/Web/Swagger/Monitor");
         }
 
@@ -89,27 +92,12 @@ namespace ClusterKit.Web.Tests
                         }
 
                     akka.actor.deployment {
-                        ""/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-
-                        /Web {
-                            IsNameSpace = true
-                        }
- 		                 /Web/Swagger {
+                        /Web/Swagger {
                             type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
-                            dispatcher = ClusterKit.test-dispatcher
                         }
 
                         /Web/Swagger/Monitor {
                             type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
-                            dispatcher = ClusterKit.test-dispatcher
                         }
                     }
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));
@@ -122,7 +110,7 @@ namespace ClusterKit.Web.Tests
             public override List<BaseInstaller> GetPluginInstallers()
             {
                 var installers = base.GetPluginInstallers();
-                installers.Add(new NginxConfigurator.Installer());
+                installers.Add(new Swagger.Installer());
                 return installers;
             }
         }

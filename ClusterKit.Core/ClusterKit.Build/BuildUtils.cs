@@ -7,15 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable ArrangeStaticMemberQualifier
 namespace ClusterKit.Build
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Xml;
@@ -32,6 +31,11 @@ namespace ClusterKit.Build
     /// </summary>
     public static class BuildUtils
     {
+        /// <summary>
+        /// The list of defined projects
+        /// </summary>
+        private static List<ProjectDescription> definedProjectDescriptions = new List<ProjectDescription>();
+
         /// <summary>
         /// Gets temporary directory to store clean builds of projects
         /// </summary>
@@ -66,13 +70,7 @@ namespace ClusterKit.Build
         /// Builds current project
         /// </summary>
         /// <param name="project">Project to build</param>
-        /// <param name="restoreOriginalProjectFile">
-        /// Whether or not it would restore original project file
-        /// <remarks>
-        /// During the build it changes internal package reference to local ones
-        /// </remarks>
-        /// </param>
-        public static void Build(ProjectDescription project, bool restoreOriginalProjectFile = true)
+        public static void Build(ProjectDescription project)
         {
             var tempSrc = Path.Combine(Path.GetFullPath(BuildDirectory), "src");
 
@@ -90,7 +88,7 @@ namespace ClusterKit.Build
 
             if (Directory.Exists(tempSrc))
             {
-                var attmept = 0;
+                var attempt = 0;
                 while (true)
                 {
                     try
@@ -101,13 +99,14 @@ namespace ClusterKit.Build
                     catch (IOException)
                     {
                         ConsoleLog("Src directory is blocked. Retrying...");
-                        attmept++;
+                        attempt++;
                         Thread.Sleep(100);
-                        if (attmept >= 10)
+                        if (attempt >= 10)
                         {
                             throw;
                         }
                     }
+
                     break;
                 }
             }
@@ -119,6 +118,7 @@ namespace ClusterKit.Build
 
             Func<string, bool> filter = s => true;
             FileHelper.CopyDir(tempSrc, project.ProjectDirectory, filter.ToFSharpFunc());
+            // ReSharper disable once AssignNullToNotNullAttribute
             var projectFileName = Path.Combine(tempSrc, Path.GetFileName(project.ProjectFileName));
 
             // modifying project file to substitute internal nute-through dependencies to currently built files
@@ -128,19 +128,26 @@ namespace ClusterKit.Build
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
             namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
 
-            var refItemGroup = projDoc.DocumentElement.SelectSingleNode("//def:ItemGroup[def:Reference]", namespaceManager);
+            var rootNode = projDoc.DocumentElement;
+            if (rootNode == null)
+            {
+                ConsoleLog($"Could not read xml from {projectFileName}");
+                return;
+            }
+
+            var refItemGroup = rootNode.SelectSingleNode("//def:ItemGroup[def:Reference]", namespaceManager);
 
             foreach (var dependency in project.InternalDependencies)
             {
                 var refNode =
-                    projDoc.DocumentElement.SelectNodes("//def:Reference", namespaceManager)
-                        .Cast<XmlElement>()
+                    rootNode.SelectNodes("//def:Reference", namespaceManager)
+                        ?.Cast<XmlElement>()
                         .FirstOrDefault(
                             e =>
                             e.HasAttribute("Include")
                             && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
-                    ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
-                        .Cast<XmlElement>()
+                    ?? rootNode.SelectNodes("//def:ProjectReference", namespaceManager)
+                        ?.Cast<XmlElement>()
                         .FirstOrDefault(
                             e =>
                             e.HasAttribute("Include")
@@ -148,19 +155,22 @@ namespace ClusterKit.Build
 
                 if (refNode == null)
                 {
-                    var pr = projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager).Cast<XmlElement>().Where(e => e.HasAttribute("Include"));
-                    foreach (var refel in pr)
+                    var projectReference = rootNode.SelectNodes("//def:ProjectReference", namespaceManager)?.Cast<XmlElement>().Where(e => e.HasAttribute("Include"));
+                    if (projectReference != null)
                     {
-                        ConsoleLog($"Comparing {refel.Attributes["Include"].Value} and {dependency}");
+                        foreach (var element in projectReference)
+                        {
+                            ConsoleLog($"Comparing {element.Attributes["Include"].Value} and {dependency}");
+                        }
                     }
                 }
 
                 if (refNode != null)
                 {
                     var libPath = Path.Combine(Path.GetFullPath(BuildClean), dependency, $"{dependency}.dll");
-                    refNode.ParentNode.RemoveChild(refNode);
+                    refNode.ParentNode?.RemoveChild(refNode);
                     refNode = projDoc.CreateElement("Reference", "http://schemas.microsoft.com/developer/msbuild/2003");
-                    refItemGroup.AppendChild(refNode);
+                    refItemGroup?.AppendChild(refNode);
                     refNode.SetAttribute("Include", dependency);
                     refNode.InnerXml = $"<SpecificVersion>False</SpecificVersion><HintPath>{libPath}</HintPath><Private>True</Private>";
                     ConsoleLog($"ref linked to {dependency} was updated");
@@ -175,8 +185,7 @@ namespace ClusterKit.Build
                 }
             }
 
-            // todo: @kantora update NuGet package referencies in case of directory structure change
-
+            // todo: @kantora update NuGet package references in case of directory structure change
             ConsoleLog($"Writing modified {projectFileName}");
             projDoc.Save(projectFileName);
 
@@ -187,6 +196,7 @@ namespace ClusterKit.Build
 
             var assemblyText = File.ReadAllText(assemblyInfoPath);
             assemblyText += $"\n[assembly: AssemblyMetadata(\"NugetVersion\", \"{Version?.Replace("\"", "\\\"")}\")]\n";
+            assemblyText += $"\n[assembly: AssemblyMetadata(\"BuildDate\", \"{DateTimeOffset.Now.ToString("s")}\")]\n";
 
             var assemblyVersion = Regex.Replace(Version ?? "1.0.0.0", "((\\d\\.?)+)(.*)", "$1");
 
@@ -199,17 +209,37 @@ namespace ClusterKit.Build
 
             Directory.CreateDirectory(project.CleanBuildDirectory);
 
-            var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe", "dll.config", "exe.config" };
+            var extensions = new[] { "dll", "nuspec", "pdb", "xml", "exe", "dll.config", "exe.config", "fsx" };
 
             var buildFiles = Directory.GetFiles(project.TempBuildDirectory)
-                .Where(f => extensions.Any(e => $"{project.ProjectName}.{e}".Equals(Path.GetFileName(f), StringComparison.InvariantCultureIgnoreCase)));
-            foreach (var file in buildFiles)
+                .Where(f => extensions.Any(e => $"{project.ProjectName}.{e}".Equals(Path.GetFileName(f), StringComparison.InvariantCultureIgnoreCase)))
+                .ToList();
+
+            foreach (var fileName in buildFiles.Select(Path.GetFileName).Where(fileName => fileName != null))
             {
-                var fileName = Path.GetFileName(file);
                 ConsoleLog($"Copying {fileName}");
                 File.Copy(
                     Path.Combine(project.TempBuildDirectory, fileName),
                     Path.Combine(project.CleanBuildDirectory, fileName));
+            }
+
+            Func<string, bool> alwaysTrue = f => true;
+
+            foreach (var directory in Directory.GetDirectories(project.TempBuildDirectory).Select(Path.GetFileName))
+            {
+                ConsoleLog($"Copying localization {directory}");
+                FileHelper.CopyDir(
+                    Path.Combine(project.CleanBuildDirectory, directory),
+                    Path.Combine(project.TempBuildDirectory, directory),
+                    alwaysTrue.ToFSharpFunc());
+            }
+
+            if (buildFiles.Any(f => f.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase) || f.EndsWith(".fsx", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
+                Directory.CreateDirectory(toolsDir);
+
+                FileHelper.CopyDir(toolsDir, project.TempBuildDirectory, alwaysTrue.ToFSharpFunc());
             }
 
             TraceHelper.trace($"Build {project.ProjectName} finished");
@@ -225,7 +255,7 @@ namespace ClusterKit.Build
 
             foreach (var project in list)
             {
-                Build(project, false);
+                Build(project);
             }
         }
 
@@ -249,6 +279,92 @@ namespace ClusterKit.Build
 
             BuildTemp = Path.Combine(buildDirectory, "tmp");
             BuildClean = Path.Combine(buildDirectory, "clean");
+        }
+
+        /// <summary>
+        /// Creates global solution file that includes all registered projects
+        /// </summary>
+        /// <param name="projects">The list of projects</param>
+        public static void CreateGlobalSolution(IEnumerable<ProjectDescription> projects)
+        {
+            using (var writer = File.CreateText(Path.Combine(BuildDirectory, "global.sln")))
+            {
+                writer.Write($@"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""_Solution Items"", ""_Solution Items"", ""{{{Guid.NewGuid().ToString().ToUpper()}}}""
+	ProjectSection(SolutionItems) = preProject
+");
+
+                foreach (var filePath in Directory.GetFiles(Path.Combine(BuildDirectory, "..")))
+                {
+                    var file = Path.GetFileName(filePath);
+                    writer.WriteLine($"\t\t..\\{file} = ..\\{file}");
+                }
+
+                writer.Write($@"	EndProjectSection
+EndProject
+                ");
+
+                var folders = new List<string>();
+
+                foreach (var package in projects.GroupBy(p => p.PackageName))
+                {
+                    var packageUid = Guid.NewGuid();
+                    writer.Write(
+                        $@"
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""{package.Key}"", ""{package.Key}"", ""{{{packageUid}}}""
+EndProject
+");
+
+                    foreach (var project in package)
+                    {
+                        try
+                        {
+                            var uid = GetProjectUid(project);
+                            if (string.IsNullOrEmpty(uid))
+                            {
+                                throw new Exception("Could not parse project uid");
+                            }
+
+
+                            writer.Write(
+                                $@"
+Project(""{{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}}"") = ""{project.ProjectName}"", ""../{project.ProjectFileName}"", ""{uid}""
+EndProject
+
+");
+                            folders.Add($"\t\t{uid} = {{{packageUid}}}\n");
+                        }
+                        catch (Exception e)
+                        {
+                            ConsoleLog(
+                                $"Could not add {project.ProjectName} to global solution, {e.Message} \n {e.StackTrace}");
+                        }
+                    }
+                }
+                writer.Write($@"
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+");
+                foreach (var folder in folders)
+                {
+                    writer.Write(folder);
+                }
+                writer.Write($@"
+	EndGlobalSection
+EndGlobal
+");
+            }
         }
 
         /// <summary>
@@ -329,6 +445,27 @@ namespace ClusterKit.Build
                 fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{Path.GetFileName(file)}";
             }
 
+            foreach (var directory in Directory.GetDirectories(project.CleanBuildDirectory).Select(Path.GetFileName).Where(d => d != "tools"))
+            {
+                foreach (var file in Directory.GetFiles(Path.Combine(project.CleanBuildDirectory, directory)))
+                {
+                    var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.Combine(directory, Path.GetFileName(file));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{directory}/{Path.GetFileName(file)}";
+                }
+            }
+
+            var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
+            if (Directory.Exists(toolsDir))
+            {
+                foreach (var file in Directory.GetFiles(toolsDir))
+                {
+                    var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.Combine("tools", Path.GetFileName(file));
+                    fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./tools/{Path.GetFileName(file)}";
+                }
+            }
+
             var generatedNuspecFile = Path.Combine(project.CleanBuildDirectory, nuspecDataFileName);
             nuspecData.Save(generatedNuspecFile);
 
@@ -360,6 +497,24 @@ namespace ClusterKit.Build
             {
                 CreateNuget(project);
             }
+        }
+
+        /// <summary>
+        /// Defines the project list
+        /// </summary>
+        /// <param name="projects">The project list</param>
+        public static void DefineProjects(IEnumerable<ProjectDescription> projects)
+        {
+            definedProjectDescriptions = projects.ToList();
+        }
+
+        /// <summary>
+        /// Gets the list of defined projects
+        /// </summary>
+        /// <returns>The list of defined projects</returns>
+        public static IEnumerable<ProjectDescription> GetProjects()
+        {
+            return definedProjectDescriptions;
         }
 
         /// <summary>
@@ -451,6 +606,157 @@ namespace ClusterKit.Build
         }
 
         /// <summary>
+        /// Updates current projects (csproj) to reference projects in other folders as Nuget Package
+        /// </summary>
+        /// <param name="projects">The list of projects</param>
+        public static void SwitchToPackageRefs(IEnumerable<ProjectDescription> projects)
+        {
+            var projectList = projects.ToList();
+
+            foreach (var project in projectList)
+            {
+                var projDoc = new XmlDocument();
+                projDoc.Load(project.ProjectFileName);
+
+                XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
+                namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+                var refItemGroup = projDoc.DocumentElement.SelectSingleNode(
+                    "//def:ItemGroup[def:Reference]",
+                    namespaceManager);
+
+                foreach (var dependency in project.InternalDependencies)
+                {
+                    var refProject = projectList.FirstOrDefault(p => p.ProjectName == dependency);
+                    if (refProject == null)
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref project was not registered");
+                        continue;
+                    }
+
+                    if (refProject.PackageName == project.PackageName)
+                    {
+                        continue;
+                    }
+
+                    //ConsoleLog($"{project.ProjectName} {dependency} updating...");
+
+                    var refNode =
+                        projDoc.DocumentElement.SelectNodes("//def:Reference", namespaceManager)
+                            .Cast<XmlElement>()
+                            .FirstOrDefault(
+                                e =>
+                                e.HasAttribute("Include")
+                                && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
+                        ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
+                               .Cast<XmlElement>()
+                               .FirstOrDefault(
+                                   e =>
+                                   e.HasAttribute("Include")
+                                   && Regex.IsMatch(
+                                       e.Attributes["Include"].Value,
+                                       $"(^|[\\\\\\/]){Regex.Escape(dependency)}.csproj$"));
+
+                    if (refNode != null)
+                    {
+                        refNode.ParentNode.RemoveChild(refNode);
+                        refNode = projDoc.CreateElement(
+                                                    "Reference",
+                                                    "http://schemas.microsoft.com/developer/msbuild/2003");
+                        refItemGroup.AppendChild(refNode);
+                        refNode.SetAttribute("Include", $"{refProject.ProjectName}, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL");
+                        refNode.InnerXml = $"\n     <SpecificVersion>False</SpecificVersion>\r\n      <HintPath>..\\..\\packages\\{refProject.ProjectName}.0.0.0-local\\lib\\{refProject.ProjectName}.dll</HintPath>\r\n      <Private>True</Private>\r\n";
+
+                        //ConsoleLog($"{project.ProjectName} {dependency} {refNode.Name}");
+                    }
+                    else
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref node was not found");
+                    }
+                }
+
+                projDoc.Save(project.ProjectFileName);
+            }
+        }
+
+        /// <summary>
+        /// Updates current projects (csproj) to reference projects in other folders as projects
+        /// </summary>
+        /// <remarks>
+        /// Usefull while working in global solution
+        /// </remarks>
+        /// <param name="projects">The list of projects</param>
+        public static void SwitchToProjectRefs(IEnumerable<ProjectDescription> projects)
+        {
+            var projectList = projects.ToList();
+
+            foreach (var project in projectList)
+            {
+                var projDoc = new XmlDocument();
+                projDoc.Load(project.ProjectFileName);
+
+                XmlNamespaceManager namespaceManager = new XmlNamespaceManager(projDoc.NameTable);
+                namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+                var refItemGroup = projDoc.DocumentElement.SelectSingleNode(
+                    "//def:ItemGroup[def:Reference]",
+                    namespaceManager);
+
+                foreach (var dependency in project.InternalDependencies)
+                {
+                    var refProject = projectList.FirstOrDefault(p => p.ProjectName == dependency);
+                    if (refProject == null)
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref project was not registered");
+                        continue;
+                    }
+
+                    if (refProject.PackageName == project.PackageName)
+                    {
+                        continue;
+                    }
+
+                    //ConsoleLog($"{project.ProjectName} {dependency} updating...");
+
+                    var refNode =
+                        projDoc.DocumentElement.SelectNodes("//def:Reference", namespaceManager)
+                            .Cast<XmlElement>()
+                            .FirstOrDefault(
+                                e =>
+                                e.HasAttribute("Include")
+                                && Regex.IsMatch(e.Attributes["Include"].Value, $"^{Regex.Escape(dependency)}((, )|$)"))
+                        ?? projDoc.DocumentElement.SelectNodes("//def:ProjectReference", namespaceManager)
+                               .Cast<XmlElement>()
+                               .FirstOrDefault(
+                                   e =>
+                                   e.HasAttribute("Include")
+                                   && Regex.IsMatch(
+                                       e.Attributes["Include"].Value,
+                                       $"(^|[\\\\\\/]){Regex.Escape(dependency)}.csproj$"));
+
+                    if (refNode != null)
+                    {
+                        refNode.ParentNode.RemoveChild(refNode);
+                        refNode = projDoc.CreateElement(
+                                                    "ProjectReference",
+                                                    "http://schemas.microsoft.com/developer/msbuild/2003");
+                        refItemGroup.AppendChild(refNode);
+                        refNode.SetAttribute("Include", "../../" + refProject.ProjectFileName);
+                        refNode.InnerXml = $"\n      <Project>{GetProjectUid(refProject)}</Project>\r\n      <Name>{refProject.ProjectName}</Name>\r\n";
+
+                        //ConsoleLog($"{project.ProjectName} {dependency} {refNode.Name}");
+                    }
+                    else
+                    {
+                        ConsoleLog($"{project.ProjectName} {dependency} ref node was not found");
+                    }
+                }
+
+                projDoc.Save(project.ProjectFileName);
+            }
+        }
+
+        /// <summary>
         /// Debugger method to write sum console output
         /// </summary>
         /// <param name="message"></param>
@@ -460,6 +766,23 @@ namespace ClusterKit.Build
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(message);
             Console.ForegroundColor = currentColor;
+        }
+
+        /// <summary>
+        /// Extracts project uid from project file
+        /// </summary>
+        /// <param name="project">The project description</param>
+        /// <returns>The project's uid</returns>
+        private static string GetProjectUid(ProjectDescription project)
+        {
+            var doc = new XmlDocument();
+            doc.Load(project.ProjectFileName);
+            XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
+            namespaceManager.AddNamespace("def", "http://schemas.microsoft.com/developer/msbuild/2003");
+            var uid =
+                doc.DocumentElement?.SelectSingleNode("/def:Project/def:PropertyGroup/def:ProjectGuid", namespaceManager)?
+                    .InnerText;
+            return uid;
         }
 
         /// <summary>

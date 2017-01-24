@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeTemplateCrudsController.cs" company="ClusterKit">
+// <copyright file="NodeTemplatesRestController.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -15,12 +15,13 @@ namespace ClusterKit.NodeManager.WebApi
 
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.Web.CRUDS;
+    using ClusterKit.Web.Rest;
 
     /// <summary>
     /// All rest actions with <see cref="NodeTemplate"/>
     /// </summary>
-    [RoutePrefix("nodemanager/templates")]
-    public class NodeTemplatesRestController : BaseCrudController<NodeTemplate, int>
+    [RoutePrefix("api/1.x/clusterkit/nodemanager/templates")]
+    public class NodeTemplatesRestController : BaseRestController<NodeTemplate, int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeTemplatesRestController"/> class.

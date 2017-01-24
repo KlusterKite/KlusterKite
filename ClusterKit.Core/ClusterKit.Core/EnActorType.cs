@@ -27,6 +27,16 @@ namespace ClusterKit.Core
         /// <summary>
         /// Cluster singleton proxy actor
         /// </summary>
-        SingletonProxy
+        SingletonProxy,
+
+        /// <summary>
+        /// Cluster sharding manager
+        /// </summary>
+        Sharding,
+
+        /// <summary>
+        /// Cluster sharding proxy actor
+        /// </summary>
+        ShardingProxy
     }
 }

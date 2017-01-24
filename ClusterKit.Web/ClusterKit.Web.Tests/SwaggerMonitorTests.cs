@@ -51,29 +51,33 @@ namespace ClusterKit.Web.Tests
         public void SwaggerCollectorTest()
         {
             this.Sys.StartNameSpaceActorsFromConfiguration();
+            this.ExpectNoMsg();
             var collector = this.ActorOfAsTestActorRef<SwaggerCollectorActor>("collector");
             var response = collector.Ask<IReadOnlyCollection<string>>(new SwaggerCollectorActor.SwaggerListRequest(), TimeSpan.FromMilliseconds(200)).Result;
             Assert.NotNull(response);
             Assert.Equal(0, response.Count);
 
             collector.Tell(new SwaggerPublishDescription { Url = "test", DocUrl = "docTest" });
+            this.ExpectNoMsg();
             response = collector.Ask<IReadOnlyCollection<string>>(new SwaggerCollectorActor.SwaggerListRequest(), TimeSpan.FromMilliseconds(200)).Result;
             Assert.NotNull(response);
             Assert.Equal(1, response.Count);
             Assert.Equal("test", response.First());
 
             collector.Tell(new SwaggerPublishDescription { Url = "test2", DocUrl = "docTest" });
+            this.ExpectNoMsg();
             response = collector.Ask<IReadOnlyCollection<string>>(new SwaggerCollectorActor.SwaggerListRequest(), TimeSpan.FromMilliseconds(200)).Result;
             Assert.NotNull(response);
             Assert.Equal(1, response.Count);
             Assert.Equal("test2", response.First());
 
             this.ExpectNoMsg();
-            this.ActorSelection("/user/collector/$b")
+            this.ActorSelection("/user/collector/$a")
                 .Tell(
                     new ClusterEvent.MemberUp(
-                        Member.Create(
+                        ClusterExtensions.MemberCreate(
                             Cluster.Get(this.Sys).SelfUniqueAddress,
+                            1,
                             MemberStatus.Up,
                             ImmutableHashSet.Create("Web.Swagger.Publish"))));
             this.ExpectMsg<SwaggerPublishDescriptionRequest>("/user/Web/Swagger/Descriptor");
@@ -98,44 +102,27 @@ namespace ClusterKit.Web.Tests
                 return ConfigurationFactory.ParseString(@"
                 {
                     ClusterKit {
-                        }
+                    }
 
                     akka.actor.deployment {
-                        ""/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-
                         /collector/workers {
                              router = round-robin-pool
                              nr-of-instances = 5
-                             dispatcher = ClusterKit.test-dispatcher
-                        }
-
-                        ""/collector/*"" {
-                             dispatcher = ClusterKit.test-dispatcher
-                        }
-
-                        ""/collector/workers/*"" {
-                             dispatcher = ClusterKit.test-dispatcher
+                             dispatcher = akka.test.calling-thread-dispatcher
                         }
 
                         /Web {
                             IsNameSpace = true
+                            dispatcher = akka.test.calling-thread-dispatcher
                         }
  		                 /Web/Swagger {
                             type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
-                            dispatcher = ClusterKit.test-dispatcher
+                            dispatcher = akka.test.calling-thread-dispatcher
                         }
 
                         /Web/Swagger/Descriptor {
                             type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
-                            dispatcher = ClusterKit.test-dispatcher
+                            dispatcher = akka.test.calling-thread-dispatcher
                         }
                     }
                 }").WithFallback(base.GetAkkaConfig(windsorContainer));

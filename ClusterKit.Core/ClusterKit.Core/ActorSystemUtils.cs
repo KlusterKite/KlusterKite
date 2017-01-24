@@ -77,7 +77,7 @@ namespace ClusterKit.Core
                 var isNameSpace = config.GetConfig(key).GetBoolean("IsNameSpace");
                 if (isNameSpace)
                 {
-                    sys.ActorOf(sys.DI().Props<NameSpaceActor>(), path[0]);
+                    sys.ActorOf(sys.DI().Props(typeof(NameSpaceActor)), path[0]);
                     sys.Log.Info(
                         "{Type}: starting namespace {NameSpaceName}",
                         typeof(ActorSystemUtils).Name,

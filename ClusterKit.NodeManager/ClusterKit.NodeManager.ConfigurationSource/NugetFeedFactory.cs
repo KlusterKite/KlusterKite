@@ -1,12 +1,20 @@
-﻿using System;
-using System.Linq;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="NugetFeedFactory.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Data factory to work with <see cref="NodeTemplate" />
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
+    using System;
     using System.Data.Entity;
+    using System.Linq;
     using System.Linq.Expressions;
 
-    using ClusterKit.Core.EF;
+    using ClusterKit.Data.EF;
 
     /// <summary>
     /// Data factory to work with <see cref="NodeTemplate"/>

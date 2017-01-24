@@ -35,30 +35,7 @@ namespace ClusterKit.Core.TestKit
                 @"
                 akka.actor.serialize-messages = on
                 akka.actor.serialize-creators = on
-                akka.actor.serializers.wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
-                akka.actor.serialization-bindings {
-                  ""System.Object"" = wire
-                }
-
-                ClusterKit : {
-                    test-dispatcher {
-					    type : ""ClusterKit.Core.TestKit.CallingThreadDispatcherConfigurator, ClusterKit.Core.TestKit""
-                        throughput: 100
-                        throughput - deadline - time : 0ms
-                    }
-                }
-
-                    akka.actor.deployment {
-                        ""/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                        ""/*/*/*"" {
-                           dispatcher = ClusterKit.test-dispatcher
-                        }
-                }");
+            ");
 
             return BaseInstaller.GetStackedConfig(windsorContainer, config);
         }

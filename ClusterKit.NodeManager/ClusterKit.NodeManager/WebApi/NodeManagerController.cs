@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Serves node managment api functions
+//   Serves node management api functions
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace ClusterKit.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -18,12 +19,11 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
+    using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Web;
-    using ClusterKit.Web.CRUDS;
 
     using JetBrains.Annotations;
 
@@ -31,11 +31,11 @@ namespace ClusterKit.NodeManager.WebApi
     /// Serves node management api functions
     /// </summary>
     [UsedImplicitly]
-    [RoutePrefix("nodemanager")]
+    [RoutePrefix("api/1.x/clusterkit/nodemanager")]
     public class NodeManagerController : ApiController
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseCrudController{TObject,TId}"/> class.
+        /// Initializes a new instance of the <see cref="NodeManagerController"/> class.
         /// </summary>
         /// <param name="system">
         /// The system.
@@ -63,13 +63,28 @@ namespace ClusterKit.NodeManager.WebApi
         [Route("getDescriptions")]
         public async Task<List<NodeDescription>> GetActiveNodeDescriptions()
         {
-            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
+            var activeNodeDescriptions =
+                await
+                    this.System.ActorSelection(this.GetManagerActorProxyPath())
+                        .Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
+
+
+            return activeNodeDescriptions
+                .OrderBy(n => n.NodeTemplate)
+                .ThenBy(n => n.ContainerType)
+                .ThenBy(n => n.NodeAddress.ToString())
+                .ToList();
         }
 
         /// <summary>
         /// Gets list of available templates for specified container type for current cluster state
         /// </summary>
-        /// <returns>The list of available templates</returns>
+        /// <param name="containerType">
+        /// The container type.
+        /// </param>
+        /// <returns>
+        /// The list of available templates
+        /// </returns>
         [Route("availableTemplates/{containerType}")]
         [HttpGet]
         public async Task<List<NodeTemplate>> GetAvailableTemplates(string containerType)

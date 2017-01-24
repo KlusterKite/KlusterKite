@@ -1,1 +1,8 @@
 !web
+!**/packages/*
+!*/packages/*
+!packages
+!**/Packages/*
+!*/Packages/*
+!Packages
+web_old

@@ -14,6 +14,8 @@ namespace ClusterKit.NodeManager.Client.Messages
 
     using Akka.Actor;
 
+    using ClusterKit.NodeManager.Launcher.Messages;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -28,9 +30,25 @@ namespace ClusterKit.NodeManager.Client.Messages
         public string ContainerType { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current node is cluster leader
+        /// </summary>
+        public bool IsClusterLeader { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether software and or configuration is obsolete and needed to be upgraded
         /// </summary>
         public bool IsObsolete { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this is complete description
+        /// </summary>
+        [UsedImplicitly]
+        public bool IsInitialized { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of roles, where current node is leader
+        /// </summary>
+        public List<string> LeaderInRoles { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the list of descriptions of installed modules
@@ -56,6 +74,12 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// Gets or sets current node template version
         /// </summary>
         public int NodeTemplateVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of cluster roles
+        /// </summary>
+        [UsedImplicitly]
+        public List<string> Roles { get; set; }
 
         /// <summary>
         /// Gets or sets node start time

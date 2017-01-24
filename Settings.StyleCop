@@ -10,14 +10,19 @@
       <Value>ef</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
-      <Value>serilog</Value>
       <Value>redis</Value>
+      <Value>serilog</Value>
+      <Value>Sharding</Value>
+      <Value>sharded</Value>
       <Value>Owin</Value>
       <Value>postgres</Value>
+      <Value>precompiled</Value>
+      <Value>tcp</Value>
       <Value>nginx</Value>
       <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>ui</Value>
+      <Value>uid</Value>
       <Value>urls</Value>
     </CollectionProperty>
   </GlobalSettings>

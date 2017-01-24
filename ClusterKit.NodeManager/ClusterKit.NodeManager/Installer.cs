@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.NodeManager
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.NodeManager
 {
     using System.Collections.Generic;
 
@@ -10,10 +19,11 @@
     using Castle.Windsor;
 
     using ClusterKit.Core;
-    using ClusterKit.Core.Data;
-    using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.Data;
 
     using JetBrains.Annotations;
+
+    using NuGet;
 
     /// <summary>
     /// Installing components from current library
@@ -25,10 +35,11 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
+        // ReSharper disable once ArrangeStaticMemberQualifier
+        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClusterRole;
 
         /// <summary>
-        /// Should check the config and environment for possible erorrs.
+        /// Should check the config and environment for possible errors.
         /// If any found, shod throw the exception to prevent node from starting.
         /// </summary>
         /// <param name="config">Full akka config</param>
@@ -49,7 +60,7 @@
                 throw new ConfigurationException($"{NodeManagerActor.ConfigDatabaseNamePath} is not defined");
             }
 
-            var packageRepository = config.GetString(NodeManagerActor.PacakgeRepositoryUrlPath);
+            var packageRepository = config.GetString(NodeManagerActor.PackageRepositoryUrlPath);
             if (string.IsNullOrEmpty(packageRepository))
             {
                 throw new ConfigurationException($"{NodeManagerActor.ConfigDatabaseNamePath} is not defined");
@@ -66,7 +77,10 @@
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
         /// </summary>
         /// <returns>The list of roles</returns>
-        protected override IEnumerable<string> GetRoles() => new[] { "NodeManager" };
+        protected override IEnumerable<string> GetRoles() => new[]
+                                                                 {
+                                                                     "NodeManager"
+                                                                 };
 
         /// <summary>
         /// Registering DI components
@@ -79,7 +93,7 @@
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
 
             container.Register(
-                Component.For<DataFactory<string, PackageDescription, string>>()
+                Component.For<DataFactory<string, IPackage, string>>()
                     .ImplementedBy<NugetPackagesFactory>()
                     .LifestyleTransient());
         }

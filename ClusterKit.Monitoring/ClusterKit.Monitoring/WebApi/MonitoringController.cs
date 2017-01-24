@@ -10,16 +10,18 @@
 namespace ClusterKit.Monitoring.WebApi
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Web.Http;
 
     using Akka.Actor;
+
+    using ClusterKit.LargeObjects.Client;
     using ClusterKit.Monitoring.Messages;
 
     /// <summary>
     /// Manages web requests to describe current cluster health state
     /// </summary>
+    [RoutePrefix("api/1.x/clusterkit/monitoring")]
     public class MonitoringController : ApiController
     {
         /// <summary>
@@ -45,15 +47,37 @@ namespace ClusterKit.Monitoring.WebApi
         }
 
         /// <summary>
-        /// Gets current cluster member list
+        /// Gets the last cluster scan result.
+        /// Changes as system receives the scan results from nodes
         /// </summary>
-        /// <returns>The member list</returns>
-        [Route("MonitoringApi/GetClusterMemberList")]
-        [HttpGet]
-        public async Task<List<MemberDescription>> GetClusterMemberList()
+        /// <returns>The cluster scan result</returns>
+        [Route("getScanResult")]
+        public async Task<ClusterTree> GetClusterTree()
         {
-            return await this.system.ActorSelection("/user/Monitoring/Watcher")
-                .Ask<List<MemberDescription>>(new ClusterMemberListRequest(), this.systemTimeout);
+            try
+            {
+                var notification = await this.system
+                            .ActorSelection("/user/Monitoring/ClusterScannerProxy")
+                            .Ask<ParcelNotification>(new ClusterScanResultRequest(), this.systemTimeout);
+
+                return await notification.Receive(this.system) as ClusterTree;
+            }
+            catch (Exception exception)
+            {
+                this.system.Log.Error(exception, "{Type}: error on GetClusterTree", this.GetType().Name);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Initiates the new actor system scan
+        /// </summary>
+        /// <returns>The success of the operation</returns>
+        [Route("initiateScan")]
+        public bool InitiateScan()
+        {
+            this.system.ActorSelection("/user/Monitoring/ClusterScannerProxy").Tell(new ClusterScanRequest());
+            return true;
         }
     }
 }

@@ -49,7 +49,6 @@ namespace ClusterKit.Web.Swagger
 
             config.EnableSwagger(
                 $"{publishDocUrl}/{{apiVersion}}",
-                //swagger/docs/{apiVersion}
                 c =>
                     {
                         c.SingleApiVersion(
@@ -69,7 +68,6 @@ namespace ClusterKit.Web.Swagger
                         c.UseFullTypeNameInSchemaIds();
                     }).EnableSwaggerUi(
                         $"{publishUiUrl}/{{*assetPath}}",
-                        //{*assetPath}
                         c =>
                             {
                                 c.DisableValidator();

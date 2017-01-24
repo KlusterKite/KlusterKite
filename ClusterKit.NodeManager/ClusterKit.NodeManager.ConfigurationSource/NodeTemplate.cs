@@ -74,7 +74,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <summary>
         /// Gets or sets minimum number of working node type required for cluster to work
         /// </summary>
-        public int MininmumRequiredInstances { get; set; }
+        public int MinimumRequiredInstances { get; set; }
 
         /// <summary>
         /// Gets or sets the human readable node template name

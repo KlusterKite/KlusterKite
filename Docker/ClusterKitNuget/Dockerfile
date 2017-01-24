@@ -1,4 +1,4 @@
-FROM vassilvk/nuget-feed:latest
+FROM sunside/simple-nuget-server:latest
 MAINTAINER Mikhail Kantarovskiy <kantoramob@gmail.com>
 RUN apt-get update && apt-get -y upgrade
 COPY feedwriter.php /var/www/inc/feedwriter.php

@@ -1,8 +1,16 @@
-﻿namespace ClusterKit.Monitoring
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Monitoring
 {
     using System.Collections.Generic;
     using System.Web.Http;
-    using System.Web.Mvc;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -18,11 +26,12 @@
     /// </summary>
     public class Installer : BaseInstaller
     {
-        /// <summary>
+        /// <summary> 
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClasterRole;
+        // ReSharper disable once ArrangeStaticMemberQualifier
+        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClusterRole;
 
         /// <summary>
         /// Gets default akka configuration for current module
@@ -34,7 +43,10 @@
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
         /// </summary>
         /// <returns>The list of roles</returns>
-        protected override IEnumerable<string> GetRoles() => new[] { "Monitoring" };
+        protected override IEnumerable<string> GetRoles() => new[]
+                                                                 {
+                                                                     "Monitoring"
+                                                                 };
 
         /// <summary>
         /// Registering DI components

@@ -75,13 +75,24 @@ namespace ClusterKit.Core.Utils
         public static RouterConfig GetFromConfiguration(this IActorRef actorRef, ActorSystem system, string childPath)
         {
             var actorPath = $"/{string.Join("/", actorRef.Path.Elements.Skip(1))}/{childPath}";
-            var childConfig = system.Settings.Config.GetConfig("akka.actor.deployment")
-                ?.GetConfig(actorPath);
+            return GetFromConfiguration(system, actorPath);
+        }
+
+        /// <summary>
+        /// Workaround of https://github.com/akkadotnet/akka.net/issues/1321 bug
+        /// </summary>
+        /// <param name="system">Akka actor system</param>
+        /// <param name="actorPath">Path to child actor in deployment configuration</param>
+        /// <returns>Configured router</returns>
+        [UsedImplicitly]
+        public static RouterConfig GetFromConfiguration(ActorSystem system, string actorPath)
+        {
+            var childConfig = system.Settings.Config.GetConfig("akka.actor.deployment")?.GetConfig(actorPath);
 
             if (childConfig == null)
             {
                 system.Log.Warning("{Type}: there is no router config for path {ActorPath}", typeof(AkkaUtils).Name, actorPath);
-                return RouterConfig.NoRouter;
+                return NoRouter.Instance;
             }
 
             string routerName = childConfig.GetString("router");
@@ -89,15 +100,21 @@ namespace ClusterKit.Core.Utils
             switch (routerName)
             {
                 case "round-robin-pool":
-                    system.Log.Info("{Type}: creating RoundRobinPool router for path {ActorPath}", typeof(AkkaUtils).Name, actorPath);
+                    system.Log.Info(
+                        "{Type}: creating RoundRobinPool router for path {ActorPath}",
+                        typeof(AkkaUtils).Name,
+                        actorPath);
                     return new RoundRobinPool(childConfig);
 
                 case "consistent-hashing-pool":
-                    system.Log.Info("{Type}: creating ConsistentHashingPool router for path {ActorPath}", typeof(AkkaUtils).Name, actorPath);
+                    system.Log.Info(
+                        "{Type}: creating ConsistentHashingPool router for path {ActorPath}",
+                        typeof(AkkaUtils).Name,
+                        actorPath);
                     return new ConsistentHashingPool(childConfig);
 
                 default:
-                    return RouterConfig.NoRouter;
+                    return NoRouter.Instance;
             }
         }
 

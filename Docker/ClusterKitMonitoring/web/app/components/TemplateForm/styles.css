@@ -1,0 +1,31 @@
+.name {
+  margin-top: 5px;
+}
+
+select.selectMini {
+  -webkit-appearance: select;
+  -moz-appearance: select;
+  appearance: select;
+  width: auto;
+  line-height: 14px;
+  padding-right: 16px;
+}
+
+.inputGroup {
+  position: relative;
+}
+
+.checkboxError {
+  margin-left: 20px;
+}
+
+.radioLabel {
+  margin: 0 25px 0 5px;
+}
+
+.cog {
+  position: relative;
+  left: 10px;
+  top: 0;
+}
+

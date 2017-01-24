@@ -8,7 +8,7 @@
       }      
       cluster: {
         auto-down-unreachable-after = 15s
-    		min-nr-of-members = 3
+    	min-nr-of-members = 3
         seed-nodes = ["akka.tcp://ClusterKit@seed:3090"]
         singleton {
             # The number of retries are derived from hand-over-retry-interval and

@@ -34,7 +34,7 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         /// <summary>
         /// Gets or sets list of packages to install on node
         /// </summary>
-        public List<string> Packages { get; set; }
+        public List<PackageDescription> Packages { get; set; }
 
         /// <summary>
         /// Gets or sets NuGet feed urls to download packages

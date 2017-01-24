@@ -3,12 +3,18 @@
   "NodeTemplate": "manager",
   "NodeTemplateVersion": 0,
   "Packages": [
-    "ClusterKit.Core.Service",
-    "ClusterKit.NodeManager.Client"
+    {
+      "Id": "ClusterKit.Core.Service",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.NodeManager.Client",
+      "Version": "0.0.0-local"
+    }
   ],
   "PackageSources": [
     "/opt/packageCache",
-    "http://192.168.99.100:81/"
+    "http://nuget/"
   ],
   "RequestId": "e49705ca-9d3c-42c0-98f1-ed55fe1d7f1a",
   "Seeds": [

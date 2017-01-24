@@ -29,7 +29,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
         /// </summary>
         /// <remarks>
         /// Note that the database may already contain seed data when this method runs. This means that
-        ///             implementations of this method must check whether or not seed data is present and/or up-to-date
+        ///             implementations of this method must check whether  or not seed data is present and/or up-to-date
         ///             and then only make changes if necessary and in a non-destructive way. The
         ///             <see cref="M:System.Data.Entity.Migrations.DbSetMigrationsExtensions.AddOrUpdate``1(System.Data.Entity.IDbSet{``0},``0[])"/>
         ///             can be used to help with this, but for seeding large amounts of data it may be necessary to do less

@@ -2,6 +2,21 @@
 <doc>
 <assembly><name>FakeLib</name></assembly>
 <members>
+<member name="M:Fake.Checksum.CheckFileHash(System.String,System.String,Microsoft.FSharp.Core.FSharpOption{Fake.ChecksumHashAlgorithm})">
+<summary>
+ Check if the hash in parameter is the valid hash of the file
+</summary>
+</member>
+<member name="M:Fake.Checksum.CalculateFileHash(System.String,Microsoft.FSharp.Core.FSharpOption{Fake.ChecksumHashAlgorithm})">
+<summary>
+ Calculate the hash of a file. Default hash algorithm used: SHA256
+</summary>
+</member>
+<member name="T:Fake.Checksum">
+<summary>
+ Allow to calculate checksum
+</summary>
+</member>
 <member name="M:Fake.AdditionalSyntax.op_EqualsQmarkGreater(System.String,System.String,System.Boolean)">
 <summary>
  Defines a conditional dependency - y is dependent on x if the condition is true
@@ -1018,7 +1033,7 @@
  Creates an attribute which holds the product title
 </summary>
 </member>
-<member name="M:Fake.AssemblyInfoFile.Attribute.StringAttribute(System.String,System.String,System.String)">
+<member name="M:Fake.AssemblyInfoFile.Attribute.StringAttribute(System.String,System.String,System.String,Microsoft.FSharp.Core.FSharpOption{System.String},Microsoft.FSharp.Core.FSharpOption{System.String})">
 <summary>
  Creates a simple attribute with string values. Used as base for other attributes
 </summary>
@@ -1122,7 +1137,7 @@
 <summary>
  Update a set of attributes in an AssemblyInfo file. Fails if any attribute is not found.
  ## Parameters
-  - `assemblyInfoFile` - The file to update. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to update. Language C#, F#, VB or C++ is determined from the extension.
   - `attributes` - The Attributes that should be updated matched on Name (Namespace is not used).
 </summary>
 </member>
@@ -1131,7 +1146,7 @@
  Read the value of a single attribute from an AssemblyInfo file. Note that string values are returned with surrounding &quot;&quot;.
  ## Parameters
   - `attrName` - Name of the attribute without &quot;Attribute&quot; at the end.
-  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension.
 </summary>
 </member>
 <member name="M:Fake.AssemblyInfoFile.GetAttribute(System.String,System.String)">
@@ -1139,14 +1154,14 @@
  Read a single attribute from an AssemblyInfo file.
  ## Parameters
   - `attrName` - Name of the attribute without &quot;Attribute&quot; at the end.
-  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to read from. Language C#, F#, VB or C++ is determined from the extension.
 </summary>
 </member>
 <member name="M:Fake.AssemblyInfoFile.GetAttributes(System.String)">
 <summary>
  Read attributes from an AssemblyInfo file and return as a sequence of Attribute.
  ## Parameters
-  - `assemblyInfoFile` - The file to read attributes from. Language C#, F#, VB or C++ is determined from the extension. 
+  - `assemblyInfoFile` - The file to read attributes from. Language C#, F#, VB or C++ is determined from the extension.
 </summary>
 </member>
 <member name="M:Fake.AssemblyInfoFile.CreateCppCliAssemblyInfo(System.String,System.Collections.Generic.IEnumerable{Fake.AssemblyInfoFile.Attribute})">
@@ -1304,6 +1319,64 @@
  Contains tasks to package Azure Cloud Services.
 </summary>
 </member>
+<member name="T:Fake.Azure.Kudu.WebJobType">
+<summary>
+ The different types of web jobs.
+</summary>
+</member>
+<member name="M:Fake.Azure.Kudu.kuduSync">
+<summary>
+ Synchronises all staged files from the temporary deployment to the actual deployment, removing
+ any obsolete files, updating changed files and adding new files.
+</summary>
+</member>
+<member name="M:Fake.Azure.Kudu.stageWebJob(Fake.Azure.Kudu.WebJobType,System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Stages a set of files into a WebJob folder in the temp deployment area, ready for deployment into the website as a webjob.
+</summary>
+</member>
+<member name="M:Fake.Azure.Kudu.getWebJobPath(Fake.Azure.Kudu.WebJobType,System.String)">
+<summary>
+ Gets the path for deploying a web job to.
+</summary>
+</member>
+<member name="M:Fake.Azure.Kudu.stageFolder(System.String,Microsoft.FSharp.Core.FSharpFunc{System.String,System.Boolean})">
+ <summary>
+ Stages a folder and all subdirectories into the temp deployment area, ready for deployment into the website.
+ </summary>
+ <param name="source">The source folder to copy.</param>
+ <param name="shouldInclude">A predicate which includes files from the folder. If the entire directory should be copied, this predicate should always return true.</param>
+</member>
+<member name="P:Fake.Azure.Kudu.kuduPath">
+<summary>
+ The path to the KuduSync application.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.previousManifestPath">
+<summary>
+ Used by KuduSync for tracking and diffing deployments.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.nextManifestPath">
+<summary>
+ Used by KuduSync for tracking and diffing deployments.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.deploymentTarget">
+<summary>
+ Location where synced outputs should be deployed to.
+</summary>
+</member>
+<member name="P:Fake.Azure.Kudu.deploymentTemp">
+<summary>
+ Location where staged outputs should go before synced up to the site.
+</summary>
+</member>
+<member name="T:Fake.Azure.Kudu">
+<summary>
+ Contains tasks to stage and deploy Azure website and webjobs using source code deployment with Kudu Sync.
+</summary>
+</member>
 <member name="P:Fake.Azure.WebJobs.WebSite.WebJobs">
 <summary>
  The webjobs to deploy to this web site
@@ -1424,6 +1497,41 @@
 <member name="T:Fake.AzureHelper">
 <summary>
  Contains tasks to control the local Azure Emulator
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.Tag">
+<summary>
+ The tag of a commit that kicked off the build. This value is only available on tags.
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.RepoSlug">
+<summary>
+ The URL-friendly version of a repository name.
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.RepoOwner">
+<summary>
+ The name of the account in which the repository lives
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.Commit">
+<summary>
+ The commit hash of a commit that kicked off the build
+</summary>
+</member>
+<member name="P:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment.Branch">
+<summary>
+ The branch on which the build was kicked off. This value is only available on branches.
+</summary>
+</member>
+<member name="T:Fake.BitbucketPipelines.BitbucketPipelinesEnvironment">
+<summary>
+ Bitbucket Pipelines environment variables as [described](https://confluence.atlassian.com/bitbucket/environment-variables-in-bitbucket-pipelines-794502608.html)
+</summary>
+</member>
+<member name="T:Fake.BitbucketPipelines">
+<summary>
+ Contains code to configure FAKE for Bitbucket Pipelines integration
 </summary>
 </member>
 <member name="M:Fake.Boot.CommandHandler.Interact">
@@ -1569,6 +1677,65 @@
  download dependencies with NuGet and do other preparatory work in
  the first stage, and have these dependencies available in the
  second stage.
+</summary>
+</member>
+<member name="T:Fake.BowerHelper.BowerParams">
+<summary>
+ The Bower parameter type
+</summary>
+</member>
+<member name="T:Fake.BowerHelper.BowerCommand">
+<summary>
+ The list of support Bower commands. The `Custom` alternative
+ can be used for other commands not in the list until they are
+ implemented
+</summary>
+</member>
+<member name="T:Fake.BowerHelper.InstallArgs">
+<summary>
+ Arguments for the Bower install command
+</summary>
+</member>
+<member name="M:Fake.BowerHelper.Bower(Microsoft.FSharp.Core.FSharpFunc{Fake.BowerHelper.BowerParams,Fake.BowerHelper.BowerParams})">
+<summary>
+ Runs bower with the given modification function. Make sure to have bower installed,
+ you can install bower with nuget or a regular install. To change which `Bower` executable
+ to use you can set the `BowerFilePath` parameter with the `setParams` function.
+
+ ## Parameters
+
+ - `setParams` - Function used to overwrite the Bower default parameters.
+
+ ## Sample
+
+         Target &quot;Web&quot; (fun _ -&gt;
+             Bower (fun p -&gt;
+                       { p with
+                           Command = Install Standard
+                           WorkingDirectory = &quot;./src/FakeSimple.Web/&quot;
+                       })
+
+             Bower (fun p -&gt;
+                       { p with
+                           Command = (Run &quot;build&quot;)
+                           WorkingDirectory = &quot;./src/FAKESimple.Web/&quot;
+                       })
+         )
+</summary>
+</member>
+<member name="P:Fake.BowerHelper.defaultBowerParams">
+<summary>
+ Bower default parameters
+</summary>
+</member>
+<member name="P:Fake.BowerHelper.bowerFileName">
+<summary>
+ Default paths to Bower
+</summary>
+</member>
+<member name="T:Fake.BowerHelper">
+<summary>
+ Contains function to run bower tasks
 </summary>
 </member>
 <member name="T:Fake.BuildServerHelper.TraceMode">
@@ -1965,6 +2132,34 @@
 <member name="T:Fake.Choco.ChocoPushParams">
 <summary>
  The choco push parameter type.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Checksum64Type">
+<summary>
+ The type of checksum that the file is validated with. Default: Sha256
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.ChecksumType">
+<summary>
+ The type of checksum that the file is validated with. Default: Sha256
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Checksum64">
+<summary>
+ The checksum hash value of the PackageDownload64Url resource
+ This allows a checksum to be validated for files that are not local. The checksum type is covered by ChecksumType64.
+ Equivalent to the `--checksum &lt;string&gt;` option of Install-Chocolatey[Zip]Package functions.
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
+</summary>
+</member>
+<member name="P:Fake.Choco.ChocoPackParams.Checksum">
+<summary>
+ The checksum hash value of the PackageDownloadUrl resource
+ This allows a checksum to be validated for files that are not local. The checksum type is covered by ChecksumType.
+ Equivalent to the `--checksum &lt;string&gt;` option of Install-Chocolatey[Zip]Package functions.
+ Used to create chocolateyInstall.ps1 if it doesn&apos;t exists.
 </summary>
 </member>
 <member name="P:Fake.Choco.ChocoPackParams.UninstallPath">
@@ -2369,7 +2564,7 @@
 </member>
 <member name="P:Fake.Choco.ChocoPushDefaults">
 <summary>
- The default option set given to choco pack.
+ The default option set given to choco push.
 </summary>
 </member>
 <member name="P:Fake.Choco.ChocoPackDefaults">
@@ -2573,6 +2768,60 @@
  Contains tasks to compile C# source files with CSC.EXE (C# Compiler).
 </summary>
 </member>
+<member name="P:Fake.DocFxHelper.DocFxParams.Serve">
+<summary>
+ Serves the generated documentation on localhost. Default: false
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.Timeout">
+<summary>
+ Allows to specify a timeout for DocFx. Default: 5 min
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.WorkingDirectory">
+<summary>
+ DocFx WorkingDirectory. Default: docs
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.DocFxJson">
+<summary>
+ the DocFxJson Config-File. Default: docs/docfx.json
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxParams.ToolPath">
+<summary>
+ The tool path - FAKE tries to find docfx.exe automatically in any sub folder.
+</summary>
+</member>
+<member name="T:Fake.DocFxHelper.DocFxParams">
+<summary>
+ The parameter type for DocFx.
+</summary>
+</member>
+<member name="M:Fake.DocFxHelper.DocFx(Microsoft.FSharp.Core.FSharpFunc{Fake.DocFxHelper.DocFxParams,Fake.DocFxHelper.DocFxParams})">
+<summary>
+ Generates a DocFx documentation.
+ ## Parameters
+  - `setParams` - Function used to manipulate the default DocFx parameters. See `DocFxDefaults`
+ ## Sample
+
+     DocFx (fun p -&gt; 
+      { p with 
+          DocFxJson = &quot;foo&quot; @@ &quot;bar&quot; @@ &quot;docfx.json&quot;
+          Timeout = TimeSpan.FromMinutes 10.
+      })
+</summary>
+</member>
+<member name="P:Fake.DocFxHelper.DocFxDefaults">
+<summary>
+ The default parameters
+</summary>
+</member>
+<member name="T:Fake.DocFxHelper">
+<summary>
+ Contains helper functions to run the documentation tool &quot;docfx&quot;.
+</summary>
+</member>
 <member name="P:Fake.DocuHelper.DocuParams.OutputPath">
 <summary>
  The output path of the generated docs. The default is &quot;./output/&quot;.
@@ -2763,6 +3012,368 @@
 <member name="T:Fake.DotCover">
 <summary>
  Contains a task which can be used to run [DotCover](http://www.jetbrains.com/dotcover/) on .NET assemblies.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.Output">
+<summary>
+ Optional outputh path
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.VersionSuffix">
+<summary>
+ Optional version suffix.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.Runtime">
+<summary>
+ Allows to test a specific runtime
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.Framework">
+<summary>
+ Allows to publish to a specific framework
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.Project">
+<summary>
+ Project (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PublishParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.PublishParams">
+<summary>
+ DotNet publish parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.Project">
+<summary>
+ Project (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.VersionSuffix">
+<summary>
+ Optional version suffix.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.OutputPath">
+<summary>
+ Optional output path.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.PackParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.PackParams">
+<summary>
+ DotNet pack parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.Runtime">
+<summary>
+ Allows to test a specific runtime
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.Framework">
+<summary>
+ Allows to test a specific framework
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.Project">
+<summary>
+ Project (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.TestParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.TestParams">
+<summary>
+ DotNet test parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.Runtime">
+<summary>
+ Allows to build for a specific runtime
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.Framework">
+<summary>
+ Allows to build for a specific framework
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.Configuration">
+<summary>
+ The build configuration.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.Project">
+<summary>
+ Project (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.BuildParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.BuildParams">
+<summary>
+ DotNet build parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.AdditionalArgs">
+<summary>
+ Additional Args
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.NoCache">
+<summary>
+ Whether to use the NuGet cache.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.Project">
+<summary>
+ Project (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.RestoreParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.RestoreParams">
+<summary>
+ DotNet restore parameters
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.CommandParams.TimeOut">
+<summary>
+ A timeout for the command.
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.CommandParams.WorkingDir">
+<summary>
+ Working directory (optional).
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.CommandParams.ToolPath">
+<summary>
+ ToolPath - usually just &quot;dotnet&quot;
+</summary>
+</member>
+<member name="T:Fake.DotNetCli.CommandParams">
+<summary>
+ DotNet parameters
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.SetVersionInProjectJson(System.String,System.String)">
+<summary>
+ Sets version in project.json
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Publish(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.PublishParams,Fake.DotNetCli.PublishParams})">
+<summary>
+ Runs the dotnet &quot;publish&quot; command.
+ ## Parameters
+
+  - `setPublishParams` - Function used to overwrite the publish default parameters.
+
+ ## Sample
+
+     DotNetCli.Publish
+       (fun p -&gt; 
+            { p with 
+                 Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Pack(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.PackParams,Fake.DotNetCli.PackParams})">
+<summary>
+ Runs the dotnet &quot;pack&quot; command.
+ ## Parameters
+
+  - `setPackParams` - Function used to overwrite the pack default parameters.
+
+ ## Sample
+
+     DotNetCli.Pack
+       (fun p -&gt; 
+            { p with 
+                 Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Test(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.TestParams,Fake.DotNetCli.TestParams})">
+<summary>
+ Runs the dotnet &quot;test&quot; command.
+ ## Parameters
+
+  - `setTestParams` - Function used to overwrite the test default parameters.
+
+ ## Sample
+
+     DotNetCli.Test
+       (fun p -&gt; 
+            { p with 
+                 Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Build(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.BuildParams,Fake.DotNetCli.BuildParams})">
+<summary>
+ Runs the dotnet &quot;build&quot; command.
+ ## Parameters
+
+  - `setBuildParams` - Function used to overwrite the build default parameters.
+
+ ## Sample
+
+     DotNetCli.Build
+       (fun p -&gt; 
+            { p with 
+                 Configuration = &quot;Release&quot; })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.Restore(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.RestoreParams,Fake.DotNetCli.RestoreParams})">
+<summary>
+ Runs the dotnet &quot;restore&quot; command.
+ ## Parameters
+
+  - `setRestoreParams` - Function used to overwrite the restore default parameters.
+
+ ## Sample
+
+     DotNetCli.Restore 
+         (fun p -&gt; 
+              { p with 
+                   NoCache = true })
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.RunCommand(Microsoft.FSharp.Core.FSharpFunc{Fake.DotNetCli.CommandParams,Fake.DotNetCli.CommandParams},System.String)">
+<summary>
+ Runs a dotnet command.
+ ## Parameters
+
+  - `setCommandParams` - Function used to overwrite the default parameters.
+  - `args` - command and additional arguments.
+
+ ## Sample
+
+     DotNetCli.RunCommand
+         (fun p -&gt; 
+              { p with 
+                   TimeOut = TimeSpan.FromMinutes 10. })
+         &quot;restore&quot;
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.isInstalled">
+<summary>
+ Checks wether the dotnet CLI is installed
+</summary>
+</member>
+<member name="M:Fake.DotNetCli.getVersion">
+<summary>
+ Gets the installed dotnet version
+</summary>
+</member>
+<member name="P:Fake.DotNetCli.commandName">
+<summary>
+ The dotnet command name
+</summary>
+</member>
+<member name="T:Fake.DotNetCli">
+<summary>
+ Contains a task which can be used to run dotnet CLI commands.
 </summary>
 </member>
 <member name="P:Fake.DynamicsCRMHelper.SolutionPackagerParams.Folder">
@@ -3304,6 +3915,11 @@
  Determines if the current system is an Unix system
 </summary>
 </member>
+<member name="P:Fake.EnvironmentHelper.isWindows">
+<summary>
+ Determines if the current system is a Windows system
+</summary>
+</member>
 <member name="P:Fake.EnvironmentHelper.SystemRoot">
 <summary>
  The system root environment variable. Typically &quot;C:\Windows&quot;
@@ -3348,17 +3964,17 @@
 </member>
 <member name="M:Fake.EnvironmentHelper.environVarOrNone(System.String)">
 <summary>
- Retrieves the environment variable or None
+ Retrieves the environment variable or None if no value was set
 </summary>
 </member>
 <member name="M:Fake.EnvironmentHelper.getEnvironmentVarAsBool(System.String)">
 <summary>
- Retrieves the environment variable with the given name or returns the false if no value was set
+ Retrieves the environment variable with the given name or returns false if no value was set
 </summary>
 </member>
 <member name="M:Fake.EnvironmentHelper.getEnvironmentVarAsBoolOrDefault(System.String,System.Boolean)">
 <summary>
- Retrieves the environment variable with the given name or returns the default bool if no value was set
+ Retrieves the environment variable with the given name or returns the default value if no value was set
 </summary>
 </member>
 <member name="M:Fake.EnvironmentHelper.environVarOrFail(System.String)">
@@ -3386,6 +4002,16 @@
  Sets the environment variable with the given name for the current process.
 </summary>
 </member>
+<member name="M:Fake.EnvironmentHelper.setMachineEnvironVar(System.String,System.String)">
+<summary>
+ Sets the environment variable with the given name for the current machine.
+</summary>
+</member>
+<member name="M:Fake.EnvironmentHelper.setUserEnvironVar(System.String,System.String)">
+<summary>
+ Sets the environment variable with the given name for the current user.
+</summary>
+</member>
 <member name="M:Fake.EnvironmentHelper.setEnvironVar(System.String,System.String)">
 <summary>
  Sets the environment variable with the given name
@@ -3396,7 +4022,17 @@
  Retrieves all environment variables from the given target
 </summary>
 </member>
+<member name="M:Fake.EnvironmentHelper.op_LessDivideGreater(System.String,System.String)">
+<summary>
+ Combines two path strings using Path.Combine
+</summary>
+</member>
 <member name="M:Fake.EnvironmentHelper.op_AtAt(System.String,System.String)">
+<summary>
+ Combines two path strings using Path.Combine
+</summary>
+</member>
+<member name="M:Fake.EnvironmentHelper.combinePathsNoTrim(System.String,System.String)">
 <summary>
  Combines two path strings using Path.Combine
 </summary>
@@ -3744,11 +4380,11 @@
 </member>
 <member name="M:Fake.FileHelper.Rename(System.String,System.String)">
 <summary>
- Renames the file to the target file name.
+ Renames the file or directory to the target name.
  ## Parameters
  
-  - `target` - The target file name.
-  - `file` - The orginal file name.
+  - `target` - The target file or directory name.
+  - `fileName` - The orginal file or directory name.
 </summary>
 </member>
 <member name="M:Fake.FileHelper.CopyCached(System.String,System.String,System.Collections.Generic.IEnumerable{System.String})">
@@ -3922,7 +4558,8 @@
 </member>
 <member name="M:Fake.FileSystem.findToolInSubPath(System.String,System.String)">
 <summary>
- Looks for a tool first in its default path, if not found in all subfolders of the root folder - returns the tool file name.
+ Looks for a tool first in its default path, if not found the in ./packages/ and then
+ in all subfolders of the root folder - returns the tool file name.
 </summary>
 </member>
 <member name="M:Fake.FileSystem.op_BangBang(System.String)">
@@ -4033,6 +4670,11 @@
 <member name="M:Fake.FileSystemHelper.TryFindFirstMatchingFile(System.String,System.String)">
 <summary>
  Gets the first file in the directory matching the search pattern as an option value.
+</summary>
+</member>
+<member name="M:Fake.FileSystemHelper.filesInDirMatchingRecursive(System.String,System.IO.DirectoryInfo)">
+<summary>
+ Finds all the files in the directory and in all subdirectories matching the search pattern.
 </summary>
 </member>
 <member name="M:Fake.FileSystemHelper.filesInDirMatching(System.String,System.IO.DirectoryInfo)">
@@ -4770,6 +5412,15 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Does not support FTPS and SFTP.
 </summary>
 </member>
+<member name="M:Fake.FuchuHelper.Fuchu(System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Execute Fuchu tests from one or more assemblies.
+ Multiple assemblies are run concurrently.
+ ## Parameters
+ 
+  - `testExes` - The paths of the executables containing Fuchu tests to run.
+</summary>
+</member>
 <member name="T:Fake.FxCopHelper.FxCopParams">
 <summary>
  Parameter type for the FxCop tool
@@ -5036,6 +5687,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Runs the given git command, waits for its completion.
 </summary>
 </member>
+<member name="M:Fake.Git.CommandHelper.directRunGitCommandAndFail(System.String,System.String)">
+<summary>
+ Runs the given git command, waits for its completion and fails when it didn&apos;t succeeded.
+</summary>
+</member>
 <member name="M:Fake.Git.CommandHelper.directRunGitCommand(System.String,System.String)">
 <summary>
  Runs the given git command, waits for its completion and returns whether it succeeded.
@@ -5096,7 +5752,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Gets the commit message
 </summary>
 </member>
-<member name="M:Fake.Git.CommitMessage.getCommitMessageFileInfo(System.String)">
+<member name="M:Fake.Git.CommitMessage.getCommitMessageFileInfos(System.String)">
 <summary>
  Returns the commit message file.
 </summary>
@@ -5417,6 +6073,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
   - `file` - The file to reset - null means all files.
 </summary>
 </member>
+<member name="M:Fake.Git.Reset.resetOrCheckout(System.String,System.String)">
+<summary>
+ the intent of the &apos;reset&apos; helper is to either set a repo to a certain point, or set a file to a certain point.  Git reset doesn&apos;t take file paths in the hard/mixed/soft modes, and so you have to use checkout instead for that.
+ This function encapsulates caring about that so you don&apos;t have to.      
+</summary>
+</member>
 <member name="T:Fake.Git.Reset">
 <summary>
  Contains helper functions which allow to deal with git reset.
@@ -5556,6 +6218,27 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains helper functions which allow to deal with git submodules.
 </summary>
 </member>
+<member name="M:Fake.GitVersionHelper.GitVersion(Microsoft.FSharp.Core.FSharpFunc{Fake.GitVersionHelper.GitversionParams,Fake.GitVersionHelper.GitversionParams})">
+<summary>
+ Runs [GitVersion](https://gitversion.readthedocs.io/en/latest/) on a .NET project file.
+ ## Parameters
+
+  - `setParams` - Function used to manipulate the GitversionDefaults value.
+
+ ## Sample
+
+      GitVersion id // Use Defaults
+      GitVersion (fun p -&gt; { p with ToolPath = currentDirectory @@ &quot;tools&quot; }
+</summary>
+</member>
+<member name="T:Fake.GitVersionHelper">
+<summary>
+ Containts helper function for GitVersion - a tool to help you achieve Semantic Versioning on your project.
+
+ To install GitVersion.exe on Windows, start PowerShell as Administrator and run choco install gitversion.portable -s https://chocolatey.org/api/v2&quot;
+ For Mac and Unix, install the NuGet version.
+</summary>
+</member>
 <member name="T:Fake.Globbing">
 <summary>
  This module contains a file pattern globbing implementation.
@@ -5647,6 +6330,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.HipChatNotificationHelper">
 <summary>
  Contains a task to send notification messages to a [HipChat](https://www.hipchat.com/) room
+</summary>
+</member>
+<member name="P:Fake.HockeyAppHelper.HockeyAppUploadParams.AppId">
+<summary>
+ Set to your App Id (required for UWP apps targeting windows phone)
 </summary>
 </member>
 <member name="P:Fake.HockeyAppHelper.HockeyAppUploadParams.UploadTimeout">
@@ -5938,6 +6626,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  All files which are in &quot;Compile&quot; sections
 </summary>
 </member>
+<member name="P:Fake.MSBuild.ProjectSystem.ProjectFile.ContentFiles">
+<summary>
+ All files which are in &quot;Content&quot; sections
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.Save(Microsoft.FSharp.Core.FSharpOption{System.String})">
 <summary>
  Saves the project file
@@ -5946,6 +6639,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.RemoveFile(System.String)">
 <summary>
  Removes a file from the Compile nodes
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.RemoveContentFile(System.String)">
+<summary>
+ Removes a file from the Content nodes
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.FromFile(System.String)">
@@ -5958,14 +6656,29 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Finds duplicate files which are in &quot;Compile&quot; sections
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.FindDuplicateContentFiles">
+<summary>
+ Finds duplicate files which are in &quot;Content&quot; sections
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.AddFile(System.String)">
 <summary>
  Add a file to the Compile nodes
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.ProjectFile.AddContentFile(System.String)">
+<summary>
+ Add a file to the Content nodes
+</summary>
+</member>
 <member name="T:Fake.MSBuild.ProjectSystem.ProjectFile">
 <summary>
  A small abstraction over MSBuild project files.
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.RemoveContentNodesWithMissingFiles(System.String)">
+<summary>
+ Removes projects Content nodes that have Include attributes pointing to files missing from the file system.  Saves updated projects.
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.RemoveCompileNodesWithMissingFiles(System.String)">
@@ -5979,10 +6692,21 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  For F# projects it is also reporting unordered files.
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.FixProjectContentFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Compares the given projects to the template project and adds all missing content files to the projects if needed.
+ It also removes duplicate files from the project files.
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.FixProjectFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
  Compares the given projects to the template project and adds all missing files to the projects if needed.
  It also removes duplicate files from the project files.
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.RemoveDuplicateContentFiles(System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ It removes duplicate content files from the project files.
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.RemoveDuplicateFiles(System.Collections.Generic.IEnumerable{System.String})">
@@ -5990,9 +6714,20 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  It removes duplicate files from the project files.
 </summary>
 </member>
+<member name="M:Fake.MSBuild.ProjectSystem.FixMissingContentFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Compares the given projects to the template project and adds all missing files to the projects if needed.
+</summary>
+</member>
 <member name="M:Fake.MSBuild.ProjectSystem.FixMissingFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
  Compares the given projects to the template project and adds all missing files to the projects if needed.
+</summary>
+</member>
+<member name="M:Fake.MSBuild.ProjectSystem.findMissingContentFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Compares the given project files againts the template project and returns which files are missing.
+ For F# projects it is also reporting unordered files.
 </summary>
 </member>
 <member name="M:Fake.MSBuild.ProjectSystem.findMissingFiles(System.String,System.Collections.Generic.IEnumerable{System.String})">
@@ -6018,7 +6753,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 </member>
 <member name="M:Fake.MSBuild.SpecsRemovement.Nothing``2(``0,``1)">
 <summary>
- A Convetion which matches nothing
+ A Convention which matches nothing
 </summary>
 </member>
 <member name="M:Fake.MSBuild.SpecsRemovement.AllSpecAndTestDataFiles(System.String,System.String)">
@@ -6104,17 +6839,35 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 </member>
 <member name="M:Fake.MSBuildHelper.BuildWebsites(System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
- Builds the given web project files in debug mode and copies them to the given websiteDir.
+ Builds the given web project files with debug configuration and copies them to the given websiteDir.
  ## Parameters
   - `outputPath` - The output path.
   - `projectFiles` - The project file paths.
 </summary>
 </member>
-<member name="M:Fake.MSBuildHelper.BuildWebsite(System.String,System.String)">
+<member name="M:Fake.MSBuildHelper.BuildWebsitesConfig(System.String,System.String,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
- Builds the given web project file in debug mode and copies it to the given websiteDir.
+ Builds the given web project files in specified configuration and copies them to the given outputPath.
  ## Parameters
   - `outputPath` - The output path.
+  - `configuration` - MSBuild configuration.
+  - `projectFiles` - The project file paths.
+</summary>
+</member>
+<member name="M:Fake.MSBuildHelper.BuildWebsite(System.String,System.String)">
+<summary>
+ Builds the given web project file with debug configuration and copies it to the given outputPath.
+ ## Parameters
+  - `outputPath` - The output path.
+  - `projectFile` - The project file path.
+</summary>
+</member>
+<member name="M:Fake.MSBuildHelper.BuildWebsiteConfig(System.String,System.String,System.String)">
+<summary>
+ Builds the given web project file in the specified configuration and copies it to the given outputPath.
+ ## Parameters
+  - `outputPath` - The output path.
+  - `configuration` - MSBuild configuration.
   - `projectFile` - The project file path.
 </summary>
 </member>
@@ -7412,6 +8165,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Option type for selecting one command
 </summary>
 </member>
+<member name="P:Fake.OctoTools.PushOptions.ReplaceExisting">
+<summary>
+ if the package already exists, should this package overwrite it?
+</summary>
+</member>
 <member name="P:Fake.OctoTools.DeleteReleaseOptions.MaxVersion">
 <summary>
  Maximum (inclusive) version number for the range of versions to delete
@@ -7449,6 +8207,17 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <summary>
  Specifies maximum time that deployment can take
  (default: 10 minutes)
+</summary>
+</member>
+<member name="P:Fake.OctoTools.DeployReleaseOptions.Progress">
+<summary>
+ Show progress of the deployment.
+ (Sets --waitfordeployment and --norawlog to true.)
+</summary>
+</member>
+<member name="P:Fake.OctoTools.DeployReleaseOptions.NoRawLog">
+<summary>
+ Don&apos;t print the raw log of failed tasks
 </summary>
 </member>
 <member name="P:Fake.OctoTools.DeployReleaseOptions.WaitForDeployment">
@@ -7565,6 +8334,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="M:Fake.OctoTools.commandLine(Fake.OctoTools.OctoCommand)">
 <summary>
  Maps a command to string input for the octopus tools cli.
+</summary>
+</member>
+<member name="M:Fake.OctoTools.pushCommandLine(Fake.OctoTools.PushOptions)">
+<summary>
+ [omit]
 </summary>
 </member>
 <member name="M:Fake.OctoTools.serverCommandLine(Fake.OctoTools.OctoServerOptions)">
@@ -8046,6 +8820,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Contains functions which allow to deal with permissions.
 </summary>
 </member>
+<member name="P:Fake.PicklesHelper.PicklesParams.IncludeExperimentalFeatures">
+<summary>
+ Option which allows to enable some experimental features
+</summary>
+</member>
 <member name="P:Fake.PicklesHelper.PicklesParams.ErrorLevel">
 <summary>
  Option which allows to specify if failure of pickles should break the build.
@@ -8163,11 +8942,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  - `SystemUnderTestVersion` - `None`
  - `TimeOut` - 5 minutes
  - `ErrorLevel` - `Error`
+ - `IncludeExperimentalFeatures` - `None` 
 </summary>
 </member>
 <member name="T:Fake.PicklesHelper">
 <summary>
- Contains tasks to run the [Pickles](http://http://www.picklesdoc.com/) living documentation generator
+ Contains tasks to run the [Pickles](http://www.picklesdoc.com/) living documentation generator
 </summary>
 </member>
 <member name="M:Fake.ProcessHelper.Shell.Exec(System.String,Microsoft.FSharp.Core.FSharpOption{System.String},Microsoft.FSharp.Core.FSharpOption{System.String})">
@@ -8619,6 +9399,24 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.ProcessTestRunner">
 <summary>
  Allows to execute processes as unit tests.
+</summary>
+</member>
+<member name="M:Fake.PsExecHelper.execRemote(System.String,System.String,System.String,System.String,System.String,System.TimeSpan)">
+<summary>
+ Use Sysinternals PsExec to execute a process on a remote machine.
+ ## Parameters
+
+ - `host` - The hostname of the machine to connect to.
+ - `username` - A username valid for connecting to the remote machine.
+ - `password` - The cleartext password of the given user.
+ - `exe` - The path to the file that is to be executed.
+ - `inputs` - The command-line arguments to pass to the remote process.
+ - `timeOut` - The timeout for PsExec.
+</summary>
+</member>
+<member name="T:Fake.PsExecHelper">
+<summary>
+ Contains functions for working with Sysinternals PsExec
 </summary>
 </member>
 <member name="T:Fake.REST.PostMethod">
@@ -9460,6 +10258,49 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Conatins a task which allows to perform file copies using [SCP](http://en.wikipedia.org/wiki/Secure_copy), which is based on the Secure Shell (SSH) protocol.
 </summary>
 </member>
+<member name="P:Fake.SSHHelper.SSHParams.RemoteUser">
+<summary>
+ remote User
+</summary>
+</member>
+<member name="P:Fake.SSHHelper.SSHParams.PrivateKeyPath">
+<summary>
+ Path of the private key file (optional)
+</summary>
+</member>
+<member name="P:Fake.SSHHelper.SSHParams.ToolPath">
+<summary>
+ Path of the scp.exe 
+</summary>
+</member>
+<member name="T:Fake.SSHHelper.SSHParams">
+<summary>
+ The SSH parameter type.
+</summary>
+</member>
+<member name="M:Fake.SSHHelper.SSH(Microsoft.FSharp.Core.FSharpFunc{Fake.SSHHelper.SSHParams,Fake.SSHHelper.SSHParams},System.String)">
+<summary>
+ Performs a command via SSH.
+ ## Parameters
+
+  - `setParams` - Function used to manipulate the default SSHParams value.
+  - `command` - The target path. Can be something like user@host:directory/TargetFile or a local path.
+
+ ## Sample
+
+     SSH (fun p -&gt; { p with ToolPath = &quot;tools/ssh.exe&quot; }) command
+</summary>
+</member>
+<member name="P:Fake.SSHHelper.SSHDefaults">
+<summary>
+ The SSH default parameters
+</summary>
+</member>
+<member name="T:Fake.SSHHelper">
+<summary>
+ Conatins a task which allows to perform SSH operations
+</summary>
+</member>
 <member name="P:Fake.SemVerHelper.SemVerInfo.Build">
 <summary>
  The optional build no.
@@ -9498,9 +10339,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 
      parse &quot;1.0.0-rc.1&quot;     &lt; parse &quot;1.0.0&quot;          // true
      parse &quot;1.2.3-alpha&quot;    &gt; parse &quot;1.2.2&quot;          // true
-     parse &quot;1.2.3-alpha2&quot;   &gt; parse &quot;1.2.3-alpha&quot;    // true
-     parse &quot;1.2.3-alpha002&quot; &gt; parse &quot;1.2.3-alpha1&quot;   // true
-     parse &quot;1.5.0-beta.2&quot;   &gt; parse &quot;1.5.0-rc.1&quot;     // false
+     parse &quot;1.2.3-alpha2&quot;   &gt; parse &quot;1.2.3-alpha&quot;    // true, but only because of lexical compare
+     parse &quot;1.2.3-alpha002&quot; &gt; parse &quot;1.2.3-alpha1&quot;   // false, due to lexical compare
+     parse &quot;1.5.0-beta.2&quot;   &gt; parse &quot;1.5.0-rc.1&quot;     // false, due to lexical compare of first prerelease identitifer
+     parse &quot;1.5.0-beta.2&quot;   &gt; parse &quot;1.5.0-beta.3&quot;   // true, due to numeric compare of second prerelease identitifer
+     parse &quot;1.5.0-0123.001&quot; &lt; parse &quot;1.5.0-0123.002&quot; // true, due to numeric compare of second prerelease identifier
+     parse &quot;1.0.0+lol&quot;      = parse &quot;1.0.0&quot;          // true, because build identifiers do not influence comparison
 </summary>
 </member>
 <member name="M:Fake.SemVerHelper.isValidSemVer(System.String)">
@@ -9702,6 +10546,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  The signtool will be search in the toolPath.
 </summary>
 </member>
+<member name="M:Fake.SignToolHelper.AppendSignature(System.String,Fake.SignToolHelper.SignParams,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Appends a SHA 256 signature to assemblies according to the settings specified in the parameters using signtool.exe.
+ This will be looked up using the toolsPath parameter.
+</summary>
+</member>
 <member name="M:Fake.SignToolHelper.Sign(System.String,Fake.SignToolHelper.SignParams,System.Collections.Generic.IEnumerable{System.String})">
 <summary>
  Signs assemblies according to the settings specified in the parameters using signtool.exe.
@@ -9897,9 +10747,18 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  The supported commands of Sonar Qube. It is called with Begin before compilation, and End after compilation.
 </summary>
 </member>
+<member name="M:Fake.SonarQubeHelper.SonarQubeEnd">
+<summary>
+ This task can be used to run the end command of [Sonar Qube](http://sonarqube.org/) on a project.
+
+ ## Sample
+   SonarQubeEnd
+
+</summary>
+</member>
 <member name="M:Fake.SonarQubeHelper.SonarQube(Fake.SonarQubeHelper.SonarQubeCall,Microsoft.FSharp.Core.FSharpFunc{Fake.SonarQubeHelper.SonarQubeParams,Fake.SonarQubeHelper.SonarQubeParams})">
 <summary>
- This task to can be used to run [Sonar Qube](http://conarqube.org/) on a project.
+ This task to can be used to run [Sonar Qube](http://sonarqube.org/) on a project.
  ## Parameters
 
   - `call` - Begin or End, to start analysis or finish it
@@ -9949,6 +10808,96 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="T:Fake.SpecFlowHelper">
 <summary>
  Contains a task which allows to run [SpecFlow](http://www.specflow.org/) tests.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.AdditionalSqlPackageProperties">
+<summary>
+ Additional configuration parameters required by sqlpackage.exe
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.RecreateDb">
+<summary>
+ Recreates the database from scratch on publish (rather than an in-place update). Defaults to false.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.DropObjectsNotInSource">
+<summary>
+ Drops objects in the destination that do not exist in the source. Defaults to false.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.BlockOnPossibleDataLoss">
+<summary>
+ Block deployment if data loss can occur. Defaults to true.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Timeout">
+<summary>
+ Timeout for deploy (defaults to 120 seconds).
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Destination">
+<summary>
+ Path to destination (path to DACPAC or Connection String).
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Source">
+<summary>
+ Path to source (path to DACPAC or Connection String).
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.Action">
+<summary>
+ Type of action to execute. Defaults to Deploy.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.DeployDbArgs.SqlPackageToolPath">
+<summary>
+ The path to SqlPackage.exe.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployDbArgs">
+<summary>
+ Configuration arguments for DacPac deploy
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction.Report">
+<summary>
+ Generate an XML report for the differences between two databases.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction.Script">
+<summary>
+ Generate a SQL script to sync two databases.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction.Deploy">
+<summary>
+ Generate and apply a synchronisation script between two databases.
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac.DeployAction">
+<summary>
+ The type of action to execute.
+</summary>
+</member>
+<member name="M:Fake.Sql.DacPac.deployDb(Microsoft.FSharp.Core.FSharpFunc{Fake.Sql.DacPac.DeployDbArgs,Fake.Sql.DacPac.DeployDbArgs})">
+<summary>
+ Deploys a SQL DacPac or database to another database or DacPac.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.defaultDeploymentArgs">
+<summary>
+ The default DacPac deployment arguments.
+</summary>
+</member>
+<member name="P:Fake.Sql.DacPac.PropertyKeys.sqlAzureDbSize">
+<summary>
+ When creating a new SQL Azure database, specifies the database service tier to use e.g. S2, P1
+</summary>
+</member>
+<member name="T:Fake.Sql.DacPac">
+<summary>
+ Contains helpers around deploying databases.
 </summary>
 </member>
 <member name="P:Fake.Squirrel.SquirrelParams.SigningSecret">
@@ -10027,7 +10976,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  ## Sample usage
 
      Target &quot;CreatePackage&quot; (fun _ -&gt;
-         SquirrelPack (fun p -&gt; { p with WorkingDir = Some &quot;./tmp&quot; }) &quot;./my.nuget&quot;
+         SquirrelPack (fun p -&gt; { p with WorkingDir = Some &quot;./tmp&quot; }) &quot;./my.nupkg&quot;
      )
 </summary>
 </member>
@@ -10046,7 +10995,7 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  - `ToolPath` - The `squirrel.exe` path if it exists in a subdirectory of the current directory.
  - `TimeOut` - 10 minutes
  - `SignExecutable` - `None`
- - `SigningSecret` - `None`
+ - `SigningKeyFile` - `None`
  - `SigningSecret` - `None`
 </summary>
 </member>
@@ -10705,6 +11654,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  [omit]
 </summary>
 </member>
+<member name="M:Fake.TargetHelper.GetErrors">
+<summary>
+ Get Errors - Returns the errors that occured during execution
+</summary>
+</member>
 <member name="M:Fake.TargetHelper.Target(System.String,Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,Microsoft.FSharp.Core.Unit})">
 <summary>
  Creates a Target.
@@ -10724,35 +11678,35 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  The following sample creates 4 targets using TargetTemplateWithDependencies and hooks them into the build pipeline.
 
      // Create target creation functions
-     let createCompileTarget name strategy = 
-     TargetTemplateWithDependencies 
-         [&quot;Clean&quot;; &quot;ResolveDependencies&quot;] // dependencies to other targets 
-         (fun targetParameter -&gt; 
-           tracefn &quot;--- start compile product...&quot;  
+     let createCompileTarget name strategy =
+     TargetTemplateWithDependencies
+         [&quot;Clean&quot;; &quot;ResolveDependencies&quot;] // dependencies to other targets
+         (fun targetParameter -&gt;
+           tracefn &quot;--- start compile product...&quot;
            if targetParameter = &quot;a&quot; then
              tracefn &quot;    ---- Strategy A&quot;
            else
              tracefn &quot;    ---- Strategy B&quot;
-           tracefn &quot;--- finish compile product ...&quot;    
+           tracefn &quot;--- finish compile product ...&quot;
          ) name strategy
-     
-     let createTestTarget name dependencies filePattern = 
-       TargetTemplateWithDependencies 
-         dependencies 
-         (fun filePattern -&gt;   
+
+     let createTestTarget name dependencies filePattern =
+       TargetTemplateWithDependencies
+         dependencies
+         (fun filePattern -&gt;
            tracefn &quot;--- start compile tests ...&quot;
            !! filePattern
            |&gt; RunTests
            tracefn &quot;--- finish compile tests ...&quot;)
          name filePattern
-     
+
      // create some targets
      createCompileTarget &quot;C1&quot; &quot;a&quot;
      createCompileTarget &quot;C2&quot; &quot;b&quot;
-     
+
      createTestTarget &quot;T1&quot; [&quot;C1&quot;] &quot;**/C1/*.*&quot;
      createTestTarget &quot;T2&quot; [&quot;C1&quot;; &quot;C2&quot;] &quot;**/C?/*.*&quot;
-     
+
      // hook targets to normal build pipeline
      &quot;T1&quot; ==&gt; &quot;T2&quot; ==&gt; &quot;Test&quot;
 
@@ -11104,6 +12058,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="P:Fake.TeamCityHelper.sendTeamCityDotCoverHome">
 <summary>
  Sends the full path to the dotCover home folder to override the bundled dotCover to TeamCity
+</summary>
+</member>
+<member name="M:Fake.TeamCityHelper.sendTeamCityDotNetCoverageImportForTool(System.String,Fake.TeamCityHelper.TeamCityDotNetCoverageTool)">
+<summary>
+ Sends an dotcover, partcover, ncover or ncover3 results filename to TeamCity    
 </summary>
 </member>
 <member name="M:Fake.TeamCityHelper.sendTeamCityDotNetCoverageImport(System.String)">
@@ -11958,6 +12917,12 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Traces the message to the console
 </summary>
 </member>
+<member name="M:Fake.TraceHelper.traceStartTaskUsing(System.String,System.String)">
+<summary>
+ Traces the begin of a task and closes it again after disposing of the return value
+ (call it with &apos;use&apos;)
+</summary>
+</member>
 <member name="M:Fake.TraceHelper.traceEndTask(System.String,System.String)">
 <summary>
  Traces the end of a task
@@ -12707,6 +13672,71 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
   - `assemblyFile` - The assembly file path.
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.HeatParams.VariableName">
+<summary>
+ Substitute File/@Source=&quot;SourceDir&quot; with a preprocessor or a wix variable  (Parameter: -var)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.ComponentGroupName">
+<summary>
+ Component group name, cannot contain spaces. (Parameter: -cg)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.DirectoryReference">
+<summary>
+ Directory reference to root directories, cannot contains spaces. (Parameter: -dr)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressUniqueIds">
+<summary>
+ Suppress unique identifiers for files, components, &amp; directories.(Parameter: -suid)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressRegistry">
+<summary>
+ Suppress registry harvesting. (Parameter: -sreg)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressRootDirectory">
+<summary>
+ Suppress harvesting the root directory as an element. (Parameter: -srd)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressDirectoryFragments">
+<summary>
+ Suppress generation of fragments for directories and components. (Parameter: -sfrag)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.SupressComElements">
+<summary>
+ Suppress COM elements. (Parameter: -scom)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.GenerateGuidNow">
+<summary>
+ Generate guids now. All components are given a guid when heat is run. (Parameter: -gg)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.AutoGenerateGuid">
+<summary>
+ Auto generate component guids at compile time, e.g. set Guid=&quot;*&quot;. (Parameter: -ag)
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.TimeOut">
+<summary>
+ Timeout for the call to Heat
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatParams.ToolDirectory">
+<summary>
+ Directory that contains the Heat tool
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.Script.Platform">
+<summary>
+ Specify architecture of package. For 64Bit Setups set ProgramFilesFolder to ProgramFiles64, package platform to X64, all components to Win64 = yes and all files&apos; processorArchitecture to X64.
+</summary>
+</member>
 <member name="P:Fake.WiXHelper.Script.CustomReplacements">
 <summary>
  You can add custom replacements for the wix xml here.
@@ -12735,6 +13765,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
 <member name="P:Fake.WiXHelper.Script.Components">
 <summary>
  Nest Components in here
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.Script.DirectoryRefs">
+<summary>
+ You can nest DirectoryRefs in here
 </summary>
 </member>
 <member name="P:Fake.WiXHelper.Script.Directories">
@@ -13101,6 +14136,11 @@ Partial validation for folder name, based on http://msdn.microsoft.com/en-us/lib
  Used in WiXCustomAction for determing when to run the custom action
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.WiXScript.Platform">
+<summary>
+ Specify architecture of package. For 64Bit Setups set ProgramFilesFolder to ProgramFiles64, package platform to X64, all components to Win64 = yes and all files&apos; processorArchitecture to X64.
+</summary>
+</member>
 <member name="P:Fake.WiXHelper.WiXScript.ActionSequences">
 <summary>
  You can nest InstallExecuteSequence actions in here
@@ -13318,6 +14358,11 @@ hidden
  WiX parameter type
 </summary>
 </member>
+<member name="T:Fake.WiXHelper.WiXDirectoryRef">
+<summary>
+ Reference to a component for including it in a feature
+</summary>
+</member>
 <member name="T:Fake.WiXHelper.WiXDir">
 <summary>
  WiX Directories define a logical directory which can include components and files
@@ -13331,6 +14376,182 @@ hidden
 <member name="T:Fake.WiXHelper.WiXComponentRef">
 <summary>
  Reference to a component for including it in a feature
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Values">
+<summary>
+ You can nest child registry values here
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Keys">
+<summary>
+ You can nest child registry keys here
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.ForceDeleteOnUninstall">
+<summary>
+ Set this attribute to &apos;yes&apos; to remove the key with all its values and subkeys when the parent component is uninstalled
+ Note that this value is useful only if your program creates additional values or subkeys under this key and you want an uninstall to remove them
+ MSI already removes all values and subkeys that it creates, so this option just adds additional overhead to uninstall. The default is &quot;no&quot;
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.ForceCreateOnInstall">
+<summary>
+ Set this attribute to &apos;yes&apos; to create an empty key, if absent, when the parent component is installed
+ This value is needed only to create an empty key with no subkeys or values.
+ Windows Installer creates keys as needed to store subkeys and values. The default is &quot;no&quot;
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Key">
+<summary>
+ The localizable key for the registry value
+ If the parent element is a RegistryKey, this value may be omitted to use the path of the parent, or if its specified it will be appended to the path of the parent
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Root">
+<summary>
+ The predefined root key for the registry value
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryKey.Id">
+<summary>
+ Primary key used to identify this particular entry
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryKey">
+<summary>
+ Parameters for WiX RegistryKey
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Root">
+<summary>
+ The predefined root key for the registry value.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.KeyPath">
+<summary>
+ Set this attribute to &apos;yes&apos; to make this registry key the KeyPath of the parent component
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Key">
+<summary>
+ The localizable key for the registry value
+ If the parent element is a RegistryKey, this value may be omitted to use the path of the parent, or if its specified it will be appended to the path of the parent
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Type">
+<summary>
+ The type of the desired registry key
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Action">
+<summary>
+ The action that will be taken for this registry value
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Value">
+<summary>
+ The localizable registry value. 
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Name">
+<summary>
+ The localizable registry value name. If this attribute is not provided the default value for the registry key will be set instead
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXRegistryValue.Id">
+<summary>
+ The Id of this value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValue">
+<summary>
+ Parameters for WiX RegistryValue
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.MultiString">
+<summary>
+ The value is interpreted and stored as a multiple strings (REG_MULTI_SZ)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.Expandable">
+<summary>
+ The value is interpreted and stored as an expandable string (REG_EXPAND_SZ)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.Binary">
+<summary>
+ The value is interpreted and stored as a hexadecimal value (REG_BINARY)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.Integer">
+<summary>
+ The value is interpreted and stored as an integer (REG_DWORD)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType.String">
+<summary>
+ The value is interpreted and stored as a string (REG_SZ)
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueType">
+<summary>
+ The desired type of a registry key.
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction.Write">
+<summary>
+ Writes a registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction.Prepend">
+<summary>
+ Prepends the specified value(s) to a multiString registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction.Append">
+<summary>
+ Appends the specified value(s) to a multiString registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryValueAction">
+<summary>
+ The action that will be taken for a registry value
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKU">
+<summary>
+ Writes this registry key inside either the HKEY_USers registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKLM">
+<summary>
+ Writes this registry key inside either the HKEY_LOCAL_MACHINE registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKCU">
+<summary>
+ Writes this registry key inside either the HKEY_CURRENT_USER registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKCR">
+<summary>
+ Writes this registry key inside either the HKEY_CLASSES_ROOT registry root
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType.HKMU">
+<summary>
+ Writes this registry key inside either HKEY_LOCAL_MACHINE or HKEY_CURRENT_USER. Wix decides at install time based on wether or not this is an &quot;all users&quot; install
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXRegistryRootType">
+<summary>
+ Represents the registry root under which this key should be written
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceInstall.ServiceConfig">
+<summary>
+ Service configuration information for failure actions.
 </summary>
 </member>
 <member name="P:Fake.WiXHelper.WiXServiceInstall.ServiceDependencies">
@@ -13430,6 +14651,56 @@ hidden
  Service or group of services that must start before the parent service.
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.ThirdFailureActionType">
+<summary>
+ [Required] Action to take on the third failure of the service.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.ServiceName">
+<summary>
+ Required if not under a ServiceInstall element.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.SecondFailureActionType">
+<summary>
+ [Required] Action to take on the second failure of the service.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.RestartServiceDelayInSeconds">
+<summary>
+ If any of the three *ActionType attributes is &quot;restart&quot;, this specifies the number of seconds to wait before doing so.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.ResetPeriodInDays">
+<summary>
+ Number of days after which to reset the failure count to zero if there are no failures.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.RebootMessage">
+<summary>
+ If any of the three *ActionType attributes is &quot;reboot&quot;, this specifies the message to broadcast to server users before doing so.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.ProgramCommandLine">
+<summary>
+ If any of the three *ActionType attributes is &quot;runCommand&quot;, this specifies the command to run when doing so. This value is formatted.
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXServiceConfig.FirstFailureActionType">
+<summary>
+ [Required] Determines the type of the service failure action.
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.WiXServiceConfig">
+<summary>
+ Service configuration information for failure actions.
+</summary>
+</member>
+<member name="T:Fake.WiXHelper.ServiceFailureActionType">
+<summary>
+ Determines the type of the service failure action.
+</summary>
+</member>
 <member name="T:Fake.WiXHelper.ServiceInstallType.SystemDriver">
 <summary>
  A file system driver service. This value is not currently supported by the Windows Installer.
@@ -13520,9 +14791,44 @@ hidden
  Specifies whether an action occur on install, uninstall or both.
 </summary>
 </member>
+<member name="P:Fake.WiXHelper.WiXFile.ProcessorArchitecture">
+<summary>
+ File Architecture, either X64 or X86, defaults to X64
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXFile.Source">
+<summary>
+ File Path in WiX definition
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXFile.Name">
+<summary>
+ File Name in WiX definition
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXFile.Id">
+<summary>
+ File Id in WiX definition
+</summary>
+</member>
 <member name="T:Fake.WiXHelper.WiXFile">
 <summary>
  WiX File Element
+</summary>
+</member>
+<member name="M:Fake.WiXHelper.HarvestDirectory(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.HeatParams,Fake.WiXHelper.HeatParams},System.String,System.String)">
+<summary>
+ Harvests the contents of a Directory for use with Wix using the [Heat](http://wixtoolset.org/documentation/manual/v3/overview/heat.html) tool.
+ ## Parameters
+  - `setParams` - Function used to manipulate the Heat default parameters.
+  - `directory` - The path to the directory that will be harvested by Heat.
+  - `outputFile` - The output file path given to Heat.
+
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.HeatDefaulParams">
+<summary>
+ Default values for the Heat harvesting
 </summary>
 </member>
 <member name="M:Fake.WiXHelper.WiX(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXParams,Fake.WiXHelper.WiXParams},System.String,System.String)">
@@ -13719,6 +15025,7 @@ hidden
                                 UIRefs = uiRef1.ToString() + uiRef2.ToString()
                                 WiXVariables = wiXLicense.ToString()
                                 Directories = directories
+                                DirectoryRefs = directoryrefs
                                 BuildNumber = &quot;1.0.0&quot;
                                 Features = rootFeature.ToString()
                                 CustomActions = action1.ToString() + action2.ToString()
@@ -13872,7 +15179,7 @@ hidden
  Use this to attach service installs to your components.          
 </summary>
 </member>
-<member name="M:Fake.WiXHelper.bulkComponentCreationAsSubDir(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo)">
+<member name="M:Fake.WiXHelper.bulkComponentCreationAsSubDir(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo,Fake.WiXHelper.Architecture)">
 <summary>
  Creates WiX component with directories and files from the given DirectoryInfo
  The function will create one component for each file [best practice](https://support.microsoft.com/de-de/kb/290997/en-us)
@@ -13881,7 +15188,7 @@ hidden
  The components are embedded into the passed in root directory.
 </summary>
 </member>
-<member name="M:Fake.WiXHelper.bulkComponentCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo)">
+<member name="M:Fake.WiXHelper.bulkComponentCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo,Fake.WiXHelper.Architecture)">
 <summary>
  Creates WiX component with directories and files from the given DirectoryInfo
  The function will create one component for each file [best practice](https://support.microsoft.com/de-de/kb/290997/en-us)
@@ -13890,7 +15197,7 @@ hidden
  You can use the getComponentIdsFromWiXString function for getting all created component refs and adding them to features.
 </summary>
 </member>
-<member name="M:Fake.WiXHelper.bulkComponentTreeCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},Microsoft.FSharp.Core.FSharpFunc{System.IO.DirectoryInfo,System.Boolean},System.IO.DirectoryInfo)">
+<member name="M:Fake.WiXHelper.bulkComponentTreeCreation(Microsoft.FSharp.Core.FSharpFunc{System.IO.FileInfo,System.Boolean},Microsoft.FSharp.Core.FSharpFunc{System.IO.DirectoryInfo,System.Boolean},System.IO.DirectoryInfo,Fake.WiXHelper.Architecture)">
 <summary>
  Creates a WiX directory and component hierarchy from the given DirectoryInfo
  The function will create one component for each file [best practice](https://support.microsoft.com/de-de/kb/290997/en-us)
@@ -13930,6 +15237,16 @@ hidden
 get component refs from a directory component hierarchy
 </summary>
 </member>
+<member name="M:Fake.WiXHelper.generateDirectoryRef(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXDirectoryRef,Fake.WiXHelper.WiXDirectoryRef})">
+<summary>
+ Use this for generating component refs
+</summary>
+</member>
+<member name="P:Fake.WiXHelper.WiXDirectoryRefDefaults">
+<summary>
+ Defaults for component ref
+</summary>
+</member>
 <member name="M:Fake.WiXHelper.generateComponentRef(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXComponentRef,Fake.WiXHelper.WiXComponentRef})">
 <summary>
  Use this for generating component refs
@@ -13938,6 +15255,45 @@ get component refs from a directory component hierarchy
 <member name="P:Fake.WiXHelper.WiXComponentRefDefaults">
 <summary>
  Defaults for component ref
+</summary>
+</member>
+<member name="M:Fake.WiXHelper.generateRegistryKey(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXRegistryKey,Fake.WiXHelper.WiXRegistryKey})">
+<summary>
+ Generates a registry key based on the given parameters, use toString on it when embedding it
+ You can pass other registry keys and values into RegistryKeys or RegistryValues for making a hierarchy
+ ## Parameters
+  - `setParams` - Function used to manipulate the WiX default parameters.
+
+ ## Sample
+ let key = generateRegistryKey(fun k -&gt;
+                                 {k with
+                                   Id = &quot;KeyId&quot;
+                                   Key = &quot;SomeKey&quot;
+                                   Root = Some WiXRegistryRootType.HKCR
+                                   ForceCreateOnInstall = YesOrNo.Yes
+                                   ForceDeleteOnUninstall = YesOrNo.No
+                                   Keys = someChildKeys
+                                   Values = someChildValues
+                                 })
+</summary>
+</member>
+<member name="M:Fake.WiXHelper.generateRegistryValue(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXRegistryValue,Fake.WiXHelper.WiXRegistryValue})">
+<summary>
+ Generates a registry value based on the given parameters, use toString on it when embedding it
+ ## Parameters
+  - `setParams` - Function used to manipulate the WiX default parameters.
+
+ ## Sample
+ let registryValue = generateRegistryValue(fun v -&gt; 
+                                               {v with
+                                                   Id = &quot;asdasd&quot;
+                                                   Name = &quot;Something&quot;
+                                                   Key = &quot;Somewhere&quot;
+                                                   Root = Some WiXRegistryRootType.HKU
+                                                   Type = WiXRegistryValueType.Integer
+                                                   KeyPath = YesOrNo.No
+                                                   Value = &quot;2&quot;
+                                               })
 </summary>
 </member>
 <member name="M:Fake.WiXHelper.generateServiceInstall(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXServiceInstall,Fake.WiXHelper.WiXServiceInstall})">
@@ -13953,6 +15309,11 @@ get component refs from a directory component hierarchy
 <member name="M:Fake.WiXHelper.generateServiceDependency(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXServiceDependency,Fake.WiXHelper.WiXServiceDependency})">
 <summary>
  Use this for generating service dependencies
+</summary>
+</member>
+<member name="M:Fake.WiXHelper.generateServiceConfig(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXServiceConfig,Fake.WiXHelper.WiXServiceConfig})">
+<summary>
+ Use this for generating service configs
 </summary>
 </member>
 <member name="M:Fake.WiXHelper.generateServiceControl(Microsoft.FSharp.Core.FSharpFunc{Fake.WiXHelper.WiXServiceControl,Fake.WiXHelper.WiXServiceControl})">
@@ -14943,6 +16304,31 @@ get component refs from a directory component hierarchy
 <member name="M:Yaaf.FSharp.Scripting.Extensions.IFsiSession.EvalExpression``1(Yaaf.FSharp.Scripting.IFsiSession,System.String)">
 <summary>
  Evaluate the given expression and return its result.
+</summary>
+</member>
+<member name="M:Yaaf.FSharp.Scripting.Extensions.IFsiSession.EvalScriptAsInteraction(Yaaf.FSharp.Scripting.IFsiSession,System.String)">
+<summary>
+ See https://github.com/Microsoft/visualfsharp/issues/1392
+</summary>
+</member>
+<member name="M:Yaaf.FSharp.Scripting.Extensions.IFsiSession.EvalScriptAsInteractionWithOutput(Yaaf.FSharp.Scripting.IFsiSession,System.String)">
+<summary>
+ See https://github.com/Microsoft/visualfsharp/issues/1392
+</summary>
+</member>
+<member name="M:Yaaf.FSharp.Scripting.StringHelpers.String.splitUnescape(System.Char,System.String,System.String)">
+<summary>
+ Reproduces the original substrings from a string created with concatEscape.
+</summary>
+</member>
+<member name="M:Yaaf.FSharp.Scripting.StringHelpers.String.concatEscape(System.Char,System.String,System.Collections.Generic.IEnumerable{System.String})">
+<summary>
+ Returns a new string by connecting the given strings with the given separator.
+</summary>
+</member>
+<member name="M:Yaaf.FSharp.Scripting.StringHelpers.Tokenizer.create(System.Char,System.String)">
+<summary>
+ Returns a function who can convert a given source string to a token stream.
 </summary>
 </member>
 <member name="M:Yaaf.FSharp.Scripting.CompilerServiceExtensions.Type.get_FSharpFullNameWithTypeArgs(System.Type)">

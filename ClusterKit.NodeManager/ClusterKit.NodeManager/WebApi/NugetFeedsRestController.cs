@@ -1,23 +1,32 @@
-﻿namespace ClusterKit.NodeManager.WebApi
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="NugetFeedsRestController.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   All rest actions with <see cref="SeedAddress" />
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.NodeManager.WebApi
 {
     using System.Web.Http;
 
     using Akka.Actor;
 
     using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.Web.CRUDS;
+    using ClusterKit.Web.Rest;
 
     using JetBrains.Annotations;
 
     /// <summary>
     /// All rest actions with <see cref="SeedAddress"/>
     /// </summary>
-    [RoutePrefix("nodemanager/nugetFeed")]
+    [RoutePrefix("api/1.x/clusterkit/nodemanager/nugetFeed")]
     [UsedImplicitly]
-    public class NugetFeedsRestController : BaseCrudController<NugetFeed, int>
+    public class NugetFeedsRestController : BaseRestController<NugetFeed, int>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SeedAddressesRestController"/> class.
+        /// Initializes a new instance of the <see cref="NugetFeedsRestController"/> class.
         /// </summary>
         /// <param name="system">
         /// The system.

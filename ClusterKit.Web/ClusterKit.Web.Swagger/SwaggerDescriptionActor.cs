@@ -41,8 +41,8 @@ namespace ClusterKit.Web.Swagger
             Cluster.Get(Context.System)
                 .Subscribe(
                     this.Self,
-                    ClusterEvent.InitialStateAsEvents,
-                    new[] { typeof(ClusterEvent.MemberUp) });
+                    ClusterEvent.InitialStateAsEvents, 
+                    typeof(ClusterEvent.MemberUp));
 
             this.Receive<ClusterEvent.MemberUp>(
                 m => m.Member.Roles.Contains("Web.Swagger.Monitor"),
@@ -52,7 +52,7 @@ namespace ClusterKit.Web.Swagger
         }
 
         /// <summary>
-        /// Proccesses the swagger description request
+        /// Processes the swagger description request
         /// </summary>
         private void OnNodeDescriptionRequest()
         {

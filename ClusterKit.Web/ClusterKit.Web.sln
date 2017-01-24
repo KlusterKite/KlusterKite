@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web", "ClusterKit.Web\ClusterKit.Web.csproj", "{477B201A-A30C-4360-B56A-6F61C049BB04}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E142B59E-0646-4EAB-970E-D6175A16AC3E}"
 	ProjectSection(SolutionItems) = preProject
+		..\build.config.fsx = ..\build.config.fsx
 		..\build.fsx = ..\build.fsx
 		..\nuget.config = ..\nuget.config
 		..\Settings.StyleCop = ..\Settings.StyleCop
@@ -28,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Swagger.Mess
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Descriptor", "ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj", "{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.CRUDS", "ClusterKit.Web.CRUDS\ClusterKit.Web.CRUDS.csproj", "{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.Web.Rest", "ClusterKit.Web.Rest\ClusterKit.Web.Rest.csproj", "{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

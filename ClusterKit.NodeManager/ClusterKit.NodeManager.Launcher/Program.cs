@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿ // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -85,7 +85,7 @@ namespace ClusterKit.NodeManager.Launcher
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine(@"workingDirectory does not extist");
+                    Console.WriteLine(@"workingDirectory does not exist");
                     this.IsValid = false;
                 }
             }
@@ -98,7 +98,7 @@ namespace ClusterKit.NodeManager.Launcher
                 this.IsValid = false;
             }
 
-            this.ContainerType = ConfigurationManager.AppSettings["containerType"];
+            this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE") ?? ConfigurationManager.AppSettings["containerType"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
                 Console.WriteLine(@"containerType is not configured");
@@ -109,7 +109,7 @@ namespace ClusterKit.NodeManager.Launcher
         /// <summary>
         /// Action to be done after node stops
         /// </summary>
-        public enum EnStopMode
+        private enum EnStopMode
         {
             /// <summary>
             /// Will clean node data and request cluster for new node configuration
@@ -123,34 +123,34 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
-        /// Url of cluster configuration service
+        /// Gets the url of cluster configuration service
         /// </summary>
-        public Uri ConfigurationUrl { get; }
+        private Uri ConfigurationUrl { get; }
 
         /// <summary>
-        /// Type of container assigned to current machine
+        /// Gets the type of container assigned to current machine
         /// </summary>
-        public string ContainerType { get; }
+        private string ContainerType { get; }
 
         /// <summary>
-        /// Gets the value indicating that configuration is correct
+        /// Gets a value indicating whether that configuration is correct
         /// </summary>
-        public bool IsValid { get; } = true;
+        private bool IsValid { get; } = true;
 
         /// <summary>
-        /// Action to be done after node stops
+        /// Gets the action to be done after node stops
         /// </summary>
-        public EnStopMode StopMode { get; } = EnStopMode.CleanRestart;
+        private EnStopMode StopMode { get; } = EnStopMode.CleanRestart;
 
         /// <summary>
         /// Gets current node unique identification number
         /// </summary>
-        public Guid Uid { get; } = Guid.NewGuid();
+        private Guid Uid { get; } = Guid.NewGuid();
 
         /// <summary>
-        /// Current working directory. All packages and new service will be stored here.
+        /// Gets the current working directory. All packages and new service will be stored here.
         /// </summary>
-        public string WorkingDirectory { get; }
+        private string WorkingDirectory { get; }
 
         /// <summary>
         /// Checks the ability to create and write to a file in the supplied directory.
@@ -231,29 +231,28 @@ namespace ClusterKit.NodeManager.Launcher
             while (response.StatusCode == HttpStatusCode.ServiceUnavailable)
             {
                 var retryHeader = response.Headers.FirstOrDefault(
-                    h => "Retry - After".Equals(h.Name, StringComparison.InvariantCultureIgnoreCase));
+                    h => "Retry-After".Equals(h.Name, StringComparison.InvariantCultureIgnoreCase));
                 int timeToWait;
                 if (!int.TryParse(retryHeader?.Value?.ToString(), out timeToWait))
                 {
                     timeToWait = 60;
                 }
 
-                Console.WriteLine($"Config service anavailable, retrying in {timeToWait} seconds...");
+                Console.WriteLine($@"Config service anavailable, retrying in {timeToWait} seconds...");
                 Thread.Sleep(TimeSpan.FromSeconds(timeToWait));
                 response = client.Execute<NodeStartUpConfiguration>(request);
             }
 
-            bool usedFallBack;
             if (response.StatusCode != HttpStatusCode.OK || response.Data == null)
             {
-                usedFallBack = true;
                 var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
                 if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
                 {
                     throw new Exception(
-                        "Could not get configuration from service and there is no fallback configuration");
+                        $"Could not get configuration (response: {response.StatusCode}) from service and there is no fallback configuration");
                 }
 
+                Console.WriteLine(@"Could not get configuration, using fallback...");
                 var serializer = new JsonSerializer();
 
                 using (var file = File.OpenRead(fallBackConfiguration))
@@ -265,24 +264,43 @@ namespace ClusterKit.NodeManager.Launcher
             }
             else
             {
-                usedFallBack = false;
                 config = response.Data;
             }
 
-            Console.WriteLine($"Got {config.NodeTemplate} configuration");
+            Console.WriteLine($@"Got {config.NodeTemplate} configuration");
             this.CleanWorkingDir();
             this.PrepareNuGetConfig(config);
             this.InstallPackages(config);
-            this.CreateService(config, usedFallBack);
+            this.CreateService(config);
             this.FixAssemblyVersions();
         }
 
         /// <summary>
-        /// Createst runnable service from installed packages
+        /// Copy directory
+        /// </summary>
+        /// <param name="source">The source directory</param>
+        /// <param name="target">The destination directory</param>
+        private void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+        {
+            var subDirectories = target.GetDirectories();
+            foreach (var dir in source.GetDirectories())
+            {
+                var directoryInfo = subDirectories.FirstOrDefault(d => d.Name == dir.Name)
+                                    ?? target.CreateSubdirectory(dir.Name);
+                this.CopyFilesRecursively(dir, directoryInfo);
+            }
+
+            foreach (var file in source.GetFiles())
+            {
+                file.CopyTo(Path.Combine(target.FullName, file.Name), true);
+            }
+        }
+
+        /// <summary>
+        /// Creates the runnable service from installed packages
         /// </summary>
         /// <param name="configuration">Current node configuration</param>
-        /// <param name="usedFallback">Value indicating whether configuration was received from cluster or used fallbcack for cluster start</param>
-        private void CreateService(NodeStartUpConfiguration configuration, bool usedFallback)
+        private void CreateService(NodeStartUpConfiguration configuration)
         {
             Console.WriteLine(@"Creating service");
             var serviceDir = Path.Combine(this.WorkingDirectory, "service");
@@ -309,30 +327,28 @@ namespace ClusterKit.NodeManager.Launcher
 
                 var endDir =
                     matches
-                        .Select(m => specificDirs.FirstOrDefault(d => m.IsMatch(d)))
+                        .Select(m => specificDirs.FirstOrDefault(m.IsMatch))
                         .FirstOrDefault(d => d != null);
 
                 endDir = endDir != null ? Path.Combine(directory, "lib", endDir) : Path.Combine(directory, "lib");
-                Console.WriteLine($"Installing {Path.GetDirectoryName(directory)} from {endDir}");
-                foreach (var file in Directory.GetFiles(endDir))
-                {
-                    File.Copy(file, Path.Combine(this.WorkingDirectory, "service", Path.GetFileName(file)), true);
-                }
+                Console.WriteLine($@"Installing {Path.GetDirectoryName(directory)} from {endDir}");
+                this.CopyFilesRecursively(new DirectoryInfo(endDir), new DirectoryInfo(Path.Combine(this.WorkingDirectory, "service")));
             }
 
             File.WriteAllText(Path.Combine(serviceDir, "akka.hocon"), configuration.Configuration);
-            Console.WriteLine($"General configuration: \n {configuration.Configuration}");
+            Console.WriteLine($@"General configuration: \n {configuration.Configuration}");
 
             // cluster self-join is not welcomed
             var seeds = configuration.Seeds.ToList();
             string startConfig = $@"{{
+                ClusterKit.NodeManager.NodeTemplateVersion = {configuration.NodeTemplateVersion}
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}
                 ClusterKit.NodeManager.NodeId = { this.Uid }
                 akka.cluster.seed-nodes = [{string.Join(", ", seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
-            Console.WriteLine($"Start configuration: \n {startConfig}");
+            Console.WriteLine($@"Start configuration: \n {startConfig}");
         }
 
         /// <summary>
@@ -348,14 +364,14 @@ namespace ClusterKit.NodeManager.Launcher
             var documentElement = confDoc.DocumentElement;
             if (documentElement == null)
             {
-                Console.WriteLine($"Configuration file {configName} is broken");
+                Console.WriteLine($@"Configuration file {configName} is broken");
                 return;
             }
 
             documentElement = (XmlElement)documentElement.SelectSingleNode("/configuration");
             if (documentElement == null)
             {
-                Console.WriteLine($"Configuration file {configName} is broken");
+                Console.WriteLine($@"Configuration file {configName} is broken");
                 return;
             }
 
@@ -364,29 +380,29 @@ namespace ClusterKit.NodeManager.Launcher
 
             var nameTable = confDoc.NameTable;
             var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", uri);
+            const string Uri = "urn:schemas-microsoft-com:asm.v1";
+            namespaceManager.AddNamespace("urn", Uri);
 
             var assemblyBindingNode = runTimeNode.SelectSingleNode("./urn:assemblyBinding", namespaceManager)
-                                      ?? runTimeNode.AppendChild(confDoc.CreateElement("assemblyBinding", uri));
+                                      ?? runTimeNode.AppendChild(confDoc.CreateElement("assemblyBinding", Uri));
 
             foreach (var lib in Directory.GetFiles(dirName, "*.dll"))
             {
                 var parameters = AssemblyName.GetAssemblyName(lib);
                 var dependentNode =
-                    assemblyBindingNode.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
-                    ?? assemblyBindingNode.AppendChild(confDoc.CreateElement("dependentAssembly", uri));
+                    assemblyBindingNode?.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
+                    ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
 
                 dependentNode.RemoveAll();
-                var assemblyIdentityNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", uri));
+                var assemblyIdentityNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);
                 assemblyIdentityNode.SetAttribute("publicKeyToken", BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", "").ToLower(CultureInfo.InvariantCulture));
-                var bindingRedirectNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", uri));
+                var bindingRedirectNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
 
                 // Console.WriteLine($"{parameters.Name} {parameters.Version} {BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", "").ToLower(CultureInfo.InvariantCulture)}");
-                Console.WriteLine($"{parameters.Name} {parameters.Version}");
+                Console.WriteLine($@"{parameters.Name} {parameters.Version}");
             }
 
             confDoc.Save(configName);
@@ -398,24 +414,47 @@ namespace ClusterKit.NodeManager.Launcher
         /// <param name="configuration">The node configuration</param>
         private void InstallPackages(NodeStartUpConfiguration configuration)
         {
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<packages>\n</packages>\n");
+            // ReSharper disable PossibleNullReferenceException
+            var rootNode = xmlDocument.DocumentElement.SelectSingleNode("/packages");
             foreach (var package in configuration.Packages)
             {
-                Console.WriteLine($"Downloading {package}...");
-                using (var process = new Process())
-                {
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.WorkingDirectory = Path.GetFullPath(this.WorkingDirectory);
-                    process.StartInfo.FileName = "nuget.exe";
-                    process.StartInfo.Arguments =
-                        $"install {package} -PreRelease -NonInteractive -ConfigFile nuget.config -OutputDirectory packages -DisableParallelProcessing";
-                    process.Start();
-                    process.WaitForExit();
+                var packageNode = (XmlElement)rootNode.AppendChild(xmlDocument.CreateElement("package"));
+                packageNode.SetAttribute("id", package.Id);
+                packageNode.SetAttribute("version", package.Version);
+            }
 
-                    if (process.ExitCode != 0)
-                    {
-                        throw new Exception($"Could not install package {package}");
-                    }
+            xmlDocument.Save(Path.Combine(this.WorkingDirectory, "packages.config"));
+            using (var process = new Process())
+            {
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.WorkingDirectory = Path.GetFullPath(this.WorkingDirectory);
+                process.StartInfo.FileName = "nuget.exe";
+                process.StartInfo.Arguments =
+                    "install packages.config -PreRelease -NonInteractive -ConfigFile nuget.config -OutputDirectory packages -DisableParallelProcessing";
+                process.Start();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception("Could not install packages");
                 }
+            }
+
+            //Checking installation
+            var installedPackages = Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")).Select(Path.GetFileName).ToList();
+            var missedPackages = configuration.Packages
+                .Where(p => installedPackages.All(d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-[\\w\\d\\-]*)?$")))
+                .ToList();
+            foreach (var packageName in missedPackages)
+            {
+                Console.WriteLine($@"Package {packageName.Id} was not installed");
+            }
+
+            if (missedPackages.Any())
+            {
+                throw new Exception("Could not install packages");
             }
         }
 
@@ -425,11 +464,21 @@ namespace ClusterKit.NodeManager.Launcher
         private void LaunchNode()
         {
             Console.WriteLine(@"Starting node");
-            var process = new Process();
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.WorkingDirectory = Path.Combine(Path.GetFullPath(this.WorkingDirectory), "service");
-            process.StartInfo.FileName = Path.Combine(Path.GetFullPath(this.WorkingDirectory), "service", "ClusterKit.Core.Service.exe");
-            process.StartInfo.Arguments = "-config:start.hocon";
+            var process = new Process
+                              {
+                                  StartInfo =
+                                      {
+                                          UseShellExecute = false,
+                                          WorkingDirectory =
+                                              Path.Combine(Path.GetFullPath(this.WorkingDirectory), "service"),
+                                          FileName =
+                                              Path.Combine(
+                                                  Path.GetFullPath(this.WorkingDirectory),
+                                                  "service",
+                                                  "ClusterKit.Core.Service.exe"),
+                                          Arguments = "--config=start.hocon"
+                                      }
+                              };
             process.Start();
 
             process.WaitForExit();
@@ -445,6 +494,7 @@ namespace ClusterKit.NodeManager.Launcher
             var configPath = Path.Combine(this.WorkingDirectory, "nuget.config");
 
             File.Copy(
+                // ReSharper disable once AssignNullToNotNullAttribute
                 Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "nuget.exe"),
                 Path.Combine(this.WorkingDirectory, "nuget.exe"));
 
@@ -479,6 +529,7 @@ namespace ClusterKit.NodeManager.Launcher
                         {
                             this.ConfigureNode();
                             this.LaunchNode();
+                            Thread.Sleep(TimeSpan.FromSeconds(30));
                         }
                         catch (ThreadAbortException)
                         {
@@ -486,13 +537,13 @@ namespace ClusterKit.NodeManager.Launcher
                         }
                         catch (Exception exception)
                         {
-                            Console.WriteLine($"Failed to launch, {exception.Message}");
+                            Console.WriteLine($@"Failed to launch, {exception.Message}");
                             Console.WriteLine(exception.StackTrace);
                             Thread.Sleep(TimeSpan.FromSeconds(10));
                         }
                     }
                 default:
-                    Console.WriteLine("Unsupported stop mode");
+                    Console.WriteLine(@"Unsupported stop mode");
                     return;
             }
         }

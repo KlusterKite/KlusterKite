@@ -55,7 +55,7 @@ namespace ClusterKit.Web.Tests
                 this.ActorOfAsTestActorRef<WebDescriptorActor>(this.Sys.DI().Props<WebDescriptorActor>());
             */
             this.Sys.StartNameSpaceActorsFromConfiguration();
-
+            this.ExpectNoMsg();
             var response =
                 this.Sys.GetWebDescriptor(Cluster.Get(this.Sys).SelfAddress)
                     .Ask<WebDescriptionResponse>(new WebDescriptionRequest(), TimeSpan.FromMilliseconds(500))

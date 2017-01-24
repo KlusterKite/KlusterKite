@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.NodeManager.Client
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.NodeManager.Client
 {
     using Akka.Actor;
     using Akka.Configuration;
@@ -36,6 +45,7 @@
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<ILoggerConfigurator>().ImplementedBy<LoggerConfigurator>().LifestyleTransient());
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
         }

@@ -8,13 +8,14 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Linq;
-    using System.Runtime.CompilerServices;
 
     using Akka.Actor;
     using Akka.Cluster.Tools.Singleton;
     using Akka.Configuration;
     using Akka.DI.Core;
     using Akka.Event;
+
+    using Castle.Windsor;
 
     using JetBrains.Annotations;
 
@@ -24,78 +25,49 @@ namespace ClusterKit.Core
     [UsedImplicitly]
     public class NameSpaceActor : UntypedActor
     {
+        private readonly IWindsorContainer container;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NameSpaceActor"/> class.
         /// </summary>
-        public NameSpaceActor()
-        {
-            InitChildActorsFromConfig(NameSpaceActor.Context, this.Self.Path);
-        }
-
-        /// <summary>
-        /// Creates child actors according to current config
-        /// </summary>
-        /// <param name="context">Current actor's context</param>
-        /// <param name="actorPath">Current actor's path</param>
-        public static void InitChildActorsFromConfig(IActorContext context, ActorPath actorPath)
-        {
-            var config = Context.System.Settings.Config.GetConfig("akka.actor.deployment");
-            if (config == null)
-            {
-                return;
-            }
-
-            var namespacePathElements = actorPath.Elements.Skip(1).ToList();
-            foreach (var pair in config.AsEnumerable())
-            {
-                var key = pair.Key;
-
-                var path = key.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-                if (path.Length != namespacePathElements.Count + 1)
-                {
-                    continue;
-                }
-
-                if (namespacePathElements.Where((t, i) => path[i] != t).Any())
-                {
-                    continue;
-                }
-
-                var actorConfig = config.GetConfig(key);
-                EnActorType actorType;
-                if (!Enum.TryParse(actorConfig.GetString("actor-type"), out actorType))
-                {
-                    actorType = EnActorType.Simple;
-                }
-
-                var currentPath = "/" + string.Join("/", namespacePathElements);
-
-                switch (actorType)
-                {
-                    case EnActorType.Singleton:
-                        CreateSingletonActor(context, actorConfig, currentPath, path.Last());
-                        break;
-
-                    case EnActorType.SingletonProxy:
-                        CreateSingletonProxyActor(context, actorConfig, currentPath, path.Last());
-                        break;
-
-                    default:
-                        CreateSimpleActor(context, actorConfig, currentPath, path.Last());
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The on receive.
-        /// </summary>
-        /// <param name="message">
-        /// The message.
+        /// <param name="windsorContainer">
+        /// Dependency resolver
         /// </param>
-        protected override void OnReceive(object message)
+        public NameSpaceActor(IWindsorContainer windsorContainer)
         {
-            this.Unhandled(message);
+            this.container = windsorContainer;
+        }
+
+        /// <summary>
+        /// Creates cluster sharding actor from config
+        /// </summary>
+        /// <param name="context">Current actor context (will create child actor)</param>
+        /// <param name="actorConfig">Configuration to create from</param>
+        /// <param name="windsorContainer">Dependency resolver</param>
+        /// <param name="pathName">New actor's path name</param>
+        protected virtual void CreateShardingActor(
+            IActorContext context,
+            Config actorConfig,
+            IWindsorContainer windsorContainer,
+            string pathName)
+        {
+            context.ActorOf(Props.Create(() => new ShardingWrappperActor(windsorContainer, actorConfig)), pathName);
+        }
+
+        /// <summary>
+        /// Creates cluster sharding proxy actor from config
+        /// </summary>
+        /// <param name="context">Current actor context (will create child actor)</param>
+        /// <param name="actorConfig">Configuration to create from</param>
+        /// <param name="windsorContainer">Dependency resolver</param>
+        /// <param name="pathName">New actor's path name</param>
+        protected virtual void CreateShardingProxyActor(
+            IActorContext context,
+            Config actorConfig,
+            IWindsorContainer windsorContainer,
+            string pathName)
+        {
+            context.ActorOf(Props.Create(() => new ShardingProxyWrappperActor(windsorContainer, actorConfig)), pathName);
         }
 
         /// <summary>
@@ -103,11 +75,13 @@ namespace ClusterKit.Core
         /// </summary>
         /// <param name="context">Current actor context (will create child actor)</param>
         /// <param name="actorConfig">Configuration to create from</param>
+        /// <param name="windsorContainer">Dependency resolver</param>
         /// <param name="currentPath">Parent (current) actor path</param>
         /// <param name="pathName">New actor's path name</param>
-        private static void CreateSimpleActor(
+        protected virtual void CreateSimpleActor(
             IActorContext context,
             Config actorConfig,
+            IWindsorContainer windsorContainer,
             string currentPath,
             string pathName)
         {
@@ -127,7 +101,16 @@ namespace ClusterKit.Core
                         currentPath,
                         type.Name,
                         pathName);
-                context.ActorOf(Context.System.DI().Props(type), pathName);
+
+                if (type == typeof(NameSpaceActor))
+                {
+                    // this is done for tests, otherwise it would lead to CircularDependencyException
+                    context.ActorOf(Props.Create(() => new NameSpaceActor(windsorContainer)), pathName);
+                }
+                else
+                {
+                    context.ActorOf(Context.System.DI().Props(type), pathName);
+                }
             }
             else
             {
@@ -148,7 +131,7 @@ namespace ClusterKit.Core
         /// <param name="actorConfig">Configuration to create from</param>
         /// <param name="currentPath">Parent (current) actor path</param>
         /// <param name="pathName">New actor's path name</param>
-        private static void CreateSingletonActor(
+        protected virtual void CreateSingletonActor(
             IActorContext context,
             Config actorConfig,
             string currentPath,
@@ -224,7 +207,7 @@ namespace ClusterKit.Core
         /// <param name="actorConfig">Configuration to create from</param>
         /// <param name="currentPath">Parent (current) actor path</param>
         /// <param name="pathName">New actor's path name</param>
-        private static void CreateSingletonProxyActor(
+        protected virtual void CreateSingletonProxyActor(
             IActorContext context,
             Config actorConfig,
             string currentPath,
@@ -285,6 +268,87 @@ namespace ClusterKit.Core
                             actorConfig.GetTimeSpan("singleton-identification-interval", TimeSpan.FromSeconds(1), false),
                             actorConfig.GetInt("buffer-size", 2048))),
                 name: pathName);
+        }
+
+        /// <summary>
+        /// The on receive.
+        /// </summary>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        protected override void OnReceive(object message)
+        {
+            this.Unhandled(message);
+        }
+
+        protected override void PreStart()
+        {
+            base.PreStart();
+            this.InitChildActorsFromConfig(Context, this.Self.Path, this.container);
+        }
+
+        /// <summary>
+        /// Creates child actors according to current config
+        /// </summary>
+        /// <param name="context">Current actor's context</param>
+        /// <param name="actorPath">Current actor's path</param>
+        /// <param name="container">Dependency resolver</param>
+        private void InitChildActorsFromConfig(IActorContext context, ActorPath actorPath, IWindsorContainer container)
+        {
+            var config = Context.System.Settings.Config.GetConfig("akka.actor.deployment");
+            if (config == null)
+            {
+                return;
+            }
+
+            var namespacePathElements = actorPath.Elements.Skip(1).ToList();
+            foreach (var pair in config.AsEnumerable())
+            {
+                var key = pair.Key;
+
+                var path = key.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                if (path.Length != namespacePathElements.Count + 1)
+                {
+                    continue;
+                }
+
+                if (namespacePathElements.Where((t, i) => path[i] != t).Any())
+                {
+                    continue;
+                }
+
+                var actorConfig = config.GetConfig(key);
+                EnActorType actorType;
+                if (!Enum.TryParse(actorConfig.GetString("actor-type"), out actorType))
+                {
+                    actorType = EnActorType.Simple;
+                }
+
+                var currentPath = "/" + string.Join("/", namespacePathElements);
+
+                switch (actorType)
+                {
+                    case EnActorType.Singleton:
+                        this.CreateSingletonActor(context, actorConfig, currentPath, path.Last());
+                        break;
+
+                    case EnActorType.SingletonProxy:
+                        this.CreateSingletonProxyActor(context, actorConfig, currentPath, path.Last());
+                        break;
+
+                    case EnActorType.Sharding:
+                        this.CreateShardingActor(context, actorConfig, container, path.Last());
+                        break;
+
+                    case EnActorType.ShardingProxy:
+                        this.CreateShardingProxyActor(context, actorConfig, container, path.Last());
+                        break;
+
+                    default:
+                        this.CreateSimpleActor(context, actorConfig, container, currentPath, path.Last());
+                        break;
+                }
+            }
         }
     }
 }

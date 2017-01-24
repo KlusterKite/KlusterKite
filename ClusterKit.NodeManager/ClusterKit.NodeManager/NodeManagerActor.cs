@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationDbWorker.cs" company="ClusterKit">
+// <copyright file="NodeManagerActor.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Singleton actor perfoming all node configuration related database working
+//   Singleton actor performing all node configuration related work
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -20,16 +20,18 @@ namespace ClusterKit.NodeManager
     using Akka.Util.Internal;
 
     using ClusterKit.Core;
-    using ClusterKit.Core.Data;
     using ClusterKit.Core.Ping;
-    using ClusterKit.Core.Rest.ActionMessages;
     using ClusterKit.Core.Utils;
+    using ClusterKit.Data;
+    using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
 
     using JetBrains.Annotations;
+
+    using NuGet;
 
     /// <summary>
     /// Singleton actor performing all node configuration related work
@@ -50,7 +52,7 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        public const string PacakgeRepositoryUrlPath = "ClusterKit.NodeManager.PackageRepository";
+        public const string PackageRepositoryUrlPath = "ClusterKit.NodeManager.PackageRepository";
 
         /// <summary>
         /// List of node by templates
@@ -73,7 +75,7 @@ namespace ClusterKit.NodeManager
         private readonly TimeSpan fullClusterWaitTimeout;
 
         /// <summary>
-        /// After configuration request, it is assumed that new node of template shuld be up soon, and this is taken into account on subsequient configuration templates. This is timeout, after it it is supposed that something have gone wrong and that request is obsolete.
+        /// After configuration request, it is assumed that new node of template should be up soon, and this is taken into account on subsequent configuration templates. This is timeout, after it it is supposed that something have gone wrong and that request is obsolete.
         /// </summary>
         private readonly TimeSpan newNodeJoinTimeout;
 
@@ -88,7 +90,7 @@ namespace ClusterKit.NodeManager
         private readonly TimeSpan newNodeRequestDescriptionNotificationTimeout;
 
         /// <summary>
-        /// List of known node desciptions
+        /// List of known node descriptions
         /// </summary>
         private readonly Dictionary<Address, NodeDescription> nodeDescriptions = new Dictionary<Address, NodeDescription>();
 
@@ -103,9 +105,19 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<int, NugetFeed> nugetFeeds = new Dictionary<int, NugetFeed>();
 
         /// <summary>
+        /// Random number generator
+        /// </summary>
+        private readonly Random random = new Random();
+
+        /// <summary>
         /// List of pending node description requests
         /// </summary>
         private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications = new Dictionary<Address, Cancelable>();
+
+        /// <summary>
+        /// Roles leaders
+        /// </summary>
+        private readonly Dictionary<string, Address> roleLeaders = new Dictionary<string, Address>();
 
         /// <summary>
         /// The node message router
@@ -128,6 +140,11 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<Guid, UpgradeData> upgradingNodes = new Dictionary<Guid, UpgradeData>();
 
         /// <summary>
+        /// The current cluster leader
+        /// </summary>
+        private Address clusterLeader;
+
+        /// <summary>
         /// The database connection string
         /// </summary>
         private string connectionString;
@@ -140,12 +157,7 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// List of packages in local repository;
         /// </summary>
-        private Dictionary<string, PackageDescription> packages = new Dictionary<string, PackageDescription>();
-
-        /// <summary>
-        /// Random number generator
-        /// </summary>
-        private Random rnd = new Random();
+        private Dictionary<string, IPackage> packages = new Dictionary<string, IPackage>();
 
         /// <summary>
         /// Handle to prevent excess upgrade messages
@@ -179,10 +191,14 @@ namespace ClusterKit.NodeManager
             this.newNodeRequestDescriptionNotificationMaxRequests = Context.System.Settings.Config.GetInt("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
             this.upgradablePart = Context.System.Settings.Config.GetDecimal("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
 
-            this.Self.Tell(new InitializationMessage());
             this.Receive<InitializationMessage>(m => this.Initialize());
             this.Receive<object>(m => this.Stash.Stash());
+            // ReSharper disable FormatStringProblem
+            // ReSharper disable RedundantToStringCall
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+            // ReSharper restore RedundantToStringCall
+            // ReSharper restore FormatStringProblem
+            this.Self.Tell(new InitializationMessage());
         }
 
         /// <summary>
@@ -205,12 +221,17 @@ namespace ClusterKit.NodeManager
         {
             if (message == null)
             {
-                Context.GetLogger().Warning("{Type}: recieved null message", this.GetType().Name);
+                // ReSharper disable FormatStringProblem
+                Context.GetLogger().Warning("{Type}: received null message", this.GetType().Name);
+                // ReSharper restore FormatStringProblem
             }
             else
             {
-                Context.GetLogger().Warning("{Type}: recieved unsupported message of type {MessageTypeName}", this.GetType().Name, message.GetType().Name);
+                // ReSharper disable FormatStringProblem
+                Context.GetLogger().Warning("{Type}: received unsupported message of type {MessageTypeName}", this.GetType().Name, message.GetType().Name);
+                // ReSharper restore FormatStringProblem
             }
+
             base.Unhandled(message);
         }
 
@@ -222,6 +243,11 @@ namespace ClusterKit.NodeManager
         {
             nodeDescription.IsObsolete = false;
             NodeTemplate template;
+            if (string.IsNullOrWhiteSpace(nodeDescription.NodeTemplate))
+            {
+                return;
+            }
+
             if (!this.nodeTemplates.TryGetValue(nodeDescription.NodeTemplate, out template)
                 || template.Version != nodeDescription.NodeTemplateVersion)
             {
@@ -230,21 +256,44 @@ namespace ClusterKit.NodeManager
 
             foreach (var module in nodeDescription.Modules)
             {
-                PackageDescription package;
-                if (!this.packages.TryGetValue(module.Id, out package))
+                IPackage package;
+                if (string.IsNullOrWhiteSpace(module.Id))
                 {
                     Context.GetLogger().Error(
-                        "{Type}: node with template {TemplateCode} on container {ContainerCode} on address {NodeAddressString} has module {PackageId} that does not contained in repository. This node cannot be upgraded",
+                        // ReSharper disable FormatStringProblem
+                        "{Type}: got module with null id from template {TemplateCode} on container {ContainerCode} on address {NodeAddressString}",
+                        // ReSharper restore FormatStringProblem
                         this.GetType().Name,
                         nodeDescription.NodeTemplate,
                         nodeDescription.ContainerType,
+                        nodeDescription.NodeAddress.ToString());
+                    continue;
+                }
+
+                if (!this.packages.TryGetValue(module.Id, out package))
+                {
+                    Context.GetLogger().Error(
+                        // ReSharper disable FormatStringProblem
+                        "{Type}: node with template {TemplateCode} on container {ContainerCode} on address {NodeAddressString} has module {PackageId} that does not contained in repository. This node cannot be upgraded",
+                        // ReSharper restore FormatStringProblem
+                        this.GetType().Name,
+                        nodeDescription.NodeTemplate,
+                        nodeDescription.ContainerType,
+                        // ReSharper disable RedundantToStringCall
                         nodeDescription.NodeAddress.ToString(),
+                        // ReSharper restore RedundantToStringCall
                         module.Id);
                     nodeDescription.IsObsolete = false;
                     return;
                 }
 
-                if (package.Version != module.Version)
+                SemanticVersion version;
+                if (!SemanticVersion.TryParse(module.Version, out version))
+                {
+                    continue;
+                }
+
+                if (package.Version.Version != version.Version)
                 {
                     nodeDescription.IsObsolete = true;
                 }
@@ -273,10 +322,10 @@ namespace ClusterKit.NodeManager
                         })
                     .ToList();
 
-            // first we choos among templates that have nodes less then minimum required
+            // first we choose among templates that have nodes less then minimum required
             var templates =
                 availableTmplates.Where(
-                    t => t.Template.MininmumRequiredInstances > 0 && t.NodesCount < t.Template.MininmumRequiredInstances)
+                    t => t.Template.MinimumRequiredInstances > 0 && t.NodesCount < t.Template.MinimumRequiredInstances)
                     .Select(t => t.Template)
                     .ToList();
 
@@ -290,6 +339,7 @@ namespace ClusterKit.NodeManager
                         || (t.Template.MaximumNeededInstances.Value > 0
                             && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template).ToList();
             }
+
             return templates;
         }
 
@@ -331,7 +381,9 @@ namespace ClusterKit.NodeManager
             }
             catch (Exception e)
             {
+                // ReSharper disable FormatStringProblem
                 Context.GetLogger().Error(e, "{Type}: Exception during initialization", this.GetType().Name);
+                // ReSharper restore FormatStringProblem
                 Context.System.Scheduler.ScheduleTellOnce(
                     TimeSpan.FromSeconds(5),
                     this.Self,
@@ -346,7 +398,9 @@ namespace ClusterKit.NodeManager
             }
             catch (Exception e)
             {
+                // ReSharper disable FormatStringProblem
                 Context.GetLogger().Error(e, "{Type}: Exception during package list load", this.GetType().Name);
+                // ReSharper restore FormatStringProblem
                 Context.System.Scheduler.ScheduleTellOnce(
                     TimeSpan.FromSeconds(5),
                     this.Self,
@@ -362,11 +416,16 @@ namespace ClusterKit.NodeManager
                     "workers");
 
             this.Become(this.Start);
+            // ReSharper disable FormatStringProblem
+            // ReSharper disable RedundantToStringCall
+            Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+            // ReSharper restore RedundantToStringCall
+            // ReSharper restore FormatStringProblem
             this.Stash.UnstashAll();
         }
 
         /// <summary>
-        /// Receiver acror reveled itself, sending request
+        /// Receiver actor reviled itself, sending request
         /// </summary>
         /// <param name="actorIdentity">The actor identity</param>
         private void OnActorIdentity(ActorIdentity actorIdentity)
@@ -378,9 +437,29 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// There is new node going to be up and we need to decide wich template should be applied
+        /// Cluster leader has been changed
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="message">The notification message</param>
+        private void OnLeaderChanged(ClusterEvent.LeaderChanged message)
+        {
+            this.clusterLeader = message.Leader;
+            var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.IsClusterLeader);
+            if (formerLeader != null)
+            {
+                formerLeader.IsClusterLeader = false;
+            }
+
+            NodeDescription leader;
+            if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+            {
+                leader.IsClusterLeader = true;
+            }
+        }
+
+        /// <summary>
+        /// There is new node going to be up and we need to decide what template should be applied
+        /// </summary>
+        /// <param name="request">The node template request</param>
         private void OnNewNodeTemplateRequest(NewNodeTemplateRequest request)
         {
             var templates = this.GetPossibleTemplatesForContainer(request.ContainerType);
@@ -392,14 +471,14 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            var dice = this.rnd.NextDouble();
+            var dice = this.random.NextDouble();
             var sumWeight = templates.Sum(t => t.Priority);
 
             var check = 0.0;
             NodeTemplate selectedTemplate = null;
             foreach (var template in templates)
             {
-                check += (template.Priority / sumWeight);
+                check += template.Priority / sumWeight;
                 if (dice <= check)
                 {
                     selectedTemplate = template;
@@ -410,9 +489,65 @@ namespace ClusterKit.NodeManager
             // this could never happen, but code analyzers can't understand it
             if (selectedTemplate == null)
             {
+                // ReSharper disable FormatStringProblem
                 Context.GetLogger().Warning("{Type}: Failed to select template with dice", this.GetType().Name);
+                // ReSharper restore FormatStringProblem
                 selectedTemplate = templates.Last();
             }
+
+            var missedPackages = selectedTemplate.Packages.Where(p => !this.packages.ContainsKey(p)).ToList();
+            if (missedPackages.Count > 0)
+            {
+                Context.GetLogger()
+                    .Error(
+                        "{Type}: Packages {MissedPackageNames} are missing for {TemplateName}",
+                        this.GetType().Name,
+                        string.Join(", ", missedPackages),
+                        selectedTemplate.Name);
+                this.Sender.Tell(new NodeStartupWaitMessage { WaitTime = this.fullClusterWaitTimeout });
+                return;
+            }
+
+            // todo: @kantora create and keep update cache of template packages
+            var packageDescriptions = selectedTemplate.Packages
+                .Select(name => this.packages.ContainsKey(name) ? this.packages[name] : null)
+                .Where(p => p != null)
+                .ToList();
+
+            var dependenciesSet = packageDescriptions.SelectMany(d => d.DependencySets).SelectMany(d => d.Dependencies).ToList();
+            var dependencies =
+                dependenciesSet.Select(d => d.Id)
+                    .Distinct()
+                    .Where(id => packageDescriptions.All(p => p.Id != id))
+                    .Select(
+                        delegate(string id)
+                            {
+                                IPackage package;
+                                if (this.packages.TryGetValue(id, out package))
+                                {
+                                    return new PackageDescription
+                                    {
+                                        Id = package.Id,
+                                        Version = package.Version.ToString()
+                                    };
+                                }
+                                else
+                                {
+                                    var dependency =
+                                        dependenciesSet.First(
+                                            d =>
+                                            d.Id == id
+                                            && d.VersionSpec.MinVersion
+                                            == dependenciesSet.Where(dp => dp.Id == id)
+                                                   .Max(dp => dp.VersionSpec.MinVersion));
+
+                                    return new PackageDescription
+                                    {
+                                        Id = dependency.Id,
+                                        Version = dependency.VersionSpec.MinVersion.ToString()
+                                    };
+                                }
+                            }).ToList();
 
             this.Sender.Tell(
                 new NodeStartUpConfiguration
@@ -420,8 +555,8 @@ namespace ClusterKit.NodeManager
                     NodeTemplate = selectedTemplate.Code,
                     NodeTemplateVersion = selectedTemplate.Version,
                     Configuration = selectedTemplate.Configuration,
-                    Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => this.rnd.NextDouble()).ToList(),
-                    Packages = selectedTemplate.Packages,
+                    Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => this.random.NextDouble()).ToList(),
+                    Packages = packageDescriptions.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).Union(dependencies).ToList(),
                     PackageSources = this.nugetFeeds.Values.Select(f => f.Address).ToList()
                 });
 
@@ -453,9 +588,13 @@ namespace ClusterKit.NodeManager
             {
                 Context.GetLogger()
                     .Warning(
+                        // ReSharper disable FormatStringProblem
                         "{Type}: received nodeDescription with null address from {NodeAddress}",
+                        // ReSharper restore FormatStringProblem
                         this.GetType().Name,
+                        // ReSharper disable RedundantToStringCall
                         this.Sender.Path.Address.ToString());
+                // ReSharper restore RedundantToStringCall
                 return;
             }
 
@@ -463,9 +602,13 @@ namespace ClusterKit.NodeManager
             {
                 Context.GetLogger()
                     .Warning(
-                        "{Type}: received nodeDescription from uknown node with address {NodeAddress}",
+                        // ReSharper disable FormatStringProblem
+                        "{Type}: received nodeDescription from unknown node with address {NodeAddress}",
+                        // ReSharper restore FormatStringProblem
                         this.GetType().Name,
+                        // ReSharper disable RedundantToStringCall
                         address.ToString());
+                // ReSharper restore RedundantToStringCall
                 return;
             }
 
@@ -476,6 +619,9 @@ namespace ClusterKit.NodeManager
 
             this.requestDescriptionNotifications.Remove(address);
             this.nodeDescriptions[address] = nodeDescription;
+
+            nodeDescription.IsClusterLeader = this.clusterLeader == address;
+            nodeDescription.LeaderInRoles = this.roleLeaders.Where(p => p.Value == address).Select(p => p.Key).ToList();
 
             if (!string.IsNullOrEmpty(nodeDescription.NodeTemplate))
             {
@@ -499,18 +645,26 @@ namespace ClusterKit.NodeManager
 
                 Context.GetLogger()
                     .Info(
+                        // ReSharper disable FormatStringProblem
                         "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
+                        // ReSharper restore FormatStringProblem
                         this.GetType().Name,
                         nodeDescription.NodeTemplate,
+                        // ReSharper disable RedundantToStringCall
                         address.ToString());
+                // ReSharper restore RedundantToStringCall
             }
             else
             {
                 Context.GetLogger()
                     .Info(
+                        // ReSharper disable FormatStringProblem
                         "{Type}: New node without nodetemplate on address {NodeAddress}",
+                        // ReSharper restore FormatStringProblem
                         this.GetType().Name,
+                        // ReSharper disable RedundantToStringCall
                         address.ToString());
+                // ReSharper restore RedundantToStringCall
             }
 
             this.Self.Tell(new UpgradeMessage());
@@ -519,9 +673,10 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Processes node removed cluster event
         /// </summary>
-        /// <param name="address">Obsolete node address</param>
-        private void OnNodeDown(Address address)
+        /// <param name="member">Obsolete node</param>
+        private void OnNodeDown(Member member)
         {
+            var address = member.Address;
             Cancelable cancelable;
             if (this.requestDescriptionNotifications.TryGetValue(address, out cancelable))
             {
@@ -529,12 +684,24 @@ namespace ClusterKit.NodeManager
                 this.requestDescriptionNotifications.Remove(address);
             }
 
-            var nodeDescription = this.nodeDescriptions[address];
-            this.nodeDescriptions.Remove(address);
+            NodeDescription nodeDescription;
 
-            if (!string.IsNullOrWhiteSpace(nodeDescription?.NodeTemplate))
+            if (this.nodeDescriptions.TryGetValue(address, out nodeDescription))
             {
-                this.activeNodesByTemplate[nodeDescription.NodeTemplate].Remove(address);
+                nodeDescription = this.nodeDescriptions[address];
+                this.nodeDescriptions.Remove(address);
+
+                if (!string.IsNullOrWhiteSpace(nodeDescription?.NodeTemplate))
+                {
+                    this.activeNodesByTemplate[nodeDescription.NodeTemplate].Remove(address);
+                }
+            }
+            else
+            {
+                Context.GetLogger().Warning(
+                    "{Type}: received node down for unknown node with address {NodeAddress}",
+                    this.GetType().ToString(),
+                    address.ToString());
             }
         }
 
@@ -574,18 +741,38 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Processes new node cluster event
         /// </summary>
-        /// <param name="address">New node address</param>
-        private void OnNodeUp(Address address)
+        /// <param name="member">New node</param>
+        private void OnNodeUp(Member member)
         {
+            var address = member.Address;
             var cancelable = new Cancelable(Context.System.Scheduler);
             this.requestDescriptionNotifications[address] = cancelable;
+
+            if (!this.nodeDescriptions.ContainsKey(address))
+            {
+                var nodeDescription = new NodeDescription
+                                          {
+                                              IsInitialized = false,
+                                              NodeAddress = address,
+                                              Modules = new List<PackageDescription>(),
+                                              Roles = new List<string>(member.Roles),
+                                              LeaderInRoles =
+                                                  this.roleLeaders.Where(p => p.Value == address)
+                                                      .Select(p => p.Key)
+                                                      .ToList(),
+                                              IsClusterLeader = address == this.clusterLeader
+                                          };
+
+                this.nodeDescriptions.Add(address, nodeDescription);
+            }
+
             this.OnRequestDescriptionNotification(new RequestDescriptionNotification { Address = address });
         }
 
         /// <summary>
         /// Process of manual node upgrade request
         /// </summary>
-        /// <param name="address">Address of the node tu upgrade</param>
+        /// <param name="address">Address of the node to upgrade</param>
         private void OnNodeUpdateRequest(Address address)
         {
             if (!this.nodeDescriptions.ContainsKey(address))
@@ -605,6 +792,7 @@ namespace ClusterKit.NodeManager
             this.upgradeMessageSchedule?.Cancel();
 
             var upgradeTimeOut = this.newNodeJoinTimeout + this.newNodeRequestDescriptionNotificationTimeout;
+            
             // removing lost nodes
             var obsoleteUpgrades =
                 this.upgradingNodes.Values.Where(
@@ -614,8 +802,8 @@ namespace ClusterKit.NodeManager
             var isUpgrading = false;
 
             // searching for nodes to upgrade
-            var grouppedNodes = this.nodeDescriptions.Values.GroupBy(n => n.NodeTemplate);
-            foreach (var nodeGroup in grouppedNodes)
+            var groupedNodes = this.nodeDescriptions.Values.GroupBy(n => n.NodeTemplate);
+            foreach (var nodeGroup in groupedNodes)
             {
                 if (!nodeGroup.Any(n => n.IsObsolete))
                 {
@@ -627,16 +815,18 @@ namespace ClusterKit.NodeManager
                 {
                     Context.GetLogger()
                         .Error(
-                            "{Type}: could not find template with {TemplateCode} during upgrade proccess",
+                            // ReSharper disable FormatStringProblem
+                            "{Type}: could not find template with {TemplateCode} during upgrade process",
+                            // ReSharper restore FormatStringProblem
                             this.GetType().Name,
                             nodeGroup.Key);
                     nodeGroup.ForEach(n => n.IsObsolete = false);
                     continue;
                 }
 
-                if (nodeGroup.Count() <= nodeTemplate.MininmumRequiredInstances)
+                if (nodeGroup.Count() <= nodeTemplate.MinimumRequiredInstances)
                 {
-                    // node upgrade is blocked if it can cause cluster mulfunction
+                    // node upgrade is blocked if it can cause cluster malfunction
                     continue;
                 }
 
@@ -742,6 +932,38 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// The role leader has been changed
+        /// </summary>
+        /// <param name="message">The notification message</param>
+        private void OnRoleLeaderChanged(ClusterEvent.RoleLeaderChanged message)
+        {
+            if (string.IsNullOrWhiteSpace(message.Role))
+            {
+                Context.GetLogger().Warning(
+                    "{Type}: received RoleLeaderChanged message with empty role",
+                    this.GetType().ToString());
+                return;
+            }
+
+            var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.LeaderInRoles.Contains(message.Role));
+            formerLeader?.LeaderInRoles.Remove(message.Role);
+
+            if (message.Leader == null)
+            {
+                this.roleLeaders.Remove(message.Role);
+            }
+            else
+            {
+                this.roleLeaders[message.Role] = message.Leader;
+                NodeDescription leader;
+                if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+                {
+                    leader.LeaderInRoles.Add(message.Role);
+                }
+            }
+        }
+
+        /// <summary>
         /// Process the <seealso cref="SeedAddress"/> update event
         /// </summary>
         /// <param name="message"><seealso cref="SeedAddress"/> update notification</param>
@@ -773,7 +995,7 @@ namespace ClusterKit.NodeManager
                         new TemplatesUsageStatistics.TemplateUsageStatistics
                         {
                             MaximumRequiredNodes = t.MaximumNeededInstances,
-                            MinimumRequiredNodes = t.MininmumRequiredInstances,
+                            MinimumRequiredNodes = t.MinimumRequiredInstances,
                             Name = t.Code,
                             ActiveNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
                                 ? this.activeNodesByTemplate[t.Code].Count
@@ -795,8 +1017,8 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void ReloadPackageList()
         {
-            var feedUrl = Context.System.Settings.Config.GetString(PacakgeRepositoryUrlPath);
-            var factory = DataFactory<string, PackageDescription, string>.CreateFactory(feedUrl);
+            var feedUrl = Context.System.Settings.Config.GetString(PackageRepositoryUrlPath);
+            var factory = DataFactory<string, IPackage, string>.CreateFactory(feedUrl);
 
             this.packages = factory.GetList(0, null).Result.ToDictionary(p => p.Id);
 
@@ -813,19 +1035,23 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void Start()
         {
-            Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
-
             Cluster.Get(Context.System)
-                               .Subscribe(
-                                   this.Self,
-                                   ClusterEvent.InitialStateAsEvents,
-                                   new[] { typeof(ClusterEvent.MemberRemoved), typeof(ClusterEvent.MemberUp) });
+               .Subscribe(
+                   this.Self,
+                   ClusterEvent.InitialStateAsEvents,
+                   typeof(ClusterEvent.MemberRemoved),
+                   typeof(ClusterEvent.MemberUp),
+                   typeof(ClusterEvent.LeaderChanged),
+                   typeof(ClusterEvent.RoleLeaderChanged));
 
             // ping message will indicate that actor started and ready to work
             this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
 
-            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member.Address));
-            this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member.Address));
+            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member));
+            this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member));
+
+            this.Receive<ClusterEvent.LeaderChanged>(m => this.OnLeaderChanged(m));
+            this.Receive<ClusterEvent.RoleLeaderChanged>(m => this.OnRoleLeaderChanged(m));
 
             this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
             this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
@@ -844,7 +1070,7 @@ namespace ClusterKit.NodeManager
             this.Receive<NewNodeTemplateRequest>(m => this.OnNewNodeTemplateRequest(m));
             this.Receive<RequestTimeOut>(m => this.OnRequestTimeOut(m));
 
-            this.Receive<PackageListRequest>(m => this.Sender.Tell(this.packages.Values.ToList()));
+            this.Receive<PackageListRequest>(m => this.Sender.Tell(this.packages.Values.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList()));
 
             this.Receive<ReloadPackageListRequest>(
                 m =>
@@ -857,7 +1083,9 @@ namespace ClusterKit.NodeManager
                         catch (Exception e)
                         {
                             this.Sender.Tell(false);
+                            // ReSharper disable FormatStringProblem
                             Context.GetLogger().Error(e, "{Type}: Exception during package list load", this.GetType().Name);
+                            // ReSharper restore FormatStringProblem
                         }
                     });
 
@@ -867,11 +1095,11 @@ namespace ClusterKit.NodeManager
             this.Receive<TemplatesStatisticsRequest>(m => this.OnTemplatesStatisticsRequest());
 
             this.Receive<CollectionRequest<NodeTemplate>>(m => this.workers.Forward(m));
-            this.Receive<RestActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<SeedAddress>>(m => this.workers.Forward(m));
-            this.Receive<RestActionMessage<SeedAddress, int>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<SeedAddress, int>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<NugetFeed>>(m => this.workers.Forward(m));
-            this.Receive<RestActionMessage<NugetFeed, int>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<NugetFeed, int>>(m => this.workers.Forward(m));
         }
 
         /// <summary>
@@ -929,7 +1157,7 @@ namespace ClusterKit.NodeManager
             public string NodeTemplate { get; set; }
 
             /// <summary>
-            /// Gets or sets time of upgrade initialization proccess
+            /// Gets or sets time of upgrade initialization process
             /// </summary>
             public DateTimeOffset UpgradeStartTime { get; set; }
         }
@@ -946,6 +1174,9 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private class Worker : BaseCrudActorWithNotifications<ConfigurationContext>
         {
+            /// <summary>
+            /// The database connection string
+            /// </summary>
             private readonly string connectionString;
 
             /// <summary>
@@ -953,6 +1184,9 @@ namespace ClusterKit.NodeManager
             /// </summary>
             private readonly IContextFactory<ConfigurationContext> contextFactory;
 
+            /// <summary>
+            /// The database name
+            /// </summary>
             private readonly string databaseName;
 
             /// <summary>
@@ -976,17 +1210,18 @@ namespace ClusterKit.NodeManager
                 IContextFactory<ConfigurationContext> contextFactory,
                 IActorRef parent) : base(parent)
             {
+                // ReSharper disable FormatStringProblem
                 Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
-
+                // ReSharper restore FormatStringProblem
                 this.connectionString = connectionString;
                 this.databaseName = databaseName;
                 this.contextFactory = contextFactory;
 
-                this.ReceiveAsync<RestActionMessage<NodeTemplate, int>>(
+                this.ReceiveAsync<CrudActionMessage<NodeTemplate, int>>(
                     this.OnRequest);
-                this.ReceiveAsync<RestActionMessage<SeedAddress, int>>(
+                this.ReceiveAsync<CrudActionMessage<SeedAddress, int>>(
                     this.OnRequest);
-                this.ReceiveAsync<RestActionMessage<NugetFeed, int>>(
+                this.ReceiveAsync<CrudActionMessage<NugetFeed, int>>(
                     this.OnRequest);
 
                 this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
@@ -997,9 +1232,9 @@ namespace ClusterKit.NodeManager
             /// <summary>
             /// Method called before object modification in database
             /// </summary>
-            /// <param name="newObject">The new Object.
-            ///             </param><param name="oldObject">The old Object.
-            ///             </param>
+            /// <typeparam name="TObject">The type of object</typeparam>
+            /// <param name="newObject">The new Object.</param>
+            /// <param name="oldObject">The old Object.</param>
             /// <returns>
             /// The new version of object or null to prevent update
             /// </returns>
@@ -1010,7 +1245,8 @@ namespace ClusterKit.NodeManager
                     ((NodeTemplate)(object)newObject).Version = ((NodeTemplate)(object)oldObject).Version + 1;
                 }
 
-                return base.BeforeUpdate(newObject, oldObject);
+                // ReSharper disable once RedundantTypeArgumentsOfMethod
+                return base.BeforeUpdate<TObject>(newObject, oldObject);
             }
 
             /// <summary>

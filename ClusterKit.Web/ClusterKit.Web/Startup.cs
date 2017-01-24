@@ -32,6 +32,7 @@ namespace ClusterKit.Web
         /// The Owin service configuration
         /// </summary>
         /// <param name="appBuilder">The builder</param>
+        [UsedImplicitly]
         public void Configuration(IAppBuilder appBuilder)
         {
             var owinStartupConfigurators = ServiceLocator.Current.GetAllInstances<IOwinStartupConfigurator>().ToList();
@@ -50,9 +51,9 @@ namespace ClusterKit.Web
             config.DependencyResolver = dependencyResolver;
 
             config.EnsureInitialized();
-            appBuilder.UseWebApi(config);
 
             owinStartupConfigurators.ForEach(c => c.ConfigureApp(appBuilder));
+            appBuilder.UseWebApi(config);
         }
 
         /// <summary>

@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.NodeManager.ConfigurationSource
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using Akka.Configuration;
 
@@ -7,7 +16,7 @@
     using Castle.Windsor;
 
     using ClusterKit.Core;
-    using ClusterKit.Core.Data;
+    using ClusterKit.Data;
 
     using JetBrains.Annotations;
 
@@ -27,7 +36,7 @@
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{ClusterKit.NodeManager.ConfigurationSeederType = \"ClusterKit.NodeManager.ConfigurationSource.ConfigurationSeeder, ClusterKit.NodeManager.ConfigurationSource\"}");
 
         /// <summary>
         /// Registering DI components
