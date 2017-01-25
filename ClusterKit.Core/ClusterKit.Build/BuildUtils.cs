@@ -304,7 +304,7 @@ Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""_Solution Items"", ""_
                     writer.WriteLine($"\t\t..\\{file} = ..\\{file}");
                 }
 
-                writer.Write($@"	EndProjectSection
+                writer.Write(@"	EndProjectSection
 EndProject
                 ");
 
@@ -318,7 +318,6 @@ EndProject
 Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""{package.Key}"", ""{package.Key}"", ""{{{packageUid}}}""
 EndProject
 ");
-
                     foreach (var project in package)
                     {
                         try
@@ -334,7 +333,6 @@ EndProject
                                 $@"
 Project(""{{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}}"") = ""{project.ProjectName}"", ""../{project.ProjectFileName}"", ""{uid}""
 EndProject
-
 ");
                             folders.Add($"\t\t{uid} = {{{packageUid}}}\n");
                         }
@@ -676,6 +674,87 @@ EndGlobal
                 }
 
                 projDoc.Save(project.ProjectFileName);
+                NugetAddLinksToLocalPackages(project, projectList);
+            }
+        }
+
+        /// <summary>
+        /// Adds links to internal dependencies from packages.config
+        /// </summary>
+        /// <param name="project">The project description</param>
+        /// <param name="projects">The list of all projects</param>
+        private static void NugetAddLinksToLocalPackages(ProjectDescription project, List<ProjectDescription> projects)
+        {
+            var packagesFileName = Path.Combine(project.ProjectDirectory, "packages.config");
+            if (File.Exists(packagesFileName))
+            {
+                var packagesDoc = new XmlDocument();
+                packagesDoc.Load(packagesFileName);
+
+                var documentNode = packagesDoc.DocumentElement;
+                foreach (var dependency in project.InternalDependencies.Where(d => documentNode.SelectNodes($"./package[@id=\"{d}\"]").Count == 0))
+                {
+                    var dependencyProject = projects.FirstOrDefault(p => p.ProjectName == dependency);
+                    if (dependencyProject == null)
+                    {
+                        ConsoleLog($"{project.ProjectName} linked dependency {dependency} is not registered");
+                        continue;
+                    }
+
+                    if (dependencyProject.PackageName == project.PackageName)
+                    {
+                        continue;
+                    }
+
+                    ConsoleLog($"{project.ProjectName} adding nuget ref to {dependency}");
+                    var packageElement = packagesDoc.CreateElement("package");
+                    packageElement.SetAttribute("id", dependency);
+                    packageElement.SetAttribute("version", "0.0.0-local");
+                    packageElement.SetAttribute("targetFramework", "net45");
+                    documentNode.AppendChild(packageElement);
+                }
+
+                packagesDoc.Save(packagesFileName);
+                
+            }
+        }
+
+        /// <summary>
+        /// Adds links to internal dependencies from packages.config
+        /// </summary>
+        /// <param name="project">The project description</param>
+        /// <param name="projects">The list of all projects</param>
+        private static void NugetRemoveLinksToLocalPackages(ProjectDescription project, List<ProjectDescription> projects)
+        {
+            var packagesFileName = Path.Combine(project.ProjectDirectory, "packages.config");
+            if (File.Exists(packagesFileName))
+            {
+                var packagesDoc = new XmlDocument();
+                packagesDoc.Load(packagesFileName);
+
+                var documentNode = packagesDoc.DocumentElement;
+                foreach (var dependency in project.InternalDependencies.Where(d => documentNode.SelectNodes($"./package[@id=\"{d}\"]").Count != 0))
+                {
+                    var dependencyProject = projects.FirstOrDefault(p => p.ProjectName == dependency);
+                    if (dependencyProject == null)
+                    {
+                        ConsoleLog($"{project.ProjectName} linked dependency {dependency} is not registered");
+                        continue;
+                    }
+
+                    ConsoleLog($"{project.ProjectName} removing nuget ref to {dependency}");
+                    var packageElement = documentNode.SelectSingleNode($"./package[@id=\"{dependency}\"]");
+                    if (packageElement == null)
+                    {
+                        ConsoleLog($"{project.ProjectName} linked dependency {dependency} is not found in package.json from second read O_O");
+                        continue;
+                    }
+
+                    documentNode.RemoveChild(packageElement);
+                }
+
+                packagesDoc.Save(packagesFileName);
+
             }
         }
 
@@ -689,7 +768,6 @@ EndGlobal
         public static void SwitchToProjectRefs(IEnumerable<ProjectDescription> projects)
         {
             var projectList = projects.ToList();
-
             foreach (var project in projectList)
             {
                 var projDoc = new XmlDocument();
@@ -753,6 +831,7 @@ EndGlobal
                 }
 
                 projDoc.Save(project.ProjectFileName);
+                NugetRemoveLinksToLocalPackages(project, projectList);
             }
         }
 

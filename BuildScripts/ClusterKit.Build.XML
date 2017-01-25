@@ -121,6 +121,20 @@
             </summary>
             <param name="projects">The list of projects</param>
         </member>
+        <member name="M:ClusterKit.Build.BuildUtils.NugetAddLinksToLocalPackages(ClusterKit.Build.ProjectDescription,System.Collections.Generic.List{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Adds links to internal dependencies from packages.config
+            </summary>
+            <param name="project">The project description</param>
+            <param name="projects">The list of all projects</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.NugetRemoveLinksToLocalPackages(ClusterKit.Build.ProjectDescription,System.Collections.Generic.List{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Adds links to internal dependencies from packages.config
+            </summary>
+            <param name="project">The project description</param>
+            <param name="projects">The list of all projects</param>
+        </member>
         <member name="M:ClusterKit.Build.BuildUtils.SwitchToProjectRefs(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
             <summary>
             Updates current projects (csproj) to reference projects in other folders as projects

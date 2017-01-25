@@ -33,10 +33,6 @@
     <DocumentationFile>bin\Release\ClusterKit.NodeManager.ConfigurationSource.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj">
-      <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
-      <Name>ClusterKit.Data.CRUD</Name>
-    </ProjectReference>
     <Reference Include="Akka, Version=1.1.2.258, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Akka.1.1.2.258-beta\lib\net45\Akka.dll</HintPath>
@@ -169,6 +165,10 @@
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
       <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
       <Name>ClusterKit.LargeObjects</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj">
+      <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
+      <Name>ClusterKit.Data.CRUD</Name>
 </ProjectReference>
   </ItemGroup>
   <ItemGroup>
