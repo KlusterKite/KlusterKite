@@ -363,6 +363,8 @@ Global
 EndGlobal
 ");
             }
+
+            File.Copy(Path.Combine(BuildDirectory, "..", "global.sln.DotSettings"), Path.Combine(BuildDirectory, "global.sln.DotSettings"), true);
         }
 
         /// <summary>
