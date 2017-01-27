@@ -7,6 +7,14 @@
       loglevel : INFO
 
       actor : {
+
+        serializers {
+          hyperion = "Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion"
+        }
+        serialization-bindings {
+          "System.Object" = hyperion
+        } 
+
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"
         
         #default-dispatcher {
@@ -27,15 +35,6 @@
             type = "ClusterKit.Core.Cluster.ClusterLoggingActor, ClusterKit.Core"
           }          
         }
-
-        serializers {
-		      wire = "Akka.Serialization.WireSerializer, Akka.Serialization.Wire"
-        }
-
-        serialization-bindings {
-		      "System.Object" = wire
-        }
-
       }
 
       remote : {
@@ -66,7 +65,7 @@
 
       cluster: {
         auto-down-unreachable-after = 15s
-		    min-nr-of-members = 1
+		    min-nr-of-members = 3
         seed-node-timeout = 5s
         retry-unsuccessful-join-after = 10s
 

@@ -47,6 +47,7 @@ namespace ClusterKit.Web.Swagger
             var publishDocUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", "swagger");
             var publishUiUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", "swagger/ui");
 
+            Log.Information("Swagger: setting up swagger on {SwaggerUrl}", publishUiUrl);
             config.EnableSwagger(
                 $"{publishDocUrl}/{{apiVersion}}",
                 c =>
@@ -72,6 +73,8 @@ namespace ClusterKit.Web.Swagger
                             {
                                 c.DisableValidator();
                             });
+
+            Log.Information("Swagger was set up successfully");
         }
 
         /// <summary>

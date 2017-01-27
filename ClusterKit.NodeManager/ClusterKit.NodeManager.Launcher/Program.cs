@@ -25,6 +25,9 @@ namespace ClusterKit.NodeManager.Launcher
 
     using Newtonsoft.Json;
 
+    using NuGet.Common;
+    using NuGet.Frameworks;
+
     using RestSharp;
 
     /// <summary>
@@ -272,28 +275,7 @@ namespace ClusterKit.NodeManager.Launcher
             this.PrepareNuGetConfig(config);
             this.InstallPackages(config);
             this.CreateService(config);
-            this.FixAssemblyVersions();
-        }
-
-        /// <summary>
-        /// Copy directory
-        /// </summary>
-        /// <param name="source">The source directory</param>
-        /// <param name="target">The destination directory</param>
-        private void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
-        {
-            var subDirectories = target.GetDirectories();
-            foreach (var dir in source.GetDirectories())
-            {
-                var directoryInfo = subDirectories.FirstOrDefault(d => d.Name == dir.Name)
-                                    ?? target.CreateSubdirectory(dir.Name);
-                this.CopyFilesRecursively(dir, directoryInfo);
-            }
-
-            foreach (var file in source.GetFiles())
-            {
-                file.CopyTo(Path.Combine(target.FullName, file.Name), true);
-            }
+            this.FixAssemblyVersions(); 
         }
 
         /// <summary>
@@ -306,33 +288,33 @@ namespace ClusterKit.NodeManager.Launcher
             var serviceDir = Path.Combine(this.WorkingDirectory, "service");
             Directory.CreateDirectory(serviceDir);
 
-            var matches = new[]
-                              {
-                                  new Regex("(^|\\+)net45", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)net40", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)net35", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)net20", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)dotnet", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)netcore45", RegexOptions.IgnoreCase),
-                              };
+            var packageReader = new NuGet.Protocol.FindLocalPackagesResourcePackagesConfig(Path.Combine(this.WorkingDirectory, "packages"));
+            var packages = packageReader.GetPackages(NullLogger.Instance, CancellationToken.None);
 
-            foreach (var directory in Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")))
+            var targetFramework = NuGetFramework.ParseFrameworkName(
+                ".NETFramework,Version=v4.5",
+                new DefaultFrameworkNameProvider());
+
+            foreach (var localPackageInfo in packages)
             {
-                if (!Directory.Exists(Path.Combine(directory, "lib")))
+                using (var reader = localPackageInfo.GetReader())
                 {
-                    continue;
+                    var specificGroup = NuGetFrameworkUtility.GetNearest(reader.GetLibItems(), targetFramework);
+                    if (specificGroup == null || specificGroup.HasEmptyFolder)
+                    {
+                        continue;
+                    }
+
+                    foreach (var item in specificGroup.Items)
+                    {
+                        Console.WriteLine($@"Installing {localPackageInfo.Identity.Id} {item}");
+                        var fileName = item.Split('/').Last();
+                        using (var file = File.Create(Path.Combine(serviceDir, fileName)))
+                        {
+                            reader.GetStream(item).CopyTo(file);
+                        }
+                    }
                 }
-
-                var specificDirs = Directory.GetDirectories(Path.Combine(directory, "lib")).Select(d => d.Split(Path.DirectorySeparatorChar).Last()).ToList();
-
-                var endDir =
-                    matches
-                        .Select(m => specificDirs.FirstOrDefault(m.IsMatch))
-                        .FirstOrDefault(d => d != null);
-
-                endDir = endDir != null ? Path.Combine(directory, "lib", endDir) : Path.Combine(directory, "lib");
-                Console.WriteLine($@"Installing {Path.GetDirectoryName(directory)} from {endDir}");
-                this.CopyFilesRecursively(new DirectoryInfo(endDir), new DirectoryInfo(Path.Combine(this.WorkingDirectory, "service")));
             }
 
             File.WriteAllText(Path.Combine(serviceDir, "akka.hocon"), configuration.Configuration);
@@ -392,7 +374,7 @@ namespace ClusterKit.NodeManager.Launcher
                 var dependentNode =
                     assemblyBindingNode?.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
                     ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
-
+                
                 dependentNode.RemoveAll();
                 var assemblyIdentityNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);

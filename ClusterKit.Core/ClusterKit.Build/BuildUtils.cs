@@ -382,92 +382,12 @@ EndGlobal
 
             TraceHelper.trace($"Packing {project.ProjectName}");
 
-            var nuspecData = new XmlDocument();
-            var nuspecDataFileName = $"{project.ProjectName}.nuspec";
-            nuspecData.Load(Path.Combine(project.ProjectDirectory, nuspecDataFileName));
-            // ReSharper disable PossibleNullReferenceException
-            var metaData = nuspecData.DocumentElement.SelectSingleNode("/package/metadata");
-            metaData.SelectSingleNode("id").InnerText = project.ProjectName;
-            metaData.SelectSingleNode("version").InnerText = Version;
-            metaData.SelectSingleNode("title").InnerText = project.ProjectName;
-
-            if ("$author$".Equals(metaData.SelectSingleNode("authors").InnerText))
+            var generatedNuspecFile = GenerateNuspecFile(project);
+            if (string.IsNullOrWhiteSpace(generatedNuspecFile))
             {
-                metaData.SelectSingleNode("authors").InnerText = "ClusterKit Team";
+                ConsoleLog($@"Nuspec file for {project.ProjectName} is either not found or corrupted");
+                return;
             }
-
-            if ("$author$".Equals(metaData.SelectSingleNode("owners").InnerText))
-            {
-                metaData.SelectSingleNode("owners").InnerText = "ClusterKit Team";
-            }
-
-            if ("$description$".Equals(metaData.SelectSingleNode("description").InnerText))
-            {
-                metaData.SelectSingleNode("description").InnerText = "ClusterKit lib";
-            }
-
-            var dependenciesRootElement = metaData.AppendChild(nuspecData.CreateElement("dependencies"));
-            var dependenciesDoc = new XmlDocument();
-            dependenciesDoc.Load(Path.Combine(project.ProjectDirectory, "packages.config"));
-
-            foreach (XmlElement dependency in dependenciesDoc.DocumentElement.SelectNodes("/packages/package"))
-            {
-                if (project.InternalDependencies.Contains(dependency.Attributes["id"].Value))
-                {
-                    continue;
-                }
-
-                if (!Directory.Exists(Path.Combine(PackageInputDirectory, $"{dependency.Attributes["id"].Value}.{dependency.Attributes["version"].Value}")))
-                {
-                    continue;
-                }
-
-                var dependencyElement = dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"));
-                dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value =
-                    dependency.Attributes["id"].Value;
-                dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value =
-                    dependency.Attributes["version"].Value;
-            }
-
-            foreach (var dependency in project.InternalDependencies)
-            {
-                var dependencyElement = dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"));
-                dependencyElement.Attributes.Append(nuspecData.CreateAttribute("id")).Value =
-                    dependency;
-                dependencyElement.Attributes.Append(nuspecData.CreateAttribute("version")).Value = Version;
-            }
-
-            var filesRootElement = nuspecData.DocumentElement.SelectSingleNode("/package").AppendChild(nuspecData.CreateElement("files"));
-            foreach (var file in Directory.GetFiles(project.CleanBuildDirectory))
-            {
-                var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
-                fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.GetFileName(file);
-                fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{Path.GetFileName(file)}";
-            }
-
-            foreach (var directory in Directory.GetDirectories(project.CleanBuildDirectory).Select(Path.GetFileName).Where(d => d != "tools"))
-            {
-                foreach (var file in Directory.GetFiles(Path.Combine(project.CleanBuildDirectory, directory)))
-                {
-                    var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
-                    fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.Combine(directory, Path.GetFileName(file));
-                    fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./lib/{directory}/{Path.GetFileName(file)}";
-                }
-            }
-
-            var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
-            if (Directory.Exists(toolsDir))
-            {
-                foreach (var file in Directory.GetFiles(toolsDir))
-                {
-                    var fileElement = filesRootElement.AppendChild(nuspecData.CreateElement("file"));
-                    fileElement.Attributes.Append(nuspecData.CreateAttribute("src")).Value = Path.Combine("tools", Path.GetFileName(file));
-                    fileElement.Attributes.Append(nuspecData.CreateAttribute("target")).Value = $"./tools/{Path.GetFileName(file)}";
-                }
-            }
-
-            var generatedNuspecFile = Path.Combine(project.CleanBuildDirectory, nuspecDataFileName);
-            nuspecData.Save(generatedNuspecFile);
 
             if (!Directory.Exists(PackageOutputDirectory))
             {
@@ -485,6 +405,186 @@ EndGlobal
             Fake.NuGetHelper.NuGetPackDirectly(provider.ToFSharpFunc(), generatedNuspecFile);
 
             // ReSharper restore PossibleNullReferenceException
+        }
+
+        /// <summary>
+        /// Updates nuspec file for the project
+        /// </summary>
+        /// <param name="project"></param>
+        /// <returns></returns>
+        private static string GenerateNuspecFile(ProjectDescription project)
+        {
+            var nuspecData = new XmlDocument();
+            var nuspecDataFileName = $"{project.ProjectName}.nuspec";
+            nuspecData.Load(Path.Combine(project.ProjectDirectory, nuspecDataFileName));
+
+            var metaData = nuspecData.DocumentElement?.SelectSingleNode("/package/metadata");
+            if (metaData == null)
+            {
+                return null;
+            }
+
+            GenerateNuspecFileSetDescription(project, metaData, nuspecData);
+            GenerateNuspecFileSetDependencies(project, metaData, nuspecData);
+
+            var filesRootElement = (XmlElement)nuspecData.DocumentElement.AppendChild(nuspecData.CreateElement("files"));
+
+            GenerateNuspecFileSetAssembly(project, metaData, nuspecData, filesRootElement);
+            GenerateNuspecFileSetTools(project, filesRootElement, nuspecData);
+
+            var generatedNuspecFile = Path.Combine(project.CleanBuildDirectory, nuspecDataFileName);
+            nuspecData.Save(generatedNuspecFile);
+            return generatedNuspecFile;
+        }
+
+        /// <summary>
+        /// Set tools contents to the nuspec
+        /// </summary>
+        /// <param name="project">The project definition</param>
+        /// <param name="filesRootElement">The "files" xml node</param>
+        /// <param name="nuspecData">The nusec xml document</param>
+        private static void GenerateNuspecFileSetTools(
+            ProjectDescription project,
+            XmlElement filesRootElement,
+            XmlDocument nuspecData)
+        {
+            var toolsDir = Path.Combine(project.CleanBuildDirectory, "tools");
+            if (!Directory.Exists(toolsDir))
+            {
+                return;
+            }
+
+            var fileElement = (XmlElement)filesRootElement.AppendChild(nuspecData.CreateElement("file"));
+            fileElement.SetAttribute("src", "tools/**/*.*");
+            fileElement.SetAttribute("target", "");
+        }
+
+        /// <summary>
+        /// Adds assembly files
+        /// </summary>
+        /// <param name="project">The project definition</param>
+        /// <param name="metaData">The metadata xml node</param>
+        /// <param name="nuspecData">The nusec xml document</param>
+        /// <param name="filesRootElement">The "files" xml node</param>
+        private static void GenerateNuspecFileSetAssembly(
+            ProjectDescription project,
+            XmlNode metaData,
+            XmlDocument nuspecData,
+            XmlElement filesRootElement)
+        {
+            const string TargetFramework = "net45";
+
+            var fileElement = (XmlElement)filesRootElement.AppendChild(nuspecData.CreateElement("file"));
+            fileElement.SetAttribute("src", "**/*.*");
+            fileElement.SetAttribute("target", $"lib/{TargetFramework}");
+            fileElement.SetAttribute("exclude", "tools/**/*.*");
+
+
+            var assemblies = Directory.GetFiles(project.CleanBuildDirectory, "*.dll");
+
+            if (assemblies.Length > 0)
+            {
+                var referencesRootElement = metaData.AppendChild(nuspecData.CreateElement("references"));
+                var referenceGroupElement =
+                    (XmlElement)referencesRootElement.AppendChild(nuspecData.CreateElement("group"));
+                referenceGroupElement.SetAttribute("targetFramework", TargetFramework);
+
+                foreach (var file in assemblies)
+                {
+                    var reference = (XmlElement)referenceGroupElement.AppendChild(nuspecData.CreateElement("reference"));
+                    reference.SetAttribute("file", $"{Path.GetFileName(file)}");
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Sets the list of dependencies to the nuspec file
+        /// </summary>
+        /// <param name="project">The project description</param>
+        /// <param name="metaData">The metadata xml-node</param>
+        /// <param name="nuspecData">The xml document of the nuspec file</param>
+        private static void GenerateNuspecFileSetDependencies(
+            ProjectDescription project,
+            XmlNode metaData,
+            XmlDocument nuspecData)
+        {
+            var dependenciesRootElement = metaData.AppendChild(nuspecData.CreateElement("dependencies"));
+            var dependenciesDoc = new XmlDocument();
+            dependenciesDoc.Load(Path.Combine(project.ProjectDirectory, "packages.config"));
+
+            var packagesList = dependenciesDoc.DocumentElement?.SelectNodes("/packages/package");
+
+            if (packagesList == null)
+            {
+                ConsoleLog($@"Missed o corrupted packages.config in project {project.ProjectName}");
+                return;
+            }
+
+            foreach (XmlElement dependency in packagesList)
+            {
+                if (project.InternalDependencies.Contains(dependency.Attributes["id"].Value))
+                {
+                    continue;
+                }
+
+                if (
+                    !Directory.Exists(
+                        Path.Combine(
+                            PackageInputDirectory,
+                            $"{dependency.Attributes["id"].Value}.{dependency.Attributes["version"].Value}")))
+                {
+                    continue;
+                }
+
+                var dependencyElement = (XmlElement)dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"));
+                dependencyElement.SetAttribute("id", dependency.Attributes["id"].Value);
+                dependencyElement.SetAttribute("version", dependency.Attributes["version"].Value);
+            }
+
+            foreach (var dependency in project.InternalDependencies)
+            {
+                var dependencyElement = (XmlElement)dependenciesRootElement.AppendChild(nuspecData.CreateElement("dependency"));
+                dependencyElement.SetAttribute("id", dependency);
+                dependencyElement.SetAttribute("version", Version);
+            }
+        }
+
+        /// <summary>
+        /// Sets descriptional metadata to the nuspec file
+        /// </summary>
+        /// <param name="project">The project description</param>
+        /// <param name="metaData">The metadata xml-node</param>
+        /// <param name="nuspecData">The xml document of the nuspec file</param>
+        private static void GenerateNuspecFileSetDescription(
+            ProjectDescription project,
+            XmlNode metaData,
+            XmlDocument nuspecData)
+        {
+            (metaData.SelectSingleNode("id") ?? metaData.AppendChild(nuspecData.CreateElement("id"))).InnerText =
+                project.ProjectName;
+            (metaData.SelectSingleNode("version") ?? metaData.AppendChild(nuspecData.CreateElement("version"))).InnerText =
+                Version;
+            (metaData.SelectSingleNode("title") ?? metaData.AppendChild(nuspecData.CreateElement("title"))).InnerText =
+                project.ProjectName;
+
+            var authorsNode = metaData.SelectSingleNode("authors");
+            if (authorsNode?.InnerText == "$author$")
+            {
+                authorsNode.InnerText = "ClusterKit Team";
+            }
+
+            var ownersNode = metaData.SelectSingleNode("owners");
+            if (ownersNode?.InnerText == "$author$")
+            {
+                ownersNode.InnerText = "ClusterKit Team";
+            }
+
+            var descriptionNode = metaData.SelectSingleNode("description");
+            if (descriptionNode?.InnerText == "$description$")
+            {
+                descriptionNode.InnerText = "ClusterKit lib";
+            }
         }
 
         /// <summary>
@@ -665,7 +765,7 @@ EndGlobal
                                                     "http://schemas.microsoft.com/developer/msbuild/2003");
                         refItemGroup.AppendChild(refNode);
                         refNode.SetAttribute("Include", $"{refProject.ProjectName}, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL");
-                        refNode.InnerXml = $"\n     <SpecificVersion>False</SpecificVersion>\r\n      <HintPath>..\\..\\packages\\{refProject.ProjectName}.0.0.0-local\\lib\\{refProject.ProjectName}.dll</HintPath>\r\n      <Private>True</Private>\r\n";
+                        refNode.InnerXml = $"\n     <SpecificVersion>False</SpecificVersion>\r\n      <HintPath>..\\..\\packages\\{refProject.ProjectName}.0.0.0-local\\lib\\net45\\{refProject.ProjectName}.dll</HintPath>\r\n      <Private>True</Private>\r\n";
 
                         //ConsoleLog($"{project.ProjectName} {dependency} {refNode.Name}");
                     }

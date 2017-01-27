@@ -179,10 +179,10 @@ namespace ClusterKit.LargeObjects.Tests
                 @"{
                     akka.actor {
                         serializers {
-                            wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
+                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
                         }
                         serialization-bindings {
-                            ""System.Object"" = wire
+                            ""System.Object"" = hyperion
                         }
                     }
 

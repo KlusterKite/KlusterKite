@@ -319,8 +319,9 @@ namespace ClusterKit.NodeManager.Tests
             var nodeTemplate = templatesFactory.Storage[1];
             testActor.Tell(new CrudActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Data = nodeTemplate, Id = nodeTemplate.Id });
 
-            //nodeTemplate.Version = 2;
-            //testActor.Tell(new UpdateMessage<NodeTemplate> { ActionType = EnActionType.Update, NewObject = nodeTemplate, OldObject = nodeTemplate });
+            //// nodeTemplate.Version = 2;
+            //// testActor.Tell(new UpdateMessage<NodeTemplate> { ActionType = EnActionType.Update, NewObject = nodeTemplate, OldObject = nodeTemplate });
+
             descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(1, descriptions.Count);
@@ -860,10 +861,10 @@ namespace ClusterKit.NodeManager.Tests
                     }
 
                     serializers {
-		                wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
+		                hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
                     }
                     serialization-bindings {
-		                ""System.Object"" = wire
+                        ""System.Object"" = hyperion
                     }
                   }
 

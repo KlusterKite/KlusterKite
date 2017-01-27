@@ -101,7 +101,18 @@ namespace ClusterKit.NodeManager.WebApi
         [HttpPost]
         public async Task<NodeStartUpConfiguration> GetConfiguration(NewNodeTemplateRequest request)
         {
-            var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<object>(request, this.AkkaTimeout);
+            object result;
+            try
+            {
+                this.System.Log.Info("{Type}: sending message to {Path}", this.GetType().Name, this.GetManagerActorProxyPath());
+                result = await this.System.ActorSelection(this.GetManagerActorProxyPath())
+                             .Ask<object>(request, this.AkkaTimeout);
+            }
+            catch (Exception exception)
+            {
+                this.System.Log.Error(exception, "{Type}: GetConfiguration exception", this.GetType().Name);
+                throw;
+            }
 
             var configuration = result as NodeStartUpConfiguration;
             if (configuration != null)

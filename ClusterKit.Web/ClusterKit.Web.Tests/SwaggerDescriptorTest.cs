@@ -91,6 +91,15 @@ namespace ClusterKit.Web.Tests
                             }
                         }
 
+                    akka.actor {
+                        serializers {
+                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                        }
+                        serialization-bindings {
+                            ""System.Object"" = hyperion
+                        }
+                    }
+
                     akka.actor.deployment {
                         /Web/Swagger {
                             type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""

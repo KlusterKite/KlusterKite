@@ -1,16 +1,27 @@
-﻿namespace ClusterKit.Web
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WebTracer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Debug configuration
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Web
 {
     using System;
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Web.Http;
+
     using Akka.Actor;
     using Akka.Configuration;
-    using Akka.Event;
 
     using JetBrains.Annotations;
+
     using Microsoft.Owin;
+
     using Owin;
 
     /// <summary>
@@ -20,6 +31,11 @@
     public class WebTracer : IOwinStartupConfigurator
     {
         /// <summary>
+        /// The system configuration
+        /// </summary>
+        private readonly Config config;
+
+        /// <summary>
         /// The actor system
         /// </summary>
         /// <remarks>Just for debugging</remarks>
@@ -27,9 +43,15 @@
         private ActorSystem system;
 
         /// <summary>
-        /// The system configuration
+        /// Initializes a new instance of the <see cref="WebTracer"/> class.
         /// </summary>
-        private Config config;
+        /// <param name="system">The actor system</param>
+        /// <param name="config">The system configuration</param>
+        public WebTracer(ActorSystem system, Config config)
+        {
+            this.system = system;
+            this.config = config;
+        }
 
         /// <summary>
         /// Add additional http configuration
@@ -45,21 +67,10 @@
         /// <param name="appBuilder">The builder</param>
         public void ConfigureApp(IAppBuilder appBuilder)
         {
-            if (this.config.GetBoolean("ClusterKit.Web.Debug.Trace"))
+            if (this.config.GetBoolean("ClusterKit.Web.Debug.Trace") || true)
             {
                 appBuilder.Use<TraceMiddleware>();
             }
-        }
-
-        /// <summary>
-        /// Creates the new instance of <see cref="WebTracer"/>
-        /// </summary>
-        /// <param name="system">The actor system</param>
-        /// <param name="config">The system configuration</param>
-        public WebTracer(ActorSystem system, Config config)
-        {
-            this.system = system;
-            this.config = config;
         }
 
         /// <summary>
@@ -74,9 +85,11 @@
             private static long requestNumber;
 
             /// <summary>
-            /// Creates the new instance of the <see cref="TraceMiddleware"/>
+            /// Initializes a new instance of the <see cref="TraceMiddleware"/> class.
             /// </summary>
-            /// <param name="next">The next middleware in the conveyor</param>
+            /// <param name="next">
+            /// The next.
+            /// </param>
             public TraceMiddleware(OwinMiddleware next)
                 : base(next)
             {
@@ -87,12 +100,21 @@
             /// <returns>The async process task</returns>
             public override async Task Invoke(IOwinContext context)
             {
-                var n = Interlocked.Increment(ref requestNumber);
+                var n = Interlocked.Increment(ref TraceMiddleware.requestNumber);
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Console.WriteLine($@"Owin started Request {n} {context.Request.Path}");
-                await this.Next.Invoke(context);
-                Console.WriteLine($@"Owin finished Request {n} {context.Request.Path} in {stopwatch.ElapsedMilliseconds}ms");
+                try
+                {
+                    await this.Next.Invoke(context);
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
+                }
+
+                Console.WriteLine(
+                    $@"Owin finished Request {n} {context.Request.Path} in {stopwatch.ElapsedMilliseconds}ms");
             }
         }
     }
