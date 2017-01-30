@@ -108,7 +108,7 @@ namespace ClusterKit.Core.Service
             // log configuration finished
 
             // performing prestart checks
-            BaseInstaller.RunPrecheck(container, config);
+            BaseInstaller.RunPreCheck(container, config);
 
             // starting Akka system
             Console.WriteLine(@"starting akka system");

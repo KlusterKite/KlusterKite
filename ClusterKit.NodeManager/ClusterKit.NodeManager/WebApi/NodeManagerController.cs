@@ -68,7 +68,6 @@ namespace ClusterKit.NodeManager.WebApi
                     this.System.ActorSelection(this.GetManagerActorProxyPath())
                         .Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
 
-
             return activeNodeDescriptions
                 .OrderBy(n => n.NodeTemplate)
                 .ThenBy(n => n.ContainerType)

@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Web.SignalR
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Web.SignalR
 {
     using Akka.Actor;
     using Akka.Configuration;

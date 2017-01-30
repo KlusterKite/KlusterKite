@@ -21,6 +21,11 @@ namespace ClusterKit.Core.TestKit
     public class TestConfigurator
     {
         /// <summary>
+        /// Gets a value indicating whether <see cref="BaseInstaller.RunPostStart"/> should be called
+        /// </summary>
+        public virtual bool RunPostStart => false;
+
+        /// <summary>
         /// Gets the akka system config
         /// </summary>
         /// <param name="windsorContainer">

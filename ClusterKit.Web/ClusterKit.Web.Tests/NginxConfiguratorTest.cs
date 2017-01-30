@@ -54,7 +54,7 @@ namespace ClusterKit.Web.Tests
         [Fact]
         public void ServiceConfigGenerationTest()
         {
-            BaseInstaller.RunPrecheck(this.WindsorContainer, this.Sys.Settings.Config);
+            BaseInstaller.RunPreCheck(this.WindsorContainer, this.Sys.Settings.Config);
             var configurator = this.ActorOfAsTestActorRef<NginxConfiguratorActor>("configurator");
 
             this.ActorOfAsTestActorRef<NameSpaceActor>(this.Sys.DI().Props<NameSpaceActor>(), "Web");

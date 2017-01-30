@@ -67,9 +67,9 @@ namespace ClusterKit.Web
         /// <param name="appBuilder">The builder</param>
         public void ConfigureApp(IAppBuilder appBuilder)
         {
-            if (this.config.GetBoolean("ClusterKit.Web.Debug.Trace") || true)
+            if (this.config.GetBoolean("ClusterKit.Web.Debug.Trace"))
             {
-                appBuilder.Use<TraceMiddleware>();
+                appBuilder.Use<TraceMiddleware>(this.system);
             }
         }
 
@@ -85,14 +85,23 @@ namespace ClusterKit.Web
             private static long requestNumber;
 
             /// <summary>
+            /// The actor system
+            /// </summary>
+            private ActorSystem system;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="TraceMiddleware"/> class.
             /// </summary>
             /// <param name="next">
             /// The next.
             /// </param>
-            public TraceMiddleware(OwinMiddleware next)
+            /// <param name="system">
+            /// The system.
+            /// </param>
+            public TraceMiddleware(OwinMiddleware next, ActorSystem system)
                 : base(next)
             {
+                this.system = system;
             }
 
             /// <summary>Process an individual request.</summary>
@@ -100,10 +109,16 @@ namespace ClusterKit.Web
             /// <returns>The async process task</returns>
             public override async Task Invoke(IOwinContext context)
             {
-                var n = Interlocked.Increment(ref TraceMiddleware.requestNumber);
+                var n = Interlocked.Increment(ref requestNumber);
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                Console.WriteLine($@"Owin started Request {n} {context.Request.Path}");
+
+                this.system.Log.Info(
+                    "{Type}: started Request {RequestNumber} {RequestPath}",
+                    this.GetType().Name,
+                    n,
+                    context.Request.Path);
+
                 try
                 {
                     await this.Next.Invoke(context);
@@ -111,10 +126,20 @@ namespace ClusterKit.Web
                 catch (Exception exception)
                 {
                     Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
+
+                    this.system.Log.Error(
+                        "{Type}: error resolving {RequestNumber} {RequestPath}",
+                        this.GetType().Name,
+                        n,
+                        context.Request.Path);
                 }
 
-                Console.WriteLine(
-                    $@"Owin finished Request {n} {context.Request.Path} in {stopwatch.ElapsedMilliseconds}ms");
+                this.system.Log.Info(
+                    "{Type}: finished Request {RequestNumber} {RequestPath} in {ElapsedMilliseconds}ms",
+                    this.GetType().Name,
+                    n,
+                    context.Request.Path,
+                    stopwatch.ElapsedMilliseconds);
             }
         }
     }

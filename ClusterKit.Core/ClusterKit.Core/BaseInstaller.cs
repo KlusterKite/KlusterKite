@@ -77,7 +77,7 @@ namespace ClusterKit.Core
         public static IList<BaseInstaller> GetRegisteredBaseInstallers(IWindsorContainer container)
         {
             List<BaseInstaller> list;
-            if (!RegisteredInstallers.TryGetValue(container, out list))
+            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
             {
                 return new List<BaseInstaller>();
             }
@@ -102,7 +102,7 @@ namespace ClusterKit.Core
             Log.Information("ClusterKit starting plugin manager");
 
             List<BaseInstaller> list;
-            if (!RegisteredInstallers.TryGetValue(container, out list))
+            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
             {
                 return config;
             }
@@ -131,7 +131,7 @@ namespace ClusterKit.Core
         public static void RunPostStart(IWindsorContainer container)
         {
             List<BaseInstaller> list;
-            if (!RegisteredInstallers.TryGetValue(container, out list))
+            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
             {
                 return;
             }
@@ -149,10 +149,10 @@ namespace ClusterKit.Core
         /// The windsor container.
         /// </param>
         /// <param name="config">Full akka config</param>
-        public static void RunPrecheck(IWindsorContainer container, Config config)
+        public static void RunPreCheck(IWindsorContainer container, Config config)
         {
             List<BaseInstaller> list;
-            if (!RegisteredInstallers.TryGetValue(container, out list))
+            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
             {
                 return;
             }

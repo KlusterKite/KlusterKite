@@ -34,9 +34,6 @@ namespace ClusterKit.Core.TestKit
         protected HackedBaseActorTest(TestDescription description) : base(description.System)
         {
             description.Container.Register(Component.For<IActorRef>().Instance(this.TestActor).Named("testActor").LifestyleTransient());
-            description.Container.Register(Component.For<IWindsorContainer>().Instance(description.Container).LifestyleSingleton());
-            description.Container.Register(Component.For<ActorSystem>().Instance(this.Sys).LifestyleSingleton());
-            description.Container.Register(Component.For<Config>().Instance(this.Sys.Settings.Config).LifestyleSingleton());
             this.WindsorContainer = description.Container;
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(this.WindsorContainer));
         }

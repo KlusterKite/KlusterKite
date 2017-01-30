@@ -2,14 +2,17 @@
   <GlobalSettings>
     <StringProperty Name="Culture">en-US</StringProperty>
     <CollectionProperty Name="RecognizedWords">
+      <Value>Auth</Value>
       <Value>api</Value>
       <Value>akka</Value>
       <Value>crud</Value>
       <Value>datasource</Value>
       <Value>dbset</Value>
       <Value>ef</Value>
+      <Value>json</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
+      <Value>OAuth</Value>
       <Value>redis</Value>
       <Value>serilog</Value>
       <Value>Sharding</Value>
@@ -25,6 +28,7 @@
       <Value>uid</Value>
       <Value>urls</Value>
       <Value>untyped</Value>
+      <Value>web-api</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>

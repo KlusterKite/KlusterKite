@@ -80,16 +80,16 @@ namespace ClusterKit.Web
                     Classes.FromAssembly(registeredAssembly).BasedOn<ApiController>().LifestyleScoped());
             }
 
-            var system = ServiceLocator.Current.GetInstance<ActorSystem>();
+            var system = this.currentContainer.Resolve<ActorSystem>();
             var bindUrl = Installer.GetOwinBindUrl(system.Settings.Config);
-            Log.Information("Starting web server on {Url}", bindUrl);
+            system.Log.Info("Starting web server on {Url}", bindUrl);
             try
             {
                 WebApp.Start<Startup>(bindUrl);
             }
             catch (Exception exception)
             {
-                Log.Error(exception, "Could not start owin server");
+                system.Log.Error(exception, "Could not start owin server");
             }
         }
 
