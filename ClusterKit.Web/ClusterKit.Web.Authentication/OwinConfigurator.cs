@@ -7,9 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Auth
+namespace ClusterKit.Web.Authentication
 {
     using System.Web.Http;
+
+    using Akka.Actor;
 
     using Castle.Windsor;
 
@@ -56,7 +58,8 @@ namespace ClusterKit.Web.Auth
                                   TokenEndpointPath = new PathString("/api/1.x/security/token"),
                                   ApplicationCanDisplayErrors = true,
                                   AllowInsecureHttp = true, // internal communication is insecure
-                                  Provider = new AuthorizationServerProvider(this.container.ResolveAll<IClientProvider>())
+                                  Provider = new AuthorizationServerProvider(this.container.ResolveAll<IClientProvider>()),
+                                  AccessTokenProvider = new AuthenticationTokenProvider(this.container.Resolve<ActorSystem>()),
                               };
 
             appBuilder.UseOAuthAuthorizationServer(options);

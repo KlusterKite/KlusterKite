@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Auth {
+namespace ClusterKit.Web.Authentication {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ClusterKit.Web.Auth {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ClusterKit.Web.Auth.Configuration", typeof(Configuration).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ClusterKit.Web.Authentication.Configuration", typeof(Configuration).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

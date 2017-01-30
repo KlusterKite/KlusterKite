@@ -19,19 +19,24 @@ namespace ClusterKit.Security.Client
     public interface IClient
     {
         /// <summary>
-        /// Gets the client id
+        /// Gets the client application id
         /// </summary>
         string ClientId { get; }
 
         /// <summary>
-        /// Gets the client name
+        /// Gets the client application name
         /// </summary>
         string Name { get; }
 
         /// <summary>
+        /// Gets the client type name
+        /// </summary>
+        string Type { get; }
+
+        /// <summary>
         /// Gets the authorization scope for application
         /// </summary>
-        IEnumerable<string> Scope { get; }
+        IEnumerable<string> OwnScope { get; }
 
         /// <summary>
         /// Authenticate user using its login and password
@@ -39,6 +44,6 @@ namespace ClusterKit.Security.Client
         /// <param name="userName">The user name (login)</param>
         /// <param name="password">The user password</param>
         /// <returns>The authenticated user or null</returns>
-        Task<IIdentity> AuthenticateUserAsync(string userName, string password);
+        Task<UserSession> AuthenticateUserAsync(string userName, string password);
     }
 }

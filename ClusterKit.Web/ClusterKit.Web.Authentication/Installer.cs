@@ -6,7 +6,7 @@
 //   Installing components from current library
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Web.Auth
+namespace ClusterKit.Web.Authentication
 {
     using System.Collections.Generic;
 
@@ -28,7 +28,7 @@ namespace ClusterKit.Web.Auth
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
 
         /// <summary>
         /// Gets default akka configuration for current module
@@ -42,7 +42,7 @@ namespace ClusterKit.Web.Auth
         /// <returns>The list of roles</returns>
         protected override IEnumerable<string> GetRoles() => new[]
                                                                  {
-                                                                     "ClusterKit.Web.Auth"
+                                                                     "ClusterKit.Web.Authentication"
                                                                  };
 
         /// <summary>

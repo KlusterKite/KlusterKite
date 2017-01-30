@@ -7,8 +7,8 @@
     <ProjectGuid>{4975B025-A1D7-48E8-99D6-96D3722ACD78}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClusterKit.Web.Auth</RootNamespace>
-    <AssemblyName>ClusterKit.Web.Auth</AssemblyName>
+    <RootNamespace>ClusterKit.Web.Authentication</RootNamespace>
+    <AssemblyName>ClusterKit.Web.Authentication</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\ClusterKit.Web.Auth.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\ClusterKit.Web.Authentication.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\ClusterKit.Web.Auth.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\ClusterKit.Web.Authentication.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Akka, Version=1.1.3.31, Culture=neutral, processorArchitecture=MSIL">
@@ -149,6 +149,10 @@
       <HintPath>..\..\packages\Serilog.2.3.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="StackExchange.Redis">
+      <HintPath>..\..\packages\StackExchange.Redis.1.2.0\lib\net46\StackExchange.Redis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -191,6 +195,10 @@
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
+      <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
+      <Name>ClusterKit.Security.Client</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Configuration.resx">
@@ -206,7 +214,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationController.cs" />
+    <Compile Include="AuthenticationTokenProvider.cs" />
     <Compile Include="AuthorizationServerProvider.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="OwinConfigurator.cs" />
@@ -225,10 +233,6 @@
     <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj">
       <Project>{261dfdc5-5107-41b5-a8f4-a34f84d22931}</Project>
       <Name>ClusterKit.LargeObjects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Client\ClusterKit.Security.Client.csproj">
-      <Project>{25e3b4dc-717e-4eca-a756-3112e2093cff}</Project>
-      <Name>ClusterKit.Security.Client</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
       <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>

@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Auth
+namespace ClusterKit.Web.Authentication
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -25,9 +25,14 @@ namespace ClusterKit.Web.Auth
     public class AuthorizationServerProvider : OAuthAuthorizationServerProvider
     {
         /// <summary>
-        /// The key to store current client
+        /// The key to store current client in the context
         /// </summary>
-        private const string OwinContextClientKey = "client";
+        public const string OwinContextClientKey = "client";
+
+        /// <summary>
+        /// The key to store current client in the context
+        /// </summary>
+        public const string OwinContextUserSessionKey = "userSession";
 
         /// <summary>
         /// The client providers
@@ -98,14 +103,29 @@ namespace ClusterKit.Web.Auth
                 return;
             }
 
-            var user = await client.AuthenticateUserAsync(context.UserName, context.Password);
-            if (user == null)
+            var session = await client.AuthenticateUserAsync(context.UserName, context.Password);
+            if (session == null)
             {
                 return;
             }
 
-            var identity = new ClaimsIdentity(user, client.Scope.Select(x => new Claim("urn:oauth:scope", x)));
+            context.OwinContext.Set(OwinContextUserSessionKey, session);
+            var identity = new ClaimsIdentity(session.User.UserId);
             context.Validated(identity);
+        }
+
+        /// <summary>
+        /// Called at the final stage of a successful Token endpoint request. An application may implement this call in order to do any final
+        /// modification of the claims being used to issue access or refresh tokens. This call may also be used in order to add additional
+        /// response parameters to the Token endpoint's json response body.
+        /// </summary>
+        /// <param name="context">The context of the event carries information in and results out.</param>
+        /// <returns>Task to enable asynchronous execution</returns>
+        public override Task TokenEndpoint(OAuthTokenEndpointContext context)
+        {
+            var userSession = context.OwinContext.Get<UserSession>(OwinContextUserSessionKey);
+            context.Properties.ExpiresUtc = userSession.Expiring;
+            return base.TokenEndpoint(context);
         }
 
         /// <summary>

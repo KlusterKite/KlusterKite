@@ -1,0 +1,6 @@
+{
+	ClusterKit.Web.Authentication.RedisConnection = "redis:6379"
+	ClusterKit.Web.Authentication.RedisDb = 1
+	ClusterKit.Web.Authentication.TokenExpirery = 30m
+	ClusterKit.Web.Authentication.TokenKeyPrefix = "ClusterKit:Web:Authentication:"
+}

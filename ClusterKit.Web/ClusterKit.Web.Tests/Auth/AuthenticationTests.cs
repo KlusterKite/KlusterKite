@@ -6,14 +6,15 @@
 //   Testing authentication process
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace ClusterKit.Web.Tests.Auth
 {
+    using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.Net;
     using System.Net.Sockets;
-    using System.Security.Principal;
     using System.Threading.Tasks;
+    using System.Web.Http;
 
     using Akka.Configuration;
 
@@ -23,13 +24,16 @@ namespace ClusterKit.Web.Tests.Auth
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
+    using ClusterKit.Core.Utils;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
 
-    using Microsoft.Owin.Security.OAuth;
+    using Newtonsoft.Json;
 
     using RestSharp;
+
+    using StackExchange.Redis;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -89,12 +93,17 @@ namespace ClusterKit.Web.Tests.Auth
         [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword", HttpStatusCode.OK)]
         [InlineData("unit-test-secret", "test-secret", "testUser1", "testPassword", HttpStatusCode.BadRequest)]
         [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword1", HttpStatusCode.BadRequest)]
-        public async Task GrantPasswordTest(string clientId, string clientSecret, string userName, string userPassword, HttpStatusCode expectedResult)
+        public async Task GrantPasswordTest(
+            string clientId,
+            string clientSecret,
+            string userName,
+            string userPassword,
+            HttpStatusCode expectedResult)
         {
             this.ExpectNoMsg();
             this.Log.Info("Owin port is {OwinPort}", this.OwinPort);
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 1000 };
+            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST, Resource = "/api/1.x/security/token" };
             request.AddParameter("grant_type", "password");
@@ -111,6 +120,26 @@ namespace ClusterKit.Web.Tests.Auth
             // client.Authenticator = new RestSharp.Authenticators.OAuth2AuthorizationRequestHeaderAuthenticator();
             // var request = new RestRequest { Method = Method.GET, Resource = "/auth/authenticate?login=user&password=password" };
             Assert.Equal(expectedResult, result.StatusCode);
+
+            if (expectedResult == HttpStatusCode.OK)
+            {
+                var tokenDescription = JsonConvert.DeserializeObject<TokenDescription>(result.Content);
+                var redisConnectionString = this.Sys.Settings.Config.GetString("ClusterKit.Web.Authentication.RedisConnection");
+                var redisDb = this.Sys.Settings.Config.GetInt("ClusterKit.Web.Authentication.RedisDb");
+                var tokenKeyPrefix = this.Sys.Settings.Config.GetString("ClusterKit.Web.Authentication.TokenKeyPrefix");
+
+                using (var connection = await ConnectionMultiplexer.ConnectAsync(redisConnectionString))
+                {
+                    var db = connection.GetDatabase(redisDb);
+                    var data = await db.StringGetAsync($"{tokenKeyPrefix}{tokenDescription.Token}");
+                    Assert.True(data.HasValue);
+                    var session = data.ToString().DeserializeFromAkkaString<UserSession>(this.Sys);
+
+                    Assert.Equal(clientId, session.ClientId);
+                    Assert.Equal(typeof(User), session.User.GetType());
+                    Assert.Equal(userName, session.User.UserId);
+                }
+            }
         }
 
         /// <summary>
@@ -141,6 +170,7 @@ namespace ClusterKit.Web.Tests.Auth
                 {{
                     ClusterKit {{
  		                Web {{
+                            Authentication.RedisConnection = ""{ConfigurationManager.ConnectionStrings["redis"].ConnectionString}""
                             OwinPort = {port},
  			                OwinBindAddress = ""http://*:{port}"",
                             Debug.Trace = true
@@ -159,7 +189,7 @@ namespace ClusterKit.Web.Tests.Auth
                 var installers = base.GetPluginInstallers();
                 installers.Add(new Descriptor.Installer());
                 installers.Add(new Installer());
-                installers.Add(new Web.Auth.Installer());
+                installers.Add(new Authentication.Installer());
                 installers.Add(new TestInstaller());
                 return installers;
             }
@@ -187,6 +217,45 @@ namespace ClusterKit.Web.Tests.Auth
         }
 
         /// <summary>
+        /// The test client
+        /// </summary>
+        private class TestClient : IClient
+        {
+            /// <inheritdoc />
+            public string ClientId { get; set; }
+
+            /// <inheritdoc />
+            public string Name { get; set; }
+
+            /// <inheritdoc />
+            public IEnumerable<string> OwnScope { get; set; }
+
+            /// <inheritdoc />
+            public string Type => this.GetType().Name;
+
+            /// <inheritdoc />
+            public Task<UserSession> AuthenticateUserAsync(string userName, string password)
+            {
+                if (userName == "testUser" && password == "testPassword")
+                {
+                    var session = new UserSession(
+                        new User { UserId = userName },
+                        new[] { "User" },
+                        this.ClientId,
+                        this.Type,
+                        this.OwnScope,
+                        DateTimeOffset.Now, 
+                        DateTimeOffset.Now.AddSeconds(60),
+                        null);
+
+                    return Task.FromResult(session);
+                }
+
+                return Task.FromResult<UserSession>(null);
+            }
+        }
+
+        /// <summary>
         /// The test client provider
         /// </summary>
         [UsedImplicitly]
@@ -201,24 +270,28 @@ namespace ClusterKit.Web.Tests.Auth
                 switch (clientId)
                 {
                     case "unit-test-nosecret":
-                        return Task.FromResult<IClient>(new TestClient
-                                                            {
-                                                                ClientId = clientId,
-                                                                Name = "Test - no secret",
-                                                                Scope = new []{ "Test1", "Test2" }
-                                                            });
+                        return
+                            Task.FromResult<IClient>(
+                                new TestClient
+                                    {
+                                        ClientId = clientId,
+                                        Name = "Test - no secret",
+                                        OwnScope = new[] { "Test1", "Test2" }
+                                    });
                     case "unit-test-secret":
                         if (secret == "test-secret")
                         {
-                            return Task.FromResult<IClient>(new TestClient
-                            {
-                                ClientId = clientId,
-                                Name = "Test - secret",
-                                Scope = new[] { "Test1", "Test3" }
-                            });
+                            return
+                                Task.FromResult<IClient>(
+                                    new TestClient
+                                        {
+                                            ClientId = clientId,
+                                            Name = "Test - secret",
+                                            OwnScope = new[] { "Test1", "Test3" }
+                                        });
                         }
-                        break;
 
+                        break;
                 }
 
                 return Task.FromResult<IClient>(null);
@@ -226,29 +299,12 @@ namespace ClusterKit.Web.Tests.Auth
         }
 
         /// <summary>
-        /// The test client
+        /// The test user
         /// </summary>
-        private class TestClient : IClient
+        private class User : IUser
         {
             /// <inheritdoc />
-            public string ClientId { get; set; }
-
-            /// <inheritdoc />
-            public string Name { get; set; }
-
-            /// <inheritdoc />
-            public IEnumerable<string> Scope { get; set; }
-
-            /// <inheritdoc />
-            public Task<IIdentity> AuthenticateUserAsync(string userName, string password)
-            {
-                if (userName == "testUser" && password == "testPassword")
-                {
-                    return Task.FromResult<IIdentity>(new GenericIdentity(userName, OAuthDefaults.AuthenticationType));
-                }
-
-                return Task.FromResult<IIdentity>(null);
-            }
+            public string UserId { get; set; }
         }
     }
 }
