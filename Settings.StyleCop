@@ -1,8 +1,8 @@
 <StyleCopSettings Version="105">
   <GlobalSettings>
-    <StringProperty Name="Culture">en-US</StringProperty>
     <CollectionProperty Name="RecognizedWords">
       <Value>Auth</Value>
+      <Value>Authorizer</Value>
       <Value>api</Value>
       <Value>akka</Value>
       <Value>crud</Value>
@@ -37,6 +37,16 @@
         <StringProperty Name="CompanyName">ClusterKit</StringProperty>
         <StringProperty Name="Copyright">All rights reserved</StringProperty>
       </AnalyzerSettings>
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.CSharp.ReadabilityRules">
+      <Rules>
+        <Rule Name="PrefixCallsCorrectly">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+      </Rules>
+      <AnalyzerSettings />
     </Analyzer>
   </Analyzers>
 </StyleCopSettings>

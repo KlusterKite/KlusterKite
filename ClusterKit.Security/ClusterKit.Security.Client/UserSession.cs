@@ -45,7 +45,7 @@ namespace ClusterKit.Security.Client
         /// <param name="extraData">
         /// The extra data.
         /// </param>
-        public UserSession([NotNull] IUser user, [NotNull]IEnumerable<string> userScope, [NotNull] string clientId, [NotNull] string clientType, [NotNull] IEnumerable<string> clientScope, DateTimeOffset created, DateTimeOffset expiring, object extraData)
+        public UserSession([CanBeNull] IUser user, [CanBeNull]IEnumerable<string> userScope, [NotNull] string clientId, [NotNull] string clientType, [NotNull] IEnumerable<string> clientScope, DateTimeOffset created, DateTimeOffset expiring, object extraData)
         {
             this.User = user;
             this.UserScope = userScope;
@@ -60,13 +60,13 @@ namespace ClusterKit.Security.Client
         /// <summary>
         /// Gets the user identity
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         public IUser User { get; }
 
         /// <summary>
         /// Gets the user's authorized actions scope
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         public IEnumerable<string> UserScope { get; }
 
         /// <summary>

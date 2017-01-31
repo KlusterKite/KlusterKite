@@ -116,9 +116,6 @@ namespace ClusterKit.Web.Tests.Auth
             }
 
             var result = await client.ExecuteTaskAsync(request);
-
-            // client.Authenticator = new RestSharp.Authenticators.OAuth2AuthorizationRequestHeaderAuthenticator();
-            // var request = new RestRequest { Method = Method.GET, Resource = "/auth/authenticate?login=user&password=password" };
             Assert.Equal(expectedResult, result.StatusCode);
 
             if (expectedResult == HttpStatusCode.OK)
@@ -216,7 +213,7 @@ namespace ClusterKit.Web.Tests.Auth
             }
         }
 
-        /// <summary>
+        /// <summary> 
         /// The test client
         /// </summary>
         private class TestClient : IClient

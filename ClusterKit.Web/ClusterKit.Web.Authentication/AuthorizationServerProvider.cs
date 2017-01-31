@@ -110,7 +110,7 @@ namespace ClusterKit.Web.Authentication
             }
 
             context.OwinContext.Set(OwinContextUserSessionKey, session);
-            var identity = new ClaimsIdentity(session.User.UserId);
+            var identity = new ClaimsIdentity(session.User?.UserId ?? session.ClientId);
             context.Validated(identity);
         }
 
