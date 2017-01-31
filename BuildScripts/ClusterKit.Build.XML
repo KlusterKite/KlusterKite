@@ -44,81 +44,6 @@
             Gets global output packages version
             </summary>
         </member>
-        <member name="M:ClusterKit.Build.BuildUtils.Build(ClusterKit.Build.ProjectDescription)">
-            <summary>
-            Builds current project
-            </summary>
-            <param name="project">Project to build</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.Build(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
-            <summary>
-            Builds all projects
-            </summary>
-            <param name="projects">The list of projects to build</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.Configure(System.String,System.String,System.String,System.String)">
-            <summary>
-            Configures current build execution
-            </summary>
-            <param name="version">Global output packages version</param>
-            <param name="buildDirectory">Temp directory to build projects</param>
-            <param name="packageOutputDirectory">Output directory to put prepared nuget packages</param>
-            <param name="packageInputDirectory">directory with sources nuget packages</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.CreateGlobalSolution(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
-            <summary>
-            Creates global solution file that includes all registered projects
-            </summary>
-            <param name="projects">The list of projects</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.CreateNuget(ClusterKit.Build.ProjectDescription)">
-            <summary>
-            Creates nuget package
-            </summary>
-            <param name="project">
-            The project to publish
-            </param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFile(ClusterKit.Build.ProjectDescription)">
-            <summary>
-            Updates nuspec file for the project
-            </summary>
-            <param name="project"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetTools(ClusterKit.Build.ProjectDescription,System.Xml.XmlElement,System.Xml.XmlDocument)">
-            <summary>
-            Set tools contents to the nuspec
-            </summary>
-            <param name="project">The project definition</param>
-            <param name="filesRootElement">The "files" xml node</param>
-            <param name="nuspecData">The nusec xml document</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetAssembly(ClusterKit.Build.ProjectDescription,System.Xml.XmlNode,System.Xml.XmlDocument,System.Xml.XmlElement)">
-            <summary>
-            Adds assembly files
-            </summary>
-            <param name="project">The project definition</param>
-            <param name="metaData">The metadata xml node</param>
-            <param name="nuspecData">The nusec xml document</param>
-            <param name="filesRootElement">The "files" xml node</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetDependencies(ClusterKit.Build.ProjectDescription,System.Xml.XmlNode,System.Xml.XmlDocument)">
-            <summary>
-            Sets the list of dependencies to the nuspec file
-            </summary>
-            <param name="project">The project description</param>
-            <param name="metaData">The metadata xml-node</param>
-            <param name="nuspecData">The xml document of the nuspec file</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetDescription(ClusterKit.Build.ProjectDescription,System.Xml.XmlNode,System.Xml.XmlDocument)">
-            <summary>
-            Sets descriptional metadata to the nuspec file
-            </summary>
-            <param name="project">The project description</param>
-            <param name="metaData">The metadata xml-node</param>
-            <param name="nuspecData">The xml document of the nuspec file</param>
-        </member>
         <member name="M:ClusterKit.Build.BuildUtils.CreateNuget(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
             <summary>
             Creates nuget package for all projects
@@ -161,6 +86,103 @@
             </summary>
             <param name="projects">The list of projects</param>
         </member>
+        <member name="M:ClusterKit.Build.BuildUtils.SwitchToProjectRefs(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Updates current projects (csproj) to reference projects in other folders as projects
+            </summary>
+            <remarks>
+            Useful while working in global solution
+            </remarks>
+            <param name="projects">The list of projects</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.Build(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Builds current project
+            </summary>
+            <param name="project">Project to build</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.Build(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Builds all projects
+            </summary>
+            <param name="projects">The list of projects to build</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.Configure(System.String,System.String,System.String,System.String)">
+            <summary>
+            Configures current build execution
+            </summary>
+            <param name="version">Global output packages version</param>
+            <param name="buildDirectory">Temp directory to build projects</param>
+            <param name="packageOutputDirectory">Output directory to put prepared nuget packages</param>
+            <param name="packageInputDirectory">directory with sources nuget packages</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.CreateGlobalSolution(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
+            <summary>
+            Creates global solution file that includes all registered projects
+            </summary>
+            <param name="projects">The list of projects</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.CreateNuget(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Creates nuget package
+            </summary>
+            <param name="project">
+            The project to publish
+            </param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.ConsoleLog(System.String)">
+            <summary>
+            Debugger method to write sum console output
+            </summary>
+            <param name="message">The message</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFile(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Updates nuspec file for the project
+            </summary>
+            <param name="project">The project description</param>
+            <returns>The path to nuspec file</returns>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetAssembly(ClusterKit.Build.ProjectDescription,System.Xml.XmlNode,System.Xml.XmlDocument,System.Xml.XmlElement)">
+            <summary>
+            Adds assembly files
+            </summary>
+            <param name="project">The project definition</param>
+            <param name="metaData">The metadata xml node</param>
+            <param name="nuspecData">The nuspec xml document</param>
+            <param name="filesRootElement">The "files" xml node</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetDependencies(ClusterKit.Build.ProjectDescription,System.Xml.XmlNode,System.Xml.XmlDocument)">
+            <summary>
+            Sets the list of dependencies to the nuspec file
+            </summary>
+            <param name="project">The project description</param>
+            <param name="metaData">The metadata xml-node</param>
+            <param name="nuspecData">The xml document of the nuspec file</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetDescription(ClusterKit.Build.ProjectDescription,System.Xml.XmlNode,System.Xml.XmlDocument)">
+            <summary>
+            Sets description metadata to the nuspec file
+            </summary>
+            <param name="project">The project description</param>
+            <param name="metaData">The metadata xml-node</param>
+            <param name="nuspecData">The xml document of the nuspec file</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GenerateNuspecFileSetTools(ClusterKit.Build.ProjectDescription,System.Xml.XmlElement,System.Xml.XmlDocument)">
+            <summary>
+            Set tools contents to the nuspec
+            </summary>
+            <param name="project">The project definition</param>
+            <param name="filesRootElement">The "files" xml node</param>
+            <param name="nuspecData">The nuspec xml document</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.GetProjectUid(ClusterKit.Build.ProjectDescription)">
+            <summary>
+            Extracts project uid from project file
+            </summary>
+            <param name="project">The project description</param>
+            <returns>The project's uid</returns>
+        </member>
         <member name="M:ClusterKit.Build.BuildUtils.NugetAddLinksToLocalPackages(ClusterKit.Build.ProjectDescription,System.Collections.Generic.List{ClusterKit.Build.ProjectDescription})">
             <summary>
             Adds links to internal dependencies from packages.config
@@ -174,28 +196,6 @@
             </summary>
             <param name="project">The project description</param>
             <param name="projects">The list of all projects</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.SwitchToProjectRefs(System.Collections.Generic.IEnumerable{ClusterKit.Build.ProjectDescription})">
-            <summary>
-            Updates current projects (csproj) to reference projects in other folders as projects
-            </summary>
-            <remarks>
-            Usefull while working in global solution
-            </remarks>
-            <param name="projects">The list of projects</param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.ConsoleLog(System.String)">
-            <summary>
-            Debugger method to write sum console output
-            </summary>
-            <param name="message"></param>
-        </member>
-        <member name="M:ClusterKit.Build.BuildUtils.GetProjectUid(ClusterKit.Build.ProjectDescription)">
-            <summary>
-            Extracts project uid from project file
-            </summary>
-            <param name="project">The project description</param>
-            <returns>The project's uid</returns>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.RestoreProjectDependencies(ClusterKit.Build.ProjectDescription)">
             <summary>

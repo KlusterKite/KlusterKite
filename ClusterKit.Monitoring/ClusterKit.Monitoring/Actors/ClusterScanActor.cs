@@ -15,7 +15,6 @@ namespace ClusterKit.Monitoring.Actors
 
     using Akka.Actor;
     using Akka.Cluster;
-    using Akka.Cluster.Tools.PublishSubscribe;
 
     using ClusterKit.LargeObjects;
     using ClusterKit.LargeObjects.Client;
@@ -54,7 +53,6 @@ namespace ClusterKit.Monitoring.Actors
 
             this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member));
             this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member));
-
 
             this.Receive<ClusterScanRequest>(m => this.OnClusterScanRequest());
             this.Receive<ClusterScanResultRequest>(
@@ -109,6 +107,7 @@ namespace ClusterKit.Monitoring.Actors
             {
                 Context.ActorSelection($"{address}/user/Monitoring/Scanner").Tell(new ActorSystemScanRequest());
             }
+
             this.clusterTree.Nodes.Clear();
             Context.System.Log.Info("{Type}: cluster scan was initiated", this.GetType().Name);
         }

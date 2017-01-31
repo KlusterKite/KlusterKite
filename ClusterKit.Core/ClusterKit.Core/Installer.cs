@@ -7,7 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-// ReSharper disable ArrangeStaticMemberQualifier
 namespace ClusterKit.Core
 {
     using Akka.Actor;
@@ -26,7 +25,7 @@ namespace ClusterKit.Core
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
         /// Gets default akka configuration for current module

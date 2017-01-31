@@ -13,14 +13,6 @@ namespace ClusterKit.Web.Authorization
 
     using Akka.Actor;
 
-    using Castle.Windsor;
-
-    using ClusterKit.Security.Client;
-
-    using Microsoft.Owin;
-    using Microsoft.Owin.Security.Infrastructure;
-    using Microsoft.Owin.Security.OAuth;
-
     using Owin;
 
     /// <summary>
@@ -31,7 +23,7 @@ namespace ClusterKit.Web.Authorization
         /// <summary>
         /// The current actor system
         /// </summary>
-        private ActorSystem system;
+        private readonly ActorSystem system;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinConfigurator"/> class.

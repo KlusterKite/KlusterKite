@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Web.Swagger
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Web.Swagger
 {
     using System.Collections.Generic;
 
@@ -20,10 +29,10 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
-        /// Should check the config and environment for possible erorrs.
+        /// Should check the config and environment for possible errors.
         /// If any found, shod throw the exception to prevent node from starting.
         /// </summary>
         /// <param name="config">Full akka config</param>
@@ -59,7 +68,10 @@
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
         /// </summary>
         /// <returns>The list of roles</returns>
-        protected override IEnumerable<string> GetRoles() => new[] { "Web.Swagger.Publish" };
+        protected override IEnumerable<string> GetRoles() => new[]
+                                                                 {
+                                                                     "Web.Swagger.Publish"
+                                                                 };
 
         /// <summary>
         /// Registering DI components

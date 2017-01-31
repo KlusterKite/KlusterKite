@@ -14,7 +14,6 @@ namespace ClusterKit.Web.Tests.Auth
     using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using Akka.Configuration;
 
@@ -133,8 +132,8 @@ namespace ClusterKit.Web.Tests.Auth
                     var session = data.ToString().DeserializeFromAkkaString<UserSession>(this.Sys);
 
                     Assert.Equal(clientId, session.ClientId);
-                    Assert.Equal(typeof(User), session.User.GetType());
-                    Assert.Equal(userName, session.User.UserId);
+                    Assert.Equal(typeof(User), session.User?.GetType());
+                    Assert.Equal(userName, session.User?.UserId);
                 }
             }
         }
@@ -198,7 +197,7 @@ namespace ClusterKit.Web.Tests.Auth
         public class TestInstaller : BaseInstaller
         {
             /// <inheritdoc />
-            protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClusterRole;
+            protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
 
             /// <inheritdoc />
             protected override Config GetAkkaConfig()

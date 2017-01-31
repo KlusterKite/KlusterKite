@@ -6,7 +6,6 @@
 //   Base class to install ClusterKit plugin components
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace ClusterKit.Core
 {
     using System;
@@ -32,12 +31,6 @@ namespace ClusterKit.Core
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles node role functionality
         /// </summary>
-        [Obsolete("Sorry for orthography. Will be removed soon.")]
-        protected const decimal PriorityClasterRole = 100M;
-
-        /// <summary>
-        /// Predefined priority to load configuration for plugins, that handles node role functionality
-        /// </summary>
         [UsedImplicitly]
         protected const decimal PriorityClusterRole = 100M;
 
@@ -56,8 +49,8 @@ namespace ClusterKit.Core
         /// <summary>
         /// Every time <seealso cref="Install"/> called, installer register itself here
         /// </summary>
-        private static readonly Dictionary<IWindsorContainer, List<BaseInstaller>> RegisteredInstallers
-            = new Dictionary<IWindsorContainer, List<BaseInstaller>>();
+        private static readonly Dictionary<IWindsorContainer, List<BaseInstaller>> RegisteredInstallers =
+            new Dictionary<IWindsorContainer, List<BaseInstaller>>();
 
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
@@ -77,7 +70,7 @@ namespace ClusterKit.Core
         public static IList<BaseInstaller> GetRegisteredBaseInstallers(IWindsorContainer container)
         {
             List<BaseInstaller> list;
-            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
+            if (!RegisteredInstallers.TryGetValue(container, out list))
             {
                 return new List<BaseInstaller>();
             }
@@ -102,7 +95,7 @@ namespace ClusterKit.Core
             Log.Information("ClusterKit starting plugin manager");
 
             List<BaseInstaller> list;
-            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
+            if (!RegisteredInstallers.TryGetValue(container, out list))
             {
                 return config;
             }
@@ -111,11 +104,14 @@ namespace ClusterKit.Core
                 list.SelectMany(i => i.GetRoles())
                     .Distinct()
                     .Where(r => !string.IsNullOrWhiteSpace(r))
-                    .Select(r => $"\"{ r.Replace("\"", "\\\"") }\"").ToList();
+                    .Select(r => $"\"{r.Replace("\"", "\\\"")}\"")
+                    .ToList();
 
             if (rolesList.Any())
             {
-                config = config.WithFallback(ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
+                config =
+                    config.WithFallback(
+                        ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
             }
 
             return list.OrderByDescending(i => i.AkkaConfigLoadPriority)
@@ -131,7 +127,7 @@ namespace ClusterKit.Core
         public static void RunPostStart(IWindsorContainer container)
         {
             List<BaseInstaller> list;
-            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
+            if (!RegisteredInstallers.TryGetValue(container, out list))
             {
                 return;
             }
@@ -152,7 +148,7 @@ namespace ClusterKit.Core
         public static void RunPreCheck(IWindsorContainer container, Config config)
         {
             List<BaseInstaller> list;
-            if (!BaseInstaller.RegisteredInstallers.TryGetValue(container, out list))
+            if (!RegisteredInstallers.TryGetValue(container, out list))
             {
                 return;
             }

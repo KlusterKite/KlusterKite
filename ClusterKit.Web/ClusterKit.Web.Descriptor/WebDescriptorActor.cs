@@ -25,11 +25,6 @@ namespace ClusterKit.Web.Descriptor
     public class WebDescriptorActor : ReceiveActor
     {
         /// <summary>
-        /// Services, defined in config
-        /// </summary>
-        private readonly WebDescriptionResponse webDescription;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="WebDescriptorActor"/> class.
         /// </summary>
         public WebDescriptorActor()
@@ -80,8 +75,7 @@ namespace ClusterKit.Web.Descriptor
             }
 
             description.Services = services.AsReadOnly();
-            this.webDescription = description;
-            this.Receive<WebDescriptionRequest>(m => this.Sender.Tell(this.webDescription));
+            this.Receive<WebDescriptionRequest>(m => this.Sender.Tell(description));
         }
     }
 }

@@ -61,30 +61,35 @@ namespace ClusterKit.Security.Client
         /// Gets the user identity
         /// </summary>
         [CanBeNull]
+        [UsedImplicitly]
         public IUser User { get; }
 
         /// <summary>
         /// Gets the user's authorized actions scope
         /// </summary>
         [CanBeNull]
+        [UsedImplicitly]
         public IEnumerable<string> UserScope { get; }
 
         /// <summary>
         /// Gets the client id
         /// </summary>
         [NotNull]
+        [UsedImplicitly]
         public string ClientId { get; }
 
         /// <summary>
         /// Gets the client type
         /// </summary>
         [NotNull]
+        [UsedImplicitly]
         public string ClientType { get; }
 
         /// <summary>
         /// Gets the client's authorized actions scope
         /// </summary>
         [NotNull]
+        [UsedImplicitly]
         public IEnumerable<string> ClientScope { get; }
 
         /// <summary>
@@ -100,7 +105,7 @@ namespace ClusterKit.Security.Client
         /// <summary>
         /// Gets some extra data from client
         /// </summary>
+        [UsedImplicitly]
         public object ExtraData { get; }
-
     }
 }

@@ -23,9 +23,6 @@ namespace ClusterKit.Web
     using ClusterKit.Core;
 
     using Microsoft.Owin.Hosting;
-    using Microsoft.Practices.ServiceLocation;
-
-    using Serilog;
 
     /// <summary>
     /// Installing components from current library
@@ -41,7 +38,7 @@ namespace ClusterKit.Web
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
         /// Gets default akka configuration for current module
@@ -70,7 +67,7 @@ namespace ClusterKit.Web
             }
 
             var registeredAssemblies =
-                BaseInstaller.GetRegisteredBaseInstallers(this.currentContainer)
+                GetRegisteredBaseInstallers(this.currentContainer)
                     .Select(i => i.GetType().Assembly)
                     .Distinct();
 
@@ -81,7 +78,7 @@ namespace ClusterKit.Web
             }
 
             var system = this.currentContainer.Resolve<ActorSystem>();
-            var bindUrl = Installer.GetOwinBindUrl(system.Settings.Config);
+            var bindUrl = GetOwinBindUrl(system.Settings.Config);
             system.Log.Info("Starting web server on {Url}", bindUrl);
             try
             {

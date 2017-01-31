@@ -140,7 +140,7 @@ namespace ClusterKit.Web.Authentication
         public override Task GrantCustomExtension(OAuthGrantCustomExtensionContext context)
         {
             // todo: implement custom extensions
-            return base.GrantCustomExtension(context);
+            return Task.CompletedTask;
         }
     }
 }

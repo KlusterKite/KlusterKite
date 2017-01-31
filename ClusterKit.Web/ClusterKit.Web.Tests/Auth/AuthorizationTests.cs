@@ -191,6 +191,10 @@ namespace ClusterKit.Web.Tests.Auth
         [RoutePrefix("test")]
         public class TestController : ApiController
         {
+            /// <summary>
+            /// Tests user authentication
+            /// </summary>
+            /// <returns>The user name</returns>
             [HttpGet]
             [Route("user")]
             public string GetUserSession()

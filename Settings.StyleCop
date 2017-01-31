@@ -24,6 +24,7 @@
       <Value>nginx</Value>
       <Value>Npgsql</Value>
       <Value>nuget</Value>
+      <Value>nuspec</Value>
       <Value>ui</Value>
       <Value>uid</Value>
       <Value>urls</Value>

@@ -56,7 +56,6 @@ namespace ClusterKit.Log.ElasticSearch
                 indexFormat,
                 string.Join("\n\t\t", nodes));
 
-
             SelfLog.Enable(Console.WriteLine);
             var options = new ElasticsearchSinkOptions(nodes.Select(s => new Uri(s)))
                               {
@@ -66,8 +65,6 @@ namespace ClusterKit.Log.ElasticSearch
                               };
 
             return configuration.WriteTo.Elasticsearch(options);
-
-
         }
     }
 }

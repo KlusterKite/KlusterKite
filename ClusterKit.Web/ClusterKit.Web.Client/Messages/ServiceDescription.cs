@@ -93,6 +93,7 @@ namespace ClusterKit.Web.Client.Messages
             {
                 return false;
             }
+
             return obj is ServiceDescription && this.Equals((ServiceDescription)obj);
         }
 

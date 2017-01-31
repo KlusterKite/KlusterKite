@@ -79,12 +79,12 @@ namespace ClusterKit.Web.NginxConfigurator
         public List<Address> KnownActiveNodes { get; } = new List<Address>();
 
         /// <summary>
-        /// Gets cahed data of published web urls in everey known node
+        /// Gets cached data of published web urls in every known node
         /// </summary>
         public Dictionary<Address, WebDescriptionResponse> NodePublishUrls { get; } = new Dictionary<Address, WebDescriptionResponse>();
 
         /// <summary>
-        /// Compiles upstream name from hostname and servicename
+        /// Compiles upstream name from hostname and service name
         /// </summary>
         /// <param name="hostName">Host name of service</param>
         /// <param name="serviceName">Service location</param>
@@ -311,7 +311,7 @@ namespace ClusterKit.Web.NginxConfigurator
                         new ProcessStartInfo(command, arguments)
                         {
                             UseShellExecute = false,
-                            WorkingDirectory = Path.GetDirectoryName(command) ?? ".",
+                            WorkingDirectory = Path.GetDirectoryName(command)
                         });
 
                     if (proccess != null && !proccess.WaitForExit(10000))
@@ -326,7 +326,6 @@ namespace ClusterKit.Web.NginxConfigurator
         /// Writes every defined service to nginx config
         /// </summary>
         /// <param name="config">Configuration file to write</param>
-        ///
         private void WriteServicesToConfig(StringBuilder config)
         {
             foreach (var host in this.Configuration)
@@ -348,9 +347,8 @@ namespace ClusterKit.Web.NginxConfigurator
                         config.Append("\t\t sub_filter_types text/json; \n");
                         config.Append("\t\t sub_filter_types application/xml; \n");
                         config.Append("\t\t sub_filter_types application/json; \n");
-                        //sub_filter "http://your_server/" "http://your_server/admin/";
-                        //sub_filter_once off;
                     }
+
                     config.Append("\t}\n");
                 }
 

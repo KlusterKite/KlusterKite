@@ -46,7 +46,13 @@ namespace ClusterKit.Data.EF.Npgsql
             command.CommandText = $"SELECT count(*) FROM pg_database WHERE datname = '{databaseName}'";
             command.CommandType = CommandType.Text;
 
-            var count = (long)command.ExecuteScalar();
+            var scalar = command.ExecuteScalar();
+            if (scalar == null)
+            {
+                throw new Exception("Unexpected database behavior");
+            }
+
+            var count = (long)scalar;
 
             if (count == 0)
             {

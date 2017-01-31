@@ -22,16 +22,14 @@ namespace ClusterKit.NodeManager.Client
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Launcher.Messages;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Small client actor for node managing. Provides current node configuration information and executes update related commands
     /// </summary>
+    [UsedImplicitly]
     public class NodeManagerReceiverActor : ReceiveActor
     {
-        /// <summary>
-        /// Current node description
-        /// </summary>
-        private readonly NodeDescription description;
-
         /// <summary>
         /// Start time of the node
         /// </summary>
@@ -50,9 +48,10 @@ namespace ClusterKit.NodeManager.Client
                 nodeId = Guid.NewGuid();
             }
 
+            NodeDescription description;
             try
             {
-                this.description = new NodeDescription
+                description = new NodeDescription
                 {
                     IsInitialized = true,
                     NodeAddress = Cluster.Get(Context.System).SelfAddress,
@@ -93,7 +92,7 @@ namespace ClusterKit.NodeManager.Client
                 throw;
             }
 
-            this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(this.description));
+            this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(description));
             this.ReceiveAsync<ShutdownMessage>(
                 async m =>
                     {

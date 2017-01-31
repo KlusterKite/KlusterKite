@@ -21,8 +21,6 @@ namespace ClusterKit.Web.Authentication
     using Microsoft.Owin.Security;
     using Microsoft.Owin.Security.Infrastructure;
 
-    using Newtonsoft.Json;
-
     using StackExchange.Redis;
 
     /// <summary>
@@ -106,7 +104,7 @@ namespace ClusterKit.Web.Authentication
                 if (data.HasValue)
                 {
                     var session = data.ToString().DeserializeFromAkkaString<UserSession>(this.system);
-                    context.SetTicket(new AuthenticationTicket(new ClaimsIdentity(session.User.UserId), new AuthenticationProperties { ExpiresUtc = session.Expiring, IssuedUtc = session.Created }));
+                    context.SetTicket(new AuthenticationTicket(new ClaimsIdentity(session.User?.UserId ?? session.ClientId), new AuthenticationProperties { ExpiresUtc = session.Expiring, IssuedUtc = session.Created }));
                 }
             }
         }

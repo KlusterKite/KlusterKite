@@ -168,14 +168,24 @@ namespace ClusterKit.Core.Tests.Configuration
             }
         }
 
+        /// <summary>
+        /// The test installer
+        /// </summary>
         public class TestInstaller : BaseInstaller
         {
+            /// <inheritdoc />
             protected override decimal AkkaConfigLoadPriority => -1M;
 
+            /// <inheritdoc />
             protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
-            protected override IEnumerable<string> GetRoles() => new[] { "test" };
+            /// <inheritdoc />
+            protected override IEnumerable<string> GetRoles() => new[]
+                                                                     {
+                                                                         "test"
+                                                                     };
 
+            /// <inheritdoc />
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
                 container.Register(Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
@@ -189,25 +199,13 @@ namespace ClusterKit.Core.Tests.Configuration
         [UsedImplicitly]
         public class TestMessageExtractor : IMessageExtractor
         {
-            /// <summary>
-            /// Extract the entity id from an incoming <paramref name="message"/>.
-            ///             If `null` is returned the message will be `unhandled`, i.e. posted as `Unhandled`
-            ///              messages on the event stream
-            /// </summary>
+            /// <inheritdoc />
             public string EntityId(object message) => message.GetType().Name;
 
-            /// <summary>
-            /// Extract the message to send to the entity from an incoming <paramref name="message"/>.
-            ///             Note that the extracted message does not have to be the same as the incoming
-            ///             message to support wrapping in message envelope that is unwrapped before
-            ///             sending to the entity actor.
-            /// </summary>
+            /// <inheritdoc />
             public object EntityMessage(object message) => message;
 
-            /// <summary>
-            /// Extract the entity id from an incoming <paramref name="message"/>. Only messages that
-            ///             passed the <see cref="M:Akka.Cluster.Sharding.IMessageExtractor.EntityId(System.Object)"/> method will be used as input to this method.
-            /// </summary>
+            /// <inheritdoc />
             public string ShardId(object message) => message.GetType().Assembly.FullName;
         }
     }

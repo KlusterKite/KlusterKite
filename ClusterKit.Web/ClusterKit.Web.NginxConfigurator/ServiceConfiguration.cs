@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ServiceConfiguration.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Published web service configuration description for Nginx
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Web.NginxConfigurator
 {
     using System.Collections.Generic;
@@ -10,6 +19,9 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceConfiguration"/> class.
         /// </summary>
+        /// <param name="serviceName">
+        /// The service name.
+        /// </param>
         public ServiceConfiguration(string serviceName)
         {
             this.ServiceName = serviceName;

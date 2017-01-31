@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WebConfiguration.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Nginx sites configuration description
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Web.NginxConfigurator
 {
     using System.Collections;
@@ -10,7 +19,7 @@ namespace ClusterKit.Web.NginxConfigurator
     public class WebConfiguration : IEnumerable<HostConfiguration>
     {
         /// <summary>
-        ///
+        /// The list of cached hosts
         /// </summary>
         private readonly Dictionary<string, HostConfiguration> hosts = new Dictionary<string, HostConfiguration>();
 

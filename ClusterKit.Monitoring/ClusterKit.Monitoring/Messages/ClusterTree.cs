@@ -13,8 +13,6 @@ namespace ClusterKit.Monitoring.Messages
     using System.Collections.Generic;
     using System.Linq;
 
-    using Akka.Actor;
-
     using ClusterKit.Monitoring.Client.Messages;
 
     using JetBrains.Annotations;

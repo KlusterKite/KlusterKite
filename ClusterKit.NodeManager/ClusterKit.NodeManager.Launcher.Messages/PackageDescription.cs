@@ -29,29 +29,46 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         /// </summary>
         public string Version { get; set; }
 
-
-        /// <summary>Determines whether the specified object is not equal to the current object.</summary>
-        /// <returns>true if the specified object  is equal to the current object; otherwise, false.</returns>
+        /// <summary>
+        /// Determines whether the specified object is not equal to the current object.
+        /// </summary>
+        /// <param name="left">The left operand</param>
+        /// <param name="right">The right operand</param>
+        /// <returns>
+        /// true if the specified object  is equal to the current object; otherwise, false.
+        /// </returns>
         public static bool operator !=(PackageDescription left, PackageDescription right)
         {
             return !Equals(left, right);
         }
 
         /// <summary>Determines whether the specified object is equal to the current object.</summary>
+        /// <param name="left">The left operand</param>
+        /// <param name="right">The right operand</param>
         /// <returns>true if the specified object  is equal to the current object; otherwise, false.</returns>
         public static bool operator ==(PackageDescription left, PackageDescription right)
         {
             return Equals(left, right);
         }
 
-        /// <summary>Determines whether the specified object is equal to the current object.</summary>
-        /// <returns>true if the specified object  is equal to the current object; otherwise, false.</returns>
-        /// <param name="obj">The object to compare with the current object. </param>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
             return this.Equals((PackageDescription)obj);
         }
 

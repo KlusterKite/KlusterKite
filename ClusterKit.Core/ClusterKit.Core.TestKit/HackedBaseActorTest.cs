@@ -10,7 +10,6 @@
 namespace ClusterKit.Core.TestKit
 {
     using Akka.Actor;
-    using Akka.Configuration;
     using Akka.TestKit.Xunit2;
 
     using Castle.MicroKernel.Registration;

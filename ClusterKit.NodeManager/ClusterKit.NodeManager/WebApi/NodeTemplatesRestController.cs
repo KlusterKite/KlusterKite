@@ -14,7 +14,6 @@ namespace ClusterKit.NodeManager.WebApi
     using Akka.Actor;
 
     using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.Web.CRUDS;
     using ClusterKit.Web.Rest;
 
     /// <summary>

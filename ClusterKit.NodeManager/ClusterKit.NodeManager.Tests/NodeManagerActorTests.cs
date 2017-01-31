@@ -10,7 +10,6 @@
 namespace ClusterKit.NodeManager.Tests
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
@@ -130,7 +129,6 @@ namespace ClusterKit.NodeManager.Tests
             this.ExpectNoMsg();
             this.Log.Warning("!!!!!!!!!!! Nodes started");
 
-
             var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(3, descriptions.Count);
@@ -189,7 +187,7 @@ namespace ClusterKit.NodeManager.Tests
 
             this.SetAutoPilot(
                 new DelegateAutoPilot(
-                    delegate (IActorRef sender, object message)
+                    delegate(IActorRef sender, object message)
                         {
                             var identifyMessage = message as RemoteTestMessage<Identify>;
                             if (identifyMessage != null)
@@ -236,7 +234,7 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Tests taht nodes become obsolete on nodetemplate edit
+        /// Tests that nodes became obsolete on node template edit
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -271,7 +269,7 @@ namespace ClusterKit.NodeManager.Tests
             var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
             this.SetAutoPilot(
                 new DelegateAutoPilot(
-                    delegate (IActorRef sender, object message)
+                    delegate(IActorRef sender, object message)
                     {
                         var identifyMessage = message as RemoteTestMessage<Identify>;
                         if (identifyMessage != null)
@@ -329,7 +327,7 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Tests taht nodes become obsolete on new package version upload
+        /// Tests that nodes become obsolete on new package version upload
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -365,7 +363,7 @@ namespace ClusterKit.NodeManager.Tests
             var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
             this.SetAutoPilot(
                 new DelegateAutoPilot(
-                    delegate (IActorRef sender, object message)
+                    delegate(IActorRef sender, object message)
                     {
                         var identifyMessage = message as RemoteTestMessage<Identify>;
                         if (identifyMessage != null)
@@ -455,7 +453,7 @@ namespace ClusterKit.NodeManager.Tests
             var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
             this.SetAutoPilot(
                 new DelegateAutoPilot(
-                    delegate (IActorRef sender, object message)
+                    delegate(IActorRef sender, object message)
                     {
                         var identifyMessage = message as RemoteTestMessage<Identify>;
                         if (identifyMessage != null)
@@ -595,7 +593,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.0.0.0" } }
+                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.0.0.0" } }
                                     }
             };
 
@@ -618,7 +616,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
+                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
                                     }
             };
             router.RegisterVirtualNode(node2.Address.Address, node2.Client);
@@ -652,7 +650,7 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Tests template distibution
+        /// Tests template distribution
         /// </summary>
         /// <returns>
         /// The <see cref="Task"/>.
@@ -715,7 +713,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
+                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
                                     }
             };
 
@@ -738,7 +736,7 @@ namespace ClusterKit.NodeManager.Tests
                                     {
                                         NodeTemplate = "test-template",
                                         ContainerType = "test",
-                                        Modules = new List<PackageDescription> {new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
+                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
                                     }
             };
             router.RegisterVirtualNode(node2.Address.Address, node2.Client);
@@ -772,8 +770,6 @@ namespace ClusterKit.NodeManager.Tests
                 this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
 
             await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0"), DependencySets = new List<PackageDependencySet>() });
-
-            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
 
             await
                 templatesFactory.Insert(
@@ -836,12 +832,14 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Replaces production datasources with the test ones
+        /// Replaces production data sources with the test ones
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
+            /// <inheritdoc />
             protected override decimal AkkaConfigLoadPriority => -1M;
 
+            /// <inheritdoc />
             protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(@"
             {
                 ClusterKit.NodeManager.ConfigurationDatabaseName = ""TestConfigurationDatabase""
@@ -889,6 +887,7 @@ namespace ClusterKit.NodeManager.Tests
                 }
             }");
 
+            /// <inheritdoc />
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
                 container.Register(Classes.FromAssemblyContaining<NodeManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
@@ -913,62 +912,120 @@ namespace ClusterKit.NodeManager.Tests
             }
         }
 
+        /// <summary>
+        /// The test package description
+        /// </summary>
         private class TestPackage : IPackage
         {
+            /// <inheritdoc />
             public IEnumerable<IPackageAssemblyReference> AssemblyReferences
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    throw new InvalidOperationException();
                 }
             }
 
-            public IEnumerable<string> Authors { get; set; }
-            public string Copyright { get; set; }
+            /// <inheritdoc />
+            public IEnumerable<string> Authors => null;
+
+            /// <inheritdoc />
+            public string Copyright => null;
+
+            /// <inheritdoc />
             public IEnumerable<PackageDependencySet> DependencySets { get; set; }
-            public string Description { get; set; }
-            public bool DevelopmentDependency { get; set; }
-            public int DownloadCount { get; set; }
-            public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies { get; set; }
-            public Uri IconUrl { get; set; }
+
+            /// <inheritdoc />
+            public string Description => null;
+
+            /// <inheritdoc />
+            public bool DevelopmentDependency => false;
+
+            /// <inheritdoc />
+            public int DownloadCount => 0;
+
+            /// <inheritdoc />
+            public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies => null;
+
+            /// <inheritdoc />
+            public Uri IconUrl => null;
+
+            /// <inheritdoc />
             public string Id { get; set; }
 
-            public bool IsAbsoluteLatestVersion { get; set; }
-            public bool IsLatestVersion { get; set; }
-            public string Language { get; set; }
-            public Uri LicenseUrl { get; set; }
-            public bool Listed { get; set; }
-            public Version MinClientVersion { get; set; }
-            public IEnumerable<string> Owners { get; set; }
-            public ICollection<PackageReferenceSet> PackageAssemblyReferences { get; set; }
-            public Uri ProjectUrl { get; set; }
-            public DateTimeOffset? Published { get; set; }
-            public string ReleaseNotes { get; set; }
-            public Uri ReportAbuseUrl { get; set; }
-            public bool RequireLicenseAcceptance { get; set; }
-            public string Summary { get; set; }
-            public string Tags { get; set; }
-            public string Title { get; set; }
+            /// <inheritdoc />
+            public bool IsAbsoluteLatestVersion => false;
+
+            /// <inheritdoc />
+            public bool IsLatestVersion => false;
+
+            /// <inheritdoc />
+            public string Language => null;
+
+            /// <inheritdoc />
+            public Uri LicenseUrl => null;
+
+            /// <inheritdoc />
+            public bool Listed => false;
+
+            /// <inheritdoc />
+            public Version MinClientVersion => null;
+
+            /// <inheritdoc />
+            public IEnumerable<string> Owners => null;
+
+            /// <inheritdoc />
+            public ICollection<PackageReferenceSet> PackageAssemblyReferences => null;
+
+            /// <inheritdoc />
+            public Uri ProjectUrl => null;
+
+            /// <inheritdoc />
+            public DateTimeOffset? Published => null;
+
+            /// <inheritdoc />
+            public string ReleaseNotes => null;
+
+            /// <inheritdoc />
+            public Uri ReportAbuseUrl => null;
+
+            /// <inheritdoc />
+            public bool RequireLicenseAcceptance => false;
+
+            /// <inheritdoc />
+            public string Summary => null;
+
+            /// <inheritdoc />
+            public string Tags => null;
+
+            /// <inheritdoc />
+            public string Title => null;
+
+            /// <inheritdoc />
             public SemanticVersion Version { get; set; }
 
+            /// <inheritdoc />
             public void ExtractContents(IFileSystem fileSystem, string extractPath)
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
 
+            /// <inheritdoc />
             public IEnumerable<IPackageFile> GetFiles()
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
 
+            /// <inheritdoc />
             public Stream GetStream()
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
 
+            /// <inheritdoc />
             public IEnumerable<FrameworkName> GetSupportedFrameworks()
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
         }
 
@@ -977,6 +1034,9 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private class VirtualNode
         {
+            /// <summary>
+            /// Current virtual timestamp
+            /// </summary>
             private static long time;
 
             /// <summary>
@@ -984,6 +1044,18 @@ namespace ClusterKit.NodeManager.Tests
             /// </summary>
             private readonly IActorRef nodeManager;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="VirtualNode"/> class.
+            /// </summary>
+            /// <param name="num">
+            /// The node number.
+            /// </param>
+            /// <param name="nodeManager">
+            /// The node manager.
+            /// </param>
+            /// <param name="system">
+            /// The system.
+            /// </param>
             public VirtualNode(int num, IActorRef nodeManager, ActorSystem system)
             {
                 this.nodeManager = nodeManager;
@@ -1016,26 +1088,48 @@ namespace ClusterKit.NodeManager.Tests
                 this.Client = system.ActorOf(Props.Create(() => new VirtualClient(this)), $"virtualNode{num}");
             }
 
+            /// <summary>
+            /// Gets the node address
+            /// </summary>
             public UniqueAddress Address { get; }
 
+            /// <summary>
+            /// Gets the virtual node client actor
+            /// </summary>
             public IActorRef Client { get; }
 
+            /// <summary>
+            /// Gets the node description
+            /// </summary>
             public NodeDescription Description { get; }
 
             /// <summary>
-            /// Gets the node state
+            /// Gets a value indicating whether the node was started
             /// </summary>
             public bool IsUp { get; private set; }
 
+            /// <summary>
+            /// Gets the node uid
+            /// </summary>
             public Guid NodeId { get; }
 
+            /// <summary>
+            /// Gets the node number
+            /// </summary>
             public int Number { get; }
 
+            /// <summary>
+            /// Gets the next timestamp (1 second later)
+            /// </summary>
+            /// <returns>The timestamp</returns>
             public static long GetNextTime()
             {
                 return Interlocked.Add(ref time, 1L);
             }
 
+            /// <summary>
+            /// Commands virtual node to emulate shutdown process
+            /// </summary>
             public void GoDown()
             {
                 if (!this.IsUp)
@@ -1049,6 +1143,9 @@ namespace ClusterKit.NodeManager.Tests
                 this.IsUp = false;
             }
 
+            /// <summary>
+            /// Commands virtual node to emulate start process
+            /// </summary>
             public void GoUp()
             {
                 if (this.IsUp)
@@ -1062,25 +1159,32 @@ namespace ClusterKit.NodeManager.Tests
                 this.IsUp = true;
             }
 
+            /// <summary>
+            /// Virtual client actor
+            /// </summary>
             public class VirtualClient : ReceiveActor
             {
-                private VirtualNode node;
-
+                /// <summary>
+                /// Initializes a new instance of the <see cref="VirtualClient"/> class.
+                /// </summary>
+                /// <param name="node">
+                /// The virtual node.
+                /// </param>
                 public VirtualClient(VirtualNode node)
                 {
-                    this.node = node;
-
                     this.Receive<TestMessage<Identify>>(m => this.Sender.Tell(new ActorIdentity(m.Message.MessageId, this.Self)));
-                    this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(this.node.Description, this.Self));
-                    this.Receive<TestMessage<ShutdownMessage>>(m => this.node.GoDown());
+                    this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(node.Description, this.Self));
+                    this.Receive<TestMessage<ShutdownMessage>>(m => node.GoDown());
                 }
 
+                /// <inheritdoc />
                 protected override bool AroundReceive(Receive receive, object message)
                 {
                     Context.GetLogger().Warning($"Got message of type {message.GetType().FullName}");
                     return base.AroundReceive(receive, message);
                 }
 
+                /// <inheritdoc />
                 protected override void Unhandled(object message)
                 {
                     Context.GetLogger().Error($"Got unhandled message of type {message.GetType().FullName}");

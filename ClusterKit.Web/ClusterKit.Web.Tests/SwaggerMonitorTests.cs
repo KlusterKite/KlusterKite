@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SwaggerMonitorTestscs.cs" company="ClusterKit">
+// <copyright file="SwaggerMonitorTests.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>

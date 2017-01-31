@@ -1,8 +1,16 @@
-﻿namespace ClusterKit.Web.CRUDS
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Web.Rest
 {
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
     using Castle.MicroKernel.SubSystems.Configuration;
     using Castle.Windsor;
 
@@ -17,7 +25,7 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
         /// Gets default akka configuration for current module
@@ -32,7 +40,6 @@
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<IOwinStartupConfigurator>().ImplementedBy(typeof(OwinConfigurator)));
         }
     }
 }

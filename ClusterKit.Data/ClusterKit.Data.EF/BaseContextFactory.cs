@@ -151,7 +151,7 @@ namespace ClusterKit.Data.EF
             catch (DbEntityValidationException entityValidationException)
             {
                 var entityErrors = string.Join(
-                    "",
+                    string.Empty,
                     entityValidationException.EntityValidationErrors.Select(error => $"\t{error.Entry.GetType().Name}:\n{string.Join("", error.ValidationErrors.Select(ve => $"\t\t{ve.PropertyName}: {ve.ErrorMessage}\n"))}"));
                 var errorMessage = $"{typeof(TContext).Name} migration error\n{entityErrors}";
                 context.Dispose();

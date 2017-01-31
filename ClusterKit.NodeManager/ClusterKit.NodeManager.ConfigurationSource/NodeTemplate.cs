@@ -48,12 +48,14 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         [JsonIgnore]
         [XmlIgnore]
+        [UsedImplicitly]
         public string ContainerTypesList
         {
             get
             {
                 return this.ContainerTypes == null ? string.Empty : string.Join("; ", this.ContainerTypes);
             }
+
             set
             {
                 this.ContainerTypes = value?.Split(new[] { "; " }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
@@ -93,12 +95,14 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         [JsonIgnore]
         [XmlIgnore]
+        [UsedImplicitly]
         public string PackagesList
         {
             get
             {
                 return this.Packages == null ? string.Empty : string.Join("; ", this.Packages);
             }
+
             set
             {
                 this.Packages = value?.Split(new[] { "; " }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();

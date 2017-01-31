@@ -374,11 +374,16 @@ namespace ClusterKit.NodeManager.Launcher
                 var dependentNode =
                     assemblyBindingNode?.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
                     ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
+
+                if (dependentNode == null)
+                {
+                    continue;
+                }
                 
                 dependentNode.RemoveAll();
                 var assemblyIdentityNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);
-                assemblyIdentityNode.SetAttribute("publicKeyToken", BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", "").ToLower(CultureInfo.InvariantCulture));
+                assemblyIdentityNode.SetAttribute("publicKeyToken", BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", string.Empty).ToLower(CultureInfo.InvariantCulture));
                 var bindingRedirectNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
@@ -424,7 +429,7 @@ namespace ClusterKit.NodeManager.Launcher
                 }
             }
 
-            //Checking installation
+            // Checking installation
             var installedPackages = Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")).Select(Path.GetFileName).ToList();
             var missedPackages = configuration.Packages
                 .Where(p => installedPackages.All(d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-[\\w\\d\\-]*)?$")))
@@ -524,6 +529,7 @@ namespace ClusterKit.NodeManager.Launcher
                             Thread.Sleep(TimeSpan.FromSeconds(10));
                         }
                     }
+
                 default:
                     Console.WriteLine(@"Unsupported stop mode");
                     return;

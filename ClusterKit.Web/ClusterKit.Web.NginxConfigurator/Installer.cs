@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Web.NginxConfigurator
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Web.NginxConfigurator
 {
     using System.Collections.Generic;
     using System.IO;
@@ -27,7 +36,7 @@
         protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
 
         /// <summary>
-        /// Should check the config and environment for possible erorrs.
+        /// Should check the config and environment for possible errors.
         /// If any found, shod throw the exception to prevent node from starting.
         /// </summary>
         /// <param name="config">Full akka config</param>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OwinConfiguration.cs" company="ClusterKit">
+// <copyright file="OwinConfigurator.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -66,6 +66,7 @@ namespace ClusterKit.Web.Swagger
                         {
                             c.IncludeXmlComments(Path.GetFullPath(commentFile));
                         }
+
                         c.UseFullTypeNameInSchemaIds();
                     }).EnableSwaggerUi(
                         $"{publishUiUrl}/{{*assetPath}}",

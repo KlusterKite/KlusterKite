@@ -9,7 +9,6 @@
 
 namespace ClusterKit.Data.CRUD.ActionMessages
 {
-    using System;
     using Akka.Routing;
 
     using JetBrains.Annotations;

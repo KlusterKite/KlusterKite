@@ -7,7 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-// ReSharper disable ArrangeStaticMemberQualifier
 namespace ClusterKit.LargeObjects
 {
     using System;
