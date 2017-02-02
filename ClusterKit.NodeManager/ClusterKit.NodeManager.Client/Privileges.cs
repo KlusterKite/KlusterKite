@@ -10,10 +10,12 @@
 namespace ClusterKit.NodeManager.Client
 {
     using ClusterKit.NodeManager.Client.ORM;
+    using ClusterKit.Security.Client.Attributes;
 
     /// <summary>
     /// The list of defined module privileges
     /// </summary>
+    [PrivilegesContainer]
     public static class Privileges
     {
         /// <summary>

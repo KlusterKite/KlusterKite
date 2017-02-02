@@ -5,6 +5,7 @@
  		OAuth2ClientId = "swagger-ui"
 
  		EnableSwaggerApplication = true, // THIS SHOULD BE DISABLED ON PRODUCTION ENVIRONMENT
+ 		
  	}
 
 	akka.actor.deployment {

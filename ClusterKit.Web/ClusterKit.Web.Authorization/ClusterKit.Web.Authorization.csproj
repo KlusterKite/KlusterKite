@@ -131,7 +131,8 @@
       <HintPath>..\..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth">
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -202,6 +203,7 @@
   <ItemGroup>
     <Compile Include="Attributes\RequireClientPrivilegeAttribute.cs" />
     <Compile Include="Attributes\RequireSessionAttribute.cs" />
+    <Compile Include="Attributes\RequireUserAttribute.cs" />
     <Compile Include="Attributes\RequireUserPrivilegeAttribute.cs" />
     <Compile Include="AuthorizedController.cs" />
     <Compile Include="Authorizer.cs" />

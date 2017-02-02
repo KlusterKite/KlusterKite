@@ -90,7 +90,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Web.Swagger",
                                     "ClusterKit.Log.Console",
                                     "ClusterKit.Log.ElasticSearch",
-                                    "ClusterKit.Web.Authorization",
+                                    "ClusterKit.Web.Authentication",
                                     "ClusterKit.Security.SessionRedis",
                                 },
                         Configuration = Configurations.ClusterManager,
@@ -133,7 +133,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                 {
                                     Uid = Guid.NewGuid(),
                                     Name = "Admin",
-                                    AllowedScope = new List<string>(Privileges.GetAllPrivilegesList())
+                                    AllowedScope = new List<string>(Security.Client.Utils.DefinedPrivileges.Select(d => d.Privilege))
                                 };
             var guestRole = new Role
                                 {

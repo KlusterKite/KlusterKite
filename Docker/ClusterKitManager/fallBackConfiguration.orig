@@ -55,7 +55,7 @@
     },
     {
       "BuildDate": null,
-      "Id": "ClusterKit.Web.Authorization",
+      "Id": "ClusterKit.Web.Authentication",
       "Version": "0.0.0-local"
     },
     {

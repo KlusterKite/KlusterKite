@@ -39,6 +39,7 @@ services:
         ipv4_address: 172.18.0.3
   redis:
     image: clusterkit/redis
+    privileged: true
     networks:
       default:
         ipv4_address: 172.18.0.4
@@ -100,6 +101,7 @@ services:
      - "seed"
      - "configDb"
      - "nuget"
+     - "entry"
     logging:
         driver: json-file
         options:
@@ -134,6 +136,7 @@ services:
      - "manager"
      - "nuget"
      - "configDb"
+     - "entry"
     logging:
         driver: json-file
         options:

@@ -86,9 +86,12 @@ namespace ClusterKit.Web.Tests.Auth
         /// <param name="expectedResult">The expected response code</param>
         /// <returns>The async task</returns>
         [Theory]
+        [InlineData(EnAuthenticationType.None, "session", HttpStatusCode.Unauthorized)]
+        [InlineData(EnAuthenticationType.User, "session", HttpStatusCode.OK)]
+        [InlineData(EnAuthenticationType.Client, "session", HttpStatusCode.OK)]
         [InlineData(EnAuthenticationType.None, "user", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.User, "user", HttpStatusCode.OK)]
-        [InlineData(EnAuthenticationType.Client, "user", HttpStatusCode.OK)]
+        [InlineData(EnAuthenticationType.Client, "user", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.User, "AuthorizedUserAction", HttpStatusCode.NoContent)]
         [InlineData(EnAuthenticationType.Client, "AuthorizedUserAction", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.User, "UnauthorizedUserAction", HttpStatusCode.Unauthorized)]
@@ -223,11 +226,29 @@ namespace ClusterKit.Web.Tests.Auth
             /// </summary>
             /// <returns>The user name</returns>
             [HttpGet]
-            [Route("user")]
+            [Route("session")]
             public string GetUserSession()
             {
                 var session = this.GetSession();
                 return session.User?.UserId ?? session.ClientId;
+            }
+
+            /// <summary>
+            /// Tests user authentication
+            /// </summary>
+            /// <returns>The user name</returns>
+            [HttpGet]
+            [RequireUser]
+            [Route("user")]
+            public string GetUser()
+            {
+                var session = this.GetSession();
+                if (session.User == null)
+                {
+                    throw new ArgumentNullException(nameof(UserSession.User));
+                }
+
+                return session.User.UserId;
             }
 
             /// <summary>

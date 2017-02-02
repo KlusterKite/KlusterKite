@@ -18,6 +18,7 @@ namespace ClusterKit.Web.Authentication
     using ClusterKit.Security.Client;
 
     using Microsoft.Owin;
+    using Microsoft.Owin.Security.DataProtection;
     using Microsoft.Owin.Security.OAuth;
 
     using Owin;
@@ -61,6 +62,7 @@ namespace ClusterKit.Web.Authentication
                 "ClusterKit.Web.AuthenticationTokenEndpointPath",
                 "/api/1.x/security/token");
 
+            appBuilder.SetDataProtectionProvider(new DataNoProtectionProvider());
             var options = new OAuthAuthorizationServerOptions
                               {
                                   AuthorizeEndpointPath =

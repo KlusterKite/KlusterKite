@@ -9,9 +9,12 @@
 
 namespace ClusterKit.Security.Client
 {
+    using ClusterKit.Security.Client.Attributes;
+
     /// <summary>
     /// The list of default privileges
     /// </summary>
+    [PrivilegesContainer]
     public static class Privileges
     {
         /// <summary>

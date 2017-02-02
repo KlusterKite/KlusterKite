@@ -9,10 +9,13 @@
 
 namespace ClusterKit.Web.Authorization
 {
+    using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
 
     using ClusterKit.Security.Client;
+
+    using JetBrains.Annotations;
 
     using Microsoft.Owin;
 
@@ -22,13 +25,41 @@ namespace ClusterKit.Web.Authorization
     public static class AuthorizedController
     {
         /// <summary>
+        /// Gets security request description
+        /// </summary>
+        /// <param name="context">The owin context</param>
+        /// <returns>The security request description</returns>
+        [UsedImplicitly]
+        public static RequestDescription GetRequestDescription(this IOwinContext context)
+        {
+            return new RequestDescription
+                       {
+                           Authentication = context.GetSession(),
+                           RemoteAddress = context.Request.RemoteIpAddress,
+                           Headers = context.Request.Headers.ToDictionary(p => p.Key, p => string.Join("; ", p.Value))
+                       };
+        }
+
+        /// <summary>
+        /// Gets security request description
+        /// </summary>
+        /// <param name="controller">The api controller</param>
+        /// <returns>The security request description</returns>
+        [UsedImplicitly]
+        public static RequestDescription GetRequestDescription(this ApiController controller)
+        {
+            var context = controller.Request.GetOwinContext();
+            return context.GetRequestDescription();
+        }
+
+        /// <summary>
         /// Gets authenticated user session or null
         /// </summary>
         /// <param name="context">The owin context</param>
         /// <returns>The user session</returns>
         public static UserSession GetSession(this IOwinContext context)
         {
-            return context?.Get<UserSession>("UserSession");
+            return context.Get<UserSession>("UserSession");
         }
 
         /// <summary>
@@ -39,7 +70,7 @@ namespace ClusterKit.Web.Authorization
         public static UserSession GetSession(this ApiController controller)
         {
             var context = controller.Request.GetOwinContext();
-            return context?.GetSession();
+            return context.GetSession();
         }
     }
 }

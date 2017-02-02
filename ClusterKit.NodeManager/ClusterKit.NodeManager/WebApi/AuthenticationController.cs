@@ -9,36 +9,21 @@
 
 namespace ClusterKit.NodeManager.WebApi
 {
+    using System.Collections.Generic;
     using System.Net;
     using System.Web.Http;
 
-    using Akka.Actor;
-
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Web.Authorization;
+    using ClusterKit.Web.Authorization.Attributes;
 
     /// <summary>
     /// Authenticate web api users
     /// </summary>
     [RoutePrefix("api/1.x/clusterkit/nodemanager/authentication")]
+    [RequireUser]
     public class AuthenticationController : ApiController
     {
-        /// <summary>
-        /// The actor system.
-        /// </summary>
-        private readonly ActorSystem system;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
-        /// </summary>
-        /// <param name="system">
-        /// The actor system.
-        /// </param>
-        public AuthenticationController(ActorSystem system)
-        {
-            this.system = system;
-        }
-
         /// <summary>
         /// Gets the currently authenticated user name
         /// </summary>
@@ -48,11 +33,6 @@ namespace ClusterKit.NodeManager.WebApi
         public UserDescription GetUser()
         {
             var session = this.GetSession();
-            if (session == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
-            }
-
             var description = session.User as UserDescription;
 
             if (description == null)
@@ -61,6 +41,18 @@ namespace ClusterKit.NodeManager.WebApi
             }
 
             return description;
+        }
+
+        /// <summary>
+        /// Gets the currently authenticated user scope list (the list of granted privileges)
+        /// </summary>
+        /// <returns>The user name</returns>
+        [Route("userScope")]
+        [HttpGet]
+        public IEnumerable<string> GetMyScope()
+        {
+            var session = this.GetSession();
+            return session.UserScope;
         }
     }
 }

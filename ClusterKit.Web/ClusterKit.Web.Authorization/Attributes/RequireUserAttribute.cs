@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequireSessionAttribute.cs" company="ClusterKit">
+// <copyright file="RequireUserAttribute.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Defines the RequireSessionAttribute type.
+//   Marks api method to check for user authentication
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,10 +18,10 @@ namespace ClusterKit.Web.Authorization.Attributes
     using System.Web.Http.Results;
 
     /// <summary>
-    /// Marks api method to check for authentication
+    /// Marks api method to check for user authentication
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class RequireSessionAttribute : Attribute, IAuthenticationFilter
+    public class RequireUserAttribute : Attribute, IAuthenticationFilter
     {
         /// <inheritdoc />
         public bool AllowMultiple => false;
@@ -35,9 +35,10 @@ namespace ClusterKit.Web.Authorization.Attributes
         /// <inheritdoc />
         public Task ChallengeAsync(HttpAuthenticationChallengeContext context, CancellationToken cancellationToken)
         {
-            if (context.Request.GetOwinContext().GetSession() == null)
+            var userSession = context.Request.GetOwinContext().GetSession();
+            if (userSession?.User == null)
             {
-                context.Result = new UnauthorizedResult(new AuthenticationHeaderValue[0],  context.Request);
+                context.Result = new UnauthorizedResult(new AuthenticationHeaderValue[0], context.Request);
             }
 
             return Task.CompletedTask;
