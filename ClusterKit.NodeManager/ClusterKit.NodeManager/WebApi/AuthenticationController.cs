@@ -11,7 +11,6 @@ namespace ClusterKit.NodeManager.WebApi
 {
     using System.Collections.Generic;
     using System.Net;
-    using System.Threading.Tasks;
     using System.Web.Http;
 
     using ClusterKit.NodeManager.Client.ORM;
@@ -67,17 +66,6 @@ namespace ClusterKit.NodeManager.WebApi
         public IEnumerable<PrivilegeDescription> GetRegisteredPrivileges()
         {
             return Utils.DefinedPrivileges;
-        }
-
-        /// <summary>
-        /// Renews the expiry of the token
-        /// </summary>
-        /// <returns>The renewed token</returns>
-        [Route("renewToken")]
-        [HttpGet]
-        public Task<TokenResponse> RefreshToken()
-        {
-            return Task.FromResult<TokenResponse>(null);
         }
     }
 }
