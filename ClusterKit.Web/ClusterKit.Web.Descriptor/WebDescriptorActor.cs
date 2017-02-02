@@ -19,7 +19,7 @@ namespace ClusterKit.Web.Descriptor
     using JetBrains.Annotations;
 
     /// <summary>
-    /// Standard actor, that described current node web services to other nodes
+    /// Standard actor, that describes current node web services to other nodes
     /// </summary>
     [UsedImplicitly]
     public class WebDescriptorActor : ReceiveActor

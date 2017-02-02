@@ -24,6 +24,7 @@ Target "DockerBase" (fun _ ->
     buildDocker "clusterkit/entry" "Docker/ClusterKitEntry"
     buildDocker "clusterkit/vpn" "Docker/ClusterKitVpn"
     buildDocker "clusterkit/elk" "Docker/ClusterKitELK"
+    buildDocker "clusterkit/redis" "Docker/ClusterKit.Redis"
 )
 
 // builds standard docker images

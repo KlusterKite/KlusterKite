@@ -24,7 +24,6 @@ namespace ClusterKit.Web.Tests.Auth
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Core.Utils;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.Authorization;
 
@@ -32,8 +31,6 @@ namespace ClusterKit.Web.Tests.Auth
 
     using RestSharp;
     using RestSharp.Authenticators;
-
-    using StackExchange.Redis;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -112,23 +109,7 @@ namespace ClusterKit.Web.Tests.Auth
                 DateTimeOffset.Now.AddMinutes(1),
                 "hello world");
 
-            var redisConnectionString =
-                this.Sys.Settings.Config.GetString("ClusterKit.Web.Authentication.RedisConnection");
-            var redisDb = this.Sys.Settings.Config.GetInt("ClusterKit.Web.Authentication.RedisDb");
-            var tokenKeyPrefix = this.Sys.Settings.Config.GetString("ClusterKit.Web.Authentication.TokenKeyPrefix");
-
-            var token = Guid.NewGuid().ToString("N");
-
-            using (var connection = await ConnectionMultiplexer.ConnectAsync(redisConnectionString))
-            {
-                var db = connection.GetDatabase(redisDb);
-                await db.StringSetAsync(
-                    $"{tokenKeyPrefix}{token}",
-                    session.SerializeToAkkaString(this.Sys),
-                    TimeSpan.FromMinutes(1));
-            }
-
-            return token;
+            return await this.WindsorContainer.Resolve<ITokenManager>().CreateAccessToken(session);
         }
 
         /// <summary>
@@ -227,6 +208,7 @@ namespace ClusterKit.Web.Tests.Auth
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
                 container.Register(Classes.From(typeof(TestController)));
+                container.Register(Component.For<ITokenManager>().ImplementedBy<MoqTokenManager>().LifestyleSingleton());
             }
         }
 

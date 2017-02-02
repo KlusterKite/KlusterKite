@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NodeTemplate.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace ClusterKit.NodeManager.Client.ORM
 {
     using System;
     using System.Collections.Generic;

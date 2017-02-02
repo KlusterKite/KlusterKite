@@ -13,7 +13,7 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
-    using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Web.Rest;
 
     /// <summary>

@@ -53,6 +53,16 @@
       "Id": "ClusterKit.Log.ElasticSearch",
       "Version": "0.0.0-local"
     },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.Authorization",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Security.SessionRedis",
+      "Version": "0.0.0-local"
+    },
 
   ],
   "PackageSources": [

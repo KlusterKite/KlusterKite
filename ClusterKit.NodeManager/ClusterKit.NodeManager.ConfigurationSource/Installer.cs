@@ -9,6 +9,8 @@
 
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
+    using System;
+
     using Akka.Configuration;
 
     using Castle.MicroKernel.Registration;
@@ -17,6 +19,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using ClusterKit.Core;
     using ClusterKit.Data;
+    using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
 
@@ -51,6 +54,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 .ImplementedBy<NugetFeedFactory>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, SeedAddress, int>>()
                 .ImplementedBy<SeedAddressFactorycs>().LifestyleTransient());
+
+            container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
+            container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactory>().LifestyleTransient());
 
             container.Register(
                 Component.For<IContextFactory<ConfigurationContext>>()

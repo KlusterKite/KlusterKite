@@ -11,7 +11,7 @@ namespace ClusterKit.Web.Authorization
 {
     using System.Web.Http;
 
-    using Akka.Actor;
+    using ClusterKit.Security.Client;
 
     using Owin;
 
@@ -21,19 +21,19 @@ namespace ClusterKit.Web.Authorization
     public class OwinConfigurator : IOwinStartupConfigurator
     {
         /// <summary>
-        /// The current actor system
+        /// The token manager
         /// </summary>
-        private readonly ActorSystem system;
+        private readonly ITokenManager tokenManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinConfigurator"/> class.
         /// </summary>
-        /// <param name="system">
-        /// The system.
+        /// <param name="tokenManager">
+        /// The token Manager.
         /// </param>
-        public OwinConfigurator(ActorSystem system)
+        public OwinConfigurator(ITokenManager tokenManager)
         {
-            this.system = system;
+            this.tokenManager = tokenManager;
         }
 
         /// <inheritdoc />
@@ -44,7 +44,7 @@ namespace ClusterKit.Web.Authorization
         /// <inheritdoc />
         public void ConfigureApp(IAppBuilder appBuilder)
         {
-            appBuilder.Use<Authorizer>(new Authorizer.AuthorizerOptions("Bearer", this.system));
+            appBuilder.Use<Authorizer>(new Authorizer.AuthorizerOptions("Bearer", this.tokenManager));
         }
     }
 }

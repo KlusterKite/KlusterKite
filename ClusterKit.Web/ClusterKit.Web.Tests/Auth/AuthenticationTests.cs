@@ -23,7 +23,6 @@ namespace ClusterKit.Web.Tests.Auth
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Core.Utils;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
@@ -31,8 +30,6 @@ namespace ClusterKit.Web.Tests.Auth
     using Newtonsoft.Json;
 
     using RestSharp;
-
-    using StackExchange.Redis;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -120,21 +117,11 @@ namespace ClusterKit.Web.Tests.Auth
             if (expectedResult == HttpStatusCode.OK)
             {
                 var tokenDescription = JsonConvert.DeserializeObject<TokenDescription>(result.Content);
-                var redisConnectionString = this.Sys.Settings.Config.GetString("ClusterKit.Web.Authentication.RedisConnection");
-                var redisDb = this.Sys.Settings.Config.GetInt("ClusterKit.Web.Authentication.RedisDb");
-                var tokenKeyPrefix = this.Sys.Settings.Config.GetString("ClusterKit.Web.Authentication.TokenKeyPrefix");
-
-                using (var connection = await ConnectionMultiplexer.ConnectAsync(redisConnectionString))
-                {
-                    var db = connection.GetDatabase(redisDb);
-                    var data = await db.StringGetAsync($"{tokenKeyPrefix}{tokenDescription.Token}");
-                    Assert.True(data.HasValue);
-                    var session = data.ToString().DeserializeFromAkkaString<UserSession>(this.Sys);
-
-                    Assert.Equal(clientId, session.ClientId);
-                    Assert.Equal(typeof(User), session.User?.GetType());
-                    Assert.Equal(userName, session.User?.UserId);
-                }
+                var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
+                var session = await tokenManager.ValidateAccessToken(tokenDescription.Token);
+                Assert.NotNull(session);
+                Assert.NotNull(session.User);
+                Assert.Equal(userName, session.User.UserId);
             }
         }
 
@@ -209,6 +196,7 @@ namespace ClusterKit.Web.Tests.Auth
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
                 container.Register(Component.For<IClientProvider>().ImplementedBy<TestClientProvider>());
+                container.Register(Component.For<ITokenManager>().ImplementedBy<MoqTokenManager>().LifestyleSingleton());
             }
         }
 
@@ -247,6 +235,12 @@ namespace ClusterKit.Web.Tests.Auth
                     return Task.FromResult(session);
                 }
 
+                return Task.FromResult<UserSession>(null);
+            }
+
+            /// <inheritdoc />
+            public Task<UserSession> AuthenticateSelf()
+            {
                 return Task.FromResult<UserSession>(null);
             }
         }

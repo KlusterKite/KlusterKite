@@ -11,7 +11,7 @@ namespace ClusterKit.Web.Authentication
 {
     using System.Web.Http;
 
-    using Akka.Actor;
+    using Akka.Configuration;
 
     using Castle.Windsor;
 
@@ -52,14 +52,30 @@ namespace ClusterKit.Web.Authentication
         public void ConfigureApp(IAppBuilder appBuilder)
         {
             Serilog.Log.Logger.Information("------------ Setting up authorization server -------------");
+            var config = this.container.Resolve<Config>();
+
+            var authorizeEndpointPath = config.GetString(
+                "ClusterKit.Web.Authentication.AuthorizeEndpointPath",
+                "/api/1.x/security/authorization");
+            var tokenEndpointPath = config.GetString(
+                "ClusterKit.Web.AuthenticationTokenEndpointPath",
+                "/api/1.x/security/token");
+
             var options = new OAuthAuthorizationServerOptions
                               {
-                                  AuthorizeEndpointPath = new PathString("/api/1.x/security/authorization"),
-                                  TokenEndpointPath = new PathString("/api/1.x/security/token"),
+                                  AuthorizeEndpointPath =
+                                      new PathString(authorizeEndpointPath),
+                                  TokenEndpointPath = new PathString(tokenEndpointPath),
                                   ApplicationCanDisplayErrors = true,
-                                  AllowInsecureHttp = true, // internal communication is insecure
-                                  Provider = new AuthorizationServerProvider(this.container.ResolveAll<IClientProvider>()),
-                                  AccessTokenProvider = new AuthenticationTokenProvider(this.container.Resolve<ActorSystem>()),
+
+                                  // internal communication is insecure
+                                  AllowInsecureHttp = true,
+                                  Provider =
+                                      new AuthorizationServerProvider(
+                                          this.container.ResolveAll<IClientProvider>()),
+                                  AccessTokenProvider =
+                                      new AuthenticationTokenProvider(
+                                          this.container.Resolve<ITokenManager>()),
                               };
 
             appBuilder.UseOAuthAuthorizationServer(options);

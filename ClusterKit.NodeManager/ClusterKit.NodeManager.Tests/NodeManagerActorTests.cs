@@ -38,6 +38,7 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Data.EF.TestKit;
     using ClusterKit.Data.TestKit;
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;

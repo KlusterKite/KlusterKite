@@ -15,6 +15,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using System.Linq.Expressions;
 
     using ClusterKit.Data.EF;
+    using ClusterKit.NodeManager.Client.ORM;
 
     /// <summary>
     /// Data factory to work with <see cref="NodeTemplate"/>

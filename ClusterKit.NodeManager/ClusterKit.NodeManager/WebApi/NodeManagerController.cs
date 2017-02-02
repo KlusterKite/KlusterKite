@@ -21,7 +21,7 @@ namespace ClusterKit.NodeManager.WebApi
 
     using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
 

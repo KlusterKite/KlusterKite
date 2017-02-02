@@ -33,6 +33,10 @@
     <DocumentationFile>bin\Release\ClusterKit.NodeManager.ConfigurationSource.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
+      <Project>{983DAEB9-B058-41A9-8403-29851F2244B7}</Project>
+      <Name>ClusterKit.NodeManager.Client</Name>
+    </ProjectReference>
     <Reference Include="Akka, Version=1.1.3.31, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Akka.1.1.3\lib\net45\Akka.dll</HintPath>
@@ -235,27 +239,31 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF/ClusterKit.Data.EF.csproj">
       <Project>{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}</Project>
       <Name>ClusterKit.Data.EF</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data/ClusterKit.Data.csproj">
       <Project>{0D6871D1-5A69-4533-BA4B-073B876232C5}</Project>
       <Name>ClusterKit.Data</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj">
       <Project>{7DE19EFC-58C5-4DBF-8A2A-E81E54AF5623}</Project>
       <Name>ClusterKit.LargeObjects.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
       <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
       <Name>ClusterKit.LargeObjects</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj">
       <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
       <Name>ClusterKit.Data.CRUD</Name>
-</ProjectReference>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
+      <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
+      <Name>ClusterKit.Security.Client</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationContext.cs" />
@@ -267,18 +275,17 @@
     </Compile>
     <Compile Include="ConfigurationSeeder.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="Migrations\201609131410062_Init.cs" />
-    <Compile Include="Migrations\201609131410062_Init.Designer.cs">
-      <DependentUpon>201609131410062_Init.cs</DependentUpon>
+    <Compile Include="Migrations\201702011416515_Init.cs" />
+    <Compile Include="Migrations\201702011416515_Init.Designer.cs">
+      <DependentUpon>201702011416515_Init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="NodeTemplate.cs" />
     <Compile Include="NodeTemplateFactory.cs" />
-    <Compile Include="NugetFeed.cs" />
     <Compile Include="NugetFeedFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SeedAddress.cs" />
+    <Compile Include="RoleFactory.cs" />
     <Compile Include="SeedAddressFactorycs.cs" />
+    <Compile Include="UserFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -293,8 +300,8 @@
       <LastGenOutput>Configurations.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201609131410062_Init.resx">
-      <DependentUpon>201609131410062_Init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201702011416515_Init.resx">
+      <DependentUpon>201702011416515_Init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

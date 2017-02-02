@@ -104,13 +104,43 @@ namespace ClusterKit.Web.Authentication
             }
 
             var session = await client.AuthenticateUserAsync(context.UserName, context.Password);
+            if (session?.User == null)
+            {
+                return;
+            }
+
+            context.OwinContext.Set(OwinContextUserSessionKey, session);
+            var identity = new ClaimsIdentity(session.User.UserId);
+            context.Validated(identity);
+        }
+
+        /// <summary>
+        /// Called when a request to the Token endpoint arrives with a "grant_type" of "client_credentials". This occurs when a registered client
+        /// application wishes to acquire an "access_token" to interact with protected resources on it's own behalf, rather than on behalf of an authenticated user.
+        /// If the web application supports the client credentials it may assume the context.ClientId has been validated by the ValidateClientAuthentication call.
+        /// To issue an access token the context.Validated must be called with a new ticket containing the claims about the client application which should be associated
+        /// with the access token. The application should take appropriate measures to ensure that the endpoint isn’t abused by malicious callers.
+        /// The default behavior is to reject this grant type.
+        /// See also http://tools.ietf.org/html/rfc6749#section-4.4.2
+        /// </summary>
+        /// <param name="context">The context of the event carries information in and results out.</param>
+        /// <returns>Task to enable asynchronous execution</returns>
+        public override async Task GrantClientCredentials(OAuthGrantClientCredentialsContext context)
+        {
+            var client = context.OwinContext.Get<IClient>(OwinContextClientKey);
+            if (client == null)
+            {
+                return;
+            }
+
+            var session = await client.AuthenticateSelf();
             if (session == null)
             {
                 return;
             }
 
             context.OwinContext.Set(OwinContextUserSessionKey, session);
-            var identity = new ClaimsIdentity(session.User?.UserId ?? session.ClientId);
+            var identity = new ClaimsIdentity(session.ClientId);
             context.Validated(identity);
         }
 
