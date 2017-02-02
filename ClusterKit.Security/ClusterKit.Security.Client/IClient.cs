@@ -43,12 +43,19 @@ namespace ClusterKit.Security.Client
         /// <param name="userName">The user name (login)</param>
         /// <param name="password">The user password</param>
         /// <returns>The authenticated user or null</returns>
-        Task<UserSession> AuthenticateUserAsync(string userName, string password);
+        Task<AuthenticationResult> AuthenticateUserAsync(string userName, string password);
 
         /// <summary>
         /// The application authenticates itself and will make operations on it's own behalf.
         /// </summary>
         /// <returns>The generated user session or null, in case self authentication is denied</returns>
-        Task<UserSession> AuthenticateSelf();
+        Task<AuthenticationResult> AuthenticateSelf();
+
+        /// <summary>
+        /// Renews authentication session
+        /// </summary>
+        /// <param name="refreshTicket">The refresh ticket data</param>
+        /// <returns>The subsequent authentication result</returns>
+        Task<AuthenticationResult> AuthenticateWithRefreshTicket(RefreshTicket refreshTicket);
     }
 }

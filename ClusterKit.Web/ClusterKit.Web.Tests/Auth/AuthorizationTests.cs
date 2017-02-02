@@ -28,8 +28,6 @@ namespace ClusterKit.Web.Tests.Auth
     using ClusterKit.Web.Authorization;
     using ClusterKit.Web.Authorization.Attributes;
 
-    using Newtonsoft.Json;
-
     using RestSharp;
     using RestSharp.Authenticators;
 
@@ -128,7 +126,7 @@ namespace ClusterKit.Web.Tests.Auth
         /// <returns>The user token</returns>
         private async Task<string> SetUserSession()
         {
-            var session = new UserSession(
+            var session = new AccessTicket(
                 new User { UserId = "testUser" },
                 new[] { "User1" },
                 "testClient",
@@ -147,7 +145,7 @@ namespace ClusterKit.Web.Tests.Auth
         /// <returns>The user token</returns>
         private async Task<string> SetClientSession()
         {
-            var session = new UserSession(
+            var session = new AccessTicket(
                 null,
                 null,
                 "testClient-2",
@@ -245,7 +243,7 @@ namespace ClusterKit.Web.Tests.Auth
                 var session = this.GetSession();
                 if (session.User == null)
                 {
-                    throw new ArgumentNullException(nameof(UserSession.User));
+                    throw new ArgumentNullException(nameof(AccessTicket.User));
                 }
 
                 return session.User.UserId;

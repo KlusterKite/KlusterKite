@@ -38,16 +38,26 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         public IEnumerable<string> OwnScope => new string[0];
 
         /// <inheritdoc />
-        public Task<UserSession> AuthenticateUserAsync(string userName, string password)
+        public Task<AuthenticationResult> AuthenticateUserAsync(string userName, string password)
         {
-            return Task.FromResult<UserSession>(null);
+            return Task.FromResult<AuthenticationResult>(null);
         }
 
         /// <inheritdoc />
-        public Task<UserSession> AuthenticateSelf()
+        public Task<AuthenticationResult> AuthenticateSelf()
         {
+            var result = new AuthenticationResult(
+                new AccessTicket(null, null, this.ClientId, this.Type, this.OwnScope, DateTimeOffset.Now, DateTimeOffset.Now.AddHours(1), null),
+                null);
+
             // todo: move expiring timespan to config
-            return Task.FromResult(new UserSession(null, null, this.ClientId, this.Type, this.OwnScope, DateTimeOffset.Now, DateTimeOffset.Now.AddHours(1), null));
+            return Task.FromResult(result);
+        }
+
+        /// <inheritdoc />
+        public Task<AuthenticationResult> AuthenticateWithRefreshTicket(RefreshTicket refreshTicket)
+        {
+            return Task.FromResult<AuthenticationResult>(null);
         }
     }
 }

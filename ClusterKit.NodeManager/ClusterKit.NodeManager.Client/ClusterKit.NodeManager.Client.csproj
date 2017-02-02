@@ -160,7 +160,8 @@
     </Compile>
     <Compile Include="Installer.cs" />
     <Compile Include="LoggerConfigurator.cs" />
-    <Compile Include="Messages\AuthenticateUser.cs" />
+    <Compile Include="Messages\AuthenticateUserWithCredentials.cs" />
+    <Compile Include="Messages\AuthenticateUserWithUid.cs" />
     <Compile Include="Messages\NodeDescription.cs" />
     <Compile Include="Messages\NodeDescriptionRequest.cs" />
     <Compile Include="Messages\PackageListRequest.cs" />

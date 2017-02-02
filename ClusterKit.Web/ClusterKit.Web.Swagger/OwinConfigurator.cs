@@ -47,8 +47,6 @@ namespace ClusterKit.Web.Swagger
             var publishDocUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishDocPath", "swagger");
             var publishUiUrl = akkaConfig.GetString("ClusterKit.Web.Swagger.Publish.publishUiPath", "swagger/ui");
 
-            var useOAuth2 = akkaConfig.GetBoolean("ClusterKit.Web.Swagger.OAuth2Enabled");
-
             Log.Information("Swagger: setting up swagger on {SwaggerUrl}", publishUiUrl);
             config.EnableSwagger(
                 $"{publishDocUrl}/{{apiVersion}}",
@@ -70,22 +68,11 @@ namespace ClusterKit.Web.Swagger
                         }
 
                         c.UseFullTypeNameInSchemaIds();
-                        if (useOAuth2)
-                        {
-                            c.OAuth2("oauth2").Flow("implicit").TokenUrl(akkaConfig.GetString("ClusterKit.Web.Swagger.OAuth2TokenUrl"));
-                        }
                     }).EnableSwaggerUi(
                         $"{publishUiUrl}/{{*assetPath}}",
                         c =>
                             {
                                 c.DisableValidator();
-                                if (useOAuth2)
-                                {
-                                    c.EnableOAuth2Support(
-                                        akkaConfig.GetString("ClusterKit.Web.Swagger.OAuth2ClientId"),
-                                        "swagger",
-                                        "Swagger UI");
-                                }
                             });
 
             Log.Information("Swagger was set up successfully");

@@ -211,7 +211,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationTokenProvider.cs" />
+    <Compile Include="RefreshTokenProvider.cs" />
+    <Compile Include="AuthenticationExtensionsController.cs" />
+    <Compile Include="AccessTokenProvider.cs" />
     <Compile Include="AuthorizationServerProvider.cs" />
     <Compile Include="DataNoProtectionProvider.cs" />
     <Compile Include="Installer.cs" />
@@ -231,6 +233,10 @@
     <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj">
       <Project>{261dfdc5-5107-41b5-a8f4-a34f84d22931}</Project>
       <Name>ClusterKit.LargeObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj">
+      <Project>{6adfbddf-e452-46fc-a037-6d57300be561}</Project>
+      <Name>ClusterKit.Web.Authorization</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
       <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>

@@ -19,9 +19,7 @@ namespace ClusterKit.Web.Swagger
     using Castle.Windsor;
 
     using ClusterKit.Core;
-    using ClusterKit.Security.Client;
-    using ClusterKit.Web.Swagger.OAuth;
-
+    
     /// <summary>
     /// Installing components from current library
     /// </summary>
@@ -83,7 +81,6 @@ namespace ClusterKit.Web.Swagger
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(Component.For<IOwinStartupConfigurator>().ImplementedBy<OwinConfigurator>());
-            container.Register(Component.For<IClientProvider>().ImplementedBy<ClientProvider>());
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
         }

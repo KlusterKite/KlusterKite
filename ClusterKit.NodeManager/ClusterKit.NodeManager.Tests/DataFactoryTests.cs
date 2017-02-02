@@ -15,8 +15,6 @@ namespace ClusterKit.NodeManager.Tests
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Akka.Configuration;
-
     using ClusterKit.Data.EF.Npgsql;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;

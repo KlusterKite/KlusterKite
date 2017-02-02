@@ -128,6 +128,7 @@ namespace ClusterKit.Web
                     Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
 
                     this.system.Log.Error(
+                        exception,
                         "{Type}: error resolving {RequestNumber} {RequestPath}",
                         this.GetType().Name,
                         n,

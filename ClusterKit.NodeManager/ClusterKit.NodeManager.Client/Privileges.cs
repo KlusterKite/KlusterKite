@@ -124,18 +124,8 @@ namespace ClusterKit.NodeManager.Client
         public const string ManualNodeUpdate = "ClusterKit.NodeManager.ManualNodeUpdate";
 
         /// <summary>
-        /// Gets all defined privileges list
+        /// The privilege to get the list of all registered privileges
         /// </summary>
-        /// <returns>The privileges list</returns>
-        public static string[] GetAllPrivilegesList()
-        {
-            return new[]
-                       {
-                           GetNodeList, GetSwaggerList, ManualNodeUpdate, NodeTemplateCreate, NodeTemplateDelete,
-                           NodeTemplateUpdate, NugetFeedCreate, NugetFeedDelete, NugetFeedUpdate, RoleCreate, RoleDelete,
-                           RoleRead, RoleUpdate, SeedAddressCreate, SeedAddressDelete, SeedAddressUpdate,
-                           UpdateNugetCache, UserCreate, UserRead, UserResetPassword, UserUpdate
-                       };
-        }
+        public const string GetPrivilegesList = "ClusterKit.NodeManager.GetPrivilegesList";
     }
 }

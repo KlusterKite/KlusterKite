@@ -32,7 +32,12 @@ namespace ClusterKit.Web.Authentication
         /// <summary>
         /// The key to store current client in the context
         /// </summary>
-        public const string OwinContextUserSessionKey = "userSession";
+        public const string OwinContextAuthenticationResultKey = "authenticationData";
+
+        /// <summary>
+        /// The key to store current client in the context
+        /// </summary>
+        public const string OwinContextRefreshTicketKey = "refreshTicket";
 
         /// <summary>
         /// The client providers
@@ -103,14 +108,14 @@ namespace ClusterKit.Web.Authentication
                 return;
             }
 
-            var session = await client.AuthenticateUserAsync(context.UserName, context.Password);
-            if (session?.User == null)
+            var result = await client.AuthenticateUserAsync(context.UserName, context.Password);
+            if (result?.AccessTicket.User == null)
             {
                 return;
             }
 
-            context.OwinContext.Set(OwinContextUserSessionKey, session);
-            var identity = new ClaimsIdentity(session.User.UserId);
+            context.OwinContext.Set(OwinContextAuthenticationResultKey, result);
+            var identity = new ClaimsIdentity(result.AccessTicket.User.UserId);
             context.Validated(identity);
         }
 
@@ -133,14 +138,47 @@ namespace ClusterKit.Web.Authentication
                 return;
             }
 
-            var session = await client.AuthenticateSelf();
-            if (session == null)
+            var result = await client.AuthenticateSelf();
+            if (result == null)
             {
                 return;
             }
 
-            context.OwinContext.Set(OwinContextUserSessionKey, session);
-            var identity = new ClaimsIdentity(session.ClientId);
+            context.OwinContext.Set(OwinContextAuthenticationResultKey, result);
+            var identity = new ClaimsIdentity(result.AccessTicket.ClientId);
+            context.Validated(identity);
+        }
+
+        /// <summary>
+        /// Called when a request to the Token endpoint arrives with a "grant_type" of "refresh_token". This occurs if your application has issued a "refresh_token"
+        /// along with the "access_token", and the client is attempting to use the "refresh_token" to acquire a new "access_token", and possibly a new "refresh_token".
+        /// To issue a refresh token the an Options.RefreshTokenProvider must be assigned to create the value which is returned. The claims and properties
+        /// associated with the refresh token are present in the context.Ticket. The application must call context.Validated to instruct the
+        /// Authorization Server middleware to issue an access token based on those claims and properties. The call to context.Validated may
+        /// be given a different AuthenticationTicket or ClaimsIdentity in order to control which information flows from the refresh token to
+        /// the access token. The default behavior when using the OAuthAuthorizationServerProvider is to flow information from the refresh token to
+        /// the access token unmodified.
+        /// See also http://tools.ietf.org/html/rfc6749#section-6
+        /// </summary>
+        /// <param name="context">The context of the event carries information in and results out.</param>
+        /// <returns>Task to enable asynchronous execution</returns>
+        public override async Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)
+        {
+            var refreshTicket = context.OwinContext.Get<RefreshTicket>(OwinContextRefreshTicketKey);
+            var client = context.OwinContext.Get<IClient>(OwinContextClientKey);
+            if (refreshTicket == null || client == null || client.ClientId != refreshTicket.ClientId)
+            {
+                return;
+            }
+
+            var result = await client.AuthenticateWithRefreshTicket(refreshTicket);
+            if (result == null)
+            {
+                return;
+            }
+
+            context.OwinContext.Set(OwinContextAuthenticationResultKey, result);
+            var identity = new ClaimsIdentity(result.AccessTicket.User?.UserId ?? result.AccessTicket.ClientId);
             context.Validated(identity);
         }
 
@@ -153,8 +191,8 @@ namespace ClusterKit.Web.Authentication
         /// <returns>Task to enable asynchronous execution</returns>
         public override Task TokenEndpoint(OAuthTokenEndpointContext context)
         {
-            var userSession = context.OwinContext.Get<UserSession>(OwinContextUserSessionKey);
-            context.Properties.ExpiresUtc = userSession.Expiring;
+            var authenticationResult = context.OwinContext.Get<AuthenticationResult>(OwinContextAuthenticationResultKey);
+            context.Properties.ExpiresUtc = authenticationResult.AccessTicket.Expiring;
             return base.TokenEndpoint(context);
         }
 

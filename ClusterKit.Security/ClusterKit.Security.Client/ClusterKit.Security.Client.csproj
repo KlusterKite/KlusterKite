@@ -139,6 +139,8 @@
   <ItemGroup>
     <Compile Include="Attributes\PrivilegeDescriptionAttribute.cs" />
     <Compile Include="Attributes\PrivilegesContainerAttribute.cs" />
+    <Compile Include="AuthenticationResult.cs" />
+    <Compile Include="RefreshTicket.cs" />
     <Compile Include="IClient.cs" />
     <Compile Include="IClientProvider.cs" />
     <Compile Include="Installer.cs" />
@@ -149,8 +151,8 @@
     <Compile Include="Privileges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestDescription.cs" />
-    <Compile Include="TokenDescription.cs" />
-    <Compile Include="UserSession.cs" />
+    <Compile Include="TokenResponse.cs" />
+    <Compile Include="AccessTicket.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

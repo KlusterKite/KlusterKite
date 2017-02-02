@@ -97,7 +97,6 @@ namespace ClusterKit.Web.Tests.Auth
             HttpStatusCode expectedResult)
         {
             this.ExpectNoMsg();
-            this.Log.Info("Owin port is {OwinPort}", this.OwinPort);
 
             var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
 
@@ -116,12 +115,85 @@ namespace ClusterKit.Web.Tests.Auth
 
             if (expectedResult == HttpStatusCode.OK)
             {
-                var tokenDescription = JsonConvert.DeserializeObject<TokenDescription>(result.Content);
+                var tokenDescription = JsonConvert.DeserializeObject<TokenResponse>(result.Content);
                 var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
-                var session = await tokenManager.ValidateAccessToken(tokenDescription.Token);
-                Assert.NotNull(session);
-                Assert.NotNull(session.User);
-                Assert.Equal(userName, session.User.UserId);
+                var accessTicket = await tokenManager.ValidateAccessToken(tokenDescription.AccessToken);
+                Assert.NotNull(accessTicket);
+                Assert.NotNull(accessTicket.User);
+                Assert.Equal(userName, accessTicket.User.UserId);
+
+                var refreshTicket = await tokenManager.ValidateRefreshToken(tokenDescription.RefreshToken);
+                Assert.NotNull(refreshTicket);
+                Assert.NotNull(refreshTicket.UserId);
+                Assert.Equal(userName, refreshTicket.UserId);
+            }
+        }
+
+        /// <summary>
+        /// Tests the refreshing access tokens process
+        /// </summary>
+        /// <param name="createTicket">A value indicating whether to create refresh tokens in the test</param>
+        /// <param name="ticketUserId">The user id in the refresh ticket</param>
+        /// <param name="ticketClientId">The client id in the ticket</param>
+        /// <param name="clientId">The client id in the request</param>
+        /// <param name="clientSecret">The client secret in the request</param>
+        /// <param name="expectedResult">The expected response code</param>
+        /// <returns>Async task</returns>
+        [Theory]
+        [InlineData(false, null, null, "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(false, null, null, "unit-test-nosecret", null, HttpStatusCode.BadRequest)]
+        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.OK)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "random", HttpStatusCode.BadRequest)]
+        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-nosecret", null, HttpStatusCode.OK)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-nosecret", null, HttpStatusCode.BadRequest)]
+        public async Task GrantRefreshToken(
+            bool createTicket,
+            string ticketUserId,
+            string ticketClientId,
+            string clientId,
+            string clientSecret,
+            HttpStatusCode expectedResult)
+        {
+            this.ExpectNoMsg();
+            var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
+            var token = createTicket
+                            ? await tokenManager.CreateRefreshToken(
+                                  new RefreshTicket(
+                                      ticketUserId,
+                                      ticketClientId,
+                                      "TestClient",
+                                      DateTimeOffset.Now,
+                                      DateTimeOffset.Now.AddMinutes(1)))
+                            : Guid.NewGuid().ToString("N");
+
+            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
+
+            var request = new RestRequest { Method = Method.POST, Resource = "/api/1.x/security/token" };
+            request.AddParameter("grant_type", "refresh_token");
+            request.AddParameter("refresh_token", token);
+            request.AddParameter("client_id", clientId);
+            if (!string.IsNullOrWhiteSpace(clientSecret))
+            {
+                request.AddParameter("client_secret", clientSecret);
+            }
+
+            var result = await client.ExecuteTaskAsync(request);
+            Assert.Equal(expectedResult, result.StatusCode);
+            if (expectedResult == HttpStatusCode.OK)
+            {
+                var tokenDescription = JsonConvert.DeserializeObject<TokenResponse>(result.Content);
+                var accessTicket = await tokenManager.ValidateAccessToken(tokenDescription.AccessToken);
+                Assert.NotNull(accessTicket);
+                Assert.NotNull(accessTicket.User);
+                Assert.Equal(ticketUserId, accessTicket.User.UserId);
+
+                var refreshTicket = await tokenManager.ValidateRefreshToken(tokenDescription.RefreshToken);
+                Assert.NotNull(refreshTicket);
+                Assert.NotNull(refreshTicket.UserId);
+                Assert.Equal(ticketUserId, refreshTicket.UserId);
             }
         }
 
@@ -153,7 +225,8 @@ namespace ClusterKit.Web.Tests.Auth
                 {{
                     ClusterKit {{
  		                Web {{
-                            Authentication.RedisConnection = ""{ConfigurationManager.ConnectionStrings["redis"].ConnectionString}""
+                            Authentication.RedisConnection = ""{ConfigurationManager.ConnectionStrings["redis"]
+                    .ConnectionString}""
                             OwinPort = {port},
  			                OwinBindAddress = ""http://*:{port}"",
                             Debug.Trace = true
@@ -218,30 +291,55 @@ namespace ClusterKit.Web.Tests.Auth
             public string Type => this.GetType().Name;
 
             /// <inheritdoc />
-            public Task<UserSession> AuthenticateUserAsync(string userName, string password)
+            public Task<AuthenticationResult> AuthenticateSelf()
             {
-                if (userName == "testUser" && password == "testPassword")
-                {
-                    var session = new UserSession(
-                        new User { UserId = userName },
-                        new[] { "User" },
-                        this.ClientId,
-                        this.Type,
-                        this.OwnScope,
-                        DateTimeOffset.Now, 
-                        DateTimeOffset.Now.AddSeconds(60),
-                        null);
-
-                    return Task.FromResult(session);
-                }
-
-                return Task.FromResult<UserSession>(null);
+                return Task.FromResult<AuthenticationResult>(null);
             }
 
             /// <inheritdoc />
-            public Task<UserSession> AuthenticateSelf()
+            public Task<AuthenticationResult> AuthenticateUserAsync(string userName, string password)
             {
-                return Task.FromResult<UserSession>(null);
+                if (userName == "testUser" && password == "testPassword")
+                {
+                    return Task.FromResult(this.CreateAuthenticationResult(userName));
+                }
+
+                return Task.FromResult<AuthenticationResult>(null);
+            }
+
+            /// <inheritdoc />
+            public Task<AuthenticationResult> AuthenticateWithRefreshTicket(RefreshTicket refreshTicket)
+            {
+                return refreshTicket.UserId == "testUser"
+                           ? Task.FromResult(this.CreateAuthenticationResult(refreshTicket.UserId))
+                           : Task.FromResult<AuthenticationResult>(null);
+            }
+
+            /// <summary>
+            /// Creates the authentication result
+            /// </summary>
+            /// <param name="userName">The user name</param>
+            /// <returns>The authentication result</returns>
+            private AuthenticationResult CreateAuthenticationResult(string userName)
+            {
+                var accessTicket = new AccessTicket(
+                    new User { UserId = userName },
+                    new[] { "User" },
+                    this.ClientId,
+                    this.Type,
+                    this.OwnScope,
+                    DateTimeOffset.Now,
+                    DateTimeOffset.Now.AddSeconds(60),
+                    null);
+                var refreshTicket = new RefreshTicket(
+                    userName,
+                    this.ClientId,
+                    this.Type,
+                    DateTimeOffset.Now,
+                    DateTimeOffset.Now.AddSeconds(60));
+
+                var authenticationResult = new AuthenticationResult(accessTicket, refreshTicket);
+                return authenticationResult;
             }
         }
 

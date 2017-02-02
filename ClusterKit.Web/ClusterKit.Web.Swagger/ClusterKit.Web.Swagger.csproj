@@ -195,8 +195,6 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="Installer.cs" />
-    <Compile Include="OAuth\ClientProvider.cs" />
-    <Compile Include="OAuth\SwaggerClient.cs" />
     <Compile Include="OwinConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerDescriptionActor.cs" />

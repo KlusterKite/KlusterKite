@@ -6,9 +6,9 @@
 //   The ClusterKit nodmanager web UI
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace ClusterKit.NodeManager.Authentication.Clients
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -49,50 +49,81 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         public string Name => "The ClusterKit nodmanager web UI";
 
         /// <inheritdoc />
-        public string Type => this.GetType().Name;
-
-        /// <inheritdoc />
         public IEnumerable<string> OwnScope => new string[0];
 
         /// <inheritdoc />
-        public async Task<UserSession> AuthenticateUserAsync(string userName, string password)
+        public string Type => this.GetType().Name;
+
+        /// <inheritdoc />
+        public Task<AuthenticationResult> AuthenticateSelf()
+        {
+            return Task.FromResult<AuthenticationResult>(null);
+        }
+
+        /// <inheritdoc />
+        public async Task<AuthenticationResult> AuthenticateUserAsync(string userName, string password)
         {
             var response =
                 await this.system.GetNodeManager()
                     .Ask<CrudActionResponse<User>>(
-                        new AuthenticateUser { Login = userName, Password = password },
+                        new AuthenticateUserWithCredentials { Login = userName, Password = password },
                         ConfigurationUtils.GetRestTimeout(this.system));
 
-            if (response.Data != null)
-            {
-                var user = response.Data;
-                // ReSharper disable ArrangeRedundantParentheses
-                if (user.IsDeleted || !user.IsBlocked
-                    || (user.ActiveTill.HasValue && user.ActiveTill.Value < this.system.Scheduler.Now)
-                    || (user.BlockedTill.HasValue && user.BlockedTill.Value > this.system.Scheduler.Now))
-                {
-                    return null;
-                }
-
-                // ReSharper restore ArrangeRedundantParentheses
-                return new UserSession(
-                    user.GetDescription(),
-                    user.GetScope(),
-                    this.ClientId,
-                    this.Type,
-                    this.OwnScope,
-                    this.system.Scheduler.Now,
-                    this.system.Scheduler.Now.AddMinutes(30),
-                    null);
-            }
-
-            return null;
+            return response.Data != null ? this.CreateUserAuthenticationResult(response.Data) : null;
         }
 
         /// <inheritdoc />
-        public Task<UserSession> AuthenticateSelf()
+        public async Task<AuthenticationResult> AuthenticateWithRefreshTicket(RefreshTicket refreshTicket)
         {
-            return Task.FromResult<UserSession>(null);
+            Guid uid;
+            if (!Guid.TryParseExact(refreshTicket.UserId, "N", out uid))
+            {
+                return null;
+            }
+
+            var response =
+                await this.system.GetNodeManager()
+                    .Ask<CrudActionResponse<User>>(
+                        new AuthenticateUserWithUid { Uid = uid },
+                        ConfigurationUtils.GetRestTimeout(this.system));
+
+            return response.Data != null ? this.CreateUserAuthenticationResult(response.Data) : null;
+        }
+
+        /// <summary>
+        /// Creates <see cref="AuthenticationResult"/> from user data
+        /// </summary>
+        /// <param name="user">The user</param>
+        /// <returns>The <see cref="AuthenticationResult"/></returns>
+        private AuthenticationResult CreateUserAuthenticationResult(User user)
+        {
+            // ReSharper disable ArrangeRedundantParentheses
+            if (user.IsDeleted || !user.IsBlocked
+                || (user.ActiveTill.HasValue && user.ActiveTill.Value < this.system.Scheduler.Now)
+                || (user.BlockedTill.HasValue && user.BlockedTill.Value > this.system.Scheduler.Now))
+            {
+                return null;
+            }
+
+            // ReSharper restore ArrangeRedundantParentheses
+            // todo: move expiring timespan to config
+            var accessTicket = new AccessTicket(
+                user.GetDescription(),
+                user.GetScope(),
+                this.ClientId,
+                this.Type,
+                this.OwnScope,
+                this.system.Scheduler.Now,
+                this.system.Scheduler.Now.AddMinutes(30),
+                null);
+            var refreshTicket = new RefreshTicket(
+                user.Uid.ToString("N"),
+                this.ClientId,
+                this.Type,
+                this.system.Scheduler.Now,
+                this.system.Scheduler.Now.AddDays(1));
+
+            return new AuthenticationResult(accessTicket, refreshTicket);
         }
     }
 }

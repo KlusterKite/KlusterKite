@@ -1,13 +1,4 @@
  {
- 	ClusterKit.Web.Swagger {
- 		OAuth2Enabled = true,
- 		OAuth2TokenUrl = "http://entry/api/1.x/security/token",
- 		OAuth2ClientId = "swagger-ui"
-
- 		EnableSwaggerApplication = true, // THIS SHOULD BE DISABLED ON PRODUCTION ENVIRONMENT
- 		
- 	}
-
 	akka.actor.deployment {
  		 /Web {
             IsNameSpace = true

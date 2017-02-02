@@ -21,7 +21,7 @@ namespace ClusterKit.Security.Client
         /// <summary>
         /// Gets or sets the authentication description
         /// </summary>
-        public UserSession Authentication { get; set; }
+        public AccessTicket Authentication { get; set; }
 
         /// <summary>
         /// Gets or sets the client / user remote address

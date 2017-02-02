@@ -285,7 +285,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleFactory.cs" />
     <Compile Include="SeedAddressFactorycs.cs" />
-    <Compile Include="UserFactory.cs" />
+    <Compile Include="UserFactoryByLogin.cs" />
+    <Compile Include="UserFactoryByUid.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

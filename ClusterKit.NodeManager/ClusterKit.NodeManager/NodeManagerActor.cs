@@ -1103,7 +1103,8 @@ namespace ClusterKit.NodeManager
             this.Receive<CollectionRequest<NugetFeed>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<NugetFeed, int>>(m => this.workers.Forward(m));
 
-            this.Receive<AuthenticateUser>(m => this.workers.Forward(m));
+            this.Receive<AuthenticateUserWithCredentials>(m => this.workers.Forward(m));
+            this.Receive<AuthenticateUserWithUid>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<User>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<User, Guid>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<Role>>(m => this.workers.Forward(m));
@@ -1237,7 +1238,8 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, int>);
                 this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, int>);
 
-                this.ReceiveAsync<AuthenticateUser>(this.AuthenticateUser);
+                this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
+                this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);
             }
 
             /// <summary>
@@ -1274,7 +1276,7 @@ namespace ClusterKit.NodeManager
             /// </summary>
             /// <param name="request">The request</param>
             /// <returns>The async task</returns>
-            private async Task AuthenticateUser(AuthenticateUser request)
+            private async Task AuthenticateUser(AuthenticateUserWithCredentials request)
             {
                 using (var ds = await this.GetContext())
                 {
@@ -1293,7 +1295,37 @@ namespace ClusterKit.NodeManager
                     {
                         this.Sender.Tell(
                             CrudActionResponse<User>.Error(
-                                new DatasourceInnerException("Exception on AuthenticateUser operation", exception),
+                                new DatasourceInnerException("Exception on AuthenticateUserWithCredentials operation", exception),
+                                null));
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Authenticate user by it's uid
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task AuthenticateUser(AuthenticateUserWithUid request)
+            {
+                using (var ds = await this.GetContext())
+                {
+                    var factory = DataFactory<ConfigurationContext, User, Guid>.CreateFactory(ds);
+                    try
+                    {
+                        var user = await factory.Get(request.Uid);
+                        if (!user.HasValue)
+                        {
+                            this.Sender.Tell(CrudActionResponse<User>.Error(new EntityNotFoundException(), null));
+                        }
+
+                        this.Sender.Tell(CrudActionResponse<User>.Success(user, null));
+                    }
+                    catch (Exception exception)
+                    {
+                        this.Sender.Tell(
+                            CrudActionResponse<User>.Error(
+                                new DatasourceInnerException("Exception on AuthenticateUserWithCredentials operation", exception),
                                 null));
                     }
                 }

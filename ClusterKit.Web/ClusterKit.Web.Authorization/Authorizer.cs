@@ -99,7 +99,8 @@ namespace ClusterKit.Web.Authorization
                     return null;
                 }
 
-                this.Context.Set("UserSession", session);
+                this.Context.Set("AccessTicket", session);
+                this.Context.Set("Token", token);
 
                 return new AuthenticationTicket(
                     new ClaimsIdentity(session.User?.UserId ?? session.ClientId),

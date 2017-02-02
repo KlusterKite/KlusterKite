@@ -57,9 +57,9 @@ namespace ClusterKit.Web.Authorization
         /// </summary>
         /// <param name="context">The owin context</param>
         /// <returns>The user session</returns>
-        public static UserSession GetSession(this IOwinContext context)
+        public static AccessTicket GetSession(this IOwinContext context)
         {
-            return context.Get<UserSession>("UserSession");
+            return context.Get<AccessTicket>("AccessTicket");
         }
 
         /// <summary>
@@ -67,10 +67,33 @@ namespace ClusterKit.Web.Authorization
         /// </summary>
         /// <param name="controller">The api controller</param>
         /// <returns>The user session</returns>
-        public static UserSession GetSession(this ApiController controller)
+        public static AccessTicket GetSession(this ApiController controller)
         {
             var context = controller.Request.GetOwinContext();
             return context.GetSession();
+        }
+
+        /// <summary>
+        /// Gets authenticated user session or null
+        /// </summary>
+        /// <param name="context">The owin context</param>
+        /// <returns>The user session</returns>
+        [UsedImplicitly]
+        public static string GetAuthenticationToken(this IOwinContext context)
+        {
+            return context.Get<string>("Token");
+        }
+
+        /// <summary>
+        /// Gets authenticated user session or null
+        /// </summary>
+        /// <param name="controller">The api controller</param>
+        /// <returns>The user session</returns>
+        [UsedImplicitly]
+        public static string GetAuthenticationToken(this ApiController controller)
+        {
+            var context = controller.Request.GetOwinContext();
+            return context.GetAuthenticationToken();
         }
     }
 }
