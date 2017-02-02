@@ -49,7 +49,7 @@ namespace ClusterKit.Web
 
             var dependencyResolver = new WindsorDependencyResolver(ServiceLocator.Current.GetInstance<IWindsorContainer>());
             config.DependencyResolver = dependencyResolver;
-
+            
             config.EnsureInitialized();
 
             owinStartupConfigurators.ForEach(c => c.ConfigureApp(appBuilder));

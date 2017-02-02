@@ -11,6 +11,8 @@ namespace ClusterKit.Security.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -48,10 +50,10 @@ namespace ClusterKit.Security.Client
         public UserSession([CanBeNull] IUser user, [CanBeNull]IEnumerable<string> userScope, [NotNull] string clientId, [NotNull] string clientType, [NotNull] IEnumerable<string> clientScope, DateTimeOffset created, DateTimeOffset expiring, object extraData)
         {
             this.User = user;
-            this.UserScope = userScope;
+            this.UserScope = userScope?.ToList().AsReadOnly() ?? new List<string>().AsReadOnly();
             this.ClientId = clientId;
             this.ClientType = clientType;
-            this.ClientScope = clientScope;
+            this.ClientScope = clientScope.ToList().AsReadOnly();
             this.Created = created;
             this.Expiring = expiring;
             this.ExtraData = extraData;
@@ -67,9 +69,9 @@ namespace ClusterKit.Security.Client
         /// <summary>
         /// Gets the user's authorized actions scope
         /// </summary>
-        [CanBeNull]
+        [NotNull]
         [UsedImplicitly]
-        public IEnumerable<string> UserScope { get; }
+        public IReadOnlyList<string> UserScope { get; }
 
         /// <summary>
         /// Gets the client id
@@ -90,7 +92,7 @@ namespace ClusterKit.Security.Client
         /// </summary>
         [NotNull]
         [UsedImplicitly]
-        public IEnumerable<string> ClientScope { get; }
+        public IReadOnlyList<string> ClientScope { get; }
 
         /// <summary>
         /// Gets the session created time

@@ -26,6 +26,7 @@ namespace ClusterKit.Web.Tests.Auth
     using ClusterKit.Core.TestKit;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.Authorization;
+    using ClusterKit.Web.Authorization.Attributes;
 
     using Newtonsoft.Json;
 
@@ -52,45 +53,70 @@ namespace ClusterKit.Web.Tests.Auth
         }
 
         /// <summary>
+        /// The type of test authentication
+        /// </summary>
+        public enum EnAuthenticationType
+        {
+            /// <summary>
+            /// There is no authentication
+            /// </summary>
+            None,
+
+            /// <summary>
+            /// There is user authentication
+            /// </summary>
+            User,
+
+            /// <summary>
+            /// There is client authentication
+            /// </summary>
+            Client
+        }
+
+        /// <summary>
         /// Current owin bind port
         /// </summary>
         private int OwinPort => this.Sys.Settings.Config.GetInt("ClusterKit.Web.OwinPort");
 
         /// <summary>
-        /// Checks user authorization
+        /// Checks various authorization combinations
         /// </summary>
-        /// <returns>Async task</returns>
-        [Fact]
-        public async Task CheckUserSession()
+        /// <param name="authenticationType">The authentication type</param>
+        /// <param name="method">The requested method</param>
+        /// <param name="expectedResult">The expected response code</param>
+        /// <returns>The async task</returns>
+        [Theory]
+        [InlineData(EnAuthenticationType.None, "user", HttpStatusCode.Unauthorized)]
+        [InlineData(EnAuthenticationType.User, "user", HttpStatusCode.OK)]
+        [InlineData(EnAuthenticationType.Client, "user", HttpStatusCode.OK)]
+        [InlineData(EnAuthenticationType.User, "AuthorizedUserAction", HttpStatusCode.NoContent)]
+        [InlineData(EnAuthenticationType.Client, "AuthorizedUserAction", HttpStatusCode.Unauthorized)]
+        [InlineData(EnAuthenticationType.User, "UnauthorizedUserAction", HttpStatusCode.Unauthorized)]
+        [InlineData(EnAuthenticationType.Client, "UnauthorizedUserAction", HttpStatusCode.Unauthorized)]
+        [InlineData(EnAuthenticationType.User, "UnauthorizedClientUserAction", HttpStatusCode.Unauthorized)]
+        [InlineData(EnAuthenticationType.Client, "UnauthorizedClientUserAction", HttpStatusCode.Unauthorized)]
+        [InlineData(EnAuthenticationType.User, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
+        [InlineData(EnAuthenticationType.Client, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
+        public async Task CheckAuthorization(EnAuthenticationType authenticationType, string method, HttpStatusCode expectedResult) 
         {
             this.ExpectNoMsg();
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
-            var token = await this.SetUserSession();
-            client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(token, "Bearer");
-            var request = new RestRequest { Method = Method.GET, Resource = "/test/user" };
+            var client = new RestClient($"http://localhost:{this.OwinPort}/test") { Timeout = 5000 };
+            switch (authenticationType)
+            {
+                case EnAuthenticationType.User:
+                    client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(await this.SetUserSession(), "Bearer");
+                    break;
+                case EnAuthenticationType.Client:
+                    client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(await this.SetClientSession(), "Bearer");
+                    break;
+            }
+
+            var request = new RestRequest { Method = Method.GET, Resource = method };
             request.AddHeader("Accept", "application/json, text/json");
             var result = await client.ExecuteTaskAsync(request);
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            Assert.NotNull(result.Content);
-            Assert.Equal("testUser", JsonConvert.DeserializeObject<string>(result.Content));
-        }
-
-        /// <summary>
-        /// Checks unauthorized user
-        /// </summary>
-        /// <returns>Async task</returns>
-        [Fact]
-        public async Task CheckUnauthorizedUser()
-        {
-            this.ExpectNoMsg();
-            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
-            var request = new RestRequest { Method = Method.GET, Resource = "/test/user" };
-            request.AddHeader("Accept", "application/json, text/json");
-            var result = await client.ExecuteTaskAsync(request);
-
-            Assert.Equal(HttpStatusCode.Unauthorized, result.StatusCode);
+            Assert.Equal(expectedResult, result.StatusCode);
         }
 
         /// <summary>
@@ -105,6 +131,25 @@ namespace ClusterKit.Web.Tests.Auth
                 "testClient",
                 "testClientType",
                 new[] { "Client1", "Client2" },
+                DateTimeOffset.Now,
+                DateTimeOffset.Now.AddMinutes(1),
+                "hello world");
+
+            return await this.WindsorContainer.Resolve<ITokenManager>().CreateAccessToken(session);
+        }
+
+        /// <summary>
+        /// Sets the client authenticated session
+        /// </summary>
+        /// <returns>The user token</returns>
+        private async Task<string> SetClientSession()
+        {
+            var session = new UserSession(
+                null,
+                null,
+                "testClient-2",
+                "testClientType",
+                new[] { "Client1-2", "Client2-2" },
                 DateTimeOffset.Now,
                 DateTimeOffset.Now.AddMinutes(1),
                 "hello world");
@@ -170,6 +215,7 @@ namespace ClusterKit.Web.Tests.Auth
         /// The testing web api controller
         /// </summary>
         [RoutePrefix("test")]
+        [RequireSession]
         public class TestController : ApiController
         {
             /// <summary>
@@ -181,12 +227,51 @@ namespace ClusterKit.Web.Tests.Auth
             public string GetUserSession()
             {
                 var session = this.GetSession();
-                if (session == null)
-                {
-                    throw new HttpResponseException(HttpStatusCode.Unauthorized);
-                }
-
                 return session.User?.UserId ?? session.ClientId;
+            }
+
+            /// <summary>
+            /// User action authorized for default user on default client
+            /// </summary>
+            [HttpGet]
+            [Route("AuthorizedUserAction")]
+            [RequireUserPrivilege("User1")]
+            [RequireClientPrivilege("Client1")]
+            public void AuthorizedUserAction()
+            {
+            }
+
+            /// <summary>
+            /// User action unauthorized for default user, but authorized for default client
+            /// </summary>
+            [HttpGet]
+            [Route("UnauthorizedUserAction")]
+            [RequireUserPrivilege("User2")]
+            [RequireClientPrivilege("Client1")]
+            public void UnauthorizedUserAction()
+            {
+            }
+
+            /// <summary>
+            /// User action authorized for default user, but unauthorized for default client
+            /// </summary>
+            [HttpGet]
+            [Route("UnauthorizedClientUserAction")]
+            [RequireUserPrivilege("User1")]
+            [RequireClientPrivilege("Client1-2")]
+            public void UnauthorizedClientUserAction()
+            {
+            }
+
+            /// <summary>
+            /// User action authorized for either client or user
+            /// </summary>
+            [HttpGet]
+            [Route("AuthorizedEitherClientUserAction")]
+            [RequireUserPrivilege("User1", ignoreOnClientOwnBehalf: true)]
+            [RequireClientPrivilege("Client1-2", ignoreOnUserPresent: true)]
+            public void AuthorizedEitherClientUserAction()
+            {
             }
         }
 
