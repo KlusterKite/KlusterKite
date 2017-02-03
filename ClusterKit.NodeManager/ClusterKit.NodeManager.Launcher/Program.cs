@@ -1,4 +1,4 @@
-﻿ // --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -93,18 +93,27 @@ namespace ClusterKit.NodeManager.Launcher
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(this.WorkingDirectory)
-                && Directory.Exists(this.WorkingDirectory)
+            if (!string.IsNullOrWhiteSpace(this.WorkingDirectory) && Directory.Exists(this.WorkingDirectory)
                 && !CheckDirectoryAccess(this.WorkingDirectory))
             {
                 Console.WriteLine(@"workingDirectory is not accessable");
                 this.IsValid = false;
             }
 
-            this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE") ?? ConfigurationManager.AppSettings["containerType"];
+            this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE")
+                                 ?? ConfigurationManager.AppSettings["containerType"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
                 Console.WriteLine(@"containerType is not configured");
+                this.IsValid = false;
+            }
+
+            this.ApiClientId = ConfigurationManager.AppSettings["apiClientId"];
+            this.ApiClientSecret = ConfigurationManager.AppSettings["apiClientSecret"];
+
+            if (string.IsNullOrWhiteSpace(this.ApiClientId) || string.IsNullOrWhiteSpace(this.ApiClientSecret))
+            {
+                Console.WriteLine(@"api access is not configured");
                 this.IsValid = false;
             }
         }
@@ -124,6 +133,21 @@ namespace ClusterKit.NodeManager.Launcher
             /// </summary>
             RunAction
         }
+
+        /// <summary>
+        /// Gets the api authentication client id
+        /// </summary>
+        private string ApiClientId { get; }
+
+        /// <summary>
+        /// Gets the api authentication client secret
+        /// </summary>
+        private string ApiClientSecret { get; }
+
+        /// <summary>
+        /// Gets or sets the current api access token 
+        /// </summary>
+        private Token CurrentApiToken { get; set; }
 
         /// <summary>
         /// Gets the url of cluster configuration service
@@ -233,8 +257,9 @@ namespace ClusterKit.NodeManager.Launcher
 
             while (response.StatusCode == HttpStatusCode.ServiceUnavailable)
             {
-                var retryHeader = response.Headers.FirstOrDefault(
-                    h => "Retry-After".Equals(h.Name, StringComparison.InvariantCultureIgnoreCase));
+                var retryHeader =
+                    response.Headers.FirstOrDefault(
+                        h => "Retry-After".Equals(h.Name, StringComparison.InvariantCultureIgnoreCase));
                 int timeToWait;
                 if (!int.TryParse(retryHeader?.Value?.ToString(), out timeToWait))
                 {
@@ -275,7 +300,7 @@ namespace ClusterKit.NodeManager.Launcher
             this.PrepareNuGetConfig(config);
             this.InstallPackages(config);
             this.CreateService(config);
-            this.FixAssemblyVersions(); 
+            this.FixAssemblyVersions();
         }
 
         /// <summary>
@@ -288,7 +313,9 @@ namespace ClusterKit.NodeManager.Launcher
             var serviceDir = Path.Combine(this.WorkingDirectory, "service");
             Directory.CreateDirectory(serviceDir);
 
-            var packageReader = new NuGet.Protocol.FindLocalPackagesResourcePackagesConfig(Path.Combine(this.WorkingDirectory, "packages"));
+            var packageReader =
+                new NuGet.Protocol.FindLocalPackagesResourcePackagesConfig(
+                    Path.Combine(this.WorkingDirectory, "packages"));
             var packages = packageReader.GetPackages(NullLogger.Instance, CancellationToken.None);
 
             var targetFramework = NuGetFramework.ParseFrameworkName(
@@ -326,7 +353,7 @@ namespace ClusterKit.NodeManager.Launcher
                 ClusterKit.NodeManager.NodeTemplateVersion = {configuration.NodeTemplateVersion}
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}
-                ClusterKit.NodeManager.NodeId = { this.Uid }
+                ClusterKit.NodeManager.NodeId = {this.Uid}
                 akka.cluster.seed-nodes = [{string.Join(", ", seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
@@ -372,19 +399,26 @@ namespace ClusterKit.NodeManager.Launcher
             {
                 var parameters = AssemblyName.GetAssemblyName(lib);
                 var dependentNode =
-                    assemblyBindingNode?.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
+                    assemblyBindingNode?.SelectSingleNode(
+                        $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
+                        namespaceManager)
                     ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
 
                 if (dependentNode == null)
                 {
                     continue;
                 }
-                
+
                 dependentNode.RemoveAll();
-                var assemblyIdentityNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
+                var assemblyIdentityNode =
+                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);
-                assemblyIdentityNode.SetAttribute("publicKeyToken", BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", string.Empty).ToLower(CultureInfo.InvariantCulture));
-                var bindingRedirectNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
+                var publicKeyToken = BitConverter.ToString(parameters.GetPublicKeyToken())
+                    .Replace("-", string.Empty)
+                    .ToLower(CultureInfo.InvariantCulture);
+                assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
+                var bindingRedirectNode =
+                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
 
@@ -403,6 +437,7 @@ namespace ClusterKit.NodeManager.Launcher
         {
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<packages>\n</packages>\n");
+
             // ReSharper disable PossibleNullReferenceException
             var rootNode = xmlDocument.DocumentElement.SelectSingleNode("/packages");
             foreach (var package in configuration.Packages)
@@ -430,10 +465,16 @@ namespace ClusterKit.NodeManager.Launcher
             }
 
             // Checking installation
-            var installedPackages = Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")).Select(Path.GetFileName).ToList();
-            var missedPackages = configuration.Packages
-                .Where(p => installedPackages.All(d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-[\\w\\d\\-]*)?$")))
-                .ToList();
+            var installedPackages =
+                Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages"))
+                    .Select(Path.GetFileName)
+                    .ToList();
+            var missedPackages =
+                configuration.Packages.Where(
+                        p =>
+                            installedPackages.All(
+                                d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-[\\w\\d\\-]*)?$")))
+                    .ToList();
             foreach (var packageName in missedPackages)
             {
                 Console.WriteLine($@"Package {packageName.Id} was not installed");
@@ -457,7 +498,9 @@ namespace ClusterKit.NodeManager.Launcher
                                       {
                                           UseShellExecute = false,
                                           WorkingDirectory =
-                                              Path.Combine(Path.GetFullPath(this.WorkingDirectory), "service"),
+                                              Path.Combine(
+                                                  Path.GetFullPath(this.WorkingDirectory),
+                                                  "service"),
                                           FileName =
                                               Path.Combine(
                                                   Path.GetFullPath(this.WorkingDirectory),
@@ -481,8 +524,7 @@ namespace ClusterKit.NodeManager.Launcher
             var configPath = Path.Combine(this.WorkingDirectory, "nuget.config");
 
             File.Copy(
-                // ReSharper disable once AssignNullToNotNullAttribute
-                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "nuget.exe"),
+                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "nuget.exe"),
                 Path.Combine(this.WorkingDirectory, "nuget.exe"));
 
             XmlDocument doc = new XmlDocument();

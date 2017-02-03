@@ -98,7 +98,7 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         private AuthenticationResult CreateUserAuthenticationResult(User user)
         {
             // ReSharper disable ArrangeRedundantParentheses
-            if (user.IsDeleted || !user.IsBlocked
+            if (user.IsDeleted || user.IsBlocked
                 || (user.ActiveTill.HasValue && user.ActiveTill.Value < this.system.Scheduler.Now)
                 || (user.BlockedTill.HasValue && user.BlockedTill.Value > this.system.Scheduler.Now))
             {

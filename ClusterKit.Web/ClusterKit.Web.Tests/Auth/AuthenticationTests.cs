@@ -106,7 +106,7 @@ namespace ClusterKit.Web.Tests.Auth
             request.AddParameter("password", userPassword);
             request.AddParameter("client_id", clientId);
             if (!string.IsNullOrWhiteSpace(clientSecret))
-            {
+            { 
                 request.AddParameter("client_secret", clientSecret);
             }
 
