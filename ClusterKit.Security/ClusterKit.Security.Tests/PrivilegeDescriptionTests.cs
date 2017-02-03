@@ -32,7 +32,7 @@ namespace ClusterKit.Security.Tests
         public void PrivilegeDiscoverTest()
         {
             new Installer().PreCheck(Config.Empty);
-            Assert.Equal(6, Utils.DefinedPrivileges.Count);
+            Assert.Equal(7, Utils.DefinedPrivileges.Count);
         }
 
         /// <summary>
@@ -41,8 +41,11 @@ namespace ClusterKit.Security.Tests
         [Fact]
         public void PrivilegeGetListTest()
         {
-            var description = Utils.GetDefinedPrivileges(typeof(TestPrivileges));
-            Assert.Equal(4, description.Count());
+            var description = Utils.GetDefinedPrivileges(typeof(TestPrivileges)).ToList();
+            Assert.Equal(5, description.Count);
+
+            var userPrivilege = description.First(d => d.Privilege == TestPrivileges.DescribedUserPrivilege);
+            Assert.Equal(EnPrivilegeTarget.User, userPrivilege.Target);
         }
 
         /// <summary>

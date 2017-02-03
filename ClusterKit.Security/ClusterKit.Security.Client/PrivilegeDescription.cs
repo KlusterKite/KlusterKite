@@ -28,17 +28,24 @@ namespace ClusterKit.Security.Client
         /// <param name="privilege">
         /// The privilege.
         /// </param>
-        /// <param name="action">the exact controller action name</param>
+        /// <param name="action">
+        /// the exact controller action name
+        /// </param>
+        /// <param name="target">
+        /// The target to grant privilege to
+        /// </param>
         public PrivilegeDescription(
             [NotNull]string assemblyName, 
             [CanBeNull]string description, 
             [NotNull]string privilege,
-            [CanBeNull]string action = null)
+            [CanBeNull]string action = null,
+            EnPrivilegeTarget target = EnPrivilegeTarget.ClientAndUser)
         {
             this.AssemblyName = assemblyName;
             this.Description = description ?? privilege;
             this.Privilege = privilege;
             this.Action = action;
+            this.Target = target;
         }
 
         /// <summary>
@@ -68,6 +75,12 @@ namespace ClusterKit.Security.Client
         [NotNull]
         [UsedImplicitly]
         public string Privilege { get; }
+
+        /// <summary>
+        /// Gets the target to grant privilege to
+        /// </summary>
+        [UsedImplicitly]
+        public EnPrivilegeTarget Target { get; }
 
         /// <inheritdoc />
         public override string ToString()

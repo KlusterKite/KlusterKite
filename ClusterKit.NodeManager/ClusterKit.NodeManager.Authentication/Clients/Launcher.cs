@@ -13,6 +13,7 @@ namespace ClusterKit.NodeManager.Authentication.Clients
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    using ClusterKit.NodeManager.Client;
     using ClusterKit.Security.Client;
 
     /// <summary>
@@ -35,7 +36,10 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         public string Type => this.GetType().Name;
 
         /// <inheritdoc />
-        public IEnumerable<string> OwnScope => new string[0];
+        public IEnumerable<string> OwnScope => new[]
+                                                   {
+                                                       Privileges.GetConfiguration
+                                                   };
 
         /// <inheritdoc />
         public Task<AuthenticationResult> AuthenticateUserAsync(string userName, string password)

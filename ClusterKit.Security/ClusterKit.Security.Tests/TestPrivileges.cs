@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Security.Tests
 {
+    using ClusterKit.Security.Client;
     using ClusterKit.Security.Client.Attributes;
 
     using JetBrains.Annotations;
@@ -32,6 +33,13 @@ namespace ClusterKit.Security.Tests
         [UsedImplicitly]
         [PrivilegeDescription("Some privilege with description")]
         public const string DescribedPrivilege = "DescribedPrivilege";
+
+        /// <summary>
+        /// Some privilege with description
+        /// </summary>
+        [UsedImplicitly]
+        [PrivilegeDescription("Some privilege with description", Target = EnPrivilegeTarget.User)]
+        public const string DescribedUserPrivilege = "DescribedUserPrivilege";
 
         /// <summary>
         /// Some privilege with description and actions

@@ -37,6 +37,11 @@ namespace ClusterKit.Security.Client.Attributes
         public string Description { get; }
 
         /// <summary>
+        /// Gets or sets the target to grant privilege to
+        /// </summary>
+        public EnPrivilegeTarget Target { get; set; }
+
+        /// <summary>
         /// Gets or sets the possible actions extensions
         /// </summary>
         public string[] Actions { get; set; }

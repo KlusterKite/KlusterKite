@@ -102,7 +102,8 @@ namespace ClusterKit.Security.Client
                                                     container.Assembly.GetName().Name,
                                                     descriptionAttribute.Description,
                                                     $"{f.GetValue(null)}.{action}",
-                                                    action));
+                                                    action,
+                                                    descriptionAttribute.Target));
                                 }
 
                                 return new[]
@@ -110,7 +111,8 @@ namespace ClusterKit.Security.Client
                                                new PrivilegeDescription(
                                                    container.Assembly.GetName().Name,
                                                    descriptionAttribute.Description,
-                                                   (string)f.GetValue(null))
+                                                   (string)f.GetValue(null),
+                                                   target: descriptionAttribute.Target)
                                            };
                             });
         } 

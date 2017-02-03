@@ -29,6 +29,7 @@ namespace ClusterKit.NodeManager.Launcher
     using NuGet.Frameworks;
 
     using RestSharp;
+    using RestSharp.Authenticators;
 
     /// <summary>
     /// ClusterKit Node launcher
@@ -71,6 +72,21 @@ namespace ClusterKit.NodeManager.Launcher
             catch (UriFormatException)
             {
                 Console.WriteLine(@"nodeManagerUrl is not a valid URL");
+                this.IsValid = false;
+            }
+
+            try
+            {
+                this.AuthenticationUrl = new Uri(ConfigurationManager.AppSettings["authenticationUrl"]);
+            }
+            catch (ArgumentNullException)
+            {
+                Console.WriteLine(@"authenticationUrl not configured");
+                this.IsValid = false;
+            }
+            catch (UriFormatException)
+            {
+                Console.WriteLine(@"authenticationUrl is not a valid URL");
                 this.IsValid = false;
             }
 
@@ -135,6 +151,11 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
+        /// Gets the authentication url
+        /// </summary>
+        public Uri AuthenticationUrl { get; }
+
+        /// <summary>
         /// Gets the api authentication client id
         /// </summary>
         private string ApiClientId { get; }
@@ -145,11 +166,6 @@ namespace ClusterKit.NodeManager.Launcher
         private string ApiClientSecret { get; }
 
         /// <summary>
-        /// Gets or sets the current api access token 
-        /// </summary>
-        private Token CurrentApiToken { get; set; }
-
-        /// <summary>
         /// Gets the url of cluster configuration service
         /// </summary>
         private Uri ConfigurationUrl { get; }
@@ -158,6 +174,11 @@ namespace ClusterKit.NodeManager.Launcher
         /// Gets the type of container assigned to current machine
         /// </summary>
         private string ContainerType { get; }
+
+        /// <summary>
+        /// Gets or sets the current api access token 
+        /// </summary>
+        private Token CurrentApiToken { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether that configuration is correct
@@ -248,52 +269,7 @@ namespace ClusterKit.NodeManager.Launcher
         {
             Console.WriteLine(@"Configuring node...");
 
-            var client = new RestClient(this.ConfigurationUrl);
-            var request = new RestRequest { Method = Method.POST };
-            request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType, NodeUid = this.Uid });
-
-            var response = client.Execute<NodeStartUpConfiguration>(request);
-            NodeStartUpConfiguration config;
-
-            while (response.StatusCode == HttpStatusCode.ServiceUnavailable)
-            {
-                var retryHeader =
-                    response.Headers.FirstOrDefault(
-                        h => "Retry-After".Equals(h.Name, StringComparison.InvariantCultureIgnoreCase));
-                int timeToWait;
-                if (!int.TryParse(retryHeader?.Value?.ToString(), out timeToWait))
-                {
-                    timeToWait = 60;
-                }
-
-                Console.WriteLine($@"Config service anavailable, retrying in {timeToWait} seconds...");
-                Thread.Sleep(TimeSpan.FromSeconds(timeToWait));
-                response = client.Execute<NodeStartUpConfiguration>(request);
-            }
-
-            if (response.StatusCode != HttpStatusCode.OK || response.Data == null)
-            {
-                var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
-                if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
-                {
-                    throw new Exception(
-                        $"Could not get configuration (response: {response.StatusCode}) from service and there is no fallback configuration");
-                }
-
-                Console.WriteLine(@"Could not get configuration, using fallback...");
-                var serializer = new JsonSerializer();
-
-                using (var file = File.OpenRead(fallBackConfiguration))
-                using (var textReader = new StreamReader(file))
-                using (var jsonReader = new JsonTextReader(textReader))
-                {
-                    config = serializer.Deserialize<NodeStartUpConfiguration>(jsonReader);
-                }
-            }
-            else
-            {
-                config = response.Data;
-            }
+            var config = this.GetConfig();
 
             Console.WriteLine($@"Got {config.NodeTemplate} configuration");
             this.CleanWorkingDir();
@@ -301,6 +277,93 @@ namespace ClusterKit.NodeManager.Launcher
             this.InstallPackages(config);
             this.CreateService(config);
             this.FixAssemblyVersions();
+        }
+
+        /// <summary>
+        /// Gets the node config from the cluster
+        /// </summary>
+        /// <returns>The new config</returns>
+        private NodeStartUpConfiguration GetConfig()
+        {
+            while (true)
+            {
+                if ((this.CurrentApiToken == null || this.CurrentApiToken.IsExpired) && !this.GetToken())
+                {
+                    return this.GetFallBackConfig();
+                }
+
+                var authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(this.CurrentApiToken.AccessToken, "Bearer");
+                var client = new RestClient(this.ConfigurationUrl)
+                                 {
+                                     Timeout = 5000,
+                                     Authenticator = authenticator
+                                 };
+
+                var request = new RestRequest { Method = Method.POST };
+                request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType, NodeUid = this.Uid });
+                var response = client.Execute<NodeStartUpConfiguration>(request);
+
+                if (response.ResponseStatus != ResponseStatus.Completed || response.StatusCode == HttpStatusCode.BadGateway)
+                {
+                    return this.GetFallBackConfig();
+                }
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new Exception($"Unexpected response (response code: {response.StatusCode}) from service");
+                }
+
+                return response.Data;
+            }
+        }
+
+        /// <summary>
+        /// Gets the fallback config in case of cluster unavailability
+        /// </summary>
+        /// <returns>The new config</returns>
+        private NodeStartUpConfiguration GetFallBackConfig()
+        {
+            var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
+            if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
+            {
+                throw new Exception("Could not get configuration from service and there is no fallback configuration");
+            }
+
+            Console.WriteLine(@"Could not get configuration, using fallback...");
+            return JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(fallBackConfiguration));
+        }
+
+        /// <summary>
+        /// Gets the authentication token
+        /// </summary>
+        /// <returns>The success of network communication</returns>
+        private bool GetToken()
+        {
+            this.CurrentApiToken = null;
+            var client = new RestClient(this.AuthenticationUrl) { Timeout = 5000 };
+
+            var request = new RestRequest { Method = Method.POST };
+            request.AddParameter("grant_type", "client_credentials");
+            request.AddParameter("client_id", this.ApiClientId);
+            request.AddParameter("client_secret", this.ApiClientSecret);
+
+            while (true)
+            {
+                var result = client.Execute(request);
+                if (result.ResponseStatus != ResponseStatus.Completed || result.StatusCode == HttpStatusCode.BadGateway)
+                {
+                    return false;
+                }
+
+                if (result.StatusCode == HttpStatusCode.OK)
+                {
+                    this.CurrentApiToken = JsonConvert.DeserializeObject<Token>(result.Content);
+                    return true;
+                }
+
+                Console.WriteLine($@"!!!Failed to authenticate. Respones status is {result.StatusCode}. Retrying in 60s");
+                Thread.Sleep(TimeSpan.FromSeconds(60));
+            }
         }
 
         /// <summary>
@@ -413,9 +476,10 @@ namespace ClusterKit.NodeManager.Launcher
                 var assemblyIdentityNode =
                     (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);
-                var publicKeyToken = BitConverter.ToString(parameters.GetPublicKeyToken())
-                    .Replace("-", string.Empty)
-                    .ToLower(CultureInfo.InvariantCulture);
+                var publicKeyToken =
+                    BitConverter.ToString(parameters.GetPublicKeyToken())
+                        .Replace("-", string.Empty)
+                        .ToLower(CultureInfo.InvariantCulture);
                 assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
                 var bindingRedirectNode =
                     (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));

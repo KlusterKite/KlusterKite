@@ -20,10 +20,12 @@ namespace ClusterKit.NodeManager.WebApi
     using Akka.Actor;
 
     using ClusterKit.Core;
+    using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
+    using ClusterKit.Web.Authorization.Attributes;
 
     using JetBrains.Annotations;
 
@@ -98,6 +100,8 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>The configuration to apply</returns>
         [Route("getConfiguration")]
         [HttpPost]
+        [RequireSession]
+        [RequireClientPrivilege(Privileges.GetConfiguration)]
         public async Task<NodeStartUpConfiguration> GetConfiguration(NewNodeTemplateRequest request)
         {
             object result;

@@ -110,12 +110,12 @@ namespace ClusterKit.Web.Tests.Auth
                 request.AddParameter("client_secret", clientSecret);
             }
 
-            var result = await client.ExecuteTaskAsync(request);
+            var result = await client.ExecuteTaskAsync<TokenResponse>(request);
             Assert.Equal(expectedResult, result.StatusCode);
 
             if (expectedResult == HttpStatusCode.OK)
             {
-                var tokenDescription = JsonConvert.DeserializeObject<TokenResponse>(result.Content);
+                var tokenDescription = result.Data;
                 var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
                 var accessTicket = await tokenManager.ValidateAccessToken(tokenDescription.AccessToken);
                 Assert.NotNull(accessTicket);
