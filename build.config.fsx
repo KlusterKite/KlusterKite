@@ -16,6 +16,7 @@ let projects = [|
 
     new ProjectDescription("ClusterKit.Security", "./ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("ClusterKit.Security", "./ClusterKit.Security/ClusterKit.Security.SessionRedis/ClusterKit.Security.SessionRedis.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Security.Client"|]))
+    new ProjectDescription("ClusterKit.Security", "./ClusterKit.Security/ClusterKit.Security.Tests/ClusterKit.Security.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Security.Client"; "ClusterKit.Security.SessionRedis"|]))
 
     new ProjectDescription("ClusterKit.LargeObjects", "./ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("ClusterKit.LargeObjects", "./ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.LargeObjects.Client"|]))   

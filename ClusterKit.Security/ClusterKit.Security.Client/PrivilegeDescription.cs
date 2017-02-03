@@ -28,11 +28,17 @@ namespace ClusterKit.Security.Client
         /// <param name="privilege">
         /// The privilege.
         /// </param>
-        public PrivilegeDescription([NotNull]string assemblyName, [CanBeNull]string description, [NotNull]string privilege)
+        /// <param name="action">the exact controller action name</param>
+        public PrivilegeDescription(
+            [NotNull]string assemblyName, 
+            [CanBeNull]string description, 
+            [NotNull]string privilege,
+            [CanBeNull]string action = null)
         {
             this.AssemblyName = assemblyName;
             this.Description = description ?? privilege;
             this.Privilege = privilege;
+            this.Action = action;
         }
 
         /// <summary>
@@ -48,6 +54,13 @@ namespace ClusterKit.Security.Client
         [NotNull]
         [UsedImplicitly]
         public string Description { get; }
+
+        /// <summary>
+        /// Gets the exact controller action name
+        /// </summary>
+        [CanBeNull]
+        [UsedImplicitly]
+        public string Action { get; }
 
         /// <summary>
         /// Gets the privilege

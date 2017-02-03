@@ -28,31 +28,39 @@ namespace ClusterKit.Web.Authorization.Attributes
         private readonly string privilege;
 
         /// <summary>
-        /// This rule will be ignored if there is an authenticated user
-        /// </summary>
-        private readonly bool ignoreOnUserPresent;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RequireClientPrivilegeAttribute"/> class.
         /// </summary>
         /// <param name="privilege">
         /// The required privilege
         /// </param>
-        /// <param name="ignoreOnUserPresent">
-        /// This rule will be ignored if there is an authenticated user
-        /// </param>
-        public RequireClientPrivilegeAttribute(string privilege, bool ignoreOnUserPresent = false)
+        public RequireClientPrivilegeAttribute(string privilege)
         {
             this.privilege = privilege;
-            this.ignoreOnUserPresent = ignoreOnUserPresent;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this rule will be ignored if there is an authenticated user
+        /// </summary>
+        public bool IgnoreOnUserPresent { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the resulting privilege test will be run against combined string of specified privilege and action method name.
+        /// </summary>
+        /// <example>
+        /// For example specified privilege is "ClusterKit.Object" and controller action called is "Get", then user will require privilege "ClusterKit.Object.Get" in order to call this method
+        /// </example>
+        public bool CombinePrivilegeWithActionName { get; set; }
 
         /// <inheritdoc />
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
+            var requiredPrivilege = this.CombinePrivilegeWithActionName
+                                        ? $"{this.privilege}.{actionContext.ActionDescriptor.ActionName}"
+                                        : this.privilege;
+
             var session = actionContext.Request.GetOwinContext().GetSession();
-            return session == null || (session.User != null && this.ignoreOnUserPresent)
-                   || session.ClientScope.Contains(this.privilege);
+            return session == null || (session.User != null && this.IgnoreOnUserPresent)
+                   || session.ClientScope.Contains(requiredPrivilege);
         }
     }
 }

@@ -26,6 +26,24 @@ namespace ClusterKit.Security.Client
         /// </summary>
         public static IReadOnlyList<PrivilegeDescription> DefinedPrivileges { get; private set; } = new List<PrivilegeDescription>().AsReadOnly();
 
+        /// <summary>
+        /// Gets the list of defined privileges
+        /// </summary>
+        /// <param name="container">The privilege type container</param>
+        /// <returns>The list of privilege descriptions</returns>
+        public static IEnumerable<PrivilegeDescription> GetDefinedPrivileges(Type container)
+        {
+            if (container.GetCustomAttribute(typeof(PrivilegesContainerAttribute), true) == null)
+            {
+                return new PrivilegeDescription[0];
+            }
+
+            return SearchDefinedPrivileges(container)
+                    .OrderBy(d => d.Privilege)
+                    .ThenBy(d => d.Action)
+                    .ToArray();
+        }
+
         /// <summary> 
         /// Scans current configuration for defined privileges
         /// </summary>
@@ -36,16 +54,65 @@ namespace ClusterKit.Security.Client
                     .SelectMany(
                         a =>
                             a.GetTypes()
-                                .Where(t => t.IsAbstract && t.IsSealed)
-                                .Where(t => t.GetCustomAttributes(typeof(PrivilegesContainerAttribute), true).Length > 0)
-                                .SelectMany(t => t.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy))
-                                .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
-                                .Select(f => new PrivilegeDescription(
-                                    a.GetName().Name, 
-                                    ((PrivilegeDescriptionAttribute)f.GetCustomAttribute(typeof(PrivilegeDescriptionAttribute)))?.Description,
-                                    (string)f.GetValue(null))))
+                                .Where(
+                                    t =>
+                                        t.IsAbstract && t.IsSealed
+                                        && t.GetCustomAttribute(typeof(PrivilegesContainerAttribute), true) != null)
+                                .SelectMany(SearchDefinedPrivileges))
+                    .OrderBy(d => d.AssemblyName)
+                    .ThenBy(d => d.Privilege)
+                    .ThenBy(d => d.Action)
                     .ToList()
                     .AsReadOnly();
         }
+
+        /// <summary>
+        /// Gets the list of defined privileges
+        /// </summary>
+        /// <param name="container">The privilege type container</param>
+        /// <returns>The list of privilege descriptions</returns>
+        private static IEnumerable<PrivilegeDescription> SearchDefinedPrivileges(Type container)
+        {
+            return
+                container.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                    .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
+                    .SelectMany(
+                        f =>
+                            {
+                                var descriptionAttribute =
+                                    (PrivilegeDescriptionAttribute)
+                                    f.GetCustomAttribute(typeof(PrivilegeDescriptionAttribute));
+                                if (descriptionAttribute == null)
+                                {
+                                    return new[]
+                                               {
+                                                   new PrivilegeDescription(
+                                                       container.Assembly.GetName().Name,
+                                                       null,
+                                                       (string)f.GetValue(null))
+                                               };
+                                }
+
+                                if (descriptionAttribute.Actions != null && descriptionAttribute.Actions.Length > 0)
+                                {
+                                    return
+                                        descriptionAttribute.Actions.Select(
+                                            action =>
+                                                new PrivilegeDescription(
+                                                    container.Assembly.GetName().Name,
+                                                    descriptionAttribute.Description,
+                                                    $"{f.GetValue(null)}.{action}",
+                                                    action));
+                                }
+
+                                return new[]
+                                           {
+                                               new PrivilegeDescription(
+                                                   container.Assembly.GetName().Name,
+                                                   descriptionAttribute.Description,
+                                                   (string)f.GetValue(null))
+                                           };
+                            });
+        } 
     }
 }

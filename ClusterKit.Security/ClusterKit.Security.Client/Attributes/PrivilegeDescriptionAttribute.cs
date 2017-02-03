@@ -22,14 +22,23 @@ namespace ClusterKit.Security.Client.Attributes
         /// <param name="description">
         /// the description of the privilege
         /// </param>
-        public PrivilegeDescriptionAttribute(string description)
+        /// <param name="actions">
+        /// The possible actions extensions
+        /// </param>
+        public PrivilegeDescriptionAttribute(string description, params string[] actions)
         {
             this.Description = description;
+            this.Actions = actions;
         }
 
         /// <summary>
         /// Gets the description of the privilege
         /// </summary>
         public string Description { get; }
+
+        /// <summary>
+        /// Gets or sets the possible actions extensions
+        /// </summary>
+        public string[] Actions { get; set; }
     }
 }

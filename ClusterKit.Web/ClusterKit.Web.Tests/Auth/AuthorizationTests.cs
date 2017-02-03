@@ -98,6 +98,8 @@ namespace ClusterKit.Web.Tests.Auth
         [InlineData(EnAuthenticationType.Client, "UnauthorizedClientUserAction", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.User, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
         [InlineData(EnAuthenticationType.Client, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
+        [InlineData(EnAuthenticationType.User, "authorizedUserExactAction", HttpStatusCode.NoContent)]
+        [InlineData(EnAuthenticationType.User, "unauthorizedUserExactAction", HttpStatusCode.Unauthorized)]
         public async Task CheckAuthorization(EnAuthenticationType authenticationType, string method, HttpStatusCode expectedResult) 
         {
             this.ExpectNoMsg();
@@ -128,10 +130,10 @@ namespace ClusterKit.Web.Tests.Auth
         {
             var session = new AccessTicket(
                 new User { UserId = "testUser" },
-                new[] { "User1" },
+                new[] { "User1", "User.AuthorizedUserExactAction" },
                 "testClient",
                 "testClientType",
-                new[] { "Client1", "Client2" },
+                new[] { "Client1", "Client2", "Client.AuthorizedUserExactAction" },
                 DateTimeOffset.Now,
                 DateTimeOffset.Now.AddMinutes(1),
                 "hello world");
@@ -287,9 +289,31 @@ namespace ClusterKit.Web.Tests.Auth
             /// </summary>
             [HttpGet]
             [Route("AuthorizedEitherClientUserAction")]
-            [RequireUserPrivilege("User1", ignoreOnClientOwnBehalf: true)]
-            [RequireClientPrivilege("Client1-2", ignoreOnUserPresent: true)]
+            [RequireUserPrivilege("User1", IgnoreOnClientOwnBehalf = true)]
+            [RequireClientPrivilege("Client1-2", IgnoreOnUserPresent = true)]
             public void AuthorizedEitherClientUserAction()
+            {
+            }
+
+            /// <summary>
+            /// User action authorized with action name
+            /// </summary>
+            [HttpGet]
+            [Route("authorizedUserExactAction")]
+            [RequireUserPrivilege("User", CombinePrivilegeWithActionName = true)]
+            [RequireClientPrivilege("Client", CombinePrivilegeWithActionName = true)]
+            public void AuthorizedUserExactAction()
+            {
+            }
+
+            /// <summary>
+            /// User action authorized with action name
+            /// </summary>
+            [HttpGet]
+            [Route("unauthorizedUserExactAction")]
+            [RequireUserPrivilege("User1", CombinePrivilegeWithActionName = true)]
+            [RequireClientPrivilege("Client1", CombinePrivilegeWithActionName = true)]
+            public void UnauthorizedUserExactAction()
             {
             }
         }

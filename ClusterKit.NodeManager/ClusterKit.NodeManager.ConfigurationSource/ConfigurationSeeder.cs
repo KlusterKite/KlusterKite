@@ -133,13 +133,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                 {
                                     Uid = Guid.NewGuid(),
                                     Name = "Admin",
-                                    AllowedScope = new List<string>(Security.Client.Utils.DefinedPrivileges.Select(d => d.Privilege))
+                                    AllowedScope = new List<string>(Security.Client.Utils.GetDefinedPrivileges(typeof(Privileges)).Select(d => d.Privilege))
                                 };
             var guestRole = new Role
                                 {
                                     Uid = Guid.NewGuid(),
                                     Name = "Guest",
-                                    AllowedScope = new List<string> { Privileges.GetNodeList }
+                                    AllowedScope = new List<string> { Privileges.GetActiveNodeDescriptions, Privileges.GetTemplateStatistics }
                                 };
             context.Roles.Add(adminRole);
             context.Roles.Add(guestRole);

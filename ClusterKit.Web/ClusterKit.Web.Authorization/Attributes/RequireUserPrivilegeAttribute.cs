@@ -6,7 +6,6 @@
 //   Checks session for authorization
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace ClusterKit.Web.Authorization.Attributes
 {
     using System;
@@ -28,31 +27,39 @@ namespace ClusterKit.Web.Authorization.Attributes
         private readonly string privilege;
 
         /// <summary>
-        /// This rule will be ignored if client authenticated on it's own behalf
-        /// </summary>
-        private readonly bool ignoreOnClientOwnBehalf;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RequireUserPrivilegeAttribute"/> class.
         /// </summary>
         /// <param name="privilege">
         /// The required privilege
         /// </param>
-        /// <param name="ignoreOnClientOwnBehalf">
-        /// This rule will be ignored if client authenticated on it's own behalf
-        /// </param>
-        public RequireUserPrivilegeAttribute(string privilege, bool ignoreOnClientOwnBehalf = false)
+        public RequireUserPrivilegeAttribute(string privilege)
         {
             this.privilege = privilege;
-            this.ignoreOnClientOwnBehalf = ignoreOnClientOwnBehalf;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this rule will be ignored if client authenticated on it's own behalf
+        /// </summary>
+        public bool IgnoreOnClientOwnBehalf { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the resulting privilege test will be run against combined string of specified privilege and action method name.
+        /// </summary>
+        /// <example>
+        /// For example specified privilege is "ClusterKit.Object" and controller action called is "Get", then user will require privilege "ClusterKit.Object.Get" in order to call this method
+        /// </example>
+        public bool CombinePrivilegeWithActionName { get; set; }
 
         /// <inheritdoc />
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
+            var requiredPrivilege = this.CombinePrivilegeWithActionName
+                                        ? $"{this.privilege}.{actionContext.ActionDescriptor.ActionName}"
+                                        : this.privilege;
+
             var session = actionContext.Request.GetOwinContext().GetSession();
-            return session == null || (session.User == null && this.ignoreOnClientOwnBehalf)
-                   || session.UserScope.Contains(this.privilege);
+            return session == null || (session.User == null && this.IgnoreOnClientOwnBehalf)
+                   || session.UserScope.Contains(requiredPrivilege);
         }
     }
 }

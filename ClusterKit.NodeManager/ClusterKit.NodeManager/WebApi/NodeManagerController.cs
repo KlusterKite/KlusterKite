@@ -135,7 +135,7 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Gets list of available packages from local cluster repository
+        /// Gets the list of available packages from local cluster repository
         /// </summary>
         /// <returns>The list of available packages</returns>
         [Route("getPackages")]
