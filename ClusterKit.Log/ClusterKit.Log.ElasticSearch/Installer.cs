@@ -16,6 +16,7 @@ namespace ClusterKit.Log.ElasticSearch
     using Castle.Windsor;
 
     using ClusterKit.Core;
+    using ClusterKit.Core.Log;
 
     /// <summary>
     /// Installing components from current library

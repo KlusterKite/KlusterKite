@@ -17,6 +17,7 @@ namespace ClusterKit.NodeManager.Client
     using Castle.Windsor;
 
     using ClusterKit.Core;
+    using ClusterKit.Core.Log;
 
     using JetBrains.Annotations;
 

@@ -141,6 +141,8 @@
     <Compile Include="Attributes\PrivilegesContainerAttribute.cs" />
     <Compile Include="AuthenticationResult.cs" />
     <Compile Include="EnPrivilegeTarget.cs" />
+    <Compile Include="EnSeverity.cs" />
+    <Compile Include="SecurityLog.cs" />
     <Compile Include="RefreshTicket.cs" />
     <Compile Include="IClient.cs" />
     <Compile Include="IClientProvider.cs" />

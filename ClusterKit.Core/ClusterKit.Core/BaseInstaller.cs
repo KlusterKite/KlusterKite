@@ -20,8 +20,6 @@ namespace ClusterKit.Core
 
     using JetBrains.Annotations;
 
-    using Serilog;
-
     /// <summary>
     /// Base class to install ClusterKit plugin components
     /// </summary>
@@ -92,7 +90,7 @@ namespace ClusterKit.Core
         /// </returns>
         public static Config GetStackedConfig(IWindsorContainer container, Config config)
         {
-            Log.Information("ClusterKit starting plugin manager");
+            Serilog.Log.Information("ClusterKit starting plugin manager");
 
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))

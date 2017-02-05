@@ -64,6 +64,7 @@ namespace ClusterKit.Web.Authentication
 
             appBuilder.SetDataProtectionProvider(new DataNoProtectionProvider());
             var tokenProvider = this.container.Resolve<ITokenManager>();
+
             var options = new OAuthAuthorizationServerOptions
                               {
                                   AuthorizeEndpointPath =

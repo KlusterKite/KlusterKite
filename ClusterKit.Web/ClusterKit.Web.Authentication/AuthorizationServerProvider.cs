@@ -16,6 +16,7 @@ namespace ClusterKit.Web.Authentication
     using System.Threading.Tasks;
 
     using ClusterKit.Security.Client;
+    using ClusterKit.Web.Authorization;
 
     using Microsoft.Owin.Security.OAuth;
 
@@ -27,7 +28,7 @@ namespace ClusterKit.Web.Authentication
         /// <summary>
         /// The key to store current client in the context
         /// </summary>
-        public const string OwinContextClientKey = "client";
+         public const string OwinContextClientKey = "client";
 
         /// <summary>
         /// The key to store current client in the context
@@ -86,6 +87,18 @@ namespace ClusterKit.Web.Authentication
                 context.Validated(client.ClientId);
                 context.OwinContext.Set(OwinContextClientKey, client);
             }
+            else
+            {
+                var message = string.IsNullOrWhiteSpace(clientSecret)
+                                 ? "Failed authentication for client {ClientId} without secret"
+                                 : "Failed authentication for client {ClientId} with secret";
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied, 
+                    EnSeverity.Crucial, 
+                    context.OwinContext.GetRequestDescription(),
+                    message,
+                    clientId);
+            }
         }
 
         /// <summary>
@@ -105,18 +118,39 @@ namespace ClusterKit.Web.Authentication
             var client = context.OwinContext.Get<IClient>(OwinContextClientKey);
             if (client == null)
             {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Unexpected operation. Grant password authentication without client data attempt.");
                 return;
             }
 
             var result = await client.AuthenticateUserAsync(context.UserName, context.Password);
             if (result?.AccessTicket.User == null)
             {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Grant password failed for user {UserName} with client {ClientId}",
+                    context.UserName,
+                    client.ClientId);
+
                 return;
             }
 
             context.OwinContext.Set(OwinContextAuthenticationResultKey, result);
             var identity = new ClaimsIdentity(result.AccessTicket.User.UserId);
             context.Validated(identity);
+
+            SecurityLog.CreateRecord(
+                SecurityLog.EnType.AuthenticationGranted,
+                EnSeverity.Crucial,
+                context.OwinContext.GetRequestDescription(),
+                "Grant password was successfull for user {UserName} with client {ClientId}",
+                context.UserName,
+                client.ClientId);
         }
 
         /// <summary>
@@ -135,18 +169,36 @@ namespace ClusterKit.Web.Authentication
             var client = context.OwinContext.Get<IClient>(OwinContextClientKey);
             if (client == null)
             {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Unexpected operation. Grant client_credentials authentication without client data attempt.");
                 return;
             }
 
             var result = await client.AuthenticateSelf();
             if (result == null)
             {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Grant client_credentials denied for {ClientId}",
+                    client.ClientId);
+
                 return;
             }
 
             context.OwinContext.Set(OwinContextAuthenticationResultKey, result);
             var identity = new ClaimsIdentity(result.AccessTicket.ClientId);
             context.Validated(identity);
+            SecurityLog.CreateRecord(
+                SecurityLog.EnType.AuthenticationGranted,
+                EnSeverity.Crucial,
+                context.OwinContext.GetRequestDescription(),
+                "Grant client_credentials was successfull for client {ClientId}",
+                client.ClientId);
         }
 
         /// <summary>
@@ -166,20 +218,89 @@ namespace ClusterKit.Web.Authentication
         {
             var refreshTicket = context.OwinContext.Get<RefreshTicket>(OwinContextRefreshTicketKey);
             var client = context.OwinContext.Get<IClient>(OwinContextClientKey);
-            if (refreshTicket == null || client == null || client.ClientId != refreshTicket.ClientId)
+
+            if (refreshTicket == null)
             {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Unexpected operation. Grant refresh_token authentication without validated refresh ticket.");
+
+                return;
+            }
+
+            if (client == null)
+            {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Unexpected operation. Grant refresh_token authentication without client data attempt.");
+                return;
+            }
+
+            if (client.ClientId != refreshTicket.ClientId)
+            {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Attempt to authenticate with refresh ticket from other client. Request client id: {RequestClientId}, Ticket client id: {TicketClientId}",
+                    client.ClientId,
+                    refreshTicket.ClientId);
                 return;
             }
 
             var result = await client.AuthenticateWithRefreshTicket(refreshTicket);
             if (result == null)
             {
+                if (refreshTicket.UserId != null)
+                {
+                    SecurityLog.CreateRecord(
+                        SecurityLog.EnType.AuthenticationDenied,
+                        EnSeverity.Crucial,
+                        context.OwinContext.GetRequestDescription(),
+                        "Grant refresh_token denied for {ClientId} with user {UserId}",
+                        client.ClientId,
+                        refreshTicket.UserId);
+                }
+                else
+                {
+                    SecurityLog.CreateRecord(
+                        SecurityLog.EnType.AuthenticationDenied,
+                        EnSeverity.Crucial,
+                        context.OwinContext.GetRequestDescription(),
+                        "Grant refresh_token denied for {ClientId}",
+                        client.ClientId);
+                }
+
                 return;
             }
 
             context.OwinContext.Set(OwinContextAuthenticationResultKey, result);
             var identity = new ClaimsIdentity(result.AccessTicket.User?.UserId ?? result.AccessTicket.ClientId);
             context.Validated(identity);
+
+            if (refreshTicket.UserId != null)
+            {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationGranted,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Grant refresh_token for {ClientId} with user {UserId} succeeded",
+                    client.ClientId,
+                    refreshTicket.UserId);
+            }
+            else
+            {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.AuthenticationGranted,
+                    EnSeverity.Crucial,
+                    context.OwinContext.GetRequestDescription(),
+                    "Grant refresh_token for {ClientId} succeeded",
+                    client.ClientId);
+            }
         }
 
         /// <summary>
