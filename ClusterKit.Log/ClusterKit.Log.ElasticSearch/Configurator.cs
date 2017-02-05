@@ -127,7 +127,7 @@ namespace ClusterKit.Log.ElasticSearch
             Func<LogEvent, bool> logFilter = log =>
                 {
                     LogEventPropertyValue value;
-                    return log.Properties.TryGetValue(Constants.LogRecordTypeKey, out value)
+                     return log.Properties.TryGetValue(Constants.LogRecordTypeKey, out value)
                                      && (value as ScalarValue)?.Value is EnLogRecordType
                                      && (EnLogRecordType)((ScalarValue)value).Value == EnLogRecordType.Security;
                 };

@@ -10,6 +10,7 @@
 namespace ClusterKit.Security.SessionRedis
 {
     using System;
+    using System.Diagnostics;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -24,6 +25,10 @@ namespace ClusterKit.Security.SessionRedis
     /// <summary>
     /// Redis based token manager
     /// </summary>
+    /// <remarks>
+    /// Async/await was removed as it caused performance issues.
+    /// TODO: should recheck after migration to .Net.Core
+    /// </remarks>
     [UsedImplicitly]
     public class RedisSessionTokenManager : ITokenManager
     {
@@ -56,30 +61,31 @@ namespace ClusterKit.Security.SessionRedis
         public RedisSessionTokenManager(ActorSystem system)
         {
             this.system = system;
-            this.redisConnectionString = system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.RedisConnection");
+            this.redisConnectionString =
+                system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.RedisConnection");
             this.redisDb = system.Settings.Config.GetInt("ClusterKit.Security.SessionRedis.RedisDb");
             this.tokenKeyPrefix = system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.TokenKeyPrefix");
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateAccessToken(AccessTicket session)
+        public Task<string> CreateAccessToken(AccessTicket session)
         {
             var tokenUid = Guid.NewGuid();
             var token = tokenUid.ToString("N");
 
             var data = session.SerializeToAkkaString(this.system);
-            using (var connection = await ConnectionMultiplexer.ConnectAsync(this.redisConnectionString))
+            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
 
-                var result = await db.StringSetAsync(
+                var result = db.StringSet(
                     this.GetRedisAccessKey(token),
                     data,
                     session.Expiring.HasValue ? (TimeSpan?)(session.Expiring.Value - DateTimeOffset.Now) : null);
 
                 if (result)
                 {
-                    return token;
+                    return Task.FromResult(token);
                 }
 
                 var exception = new Exception("Session data server is unavailable");
@@ -89,45 +95,50 @@ namespace ClusterKit.Security.SessionRedis
         }
 
         /// <inheritdoc />
-        public async Task<AccessTicket> ValidateAccessToken(string token)
+        public Task<AccessTicket> ValidateAccessToken(string token)
         {
-            using (var connection = await ConnectionMultiplexer.ConnectAsync(this.redisConnectionString))
+            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
-                var data = await db.StringGetAsync(this.GetRedisAccessKey(token));
-                return data.HasValue ? data.ToString().DeserializeFromAkkaString<AccessTicket>(this.system) : null;
+                var data = db.StringGet(this.GetRedisAccessKey(token));
+                return data.HasValue 
+                    ? Task.FromResult(data.ToString().DeserializeFromAkkaString<AccessTicket>(this.system)) 
+                    : Task.FromResult<AccessTicket>(null);
             }
         }
 
         /// <inheritdoc />
-        public async Task<bool> RevokeAccessToken(string token)
+        public Task<bool> RevokeAccessToken(string token)
         {
-            using (var connection = await ConnectionMultiplexer.ConnectAsync(this.redisConnectionString))
+            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
-                return await db.KeyDeleteAsync(this.GetRedisAccessKey(token));
+                return Task.FromResult(db.KeyDelete(this.GetRedisAccessKey(token)));
             }
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateRefreshToken(RefreshTicket ticket)
+        public Task<string> CreateRefreshToken(RefreshTicket ticket)
         {
+            var watch = new Stopwatch();
+            watch.Start();
+
             var tokenUid = Guid.NewGuid();
             var token = tokenUid.ToString("N");
 
             var data = ticket.SerializeToAkkaString(this.system);
-            using (var connection = await ConnectionMultiplexer.ConnectAsync(this.redisConnectionString))
+            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
 
-                var result = await db.StringSetAsync(
+                var result = db.StringSet(
                     this.GetRedisRefreshKey(token),
                     data,
                     ticket.Expiring.HasValue ? (TimeSpan?)(ticket.Expiring.Value - DateTimeOffset.Now) : null);
 
                 if (result)
                 {
-                    return token;
+                    return Task.FromResult(token);
                 }
 
                 var exception = new Exception("Session data server is unavailable");
@@ -137,25 +148,30 @@ namespace ClusterKit.Security.SessionRedis
         }
 
         /// <inheritdoc />
-        public async Task<RefreshTicket> ValidateRefreshToken(string token)
+        public Task<RefreshTicket> ValidateRefreshToken(string token)
         {
-            using (var connection = await ConnectionMultiplexer.ConnectAsync(this.redisConnectionString))
+            var watch = new Stopwatch();
+            watch.Start();
+
+            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
                 var redisRefreshKey = this.GetRedisRefreshKey(token);
-                var data = await db.StringGetAsync(redisRefreshKey);
-                await db.KeyDeleteAsync(redisRefreshKey);
-                return data.HasValue ? data.ToString().DeserializeFromAkkaString<RefreshTicket>(this.system) : null;
+                var data = db.StringGet(redisRefreshKey);
+                db.KeyDelete(redisRefreshKey);
+                return data.HasValue 
+                    ? Task.FromResult(data.ToString().DeserializeFromAkkaString<RefreshTicket>(this.system)) 
+                    : Task.FromResult<RefreshTicket>(null);
             }
         }
 
         /// <inheritdoc />
-        public async Task<bool> RevokeRefreshToken(string token)
+        public Task<bool> RevokeRefreshToken(string token)
         {
-            using (var connection = await ConnectionMultiplexer.ConnectAsync(this.redisConnectionString))
+            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
-                return await db.KeyDeleteAsync(this.GetRedisRefreshKey(token));
+                return Task.FromResult(db.KeyDelete(this.GetRedisRefreshKey(token)));
             }
         }
 
