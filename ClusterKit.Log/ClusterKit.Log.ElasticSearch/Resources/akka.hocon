@@ -19,7 +19,7 @@
 		# - Warning - all unsuccessfull logins
 		# - Error - for any access denials
 		# - Fatal - none
-		securityMinimumLevel = "Debug "
+		securityMinimumLevel = "Information"
 
 		#the list of connection urls for standard log
 		securityNodes = [ "http://elk:9200/" ]

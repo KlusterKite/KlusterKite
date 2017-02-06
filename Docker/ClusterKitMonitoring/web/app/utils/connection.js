@@ -13,7 +13,7 @@ const getInstance = (accessToken => {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'bearer': accessToken,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 });

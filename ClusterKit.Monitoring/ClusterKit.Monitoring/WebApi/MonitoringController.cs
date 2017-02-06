@@ -16,12 +16,15 @@ namespace ClusterKit.Monitoring.WebApi
     using Akka.Actor;
 
     using ClusterKit.LargeObjects.Client;
+    using ClusterKit.Monitoring.Client;
     using ClusterKit.Monitoring.Messages;
+    using ClusterKit.Web.Authorization.Attributes;
 
     /// <summary>
     /// Manages web requests to describe current cluster health state
     /// </summary>
     [RoutePrefix("api/1.x/clusterkit/monitoring")]
+    [RequireUser]
     public class MonitoringController : ApiController
     {
         /// <summary>
@@ -52,6 +55,7 @@ namespace ClusterKit.Monitoring.WebApi
         /// </summary>
         /// <returns>The cluster scan result</returns>
         [Route("getScanResult")]
+        [RequireUserPrivilege(Privileges.GetClusterTree)]
         public async Task<ClusterTree> GetClusterTree()
         {
             try
@@ -74,6 +78,7 @@ namespace ClusterKit.Monitoring.WebApi
         /// </summary>
         /// <returns>The success of the operation</returns>
         [Route("initiateScan")]
+        [RequireUserPrivilege(Privileges.InitiateScan)]
         public bool InitiateScan()
         {
             this.system.ActorSelection("/user/Monitoring/ClusterScannerProxy").Tell(new ClusterScanRequest());

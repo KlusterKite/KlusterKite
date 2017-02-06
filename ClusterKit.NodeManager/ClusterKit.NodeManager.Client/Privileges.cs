@@ -50,12 +50,6 @@ namespace ClusterKit.NodeManager.Client
         public const string SeedAddress = "ClusterKit.NodeManager.SeedAddress";
 
         /// <summary>
-        /// The privilege to get swagger link list
-        /// </summary>
-        [PrivilegeDescription("Gets discovered swagger links", Target = EnPrivilegeTarget.User)]
-        public const string GetSwaggerList = "ClusterKit.NodeManager.GetSwaggerList";
-
-        /// <summary>
         /// The privilege to get the list of all registered privileges
         /// </summary>
         [PrivilegeDescription("Get the list of all system defined privilege descriptions", Target = EnPrivilegeTarget.User)]
@@ -84,6 +78,12 @@ namespace ClusterKit.NodeManager.Client
         /// </summary>
         [PrivilegeDescription("Manually initiate update nuget packages cache list", Target = EnPrivilegeTarget.User)]
         public const string ReloadPackages = "ClusterKit.NodeManager.ReloadPackages";
+
+        /// <summary>
+        /// The privilege to get the list of available templates for specified container type for current cluster state
+        /// </summary>
+        [PrivilegeDescription("Get the list of available templates for specified container type for current cluster state", Target = EnPrivilegeTarget.ClientAndUser)]
+        public const string GetAvailableTemplates = "ClusterKit.NodeManager.GetAvailableTemplates";
 
         /// <summary>
         /// The privilege to manually initiate node update (restart node)

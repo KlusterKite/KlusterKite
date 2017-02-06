@@ -14,8 +14,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using System.Linq;
 
     using ClusterKit.Data;
-    using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.ORM;
+    using ClusterKit.Security.Client;
+    
+    using Privileges = ClusterKit.NodeManager.Client.Privileges;
 
     /// <summary>
     /// Initializes empty configuration database with start data
@@ -129,17 +131,31 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 return;
             }
 
+            var adminPrivileges = new List<IEnumerable<PrivilegeDescription>>
+                                      {
+                                          Utils.GetDefinedPrivileges(typeof(Privileges)),
+                                          Utils.GetDefinedPrivileges(typeof(Web.Swagger.Messages.Privileges)),
+                                          Utils.GetDefinedPrivileges(typeof(Monitoring.Client.Privileges))
+                                      };
+
             var adminRole = new Role
                                 {
                                     Uid = Guid.NewGuid(),
                                     Name = "Admin",
-                                    AllowedScope = new List<string>(Security.Client.Utils.GetDefinedPrivileges(typeof(Privileges)).Select(d => d.Privilege))
+                                    AllowedScope =
+                                        adminPrivileges.SelectMany(l => l.Select(p => p.Privilege)).ToList()
                                 };
             var guestRole = new Role
                                 {
                                     Uid = Guid.NewGuid(),
                                     Name = "Guest",
-                                    AllowedScope = new List<string> { Privileges.GetActiveNodeDescriptions, Privileges.GetTemplateStatistics }
+                                    AllowedScope =
+                                        new List<string>
+                                            {
+                                                Privileges.GetActiveNodeDescriptions,
+                                                Privileges.GetTemplateStatistics,
+                                                $"{Privileges.NodeTemplate}.GetList"
+                                            }
                                 };
             context.Roles.Add(adminRole);
             context.Roles.Add(guestRole);

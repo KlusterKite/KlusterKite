@@ -192,6 +192,9 @@ namespace ClusterKit.Web.NginxConfigurator
                 serviceConfig.Append("\t\tproxy_set_header Host $http_host;\n");
             }
 
+            serviceConfig.Append("\t\tproxy_set_header OriginalHost $http_host;\n");
+            serviceConfig.Append("\t\tproxy_set_header OriginalUri $request_uri;\n");
+
             host[serviceName].Config = serviceConfig.ToString();
         }
 
