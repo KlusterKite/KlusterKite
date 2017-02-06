@@ -36,6 +36,7 @@ namespace ClusterKit.Web.Authorization
                        {
                            Authentication = context.GetSession(),
                            RemoteAddress = context.Request.RemoteIpAddress,
+                           RequestedLocalUrl = context.Request.Uri.ToString(),
                            Headers = context.Request.Headers.ToDictionary(p => p.Key, p => string.Join("; ", p.Value))
                        };
         }

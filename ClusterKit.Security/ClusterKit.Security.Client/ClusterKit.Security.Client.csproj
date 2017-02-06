@@ -142,6 +142,7 @@
     <Compile Include="AuthenticationResult.cs" />
     <Compile Include="EnPrivilegeTarget.cs" />
     <Compile Include="EnSeverity.cs" />
+    <Compile Include="ICrucialObject.cs" />
     <Compile Include="SecurityLog.cs" />
     <Compile Include="RefreshTicket.cs" />
     <Compile Include="IClient.cs" />

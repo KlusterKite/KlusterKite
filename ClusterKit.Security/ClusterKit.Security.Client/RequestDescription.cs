@@ -33,5 +33,10 @@ namespace ClusterKit.Security.Client
         /// </summary>
         [CanBeNull]
         public Dictionary<string, string> Headers { get; set; }
+
+        /// <summary>
+        ///  Gets or sets the local uri request
+        /// </summary>
+        public string RequestedLocalUrl { get; set; }
     }
 }

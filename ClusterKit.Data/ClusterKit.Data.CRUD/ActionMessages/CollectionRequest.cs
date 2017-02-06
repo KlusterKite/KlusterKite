@@ -10,8 +10,10 @@
 namespace ClusterKit.Data.CRUD.ActionMessages
 {
     using System;
-
+    
     using Akka.Routing;
+
+    using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
 
@@ -45,6 +47,14 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// </summary>
         [UsedImplicitly]
         public byte[] ExtraData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the original requester description
+        /// </summary>
+        /// <remarks>
+        /// This can be used for further authorization checks
+        /// </remarks>
+        public RequestDescription RequestDescription { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the response is acceptable as parcel.

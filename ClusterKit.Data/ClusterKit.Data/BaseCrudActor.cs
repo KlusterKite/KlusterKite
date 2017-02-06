@@ -19,6 +19,7 @@ namespace ClusterKit.Data
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects;
     using ClusterKit.LargeObjects.Client;
+    using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
 
@@ -262,6 +263,7 @@ namespace ClusterKit.Data
                                 result = this.OnSelect(result.Value);
                             }
 
+                            // security read log should be set on client endpoint
                             return result.HasValue
                                        ? CrudActionResponse<TObject>.Success(result, request.ExtraData)
                                        : CrudActionResponse<TObject>.Error(
@@ -305,6 +307,16 @@ namespace ClusterKit.Data
                             try
                             {
                                 await factory.Insert(entity);
+                                
+                                // security update logs are set here to be sure that they are made independently of client notification success
+                                SecurityLog.CreateRecord(
+                                    SecurityLog.EnType.DataCreateGranted,
+                                    entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
+                                    request.RequestDescription,
+                                    "{ObjectType} with {ObjectId} id was created",
+                                    typeof(TObject).FullName,
+                                    factory.GetId(entity));
+
                                 this.AfterCreate(entity);
                                 return CrudActionResponse<TObject>.Success(entity, request.ExtraData);
                             }
@@ -342,6 +354,30 @@ namespace ClusterKit.Data
                             try
                             {
                                 await factory.Update(entity, oldObject);
+
+                                // security update logs are set here to be sure that they are made independently of client notification success
+                                if (!factory.GetId(entity).Equals(factory.GetId(oldObject)))
+                                {
+                                    SecurityLog.CreateRecord(
+                                        SecurityLog.EnType.DataUpdateGranted,
+                                        entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
+                                        request.RequestDescription,
+                                        "{ObjectType} with id {ObjectId} was updated. New id is {NewObjectId}",
+                                        typeof(TObject).FullName,
+                                        factory.GetId(oldObject),
+                                        factory.GetId(entity));
+                                }
+                                else
+                                {
+                                    SecurityLog.CreateRecord(
+                                        SecurityLog.EnType.DataUpdateGranted,
+                                        entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
+                                        request.RequestDescription,
+                                        "{ObjectType} with id {ObjectId} was updated.",
+                                        typeof(TObject).FullName,
+                                        factory.GetId(entity));
+                                }
+
                                 this.AfterUpdate<TObject>(entity, oldObject);
                                 return CrudActionResponse<TObject>.Success(entity, request.ExtraData);
                             }
@@ -389,6 +425,15 @@ namespace ClusterKit.Data
                                         new EntityNotFoundException("After \"Before\" action modification"),
                                         request.ExtraData);
                             }
+
+                            // security update logs are set here to be sure that they are made independently of client notification success
+                            SecurityLog.CreateRecord(
+                                SecurityLog.EnType.DataDeleteGranted,
+                                oldObject.Value is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
+                                request.RequestDescription,
+                                "{ObjectType} with id {ObjectId} was deleted.",
+                                typeof(TObject).FullName,
+                                factory.GetId(oldObject));
 
                             this.AfterDelete<TObject>(oldObject);
                             return CrudActionResponse<TObject>.Success(oldObject, request.ExtraData);

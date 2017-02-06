@@ -14,6 +14,8 @@ namespace ClusterKit.Web.Authorization.Attributes
     using System.Web.Http;
     using System.Web.Http.Controllers;
 
+    using ClusterKit.Security.Client;
+
     /// <summary>
     /// Checks session for action authorization
     /// </summary>
@@ -38,6 +40,11 @@ namespace ClusterKit.Web.Authorization.Attributes
         }
 
         /// <summary>
+        /// Gets or sets the severity of action
+        /// </summary>
+        public EnSeverity Severity { get; set; } = EnSeverity.Trivial;
+
+        /// <summary>
         /// Gets or sets a value indicating whether this rule will be ignored if client authenticated on it's own behalf
         /// </summary>
         public bool IgnoreOnClientOwnBehalf { get; set; }
@@ -58,8 +65,23 @@ namespace ClusterKit.Web.Authorization.Attributes
                                         : this.privilege;
 
             var session = actionContext.Request.GetOwinContext().GetSession();
-            return session == null || (session.User == null && this.IgnoreOnClientOwnBehalf)
-                   || session.UserScope.Contains(requiredPrivilege);
+            var isAuthorized = session == null 
+                || (session.User == null && this.IgnoreOnClientOwnBehalf)
+                || session.UserScope.Contains(requiredPrivilege);
+
+            if (!isAuthorized)
+            {
+                SecurityLog.CreateRecord(
+                    SecurityLog.EnType.OperationDenied,
+                    this.Severity,
+                    actionContext.Request.GetOwinContext().GetRequestDescription(),
+                    "Attempt to access {ControllerName} action {ActionName} without required user privilege {Privilege}",
+                    actionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
+                    actionContext.ActionDescriptor.ActionName,
+                    this.privilege);
+            }
+
+            return isAuthorized;
         }
     }
 }

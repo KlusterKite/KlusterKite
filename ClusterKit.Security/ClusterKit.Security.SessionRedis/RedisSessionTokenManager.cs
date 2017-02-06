@@ -73,7 +73,7 @@ namespace ClusterKit.Security.SessionRedis
             var tokenUid = Guid.NewGuid();
             var token = tokenUid.ToString("N");
 
-            var data = session.SerializeToAkkaString(this.system);
+            var data = session.SerializeToAkka(this.system);
             using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
@@ -102,7 +102,7 @@ namespace ClusterKit.Security.SessionRedis
                 var db = connection.GetDatabase(this.redisDb);
                 var data = db.StringGet(this.GetRedisAccessKey(token));
                 return data.HasValue 
-                    ? Task.FromResult(data.ToString().DeserializeFromAkkaString<AccessTicket>(this.system)) 
+                    ? Task.FromResult(((byte[])data).DeserializeFromAkka<AccessTicket>(this.system)) 
                     : Task.FromResult<AccessTicket>(null);
             }
         }
@@ -126,7 +126,7 @@ namespace ClusterKit.Security.SessionRedis
             var tokenUid = Guid.NewGuid();
             var token = tokenUid.ToString("N");
 
-            var data = ticket.SerializeToAkkaString(this.system);
+            var data = ticket.SerializeToAkka(this.system);
             using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
@@ -160,7 +160,7 @@ namespace ClusterKit.Security.SessionRedis
                 var data = db.StringGet(redisRefreshKey);
                 db.KeyDelete(redisRefreshKey);
                 return data.HasValue 
-                    ? Task.FromResult(data.ToString().DeserializeFromAkkaString<RefreshTicket>(this.system)) 
+                    ? Task.FromResult(((byte[])data).DeserializeFromAkka<RefreshTicket>(this.system)) 
                     : Task.FromResult<RefreshTicket>(null);
             }
         }

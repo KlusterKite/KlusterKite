@@ -15,6 +15,8 @@ namespace ClusterKit.Security.Client
 
     using ClusterKit.Core.Log;
 
+    using Newtonsoft.Json;
+
     using Serilog.Events;
 
     using LogEvent = Serilog.Events.LogEvent;
@@ -131,6 +133,11 @@ namespace ClusterKit.Security.Client
                                     new ScalarValue(p.Value))));
             }
 
+            if (!string.IsNullOrWhiteSpace(requestDescription.RequestedLocalUrl))
+            {
+                dictionary[new ScalarValue("LocalUrl")] = new ScalarValue(requestDescription.RequestedLocalUrl);
+            }
+
             if (requestDescription.Authentication != null)
             {
                 var auth = requestDescription.Authentication;
@@ -138,6 +145,7 @@ namespace ClusterKit.Security.Client
                 if (auth.User != null)
                 {
                     authenticationDictionary[new ScalarValue("UserId")] = new ScalarValue(auth.User.UserId);
+                    authenticationDictionary[new ScalarValue("UserData")] = new ScalarValue(JsonConvert.SerializeObject(auth.User));
                 }
 
                 authenticationDictionary[new ScalarValue("ClientId")] = new ScalarValue(auth.ClientId);

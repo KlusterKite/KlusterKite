@@ -17,6 +17,8 @@ namespace ClusterKit.Web.Authorization.Attributes
     using System.Web.Http.Filters;
     using System.Web.Http.Results;
 
+    using ClusterKit.Security.Client;
+
     /// <summary>
     /// Marks api method to check for authentication
     /// </summary>
@@ -25,6 +27,11 @@ namespace ClusterKit.Web.Authorization.Attributes
     {
         /// <inheritdoc />
         public bool AllowMultiple => false;
+
+        /// <summary>
+        /// Gets or sets the severity of action
+        /// </summary>
+        public EnSeverity Severity { get; set; } = EnSeverity.Trivial;
 
         /// <inheritdoc />
         public Task AuthenticateAsync(HttpAuthenticationContext context, CancellationToken cancellationToken)
@@ -35,10 +42,19 @@ namespace ClusterKit.Web.Authorization.Attributes
         /// <inheritdoc />
         public Task ChallengeAsync(HttpAuthenticationChallengeContext context, CancellationToken cancellationToken)
         {
-            if (context.Request.GetOwinContext().GetSession() == null)
+            if (context.Request.GetOwinContext().GetSession() != null)
             {
-                context.Result = new UnauthorizedResult(new AuthenticationHeaderValue[0],  context.Request);
+                return Task.CompletedTask;
             }
+
+            SecurityLog.CreateRecord(
+                SecurityLog.EnType.OperationDenied,
+                this.Severity,
+                context.Request.GetOwinContext().GetRequestDescription(),
+                "Attempt to access {ControllerName} action {ActionName} without authenticated session",
+                context.ActionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
+                context.ActionContext.ActionDescriptor.ActionName);
+            context.Result = new UnauthorizedResult(new AuthenticationHeaderValue[0],  context.Request);
 
             return Task.CompletedTask;
         }
