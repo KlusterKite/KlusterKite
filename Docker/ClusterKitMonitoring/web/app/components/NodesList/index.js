@@ -8,6 +8,8 @@ import React, { Component, PropTypes } from 'react';
 import { autobind } from 'core-decorators';
 import { Popover, OverlayTrigger, Button } from 'react-bootstrap';
 
+import { hasPrivilege } from '../../utils/privileges';
+
 import styles from './styles.css';
 
 export default class NodesList extends Component { // eslint-disable-line react/prefer-stateless-function
@@ -92,21 +94,35 @@ export default class NodesList extends Component { // eslint-disable-line react/
               {node.IsInitialized &&
                 <td>
                   <span className="label">{node.IsInitialized}</span>
-                  {!node.IsObsolete &&
-                    <button
-                      type="button" className={`${styles.upgrade} btn btn-xs btn-success`}
-                      title="Upgrade Node"
-                      onClick={() => onManualUpgrade && onManualUpgrade(node)}>
-                      <i className="fa fa-refresh" /> Actual
-                    </button>
+                  {hasPrivilege('ClusterKit.NodeManager.UpgradeNode') &&
+                    <span>
+                      {!node.IsObsolete &&
+                        <button
+                        type="button" className={`${styles.upgrade} btn btn-xs btn-success`}
+                        title="Upgrade Node"
+                        onClick={() => onManualUpgrade && onManualUpgrade(node)}>
+                        <i className="fa fa-refresh" /> Actual
+                        </button>
+                      }
+                      {node.IsObsolete &&
+                        <button
+                        type="button" className={`${styles.upgrade} btn btn-xs btn-warning`}
+                        title="Upgrade Node"
+                        onClick={() => onManualUpgrade && onManualUpgrade(node)}>
+                        <i className="fa fa-refresh" /> Obsolete
+                        </button>
+                      }
+                    </span>
                   }
-                  {node.IsObsolete &&
-                    <button
-                      type="button" className={`${styles.upgrade} btn btn-xs btn-warning`}
-                      title="Upgrade Node"
-                      onClick={() => onManualUpgrade && onManualUpgrade(node)}>
-                      <i className="fa fa-refresh" /> Obsolete
-                    </button>
+                  {!hasPrivilege('ClusterKit.NodeManager.UpgradeNode') &&
+                    <span>
+                      {!node.IsObsolete &&
+                        <span className="label label-success">Actual</span>
+                      }
+                      {node.IsObsolete &&
+                        <span className="label label-warning">Obsolete</span>
+                      }
+                    </span>
                   }
                 </td>
               }
