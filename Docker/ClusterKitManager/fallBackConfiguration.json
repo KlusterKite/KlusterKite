@@ -320,21 +320,6 @@
     },
     {
       "BuildDate": null,
-      "Id": "Microsoft.Extensions.DependencyInjection.Abstractions",
-      "Version": "1.1.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "Microsoft.Extensions.Logging",
-      "Version": "1.1.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "Microsoft.Extensions.Logging.Abstractions",
-      "Version": "1.1.0"
-    },
-    {
-      "BuildDate": null,
       "Id": "Microsoft.NETCore.Platforms",
       "Version": "1.1.0"
     },
@@ -377,16 +362,6 @@
       "BuildDate": null,
       "Id": "Microsoft.Web.Xdt",
       "Version": "2.1.1"
-    },
-    {
-      "BuildDate": null,
-      "Id": "Microsoft.Win32.Primitives",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "NETStandard.Library",
-      "Version": "1.6.1"
     },
     {
       "BuildDate": null,
@@ -460,11 +435,6 @@
     },
     {
       "BuildDate": null,
-      "Id": "System.AppContext",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
       "Id": "System.Collections",
       "Version": "4.3.0"
     },
@@ -481,11 +451,6 @@
     {
       "BuildDate": null,
       "Id": "System.ComponentModel",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.Console",
       "Version": "4.3.0"
     },
     {
@@ -515,32 +480,12 @@
     },
     {
       "BuildDate": null,
-      "Id": "System.Globalization.Calendars",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
       "Id": "System.IO",
       "Version": "4.3.0"
     },
     {
       "BuildDate": null,
       "Id": "System.IO.Compression",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.IO.Compression.ZipFile",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.IO.FileSystem",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.IO.FileSystem.Primitives",
       "Version": "4.3.0"
     },
     {
@@ -555,17 +500,7 @@
     },
     {
       "BuildDate": null,
-      "Id": "System.Net.Http",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
       "Id": "System.Net.Primitives",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.Net.Sockets",
       "Version": "4.3.0"
     },
     {
@@ -625,26 +560,6 @@
     },
     {
       "BuildDate": null,
-      "Id": "System.Security.Cryptography.Algorithms",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.Security.Cryptography.Encoding",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.Security.Cryptography.Primitives",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.Security.Cryptography.X509Certificates",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
       "Id": "System.Text.Encoding",
       "Version": "4.3.0"
     },
@@ -671,11 +586,6 @@
     {
       "BuildDate": null,
       "Id": "System.Threading.Timer",
-      "Version": "4.3.0"
-    },
-    {
-      "BuildDate": null,
-      "Id": "System.Xml.ReaderWriter",
       "Version": "4.3.0"
     },
     {
