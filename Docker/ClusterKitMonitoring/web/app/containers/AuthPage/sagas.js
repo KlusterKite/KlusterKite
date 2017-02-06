@@ -2,33 +2,37 @@ import { take, call, put, fork, cancel } from 'redux-saga/effects';
 import { takeEvery } from 'redux-saga';
 
 import {
-  FEEDS_LOAD,
+  AUTH_REQUEST_LOGIN
 } from './constants';
 
 import {
-  feedsReceiveAction,
+  onLoginSuccessAction,
+  onLoginFailureAction,
 } from './actions';
 
 import {
-  getFeeds,
-} from '../FeedPage/api';
+  login,
+} from './api';
 
 import { LOCATION_CHANGE } from 'react-router-redux';
 
-
-function* feedsLoadSaga() {
-  const result = yield call(getFeeds);
-  console.log('result', result);
+function* loginSaga(username, password) {
+  const result = yield call(login, username, password);
+  const resultWithUserName = {
+    ...result,
+    username
+  };
   if (result != null) {
-    yield put(feedsReceiveAction(result));
+    yield put(onLoginSuccessAction(resultWithUserName));
+  } else {
+    yield put(onLoginFailureAction());
   }
 }
 
-
 function* selectSaga(action) {
   switch (action.type) {
-    case FEEDS_LOAD:
-      yield call(feedsLoadSaga);
+    case AUTH_REQUEST_LOGIN:
+      yield call(loginSaga, action.data.Username, action.data.Password);
       break;
     default:
       break;
@@ -38,7 +42,7 @@ function* selectSaga(action) {
 function* defaultSaga() {
   yield* takeEvery(
     [
-      FEEDS_LOAD,
+      AUTH_REQUEST_LOGIN,
     ],
     selectSaga);
 }
@@ -52,4 +56,3 @@ function* rootSaga() {
 export default [
   rootSaga,
 ];
-

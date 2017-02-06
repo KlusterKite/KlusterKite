@@ -20,6 +20,7 @@ import Nav from 'react-bootstrap/lib/Nav';
 import NavItem from 'react-bootstrap/lib/NavItem';
 import config from '../../config';
 
+import Cookies from 'js-cookie';
 
 import styles from './styles.css';
 
@@ -30,6 +31,15 @@ export default class App extends React.Component { // eslint-disable-line react/
   };
 
   render() {
+    const accessToken = Cookies.get('accessToken');
+    let username = null;
+    if (accessToken) {
+      username = Cookies.get('username');
+      if (!username) {
+        username = 'user';
+      }
+    }
+
     return (
       <div className={styles.app}>
 
@@ -44,21 +54,28 @@ export default class App extends React.Component { // eslint-disable-line react/
             <Navbar.Toggle />
           </Navbar.Header>
 
-          <Navbar.Collapse eventKey={0}>
+          <Navbar.Collapse>
             <Nav navbar>
               <LinkContainer to="/clusterkit/templates">
-                <NavItem eventKey={1}>Templates</NavItem>
+                <NavItem>Templates</NavItem>
               </LinkContainer>
               <LinkContainer to="/clusterkit/nugetfeeds">
-                <NavItem eventKey={2}>Nuget Feeds</NavItem>
+                <NavItem>Nuget Feeds</NavItem>
               </LinkContainer>
               <LinkContainer to="/clusterkit/packages">
-                <NavItem eventKey={3}>Packages</NavItem>
+                <NavItem>Packages</NavItem>
               </LinkContainer>
               <LinkContainer to="/clusterkit/actorsTree">
-                <NavItem eventKey={4}>Actors tree</NavItem>
+                <NavItem>Actors tree</NavItem>
               </LinkContainer>
             </Nav>
+            {username &&
+              <Nav pullRight>
+                <LinkContainer to="/clusterkit/logout">
+                  <NavItem href="#">Logout ({username})</NavItem>
+                </LinkContainer>
+              </Nav>
+            }
           </Navbar.Collapse>
         </Navbar>
 

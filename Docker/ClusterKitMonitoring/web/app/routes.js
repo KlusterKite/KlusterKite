@@ -165,8 +165,44 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     },
+    {
+      path: '/clusterkit/auth',
+      name: 'authPage',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          System.import('containers/AuthPage/reducer'),
+          System.import('containers/AuthPage/sagas'),
+          System.import('containers/AuthPage'),
+        ]);
 
+        const renderRoute = loadModule(cb);
 
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('authPage', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    },
+    {
+      path: '/clusterkit/logout',
+      name: 'authPage',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          System.import('containers/LogoutPage'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    },
     {
       path: '*',
 
