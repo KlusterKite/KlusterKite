@@ -10,6 +10,9 @@ import {
   AUTH_REQUEST_LOGIN,
   AUTH_ON_LOGIN_SUCCESS,
   AUTH_ON_LOGIN_FAILURE,
+  AUTH_REQUEST_PRIVELEGES,
+  AUTH_ON_PRIVILEGES_SUCCESS,
+  AUTH_ON_PRIVILEGES_FAILURE,
 } from './constants';
 import moment from 'moment';
 
@@ -17,6 +20,7 @@ const initialState = fromJS({
   authorized: false,
   authorizing: false,
   authorizationError: null,
+  privilegesReceived: false,
 });
 
 function authPageReducer(state = initialState, action) {
@@ -41,6 +45,18 @@ function authPageReducer(state = initialState, action) {
         .set('authorized', false)
         .set('authorizing', false)
         .set('authorizationError', 'Error');
+    case AUTH_REQUEST_PRIVELEGES:
+      return state
+        .set('requestingPrivileges', true);
+    case AUTH_ON_PRIVILEGES_SUCCESS:
+      localStorage.setItem('privileges', JSON.stringify(action.data));
+      return state
+        .set('privilegesReceived', true)
+        .set('privileges', action.data);
+    case AUTH_ON_PRIVILEGES_FAILURE:
+      return state
+        .set('privilegesReceived', false)
+        .set('privileges', null);
     default:
       return state;
   }

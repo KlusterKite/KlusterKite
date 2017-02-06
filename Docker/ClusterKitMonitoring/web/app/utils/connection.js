@@ -45,9 +45,41 @@ const requestNewToken = (refreshToken => {
  * Redirects to the authorization page (in case everything else fails)
  * @param reject Callback function
  */
-let redirectToAuth = (reject) => {
+const redirectToAuth = (reject) => {
+  localStorage.removeItem('privileges');
   window.location = '/clusterkit/auth/?from=' + encodeURI(window.location.pathname);
   reject();
+};
+
+export const processError = (e) => {
+  if (e && e.response && e.response.status) {
+    if (e.response.status === 401 || e.response.status === 404) {
+      const refreshToken = Cookies.get('refreshToken');
+      if (refreshToken) {
+        requestNewToken(refreshToken).then(data => {
+          processToken(data, resolve);
+        }).catch(error => {
+          redirectToAuth();
+        });
+      }
+    }
+  }
+
+  console.log(e);
+};
+
+/**
+ * Process new token from the server and resolve new adios connection
+ * @param data {Object} Authorization data from the server
+ * @param resolve {Function} Resolve function
+ */
+const processToken = function (data, resolve) {
+  const expiresDate = moment().add(data.data.expires_in, 'seconds');
+  Cookies.set('accessToken', data.data.access_token, {expires: expiresDate.toDate()});
+  Cookies.set('refreshToken', data.data.refresh_token, {expires: 1});
+
+  const instance = getInstance(data.data.access_token);
+  resolve(instance);
 };
 
 const promise = new Promise((resolve, reject) => {
@@ -62,12 +94,7 @@ const promise = new Promise((resolve, reject) => {
   if (!accessToken) {
     if (refreshToken) {
       requestNewToken(refreshToken).then(data => {
-        const expiresDate = moment().add(data.data.expires_in, 'seconds');
-        Cookies.set('accessToken', data.data.access_token, { expires: expiresDate.toDate() });
-        Cookies.set('refreshToken', data.data.refresh_token, { expires: 1 });
-
-        const instance = getInstance(accessToken);
-        resolve(instance);
+        processToken(data, resolve);
       }).catch(error => {
         redirectToAuth();
       });
@@ -79,4 +106,3 @@ const promise = new Promise((resolve, reject) => {
 });
 
 export default promise;
-

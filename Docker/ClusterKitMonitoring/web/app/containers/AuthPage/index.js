@@ -29,12 +29,15 @@ export class AuthPage extends React.Component { // eslint-disable-line react/pre
     authorized: PropTypes.bool,
     authorizationError: PropTypes.string,
     authorizationException: PropTypes.object,
+    privilegesReceived: PropTypes.bool,
   };
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.authorized) {
+    if (nextProps.authorized && nextProps.privilegesReceived) {
       if (this.props.location && this.props.location.query && this.props.location.query.from) {
         window.location = this.props.location.query.from;
+      } else {
+        window.location = '/clusterkit/';
       }
     }
   }

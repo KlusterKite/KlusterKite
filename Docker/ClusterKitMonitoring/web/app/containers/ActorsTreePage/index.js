@@ -8,6 +8,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import selectActorsTreePage from './selectors';
 import { autobind } from 'core-decorators';
+import { hasPrivilege } from '../../utils/privileges';
 
 import {
   treeLoadAction,
@@ -52,49 +53,50 @@ export class ActorsTreePage extends Component { // eslint-disable-line react/pre
       <div className={styles.container}>
         <h1>Actors tree</h1>
 
-        <div className={`${styles.panel} row`} >
-          <div className="col-md-6">
-            <div className="alert alert-warning" role="alert">
-              <div className={styles.scanPanel}>
-                <div>
-                  <button
-                    type="button"
-                    className="btn btn-warning btn-sm"
-                    onClick={this.handleScan}
-                    disabled={this.props.isLoading}
-                  >
-                    <i className={reloadClassName} /> {' '} Scan
-                  </button>
+        {hasPrivilege('ClusterKit.Monitoring.InitiateScan') &&
+          <div className={`${styles.panel} row`}>
+            <div className="col-md-6">
+              <div className="alert alert-warning" role="alert">
+                <div className={styles.scanPanel}>
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-warning btn-sm"
+                      onClick={this.handleScan}
+                      disabled={this.props.isLoading}
+                    >
+                      <i className={reloadClassName}/> {' '} Scan
+                    </button>
+                  </div>
+                  <div>
+                    <p>Scan generates additional load to all cluster node. Do this only in emergency situations or in
+                      development infrastructure</p>
+                  </div>
                 </div>
-                <div>
-                  <p>Scan generates additional load to all cluster node. Do this only in emergency situations or in
-                  development infrastructure</p>
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="alert alert-info" role="alert">
+                <div className={styles.scanPanel}>
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={this.handleReload}
+                      disabled={this.props.isLoading}
+                    >
+                      <i className={reloadClassName}/> {' '} Reload tree
+                    </button>
+                  </div>
+                  <div>
+                    <p>Scan can take some time and can be unfinished in time of tree load. Try to reload tree before
+                      initiating new scan</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="col-md-6">
-            <div className="alert alert-info" role="alert">
-              <div className={styles.scanPanel}>
-                <div>
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={this.handleReload}
-                    disabled={this.props.isLoading}
-                  >
-                    <i className={reloadClassName} /> {' '} Reload tree
-                  </button>
-                </div>
-                <div>
-                  <p>Scan can take some time and can be unfinished in time of tree load. Try to reload tree before
-                  initiating new scan</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        }
 
         {this.props.hasError &&
           <div className="alert alert-danger" role="alert">
