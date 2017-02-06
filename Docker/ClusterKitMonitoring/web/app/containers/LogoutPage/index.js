@@ -14,13 +14,14 @@ export class LogoutPage extends React.Component { // eslint-disable-line react/p
     Cookies.remove('accessToken');
     Cookies.remove('refreshToken');
     Cookies.remove('username');
+    localStorage.removeItem('privileges');
     window.location = '/clusterkit/auth/';
   }
 
   render() {
     return (
-      <div>
-        Logging out…
+      <div className="container">
+        <h1>Logging out…</h1>
       </div>
     );
   }

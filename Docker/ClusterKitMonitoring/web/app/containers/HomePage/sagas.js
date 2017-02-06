@@ -1,5 +1,6 @@
 import { take, call, put, race, fork, cancel } from 'redux-saga/effects';
 import { takeEvery, delay } from 'redux-saga';
+import { hasPrivilege } from '../../utils/privileges';
 
 import {
   NODE_UPGRADE,
@@ -30,9 +31,20 @@ function* nodeDescriptionsLoadSaga() {
   let cont = true;
   while (cont) {
     try {
-      const nodes = yield call(getNodeDescriptions);
-      const templates = yield call(getTemplates);
-      const swaggerLinks = yield call(getSwaggerList);
+      let nodes = null;
+      let templates = null;
+      let swaggerLinks = null;
+
+      if (hasPrivilege('ClusterKit.NodeManager.GetActiveNodeDescriptions')) {
+        nodes = yield call(getNodeDescriptions);
+      }
+      if (hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics')) {
+        templates = yield call(getTemplates);
+      }
+      if (hasPrivilege('ClusterKit.Web.Swagger.GetServices')) {
+        swaggerLinks = yield call(getSwaggerList);
+      }
+
       yield put(nodeDescriptionsReceiveAction(nodes, swaggerLinks, templates));
     } catch (exception) {
       yield put(nodeDescriptionsLoadErrorAction());

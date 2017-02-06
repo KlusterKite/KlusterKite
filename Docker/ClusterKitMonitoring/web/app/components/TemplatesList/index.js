@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
+import { hasPrivilege } from '../../utils/privileges';
 
 export default class TemplatesList extends Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -14,7 +15,9 @@ export default class TemplatesList extends Component { // eslint-disable-line re
     return (
       <div>
         <h2>Templates list</h2>
-        <Link to="/clusterkit/templates/create/" className="btn btn-primary" role="button">Add a new template</Link>
+        {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Create') &&
+          <Link to="/clusterkit/templates/create/" className="btn btn-primary" role="button">Add a new template</Link>
+        }
         <table className="table table-hover">
           <thead>
             <tr>
@@ -31,9 +34,14 @@ export default class TemplatesList extends Component { // eslint-disable-line re
           {templates && templates.length > 0 && templates.map((item) =>
             <tr key={item.Id}>
               <td>
-                <Link to={`/clusterkit/templates/${item.Id}`}>
-                  {item.Code}
-                </Link>
+                {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Get') &&
+                  <Link to={`/clusterkit/templates/${item.Id}`}>
+                    {item.Code}
+                  </Link>
+                }
+                {!hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Get') &&
+                  <span>{item.Code}</span>
+                }
               </td>
               <td>{item.Name}</td>
               <td>

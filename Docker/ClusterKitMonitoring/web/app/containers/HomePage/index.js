@@ -8,6 +8,7 @@ import React, { Component, PropTypes } from 'react';
 import { autobind } from 'core-decorators';
 import { connect } from 'react-redux';
 import selectHomePage from './selectors';
+import { hasPrivilege } from '../../utils/privileges';
 
 import {
   nodeDescriptionsLoadAction,
@@ -51,13 +52,21 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
     return (
       <div className="container">
         <h1>Monitoring</h1>
-        <button type="button" className="btn btn-primary btn-lg" onClick={this.handleReload}>
-          <i className="fa fa-refresh" /> {' '} Reload packages
-        </button>
+        {hasPrivilege('ClusterKit.NodeManager.ReloadPackages') &&
+          <button type="button" className="btn btn-primary btn-lg" onClick={this.handleReload}>
+            <i className="fa fa-refresh"/> {' '} Reload packages
+          </button>
+        }
 
-        <NodesWithTemplates nodes={this.props.nodeDescriptions} templates={this.props.templates} />
-        <NodesList nodes={this.props.nodeDescriptions} hasError={this.props.hasError} onManualUpgrade={this.onNodeUpgradeClick} />
-        <SwaggerLinksList links={this.props.swaggerLinks} />
+        {hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics') &&
+          <NodesWithTemplates nodes={this.props.nodeDescriptions} templates={this.props.templates}/>
+        }
+        {hasPrivilege('ClusterKit.NodeManager.GetActiveNodeDescriptions') &&
+          <NodesList nodes={this.props.nodeDescriptions} hasError={this.props.hasError} onManualUpgrade={this.onNodeUpgradeClick} />
+        }
+        {hasPrivilege('ClusterKit.Web.Swagger.GetServices') &&
+          <SwaggerLinksList links={this.props.swaggerLinks}/>
+        }
       </div>
     );
   }
