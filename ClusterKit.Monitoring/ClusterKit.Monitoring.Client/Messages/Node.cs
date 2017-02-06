@@ -69,5 +69,4 @@ namespace ClusterKit.Monitoring.Client.Messages
         [XmlArray("children")]
         public Node[] Children { get; set; }
     }
-
 }

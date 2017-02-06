@@ -1,17 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SwaggerDescriptorTest.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Bundle of tests for swagger descriptor
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.Web.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
 
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
-    using Akka.DI.Core;
 
     using Castle.Windsor;
 
@@ -90,6 +94,15 @@ namespace ClusterKit.Web.Tests
                                 publishUiPath = ""/swagger/ui""
                             }
                         }
+
+                    akka.actor {
+                        serializers {
+                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                        }
+                        serialization-bindings {
+                            ""System.Object"" = hyperion
+                        }
+                    }
 
                     akka.actor.deployment {
                         /Web/Swagger {

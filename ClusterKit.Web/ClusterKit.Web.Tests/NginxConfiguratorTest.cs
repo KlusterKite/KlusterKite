@@ -9,17 +9,13 @@
 
 namespace ClusterKit.Web.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
-    using System.Linq;
 
-    using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
     using Akka.DI.Core;
-    using Akka.TestKit;
 
     using Castle.Windsor;
 
@@ -27,7 +23,6 @@ namespace ClusterKit.Web.Tests
     using ClusterKit.Core.TestKit;
     using ClusterKit.Web.Client.Messages;
     using ClusterKit.Web.NginxConfigurator;
-    using ClusterKit.Web.Swagger.Monitor;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -54,7 +49,7 @@ namespace ClusterKit.Web.Tests
         [Fact]
         public void ServiceConfigGenerationTest()
         {
-            BaseInstaller.RunPrecheck(this.WindsorContainer, this.Sys.Settings.Config);
+            BaseInstaller.RunPreCheck(this.WindsorContainer, this.Sys.Settings.Config);
             var configurator = this.ActorOfAsTestActorRef<NginxConfiguratorActor>("configurator");
 
             this.ActorOfAsTestActorRef<NameSpaceActor>(this.Sys.DI().Props<NameSpaceActor>(), "Web");
@@ -153,6 +148,15 @@ namespace ClusterKit.Web.Tests
                                 }
                             }
                         }
+
+            akka.actor {
+                        serializers {
+                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                        }
+                        serialization-bindings {
+                            ""System.Object"" = hyperion
+                        }
+                    }
 
             akka.actor.deployment {
                     /Web {

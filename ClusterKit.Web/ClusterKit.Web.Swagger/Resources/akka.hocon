@@ -1,7 +1,4 @@
  {
- 	ClusterKit {
- 	}
-
 	akka.actor.deployment {
  		 /Web {
             IsNameSpace = true

@@ -16,6 +16,9 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
 
     using Akka.Actor;
 
+    using ClusterKit.Web.Authorization.Attributes;
+    using ClusterKit.Web.Swagger.Messages;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -23,6 +26,7 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
     /// </summary>
     [UsedImplicitly]
     [RoutePrefix("api/1.x/clusterkit")]
+    [RequireUser]
     public class SwaggerCollectorController : ApiController
     {
         /// <summary>
@@ -48,11 +52,12 @@ namespace ClusterKit.Web.Swagger.Monitor.WebApi
         }
 
         /// <summary>
-        /// Gets current cluster member list
+        /// Gets current cluster defined swagger links
         /// </summary>
-        /// <returns>The member list</returns>
+        /// <returns>The cluster defined swagger links</returns>
         [Route("swagger/monitor/getList")]
         [HttpGet]
+        [RequireUserPrivilege(Privileges.GetServices)]
         public async Task<IReadOnlyCollection<string>> GetServices()
         {
             try

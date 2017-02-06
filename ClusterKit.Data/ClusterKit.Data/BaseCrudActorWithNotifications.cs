@@ -55,6 +55,7 @@ namespace ClusterKit.Data
             this.NotificationReceiver.Tell(
                            new UpdateMessage<TObject> { ActionType = EnActionType.Create, NewObject = result });
 
+            // ReSharper disable once StyleCop.SA1100
             base.AfterCreate(result);
         }
 
@@ -70,6 +71,7 @@ namespace ClusterKit.Data
             this.NotificationReceiver.Tell(
                     new UpdateMessage<TObject> { ActionType = EnActionType.Delete, OldObject = deletedObject });
 
+            // ReSharper disable once StyleCop.SA1100
             base.AfterDelete(deletedObject);
         }
 
@@ -94,6 +96,8 @@ namespace ClusterKit.Data
                                     NewObject = newObject,
                                     OldObject = oldObject
                                 });
+
+            // ReSharper disable once StyleCop.SA1100
             base.AfterUpdate(newObject, oldObject);
         }
     }

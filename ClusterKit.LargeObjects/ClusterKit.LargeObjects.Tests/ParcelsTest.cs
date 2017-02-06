@@ -26,6 +26,8 @@ namespace ClusterKit.LargeObjects.Tests
     using ClusterKit.Core.TestKit;
     using ClusterKit.LargeObjects.Client;
 
+    using JetBrains.Annotations;
+
     using Xunit;
     using Xunit.Abstractions;
 
@@ -70,7 +72,7 @@ namespace ClusterKit.LargeObjects.Tests
             // checking that you cannot receive parcel twice
             try
             {
-                receivedPayload = await notification.Receive(this.Sys) as string;
+                await notification.Receive(this.Sys);
                 throw new Exception("Expected ParcelNotFoundException exception");
             }
             catch (ParcelNotFoundException)
@@ -136,7 +138,7 @@ namespace ClusterKit.LargeObjects.Tests
 
             try
             {
-                var receivedPayload = await notification.Receive(this.Sys) as string;
+                await notification.Receive(this.Sys);
                 throw new Exception("Expected ParcelNotFoundException exception");
             }
             catch (ParcelNotFoundException)
@@ -179,10 +181,10 @@ namespace ClusterKit.LargeObjects.Tests
                 @"{
                     akka.actor {
                         serializers {
-                            wire = ""Akka.Serialization.WireSerializer, Akka.Serialization.Wire""
+                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
                         }
                         serialization-bindings {
-                            ""System.Object"" = wire
+                            ""System.Object"" = hyperion
                         }
                     }
 
@@ -222,12 +224,12 @@ namespace ClusterKit.LargeObjects.Tests
             /// Gets or sets the mark of enveloper
             /// </summary>
             public string Tag { get; set; }
-       
         }
 
         /// <summary>
         /// The test notification enveloper
         /// </summary>
+        [UsedImplicitly]
         private class TestIntEnveloper : INotificationEnveloper
         {
             /// <inheritdoc />
@@ -245,6 +247,7 @@ namespace ClusterKit.LargeObjects.Tests
         /// <summary>
         /// The test notification enveloper
         /// </summary>
+        [UsedImplicitly]
         private class TestInt2Enveloper : INotificationEnveloper
         {
             /// <inheritdoc />
@@ -262,6 +265,7 @@ namespace ClusterKit.LargeObjects.Tests
         /// <summary>
         /// The test notification enveloper
         /// </summary>
+        [UsedImplicitly]
         private class TestDoubleEnveloper : INotificationEnveloper
         {
             /// <inheritdoc />

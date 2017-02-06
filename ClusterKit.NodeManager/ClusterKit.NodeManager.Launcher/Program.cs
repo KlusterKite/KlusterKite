@@ -1,4 +1,4 @@
-﻿ // --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -25,7 +25,11 @@ namespace ClusterKit.NodeManager.Launcher
 
     using Newtonsoft.Json;
 
+    using NuGet.Common;
+    using NuGet.Frameworks;
+
     using RestSharp;
+    using RestSharp.Authenticators;
 
     /// <summary>
     /// ClusterKit Node launcher
@@ -71,6 +75,21 @@ namespace ClusterKit.NodeManager.Launcher
                 this.IsValid = false;
             }
 
+            try
+            {
+                this.AuthenticationUrl = new Uri(ConfigurationManager.AppSettings["authenticationUrl"]);
+            }
+            catch (ArgumentNullException)
+            {
+                Console.WriteLine(@"authenticationUrl not configured");
+                this.IsValid = false;
+            }
+            catch (UriFormatException)
+            {
+                Console.WriteLine(@"authenticationUrl is not a valid URL");
+                this.IsValid = false;
+            }
+
             this.WorkingDirectory = ConfigurationManager.AppSettings["workingDirectory"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
@@ -90,18 +109,27 @@ namespace ClusterKit.NodeManager.Launcher
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(this.WorkingDirectory)
-                && Directory.Exists(this.WorkingDirectory)
+            if (!string.IsNullOrWhiteSpace(this.WorkingDirectory) && Directory.Exists(this.WorkingDirectory)
                 && !CheckDirectoryAccess(this.WorkingDirectory))
             {
                 Console.WriteLine(@"workingDirectory is not accessable");
                 this.IsValid = false;
             }
 
-            this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE") ?? ConfigurationManager.AppSettings["containerType"];
+            this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE")
+                                 ?? ConfigurationManager.AppSettings["containerType"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
                 Console.WriteLine(@"containerType is not configured");
+                this.IsValid = false;
+            }
+
+            this.ApiClientId = ConfigurationManager.AppSettings["apiClientId"];
+            this.ApiClientSecret = ConfigurationManager.AppSettings["apiClientSecret"];
+
+            if (string.IsNullOrWhiteSpace(this.ApiClientId) || string.IsNullOrWhiteSpace(this.ApiClientSecret))
+            {
+                Console.WriteLine(@"api access is not configured");
                 this.IsValid = false;
             }
         }
@@ -123,6 +151,21 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
+        /// Gets the authentication url
+        /// </summary>
+        public Uri AuthenticationUrl { get; }
+
+        /// <summary>
+        /// Gets the api authentication client id
+        /// </summary>
+        private string ApiClientId { get; }
+
+        /// <summary>
+        /// Gets the api authentication client secret
+        /// </summary>
+        private string ApiClientSecret { get; }
+
+        /// <summary>
         /// Gets the url of cluster configuration service
         /// </summary>
         private Uri ConfigurationUrl { get; }
@@ -131,6 +174,11 @@ namespace ClusterKit.NodeManager.Launcher
         /// Gets the type of container assigned to current machine
         /// </summary>
         private string ContainerType { get; }
+
+        /// <summary>
+        /// Gets or sets the current api access token 
+        /// </summary>
+        private Token CurrentApiToken { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether that configuration is correct
@@ -221,51 +269,7 @@ namespace ClusterKit.NodeManager.Launcher
         {
             Console.WriteLine(@"Configuring node...");
 
-            var client = new RestClient(this.ConfigurationUrl);
-            var request = new RestRequest { Method = Method.POST };
-            request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType, NodeUid = this.Uid });
-
-            var response = client.Execute<NodeStartUpConfiguration>(request);
-            NodeStartUpConfiguration config;
-
-            while (response.StatusCode == HttpStatusCode.ServiceUnavailable)
-            {
-                var retryHeader = response.Headers.FirstOrDefault(
-                    h => "Retry-After".Equals(h.Name, StringComparison.InvariantCultureIgnoreCase));
-                int timeToWait;
-                if (!int.TryParse(retryHeader?.Value?.ToString(), out timeToWait))
-                {
-                    timeToWait = 60;
-                }
-
-                Console.WriteLine($@"Config service anavailable, retrying in {timeToWait} seconds...");
-                Thread.Sleep(TimeSpan.FromSeconds(timeToWait));
-                response = client.Execute<NodeStartUpConfiguration>(request);
-            }
-
-            if (response.StatusCode != HttpStatusCode.OK || response.Data == null)
-            {
-                var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
-                if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
-                {
-                    throw new Exception(
-                        $"Could not get configuration (response: {response.StatusCode}) from service and there is no fallback configuration");
-                }
-
-                Console.WriteLine(@"Could not get configuration, using fallback...");
-                var serializer = new JsonSerializer();
-
-                using (var file = File.OpenRead(fallBackConfiguration))
-                using (var textReader = new StreamReader(file))
-                using (var jsonReader = new JsonTextReader(textReader))
-                {
-                    config = serializer.Deserialize<NodeStartUpConfiguration>(jsonReader);
-                }
-            }
-            else
-            {
-                config = response.Data;
-            }
+            var config = this.GetConfig();
 
             Console.WriteLine($@"Got {config.NodeTemplate} configuration");
             this.CleanWorkingDir();
@@ -276,23 +280,89 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
-        /// Copy directory
+        /// Gets the node config from the cluster
         /// </summary>
-        /// <param name="source">The source directory</param>
-        /// <param name="target">The destination directory</param>
-        private void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+        /// <returns>The new config</returns>
+        private NodeStartUpConfiguration GetConfig()
         {
-            var subDirectories = target.GetDirectories();
-            foreach (var dir in source.GetDirectories())
+            while (true)
             {
-                var directoryInfo = subDirectories.FirstOrDefault(d => d.Name == dir.Name)
-                                    ?? target.CreateSubdirectory(dir.Name);
-                this.CopyFilesRecursively(dir, directoryInfo);
+                if ((this.CurrentApiToken == null || this.CurrentApiToken.IsExpired) && !this.GetToken())
+                {
+                    return this.GetFallBackConfig();
+                }
+
+                var authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(this.CurrentApiToken.AccessToken, "Bearer");
+                var client = new RestClient(this.ConfigurationUrl)
+                                 {
+                                     Timeout = 5000,
+                                     Authenticator = authenticator
+                                 };
+
+                var request = new RestRequest { Method = Method.POST };
+                request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType, NodeUid = this.Uid });
+                var response = client.Execute<NodeStartUpConfiguration>(request);
+
+                if (response.ResponseStatus != ResponseStatus.Completed || response.StatusCode == HttpStatusCode.BadGateway)
+                {
+                    return this.GetFallBackConfig();
+                }
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new Exception($"Unexpected response (response code: {response.StatusCode}) from service");
+                }
+
+                return response.Data;
+            }
+        }
+
+        /// <summary>
+        /// Gets the fallback config in case of cluster unavailability
+        /// </summary>
+        /// <returns>The new config</returns>
+        private NodeStartUpConfiguration GetFallBackConfig()
+        {
+            var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
+            if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
+            {
+                throw new Exception("Could not get configuration from service and there is no fallback configuration");
             }
 
-            foreach (var file in source.GetFiles())
+            Console.WriteLine(@"Could not get configuration, using fallback...");
+            return JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(fallBackConfiguration));
+        }
+
+        /// <summary>
+        /// Gets the authentication token
+        /// </summary>
+        /// <returns>The success of network communication</returns>
+        private bool GetToken()
+        {
+            this.CurrentApiToken = null;
+            var client = new RestClient(this.AuthenticationUrl) { Timeout = 5000 };
+
+            var request = new RestRequest { Method = Method.POST };
+            request.AddParameter("grant_type", "client_credentials");
+            request.AddParameter("client_id", this.ApiClientId);
+            request.AddParameter("client_secret", this.ApiClientSecret);
+
+            while (true)
             {
-                file.CopyTo(Path.Combine(target.FullName, file.Name), true);
+                var result = client.Execute(request);
+                if (result.ResponseStatus != ResponseStatus.Completed || result.StatusCode == HttpStatusCode.BadGateway)
+                {
+                    return false;
+                }
+
+                if (result.StatusCode == HttpStatusCode.OK)
+                {
+                    this.CurrentApiToken = JsonConvert.DeserializeObject<Token>(result.Content);
+                    return true;
+                }
+
+                Console.WriteLine($@"!!!Failed to authenticate. Respones status is {result.StatusCode}. Retrying in 60s");
+                Thread.Sleep(TimeSpan.FromSeconds(60));
             }
         }
 
@@ -306,33 +376,35 @@ namespace ClusterKit.NodeManager.Launcher
             var serviceDir = Path.Combine(this.WorkingDirectory, "service");
             Directory.CreateDirectory(serviceDir);
 
-            var matches = new[]
-                              {
-                                  new Regex("(^|\\+)net45", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)net40", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)net35", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)net20", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)dotnet", RegexOptions.IgnoreCase),
-                                  new Regex("(^|\\+)netcore45", RegexOptions.IgnoreCase),
-                              };
+            var packageReader =
+                new NuGet.Protocol.FindLocalPackagesResourcePackagesConfig(
+                    Path.Combine(this.WorkingDirectory, "packages"));
+            var packages = packageReader.GetPackages(NullLogger.Instance, CancellationToken.None);
 
-            foreach (var directory in Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")))
+            var targetFramework = NuGetFramework.ParseFrameworkName(
+                ".NETFramework,Version=v4.5",
+                new DefaultFrameworkNameProvider());
+
+            foreach (var localPackageInfo in packages)
             {
-                if (!Directory.Exists(Path.Combine(directory, "lib")))
+                using (var reader = localPackageInfo.GetReader())
                 {
-                    continue;
+                    var specificGroup = NuGetFrameworkUtility.GetNearest(reader.GetLibItems(), targetFramework);
+                    if (specificGroup == null || specificGroup.HasEmptyFolder)
+                    {
+                        continue;
+                    }
+
+                    foreach (var item in specificGroup.Items)
+                    {
+                        Console.WriteLine($@"Installing {localPackageInfo.Identity.Id} {item}");
+                        var fileName = item.Split('/').Last();
+                        using (var file = File.Create(Path.Combine(serviceDir, fileName)))
+                        {
+                            reader.GetStream(item).CopyTo(file);
+                        }
+                    }
                 }
-
-                var specificDirs = Directory.GetDirectories(Path.Combine(directory, "lib")).Select(d => d.Split(Path.DirectorySeparatorChar).Last()).ToList();
-
-                var endDir =
-                    matches
-                        .Select(m => specificDirs.FirstOrDefault(m.IsMatch))
-                        .FirstOrDefault(d => d != null);
-
-                endDir = endDir != null ? Path.Combine(directory, "lib", endDir) : Path.Combine(directory, "lib");
-                Console.WriteLine($@"Installing {Path.GetDirectoryName(directory)} from {endDir}");
-                this.CopyFilesRecursively(new DirectoryInfo(endDir), new DirectoryInfo(Path.Combine(this.WorkingDirectory, "service")));
             }
 
             File.WriteAllText(Path.Combine(serviceDir, "akka.hocon"), configuration.Configuration);
@@ -344,7 +416,7 @@ namespace ClusterKit.NodeManager.Launcher
                 ClusterKit.NodeManager.NodeTemplateVersion = {configuration.NodeTemplateVersion}
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}
-                ClusterKit.NodeManager.NodeId = { this.Uid }
+                ClusterKit.NodeManager.NodeId = {this.Uid}
                 akka.cluster.seed-nodes = [{string.Join(", ", seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
@@ -390,14 +462,27 @@ namespace ClusterKit.NodeManager.Launcher
             {
                 var parameters = AssemblyName.GetAssemblyName(lib);
                 var dependentNode =
-                    assemblyBindingNode?.SelectSingleNode($"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']", namespaceManager)
+                    assemblyBindingNode?.SelectSingleNode(
+                        $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
+                        namespaceManager)
                     ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
 
+                if (dependentNode == null)
+                {
+                    continue;
+                }
+
                 dependentNode.RemoveAll();
-                var assemblyIdentityNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
+                var assemblyIdentityNode =
+                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);
-                assemblyIdentityNode.SetAttribute("publicKeyToken", BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", "").ToLower(CultureInfo.InvariantCulture));
-                var bindingRedirectNode = (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
+                var publicKeyToken =
+                    BitConverter.ToString(parameters.GetPublicKeyToken())
+                        .Replace("-", string.Empty)
+                        .ToLower(CultureInfo.InvariantCulture);
+                assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
+                var bindingRedirectNode =
+                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
 
@@ -416,6 +501,7 @@ namespace ClusterKit.NodeManager.Launcher
         {
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<packages>\n</packages>\n");
+
             // ReSharper disable PossibleNullReferenceException
             var rootNode = xmlDocument.DocumentElement.SelectSingleNode("/packages");
             foreach (var package in configuration.Packages)
@@ -442,11 +528,17 @@ namespace ClusterKit.NodeManager.Launcher
                 }
             }
 
-            //Checking installation
-            var installedPackages = Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages")).Select(Path.GetFileName).ToList();
-            var missedPackages = configuration.Packages
-                .Where(p => installedPackages.All(d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-[\\w\\d\\-]*)?$")))
-                .ToList();
+            // Checking installation
+            var installedPackages =
+                Directory.GetDirectories(Path.Combine(this.WorkingDirectory, "packages"))
+                    .Select(Path.GetFileName)
+                    .ToList();
+            var missedPackages =
+                configuration.Packages.Where(
+                        p =>
+                            installedPackages.All(
+                                d => !Regex.IsMatch(d, $"^{Regex.Escape(p.Id)}(\\.\\d+){{0,4}}(\\-[\\w\\d\\-]*)?$")))
+                    .ToList();
             foreach (var packageName in missedPackages)
             {
                 Console.WriteLine($@"Package {packageName.Id} was not installed");
@@ -470,7 +562,9 @@ namespace ClusterKit.NodeManager.Launcher
                                       {
                                           UseShellExecute = false,
                                           WorkingDirectory =
-                                              Path.Combine(Path.GetFullPath(this.WorkingDirectory), "service"),
+                                              Path.Combine(
+                                                  Path.GetFullPath(this.WorkingDirectory),
+                                                  "service"),
                                           FileName =
                                               Path.Combine(
                                                   Path.GetFullPath(this.WorkingDirectory),
@@ -494,8 +588,7 @@ namespace ClusterKit.NodeManager.Launcher
             var configPath = Path.Combine(this.WorkingDirectory, "nuget.config");
 
             File.Copy(
-                // ReSharper disable once AssignNullToNotNullAttribute
-                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "nuget.exe"),
+                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "nuget.exe"),
                 Path.Combine(this.WorkingDirectory, "nuget.exe"));
 
             XmlDocument doc = new XmlDocument();
@@ -542,6 +635,7 @@ namespace ClusterKit.NodeManager.Launcher
                             Thread.Sleep(TimeSpan.FromSeconds(10));
                         }
                     }
+
                 default:
                     Console.WriteLine(@"Unsupported stop mode");
                     return;

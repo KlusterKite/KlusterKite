@@ -66,7 +66,7 @@ namespace ClusterKit.Core.Utils
         }
 
         /// <summary>
-        /// Workaround of https://github.com/akkadotnet/akka.net/issues/1321 bug
+        /// Workaround of <seealso href="https://github.com/akkadotnet/akka.net/issues/1321"/>  bug
         /// </summary>
         /// <param name="actorRef">Current actor reference</param>
         /// <param name="system">Akka actor system</param>
@@ -74,12 +74,13 @@ namespace ClusterKit.Core.Utils
         /// <returns>Configured router</returns>
         public static RouterConfig GetFromConfiguration(this IActorRef actorRef, ActorSystem system, string childPath)
         {
+            // todo: check with new akka
             var actorPath = $"/{string.Join("/", actorRef.Path.Elements.Skip(1))}/{childPath}";
             return GetFromConfiguration(system, actorPath);
         }
 
         /// <summary>
-        /// Workaround of https://github.com/akkadotnet/akka.net/issues/1321 bug
+        /// Workaround of <seealso href="https://github.com/akkadotnet/akka.net/issues/1321"/> bug
         /// </summary>
         /// <param name="system">Akka actor system</param>
         /// <param name="actorPath">Path to child actor in deployment configuration</param>
@@ -96,7 +97,8 @@ namespace ClusterKit.Core.Utils
             }
 
             string routerName = childConfig.GetString("router");
-            //todo: @kantora - realize all router parameters and types
+
+            // todo: @kantora - realize all router parameters and types
             switch (routerName)
             {
                 case "round-robin-pool":

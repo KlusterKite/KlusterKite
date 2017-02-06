@@ -1,6 +1,14 @@
-﻿namespace ClusterKit.Web.Swagger.Monitor
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Web.Swagger.Monitor
 {
-    using System.Collections;
     using System.Collections.Generic;
     using System.Web.Http;
 
@@ -22,7 +30,7 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
         /// Gets default akka configuration for current module
@@ -34,7 +42,10 @@
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
         /// </summary>
         /// <returns>The list of roles</returns>
-        protected override IEnumerable<string> GetRoles() => new[] { "Web.Swagger.Monitor" };
+        protected override IEnumerable<string> GetRoles() => new[]
+                                                                 {
+                                                                     "Web.Swagger.Monitor"
+                                                                 };
 
         /// <summary>
         /// Registering DI components
@@ -43,7 +54,6 @@
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<IOwinStartupConfigurator>().ImplementedBy(typeof(OwinConfigurator)));
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
             container.Register(Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ApiController))).LifestyleTransient());

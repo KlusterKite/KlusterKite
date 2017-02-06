@@ -1,4 +1,12 @@
-﻿namespace ClusterKit.Web
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+namespace ClusterKit.Web
 {
     using System;
     using System.Collections.Generic;
@@ -15,9 +23,6 @@
     using ClusterKit.Core;
 
     using Microsoft.Owin.Hosting;
-    using Microsoft.Practices.ServiceLocation;
-
-    using Serilog;
 
     /// <summary>
     /// Installing components from current library
@@ -36,15 +41,6 @@
         protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
-        /// Reads owin bind url from configuration
-        /// </summary>
-        /// <param name="config">The akka config</param>
-        public static string GetOwinBindUrl(Config config)
-        {
-            return config.GetString("ClusterKit.Web.OwinBindAddress", "http://*:80");
-        }
-
-        /// <summary>
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
@@ -54,7 +50,10 @@
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
         /// </summary>
         /// <returns>The list of roles</returns>
-        protected override IEnumerable<string> GetRoles() => new[] { "Web" };
+        protected override IEnumerable<string> GetRoles() => new[]
+                                                                 {
+                                                                     "Web"
+                                                                 };
 
         /// <summary>
         /// This method will be run after service start.
@@ -68,7 +67,7 @@
             }
 
             var registeredAssemblies =
-                BaseInstaller.GetRegisteredBaseInstallers(this.currentContainer)
+                GetRegisteredBaseInstallers(this.currentContainer)
                     .Select(i => i.GetType().Assembly)
                     .Distinct();
 
@@ -78,11 +77,17 @@
                     Classes.FromAssembly(registeredAssembly).BasedOn<ApiController>().LifestyleScoped());
             }
 
-            // 3. Помечаем приложение, как запущенное и начинаем принимать web-запросы
-            var system = ServiceLocator.Current.GetInstance<ActorSystem>();
+            var system = this.currentContainer.Resolve<ActorSystem>();
             var bindUrl = GetOwinBindUrl(system.Settings.Config);
-            Log.Information("Starting web server on {Url}", bindUrl);
-            WebApp.Start<Startup>(bindUrl);
+            system.Log.Info("Starting web server on {Url}", bindUrl);
+            try
+            {
+                WebApp.Start<Startup>(bindUrl);
+            }
+            catch (Exception exception)
+            {
+                system.Log.Error(exception, "Could not start owin server");
+            }
         }
 
         /// <summary>
@@ -98,6 +103,16 @@
 
             container.Register(
                 Component.For<IOwinStartupConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
+        }
+
+        /// <summary>
+        /// Reads owin bind url from configuration
+        /// </summary>
+        /// <param name="config">The akka config</param>
+        /// <returns>The Url to bind Owin</returns>
+        private static string GetOwinBindUrl(Config config)
+        {
+            return config.GetString("ClusterKit.Web.OwinBindAddress", "http://*:80");
         }
     }
 }

@@ -4,7 +4,7 @@
 // </copyright>
 // <summary>
 //   External additional owin configuration.
-//   Shoud be registered in DI resolver
+//   Should be registered in DI resolver
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 

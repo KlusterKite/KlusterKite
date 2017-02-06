@@ -20,10 +20,12 @@ namespace ClusterKit.NodeManager.WebApi
     using Akka.Actor;
 
     using ClusterKit.Core;
+    using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
+    using ClusterKit.Web.Authorization.Attributes;
 
     using JetBrains.Annotations;
 
@@ -31,6 +33,7 @@ namespace ClusterKit.NodeManager.WebApi
     /// Serves node management api functions
     /// </summary>
     [UsedImplicitly]
+    [RequireSession]
     [RoutePrefix("api/1.x/clusterkit/nodemanager")]
     public class NodeManagerController : ApiController
     {
@@ -61,13 +64,13 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <returns>The list of descriptions</returns>
         [Route("getDescriptions")]
+        [RequireUserPrivilege(Privileges.GetActiveNodeDescriptions)]
         public async Task<List<NodeDescription>> GetActiveNodeDescriptions()
         {
             var activeNodeDescriptions =
                 await
                     this.System.ActorSelection(this.GetManagerActorProxyPath())
                         .Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
-
 
             return activeNodeDescriptions
                 .OrderBy(n => n.NodeTemplate)
@@ -87,6 +90,8 @@ namespace ClusterKit.NodeManager.WebApi
         /// </returns>
         [Route("availableTemplates/{containerType}")]
         [HttpGet]
+        [RequireUserPrivilege(Privileges.GetAvailableTemplates, IgnoreOnClientOwnBehalf = true)]
+        [RequireClientPrivilege(Privileges.GetAvailableTemplates, IgnoreOnUserPresent = true)]
         public async Task<List<NodeTemplate>> GetAvailableTemplates(string containerType)
         {
             return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = containerType }, this.AkkaTimeout);
@@ -99,9 +104,21 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>The configuration to apply</returns>
         [Route("getConfiguration")]
         [HttpPost]
+        [RequireClientPrivilege(Privileges.GetConfiguration)]
         public async Task<NodeStartUpConfiguration> GetConfiguration(NewNodeTemplateRequest request)
         {
-            var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<object>(request, this.AkkaTimeout);
+            object result;
+            try
+            {
+                this.System.Log.Info("{Type}: sending message to {Path}", this.GetType().Name, this.GetManagerActorProxyPath());
+                result = await this.System.ActorSelection(this.GetManagerActorProxyPath())
+                             .Ask<object>(request, this.AkkaTimeout);
+            }
+            catch (Exception exception)
+            {
+                this.System.Log.Error(exception, "{Type}: GetConfiguration exception", this.GetType().Name);
+                throw;
+            }
 
             var configuration = result as NodeStartUpConfiguration;
             if (configuration != null)
@@ -125,11 +142,12 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Gets list of available packages from local cluster repository
+        /// Gets the list of available packages from local cluster repository
         /// </summary>
         /// <returns>The list of available packages</returns>
         [Route("getPackages")]
         [HttpGet]
+        [RequireUserPrivilege(Privileges.GetPackages)]
         public async Task<List<PackageDescription>> GetPackages()
         {
             return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
@@ -141,6 +159,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>Current cluster statistics</returns>
         [Route("stats")]
         [HttpGet]
+        [RequireUserPrivilege(Privileges.GetTemplateStatistics)]
         public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
         {
             return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
@@ -152,6 +171,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>Success of the operation</returns>
         [Route("reloadPackages")]
         [HttpPost]
+        [RequireUserPrivilege(Privileges.ReloadPackages)]
         public async Task ReloadPackages()
         {
             var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);
@@ -167,6 +187,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>Execution task</returns>
         [Route("upgradeNode")]
         [HttpPost]
+        [RequireUserPrivilege(Privileges.UpgradeNode)]
         public async Task UpgradeNode(Address address)
         {
             var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new NodeUpgradeRequest { Address = address }, this.AkkaTimeout);

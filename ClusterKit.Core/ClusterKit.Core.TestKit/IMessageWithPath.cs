@@ -20,7 +20,7 @@ namespace ClusterKit.Core.TestKit
         string ReceiverPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the receiver address path from actor system root.
+        /// Gets the receiver address path from actor system root.
         /// </summary>
         string ReceiverPathRooted { get; }
     }

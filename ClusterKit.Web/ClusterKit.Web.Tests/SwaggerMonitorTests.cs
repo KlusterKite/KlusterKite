@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SwaggerMonitorTestscs.cs" company="ClusterKit">
+// <copyright file="SwaggerMonitorTests.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -80,7 +80,7 @@ namespace ClusterKit.Web.Tests
                             1,
                             MemberStatus.Up,
                             ImmutableHashSet.Create("Web.Swagger.Publish"))));
-            this.ExpectMsg<SwaggerPublishDescriptionRequest>("/user/Web/Swagger/Descriptor");
+            this.ExpectMsg<SwaggerPublishDescriptionRequest>("/user/Web/Swagger/Descriptor", TimeSpan.FromSeconds(1));
         }
 
         /// <summary>
@@ -102,6 +102,15 @@ namespace ClusterKit.Web.Tests
                 return ConfigurationFactory.ParseString(@"
                 {
                     ClusterKit {
+                    }
+
+                   akka.actor {
+                        serializers {
+                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                        }
+                        serialization-bindings {
+                            ""System.Object"" = hyperion
+                        }
                     }
 
                     akka.actor.deployment {

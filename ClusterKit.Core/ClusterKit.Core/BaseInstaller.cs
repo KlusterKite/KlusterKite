@@ -6,18 +6,13 @@
 //   Base class to install ClusterKit plugin components
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace ClusterKit.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
 
     using Akka.Configuration;
-    using Akka.Configuration.Hocon;
 
     using Castle.MicroKernel.Registration;
     using Castle.MicroKernel.SubSystems.Configuration;
@@ -25,20 +20,12 @@ namespace ClusterKit.Core
 
     using JetBrains.Annotations;
 
-    using Serilog;
-
     /// <summary>
     /// Base class to install ClusterKit plugin components
     /// </summary>
     [UsedImplicitly]
     public abstract class BaseInstaller : IWindsorInstaller
     {
-        /// <summary>
-        /// Predefined priority to load configuration for plugins, that handles node role functionality
-        /// </summary>
-        [Obsolete("Sorry for orthography. Will be removed soon.")]
-        protected const decimal PriorityClasterRole = 100M;
-
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles node role functionality
         /// </summary>
@@ -60,8 +47,8 @@ namespace ClusterKit.Core
         /// <summary>
         /// Every time <seealso cref="Install"/> called, installer register itself here
         /// </summary>
-        private static readonly Dictionary<IWindsorContainer, List<BaseInstaller>> RegisteredInstallers
-            = new Dictionary<IWindsorContainer, List<BaseInstaller>>();
+        private static readonly Dictionary<IWindsorContainer, List<BaseInstaller>> RegisteredInstallers =
+            new Dictionary<IWindsorContainer, List<BaseInstaller>>();
 
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
@@ -103,7 +90,7 @@ namespace ClusterKit.Core
         /// </returns>
         public static Config GetStackedConfig(IWindsorContainer container, Config config)
         {
-            Log.Information("ClusterKit starting plugin manager");
+            Serilog.Log.Information("ClusterKit starting plugin manager");
 
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -115,11 +102,14 @@ namespace ClusterKit.Core
                 list.SelectMany(i => i.GetRoles())
                     .Distinct()
                     .Where(r => !string.IsNullOrWhiteSpace(r))
-                    .Select(r => $"\"{ r.Replace("\"", "\\\"") }\"").ToList();
+                    .Select(r => $"\"{r.Replace("\"", "\\\"")}\"")
+                    .ToList();
 
             if (rolesList.Any())
             {
-                config = config.WithFallback(ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
+                config =
+                    config.WithFallback(
+                        ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
             }
 
             return list.OrderByDescending(i => i.AkkaConfigLoadPriority)
@@ -153,7 +143,7 @@ namespace ClusterKit.Core
         /// The windsor container.
         /// </param>
         /// <param name="config">Full akka config</param>
-        public static void RunPrecheck(IWindsorContainer container, Config config)
+        public static void RunPreCheck(IWindsorContainer container, Config config)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -194,7 +184,7 @@ namespace ClusterKit.Core
         }
 
         /// <summary>
-        /// Should check the config and environment for possible erorrs.
+        /// Should check the config and environment for possible errors.
         /// If any found, shod throw the exception to prevent node from starting.
         /// </summary>
         /// <param name="config">Full akka config</param>

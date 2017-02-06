@@ -1,7 +1,16 @@
-﻿using System.Collections.Generic;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ConfigurationSourceTests.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Tests for ClusterKit.NodeManager.ConfigurationSource
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.NodeManager.Tests
 {
+    using System.Collections.Generic;
+
     using Akka.Configuration;
 
     using Castle.MicroKernel.SubSystems.Configuration;
@@ -49,23 +58,32 @@ namespace ClusterKit.NodeManager.Tests
             /// <returns>The list of installers</returns>
             public override List<BaseInstaller> GetPluginInstallers()
             {
-                var pluginInstallers = new List<BaseInstaller> { new Core.TestKit.Installer(), new TestInstaller(), new Core.Installer(), new NodeManager.ConfigurationSource.Installer() };
+                var pluginInstallers = new List<BaseInstaller>
+                                           {
+                                               new Core.TestKit.Installer(),
+                                               new TestInstaller(),
+                                               new Core.Installer(),
+                                               new ConfigurationSource.Installer()
+                                           };
                 return pluginInstallers;
             }
         }
 
         /// <summary>
-        /// Replaces production datasources with the test ones
+        /// Replaces production data sources with the test ones
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
+            /// <inheritdoc />
             protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
 
+            /// <inheritdoc />
             protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(@"
             {
                 ClusterKit.NodeManager.ConfigurationSeederType = ""Test.NodeTemplateSeeder, Test""
             }");
 
+            /// <inheritdoc />
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
             }

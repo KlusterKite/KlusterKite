@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Core.TestKit
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="NameSpaceForwarder.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   The namespace actor, that also forwards all it's messages to the test actor
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Core.TestKit
 {
     using System;
 
@@ -17,6 +26,9 @@
     [UsedImplicitly]
     public class NameSpaceForwarder : NameSpaceActor
     {
+        /// <summary>
+        /// The link to the actual test actor
+        /// </summary>
         private readonly IActorRef testActor;
 
         /// <summary>

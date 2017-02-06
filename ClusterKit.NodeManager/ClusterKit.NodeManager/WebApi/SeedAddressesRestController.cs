@@ -13,13 +13,18 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
-    using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Client;
+    using ClusterKit.NodeManager.Client.ORM;
+    using ClusterKit.Security.Client;
+    using ClusterKit.Web.Authorization.Attributes;
     using ClusterKit.Web.Rest;
 
     /// <summary>
     /// All rest actions with <see cref="SeedAddress"/>
     /// </summary>
     [RoutePrefix("api/1.x/clusterkit/nodemanager/seed")]
+    [RequireUser]
+    [RequireUserPrivilege(Privileges.SeedAddress, CombinePrivilegeWithActionName = true, Severity = EnSeverity.Crucial)]
     public class SeedAddressesRestController : BaseRestController<SeedAddress, int>
     {
         /// <summary>

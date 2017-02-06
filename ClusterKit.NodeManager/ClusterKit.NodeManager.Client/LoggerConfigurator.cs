@@ -11,13 +11,16 @@ namespace ClusterKit.NodeManager.Client
 {
     using Akka.Configuration;
 
-    using ClusterKit.Core;
+    using ClusterKit.Core.Log;
+
+    using JetBrains.Annotations;
 
     using Serilog;
 
     /// <summary>
     /// Logger configuration, that enriches logs with template name
     /// </summary>
+    [UsedImplicitly]
     public class LoggerConfigurator : ILoggerConfigurator
     {
         /// <summary>

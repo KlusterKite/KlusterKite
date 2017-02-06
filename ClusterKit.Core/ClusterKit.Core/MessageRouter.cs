@@ -39,7 +39,7 @@ namespace ClusterKit.Core
         }
 
         /// <summary>
-        /// Sends message to the specified actor path on the specified node. See also <see cref="Futures.Ask"/>
+        /// Sends message to the specified actor path on the specified node. See also <see cref="Futures.Ask(Akka.Actor.ICanTell,object,System.Nullable{System.TimeSpan})"/>
         /// </summary>
         /// <typeparam name="T">The type of awaited response</typeparam>
         /// <param name="nodeAddress">The node address.</param>

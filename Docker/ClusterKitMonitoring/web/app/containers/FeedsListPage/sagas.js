@@ -18,6 +18,7 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 
 function* feedsLoadSaga() {
   const result = yield call(getFeeds);
+  console.log('result', result);
   if (result != null) {
     yield put(feedsReceiveAction(result));
   }

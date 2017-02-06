@@ -26,7 +26,7 @@ namespace ClusterKit.Core.TestKit
         /// <summary>
         /// The list of actors that would receive all messages to the virtual node as <see cref="TestMessage{T}"/>
         /// </summary>
-        private readonly Dictionary<Address, IActorRef> registerdNodes = new Dictionary<Address, IActorRef>();
+        private readonly Dictionary<Address, IActorRef> registeredNodes = new Dictionary<Address, IActorRef>();
 
         /// <summary>
         /// Reference to the test actor
@@ -45,7 +45,7 @@ namespace ClusterKit.Core.TestKit
         }
 
         /// <summary>
-        /// Sends message to the specified actor path on the specified node. See also <see cref="Futures.Ask"/>
+        /// Sends message to the specified actor path on the specified node. See also <see cref="Futures.Ask(Akka.Actor.ICanTell,object,System.Nullable{System.TimeSpan})"/>
         /// </summary>
         /// <typeparam name="T">The type of awaited response</typeparam>
         /// <param name="nodeAddress">The node address.</param>
@@ -59,7 +59,7 @@ namespace ClusterKit.Core.TestKit
 
             IActorRef receiver;
 
-            if (this.registerdNodes.TryGetValue(nodeAddress, out receiver))
+            if (this.registeredNodes.TryGetValue(nodeAddress, out receiver))
             {
                 return receiver.Ask<T>(forwardedMessage, timeout);
             }
@@ -77,7 +77,7 @@ namespace ClusterKit.Core.TestKit
         [UsedImplicitly]
         public void RegisterVirtualNode(Address address, IActorRef receiver)
         {
-            this.registerdNodes[address] = receiver;
+            this.registeredNodes[address] = receiver;
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace ClusterKit.Core.TestKit
         {
             var forwardedMessage = CreateForwardedMessage(nodeAddress, path, message);
             IActorRef receiver;
-            if (this.registerdNodes.TryGetValue(nodeAddress, out receiver))
+            if (this.registeredNodes.TryGetValue(nodeAddress, out receiver))
             {
                 receiver.Tell(forwardedMessage, sender);
             }

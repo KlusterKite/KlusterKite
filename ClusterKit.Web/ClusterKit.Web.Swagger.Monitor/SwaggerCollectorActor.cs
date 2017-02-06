@@ -15,7 +15,6 @@ namespace ClusterKit.Web.Swagger.Monitor
 
     using Akka.Actor;
     using Akka.Cluster;
-    using Akka.Event;
     using Akka.Routing;
 
     using ClusterKit.Core.Utils;
@@ -29,25 +28,17 @@ namespace ClusterKit.Web.Swagger.Monitor
     [UsedImplicitly]
     public class SwaggerCollectorActor : ReceiveActor
     {
-        private readonly IActorRef watcher;
-
-        /// <summary>
-        /// List of workers to process requests
-        /// </summary>
-        private readonly IActorRef workers;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SwaggerCollectorActor"/> class.
         /// </summary>
         public SwaggerCollectorActor()
         {
-            //this.workers = Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(FromConfig.Instance), "workers");
-            this.workers = Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")), "workers");
-            this.watcher = Context.ActorOf(Props.Create(typeof(Watcher)));
+            var workers = Context.ActorOf(Props.Create(typeof(Worker)).WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")), "workers");
+            var watcher = Context.ActorOf(Props.Create(typeof(Watcher)));
 
-            this.Receive<SwaggerPublishDescription>(m => this.watcher.Forward(m));
-            this.Receive<ReadOnlyCollection<string>>(m => this.workers.Tell(new Broadcast(m)));
-            this.Receive<object>(m => this.workers.Forward(m));
+            this.Receive<SwaggerPublishDescription>(m => watcher.Forward(m));
+            this.Receive<ReadOnlyCollection<string>>(m => workers.Tell(new Broadcast(m)));
+            this.Receive<object>(m => workers.Forward(m));
         }
 
         /// <summary>

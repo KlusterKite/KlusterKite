@@ -7,8 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-// ReSharper disable ArrangeStaticMemberQualifier
-
 namespace ClusterKit.LargeObjects
 {
     using System;
@@ -50,6 +48,11 @@ namespace ClusterKit.LargeObjects
         private static readonly ConcurrentDictionary<Guid, Parcel> Parcels = new ConcurrentDictionary<Guid, Parcel>();
 
         /// <summary>
+        /// The list of parcel notification envelopers
+        /// </summary>
+        private readonly List<INotificationEnveloper> envelopers;
+
+        /// <summary>
         /// The tcp stream read timeout
         /// </summary>
         private readonly TimeSpan readTimeout;
@@ -65,6 +68,11 @@ namespace ClusterKit.LargeObjects
         private TcpListener listener;
 
         /// <summary>
+        /// Current listener task
+        /// </summary>
+        private Task listenerTask;
+
+        /// <summary>
         /// The local server port
         /// </summary>
         private int port;
@@ -75,16 +83,6 @@ namespace ClusterKit.LargeObjects
         private ActorSystem sys;
 
         /// <summary>
-        /// Current listener task
-        /// </summary>
-        private Task listenerTask;
-
-        /// <summary>
-        /// The list of parcel notification envelopers
-        /// </summary>
-        private List<INotificationEnveloper> envelopers;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ParcelManagerActor"/> class.
         /// </summary>
         /// <param name="container">
@@ -92,11 +90,14 @@ namespace ClusterKit.LargeObjects
         /// </param>
         public ParcelManagerActor(IWindsorContainer container)
         {
-            this.readTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.LargeObjects.TcpReadTimeout", TimeSpan.FromSeconds(10));
-            this.envelopers = container.ResolveAll(typeof(INotificationEnveloper))
-                .Cast<INotificationEnveloper>()
-                .OrderByDescending(e => e.Priority)
-                .ToList();
+            this.readTimeout = Context.System.Settings.Config.GetTimeSpan(
+                "ClusterKit.LargeObjects.TcpReadTimeout",
+                TimeSpan.FromSeconds(10));
+            this.envelopers =
+                container.ResolveAll(typeof(INotificationEnveloper))
+                    .Cast<INotificationEnveloper>()
+                    .OrderByDescending(e => e.Priority)
+                    .ToList();
             this.Receive<Parcel>(m => this.OnSetLargeObjectMessage(m));
             this.Receive<CleanUpMessage>(m => this.CleanUp());
         }
@@ -160,7 +161,12 @@ namespace ClusterKit.LargeObjects
             Parcels.Values.ForEach(this.SendNotification);
 
             var cleanUpInterval = TimeSpan.FromMinutes(1);
-            this.sys.Scheduler.ScheduleTellRepeatedly(cleanUpInterval, cleanUpInterval, this.Self, new CleanUpMessage(), this.Self);
+            this.sys.Scheduler.ScheduleTellRepeatedly(
+                cleanUpInterval,
+                cleanUpInterval,
+                this.Self,
+                new CleanUpMessage(),
+                this.Self);
         }
 
         /// <summary>
@@ -174,31 +180,6 @@ namespace ClusterKit.LargeObjects
             {
                 Parcel parcel;
                 Parcels.TryRemove(obsoleteMessage.Uid, out parcel);
-            }
-        }
-
-        /// <summary>
-        /// Processes incoming connections
-        /// </summary>
-        /// <returns>The async task</returns>
-        // ReSharper disable once UnusedMethodReturnValue.Local
-        private async Task Listen()
-        {
-            try
-            {
-                while (this.listener != null)
-                {
-                    var client = await this.listener?.AcceptTcpClientAsync();
-#pragma warning disable 4014
-                    if (client != null)
-                    {
-                        this.HandleConnection(client);
-                    }
-#pragma warning restore 4014
-                }
-            }
-            catch (ObjectDisposedException)
-            {
             }
         }
 
@@ -257,6 +238,43 @@ namespace ClusterKit.LargeObjects
         }
 
         /// <summary>
+        /// Processes incoming connections
+        /// </summary>
+        /// <returns>The async task</returns>
+        // ReSharper disable once UnusedMethodReturnValue.Local
+        private async Task Listen()
+        {
+            try
+            {
+                while (this.listener != null)
+                {
+                    var client = await this.listener?.AcceptTcpClientAsync();
+#pragma warning disable 4014
+                    if (client != null)
+                    {
+                        this.HandleConnection(client);
+                    }
+
+#pragma warning restore 4014
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Parcel"/> message
+        /// </summary>
+        /// <param name="parcel">The parcel</param>
+        private void OnSetLargeObjectMessage(Parcel parcel)
+        {
+            parcel.Sender = this.Sender;
+            Parcels[parcel.Uid] = parcel;
+            this.SendNotification(parcel);
+        }
+
+        /// <summary>
         /// Reads from the stream with provided timeout
         /// </summary>
         /// <param name="stream">The stream to read from</param>
@@ -276,7 +294,7 @@ namespace ClusterKit.LargeObjects
             var ct = tokenSource.Token;
 
             var task = stream.ReadAsync(buffer, offset, length, ct);
-            
+
             if (await Task.WhenAny(task, Task.Delay(timeout, ct)) == task)
             {
                 tokenSource.Cancel();
@@ -288,29 +306,19 @@ namespace ClusterKit.LargeObjects
         }
 
         /// <summary>
-        /// Handles the <see cref="Parcel"/> message
-        /// </summary>
-        /// <param name="parcel">The parcel</param>
-        private void OnSetLargeObjectMessage(Parcel parcel)
-        {
-            parcel.Sender = this.Sender;
-            Parcels[parcel.Uid] = parcel;
-            this.SendNotification(parcel);
-        }
-
-        /// <summary>
         /// Sends parcel notification
         /// </summary>
         /// <param name="parcel">The parcel</param>
         private void SendNotification(Parcel parcel)
         {
             var notification = new ParcelNotification
-            {
-                Host = this.host,
-                Port = this.port,
-                Uid = parcel.Uid,
-                PayloadTypeName = parcel.Payload.GetType().AssemblyQualifiedName
-            };
+                                   {
+                                       Host = this.host,
+                                       Port = this.port,
+                                       Uid = parcel.Uid,
+                                       PayloadTypeName =
+                                           parcel.Payload.GetType().AssemblyQualifiedName
+                                   };
 
             object envelope = null;
             foreach (var notificationEnveloper in this.envelopers)

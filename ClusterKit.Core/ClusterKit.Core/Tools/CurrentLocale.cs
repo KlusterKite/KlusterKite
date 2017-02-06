@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Core.Tools
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="CurrentLocale.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Helper class to set current thread culture. Will restore original culture on dispose.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Core.Tools
 {
     using System;
     using System.Globalization;
@@ -11,7 +20,14 @@
     /// </summary>
     public class CurrentLocale : IDisposable
     {
+        /// <summary>
+        /// Origin thread with modified locale
+        /// </summary>
         private readonly Thread localThread;
+
+        /// <summary>
+        /// Origin culture, before modification
+        /// </summary>
         private readonly CultureInfo originalCulture;
 
         /// <summary>

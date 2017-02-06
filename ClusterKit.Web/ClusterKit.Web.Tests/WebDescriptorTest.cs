@@ -16,14 +16,14 @@ namespace ClusterKit.Web.Tests
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
-    using Akka.DI.Core;
-
+    
     using Castle.Windsor;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Web.Client;
     using ClusterKit.Web.Client.Messages;
+    using ClusterKit.Web.Descriptor;
 
     using Xunit;
     using Xunit.Abstractions;

@@ -19,16 +19,11 @@ namespace ClusterKit.Web.Descriptor
     using JetBrains.Annotations;
 
     /// <summary>
-    /// Standard actor, that described current node web services to other nodes
+    /// Standard actor, that describes current node web services to other nodes
     /// </summary>
     [UsedImplicitly]
     public class WebDescriptorActor : ReceiveActor
     {
-        /// <summary>
-        /// Services, defined in config
-        /// </summary>
-        private readonly WebDescriptionResponse webDescription;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WebDescriptorActor"/> class.
         /// </summary>
@@ -80,8 +75,7 @@ namespace ClusterKit.Web.Descriptor
             }
 
             description.Services = services.AsReadOnly();
-            this.webDescription = description;
-            this.Receive<WebDescriptionRequest>(m => this.Sender.Tell(this.webDescription));
+            this.Receive<WebDescriptionRequest>(m => this.Sender.Tell(description));
         }
     }
 }

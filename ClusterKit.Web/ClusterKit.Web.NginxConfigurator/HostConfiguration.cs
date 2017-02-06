@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="HostConfiguration.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Nginx description of host configuration
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Web.NginxConfigurator
 {
     using System.Collections;
@@ -24,7 +33,7 @@ namespace ClusterKit.Web.NginxConfigurator
         }
 
         /// <summary>
-        /// Gets the additional configuration
+        /// Gets or sets the additional configuration
         /// </summary>
         public string Config { get; set; }
 
@@ -34,7 +43,7 @@ namespace ClusterKit.Web.NginxConfigurator
         public int Count => this.services.Count;
 
         /// <summary>
-        /// Gets or sets the virtual hostname to group services
+        /// Gets the virtual hostname of group services
         /// </summary>
         public string HostName { get; private set; }
 

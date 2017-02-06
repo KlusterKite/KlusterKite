@@ -1708,6 +1708,19 @@
             Configures the sinks that log events will be emitted to.
             </summary>
         </member>
+        <member name="P:Serilog.LoggerConfiguration.AuditTo">
+            <summary>
+            Configures sinks for auditing, instead of regular (safe) logging. When auditing is used,
+            exceptions from sinks and any intermediate filters propagate back to the caller. Most callers
+            should use <see cref="P:Serilog.LoggerConfiguration.WriteTo"/> instead.
+            </summary>
+            <remarks>
+            Not all sinks are compatible with transactional auditing requirements (many will use asynchronous
+            batching to improve write throughput and latency). Sinks need to opt-in to auditing support by
+            extending <see cref="T:Serilog.Configuration.LoggerAuditSinkConfiguration"/>, though the generic <see cref="M:Serilog.Configuration.LoggerAuditSinkConfiguration.Sink(Serilog.Core.ILogEventSink,Serilog.Events.LogEventLevel,Serilog.Core.LoggingLevelSwitch)"/>
+            method allows any sink class to be adapted for auditing. 
+            </remarks>
+        </member>
         <member name="P:Serilog.LoggerConfiguration.MinimumLevel">
             <summary>
             Configures the minimum level at which events will be passed to sinks. If
@@ -1756,6 +1769,60 @@
             Apply the settings to the logger configuration.
             </summary>
             <param name="loggerConfiguration">The logger configuration to apply settings to.</param>
+        </member>
+        <member name="T:Serilog.Configuration.LoggerAuditSinkConfiguration">
+            <summary>
+            Controls audit sink configuration.
+            </summary>
+        </member>
+        <member name="M:Serilog.Configuration.LoggerAuditSinkConfiguration.Sink(Serilog.Core.ILogEventSink,Serilog.Events.LogEventLevel,Serilog.Core.LoggingLevelSwitch)">
+            <summary>
+            Audit log events to the specified <see cref="T:Serilog.Core.ILogEventSink"/>.
+            </summary>
+            <param name="logEventSink">The sink.</param>
+            <param name="restrictedToMinimumLevel">The minimum level for
+            events passed through the sink. Ignored when <paramref name="levelSwitch"/> is specified.</param>
+            <param name="levelSwitch">A switch allowing the pass-through minimum level
+            to be changed at runtime.</param>
+            <returns>Configuration object allowing method chaining.</returns>
+        </member>
+        <member name="M:Serilog.Configuration.LoggerAuditSinkConfiguration.Sink``1(Serilog.Events.LogEventLevel,Serilog.Core.LoggingLevelSwitch)">
+            <summary>
+            Audit log events to the specified <see cref="T:Serilog.Core.ILogEventSink"/>.
+            </summary>
+            <typeparam name="TSink">The sink.</typeparam>
+            <param name="restrictedToMinimumLevel">The minimum level for
+            events passed through the sink. Ignored when <paramref name="levelSwitch"/> is specified.</param>
+            <param name="levelSwitch">A switch allowing the pass-through minimum level
+            to be changed at runtime.</param>
+            <returns>Configuration object allowing method chaining.</returns>
+        </member>
+        <member name="M:Serilog.Configuration.LoggerAuditSinkConfiguration.Logger(System.Action{Serilog.LoggerConfiguration},Serilog.Events.LogEventLevel,Serilog.Core.LoggingLevelSwitch)">
+            <summary>
+            Audit log events to a sub-logger, where further processing may occur. Events through
+            the sub-logger will be constrained by filters and enriched by enrichers that are
+            active in the parent. A sub-logger cannot be used to log at a more verbose level, but
+            a less verbose level is possible.
+            </summary>
+            <param name="configureLogger">An action that configures the sub-logger.</param>
+            <param name="restrictedToMinimumLevel">The minimum level for
+            events passed through the sink. Ignored when <paramref name="levelSwitch"/> is specified.</param>
+            <param name="levelSwitch">A switch allowing the pass-through minimum level
+            to be changed at runtime.</param>
+            <returns>Configuration object allowing method chaining.</returns>
+        </member>
+        <member name="M:Serilog.Configuration.LoggerAuditSinkConfiguration.Logger(Serilog.ILogger,Serilog.Events.LogEventLevel)">
+            <summary>
+            Audit log events to a sub-logger, where further processing may occur. Events through
+            the sub-logger will be constrained by filters and enriched by enrichers that are
+            active in the parent. A sub-logger cannot be used to log at a more verbose level, but
+            a less verbose level is possible.
+            </summary>
+            <param name="logger">The sub-logger. This will <em>not</em> be shut down automatically when the
+            parent logger is disposed.</param>
+            <param name="restrictedToMinimumLevel">The minimum level for
+            events passed through the sink.</param>
+            <returns>Configuration object allowing method chaining.</returns>
         </member>
         <member name="T:Serilog.Configuration.LoggerDestructuringConfiguration">
             <summary>
@@ -2009,7 +2076,7 @@
             events passed through the sink.</param>
             <returns>Configuration object allowing method chaining.</returns>
             <remarks>Provided for binary compatibility for earlier versions,
-            should be removed in 2.0. Not marked obsolete because warnings
+            should be removed in 3.0. Not marked obsolete because warnings
             would be syntactically annoying to avoid.</remarks>
         </member>
         <member name="M:Serilog.Configuration.LoggerSinkConfiguration.Sink(Serilog.Core.ILogEventSink,Serilog.Events.LogEventLevel,Serilog.Core.LoggingLevelSwitch)">
@@ -3860,6 +3927,16 @@
             Formats log events in a simple JSON structure. Instances of this class
             are safe for concurrent access by multiple threads.
             </summary>
+        </member>
+        <member name="M:Serilog.Formatting.Json.JsonFormatter.#ctor(System.String,System.Boolean,System.IFormatProvider)">
+            <summary>
+            Construct a <see cref="T:Serilog.Formatting.Json.JsonFormatter"/>.
+            </summary>
+            <param name="closingDelimiter">A string that will be written after each log event is formatted.
+            If null, <see cref="P:System.Environment.NewLine"/> will be used.</param>
+            <param name="renderMessage">If true, the message will be rendered and written to the output as a
+            property named RenderedMessage.</param>
+            <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         </member>
         <member name="M:Serilog.Formatting.Json.JsonFormatter.#ctor(System.Boolean,System.String,System.Boolean,System.IFormatProvider)">
             <summary>

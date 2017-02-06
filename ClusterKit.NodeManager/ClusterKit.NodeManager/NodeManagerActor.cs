@@ -24,7 +24,9 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Core.Utils;
     using ClusterKit.Data;
     using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
@@ -1100,6 +1102,13 @@ namespace ClusterKit.NodeManager
             this.Receive<CrudActionMessage<SeedAddress, int>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<NugetFeed>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<NugetFeed, int>>(m => this.workers.Forward(m));
+
+            this.Receive<AuthenticateUserWithCredentials>(m => this.workers.Forward(m));
+            this.Receive<AuthenticateUserWithUid>(m => this.workers.Forward(m));
+            this.Receive<CollectionRequest<User>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<User, Guid>>(m => this.workers.Forward(m));
+            this.Receive<CollectionRequest<Role>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<Role, Guid>>(m => this.workers.Forward(m));
         }
 
         /// <summary>
@@ -1217,16 +1226,20 @@ namespace ClusterKit.NodeManager
                 this.databaseName = databaseName;
                 this.contextFactory = contextFactory;
 
-                this.ReceiveAsync<CrudActionMessage<NodeTemplate, int>>(
-                    this.OnRequest);
-                this.ReceiveAsync<CrudActionMessage<SeedAddress, int>>(
-                    this.OnRequest);
-                this.ReceiveAsync<CrudActionMessage<NugetFeed, int>>(
-                    this.OnRequest);
+                this.ReceiveAsync<CrudActionMessage<NodeTemplate, int>>(this.OnRequest);
+                this.ReceiveAsync<CrudActionMessage<SeedAddress, int>>(this.OnRequest);
+                this.ReceiveAsync<CrudActionMessage<NugetFeed, int>>(this.OnRequest);
+                this.ReceiveAsync<CrudActionMessage<User, Guid>>(this.OnRequest);
+                this.ReceiveAsync<CrudActionMessage<Role, Guid>>(this.OnRequest);
 
                 this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
                 this.ReceiveAsync<CollectionRequest<SeedAddress>>(this.OnCollectionRequest<SeedAddress, int>);
                 this.ReceiveAsync<CollectionRequest<NugetFeed>>(this.OnCollectionRequest<NugetFeed, int>);
+                this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, int>);
+                this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, int>);
+
+                this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
+                this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);
             }
 
             /// <summary>
@@ -1256,6 +1269,66 @@ namespace ClusterKit.NodeManager
             protected override async Task<ConfigurationContext> GetContext()
             {
                 return await this.contextFactory.CreateContext(this.connectionString, this.databaseName);
+            }
+
+            /// <summary>
+            /// Authenticate user by it's credentials
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task AuthenticateUser(AuthenticateUserWithCredentials request)
+            {
+                using (var ds = await this.GetContext())
+                {
+                    var factory = DataFactory<ConfigurationContext, User, string>.CreateFactory(ds);
+                    try
+                    {
+                        var user = await factory.Get(request.Login);
+                        if (!user.HasValue || !user.Value.CheckPassword(request.Password))
+                        {
+                            this.Sender.Tell(CrudActionResponse<User>.Error(new EntityNotFoundException(), null));
+                        }
+
+                        this.Sender.Tell(CrudActionResponse<User>.Success(user, null));
+                    }
+                    catch (Exception exception)
+                    {
+                        this.Sender.Tell(
+                            CrudActionResponse<User>.Error(
+                                new DatasourceInnerException("Exception on AuthenticateUserWithCredentials operation", exception),
+                                null));
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Authenticate user by it's uid
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task AuthenticateUser(AuthenticateUserWithUid request)
+            {
+                using (var ds = await this.GetContext())
+                {
+                    var factory = DataFactory<ConfigurationContext, User, Guid>.CreateFactory(ds);
+                    try
+                    {
+                        var user = await factory.Get(request.Uid);
+                        if (!user.HasValue)
+                        {
+                            this.Sender.Tell(CrudActionResponse<User>.Error(new EntityNotFoundException(), null));
+                        }
+
+                        this.Sender.Tell(CrudActionResponse<User>.Success(user, null));
+                    }
+                    catch (Exception exception)
+                    {
+                        this.Sender.Tell(
+                            CrudActionResponse<User>.Error(
+                                new DatasourceInnerException("Exception on AuthenticateUserWithCredentials operation", exception),
+                                null));
+                    }
+                }
             }
         }
     }

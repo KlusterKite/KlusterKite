@@ -47,7 +47,7 @@ namespace ClusterKit.Core.Tests.Ping
             var now = DateTime.UtcNow;
             var address = Cluster.Get(this.Sys).SelfAddress;
 
-            this.Sys.ActorSelection($"{address.ToString()}/user/Core/Ping").Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(200));
+            this.Sys.ActorSelection($"{address}/user/Core/Ping").Ask<PongMessage>(new PingMessage(), TimeSpan.FromMilliseconds(200));
             var elapsed = (DateTime.UtcNow - now).TotalMilliseconds;
             this.Sys.Log.Info("Ping in {0}ms", elapsed);
         }

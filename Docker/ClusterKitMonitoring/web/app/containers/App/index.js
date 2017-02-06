@@ -19,7 +19,9 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Nav from 'react-bootstrap/lib/Nav';
 import NavItem from 'react-bootstrap/lib/NavItem';
 import config from '../../config';
+import { hasPrivilege } from '../../utils/privileges';
 
+import Cookies from 'js-cookie';
 
 import styles from './styles.css';
 
@@ -30,6 +32,8 @@ export default class App extends React.Component { // eslint-disable-line react/
   };
 
   render() {
+    const username = this.getUsername();
+
     return (
       <div className={styles.app}>
 
@@ -44,21 +48,36 @@ export default class App extends React.Component { // eslint-disable-line react/
             <Navbar.Toggle />
           </Navbar.Header>
 
-          <Navbar.Collapse eventKey={0}>
+          <Navbar.Collapse>
             <Nav navbar>
-              <LinkContainer to="/clusterkit/templates">
-                <NavItem eventKey={1}>Templates</NavItem>
-              </LinkContainer>
-              <LinkContainer to="/clusterkit/nugetfeeds">
-                <NavItem eventKey={2}>Nuget Feeds</NavItem>
-              </LinkContainer>
-              <LinkContainer to="/clusterkit/packages">
-                <NavItem eventKey={3}>Packages</NavItem>
-              </LinkContainer>
-              <LinkContainer to="/clusterkit/actorsTree">
-                <NavItem eventKey={4}>Actors tree</NavItem>
-              </LinkContainer>
+              {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.GetList') &&
+                <LinkContainer to="/clusterkit/templates">
+                  <NavItem>Templates</NavItem>
+                </LinkContainer>
+              }
+              {hasPrivilege('ClusterKit.NodeManager.NugetFeed.GetList') &&
+                <LinkContainer to="/clusterkit/nugetfeeds">
+                  <NavItem>Nuget Feeds</NavItem>
+                </LinkContainer>
+              }
+              {hasPrivilege('ClusterKit.NodeManager.GetPackages') &&
+                <LinkContainer to="/clusterkit/packages">
+                  <NavItem>Packages</NavItem>
+                </LinkContainer>
+              }
+              {hasPrivilege('ClusterKit.Monitoring.GetClusterTree') &&
+                <LinkContainer to="/clusterkit/actorsTree">
+                  <NavItem>Actors tree</NavItem>
+                </LinkContainer>
+              }
             </Nav>
+            {username &&
+              <Nav pullRight>
+                <LinkContainer to="/clusterkit/logout">
+                  <NavItem href="#">Logout ({username})</NavItem>
+                </LinkContainer>
+              </Nav>
+            }
           </Navbar.Collapse>
         </Navbar>
 
@@ -67,5 +86,21 @@ export default class App extends React.Component { // eslint-disable-line react/
         </div>
       </div>
     );
+  }
+
+  /**
+   * Gets current authorized username from Cookies
+   * @return {string} username
+   */
+  getUsername() {
+    const refreshToken = Cookies.get('refreshToken');
+    let username = null;
+    if (refreshToken) {
+      username = Cookies.get('username');
+      if (!username) {
+        username = 'user';
+      }
+    }
+    return username;
   }
 }

@@ -13,12 +13,8 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
-    using System.Reflection;
-    using System.Xml;
-    using System.Xml.Serialization;
 
     using ClusterKit.NodeManager.Launcher.Messages;
-
 
     using Newtonsoft.Json;
 
@@ -56,20 +52,14 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
                 return;
             }
 
-
-
-
             var description = JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(fileName));
-
 
             var installedMetadata = 
                 args
                 .Skip(1)
                 .SelectMany(d => Directory.GetFiles(d, "*.nupkg", SearchOption.AllDirectories))
                 .Select(GetMetadata)
-                .Where(m => m!= null).ToList();
-
-
+                .Where(m => m != null).ToList();
 
             var localPackages = installedMetadata
                 .Where(rp => description.Packages.Any(lp => lp.Id == rp.Id))
@@ -81,7 +71,8 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
             {
                 Console.WriteLine($"\t{package.Id} {package.Version}");
             }
-            Console.WriteLine("");
+
+            Console.WriteLine(string.Empty);
 
             var allDependencies = localPackages
                 .SelectMany(p => p.DependencySets)
@@ -115,6 +106,11 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
             File.WriteAllText(fileName, JsonConvert.SerializeObject(description, Formatting.Indented));
         }
 
+        /// <summary>
+        /// Gets the package metadata
+        /// </summary>
+        /// <param name="packageName">The package name</param>
+        /// <returns>The package metadata</returns>
         private static ManifestMetadata GetMetadata(string packageName)
         {
             using (var file = File.OpenRead(packageName))
@@ -126,13 +122,12 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
                     Console.WriteLine($"Could not find metadata for package {packageName}");
                     return null;
                 }
+
                 using (var stream = nuspecFile.Open())
                 {
                     return Manifest.ReadFrom(stream, false).Metadata;
                 }
             }
         }
-
-
     }
 }

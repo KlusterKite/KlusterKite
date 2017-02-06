@@ -12,6 +12,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using System.Data.Common;
     using System.Data.Entity;
 
+    using ClusterKit.NodeManager.Client.ORM;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -63,5 +65,17 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         [UsedImplicitly]
         public virtual DbSet<NodeTemplate> Templates { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of web API users
+        /// </summary>
+        [UsedImplicitly]
+        public virtual DbSet<User> Users { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of web API user roles
+        /// </summary>
+        [UsedImplicitly]
+        public virtual DbSet<Role> Roles { get; set; }
     }
 }

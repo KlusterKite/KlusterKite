@@ -63,7 +63,7 @@ namespace ClusterKit.Core.Monads
         /// </summary>
         /// <param name="left">Left wrapper</param>
         /// <param name="right">Right wrapper</param>
-        /// <returns>Whether theese to wrappers are not equal</returns>
+        /// <returns>Whether these to wrappers are not equal</returns>
         public static bool operator !=(Maybe<T> left, Maybe<T> right)
         {
             return !left.Equals(right);
@@ -74,7 +74,7 @@ namespace ClusterKit.Core.Monads
         /// </summary>
         /// <param name="left">Left wrapper</param>
         /// <param name="right">Right wrapper</param>
-        /// <returns>Whether theese to wrappers are equal</returns>
+        /// <returns>Whether these to wrappers are equal</returns>
         public static bool operator ==(Maybe<T> left, Maybe<T> right)
         {
             return left.Equals(right);
@@ -84,7 +84,7 @@ namespace ClusterKit.Core.Monads
         /// Equals for two wrappers
         /// </summary>
         /// <param name="other">Wrapper to compare</param>
-        /// <returns>Whether theese to wrappers are equal</returns>
+        /// <returns>Whether these to wrappers are equal</returns>
         [UsedImplicitly]
         public bool Equals(Maybe<T> other)
         {

@@ -27,6 +27,8 @@ namespace ClusterKit.Core.Service
     using Castle.MicroKernel.Resolvers.SpecializedResolvers;
     using Castle.Windsor;
 
+    using ClusterKit.Core.Log;
+
     using CommonServiceLocator.WindsorAdapter;
 
     using JetBrains.Annotations;
@@ -83,7 +85,7 @@ namespace ClusterKit.Core.Service
             LogEventLevel level;
             if (!Enum.TryParse(config.GetString("ClusterKit.Log.minimumLevel"), true, out level))
             {
-                level = LogEventLevel.Information;
+                level = LogEventLevel.Verbose;
             }
 
             var loggerConfig = new LoggerConfiguration().MinimumLevel.Is(level);
@@ -108,7 +110,7 @@ namespace ClusterKit.Core.Service
             // log configuration finished
 
             // performing prestart checks
-            BaseInstaller.RunPrecheck(container, config);
+            BaseInstaller.RunPreCheck(container, config);
 
             // starting Akka system
             Console.WriteLine(@"starting akka system");

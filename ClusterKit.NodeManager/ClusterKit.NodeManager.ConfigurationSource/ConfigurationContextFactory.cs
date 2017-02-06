@@ -18,6 +18,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using ClusterKit.Data;
     using ClusterKit.Data.EF;
+    using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
 

@@ -9,7 +9,6 @@
 
 namespace ClusterKit.Log.ElasticSearch
 {
-    using Akka.Actor;
     using Akka.Configuration;
 
     using Castle.MicroKernel.Registration;
@@ -17,6 +16,7 @@ namespace ClusterKit.Log.ElasticSearch
     using Castle.Windsor;
 
     using ClusterKit.Core;
+    using ClusterKit.Core.Log;
 
     /// <summary>
     /// Installing components from current library
@@ -27,7 +27,7 @@ namespace ClusterKit.Log.ElasticSearch
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
         /// Gets default akka configuration for current module

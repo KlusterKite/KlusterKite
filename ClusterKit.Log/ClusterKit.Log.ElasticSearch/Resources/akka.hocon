@@ -1,14 +1,30 @@
 ﻿{
 	ClusterKit.Log.ElasticSearch {
-		# you can use 'none' value or any other invalid valu to disable console log
-		# this level should be no lower then "ClusterKit.Log.minimumLevel" (that is "information" by default)
+		# you can use 'none' value or any other invalid value to disable log
+		# this level should be no lower then "ClusterKit.Log.minimumLevel" (that is "Verbose" by default)
 		minimumLevel = "Information"
 
-		#the list of connection urls
+		#the list of connection urls for standard log
 		nodes = [ "http://elk:9200/" ]
 
-		typeName = "ClusterKitLog"
-
+		#the index format for standard log
 		indexFormat = "logstash-{0:yyyy.MM.dd}"
+
+		# you can use 'none' value or any other invalid value to disable log
+		# this level should be no lower then "ClusterKit.Log.minimumLevel" (that is "Verbose" by default)
+		# Usialy log level of security log defined as:
+		# - Verbose  - none
+		# - Debug - for read access of non crucial data
+		# - Information - for read access of crucial data and any data updates or other successfull actions. Also all successfull logins (token grants) are recorded here
+		# - Warning - all unsuccessfull logins
+		# - Error - for any access denials
+		# - Fatal - none
+		securityMinimumLevel = "Information"
+
+		#the list of connection urls for standard log
+		securityNodes = [ "http://elk:9200/" ]
+
+		#the index format for standard log
+		securityIndexFormat = "security-{0:yyyy.MM.dd}"
 	}	
 }

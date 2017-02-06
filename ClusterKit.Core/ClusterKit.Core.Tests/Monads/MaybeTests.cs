@@ -9,6 +9,8 @@
 
 namespace ClusterKit.Core.Tests.Monads
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using ClusterKit.Core.Monads;
 
     using Xunit;
@@ -21,6 +23,7 @@ namespace ClusterKit.Core.Tests.Monads
         /// <summary>
         /// Tests equality operators
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1216:NoValueFirstComparison", Justification = "Reviewed. Suppression is OK here.")]
         [Fact]
         public void EqualTests()
         {

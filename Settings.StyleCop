@@ -1,15 +1,18 @@
 <StyleCopSettings Version="105">
   <GlobalSettings>
-    <StringProperty Name="Culture">en-US</StringProperty>
     <CollectionProperty Name="RecognizedWords">
+      <Value>Auth</Value>
+      <Value>Authorizer</Value>
       <Value>api</Value>
       <Value>akka</Value>
       <Value>crud</Value>
       <Value>datasource</Value>
       <Value>dbset</Value>
       <Value>ef</Value>
+      <Value>json</Value>
       <Value>hocon</Value>
       <Value>Xunit</Value>
+      <Value>OAuth</Value>
       <Value>redis</Value>
       <Value>serilog</Value>
       <Value>Sharding</Value>
@@ -21,9 +24,12 @@
       <Value>nginx</Value>
       <Value>Npgsql</Value>
       <Value>nuget</Value>
+      <Value>nuspec</Value>
       <Value>ui</Value>
       <Value>uid</Value>
       <Value>urls</Value>
+      <Value>untyped</Value>
+      <Value>web-api</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>
@@ -32,6 +38,16 @@
         <StringProperty Name="CompanyName">ClusterKit</StringProperty>
         <StringProperty Name="Copyright">All rights reserved</StringProperty>
       </AnalyzerSettings>
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.CSharp.ReadabilityRules">
+      <Rules>
+        <Rule Name="PrefixCallsCorrectly">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+      </Rules>
+      <AnalyzerSettings />
     </Analyzer>
   </Analyzers>
 </StyleCopSettings>

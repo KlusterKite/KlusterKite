@@ -13,7 +13,7 @@ namespace ClusterKit.Log.Console
 
     using Akka.Configuration;
 
-    using ClusterKit.Core;
+    using ClusterKit.Core.Log;
 
     using JetBrains.Annotations;
 

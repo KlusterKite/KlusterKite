@@ -1,4 +1,13 @@
-﻿namespace ClusterKit.Core.TestKit
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Installer.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Installing components from current library
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.Core.TestKit
 {
     using Akka.Actor;
     using Akka.Configuration;
@@ -16,7 +25,7 @@
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClusterRole;
+        protected override decimal AkkaConfigLoadPriority => PriorityClusterRole;
 
         /// <summary>
         /// Gets default akka configuration for current module

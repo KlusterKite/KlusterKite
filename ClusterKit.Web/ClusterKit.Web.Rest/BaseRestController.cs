@@ -11,7 +11,9 @@ namespace ClusterKit.Web.Rest
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
 
@@ -23,6 +25,8 @@ namespace ClusterKit.Web.Rest
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects;
     using ClusterKit.LargeObjects.Client;
+    using ClusterKit.Security.Client;
+    using ClusterKit.Web.Authorization;
 
     using JetBrains.Annotations;
 
@@ -36,7 +40,8 @@ namespace ClusterKit.Web.Rest
     /// The type of object identity field
     /// </typeparam>
     [UsedImplicitly]
-    public abstract class BaseRestController<TObject, TId> : ApiController where TObject : class
+    public abstract class BaseRestController<TObject, TId> : ApiController
+        where TObject : class
     {
         /// <summary>
         /// Initializes static members of the <see cref="BaseRestController{TObject,TId}"/> class.
@@ -62,6 +67,7 @@ namespace ClusterKit.Web.Rest
         /// Gets a value indicating whether the individual data stored in entity is large enough to be send via parcels.
         /// </summary>
         [UsedImplicitly]
+
         // ReSharper disable once StaticMemberInGenericType
         protected static bool DataIsLarge { get; private set; }
 
@@ -95,7 +101,14 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Create(TObject data)
         {
-            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Create, Data = data };
+            var request = new CrudActionMessage<TObject, TId>
+                              {
+                                  ActionType = EnActionType.Create,
+                                  Data = data,
+                                  RequestDescription =
+                                      this.Request.GetOwinContext()
+                                          .GetRequestDescription()
+                              };
             return await this.SendRequest(request);
         }
 
@@ -109,7 +122,14 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Delete(TId id)
         {
-            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Delete, Id = id };
+            var request = new CrudActionMessage<TObject, TId>
+                              {
+                                  ActionType = EnActionType.Delete,
+                                  Id = id,
+                                  RequestDescription =
+                                      this.Request.GetOwinContext()
+                                          .GetRequestDescription()
+                              };
             return await this.SendRequest(request);
         }
 
@@ -123,8 +143,25 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Get(TId id)
         {
-            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Get, Id = id };
-            return await this.SendRequest(request);
+            var request = new CrudActionMessage<TObject, TId>
+                              {
+                                  ActionType = EnActionType.Get,
+                                  Id = id,
+                                  RequestDescription =
+                                      this.Request.GetOwinContext()
+                                          .GetRequestDescription()
+                              };
+            var response = await this.SendRequest(request);
+
+            SecurityLog.CreateRecord(
+                SecurityLog.EnType.DataReadGranted,
+                response is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
+                this.Request.GetOwinContext().GetRequestDescription(),
+                "{ObjectType} with id {ObjectId} was read.",
+                typeof(TObject).FullName,
+                id);
+
+            return response;
         }
 
         /// <summary>
@@ -144,24 +181,39 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<List<TObject>> GetList(int count = 100, int skip = 0)
         {
-            var collectionRequest = new CollectionRequest<TObject> { Count = count, Skip = skip };
+            var collectionRequest = new CollectionRequest<TObject>
+                                        {
+                                            Count = count,
+                                            Skip = skip,
+                                            RequestDescription =
+                                                this.Request.GetOwinContext()
+                                                    .GetRequestDescription()
+                                        };
 
+            List<TObject> objects;
             if (this.DataListIsLarge || DataIsLarge)
             {
                 collectionRequest.AcceptAsParcel = true;
                 var notification =
-                    await
-                        this.System.ActorSelection(this.GetDbActorProxyPath())
-                            .Ask<ParcelNotification>(collectionRequest, this.AkkaTimeout);
-
-                return (List<TObject>)await notification.Receive(this.System);
+                    await this.System.ActorSelection(this.GetDbActorProxyPath())
+                        .Ask<ParcelNotification>(collectionRequest, this.AkkaTimeout);
+                objects = (List<TObject>)await notification.Receive(this.System);
+            }
+            else
+            {
+                collectionRequest.AcceptAsParcel = false;
+                objects = await this.System.ActorSelection(this.GetDbActorProxyPath())
+                           .Ask<List<TObject>>(collectionRequest, this.AkkaTimeout);
             }
 
-            collectionRequest.AcceptAsParcel = false;
-            return
-                await
-                    this.System.ActorSelection(this.GetDbActorProxyPath())
-                        .Ask<List<TObject>>(collectionRequest, this.AkkaTimeout);
+            SecurityLog.CreateRecord(
+                SecurityLog.EnType.DataReadGranted,
+                typeof(TObject).GetInterfaces().Any(i => i == typeof(ICrucialObject)) ? EnSeverity.Crucial : EnSeverity.Trivial,
+                this.Request.GetOwinContext().GetRequestDescription(),
+                "The list of {ObjectType} was read.",
+                typeof(TObject).FullName);
+
+            return objects;
         }
 
         /// <summary>
@@ -177,7 +229,15 @@ namespace ClusterKit.Web.Rest
         [UsedImplicitly]
         public virtual async Task<TObject> Update([FromUri] TId id, [FromBody] TObject data)
         {
-            var request = new CrudActionMessage<TObject, TId> { ActionType = EnActionType.Update, Data = data, Id = id };
+            var request = new CrudActionMessage<TObject, TId>
+                              {
+                                  ActionType = EnActionType.Update,
+                                  Data = data,
+                                  Id = id,
+                                  RequestDescription =
+                                      this.Request.GetOwinContext()
+                                          .GetRequestDescription()
+                              };
             return await this.SendRequest(request);
         }
 
@@ -198,27 +258,26 @@ namespace ClusterKit.Web.Rest
             if (DataIsLarge)
             {
                 var notification = request.ActionType == EnActionType.Get
-                    ? await 
-                        this.System.ActorSelection(this.GetDbActorProxyPath())
-                            .Ask<ParcelNotification>(request, this.AkkaTimeout)
-                    : await
-                        this.System.GetParcelManager()
-                            .Ask<ParcelNotification>(
-                                new Parcel
-                                {
-                                    Payload = request,
-                                    Recipient = this.System.ActorSelection(this.GetDbActorProxyPath())
-                                },
-                                this.AkkaTimeout);
+                                       ? await this.System.ActorSelection(this.GetDbActorProxyPath())
+                                             .Ask<ParcelNotification>(request, this.AkkaTimeout)
+                                       : await this.System.GetParcelManager()
+                                             .Ask<ParcelNotification>(
+                                                 new Parcel
+                                                     {
+                                                         Payload = request,
+                                                         Recipient =
+                                                             this.System.ActorSelection(
+                                                                 this.GetDbActorProxyPath())
+                                                     },
+                                                 this.AkkaTimeout);
 
                 result = (CrudActionResponse<TObject>)await notification.Receive(this.System);
             }
             else
             {
                 result =
-                    await
-                        this.System.ActorSelection(this.GetDbActorProxyPath())
-                            .Ask<CrudActionResponse<TObject>>(request, this.AkkaTimeout);
+                    await this.System.ActorSelection(this.GetDbActorProxyPath())
+                        .Ask<CrudActionResponse<TObject>>(request, this.AkkaTimeout);
             }
 
             if (result.Exception != null && result.Exception.GetType() != typeof(EntityNotFoundException))
