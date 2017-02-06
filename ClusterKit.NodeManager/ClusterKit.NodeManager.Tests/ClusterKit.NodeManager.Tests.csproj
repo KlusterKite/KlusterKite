@@ -198,8 +198,6 @@
       <HintPath>..\..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Diagnostics.DiagnosticSource">
@@ -211,13 +209,11 @@
       <HintPath>..\..\packages\System.IO.Compression.4.3.0\lib\net46\System.IO.Compression.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
       <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
@@ -239,11 +235,7 @@
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
       <Private>True</Private>
@@ -266,67 +258,39 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj">
       <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
       <Name>ClusterKit.Core.TestKit</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj">
-      <Project>{7DE19EFC-58C5-4DBF-8A2A-E81E54AF5623}</Project>
-      <Name>ClusterKit.LargeObjects.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
-      <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
-      <Name>ClusterKit.LargeObjects</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj">
       <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
       <Name>ClusterKit.Data.CRUD</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data/ClusterKit.Data.csproj">
       <Project>{0D6871D1-5A69-4533-BA4B-073B876232C5}</Project>
       <Name>ClusterKit.Data</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.TestKit/ClusterKit.Data.TestKit.csproj">
       <Project>{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}</Project>
       <Name>ClusterKit.Data.TestKit</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF/ClusterKit.Data.EF.csproj">
       <Project>{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}</Project>
       <Name>ClusterKit.Data.EF</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF.TestKit/ClusterKit.Data.EF.TestKit.csproj">
       <Project>{6D78C999-7A74-488B-A55D-919C593197CA}</Project>
       <Name>ClusterKit.Data.EF.TestKit</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF.Npgsql/ClusterKit.Data.EF.Npgsql.csproj">
       <Project>{452AA14F-7657-49D2-8DA5-6A3058821217}</Project>
       <Name>ClusterKit.Data.EF.Npgsql</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj">
-      <Project>{8E543EA4-65DE-475F-8045-C094CDE58E29}</Project>
-      <Name>ClusterKit.Web.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Descriptor/ClusterKit.Web.Descriptor.csproj">
-      <Project>{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}</Project>
-      <Name>ClusterKit.Web.Descriptor</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj">
-      <Project>{477B201A-A30C-4360-B56A-6F61C049BB04}</Project>
-      <Name>ClusterKit.Web</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Rest/ClusterKit.Web.Rest.csproj">
-      <Project>{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}</Project>
-      <Name>ClusterKit.Web.Rest</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Authorization/ClusterKit.Web.Authorization.csproj">
-      <Project>{6ADFBDDF-E452-46FC-A037-6D57300BE561}</Project>
-      <Name>ClusterKit.Web.Authorization</Name>
-    </ProjectReference>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationSourceTests.cs" />
@@ -339,10 +303,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.NodeManager.Authentication\ClusterKit.NodeManager.Authentication.csproj">
-      <Project>{be29df8b-b7d9-4dee-8229-43ea6772df63}</Project>
-      <Name>ClusterKit.NodeManager.Authentication</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
       <Project>{983daeb9-b058-41a9-8403-29851f2244b7}</Project>
       <Name>ClusterKit.NodeManager.Client</Name>
