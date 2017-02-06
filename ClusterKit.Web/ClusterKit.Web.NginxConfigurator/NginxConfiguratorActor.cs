@@ -192,9 +192,6 @@ namespace ClusterKit.Web.NginxConfigurator
                 serviceConfig.Append("\t\tproxy_set_header Host $http_host;\n");
             }
 
-            serviceConfig.Append("\t\tproxy_set_header OriginalHost $http_host;\n");
-            serviceConfig.Append("\t\tproxy_set_header OriginalUri $request_uri;\n");
-
             host[serviceName].Config = serviceConfig.ToString();
         }
 
@@ -350,6 +347,8 @@ namespace ClusterKit.Web.NginxConfigurator
                         config.Append("\t\t sub_filter_types text/json; \n");
                         config.Append("\t\t sub_filter_types application/xml; \n");
                         config.Append("\t\t sub_filter_types application/json; \n");
+                        config.Append("\t\t proxy_set_header OriginalHost $http_host;\n");
+                        config.Append("\t\t proxy_set_header OriginalUri $request_uri;\n");
                     }
 
                     config.Append("\t}\n");
