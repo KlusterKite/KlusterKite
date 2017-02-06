@@ -7,6 +7,7 @@ export default class Input extends Component {
     name: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     size: PropTypes.string,
+    type: PropTypes.string,
   }
 
   /**
@@ -29,13 +30,14 @@ export default class Input extends Component {
 
   render() {
     const { name, input, meta, label } = this.props;
+    const type = this.props.type ? this.props.type : 'text';
     const classSize = this.getSizeClassName();
 
     return (
       <div className="row">
         <div className={`form-group${classSize}${(meta.error && meta.touched ? ' has-error' : '')}`}>
           <label htmlFor={name}>{label}</label>
-          <input type="text" className="form-control" id={name} {...input} />
+          <input type={type} className="form-control" id={name} {...input} />
           {meta.error && meta.touched && <div className="text-danger">{meta.error}</div>}
         </div>
       </div>

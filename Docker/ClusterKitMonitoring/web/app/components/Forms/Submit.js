@@ -8,10 +8,12 @@ export default class Submit extends Component { // eslint-disable-line react/pre
     saved: PropTypes.bool,
     saveError: PropTypes.string,
     valid: PropTypes.bool.isRequired,
+    savedText: PropTypes.string,
   }
 
   render() {
-    const { onClick, text, saving, saveError, saved, valid } = this.props;
+    const { onClick, text, saving, saveError, saved, valid, savedText } = this.props;
+    const savedTextStr = savedText != null ? savedText : 'Saved';
 
     let saveClassName = 'fa fa-refresh';
     if (saving) {
@@ -19,7 +21,7 @@ export default class Submit extends Component { // eslint-disable-line react/pre
     }
 
     return (
-      <div className="col-xs-12 form-group">
+      <div className="form-group">
         {saveError &&
           <div className="alert alert-danger" role="alert">
             <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -32,7 +34,7 @@ export default class Submit extends Component { // eslint-disable-line react/pre
           <div className="alert alert-success" role="alert">
             <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
             {' '}
-            Saved
+            {savedTextStr}
           </div>
         }
 

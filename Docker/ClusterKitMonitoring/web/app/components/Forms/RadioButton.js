@@ -7,7 +7,7 @@ export default class RadioButton extends Component { // eslint-disable-line reac
     input: PropTypes.object.isRequired,
     meta: PropTypes.object.isRequired,
     label: PropTypes.string.isRequired,
-    options: PropTypes.arrayOf(PropTypes.string),
+    options: PropTypes.object,
   }
 
   render() {
@@ -18,7 +18,7 @@ export default class RadioButton extends Component { // eslint-disable-line reac
         <label>{label}</label>
         <div className={`form-group${(meta.error && meta.touched ? ' has-error' : '')}`}>
           {Object.keys(options).map((key) =>
-            <label><Field name={name} component="input" type="radio" value={key} checked={input.value == key} /> {options[key]}&nbsp;</label> // eslint-disable-line eqeqeq
+            <label key={key}><Field name={name} component="input" type="radio" value={key} checked={input.value == key} /> {options[key]}&nbsp;</label> // eslint-disable-line eqeqeq
           )}
           {meta.error && meta.touched && <div className="text-danger">{meta.error}</div>}
         </div>

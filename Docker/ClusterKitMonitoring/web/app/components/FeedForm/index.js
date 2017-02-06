@@ -17,7 +17,7 @@ export default class FeedForm extends Component {
     handleSubmit: PropTypes.func.isRequired,
     pristine: PropTypes.bool.isRequired,
     submitting: PropTypes.bool.isRequired,
-    error: PropTypes.string.isRequired,
+    error: PropTypes.string,
     submitSucceeded: PropTypes.bool.isRequired,
     valid: PropTypes.bool.isRequired,
   }
