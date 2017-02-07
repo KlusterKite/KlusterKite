@@ -37,6 +37,11 @@ namespace ClusterKit.Build
         private static List<ProjectDescription> definedProjectDescriptions = new List<ProjectDescription>();
 
         /// <summary>
+        /// The defined solution name
+        /// </summary>
+        private static string definedSolutionName = "global";
+
+        /// <summary>
         /// Gets temporary directory to store clean builds of projects
         /// </summary>
         public static string BuildClean { get; private set; }
@@ -87,6 +92,21 @@ namespace ClusterKit.Build
         public static void DefineProjects(IEnumerable<ProjectDescription> projects)
         {
             definedProjectDescriptions = projects.ToList();
+        }
+
+        /// <summary>
+        /// Defines the solution name
+        /// </summary>
+        /// <param name="solutionName">The solution name</param>
+        [UsedImplicitly]
+        public static void DefineSolutionName([NotNull] string solutionName)
+        {
+            if (string.IsNullOrWhiteSpace(solutionName))
+            {
+                throw new ArgumentNullException(nameof(solutionName));
+            }
+
+            definedSolutionName = solutionName;
         }
 
         /// <summary>
@@ -603,7 +623,11 @@ namespace ClusterKit.Build
         /// <param name="projects">The list of projects</param>
         public static void CreateGlobalSolution(IEnumerable<ProjectDescription> projects)
         {
-            using (var writer = File.CreateText(Path.Combine(BuildDirectory, "global.sln")))
+            var fileName = definedSolutionName.IndexOf(".sln", StringComparison.InvariantCultureIgnoreCase) >= 0
+                               ? definedSolutionName
+                               : $"{definedSolutionName}.sln";
+
+            using (var writer = File.CreateText(Path.Combine(BuildDirectory, fileName)))
             {
                 writer.Write($@"
 Microsoft Visual Studio Solution File, Format Version 12.00
@@ -683,7 +707,7 @@ EndGlobal
 
             File.Copy(
                 Path.Combine(BuildDirectory, "..", "global.sln.DotSettings"),
-                Path.Combine(BuildDirectory, "global.sln.DotSettings"),
+                Path.Combine(BuildDirectory, $"{fileName}.DotSettings"),
                 true);
         }
 

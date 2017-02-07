@@ -2,6 +2,8 @@
 
 open  ClusterKit.Build
 
+BuildUtils.DefineSolutionName "ClusterKit"
+
 let projects = [|
     new ProjectDescription("ClusterKit.Core", "./ClusterKit.Core/ClusterKit.Build/ClusterKit.Build.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("ClusterKit.Core", "./ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj", ProjectDescription.EnProjectType.NugetPackage)
