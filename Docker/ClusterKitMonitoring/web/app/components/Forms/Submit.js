@@ -38,7 +38,7 @@ export default class Submit extends Component { // eslint-disable-line react/pre
           </div>
         }
 
-        <button type="button" className="btn btn-primary btn-lg" onClick={onClick} disabled={!valid}>
+        <button type="submit" className="btn btn-primary btn-lg" onClick={onClick} disabled={!valid}>
           <i className={saveClassName} /> {' '} {text}
         </button>
       </div>

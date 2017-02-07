@@ -26,7 +26,7 @@ export class HomePage extends Component { // eslint-disable-line react/prefer-st
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     nodeDescriptions: PropTypes.array.isRequired,
-    swaggerLinks: PropTypes.array.isRequired,
+    swaggerLinks: PropTypes.array,
     templates: PropTypes.array.isRequired,
     hasError: PropTypes.bool.isRequired,
   }

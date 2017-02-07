@@ -37,7 +37,6 @@ class AuthForm extends React.Component { // eslint-disable-line react/prefer-sta
   submit(values) {
     const { onSubmit } = this.props;
     onSubmit(values.toJS());
-    // return new Promise((resolve, reject) => onSubmit(values.toJS(), resolve, (error) => reject(new SubmissionError({ _error: error }))));
   }
 
   render() {
@@ -45,7 +44,7 @@ class AuthForm extends React.Component { // eslint-disable-line react/prefer-sta
 
     return (
       <div className={styles.authForm}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(this.submit)}>
           <Field component={Input} name="Username" label="Username" size="small" />
           <Field component={Input} name="Password" label="Password" type="password" size="small" />
 

@@ -47,6 +47,9 @@ const requestNewToken = (refreshToken => {
  */
 const redirectToAuth = (reject) => {
   localStorage.removeItem('privileges');
+  Cookies.remove('accessToken');
+  Cookies.remove('refreshToken');
+  Cookies.remove('username');
   window.location = '/clusterkit/auth/?from=' + encodeURI(window.location.pathname);
   reject();
 };
