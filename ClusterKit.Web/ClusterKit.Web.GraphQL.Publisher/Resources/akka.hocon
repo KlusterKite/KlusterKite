@@ -1,0 +1,12 @@
+{		
+	ClusterKit.Web {
+		Services {
+			GraphQL { 
+				Port = 8080 
+				PublicHostName = default 
+				Route = /api/1.x/graphQL 			
+			}
+
+		}
+	}	
+}
