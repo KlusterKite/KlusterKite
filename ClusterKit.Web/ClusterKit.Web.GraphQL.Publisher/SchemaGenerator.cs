@@ -53,6 +53,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                             var fieldDescription = f.GetMetadata<MergedType>(MergedType.MetaDataKey);
                             if (fieldDescription != null)
                             {
+                                f.Arguments = fieldDescription.GenerateArguments();
                                 f.ResolvedType = fieldDescription.WrapForField(graphTypes[fieldDescription.ComplexTypeName]);
                                 f.Resolver = fieldDescription;
                             }

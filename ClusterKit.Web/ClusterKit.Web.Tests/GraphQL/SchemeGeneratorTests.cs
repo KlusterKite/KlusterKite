@@ -160,7 +160,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Testing generator for some simple single api
+        /// Testing generator for some api with arrays
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
@@ -250,6 +250,114 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 ""node"": {
                                                   ""id"": {
                                                     ""id"": 20
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }";
+
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing generator for some api with arrays - filtering support
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task ArraysArgumentsApiTest()
+        {
+            var viewerType = new ApiType(
+                "viewer",
+                new[] { new ApiField("id", ApiField.TypeNameInt, ApiField.EnFlags.IsKey), new ApiField("name", ApiField.TypeNameString) });
+
+            var objectType = new ApiType("object", new[] { new ApiField("id", ApiField.TypeNameInt, ApiField.EnFlags.IsKey), new ApiField("name", ApiField.TypeNameString) });
+
+            var api = new ApiDescription(
+                "Test-Api-1",
+                "0.0.0.1",
+                new[] { viewerType, objectType },
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", ApiField.EnFlags.IsArray) });
+
+            var provider = new MoqProvider
+            {
+                Description = api,
+                Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
+            };
+
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+
+            using (var printer = new SchemaPrinter(scheme))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(scheme.Query);
+            Assert.Equal(1, scheme.Query.Fields.Count());
+            Assert.True(scheme.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = scheme;
+                                 r.Query = @"
+                                query {
+                                    api {
+                                        viewer {
+                                            id,
+                                            name
+                                        },
+                                        object(filter: { id: 10, AND: [{name: ""test"", OR: [{id_lt: 20}]}] }, sort: [name_DESC, id_ASC], limit: 10, offset: 20) {
+                                            count,
+                                            edges {
+                                                cursor,                                                
+                                                node {
+                                                    id,
+                                                    name
+                                                }
+                                            }
+                                        }
+                                    }
+                                }            
+                                ";
+                             }).ConfigureAwait(true);
+
+            this.output.WriteLine("-------- Response -----------");
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                          ""viewer"": {
+                                            ""id"": 1,
+                                            ""name"": ""test name""
+                                          },
+                                          ""object"": {
+                                            ""count"": 2,
+                                            ""edges"": [
+                                              {
+                                                ""cursor"": 10,
+                                                ""node"": {
+                                                  ""id"": null,
+                                                  ""name"": {
+                                                    ""id"": 10,
+                                                    ""name"": ""test object1""
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                ""cursor"": 20,
+                                                ""node"": {
+                                                  ""id"": null,
+                                                  ""name"": {
+                                                    ""id"": 20,
+                                                    ""name"": ""test object2""
                                                   }
                                                 }
                                               }

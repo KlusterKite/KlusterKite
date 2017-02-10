@@ -233,6 +233,7 @@
     <Compile Include="Internals\MergedType.cs" />
     <Compile Include="Internals\FieldProvider.cs" />
     <Compile Include="Internals\VirtualGraphType.cs" />
+    <Compile Include="Internals\VirtualInputGraphType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaGenerator.cs" />
   </ItemGroup>

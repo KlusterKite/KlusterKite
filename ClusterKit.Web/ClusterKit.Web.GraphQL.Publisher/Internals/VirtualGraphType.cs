@@ -23,18 +23,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     internal class VirtualGraphType : IObjectGraphType
     {
         /// <summary>
+        /// The list of fields
+        /// </summary>
+        private readonly List<FieldType> fields;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VirtualGraphType"/> class.
         /// </summary>
         /// <param name="virtualTypeName">
         /// The virtual type name.
         /// </param>
         /// <param name="fields">
-        /// The fields.
+        /// The list of fields.
         /// </param>
-        public VirtualGraphType(string virtualTypeName, List<FieldType> fields)
+        public VirtualGraphType(string virtualTypeName, List<FieldType> fields = null)
         {
             this.Name = virtualTypeName;
-            this.Fields = fields;
+            this.fields = fields ?? new List<FieldType>();
         }
 
         /// <inheritdoc />
@@ -44,7 +49,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public string Description { get; set; }
 
         /// <inheritdoc />
-        public IEnumerable<FieldType> Fields { get; }
+        public IEnumerable<FieldType> Fields => this.fields;
 
         /// <inheritdoc />
         public IEnumerable<Type> Interfaces => new List<Type>();
@@ -64,7 +69,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <inheritdoc />
         public FieldType AddField(FieldType fieldType)
         {
-            throw new InvalidOperationException();
+            this.fields.Add(fieldType);
+            return fieldType;
+        }
+
+        /// <summary>
+        /// Adds the list of fields to the field list
+        /// </summary>
+        /// <param name="fieldTypes">The list of fields</param>
+        public void AddFields(IEnumerable<FieldType> fieldTypes)
+        {
+            this.fields.AddRange(fieldTypes);
         }
 
         /// <inheritdoc />

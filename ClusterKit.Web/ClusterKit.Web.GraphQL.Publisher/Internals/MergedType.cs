@@ -84,5 +84,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         {
             return this.ComplexTypeName;
         }
+
+        /// <summary>
+        /// Generates arguments for the field
+        /// </summary>
+        /// <returns>The generated arguments</returns>
+        public virtual QueryArguments GenerateArguments()
+        {
+            return null;
+        }
     }
 }
