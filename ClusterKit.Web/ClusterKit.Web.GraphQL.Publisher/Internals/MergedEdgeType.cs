@@ -70,7 +70,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      {
                                          Name = "cursor",
                                          ResolvedType = new StringGraphType(),
-                                         Resolver = new CursorResolver()
+                                         Resolver = new CursorResolver(this.endType)
                                      },
                                  new FieldType
                                      {
@@ -85,7 +85,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                  }
                                      }
                              };
-
 
             return new VirtualGraphType(this.ComplexTypeName, fields);
         }
@@ -114,11 +113,27 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         private class CursorResolver : IFieldResolver
         {
+            /// <summary>
+            /// The objects key name
+            /// </summary>
+            private readonly string keyName;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CursorResolver"/> class.
+            /// </summary>
+            /// <param name="endType">
+            /// The end type.
+            /// </param>
+            public CursorResolver(MergedEndType endType)
+            {
+                this.keyName = endType.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(ApiField.EnFlags.IsKey)).Key;
+            }
+
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
                 var parentData = context.Source as JObject;
-                return parentData?.GetValue("id");
+                return parentData?.GetValue(this.keyName);
             }
         }
     }

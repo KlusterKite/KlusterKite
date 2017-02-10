@@ -11,8 +11,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.Web.GraphQL.Client;
-
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
@@ -90,7 +88,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Metadata = new Dictionary<string, object> { { MetaDataKey, this.edgeType } }
                                      }
                              };
-
 
             return new VirtualGraphType(this.ComplexTypeName, fields);
         }

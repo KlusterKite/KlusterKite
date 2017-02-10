@@ -91,7 +91,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 MergeFields(apiRoot, provider.Description.Fields, provider, new List<string>());
             }
 
-            rootField.Fields["api"] = apiRoot;
+            rootField.Fields["api"] = new MergedField(apiRoot);
             return rootField;
         }
 
@@ -119,25 +119,25 @@ namespace ClusterKit.Web.GraphQL.Publisher
             // todo: refactor this
             foreach (var apiField in apiFields)
             {
-                var apiFieldType = apiField.IsScalar
+                var apiFieldType = apiField.Flags.HasFlag(ApiField.EnFlags.IsScalar)
                                        ? null
                                        : provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
 
-                MergedType subField;
+                MergedField subField;
                 if (!field.Fields.TryGetValue(apiField.Name, out subField))
                 {
                     var linkEndType = new MergedEndType(apiField.TypeName)
                                           {
                                               Category =
-                                                  apiField.IsScalar
+                                                  apiField.Flags.HasFlag(ApiField.EnFlags.IsScalar)
                                                       ? MergedEndType.EnCategory.Scalar
                                                       : MergedEndType.EnCategory
                                                           .SingleApiType
                                           };
 
-                    if (!apiField.IsArray)
+                    if (!apiField.Flags.HasFlag(ApiField.EnFlags.IsArray))
                     {
-                        subField = linkEndType;
+                        subField = new MergedField(linkEndType, apiField.Flags);
                     }
                     else
                     {
@@ -151,10 +151,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                 path.Union(new[] { apiFieldType.TypeName }).ToList());
                         }
 
-                        subField = new MergedConnectionType(
+                        subField = new MergedField(new MergedConnectionType(
                             apiField.TypeName,
                             new FieldProvider { FieldType = apiFieldType, Provider = provider },
-                            linkEndType);
+                            linkEndType));
                     }
 
                     field.Fields[apiField.Name] = subField;
@@ -162,17 +162,17 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 else
                 {
                     // got the same type from different API providers
-                    if (subField.OriginalTypeName == apiField.TypeName)
+                    if (subField.Type.OriginalTypeName == apiField.TypeName)
                     {
                         // todo: write merge error
                         continue;
                     }
                 }
 
-                var endType = subField as MergedEndType;
+                var endType = subField.Type as MergedEndType;
                 if (endType != null)
                 {
-                    if (endType.Providers.Any() && (endType.Category == MergedEndType.EnCategory.Scalar || apiField.IsScalar))
+                    if (endType.Providers.Any() && (endType.Category == MergedEndType.EnCategory.Scalar || apiField.Flags.HasFlag(ApiField.EnFlags.IsScalar)))
                     {
                         // todo: write merge error
                         continue;

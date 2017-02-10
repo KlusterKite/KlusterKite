@@ -72,11 +72,11 @@ namespace ClusterKit.Web.GraphQL.Client
         /// Creates a field of this type
         /// </summary>
         /// <param name="name">The field name</param>
-        /// <param name="isArray">A value indicating whether this is an array of elements</param>
+        /// <param name="flags">The list of field flags</param>
         /// <returns>The api filed</returns>
-        public ApiField CreateField(string name, bool isArray = false)
+        public ApiField CreateField(string name, ApiField.EnFlags flags = ApiField.EnFlags.None)
         {
-            return new ApiField(name, this.TypeName, isArray);
+            return new ApiField(name, this.TypeName, flags);
         }
 
         /// <inheritdoc />

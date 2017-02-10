@@ -9,6 +9,10 @@
 
 namespace ClusterKit.Web.GraphQL.Client
 {
+    using System;
+
+    using JetBrains.Annotations;
+
     /// <summary>
     /// The filed provider
     /// </summary>
@@ -27,6 +31,7 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiField"/> class.
         /// </summary>
+        [UsedImplicitly]
         public ApiField()
         {
         }
@@ -40,35 +45,63 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="typeName">
         /// The type name.
         /// </param>
-        /// <param name="isArray">
-        /// A value indicating whether this is an array of elements
+        /// <param name="flags">
+        /// The list of field flags
         /// </param>
-        public ApiField(string name, string typeName, bool isArray = false)
+        public ApiField(string name, string typeName, EnFlags flags = EnFlags.None)
         {
             this.Name = name;
             this.TypeName = typeName;
-            this.IsScalar = typeName == TypeNameInt || typeName == TypeNameString;
-            this.IsArray = isArray;
+            this.Flags = flags;
+            if (typeName == TypeNameInt || typeName == TypeNameString)
+            {
+                this.Flags |= EnFlags.IsScalar;
+            }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this is an array of elements
+        /// The list of field flags
         /// </summary>
-        public bool IsArray { get; set; }
+        [Flags]
+        public enum EnFlags
+        {
+            /// <summary>
+            /// No special flags were set
+            /// </summary>
+            None = 0,
+
+            /// <summary>
+            /// Field type is a primitive type
+            /// </summary>
+            IsScalar = 1,
+
+            /// <summary>
+            /// This is an array of elements
+            /// </summary>
+            IsArray = 2,
+
+            /// <summary>
+            /// The field is an object key
+            /// </summary>
+            IsKey = 5
+        }
 
         /// <summary>
-        /// Gets or sets a value indicating whether field type is a primitive type
+        /// Gets or sets the list of defined flags
         /// </summary>
-        public bool IsScalar { get; set; }
+        [UsedImplicitly]
+        public EnFlags Flags { get; set; }
 
         /// <summary>
         /// Gets or sets the field name
         /// </summary>
+        [UsedImplicitly]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the field type name
         /// </summary>
+        [UsedImplicitly]
         public string TypeName { get; set; }
 
         /// <inheritdoc />

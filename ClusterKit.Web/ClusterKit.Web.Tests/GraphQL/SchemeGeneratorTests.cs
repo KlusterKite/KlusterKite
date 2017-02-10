@@ -168,15 +168,15 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var viewerType = new ApiType(
                 "viewer",
-                new[] { new ApiField("id", ApiField.TypeNameInt), new ApiField("name", ApiField.TypeNameString) });
+                new[] { new ApiField("id", ApiField.TypeNameInt, ApiField.EnFlags.IsKey), new ApiField("name", ApiField.TypeNameString) });
 
-            var objectType = new ApiType("object", new[] { new ApiField("id", ApiField.TypeNameString) });
+            var objectType = new ApiType("object", new[] { new ApiField("id", ApiField.TypeNameString, ApiField.EnFlags.IsKey) });
 
             var api = new ApiDescription(
                 "Test-Api-1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", true) });
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", ApiField.EnFlags.IsArray) });
 
             var provider = new MoqProvider
             {
@@ -224,7 +224,42 @@ namespace ClusterKit.Web.Tests.GraphQL
                              }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
-            this.output.WriteLine(new DocumentWriter(true).Write(result));
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                          ""viewer"": {
+                                            ""id"": 1,
+                                            ""name"": ""test name""
+                                          },
+                                          ""object"": {
+                                            ""count"": 2,
+                                            ""edges"": [
+                                              {
+                                                ""cursor"": 10,
+                                                ""node"": {
+                                                  ""id"": {
+                                                    ""id"": 10
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                ""cursor"": 20,
+                                                ""node"": {
+                                                  ""id"": {
+                                                    ""id"": 20
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }";
+
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
         }
 
         /// <summary>

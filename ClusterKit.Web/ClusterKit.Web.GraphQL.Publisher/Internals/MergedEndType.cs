@@ -41,7 +41,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedEndType(string originalTypeName) : base(originalTypeName)
         {
             this.Category = EnCategory.SingleApiType;
-            this.Fields = new Dictionary<string, MergedType>();
+            this.Fields = new Dictionary<string, MergedField>();
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets the list of subfields
         /// </summary>
-        public Dictionary<string, MergedType> Fields { get; }
+        public Dictionary<string, MergedField> Fields { get; }
 
         /// <summary>
         /// Gets or sets the list of providers
@@ -129,7 +129,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The list of all defined types</returns>
         public override IEnumerable<MergedType> GetAllTypes()
         {
-            return this.Fields.Values.SelectMany(f => f.GetAllTypes()).Union(new[] { this });
+            return this.Fields.Values.SelectMany(f => f.Type.GetAllTypes()).Union(new[] { this });
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 contextFieldAst.SelectionSet.Selections.Where(s => s is Field)
                     .Cast<Field>()
                     .Join(
-                        this.Fields.Where(f => f.Value.Providers.Any(fp => fp.Provider == provider)),
+                        this.Fields.Where(f => f.Value.Type.Providers.Any(fp => fp.Provider == provider)),
                         s => s.Name,
                         fp => fp.Key,
                         (s, fp) => new { Ast = s, Field = fp.Value })
@@ -212,7 +212,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             foreach (var usedField in usedFields)
             {
                 var request = new ApiRequest { Arguments = usedField.Ast.Arguments, Name = usedField.Ast.Name };
-                var endType = usedField.Field as MergedEndType;
+                var endType = usedField.Field.Type as MergedEndType;
 
                 request.Fields = endType?.Category == EnCategory.MultipleApiType 
                     ? endType.GatherMultipleApiRequest(provider, usedField.Ast).ToList() 
@@ -251,12 +251,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         /// <param name="description">The api field description</param>
         /// <returns>The <see cref="FieldType"/></returns>
-        private FieldType ConvertApiField(KeyValuePair<string, MergedType> description)
+        private FieldType ConvertApiField(KeyValuePair<string, MergedField> description)
         {
             var field = new FieldType
             {
                 Name = description.Key,
-                Metadata = new Dictionary<string, object> { { MetaDataKey, description.Value } }
+                Metadata = new Dictionary<string, object> { { MetaDataKey, description.Value.Type } }
             };
             return field;
         }
