@@ -12,6 +12,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
     using ClusterKit.Web.GraphQL.Client;
@@ -143,6 +144,86 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                          ""viewer"": {
+                                            ""id"": 1,
+                                            ""name"": ""test name""
+                                          }
+                                        }
+                                      }
+                                    }";
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing generator for some simple single api
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task ArraysApiTest()
+        {
+            var viewerType = new ApiType(
+                "viewer",
+                new[] { new ApiField("id", ApiField.TypeNameInt), new ApiField("name", ApiField.TypeNameString) });
+
+            var objectType = new ApiType("object", new[] { new ApiField("id", ApiField.TypeNameString) });
+
+            var api = new ApiDescription(
+                "Test-Api-1",
+                "0.0.0.1",
+                new[] { viewerType, objectType },
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", true) });
+
+            var provider = new MoqProvider
+            {
+                Description = api,
+                Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10}, {\"id\": 20}]}}"
+            };
+
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+
+            using (var printer = new SchemaPrinter(scheme))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(scheme.Query);
+            Assert.Equal(1, scheme.Query.Fields.Count());
+            Assert.True(scheme.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = scheme;
+                                 r.Query = @"
+                                query {
+                                    api {
+                                        viewer {
+                                            id,
+                                            name
+                                        },
+                                        object {
+                                            count,
+                                            edges {
+                                                cursor,                                                
+                                                node {
+                                                    id
+                                                }
+                                            }
+                                        }
+                                    }
+                                }            
+                                ";
+                             }).ConfigureAwait(true);
+
+            this.output.WriteLine("-------- Response -----------");
             this.output.WriteLine(new DocumentWriter(true).Write(result));
         }
 
@@ -185,7 +266,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 {
                                     Description = api2,
                                     Data =
-                                        "{\"viewer\": {\"description\": \"test name\"}, \"object2\": {\"id\": 123}}"
+                                        "{\"viewer\": {\"description\": \"test description\"}, \"object2\": {\"id\": 123}}"
                                 };
 
             var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider1, provider2 });
@@ -226,7 +307,40 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
-            this.output.WriteLine(new DocumentWriter(true).Write(result));
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                          ""viewer"": {
+                                            ""id"": 1,
+                                            ""name"": ""test name"",
+                                            ""description"": ""test description""
+                                          },
+                                          ""object1"": {
+                                            ""id"": 10
+                                          },
+                                          ""object2"": {
+                                            ""id"": 123
+                                          }
+                                        }
+                                      }
+                                    }";
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Removes formatting values from response json
+        /// </summary>
+        /// <param name="response">The json string</param>
+        /// <returns>Cleaned json string</returns>
+        private static string CleanResponse(string response)
+        {
+            return Regex.Replace(
+                response,
+                "[ \t\r\n]",
+                string.Empty,
+                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
         }
 
         /// <summary>

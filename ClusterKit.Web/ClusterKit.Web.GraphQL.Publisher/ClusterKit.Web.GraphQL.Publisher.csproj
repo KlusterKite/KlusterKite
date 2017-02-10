@@ -226,7 +226,10 @@
     </Compile>
     <Compile Include="EndpointController.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="Internals\FieldDescription.cs" />
+    <Compile Include="Internals\MergedConnectionType.cs" />
+    <Compile Include="Internals\MergedEdgeType.cs" />
+    <Compile Include="Internals\MergedEndType.cs" />
+    <Compile Include="Internals\MergedType.cs" />
     <Compile Include="Internals\FieldProvider.cs" />
     <Compile Include="Internals\VirtualGraphType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

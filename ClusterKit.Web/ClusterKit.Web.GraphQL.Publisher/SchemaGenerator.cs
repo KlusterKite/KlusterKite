@@ -33,11 +33,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
         {
             var root = MergeApis(providers);
             var types = root.GetAllTypes().ToList();
+
             var typeNames = types.Select(t => t.ComplexTypeName).Distinct().ToList();
 
             var graphTypes = typeNames.ToDictionary(
                 typeName => typeName,
-                typeName => (IGraphType)new VirtualGraphType(types.FirstOrDefault(t => t.ComplexTypeName == typeName)));
+                typeName => types.FirstOrDefault(t => t.ComplexTypeName == typeName)?.GenerateGraphType());
 
             graphTypes[ApiField.TypeNameString] = new StringGraphType();
             graphTypes[ApiField.TypeNameInt] = new IntGraphType();
@@ -49,9 +50,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 .ForEach(
                     f =>
                         {
-                            var fieldDescription = f.GetMetadata<FieldDescription>(VirtualGraphType.MetaDataKey);
-                            f.ResolvedType = graphTypes[fieldDescription.ComplexTypeName];
-                            f.Resolver = fieldDescription;
+                            var fieldDescription = f.GetMetadata<MergedType>(MergedType.MetaDataKey);
+                            if (fieldDescription != null)
+                            {
+                                f.ResolvedType = fieldDescription.WrapForField(graphTypes[fieldDescription.ComplexTypeName]);
+                                f.Resolver = fieldDescription;
+                            }
                         });
 
             var schema = new Schema
@@ -68,20 +72,19 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// </summary>
         /// <param name="providers">The API providers descriptions</param>
         /// <returns>Merged API</returns>
-        private static FieldDescription MergeApis(List<ApiProvider> providers)
+        private static MergedType MergeApis(List<ApiProvider> providers)
         {
-            var rootField = new FieldDescription
+            var rootField = new MergedEndType("root")
             {
-                Category = FieldDescription.EnCategory.ApiRoot,
-                OriginalTypeName = "root"
+                Category = MergedEndType.EnCategory.ApiRoot
             };
 
-            var apiRoot = new FieldDescription
+            var apiRoot = new MergedEndType("api")
             {
-                Category = FieldDescription.EnCategory.ApiRoot,
-                OriginalTypeName = "api",
-                Providers = providers.Select(p => new FieldProvider { Provider = p, FieldType = p.Description }).ToList()
+                Category = MergedEndType.EnCategory.ApiRoot
             };
+
+            apiRoot.AddProviders(providers.Select(p => new FieldProvider { Provider = p, FieldType = p.Description }));
 
             foreach (var provider in providers)
             {
@@ -107,51 +110,94 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="path">
         /// The types names path to avoid circular references.
         /// </param>
-        private static void MergeFields(FieldDescription field, List<ApiField> apiFields, ApiProvider provider, List<string> path)
+        private static void MergeFields(
+            MergedEndType field,
+            List<ApiField> apiFields,
+            ApiProvider provider,
+            List<string> path)
         {
+            // todo: refactor this
             foreach (var apiField in apiFields)
             {
-                FieldDescription subField;
-                if (!field.Fields.TryGetValue(apiField.Name, out subField))
-                {
-                    subField = new FieldDescription
-                    {
-                        Category =
-                                           apiField.IsScalar
-                                               ? FieldDescription.EnCategory.Scalar
-                                               : FieldDescription.EnCategory.SingleApiType,
-                        OriginalTypeName = apiField.TypeName
-                    };
-
-                    field.Fields[apiField.Name] = subField;
-                }
-
                 var apiFieldType = apiField.IsScalar
                                        ? null
                                        : provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
 
-                if (subField.OriginalTypeName != apiField.TypeName)
+                MergedType subField;
+                if (!field.Fields.TryGetValue(apiField.Name, out subField))
                 {
-                    if (subField.Category == FieldDescription.EnCategory.Scalar)
+                    var linkEndType = new MergedEndType(apiField.TypeName)
+                                          {
+                                              Category =
+                                                  apiField.IsScalar
+                                                      ? MergedEndType.EnCategory.Scalar
+                                                      : MergedEndType.EnCategory
+                                                          .SingleApiType
+                                          };
+
+                    if (!apiField.IsArray)
+                    {
+                        subField = linkEndType;
+                    }
+                    else
+                    {
+                        linkEndType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
+                        if (apiFieldType != null)
+                        {
+                            MergeFields(
+                                linkEndType,
+                                apiFieldType.Fields,
+                                provider,
+                                path.Union(new[] { apiFieldType.TypeName }).ToList());
+                        }
+
+                        subField = new MergedConnectionType(
+                            apiField.TypeName,
+                            new FieldProvider { FieldType = apiFieldType, Provider = provider },
+                            linkEndType);
+                    }
+
+                    field.Fields[apiField.Name] = subField;
+                }
+                else
+                {
+                    // got the same type from different API providers
+                    if (subField.OriginalTypeName == apiField.TypeName)
+                    {
+                        // todo: write merge error
+                        continue;
+                    }
+                }
+
+                var endType = subField as MergedEndType;
+                if (endType != null)
+                {
+                    if (endType.Providers.Any() && (endType.Category == MergedEndType.EnCategory.Scalar || apiField.IsScalar))
                     {
                         // todo: write merge error
                         continue;
                     }
 
-                    subField.Category = FieldDescription.EnCategory.MultipleApiType;
-                }
-
-                subField.Providers.Add(new FieldProvider { FieldType = apiFieldType, Provider = provider });
-
-                if (apiFieldType != null)
-                {
-                    if (path.Contains(apiFieldType.TypeName))
+                    endType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
+                    if (endType.Providers.Count() > 1)
                     {
-                        // todo: write circular reference error
-                        continue;
+                        endType.Category = MergedEndType.EnCategory.MultipleApiType;
                     }
 
-                    MergeFields(subField, apiFieldType.Fields, provider, path.Union(new[] { apiFieldType.TypeName }).ToList());
+                    if (apiFieldType != null)
+                    {
+                        if (path.Contains(apiFieldType.TypeName))
+                        {
+                            // todo: write circular reference error
+                            continue;
+                        }
+
+                        MergeFields(
+                            endType,
+                            apiFieldType.Fields,
+                            provider,
+                            path.Union(new[] { apiFieldType.TypeName }).ToList());
+                    }
                 }
             }
         }

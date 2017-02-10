@@ -23,21 +23,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     internal class VirtualGraphType : IObjectGraphType
     {
         /// <summary>
-        /// The metadata key to access the original <see cref="ApiType"/> object
-        /// </summary>
-        public const string MetaDataKey = "FieldDescription";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="VirtualGraphType"/> class.
         /// </summary>
-        /// <param name="description">
-        /// The api type.
+        /// <param name="virtualTypeName">
+        /// The virtual type name.
         /// </param>
-        public VirtualGraphType(FieldDescription description)
+        /// <param name="fields">
+        /// The fields.
+        /// </param>
+        public VirtualGraphType(string virtualTypeName, List<FieldType> fields)
         {
-            this.Name = description.ComplexTypeName;
-            var fields = new List<FieldType>();
-            fields.AddRange(description.Fields.Select(this.ConvertApiField));
+            this.Name = virtualTypeName;
             this.Fields = fields;
         }
 
@@ -99,22 +95,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public bool HasMetadata(string key)
         {
             return false;
-        }
-
-        /// <summary>
-        /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
-        /// </summary>
-        /// <param name="description">The api field description</param>
-        /// <returns>The <see cref="FieldType"/></returns>
-        private FieldType ConvertApiField(KeyValuePair<string, FieldDescription> description)
-        {
-            // todo: add arrays support
-            var field = new FieldType
-                            {
-                                Name = description.Key,
-                                Metadata = new Dictionary<string, object> { { MetaDataKey, description.Value } }
-                            };
-            return field;
         }
     }
 }

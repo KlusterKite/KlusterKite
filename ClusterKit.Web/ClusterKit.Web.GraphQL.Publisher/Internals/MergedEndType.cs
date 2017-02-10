@@ -1,9 +1,9 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FieldDescription.cs" company="ClusterKit">
+// <copyright file="MergedEndType.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The merged api type field description
+//   The merged api type description
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,26 +14,34 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Linq;
     using System.Threading.Tasks;
 
+    using ClusterKit.Web.GraphQL.Client;
+
     using global::GraphQL.Language.AST;
-    using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// The merged api type field description
+    /// The merged api type description
     /// </summary>
-    internal class FieldDescription : IFieldResolver
+    internal class MergedEndType : MergedType
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FieldDescription"/> class.
+        /// the list of providers
         /// </summary>
-        public FieldDescription()
+        private readonly List<FieldProvider> providers = new List<FieldProvider>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MergedEndType"/> class.
+        /// </summary>
+        /// <param name="originalTypeName">
+        /// The original type name.
+        /// </param>
+        public MergedEndType(string originalTypeName) : base(originalTypeName)
         {
             this.Category = EnCategory.SingleApiType;
-            this.Fields = new Dictionary<string, FieldDescription>();
-            this.Providers = new List<FieldProvider>();
+            this.Fields = new Dictionary<string, MergedType>();
         }
 
         /// <summary>
@@ -59,22 +67,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <summary>
             /// This node is the api root
             /// </summary>
-            ApiRoot,
+            ApiRoot
         }
-
-        /// <summary>
-        /// Gets or sets the type name of the field
-        /// </summary>
-        public string OriginalTypeName { get; set; }
-
-        /// <summary>
-        /// Gets combined name from all provider
-        /// </summary>
-        public string ComplexTypeName => this.Category == EnCategory.Scalar 
-                                             ? this.OriginalTypeName 
-                                             : this.Providers.Any() 
-                                                 ? string.Join("|", this.Providers.Select(p => p.FieldType.TypeName).Distinct().OrderBy(s => s).ToArray())
-                                                 : this.OriginalTypeName;
 
         /// <summary>
         /// Gets or sets the field category
@@ -82,20 +76,58 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public EnCategory Category { get; set; }
 
         /// <summary>
+        /// Gets combined name from all provider
+        /// </summary>
+        public override string ComplexTypeName
+            =>
+                this.Category == EnCategory.Scalar
+                    ? this.OriginalTypeName
+                    : this.Providers.Any()
+                        ? string.Join(
+                            "|",
+                            this.Providers.Select(p => p.FieldType.TypeName).Distinct().OrderBy(s => s).ToArray())
+                        : this.OriginalTypeName;
+
+        /// <summary>
+        /// Gets the list of subfields
+        /// </summary>
+        public Dictionary<string, MergedType> Fields { get; }
+
+        /// <summary>
         /// Gets or sets the list of providers
         /// </summary>
-        public List<FieldProvider> Providers { get; set; }
+        public override IEnumerable<FieldProvider> Providers => this.providers;
 
         /// <summary>
-        /// Gets or sets the list of subfields
+        /// Adds a provider to the provider list
         /// </summary>
-        public Dictionary<string, FieldDescription> Fields { get; set; }
+        /// <param name="provider">The provider</param>
+        public void AddProvider(FieldProvider provider)
+        {
+            this.providers.Add(provider);
+        }
 
         /// <summary>
-        /// Get all fields recursively
+        /// Adds the list of providers to the provider list
+        /// </summary>
+        /// <param name="newProviders">The list of providers</param>
+        public void AddProviders(IEnumerable<FieldProvider> newProviders)
+        {
+            this.providers.AddRange(newProviders);
+        }
+
+        /// <inheritdoc />
+        public override IGraphType GenerateGraphType()
+        {
+            var fields = this.Fields.Select(this.ConvertApiField);
+            return new VirtualGraphType(this.ComplexTypeName, fields.ToList());
+        }
+
+        /// <summary>
+        /// Get all included types recursively
         /// </summary>
         /// <returns>The list of all defined types</returns>
-        public IEnumerable<FieldDescription> GetAllTypes()
+        public override IEnumerable<MergedType> GetAllTypes()
         {
             return this.Fields.Values.SelectMany(f => f.GetAllTypes()).Union(new[] { this });
         }
@@ -105,7 +137,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         /// <param name="context">The request context</param>
         /// <returns>Resolved value</returns>
-        public object Resolve(ResolveFieldContext context)
+        public override object Resolve(ResolveFieldContext context)
         {
             switch (this.Category)
             {
@@ -116,6 +148,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 case EnCategory.MultipleApiType:
                     {
                         var parentData = context.Source as JObject;
+                        if (parentData?.Parent?.Type == JTokenType.Array)
+                        {
+                            return parentData;
+                        }
+
                         return parentData?.GetValue(context.FieldName);
                     }
 
@@ -163,25 +200,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst)
         {
             var usedFields =
-                contextFieldAst.SelectionSet.Selections.Where(s => s is Field).Cast<Field>()
+                contextFieldAst.SelectionSet.Selections.Where(s => s is Field)
+                    .Cast<Field>()
                     .Join(
                         this.Fields.Where(f => f.Value.Providers.Any(fp => fp.Provider == provider)),
                         s => s.Name,
                         fp => fp.Key,
-                        (s, fp) => new { Ast = s, Field = fp.Value }).ToList();
+                        (s, fp) => new { Ast = s, Field = fp.Value })
+                    .ToList();
 
             foreach (var usedField in usedFields)
             {
                 var request = new ApiRequest { Arguments = usedField.Ast.Arguments, Name = usedField.Ast.Name };
-                switch (usedField.Field.Category)
-                {
-                    case EnCategory.SingleApiType:
-                        request.Fields = usedField.Field.GatherSingleApiRequest(usedField.Ast).ToList();
-                        break;
-                    case EnCategory.MultipleApiType:
-                        request.Fields = usedField.Field.GatherMultipleApiRequest(provider, usedField.Ast).ToList();
-                        break;
-                }
+                var endType = usedField.Field as MergedEndType;
+
+                request.Fields = endType?.Category == EnCategory.MultipleApiType 
+                    ? endType.GatherMultipleApiRequest(provider, usedField.Ast).ToList() 
+                    : this.GatherSingleApiRequest(usedField.Ast).ToList();
 
                 yield return request;
             }
@@ -209,6 +244,21 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 yield return request;
             }
+        }
+
+        /// <summary>
+        /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
+        /// </summary>
+        /// <param name="description">The api field description</param>
+        /// <returns>The <see cref="FieldType"/></returns>
+        private FieldType ConvertApiField(KeyValuePair<string, MergedType> description)
+        {
+            var field = new FieldType
+            {
+                Name = description.Key,
+                Metadata = new Dictionary<string, object> { { MetaDataKey, description.Value } }
+            };
+            return field;
         }
     }
 }
