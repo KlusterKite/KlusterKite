@@ -40,9 +40,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 typeName => typeName,
                 typeName => types.FirstOrDefault(t => t.ComplexTypeName == typeName)?.GenerateGraphType());
 
-            graphTypes[ApiField.TypeNameString] = new StringGraphType();
-            graphTypes[ApiField.TypeNameInt] = new IntGraphType();
-
             graphTypes.Values
                 .Where(a => a is VirtualGraphType)
                 .Cast<VirtualGraphType>()
@@ -75,14 +72,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <returns>Merged API</returns>
         private static MergedType MergeApis(List<ApiProvider> providers)
         {
-            var rootField = new MergedEndType("root")
+            var rootField = new MergedObjectType("root")
             {
-                Category = MergedEndType.EnCategory.ApiRoot
+                Category = MergedObjectType.EnCategory.ApiRoot
             };
 
-            var apiRoot = new MergedEndType("api")
+            var apiRoot = new MergedObjectType("api")
             {
-                Category = MergedEndType.EnCategory.ApiRoot
+                Category = MergedObjectType.EnCategory.ApiRoot
             };
 
             apiRoot.AddProviders(providers.Select(p => new FieldProvider { Provider = p, FieldType = p.Description }));
@@ -97,9 +94,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
         }
 
         /// <summary>
-        /// Insert new fields from new provider into current field list
+        /// Insert new fields from new provider into current type
         /// </summary>
-        /// <param name="field">
+        /// <param name="parentType">
         /// Field to update
         /// </param>
         /// <param name="apiFields">
@@ -112,94 +109,63 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// The types names path to avoid circular references.
         /// </param>
         private static void MergeFields(
-            MergedEndType field,
+            MergedObjectType parentType,
             List<ApiField> apiFields,
             ApiProvider provider,
             List<string> path)
         {
-            // todo: refactor this
             foreach (var apiField in apiFields)
             {
-                var apiFieldType = apiField.Flags.HasFlag(ApiField.EnFlags.IsScalar)
-                                       ? null
-                                       : provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
-
-                MergedField subField;
-                if (!field.Fields.TryGetValue(apiField.Name, out subField))
+                MergedField complexField;
+                if (parentType.Fields.TryGetValue(apiField.Name, out complexField))
                 {
-                    var linkEndType = new MergedEndType(apiField.TypeName)
-                                          {
-                                              Category =
-                                                  apiField.Flags.HasFlag(ApiField.EnFlags.IsScalar)
-                                                      ? MergedEndType.EnCategory.Scalar
-                                                      : MergedEndType.EnCategory
-                                                          .SingleApiType
-                                          };
-
-                    if (!apiField.Flags.HasFlag(ApiField.EnFlags.IsArray))
+                    if (apiField.Flags.HasFlag(EnFieldFlags.IsScalar) || apiField.Flags.HasFlag(EnFieldFlags.IsArray)
+                        || !(complexField.Type is MergedObjectType))
                     {
-                        subField = new MergedField(linkEndType, apiField.Flags);
+                        // todo: write merge error
+                        continue;
                     }
-                    else
-                    {
-                        linkEndType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
-                        if (apiFieldType != null)
-                        {
-                            MergeFields(
-                                linkEndType,
-                                apiFieldType.Fields,
-                                provider,
-                                path.Union(new[] { apiFieldType.TypeName }).ToList());
-                        }
+                }
 
-                        subField = new MergedField(new MergedConnectionType(
-                            apiField.TypeName,
-                            new FieldProvider { FieldType = apiFieldType, Provider = provider },
-                            linkEndType));
-                    }
-
-                    field.Fields[apiField.Name] = subField;
+                MergedType newFieldType;
+                if (apiField.Flags.HasFlag(EnFieldFlags.IsScalar))
+                {
+                    newFieldType = new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
                 }
                 else
                 {
-                    // got the same type from different API providers
-                    if (subField.Type.OriginalTypeName == apiField.TypeName)
+                    var apiFieldType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
+                    var objectType = complexField?.Type as MergedObjectType ?? new MergedObjectType(apiField.TypeName);
+                    objectType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
+                    if (complexField != null)
                     {
-                        // todo: write merge error
-                        continue;
+                        objectType.Category = MergedObjectType.EnCategory.MultipleApiType;
                     }
-                }
 
-                var endType = subField.Type as MergedEndType;
-                if (endType != null)
-                {
-                    if (endType.Providers.Any() && (endType.Category == MergedEndType.EnCategory.Scalar || apiField.Flags.HasFlag(ApiField.EnFlags.IsScalar)))
+                    if (path.Contains(apiFieldType.TypeName))
                     {
-                        // todo: write merge error
+                        // todo: write circular reference error
                         continue;
                     }
 
-                    endType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
-                    if (endType.Providers.Count() > 1)
-                    {
-                        endType.Category = MergedEndType.EnCategory.MultipleApiType;
-                    }
+                    MergeFields(
+                        objectType,
+                        apiFieldType.Fields,
+                        provider,
+                        path.Union(new[] { apiFieldType.TypeName }).ToList());
 
-                    if (apiFieldType != null)
-                    {
-                        if (path.Contains(apiFieldType.TypeName))
-                        {
-                            // todo: write circular reference error
-                            continue;
-                        }
+                    newFieldType = objectType;
 
-                        MergeFields(
-                            endType,
-                            apiFieldType.Fields,
-                            provider,
-                            path.Union(new[] { apiFieldType.TypeName }).ToList());
+                    if (apiField.Flags.HasFlag(EnFieldFlags.IsArray))
+                    {
+                        newFieldType = new MergedConnectionType(
+                            objectType.OriginalTypeName,
+                            new FieldProvider { Provider = provider, FieldType = apiFieldType },
+                            objectType);
                     }
                 }
+
+                parentType.Fields[apiField.Name] = new MergedField(newFieldType, apiField.Flags);
             }
         }
     }

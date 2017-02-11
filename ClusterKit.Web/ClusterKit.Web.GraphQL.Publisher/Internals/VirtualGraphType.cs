@@ -111,5 +111,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         {
             return false;
         }
+
+        /// <summary>
+        /// The same as <see cref="VirtualGraphType"/> but with array container flag
+        /// </summary>
+        public class Array : VirtualGraphType, IArrayContainerGraph
+        {
+            /// <inheritdoc />
+            public Array(string virtualTypeName, List<FieldType> fields = null)
+                : base(virtualTypeName, fields)
+            {
+            }
+        }
     }
 }

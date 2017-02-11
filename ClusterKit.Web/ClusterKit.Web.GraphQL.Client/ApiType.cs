@@ -55,12 +55,14 @@ namespace ClusterKit.Web.GraphQL.Client
         /// Gets or sets the list of fields
         /// </summary>
         [NotNull]
+        [UsedImplicitly]
         public List<ApiField> Fields { get; set; } = new List<ApiField>();
 
         /// <summary>
         /// Gets or sets the list of methods
         /// </summary>
         [NotNull]
+        [UsedImplicitly]
         public List<ApiMethod> Methods { get; set; } = new List<ApiMethod>();
 
         /// <summary>
@@ -74,9 +76,9 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="name">The field name</param>
         /// <param name="flags">The list of field flags</param>
         /// <returns>The api filed</returns>
-        public ApiField CreateField(string name, ApiField.EnFlags flags = ApiField.EnFlags.None)
+        public ApiField CreateField(string name, EnFieldFlags flags = EnFieldFlags.None)
         {
-            return new ApiField(name, this.TypeName, flags);
+            return ApiField.Object(name, this.TypeName, flags);
         }
 
         /// <inheritdoc />

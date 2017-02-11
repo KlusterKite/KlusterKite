@@ -19,19 +19,10 @@ namespace ClusterKit.Web.GraphQL.Client
     public class ApiField
     {
         /// <summary>
-        /// The reserved type name for integer primitive
-        /// </summary>
-        public const string TypeNameInt = "int";
-
-        /// <summary>
-        /// The reserved type name for string primitive
-        /// </summary>
-        public const string TypeNameString = "string";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ApiField"/> class.
         /// </summary>
         [UsedImplicitly]
+        [Obsolete("Can be used by serializers only", true)]
         public ApiField()
         {
         }
@@ -42,55 +33,25 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="name">
         /// The name.
         /// </param>
-        /// <param name="typeName">
-        /// The type name.
-        /// </param>
         /// <param name="flags">
-        /// The list of field flags
+        /// The flags.
         /// </param>
-        public ApiField(string name, string typeName, EnFlags flags = EnFlags.None)
+        private ApiField(string name, EnFieldFlags flags)
         {
             this.Name = name;
-            this.TypeName = typeName;
             this.Flags = flags;
-            if (typeName == TypeNameInt || typeName == TypeNameString)
-            {
-                this.Flags |= EnFlags.IsScalar;
-            }
-        }
-
-        /// <summary>
-        /// The list of field flags
-        /// </summary>
-        [Flags]
-        public enum EnFlags
-        {
-            /// <summary>
-            /// No special flags were set
-            /// </summary>
-            None = 0,
-
-            /// <summary>
-            /// Field type is a primitive type
-            /// </summary>
-            IsScalar = 1,
-
-            /// <summary>
-            /// This is an array of elements
-            /// </summary>
-            IsArray = 2,
-
-            /// <summary>
-            /// The field is an object key
-            /// </summary>
-            IsKey = 5
         }
 
         /// <summary>
         /// Gets or sets the list of defined flags
         /// </summary>
         [UsedImplicitly]
-        public EnFlags Flags { get; set; }
+        public EnFieldFlags Flags { get; set; }
+
+        /// <summary>
+        /// Gets or sets the scalar type of the field
+        /// </summary>
+        public EnScalarType ScalarType { get; set; }
 
         /// <summary>
         /// Gets or sets the field name
@@ -103,6 +64,45 @@ namespace ClusterKit.Web.GraphQL.Client
         /// </summary>
         [UsedImplicitly]
         public string TypeName { get; set; }
+
+        /// <summary>
+        /// Creates an object containing field
+        /// </summary>
+        /// <param name="name">The field name</param>
+        /// <param name="typeName">The field type name</param>
+        /// <param name="flags">The field flags</param>
+        /// <returns>The new field</returns>
+        public static ApiField Object([NotNull]string name, [NotNull]string typeName, EnFieldFlags flags = EnFieldFlags.None)
+        {
+            if (flags.HasFlag(EnFieldFlags.IsScalar))
+            {
+                throw new ArgumentException("Object field can't be of scalar type");
+            }
+
+            if (flags.HasFlag(EnFieldFlags.IsKey))
+            {
+                throw new ArgumentException("Object field can't be used as key");
+            }
+
+            return new ApiField(name, flags) { TypeName = typeName, ScalarType = EnScalarType.None }; 
+        }
+
+        /// <summary>
+        /// Creates a scalar containing field
+        /// </summary>
+        /// <param name="name">The field name</param>
+        /// <param name="type">The field type</param>
+        /// <param name="flags">The field flags</param>
+        /// <returns>The new field</returns>
+        public static ApiField Scalar([NotNull] string name, EnScalarType type, EnFieldFlags flags = EnFieldFlags.None)
+        {
+            if (type == EnScalarType.None)
+            {
+                throw new ArgumentException("Type cannot be None");
+            }
+
+            return new ApiField(name, flags | EnFieldFlags.IsScalar) { ScalarType = type };
+        }
 
         /// <inheritdoc />
         public override string ToString()

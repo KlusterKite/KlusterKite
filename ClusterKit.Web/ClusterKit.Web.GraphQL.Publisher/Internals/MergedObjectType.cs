@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MergedEndType.cs" company="ClusterKit">
+// <copyright file="MergedObjectType.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -25,7 +25,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     /// <summary>
     /// The merged api type description
     /// </summary>
-    internal class MergedEndType : MergedType
+    internal class MergedObjectType : MergedType
     {
         /// <summary>
         /// the list of providers
@@ -33,12 +33,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private readonly List<FieldProvider> providers = new List<FieldProvider>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MergedEndType"/> class.
+        /// Initializes a new instance of the <see cref="MergedObjectType"/> class.
         /// </summary>
         /// <param name="originalTypeName">
         /// The original type name.
         /// </param>
-        public MergedEndType(string originalTypeName) : base(originalTypeName)
+        public MergedObjectType(string originalTypeName) : base(originalTypeName)
         {
             this.Category = EnCategory.SingleApiType;
             this.Fields = new Dictionary<string, MergedField>();
@@ -49,11 +49,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         public enum EnCategory
         {
-            /// <summary>
-            /// The end type is simple primitive
-            /// </summary>
-            Scalar,
-
             /// <summary>
             /// This is object provided by some single api
             /// </summary>
@@ -79,10 +74,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets combined name from all provider
         /// </summary>
         public override string ComplexTypeName
-            =>
-                this.Category == EnCategory.Scalar
-                    ? this.OriginalTypeName
-                    : this.Providers.Any()
+            => this.Providers.Any()
                         ? string.Join(
                             "|",
                             this.Providers.Select(p => p.FieldType.TypeName).Distinct().OrderBy(s => s).ToArray())
@@ -129,7 +121,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The list of all defined types</returns>
         public override IEnumerable<MergedType> GetAllTypes()
         {
-            return this.Fields.Values.SelectMany(f => f.Type.GetAllTypes()).Union(new[] { this });
+            yield return this;
+            foreach (var type in this.Fields.Values)
+            {
+                foreach (var subType in type.Type.GetAllTypes())
+                {
+                    yield return subType;
+                }
+            }
         }
 
         /// <summary>
@@ -143,19 +142,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 case EnCategory.ApiRoot:
                     return this.DoApiRequests(context);
-                case EnCategory.Scalar:
                 case EnCategory.SingleApiType:
                 case EnCategory.MultipleApiType:
-                    {
-                        var parentData = context.Source as JObject;
-                        if (parentData?.Parent?.Type == JTokenType.Array)
-                        {
-                            return parentData;
-                        }
-
-                        return parentData?.GetValue(context.FieldName);
-                    }
-
+                    return base.Resolve(context);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -212,7 +201,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             foreach (var usedField in usedFields)
             {
                 var request = new ApiRequest { Arguments = usedField.Ast.Arguments, Name = usedField.Ast.Name };
-                var endType = usedField.Field.Type as MergedEndType;
+                var endType = usedField.Field.Type as MergedObjectType;
 
                 request.Fields = endType?.Category == EnCategory.MultipleApiType 
                     ? endType.GatherMultipleApiRequest(provider, usedField.Ast).ToList() 

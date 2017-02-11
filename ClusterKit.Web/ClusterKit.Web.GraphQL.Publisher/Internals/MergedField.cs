@@ -25,7 +25,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="flags">
         /// The flags.
         /// </param>
-        public MergedField(MergedType type, ApiField.EnFlags flags = ApiField.EnFlags.None)
+        public MergedField(MergedType type, EnFieldFlags flags = EnFieldFlags.None)
         {
             this.Type = type;
             this.Flags = flags;
@@ -34,7 +34,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets or sets the list of the field flags
         /// </summary>
-        public ApiField.EnFlags Flags { get; set; }
+        public EnFieldFlags Flags { get; set; }
 
         /// <summary>
         /// Gets or sets the field type

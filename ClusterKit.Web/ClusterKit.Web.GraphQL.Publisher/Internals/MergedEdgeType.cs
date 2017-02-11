@@ -27,7 +27,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// The end type
         /// </summary>
-        private readonly MergedEndType endType;
+        private readonly MergedType objectType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MergedEdgeType"/> class.
@@ -38,12 +38,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="provider">
         /// The provider.
         /// </param>
-        /// <param name="endType">
+        /// <param name="objectType">
         /// The end Type.
         /// </param>
-        public MergedEdgeType(string originalTypeName, FieldProvider provider, MergedEndType endType) : base(originalTypeName)
+        public MergedEdgeType(string originalTypeName, FieldProvider provider, MergedType objectType) : base(originalTypeName)
         {
-            this.endType = endType;
+            this.objectType = objectType;
             this.Provider = provider;
         }
 
@@ -70,7 +70,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      {
                                          Name = "cursor",
                                          ResolvedType = new StringGraphType(),
-                                         Resolver = new CursorResolver(this.endType)
+                                         Resolver = new CursorResolver(this.objectType)
                                      },
                                  new FieldType
                                      {
@@ -80,19 +80,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                  {
                                                      {
                                                          MetaDataKey,
-                                                         this.endType
+                                                         this.objectType
                                                      }
                                                  }
                                      }
                              };
 
-            return new VirtualGraphType(this.ComplexTypeName, fields);
+            return new VirtualGraphType.Array(this.ComplexTypeName, fields);
         }
 
         /// <inheritdoc />
         public override IEnumerable<MergedType> GetAllTypes()
         {
-            return this.endType.GetAllTypes().Union(new[] { this });
+            yield return this;
+            foreach (var type in this.objectType.GetAllTypes())
+            {
+                yield return type;
+            }
         }
 
         /// <inheritdoc />
@@ -121,17 +125,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <summary>
             /// Initializes a new instance of the <see cref="CursorResolver"/> class.
             /// </summary>
-            /// <param name="endType">
+            /// <param name="objectType">
             /// The end type.
             /// </param>
-            public CursorResolver(MergedEndType endType)
+            public CursorResolver(MergedType objectType)
             {
-                this.keyName = endType.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(ApiField.EnFlags.IsKey)).Key;
+                this.keyName = (objectType as MergedObjectType)?.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
             }
 
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
+                if (this.keyName == null)
+                {
+                    return null;
+                }
+
                 var parentData = context.Source as JObject;
                 return parentData?.GetValue(this.keyName);
             }

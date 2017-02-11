@@ -14,6 +14,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// The merged api abstract type description
     /// </summary>
@@ -55,7 +57,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         /// <param name="context">The request context</param>
         /// <returns>Resolved value</returns>
-        public abstract object Resolve(ResolveFieldContext context);
+        public virtual object Resolve(ResolveFieldContext context)
+        {
+            var parentData = context.Source as JObject;
+            if (context.ParentType is IArrayContainerGraph && parentData?.Parent?.Type == JTokenType.Array)
+            {
+                return parentData;
+            }
+
+            return parentData?.GetValue(context.FieldName);
+        }
 
         /// <summary>
         /// Get all included types recursively

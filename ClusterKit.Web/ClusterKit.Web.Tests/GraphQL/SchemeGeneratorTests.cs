@@ -99,7 +99,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var viewerType = new ApiType(
                 "viewer",
-                new[] { new ApiField("id", ApiField.TypeNameInt), new ApiField("name", ApiField.TypeNameString) });
+                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
             var api = new ApiDescription(
                 "Test-Api-1",
@@ -168,20 +168,20 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var viewerType = new ApiType(
                 "viewer",
-                new[] { new ApiField("id", ApiField.TypeNameInt, ApiField.EnFlags.IsKey), new ApiField("name", ApiField.TypeNameString) });
+                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
-            var objectType = new ApiType("object", new[] { new ApiField("id", ApiField.TypeNameString, ApiField.EnFlags.IsKey) });
+            var objectType = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.String, EnFieldFlags.IsKey) });
 
             var api = new ApiDescription(
                 "Test-Api-1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", ApiField.EnFlags.IsArray) });
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsArray) });
 
             var provider = new MoqProvider
             {
                 Description = api,
-                Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10}, {\"id\": 20}]}}"
+                Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\" }, \"object\": { \"count\": 2, \"items\": [{\"id\": 10}, {\"id\": 20}]}}"
             };
 
             var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
@@ -207,7 +207,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     api {
                                         viewer {
                                             id,
-                                            name
+                                            name                                            
                                         },
                                         object {
                                             count,
@@ -240,17 +240,13 @@ namespace ClusterKit.Web.Tests.GraphQL
                                               {
                                                 ""cursor"": 10,
                                                 ""node"": {
-                                                  ""id"": {
-                                                    ""id"": 10
-                                                  }
+                                                  ""id"": 10
                                                 }
                                               },
                                               {
                                                 ""cursor"": 20,
                                                 ""node"": {
-                                                  ""id"": {
-                                                    ""id"": 20
-                                                  }
+                                                  ""id"": 20
                                                 }
                                               }
                                             ]
@@ -271,15 +267,15 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var viewerType = new ApiType(
                 "viewer",
-                new[] { new ApiField("id", ApiField.TypeNameInt, ApiField.EnFlags.IsKey), new ApiField("name", ApiField.TypeNameString) });
+                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
-            var objectType = new ApiType("object", new[] { new ApiField("id", ApiField.TypeNameInt, ApiField.EnFlags.IsKey), new ApiField("name", ApiField.TypeNameString) });
+            var objectType = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey), ApiField.Scalar("name", EnScalarType.String) });
 
             var api = new ApiDescription(
                 "Test-Api-1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", ApiField.EnFlags.IsArray) });
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsArray) });
 
             var provider = new MoqProvider
             {
@@ -344,21 +340,15 @@ namespace ClusterKit.Web.Tests.GraphQL
                                               {
                                                 ""cursor"": 10,
                                                 ""node"": {
-                                                  ""id"": null,
-                                                  ""name"": {
-                                                    ""id"": 10,
-                                                    ""name"": ""test object1""
-                                                  }
+                                                  ""id"": 10,
+                                                  ""name"": ""test object1""
                                                 }
                                               },
                                               {
                                                 ""cursor"": 20,
                                                 ""node"": {
-                                                  ""id"": null,
-                                                  ""name"": {
-                                                    ""id"": 20,
-                                                    ""name"": ""test object2""
-                                                  }
+                                                  ""id"": 20,
+                                                  ""name"": ""test object2""
                                                 }
                                               }
                                             ]
@@ -379,12 +369,12 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var viewerType1 = new ApiType(
                 "viewer1",
-                new[] { new ApiField("id", ApiField.TypeNameInt), new ApiField("name", ApiField.TypeNameString) });
+                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
-            var viewerType2 = new ApiType("viewer2", new[] { new ApiField("description", ApiField.TypeNameString) });
+            var viewerType2 = new ApiType("viewer2", new[] { ApiField.Scalar("description", EnScalarType.String) });
 
-            var objectType1 = new ApiType("object1", new[] { new ApiField("id", ApiField.TypeNameString) });
-            var objectType2 = new ApiType("object2", new[] { new ApiField("id", ApiField.TypeNameString) });
+            var objectType1 = new ApiType("object1", new[] { ApiField.Scalar("id", EnScalarType.String) });
+            var objectType2 = new ApiType("object2", new[] { ApiField.Scalar("id", EnScalarType.String) });
 
             var api1 = new ApiDescription(
                 "Test-Api-1",

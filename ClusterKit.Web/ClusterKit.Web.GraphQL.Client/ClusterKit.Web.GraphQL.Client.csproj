@@ -51,6 +51,8 @@
     <Compile Include="ApiField.cs" />
     <Compile Include="ApiMethod.cs" />
     <Compile Include="ApiType.cs" />
+    <Compile Include="EnFieldFlags.cs" />
+    <Compile Include="EnScalarType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublishToApiAttribute.cs" />
   </ItemGroup>

@@ -26,7 +26,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// The object end type
         /// </summary>
-        private readonly MergedEndType endType;
+        private readonly MergedType elementType;
 
         /// <summary>
         /// The type of the edge
@@ -42,14 +42,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="provider">
         /// The provider.
         /// </param>
-        /// <param name="endType">
+        /// <param name="elementType">
         /// The end Type.
         /// </param>
-        public MergedConnectionType(string originalTypeName, FieldProvider provider, MergedEndType endType) : base(originalTypeName)
+        public MergedConnectionType(string originalTypeName, FieldProvider provider, MergedType elementType) : base(originalTypeName)
         {
-            this.endType = endType;
+            this.elementType = elementType;
             this.Provider = provider;
-            this.edgeType = new MergedEdgeType(this.OriginalTypeName, provider, endType);
+            this.edgeType = new MergedEdgeType(this.OriginalTypeName, provider, elementType);
         }
 
         /// <summary>
@@ -67,16 +67,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                                     };
 
         /// <inheritdoc />
-        public override object Resolve(ResolveFieldContext context)
-        {
-            var parentData = context.Source as JObject;
-            return parentData?.GetValue(context.FieldName);
-        }
-
-        /// <inheritdoc />
         public override IEnumerable<MergedType> GetAllTypes()
         {
-            return this.edgeType.GetAllTypes().Union(new[] { this });
+            yield return this;
+            foreach (var type in this.edgeType.GetAllTypes())
+            {
+                yield return type;
+            }
         }
 
         /// <inheritdoc />
@@ -100,10 +97,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return new VirtualGraphType(this.ComplexTypeName, fields);
         }
 
-
         /// <inheritdoc />
         public override QueryArguments GenerateArguments()
         {
+            if (!(this.elementType is MergedObjectType))
+            {
+                return null;
+            }
+
             var arguments = new[]
                                 {
                                     new QueryArgument(typeof(GraphType))
@@ -128,7 +129,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                         },
                                 };
 
-
             return new QueryArguments(arguments);
         }
 
@@ -138,25 +138,35 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The filter graph type</returns>
         private GraphType GenerateFilterType()
         {
+            var objectType = (MergedObjectType)this.elementType;
             var graphType = new VirtualInputGraphType($"{this.OriginalTypeName}-Filter");
             graphType.AddField(new FieldType { Name = "AND", ResolvedType = new ListGraphType(graphType) });
             graphType.AddField(new FieldType { Name = "OR", ResolvedType = new ListGraphType(graphType) });
-            foreach (var itemField in this.endType.Fields.Where(p => p.Value.Flags.HasFlag(ApiField.EnFlags.IsScalar)))
+            foreach (var itemField in objectType.Fields.Where(p => p.Value.Flags.HasFlag(EnFieldFlags.IsScalar)))
             {
-                var type = itemField.Value.Type as MergedEndType;
+                var type = itemField.Value.Type as MergedScalarType;
                 if (type == null)
                 {
                     continue;
                 }
 
-                if (type.ComplexTypeName == ApiField.TypeNameString)
+                switch (type.ScalarType)
                 {
-                    graphType.AddFields(this.GenerateStringFilterFields(itemField.Key));
-                }
-
-                if (type.ComplexTypeName == ApiField.TypeNameInt)
-                {
-                    graphType.AddFields(this.GenerateIntFilterFields(itemField.Key));
+                    case EnScalarType.Guid:
+                    case EnScalarType.Boolean:
+                        graphType.AddFields(this.GenerateStrictEqualFilterFields(itemField.Key, type.GenerateGraphType()));
+                        break;
+                    case EnScalarType.Enum:
+                        // todo: work with enum
+                        break;
+                    case EnScalarType.Float:
+                    case EnScalarType.Decimal:
+                    case EnScalarType.Integer:
+                        graphType.AddFields(this.GenerateNumberFilterFields(itemField.Key, type.GenerateGraphType()));
+                        break;
+                    case EnScalarType.String:
+                        graphType.AddFields(this.GenerateStringFilterFields(itemField.Key));
+                        break;
                 }
             }
 
@@ -169,14 +179,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The filter graph type</returns>
         private GraphType GenerateSortType()
         {
+            var objectType = (MergedObjectType)this.elementType;
             var enumType = new EnumerationGraphType { Name = $"{this.OriginalTypeName}-OrderByEnum" };
-            foreach (var itemField in this.endType.Fields.Where(p => p.Value.Flags.HasFlag(ApiField.EnFlags.IsScalar)))
+            foreach (var itemField in objectType.Fields.Where(p => p.Value.Flags.HasFlag(EnFieldFlags.IsScalar)))
             {
                 enumType.AddValue($"{itemField.Key}_ASC", string.Empty, $"{itemField.Key}_ASC");
                 enumType.AddValue($"{itemField.Key}_DESC", string.Empty, $"{itemField.Key}_DESC");
             }
 
-            return new ListGraphType(enumType); 
+            return new ListGraphType(enumType);
         }
 
         /// <summary>
@@ -188,22 +199,55 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         {
             yield return new FieldType { Name = fieldName, ResolvedType = new StringGraphType() };
             yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_in", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_not_in", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_contains", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_not_contains", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_starts_with", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_not_starts_with", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_ends", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_ends_with", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = $"{fieldName}_not_ends_with", ResolvedType = new StringGraphType() };
         }
-
 
         /// <summary>
         /// Generates the filters for integer properties of an object
         /// </summary>
-        /// <param name="fieldName">The field name</param>
-        /// <returns>The list of properties</returns>
-        private IEnumerable<FieldType> GenerateIntFilterFields(string fieldName)
+        /// <param name="fieldName">
+        /// The field name
+        /// </param>
+        /// <param name="graphType">
+        /// The field graph Type.
+        /// </param>
+        /// <returns>
+        /// The list of properties
+        /// </returns>
+        private IEnumerable<FieldType> GenerateNumberFilterFields(string fieldName, IGraphType graphType)
         {
-            yield return new FieldType { Name = fieldName, ResolvedType = new IntGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = new IntGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_lt", ResolvedType = new IntGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_lte", ResolvedType = new IntGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_gt", ResolvedType = new IntGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_gte", ResolvedType = new IntGraphType() };
+            yield return new FieldType { Name = fieldName, ResolvedType = graphType };
+            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = graphType };
+            yield return new FieldType { Name = $"{fieldName}_lt", ResolvedType = graphType };
+            yield return new FieldType { Name = $"{fieldName}_lte", ResolvedType = graphType };
+            yield return new FieldType { Name = $"{fieldName}_gt", ResolvedType = graphType };
+            yield return new FieldType { Name = $"{fieldName}_gte", ResolvedType = graphType };
+        }
+
+        /// <summary>
+        /// Generates the filters for properties of an object that can be only equal or not equal to value
+        /// </summary>
+        /// <param name="fieldName">
+        /// The field name
+        /// </param>
+        /// <param name="graphType">
+        /// The field graph Type.
+        /// </param>
+        /// <returns>
+        /// The list of properties
+        /// </returns>
+        private IEnumerable<FieldType> GenerateStrictEqualFilterFields(string fieldName, IGraphType graphType)
+        {
+            yield return new FieldType { Name = fieldName, ResolvedType = graphType };
+            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = graphType };
         }
 
         /// <summary>
