@@ -74,11 +74,6 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <returns>The new field</returns>
         public static ApiField Object([NotNull]string name, [NotNull]string typeName, EnFieldFlags flags = EnFieldFlags.None)
         {
-            if (flags.HasFlag(EnFieldFlags.IsScalar))
-            {
-                throw new ArgumentException("Object field can't be of scalar type");
-            }
-
             if (flags.HasFlag(EnFieldFlags.IsKey))
             {
                 throw new ArgumentException("Object field can't be used as key");
@@ -101,7 +96,12 @@ namespace ClusterKit.Web.GraphQL.Client
                 throw new ArgumentException("Type cannot be None");
             }
 
-            return new ApiField(name, flags | EnFieldFlags.IsScalar) { ScalarType = type };
+            if (flags.HasFlag(EnFieldFlags.IsConnection))
+            {
+                throw new ArgumentException("Scalar field can't be used as connected objects");
+            }
+
+            return new ApiField(name, flags) { ScalarType = type };
         }
 
         /// <inheritdoc />

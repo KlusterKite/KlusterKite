@@ -47,70 +47,52 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Testing trivial scheme generator
-        /// </summary>
-        [Fact]
-        public void TrivialTest()
-        {
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider>());
-
-            using (var printer = new SchemaPrinter(scheme))
-            {
-                var description = printer.Print();
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrEmpty(description));
-            }
-        }
-
-        /// <summary>
-        /// Testing generator for some empty single api
-        /// </summary>
-        [Fact]
-        public void Trivial2Test()
-        {
-            var api = new ApiDescription
-                          {
-                              ApiName = "Test-Api-1",
-                              TypeName = "Test-Api-1",
-                              Version = new Version("0.0.0.1"),
-                          };
-
-            var provider = new MoqProvider { Description = api };
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
-
-            using (var printer = new SchemaPrinter(scheme))
-            {
-                var description = printer.Print();
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
-
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
-        }
-
-        /// <summary>
-        /// Testing generator for some simple single api
+        /// Testing generator for some api with arrays
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
-        public async Task NonEmptyApiTest()
+        public async Task ArraysApiTest()
         {
-            var viewerType = new ApiType(
-                "viewer",
-                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
+            var viewerFields = new[]
+                                   {
+                                       ApiField.Scalar("id", EnScalarType.Guid),
+                                       ApiField.Scalar("name", EnScalarType.String),
+                                       ApiField.Scalar("numbers", EnScalarType.Integer, EnFieldFlags.IsArray),
+                                       ApiField.Object("objects", "object", EnFieldFlags.IsArray)
+                                   };
+            var viewerType = new ApiType("viewer", viewerFields);
+
+            var objectType = new ApiType(
+                "object",
+                new[] { ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey), ApiField.Scalar("name", EnScalarType.String) });
 
             var api = new ApiDescription(
                 "Test-Api-1",
                 "0.0.0.1",
-                new[] { viewerType },
-                new[] { viewerType.CreateField("viewer") });
+                new[] { viewerType, objectType },
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
 
             var provider = new MoqProvider
-            {
+                               {
                                    Description = api,
-                                   Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}}"
+                                   Data = @"{
+	                                            ""viewer"": {
+		                                            ""id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
+		                                            ""name"": ""test name"",
+		                                            ""numbers"": [1, 2, 3],
+                                                    ""objects"": [
+			                                            {""id"": 30, ""name"": ""test name""}, 
+			                                            {""id"": 40, ""name"": ""test name2""}
+		                                            ]
+	                                            }, 
+	                                            ""object"": {
+		                                            ""count"": 2, 
+		                                            ""items"": [
+			                                            {""id"": 10}, 
+			                                            {""id"": 20}
+		                                            ]
+	                                            }
+                                            }"
             };
 
             var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
@@ -136,78 +118,12 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     api {
                                         viewer {
                                             id,
-                                            name
-                                        }
-                                    }
-                                }            
-                                ";
-                                 }).ConfigureAwait(true);
-
-            this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-            var expectedResponse = @"{
-                                      ""data"": {
-                                        ""api"": {
-                                          ""viewer"": {
-                                            ""id"": 1,
-                                            ""name"": ""test name""
-                                          }
-                                        }
-                                      }
-                                    }";
-            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Testing generator for some api with arrays
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task ArraysApiTest()
-        {
-            var viewerType = new ApiType(
-                "viewer",
-                new[] { ApiField.Scalar("id", EnScalarType.Guid), ApiField.Scalar("name", EnScalarType.String) });
-
-            var objectType = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.String, EnFieldFlags.IsKey) });
-
-            var api = new ApiDescription(
-                "Test-Api-1",
-                "0.0.0.1",
-                new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsArray) });
-
-            var provider = new MoqProvider
-            {
-                Description = api,
-                Data = "{\"viewer\": {\"id\": \"FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0\", \"name\": \"test name\" }, \"object\": { \"count\": 2, \"items\": [{\"id\": 10}, {\"id\": 20}]}}"
-            };
-
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
-
-            using (var printer = new SchemaPrinter(scheme))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
-
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                             r =>
-                             {
-                                 r.Schema = scheme;
-                                 r.Query = @"
-                                query {
-                                    api {
-                                        viewer {
-                                            id,
-                                            name                                            
+                                            name,
+                                            numbers,
+                                            objects {
+                                                id,
+                                                name
+                                            }
                                         },
                                         object {
                                             count,
@@ -221,7 +137,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     }
                                 }            
                                 ";
-                             }).ConfigureAwait(true);
+                                 }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
             var response = new DocumentWriter(true).Write(result);
@@ -232,7 +148,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                         ""api"": {
                                           ""viewer"": {
                                             ""id"": ""fd73bafb-3698-4fa1-81f5-27c8c83bb4f0"",
-                                            ""name"": ""test name""
+                                            ""name"": ""test name"",
+		                                    ""numbers"": [1, 2, 3],
+                                            ""objects"": [ {""id"": 30, ""name"": ""test name""}, {""id"": 40, ""name"": ""test name2""}]
                                           },
                                           ""object"": {
                                             ""count"": 2,
@@ -269,19 +187,26 @@ namespace ClusterKit.Web.Tests.GraphQL
                 "viewer",
                 new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
-            var objectType = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey), ApiField.Scalar("name", EnScalarType.String) });
+            var objectType = new ApiType(
+                "object",
+                new[]
+                    {
+                        ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
+                        ApiField.Scalar("name", EnScalarType.String)
+                    });
 
             var api = new ApiDescription(
                 "Test-Api-1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsArray) });
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
 
             var provider = new MoqProvider
-            {
-                Description = api,
-                Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
-            };
+                               {
+                                   Description = api,
+                                   Data =
+                                       "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
+                               };
 
             var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
@@ -299,9 +224,9 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = scheme;
-                                 r.Query = @"
+                                 {
+                                     r.Schema = scheme;
+                                     r.Query = @"
                                 query {
                                     api {
                                         viewer {
@@ -321,7 +246,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     }
                                 }            
                                 ";
-                             }).ConfigureAwait(true);
+                                 }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
             var response = new DocumentWriter(true).Write(result);
@@ -460,6 +385,119 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       }
                                     }";
             Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing generator for some simple single api
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task NonEmptyApiTest()
+        {
+            var viewerType = new ApiType(
+                "viewer",
+                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
+
+            var api = new ApiDescription(
+                "Test-Api-1",
+                "0.0.0.1",
+                new[] { viewerType },
+                new[] { viewerType.CreateField("viewer") });
+
+            var provider = new MoqProvider
+                               {
+                                   Description = api,
+                                   Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}}"
+                               };
+
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+
+            using (var printer = new SchemaPrinter(scheme))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(scheme.Query);
+            Assert.Equal(1, scheme.Query.Fields.Count());
+            Assert.True(scheme.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = scheme;
+                                     r.Query = @"
+                                query {
+                                    api {
+                                        viewer {
+                                            id,
+                                            name
+                                        }
+                                    }
+                                }            
+                                ";
+                                 }).ConfigureAwait(true);
+
+            this.output.WriteLine("-------- Response -----------");
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                          ""viewer"": {
+                                            ""id"": 1,
+                                            ""name"": ""test name""
+                                          }
+                                        }
+                                      }
+                                    }";
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing generator for some empty single api
+        /// </summary>
+        [Fact]
+        public void Trivial2Test()
+        {
+            var api = new ApiDescription
+                          {
+                              ApiName = "Test-Api-1",
+                              TypeName = "Test-Api-1",
+                              Version = new Version("0.0.0.1"),
+                          };
+
+            var provider = new MoqProvider { Description = api };
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+
+            using (var printer = new SchemaPrinter(scheme))
+            {
+                var description = printer.Print();
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(scheme.Query);
+            Assert.Equal(1, scheme.Query.Fields.Count());
+            Assert.True(scheme.Query.HasField("api"));
+        }
+
+        /// <summary>
+        /// Testing trivial scheme generator
+        /// </summary>
+        [Fact]
+        public void TrivialTest()
+        {
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider>());
+
+            using (var printer = new SchemaPrinter(scheme))
+            {
+                var description = printer.Print();
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrEmpty(description));
+            }
         }
 
         /// <summary>

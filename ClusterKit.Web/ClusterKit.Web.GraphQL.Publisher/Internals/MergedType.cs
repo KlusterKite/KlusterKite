@@ -26,7 +26,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// The metadata key to access the original <see cref="MergedType"/> object
         /// </summary>
-        public const string MetaDataKey = "MergedType";
+        public const string MetaDataTypeKey = "MergedType";
+
+        /// <summary>
+        /// The metadata key to access the original <see cref="MergedType"/> object
+        /// </summary>
+        public const string MetaDataFlagsKey = "Flags";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MergedType"/> class.
@@ -81,16 +86,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         /// <returns>The representing <see cref="IGraphType"/></returns>
         public abstract IGraphType GenerateGraphType();
-
-        /// <summary>
-        /// Wraps generated graph type to attach to field
-        /// </summary>
-        /// <param name="type">The originally generated type</param>
-        /// <returns>The wrapped type</returns>
-        public virtual IGraphType WrapForField(IGraphType type)
-        {
-            return type;
-        }
 
         /// <inheritdoc />
         public override string ToString()

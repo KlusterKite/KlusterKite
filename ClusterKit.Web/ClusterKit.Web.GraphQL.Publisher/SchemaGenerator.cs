@@ -48,11 +48,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 .ForEach(
                     f =>
                         {
-                            var fieldDescription = f.GetMetadata<MergedType>(MergedType.MetaDataKey);
+                            var fieldDescription = f.GetMetadata<MergedType>(MergedType.MetaDataTypeKey);
+                            var flags = f.GetMetadata<EnFieldFlags>(MergedType.MetaDataFlagsKey);
                             if (fieldDescription != null)
                             {
                                 f.Arguments = fieldDescription.GenerateArguments();
-                                f.ResolvedType = fieldDescription.WrapForField(graphTypes[fieldDescription.ComplexTypeName]);
+                                f.ResolvedType = flags.HasFlag(EnFieldFlags.IsArray)
+                                    ? new ListGraphType(graphTypes[fieldDescription.ComplexTypeName]) 
+                                    : graphTypes[fieldDescription.ComplexTypeName];
                                 f.Resolver = fieldDescription;
                             }
                         });
@@ -120,7 +123,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 MergedField complexField;
                 if (parentType.Fields.TryGetValue(apiField.Name, out complexField))
                 {
-                    if (apiField.Flags.HasFlag(EnFieldFlags.IsScalar) || apiField.Flags.HasFlag(EnFieldFlags.IsArray)
+                    if (apiField.ScalarType != EnScalarType.None 
+                        || apiField.Flags.HasFlag(EnFieldFlags.IsConnection)
+                        || apiField.Flags.HasFlag(EnFieldFlags.IsArray)
                         || !(complexField.Type is MergedObjectType))
                     {
                         // todo: write merge error
@@ -129,7 +134,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 }
 
                 MergedType newFieldType;
-                if (apiField.Flags.HasFlag(EnFieldFlags.IsScalar))
+                if (apiField.ScalarType != EnScalarType.None)
                 {
                     newFieldType = new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
                 }
@@ -157,7 +162,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
                     newFieldType = objectType;
 
-                    if (apiField.Flags.HasFlag(EnFieldFlags.IsArray))
+                    if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
                     {
                         newFieldType = new MergedConnectionType(
                             objectType.OriginalTypeName,

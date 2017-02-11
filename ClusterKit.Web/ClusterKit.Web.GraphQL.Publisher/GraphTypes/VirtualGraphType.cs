@@ -14,8 +14,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
     using System.Linq;
 
     using ClusterKit.Web.GraphQL.Client;
-    using ClusterKit.Web.GraphQL.Publisher.Internals;
-
+    
     using global::GraphQL.Types;
 
     /// <summary>

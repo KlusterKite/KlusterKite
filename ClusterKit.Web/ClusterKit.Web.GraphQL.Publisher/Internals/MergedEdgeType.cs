@@ -79,10 +79,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Metadata =
                                              new Dictionary<string, object>
                                                  {
-                                                     {
-                                                         MetaDataKey,
-                                                         this.objectType
-                                                     }
+                                                     { MetaDataTypeKey, this.objectType },
+                                                     { MetaDataFlagsKey, EnFieldFlags.None }
                                                  }
                                      }
                              };
@@ -98,12 +96,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 yield return type;
             }
-        }
-
-        /// <inheritdoc />
-        public override IGraphType WrapForField(IGraphType type)
-        {
-            return new ListGraphType(type);
         }
 
         /// <inheritdoc />

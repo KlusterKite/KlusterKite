@@ -246,7 +246,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             var field = new FieldType
             {
                 Name = description.Key,
-                Metadata = new Dictionary<string, object> { { MetaDataKey, description.Value.Type } }
+                Metadata = new Dictionary<string, object>
+                               {
+                                   { MetaDataTypeKey, description.Value.Type },
+                                   { MetaDataFlagsKey, description.Value.Flags }
+                               }
             };
             return field;
         }

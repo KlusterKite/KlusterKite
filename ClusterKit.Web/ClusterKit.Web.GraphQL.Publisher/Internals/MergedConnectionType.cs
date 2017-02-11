@@ -91,7 +91,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                  new FieldType
                                      {
                                          Name = "edges",
-                                         Metadata = new Dictionary<string, object> { { MetaDataKey, this.edgeType } }
+                                         Metadata = new Dictionary<string, object>
+                                                        {
+                                                            { MetaDataTypeKey, this.edgeType },
+                                                            { MetaDataFlagsKey, EnFieldFlags.IsArray }
+                                                        }
                                      }
                              };
 
@@ -143,9 +147,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             var graphType = new VirtualInputGraphType($"{this.OriginalTypeName}-Filter");
             graphType.AddField(new FieldType { Name = "AND", ResolvedType = new ListGraphType(graphType) });
             graphType.AddField(new FieldType { Name = "OR", ResolvedType = new ListGraphType(graphType) });
-            foreach (var itemField in objectType.Fields.Where(p => p.Value.Flags.HasFlag(EnFieldFlags.IsScalar)))
+            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType))
             {
-                var type = itemField.Value.Type as MergedScalarType;
+                var type = (MergedScalarType)itemField.Value.Type;
                 if (type == null)
                 {
                     continue;
@@ -182,7 +186,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         {
             var objectType = (MergedObjectType)this.elementType;
             var enumType = new EnumerationGraphType { Name = $"{this.OriginalTypeName}-OrderByEnum" };
-            foreach (var itemField in objectType.Fields.Where(p => p.Value.Flags.HasFlag(EnFieldFlags.IsScalar)))
+            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType))
             {
                 enumType.AddValue($"{itemField.Key}_ASC", string.Empty, $"{itemField.Key}_ASC");
                 enumType.AddValue($"{itemField.Key}_DESC", string.Empty, $"{itemField.Key}_DESC");
