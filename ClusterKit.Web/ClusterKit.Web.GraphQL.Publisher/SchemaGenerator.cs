@@ -15,6 +15,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using Akka.Util.Internal;
 
     using ClusterKit.Web.GraphQL.Client;
+    using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
     using ClusterKit.Web.GraphQL.Publisher.Internals;
 
     using global::GraphQL.Types;

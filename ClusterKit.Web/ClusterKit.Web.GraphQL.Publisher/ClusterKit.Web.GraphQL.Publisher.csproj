@@ -225,8 +225,11 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="EndpointController.cs" />
+    <Compile Include="GraphTypes\GuidGraphType.cs" />
+    <Compile Include="GraphTypes\IArrayContainerGraph.cs" />
+    <Compile Include="GraphTypes\VirtualGraphType.cs" />
+    <Compile Include="GraphTypes\VirtualInputGraphType.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="Internals\IArrayContainerGraph.cs" />
     <Compile Include="Internals\MergedConnectionType.cs" />
     <Compile Include="Internals\MergedEdgeType.cs" />
     <Compile Include="Internals\MergedObjectType.cs" />
@@ -234,8 +237,6 @@
     <Compile Include="Internals\MergedScalarType.cs" />
     <Compile Include="Internals\MergedType.cs" />
     <Compile Include="Internals\FieldProvider.cs" />
-    <Compile Include="Internals\VirtualGraphType.cs" />
-    <Compile Include="Internals\VirtualInputGraphType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaGenerator.cs" />
   </ItemGroup>

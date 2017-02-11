@@ -7,13 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.Internals
+namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using ClusterKit.Web.GraphQL.Client;
+    using ClusterKit.Web.GraphQL.Publisher.Internals;
 
     using global::GraphQL.Types;
 

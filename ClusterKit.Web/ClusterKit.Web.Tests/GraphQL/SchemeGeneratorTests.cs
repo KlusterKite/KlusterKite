@@ -168,7 +168,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var viewerType = new ApiType(
                 "viewer",
-                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
+                new[] { ApiField.Scalar("id", EnScalarType.Guid), ApiField.Scalar("name", EnScalarType.String) });
 
             var objectType = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.String, EnFieldFlags.IsKey) });
 
@@ -181,7 +181,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var provider = new MoqProvider
             {
                 Description = api,
-                Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\" }, \"object\": { \"count\": 2, \"items\": [{\"id\": 10}, {\"id\": 20}]}}"
+                Data = "{\"viewer\": {\"id\": \"FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0\", \"name\": \"test name\" }, \"object\": { \"count\": 2, \"items\": [{\"id\": 10}, {\"id\": 20}]}}"
             };
 
             var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
@@ -231,7 +231,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       ""data"": {
                                         ""api"": {
                                           ""viewer"": {
-                                            ""id"": 1,
+                                            ""id"": ""fd73bafb-3698-4fa1-81f5-27c8c83bb4f0"",
                                             ""name"": ""test name""
                                           },
                                           ""object"": {
