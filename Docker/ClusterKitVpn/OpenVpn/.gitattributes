@@ -3,10 +3,4 @@
 * text=auto
 
 *.sh text eol=lf merge=union
-
-# Custom for Visual Studio
-*.sln text eol=crlf merge=union 
-*.csproj merge=union
-*.vbproj merge=union
-*.fsproj merge=union
-*.dbproj merge=union
+*.conf text eol=lf merge=union
