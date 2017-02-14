@@ -79,8 +79,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Metadata =
                                              new Dictionary<string, object>
                                                  {
-                                                     { MetaDataTypeKey, this.objectType },
-                                                     { MetaDataFlagsKey, EnFieldFlags.None }
+                                                     { MetaDataTypeKey, new MergedField(this.objectType) }
                                                  }
                                      }
                              };

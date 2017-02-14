@@ -41,29 +41,63 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 typeName => typeName,
                 typeName => types.FirstOrDefault(t => t.ComplexTypeName == typeName)?.GenerateGraphType());
 
-            graphTypes.Values
-                .Where(a => a is VirtualGraphType)
+            graphTypes.Values.Where(a => a is VirtualGraphType)
                 .Cast<VirtualGraphType>()
                 .SelectMany(a => a.Fields)
                 .ForEach(
                     f =>
                         {
-                            var fieldDescription = f.GetMetadata<MergedType>(MergedType.MetaDataTypeKey);
-                            var flags = f.GetMetadata<EnFieldFlags>(MergedType.MetaDataFlagsKey);
+                            var fieldDescription = f.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
                             if (fieldDescription != null)
                             {
-                                f.Arguments = fieldDescription.GenerateArguments();
-                                f.ResolvedType = flags.HasFlag(EnFieldFlags.IsArray)
-                                    ? new ListGraphType(graphTypes[fieldDescription.ComplexTypeName]) 
-                                    : graphTypes[fieldDescription.ComplexTypeName];
-                                f.Resolver = fieldDescription;
+                                var typeArguments = fieldDescription.Type.GenerateArguments(graphTypes)
+                                                    ?? new QueryArguments();
+                                var fieldArguments =
+                                    fieldDescription.Arguments.Select(
+                                        p =>
+                                            new QueryArgument(typeof(VirtualInputGraphType))
+                                                {
+                                                    Name = p.Key,
+                                                    ResolvedType =
+                                                        graphTypes[
+                                                            p.Value.Type
+                                                                .ComplexTypeName
+                                                        ]
+                                                });
+
+                                var resultingArguments = typeArguments.Union(fieldArguments).ToList();
+
+                                if (resultingArguments.Any())
+                                {
+                                    f.Arguments = new QueryArguments(resultingArguments);
+                                }
+
+                                f.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
+                                                     ? new ListGraphType(
+                                                         graphTypes[fieldDescription.Type.ComplexTypeName])
+                                                     : graphTypes[fieldDescription.Type.ComplexTypeName];
+                                f.Resolver = fieldDescription.Type;
                             }
                         });
 
-            var schema = new Schema
-                             {
-                                 Query = (VirtualGraphType)graphTypes[root.ComplexTypeName],
-                             };
+            graphTypes.Values.Where(a => a is VirtualInputGraphType)
+                .Cast<VirtualInputGraphType>()
+                .SelectMany(a => a.Fields)
+                .ForEach(
+                    f =>
+                        {
+                            var fieldDescription = f.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
+                            if (fieldDescription != null)
+                            {
+                                f.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
+                                                     ? new ListGraphType(
+                                                         graphTypes[fieldDescription.Type.ComplexTypeName])
+                                                     : graphTypes[fieldDescription.Type.ComplexTypeName];
+                                f.Resolver = fieldDescription.Type;
+                            }
+                        });
+
+            var schema = new Schema { Query = (VirtualGraphType)graphTypes[root.ComplexTypeName], };
 
             schema.Initialize();
             return schema;
@@ -112,11 +146,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="path">
         /// The types names path to avoid circular references.
         /// </param>
+        /// <param name="createAsInput">A value indicating that an input type is assembled</param>
         private static void MergeFields(
             MergedObjectType parentType,
-            List<ApiField> apiFields,
+            IEnumerable<ApiField> apiFields,
             ApiProvider provider,
-            List<string> path)
+            ICollection<string> path,
+            bool createAsInput = false)
         {
             foreach (var apiField in apiFields)
             {
@@ -124,55 +160,92 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 if (parentType.Fields.TryGetValue(apiField.Name, out complexField))
                 {
                     if (apiField.ScalarType != EnScalarType.None 
+                        || createAsInput
                         || apiField.Flags.HasFlag(EnFieldFlags.IsConnection)
-                        || apiField.Flags.HasFlag(EnFieldFlags.IsArray)
-                        || !(complexField.Type is MergedObjectType))
+                        || apiField.Flags.HasFlag(EnFieldFlags.IsArray) 
+                        || !(complexField.Type is MergedObjectType)
+                        || complexField.Arguments.Any() || apiField.Arguments.Any())
                     {
                         // todo: write merge error
                         continue;
                     }
                 }
 
-                MergedType newFieldType;
-                if (apiField.ScalarType != EnScalarType.None)
+                var fieldType = CreateMergedType(provider, apiField, complexField, path, createAsInput);
+
+                if (fieldType == null)
                 {
-                    newFieldType = new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
+                    continue;
                 }
-                else
+
+                var fieldArguments = new Dictionary<string, MergedField>();
+
+                if (!createAsInput)
                 {
-                    var apiFieldType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
-                    var objectType = complexField?.Type as MergedObjectType ?? new MergedObjectType(apiField.TypeName);
-                    objectType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
-                    if (complexField != null)
+                    foreach (var argument in apiField.Arguments)
                     {
-                        objectType.Category = MergedObjectType.EnCategory.MultipleApiType;
-                    }
-
-                    if (path.Contains(apiFieldType.TypeName))
-                    {
-                        // todo: write circular reference error
-                        continue;
-                    }
-
-                    MergeFields(
-                        objectType,
-                        apiFieldType.Fields,
-                        provider,
-                        path.Union(new[] { apiFieldType.TypeName }).ToList());
-
-                    newFieldType = objectType;
-
-                    if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
-                    {
-                        newFieldType = new MergedConnectionType(
-                            objectType.OriginalTypeName,
-                            new FieldProvider { Provider = provider, FieldType = apiFieldType },
-                            objectType);
+                        var fieldArgumentType = CreateMergedType(provider, argument, null, path, true);
+                        fieldArguments[argument.Name] = new MergedField(fieldArgumentType, argument.Flags);
                     }
                 }
 
-                parentType.Fields[apiField.Name] = new MergedField(newFieldType, apiField.Flags);
+                var field = new MergedField(fieldType, apiField.Flags, fieldArguments);
+
+                parentType.Fields[apiField.Name] = field;
             }
+        }
+
+        /// <summary>
+        /// Creates field from api description
+        /// </summary>
+        /// <param name="provider">The api provider</param>
+        /// <param name="apiField">The api field description</param>
+        /// <param name="complexField">The same field merged from previous api descriptions</param>
+        /// <param name="path">The list of processed types</param>
+        /// <param name="createAsInput">A value indicating that an input type is assembled</param>
+        /// <returns>The field description</returns>
+        private static MergedType CreateMergedType(
+            ApiProvider provider,
+            ApiField apiField,
+            MergedField complexField,
+            ICollection<string> path,
+            bool createAsInput)
+        {
+            MergedType fieldType;
+            if (apiField.ScalarType != EnScalarType.None)
+            {
+                fieldType = new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
+            }
+            else
+            {
+                var apiFieldType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
+                var objectType = complexField?.Type as MergedObjectType ?? (createAsInput ? new MergedInputType(apiField.TypeName) : new MergedObjectType(apiField.TypeName));
+                objectType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
+                if (complexField != null)
+                {
+                    objectType.Category = MergedObjectType.EnCategory.MultipleApiType;
+                }
+
+                if (path.Contains(apiFieldType.TypeName))
+                {
+                    // todo: write circular reference error
+                    return null;
+                }
+
+                MergeFields(objectType, apiFieldType.Fields, provider, path.Union(new[] { apiFieldType.TypeName }).ToList());
+
+                fieldType = objectType;
+
+                if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
+                {
+                    fieldType = new MergedConnectionType(
+                        objectType.OriginalTypeName,
+                        new FieldProvider { Provider = provider, FieldType = apiFieldType },
+                        objectType);
+                }
+            }
+
+            return fieldType;
         }
     }
 }

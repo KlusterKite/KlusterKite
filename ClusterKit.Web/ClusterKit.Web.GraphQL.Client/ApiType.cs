@@ -34,20 +34,12 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="fields">
         /// The fields.
         /// </param>
-        /// <param name="methods">
-        /// The methods.
-        /// </param>
-        public ApiType(string typeName, IEnumerable<ApiField> fields = null,  IEnumerable<ApiMethod> methods = null)
+        public ApiType(string typeName, IEnumerable<ApiField> fields = null)
         {
             this.TypeName = typeName;
             if (fields != null)
             {
                 this.Fields.AddRange(fields);
-            }
-
-            if (methods != null)
-            {
-                this.Methods.AddRange(methods);
             }
         }
 
@@ -57,13 +49,6 @@ namespace ClusterKit.Web.GraphQL.Client
         [NotNull]
         [UsedImplicitly]
         public List<ApiField> Fields { get; set; } = new List<ApiField>();
-
-        /// <summary>
-        /// Gets or sets the list of methods
-        /// </summary>
-        [NotNull]
-        [UsedImplicitly]
-        public List<ApiMethod> Methods { get; set; } = new List<ApiMethod>();
 
         /// <summary>
         /// Gets or sets the type name for the api

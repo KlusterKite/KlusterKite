@@ -41,11 +41,8 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="fields">
         /// The fields.
         /// </param>
-        /// <param name="methods">
-        /// The methods.
-        /// </param>
-        public ApiDescription(string apiName, string version, IEnumerable<ApiType> types, IEnumerable<ApiField> fields = null, IEnumerable<ApiMethod> methods = null)
-            : base(apiName, fields, methods)
+        public ApiDescription(string apiName, string version, IEnumerable<ApiType> types, IEnumerable<ApiField> fields = null)
+            : base(apiName, fields)
         {
             this.ApiName = apiName;
             this.Version = Version.Parse(version);

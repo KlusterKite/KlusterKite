@@ -39,7 +39,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="originalTypeName">
         /// The original type name.
         /// </param>
-        public MergedObjectType(string originalTypeName) : base(originalTypeName)
+        public MergedObjectType(string originalTypeName)
+            : base(originalTypeName)
         {
             this.Category = EnCategory.SingleApiType;
             this.Fields = new Dictionary<string, MergedField>();
@@ -75,11 +76,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets combined name from all provider
         /// </summary>
         public override string ComplexTypeName
-            => this.Providers.Any()
-                        ? string.Join(
-                            "|",
-                            this.Providers.Select(p => p.FieldType.TypeName).Distinct().OrderBy(s => s).ToArray())
-                        : this.OriginalTypeName;
+            =>
+                this.Providers.Any()
+                    ? string.Join(
+                        "|",
+                        this.Providers.Select(p => p.FieldType.TypeName).Distinct().OrderBy(s => s).ToArray())
+                    : this.OriginalTypeName;
 
         /// <summary>
         /// Gets the list of subfields
@@ -125,6 +127,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             yield return this;
             foreach (var type in this.Fields.Values)
             {
+                foreach (var argumentsValue in type.Arguments.Values)
+                {
+                    yield return argumentsValue.Type;
+                }
+
                 foreach (var subType in type.Type.GetAllTypes())
                 {
                     yield return subType;
@@ -149,6 +156,29 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        /// <summary>
+        /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
+        /// </summary>
+        /// <param name="description">The api field description</param>
+        /// <returns>The <see cref="FieldType"/></returns>
+        protected FieldType ConvertApiField(KeyValuePair<string, MergedField> description)
+        {
+            var field = new FieldType
+                            {
+                                Name = description.Key,
+                                Type = typeof(VirtualGraphType), // to workaround internal library checks
+                                Metadata =
+                                    new Dictionary<string, object>
+                                        {
+                                            {
+                                                MetaDataTypeKey,
+                                                description.Value
+                                            }
+                                        }
+                            };
+            return field;
         }
 
         /// <summary>
@@ -204,9 +234,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var request = new ApiRequest { Arguments = usedField.Ast.Arguments, Name = usedField.Ast.Name };
                 var endType = usedField.Field.Type as MergedObjectType;
 
-                request.Fields = endType?.Category == EnCategory.MultipleApiType 
-                    ? endType.GatherMultipleApiRequest(provider, usedField.Ast).ToList() 
-                    : this.GatherSingleApiRequest(usedField.Ast).ToList();
+                request.Fields = endType?.Category == EnCategory.MultipleApiType
+                                     ? endType.GatherMultipleApiRequest(provider, usedField.Ast).ToList()
+                                     : this.GatherSingleApiRequest(usedField.Ast).ToList();
 
                 yield return request;
             }
@@ -234,25 +264,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 yield return request;
             }
-        }
-
-        /// <summary>
-        /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
-        /// </summary>
-        /// <param name="description">The api field description</param>
-        /// <returns>The <see cref="FieldType"/></returns>
-        private FieldType ConvertApiField(KeyValuePair<string, MergedField> description)
-        {
-            var field = new FieldType
-            {
-                Name = description.Key,
-                Metadata = new Dictionary<string, object>
-                               {
-                                   { MetaDataTypeKey, description.Value.Type },
-                                   { MetaDataFlagsKey, description.Value.Flags }
-                               }
-            };
-            return field;
         }
     }
 }

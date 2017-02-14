@@ -96,8 +96,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Generates arguments for the field
         /// </summary>
-        /// <returns>The generated arguments</returns>
-        public virtual QueryArguments GenerateArguments()
+        /// <param name="registeredTypes">
+        /// The registered Types.
+        /// </param>
+        /// <returns>
+        /// The generated arguments
+        /// </returns>
+        public virtual IEnumerable<QueryArgument> GenerateArguments(Dictionary<string, IGraphType> registeredTypes)
         {
             return null;
         }

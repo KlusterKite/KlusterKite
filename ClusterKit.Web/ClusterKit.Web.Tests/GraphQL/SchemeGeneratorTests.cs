@@ -22,6 +22,8 @@ namespace ClusterKit.Web.Tests.GraphQL
     using global::GraphQL.Http;
     using global::GraphQL.Utilities;
 
+    using Newtonsoft.Json.Linq;
+
     using Xunit;
     using Xunit.Abstractions;
 
@@ -62,9 +64,13 @@ namespace ClusterKit.Web.Tests.GraphQL
                                    };
             var viewerType = new ApiType("viewer", viewerFields);
 
-            var objectType = new ApiType(
-                "object",
-                new[] { ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey), ApiField.Scalar("name", EnScalarType.String) });
+            var objectFields = new[]
+                                   {
+                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
+                                       ApiField.Scalar("name", EnScalarType.String)
+                                   };
+
+            var objectType = new ApiType("object", objectFields);
 
             var api = new ApiDescription(
                 "Test-Api-1",
@@ -73,9 +79,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                 new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
 
             var provider = new MoqProvider
-                               {
-                                   Description = api,
-                                   Data = @"{
+            {
+                Description = api,
+                Data = @"{
 	                                            ""viewer"": {
 		                                            ""id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
 		                                            ""name"": ""test name"",
@@ -181,19 +187,19 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
-        public async Task ArraysArgumentsApiTest()
+        public async Task ConnectionsArgumentsApiTest()
         {
             var viewerType = new ApiType(
                 "viewer",
                 new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
-            var objectType = new ApiType(
-                "object",
-                new[]
-                    {
-                        ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
-                        ApiField.Scalar("name", EnScalarType.String)
-                    });
+            var objectFields = new[]
+                                   {
+                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
+                                       ApiField.Scalar("name", EnScalarType.String)
+                                   };
+
+            var objectType = new ApiType("object", objectFields);
 
             var api = new ApiDescription(
                 "Test-Api-1",
@@ -258,6 +264,177 @@ namespace ClusterKit.Web.Tests.GraphQL
                                           ""viewer"": {
                                             ""id"": 1,
                                             ""name"": ""test name""
+                                          },
+                                          ""object"": {
+                                            ""count"": 2,
+                                            ""edges"": [
+                                              {
+                                                ""cursor"": 10,
+                                                ""node"": {
+                                                  ""id"": 10,
+                                                  ""name"": ""test object1""
+                                                }
+                                              },
+                                              {
+                                                ""cursor"": 20,
+                                                ""node"": {
+                                                  ""id"": 20,
+                                                  ""name"": ""test object2""
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }";
+
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing generator for some api with arrays - filtering support
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task MethodsApiTest()
+        {
+            var getObjectsArguments = new[]
+                                          {
+                                              ApiField.Scalar("id", EnScalarType.Integer),
+                                              ApiField.Object("sub", "object")
+                                          };
+
+            var viewerFields = new[]
+                                   {
+                                       ApiField.Scalar("id", EnScalarType.Integer),
+                                       ApiField.Scalar("name", EnScalarType.String),
+                                       ApiField.Object(
+                                           "getObjects",
+                                           "object",
+                                           EnFieldFlags.IsArray,
+                                           getObjectsArguments),
+                                        ApiField.Object(
+                                           "getObjectConnections",
+                                           "object",
+                                           EnFieldFlags.IsConnection,
+                                           getObjectsArguments),
+                                   };
+            var viewerType = new ApiType("viewer", viewerFields);
+
+            var objectFields = new[]
+                                   {
+                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
+                                       ApiField.Scalar("name", EnScalarType.String)
+                                   };
+
+            var objectType = new ApiType("object", objectFields);
+
+            var api = new ApiDescription(
+                "Test-Api-1",
+                "0.0.0.1",
+                new[] { viewerType, objectType },
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
+
+            var provider = new MoqProvider
+                               {
+                                   Description = api,
+                                   Data =
+                                       "{\"viewer\": {\"id\": 1, \"name\": \"test name\", \"getObjects\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}], \"getObjectConnections\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
+            };
+
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+
+            using (var printer = new SchemaPrinter(scheme))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(scheme.Query);
+            Assert.Equal(1, scheme.Query.Fields.Count());
+            Assert.True(scheme.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = scheme;
+                                     r.Query = @"
+                                query {
+                                    api {
+                                        viewer {
+                                            id,
+                                            name,
+                                            getObjects(id: 10, sub: { id: 20, name: ""test arg"" }) {
+                                                id,
+                                                name
+                                            },
+                                            getObjectConnections(id: 10, sub: { id: 20, name: ""test arg"" }) {
+                                                count,
+                                                edges {
+                                                    cursor,                                                
+                                                    node {
+                                                        id,
+                                                        name
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        object(filter: { id: 10, AND: [{name: ""test"", OR: [{id_lt: 20}]}] }, sort: [name_DESC, id_ASC], limit: 10, offset: 20) {
+                                            count,
+                                            edges {
+                                                cursor,                                                
+                                                node {
+                                                    id,
+                                                    name
+                                                }
+                                            }
+                                        }
+                                    }
+                                }            
+                                ";
+                                 }).ConfigureAwait(true);
+
+            this.output.WriteLine("-------- Response -----------");
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                          ""viewer"": {
+                                            ""id"": 1,
+                                            ""name"": ""test name"",
+                                            ""getObjects"": [
+                                              {
+                                                ""id"": 10,
+                                                ""name"": ""test object1""
+                                              },
+                                              {
+                                                ""id"": 20,
+                                                ""name"": ""test object2""
+                                              }
+                                            ],
+                                            ""getObjectConnections"": {
+                                              ""count"": 2,
+                                              ""edges"": [
+                                                {
+                                                  ""cursor"": 10,
+                                                  ""node"": {
+                                                    ""id"": 10,
+                                                    ""name"": ""test object1""
+                                                  }
+                                                },
+                                                {
+                                                  ""cursor"": 20,
+                                                  ""node"": {
+                                                    ""id"": 20,
+                                                    ""name"": ""test object2""
+                                                  }
+                                                }
+                                              ]
+                                            }
                                           },
                                           ""object"": {
                                             ""count"": 2,

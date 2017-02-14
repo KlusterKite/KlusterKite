@@ -93,8 +93,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Name = "edges",
                                          Metadata = new Dictionary<string, object>
                                                         {
-                                                            { MetaDataTypeKey, this.edgeType },
-                                                            { MetaDataFlagsKey, EnFieldFlags.IsArray }
+                                                            { MetaDataTypeKey, new MergedField(this.edgeType, EnFieldFlags.IsArray) }
                                                         }
                                      }
                              };
@@ -103,38 +102,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override QueryArguments GenerateArguments()
+        public override IEnumerable<QueryArgument> GenerateArguments(Dictionary<string, IGraphType> registeredTypes)
         {
+            // todo: move to declared types use
             if (!(this.elementType is MergedObjectType))
             {
-                return null;
+                yield break;
             }
 
-            var arguments = new[]
-                                {
-                                    new QueryArgument(typeof(GraphType))
-                                        {
-                                            Name = "filter",
-                                            ResolvedType = this.GenerateFilterType()
-                                        },
-                                    new QueryArgument(typeof(GraphType))
-                                        {
-                                            Name = "sort",
-                                            ResolvedType = this.GenerateSortType()
-                                        },
-                                    new QueryArgument(typeof(GraphType))
-                                        {
-                                            Name = "limit",
-                                            ResolvedType = new IntGraphType()
-                                        },
-                                    new QueryArgument(typeof(GraphType))
-                                        {
-                                            Name = "offset",
-                                            ResolvedType = new IntGraphType()
-                                        },
-                                };
+            yield return
+                new QueryArgument(typeof(GraphType)) { Name = "filter", ResolvedType = this.GenerateFilterType() };
 
-            return new QueryArguments(arguments);
+            yield return new QueryArgument(typeof(GraphType)) { Name = "sort", ResolvedType = this.GenerateSortType() };
+
+            yield return new QueryArgument(typeof(GraphType)) { Name = "limit", ResolvedType = new IntGraphType() };
+
+            yield return new QueryArgument(typeof(GraphType)) { Name = "offset", ResolvedType = new IntGraphType() };
         }
 
         /// <summary>

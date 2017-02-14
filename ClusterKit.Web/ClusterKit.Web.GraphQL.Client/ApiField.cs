@@ -10,6 +10,7 @@
 namespace ClusterKit.Web.GraphQL.Client
 {
     using System;
+    using System.Collections.Generic;
 
     using JetBrains.Annotations;
 
@@ -49,8 +50,15 @@ namespace ClusterKit.Web.GraphQL.Client
         public EnFieldFlags Flags { get; set; }
 
         /// <summary>
+        /// Gets or sets the list of arguments (if is set - this field becomes a method)
+        /// </summary>
+        [NotNull]
+        public List<ApiField> Arguments { get; set; } = new List<ApiField>();
+
+        /// <summary>
         /// Gets or sets the scalar type of the field
         /// </summary>
+        [UsedImplicitly]
         public EnScalarType ScalarType { get; set; }
 
         /// <summary>
@@ -68,18 +76,41 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <summary>
         /// Creates an object containing field
         /// </summary>
-        /// <param name="name">The field name</param>
-        /// <param name="typeName">The field type name</param>
-        /// <param name="flags">The field flags</param>
-        /// <returns>The new field</returns>
-        public static ApiField Object([NotNull]string name, [NotNull]string typeName, EnFieldFlags flags = EnFieldFlags.None)
+        /// <param name="name">
+        /// The field name
+        /// </param>
+        /// <param name="typeName">
+        /// The field type name
+        /// </param>
+        /// <param name="flags">
+        /// The field flags
+        /// </param>
+        /// <param name="arguments">
+        /// The arguments (if is set - this field becomes a method)
+        /// </param>
+        /// <returns>
+        /// The new field
+        /// </returns>
+        public static ApiField Object(
+            [NotNull] string name,
+            [NotNull] string typeName,
+            EnFieldFlags flags = EnFieldFlags.None,
+            IEnumerable<ApiField> arguments = null)
         {
             if (flags.HasFlag(EnFieldFlags.IsKey))
             {
                 throw new ArgumentException("Object field can't be used as key");
             }
 
-            return new ApiField(name, flags) { TypeName = typeName, ScalarType = EnScalarType.None }; 
+            return new ApiField(name, flags)
+                       {
+                           TypeName = typeName,
+                           ScalarType = EnScalarType.None,
+                           Arguments =
+                               arguments != null
+                                   ? new List<ApiField>(arguments)
+                                   : new List<ApiField>()
+                       };
         }
 
         /// <summary>
@@ -88,8 +119,15 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="name">The field name</param>
         /// <param name="type">The field type</param>
         /// <param name="flags">The field flags</param>
+        /// <param name="arguments">
+        /// The arguments (if is set - this field becomes a method)
+        /// </param>
         /// <returns>The new field</returns>
-        public static ApiField Scalar([NotNull] string name, EnScalarType type, EnFieldFlags flags = EnFieldFlags.None)
+        public static ApiField Scalar(
+            [NotNull] string name,
+            EnScalarType type,
+            EnFieldFlags flags = EnFieldFlags.None,
+            IEnumerable<ApiField> arguments = null)
         {
             if (type == EnScalarType.None)
             {
@@ -101,7 +139,14 @@ namespace ClusterKit.Web.GraphQL.Client
                 throw new ArgumentException("Scalar field can't be used as connected objects");
             }
 
-            return new ApiField(name, flags) { ScalarType = type };
+            return new ApiField(name, flags)
+                       {
+                           ScalarType = type,
+                           Arguments =
+                               arguments != null
+                                   ? new List<ApiField>(arguments)
+                                   : new List<ApiField>()
+                       };
         }
 
         /// <inheritdoc />

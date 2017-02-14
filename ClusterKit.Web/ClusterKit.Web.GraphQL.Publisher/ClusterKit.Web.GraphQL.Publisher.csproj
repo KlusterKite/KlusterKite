@@ -232,6 +232,7 @@
     <Compile Include="Installer.cs" />
     <Compile Include="Internals\MergedConnectionType.cs" />
     <Compile Include="Internals\MergedEdgeType.cs" />
+    <Compile Include="Internals\MergedInputType.cs" />
     <Compile Include="Internals\MergedObjectType.cs" />
     <Compile Include="Internals\MergedField.cs" />
     <Compile Include="Internals\MergedScalarType.cs" />

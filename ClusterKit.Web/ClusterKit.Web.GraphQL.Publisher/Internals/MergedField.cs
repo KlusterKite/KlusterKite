@@ -9,7 +9,12 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
+
     using ClusterKit.Web.GraphQL.Client;
+
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The field in the <see cref="MergedType"/>
@@ -25,20 +30,30 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="flags">
         /// The flags.
         /// </param>
-        public MergedField(MergedType type, EnFieldFlags flags = EnFieldFlags.None)
+        /// <param name="arguments">
+        /// The field arguments (in case the field is method).
+        /// </param>
+        public MergedField(MergedType type, EnFieldFlags flags = EnFieldFlags.None, Dictionary<string, MergedField> arguments = null)
         {
             this.Type = type;
             this.Flags = flags;
+            this.Arguments = (arguments ?? new Dictionary<string, MergedField>()).ToImmutableDictionary();
         }
 
         /// <summary>
-        /// Gets or sets the list of the field flags
+        /// Gets the list of field arguments
         /// </summary>
-        public EnFieldFlags Flags { get; set; }
+        [NotNull]
+        public IReadOnlyDictionary<string, MergedField> Arguments { get; }
 
         /// <summary>
-        /// Gets or sets the field type
+        /// Gets the list of the field flags
         /// </summary>
-        public MergedType Type { get; set; }
+        public EnFieldFlags Flags { get; }
+
+        /// <summary>
+        /// Gets the field type
+        /// </summary>
+        public MergedType Type { get; }
     }
 }
