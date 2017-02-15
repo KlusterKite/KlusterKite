@@ -71,7 +71,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public IObjectGraphType GenerateMutationType()
         {
             var fields = this.Mutations.Select(f => this.ConvertApiField(f, new MutationResolver(f.Value)));
-            return new VirtualGraphType("Mutations", fields.ToList());
+            return new VirtualGraphType("Mutations", fields.ToList()) { Description = "The list of all detected mutations" };
         }
 
         /// <summary>

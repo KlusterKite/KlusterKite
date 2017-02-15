@@ -236,6 +236,7 @@
     <Compile Include="Internals\MergedInputType.cs" />
     <Compile Include="Internals\MergedObjectType.cs" />
     <Compile Include="Internals\MergedField.cs" />
+    <Compile Include="Internals\MergedRoot.cs" />
     <Compile Include="Internals\MergedScalarType.cs" />
     <Compile Include="Internals\MergedType.cs" />
     <Compile Include="Internals\FieldProvider.cs" />

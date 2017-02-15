@@ -473,8 +473,8 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var viewerType2 = new ApiType("viewer2", new[] { ApiField.Scalar("description", EnScalarType.String) });
 
-            var objectType1 = new ApiType("object1", new[] { ApiField.Scalar("id", EnScalarType.String) });
-            var objectType2 = new ApiType("object2", new[] { ApiField.Scalar("id", EnScalarType.String) });
+            var objectType1 = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
+            var objectType2 = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
 
             var api1 = new ApiDescription(
                 "TestApi1",
@@ -586,11 +586,20 @@ namespace ClusterKit.Web.Tests.GraphQL
             var objectType = new ApiType("object", objectFields);
 
             var mutations = new[]
-                                       {
-                                           ApiField.Object("objects_create", "object", arguments: new[] { objectType.CreateField("new") }),
-                                           ApiField.Object("objects_update", "object", arguments: new[] { objectType.CreateField("new"), ApiField.Scalar("id", EnScalarType.Integer) }),
-                                           ApiField.Object("objects_delete", "object", arguments: new[] { ApiField.Scalar("id", EnScalarType.Integer) })
-            };
+                                {
+                                    ApiField.Object(
+                                        "objects_create",
+                                        "object",
+                                        arguments: new[] { objectType.CreateField("new") }),
+                                    ApiField.Object(
+                                        "objects_update",
+                                        "object",
+                                        arguments: new[] { objectType.CreateField("new"), ApiField.Scalar("id", EnScalarType.Integer) }),
+                                    ApiField.Object(
+                                        "objects_delete",
+                                        "object",
+                                        arguments: new[] { ApiField.Scalar("id", EnScalarType.Integer) })
+                                };
 
             var api = new ApiDescription(
                 "TestApi1",
@@ -599,11 +608,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 new[] { viewerType.CreateField("viewer"), ApiField.Object("objects", "object", EnFieldFlags.IsConnection) },
                 mutations);
 
-            var provider = new MoqProvider
-                               {
-                                   Description = api,
-                                   Data = "{\"id\": 20,  \"name\": \"new object\"}"
-            };
+            var provider = new MoqProvider { Description = api, Data = "{\"id\": 20,  \"name\": \"new object\"}" };
 
             var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
@@ -644,7 +649,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.output.WriteLine("-------- Response -----------");
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-        
+
             var expectedResponse = @"{
                                       ""data"": {
                                         ""insert"": {
@@ -732,6 +737,71 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       }
                                     }";
             Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Tests introspection query and api descriptions
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task SchemaDescriptionTest()
+        {
+            var checkAttributeArguments = new[]
+                                {
+                                    ApiField.Scalar(
+                                        "attribute",
+                                        EnScalarType.String,
+                                        description: "attribute to check")
+                                };
+
+            var objectFields = new[]
+                                   {
+                                       ApiField.Scalar(
+                                           "uid",
+                                           EnScalarType.Guid,
+                                           description: "The object unique identifier"),
+                                       ApiField.Scalar("name", EnScalarType.String, description: "The object name"),
+                                       ApiField.Scalar(
+                                           "attributes",
+                                           EnScalarType.String,
+                                           EnFieldFlags.IsArray,
+                                           description: "The object attributes"),
+                                       ApiField.Scalar(
+                                           "checkAttribute",
+                                           EnScalarType.Boolean,
+                                           arguments: checkAttributeArguments,
+                                           description: "checks the attribute")
+                                   };
+
+            var objectType = new ApiType("object", objectFields) { Description = "Some abstract object" };
+            var mutations = new[]
+                                {
+                                    ApiField.Object(
+                                        "objects_create",
+                                        "object",
+                                        arguments: new[] { objectType.CreateField("new", description: "The new object data") },
+                                        description: "creates a new object")
+                                };
+
+            var api = new ApiDescription(
+                "TestApi", 
+                "0.0.0.1",
+                new[] { objectType },
+                new[] { objectType.CreateField("objects", EnFieldFlags.IsConnection, "The objects dataset") },
+                mutations) { Description = "The test api" };
+
+            var provider = new MoqProvider { Description = api };
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = scheme;
+                                 r.Query = Resources.IntrospectionQuery;
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            Assert.Equal(CleanResponse(Resources.SchemaDescriptionTestSnapshot), CleanResponse(response));
         }
 
         /// <summary>

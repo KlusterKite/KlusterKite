@@ -49,7 +49,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override string ComplexTypeName => $"{this.OriginalTypeName}-Edge";
+        public override string ComplexTypeName => $"{this.OriginalTypeName}_Edge";
+
+        /// <inheritdoc />
+        public override string Description => $"The {this.objectType.ComplexTypeName} in a connected list\n {this.objectType.Description}";
 
         /// <summary>
         /// Gets the field provider
@@ -71,20 +74,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      {
                                          Name = "cursor",
                                          ResolvedType = new StringGraphType(),
-                                         Resolver = new CursorResolver(this.objectType)
+                                         Resolver = new CursorResolver(this.objectType),
+                                         Description = "A value to use with paging positioning"
                                      },
                                  new FieldType
                                      {
                                          Name = "node",
+                                         ResolvedType = new VirtualGraphType("tmp"),
                                          Metadata =
                                              new Dictionary<string, object>
                                                  {
-                                                     { MetaDataTypeKey, new MergedField("node", this.objectType) }
+                                                     { MetaDataTypeKey, new MergedField("node", this.objectType, description: this.objectType.Description) }
                                                  }
                                      }
                              };
 
-            return new VirtualGraphType.Array(this.ComplexTypeName, fields);
+            return new VirtualGraphType.Array(this.ComplexTypeName, fields) { Description = this.Description };
         }
 
         /// <inheritdoc />

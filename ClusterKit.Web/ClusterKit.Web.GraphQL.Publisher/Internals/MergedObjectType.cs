@@ -70,9 +70,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             =>
                 this.Providers.Any()
                     ? string.Join(
-                        "|",
-                        this.Providers.Select(p => p.FieldType.TypeName).Distinct().OrderBy(s => s).ToArray())
+                        "_",
+                        this.Providers.Select(p => $"{p.Provider.Description.ApiName}_{p.FieldType.TypeName}").Distinct().OrderBy(s => s).ToArray())
                     : this.OriginalTypeName;
+
+        /// <inheritdoc />
+        public override string Description
+            =>
+                this.Providers.Any()
+                    ? string.Join(
+                        "\n",
+                        this.Providers.Select(p => p.FieldType.Description).Distinct().OrderBy(s => s).ToArray()) : null;
 
         /// <summary>
         /// Gets the list of subfields
@@ -106,7 +114,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override IGraphType GenerateGraphType()
         {
             var fields = this.Fields.Select(this.ConvertApiField);
-            return new VirtualGraphType(this.ComplexTypeName, fields.ToList());
+            return new VirtualGraphType(this.ComplexTypeName, fields.ToList()) { Description = this.Description };
         }
 
         /// <summary>
@@ -170,7 +178,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                 description.Value
                                             }
                                         },
-                                Resolver = resolver
+                                Resolver = resolver,
+                                Description = description.Value.Description
                             };
             return field;
         }

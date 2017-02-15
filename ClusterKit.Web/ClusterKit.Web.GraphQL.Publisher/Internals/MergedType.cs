@@ -29,20 +29,20 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public const string MetaDataTypeKey = "MergedType";
 
         /// <summary>
-        /// The metadata key to access the original <see cref="MergedType"/> object
-        /// </summary>
-        public const string MetaDataFlagsKey = "Flags";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="MergedType"/> class.
         /// </summary>
         /// <param name="originalTypeName">
         /// The original type name.
         /// </param>
-        public MergedType(string originalTypeName)
+        protected MergedType(string originalTypeName)
         {
             this.OriginalTypeName = originalTypeName;
         }
+
+        /// <summary>
+        /// Gets the type description
+        /// </summary>
+        public virtual string Description => null;
 
         /// <summary>
         /// Gets the type name of the field as it was first met

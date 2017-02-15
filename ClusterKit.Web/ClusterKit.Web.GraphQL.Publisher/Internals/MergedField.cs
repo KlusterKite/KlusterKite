@@ -36,13 +36,27 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="arguments">
         /// The field arguments (in case the field is method).
         /// </param>
-        public MergedField(string name, MergedType type, EnFieldFlags flags = EnFieldFlags.None, Dictionary<string, MergedField> arguments = null)
+        /// <param name="description">
+        /// The field description
+        /// </param>
+        public MergedField(
+            string name,
+            MergedType type,
+            EnFieldFlags flags = EnFieldFlags.None,
+            Dictionary<string, MergedField> arguments = null,
+            string description = null)
         {
             this.FieldName = name;
             this.Type = type;
             this.Flags = flags;
             this.Arguments = (arguments ?? new Dictionary<string, MergedField>()).ToImmutableDictionary();
+            this.Description = description;
         }
+
+        /// <summary>
+        /// Gets the type description
+        /// </summary>
+        public string Description { get; }
 
         /// <summary>
         /// Gets the original field name

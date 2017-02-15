@@ -44,6 +44,12 @@ namespace ClusterKit.Web.GraphQL.Client
         }
 
         /// <summary>
+        /// Gets or sets the human-readable type description for auto-publishing
+        /// </summary>
+        [UsedImplicitly]
+        public string Description { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of fields
         /// </summary>
         [NotNull]
@@ -60,10 +66,11 @@ namespace ClusterKit.Web.GraphQL.Client
         /// </summary>
         /// <param name="name">The field name</param>
         /// <param name="flags">The list of field flags</param>
+        /// <param name="description">The field description</param>
         /// <returns>The api filed</returns>
-        public ApiField CreateField(string name, EnFieldFlags flags = EnFieldFlags.None)
+        public ApiField CreateField(string name, EnFieldFlags flags = EnFieldFlags.None, string description = null)
         {
-            return ApiField.Object(name, this.TypeName, flags);
+            return ApiField.Object(name, this.TypeName, flags, description: description);
         }
 
         /// <inheritdoc />

@@ -23,6 +23,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
         public GuidGraphType()
         {
             this.Name = "Uid";
+            this.Description = "The Uid / Guid representation";
         }
 
         /// <inheritdoc />

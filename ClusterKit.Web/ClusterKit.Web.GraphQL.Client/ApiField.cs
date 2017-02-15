@@ -44,28 +44,35 @@ namespace ClusterKit.Web.GraphQL.Client
         }
 
         /// <summary>
+        /// Gets or sets the list of arguments (if is set - this field becomes a method)
+        /// </summary>
+        [NotNull]
+        [UsedImplicitly]
+        public List<ApiField> Arguments { get; set; } = new List<ApiField>();
+
+        /// <summary>
+        /// Gets or sets the human-readable type description for auto-publishing
+        /// </summary>
+        [UsedImplicitly]
+        public string Description { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of defined flags
         /// </summary>
         [UsedImplicitly]
         public EnFieldFlags Flags { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of arguments (if is set - this field becomes a method)
+        /// Gets or sets the field name
         /// </summary>
-        [NotNull]
-        public List<ApiField> Arguments { get; set; } = new List<ApiField>();
+        [UsedImplicitly]
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the scalar type of the field
         /// </summary>
         [UsedImplicitly]
         public EnScalarType ScalarType { get; set; }
-
-        /// <summary>
-        /// Gets or sets the field name
-        /// </summary>
-        [UsedImplicitly]
-        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the field type name
@@ -88,6 +95,9 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="arguments">
         /// The arguments (if is set - this field becomes a method)
         /// </param>
+        /// <param name="description">
+        /// The field description
+        /// </param>
         /// <returns>
         /// The new field
         /// </returns>
@@ -95,7 +105,8 @@ namespace ClusterKit.Web.GraphQL.Client
             [NotNull] string name,
             [NotNull] string typeName,
             EnFieldFlags flags = EnFieldFlags.None,
-            IEnumerable<ApiField> arguments = null)
+            IEnumerable<ApiField> arguments = null,
+            string description = null)
         {
             if (flags.HasFlag(EnFieldFlags.IsKey))
             {
@@ -106,6 +117,7 @@ namespace ClusterKit.Web.GraphQL.Client
                        {
                            TypeName = typeName,
                            ScalarType = EnScalarType.None,
+                           Description = description,
                            Arguments =
                                arguments != null
                                    ? new List<ApiField>(arguments)
@@ -122,12 +134,16 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <param name="arguments">
         /// The arguments (if is set - this field becomes a method)
         /// </param>
+        /// <param name="description">
+        /// The field description
+        /// </param>
         /// <returns>The new field</returns>
         public static ApiField Scalar(
             [NotNull] string name,
             EnScalarType type,
             EnFieldFlags flags = EnFieldFlags.None,
-            IEnumerable<ApiField> arguments = null)
+            IEnumerable<ApiField> arguments = null,
+            string description = null)
         {
             if (type == EnScalarType.None)
             {
@@ -142,6 +158,7 @@ namespace ClusterKit.Web.GraphQL.Client
             return new ApiField(name, flags)
                        {
                            ScalarType = type,
+                           Description = description,
                            Arguments =
                                arguments != null
                                    ? new List<ApiField>(arguments)

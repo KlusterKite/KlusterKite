@@ -32,13 +32,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override string ComplexTypeName => $"{base.ComplexTypeName}-Input";
+        public override string ComplexTypeName => $"{base.ComplexTypeName}_Input";
 
         /// <inheritdoc />
         public override IGraphType GenerateGraphType()
         {
             var fields = this.Fields.Select(this.ConvertApiField);
-            var inputGraphType = new VirtualInputGraphType(this.ComplexTypeName);
+            var inputGraphType = new VirtualInputGraphType(this.ComplexTypeName) { Description = this.Description };
             inputGraphType.AddFields(fields);
             return inputGraphType;
         }

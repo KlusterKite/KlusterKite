@@ -59,7 +59,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public FieldProvider Provider { get; }
 
         /// <inheritdoc />
-        public override string ComplexTypeName => $"{this.OriginalTypeName}-Connection";
+        public override string Description => $"The list of connected {this.elementType.ComplexTypeName}\n {this.elementType.Description}";
+
+        /// <inheritdoc />
+        public override string ComplexTypeName => $"{this.OriginalTypeName}_Connection";
 
         /// <inheritdoc />
         public override IEnumerable<FieldProvider> Providers => new[]
@@ -86,19 +89,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      {
                                          Name = "count",
                                          ResolvedType = new IntGraphType(),
-                                         Resolver = new CountResolver()
+                                         Resolver = new CountResolver(),
+                                         Description = "The total count of objects satisfying filter conditions"
                                      },
                                  new FieldType
                                      {
                                          Name = "edges",
+                                         Description = "The list of edges according to filtering and paging conditions",
+                                         ResolvedType = new VirtualGraphType("tmp"),
                                          Metadata = new Dictionary<string, object>
                                                         {
-                                                            { MetaDataTypeKey, new MergedField("edges", this.edgeType, EnFieldFlags.IsArray) }
+                                                            { MetaDataTypeKey, new MergedField("edges", this.edgeType, EnFieldFlags.IsArray, description: "The list of edges according to filtering and paging conditions") }
                                                         }
                                      }
                              };
 
-            return new VirtualGraphType(this.ComplexTypeName, fields);
+            return new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
         }
 
         /// <inheritdoc />
@@ -111,13 +117,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             yield return
-                new QueryArgument(typeof(GraphType)) { Name = "filter", ResolvedType = this.GenerateFilterType() };
+                new QueryArgument(typeof(GraphType)) { Name = "filter", ResolvedType = this.GenerateFilterType(), Description = "The filtering conditions" };
 
-            yield return new QueryArgument(typeof(GraphType)) { Name = "sort", ResolvedType = this.GenerateSortType() };
+            yield return new QueryArgument(typeof(GraphType)) { Name = "sort", ResolvedType = this.GenerateSortType(), Description = "The sorting function (the sequence of functions to sort, the next function will be used if all previous will give equal values)" };
 
-            yield return new QueryArgument(typeof(GraphType)) { Name = "limit", ResolvedType = new IntGraphType() };
+            yield return new QueryArgument(typeof(GraphType)) { Name = "limit", ResolvedType = new IntGraphType(), Description = "The maximum number of objects to return" };
 
-            yield return new QueryArgument(typeof(GraphType)) { Name = "offset", ResolvedType = new IntGraphType() };
+            yield return new QueryArgument(typeof(GraphType)) { Name = "offset", ResolvedType = new IntGraphType(), Description = "The number of objects to skip from the start of list" };
         }
 
         /// <summary>
@@ -127,10 +133,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private GraphType GenerateFilterType()
         {
             var objectType = (MergedObjectType)this.elementType;
-            var graphType = new VirtualInputGraphType($"{this.OriginalTypeName}-Filter");
-            graphType.AddField(new FieldType { Name = "AND", ResolvedType = new ListGraphType(graphType) });
-            graphType.AddField(new FieldType { Name = "OR", ResolvedType = new ListGraphType(graphType) });
-            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType))
+            var graphType = new VirtualInputGraphType($"{this.OriginalTypeName}_Filter") { Description = $"The filter conditions for a {this.elementType.ComplexTypeName} connected objects" };
+            graphType.AddField(new FieldType { Name = "AND", ResolvedType = new ListGraphType(graphType), Description = "The filtering conditions that will pass if all internal conditions are passed" });
+            graphType.AddField(new FieldType { Name = "OR", ResolvedType = new ListGraphType(graphType), Description = "The filtering conditions that will pass if any of internal conditions is passed" });
+            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray) && !p.Value.Arguments.Any()))
             {
                 var type = (MergedScalarType)itemField.Value.Type;
                 if (type == null)
@@ -142,7 +148,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 {
                     case EnScalarType.Guid:
                     case EnScalarType.Boolean:
-                        graphType.AddFields(this.GenerateStrictEqualFilterFields(itemField.Key, type.GenerateGraphType()));
+                        graphType.AddFields(this.GenerateStrictEqualFilterFields(itemField.Key, itemField.Value.Description, type.GenerateGraphType()));
                         break;
                     case EnScalarType.Enum:
                         // todo: work with enum
@@ -150,10 +156,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     case EnScalarType.Float:
                     case EnScalarType.Decimal:
                     case EnScalarType.Integer:
-                        graphType.AddFields(this.GenerateNumberFilterFields(itemField.Key, type.GenerateGraphType()));
+                        graphType.AddFields(this.GenerateNumberFilterFields(itemField.Key, itemField.Value.Description, type.GenerateGraphType()));
                         break;
                     case EnScalarType.String:
-                        graphType.AddFields(this.GenerateStringFilterFields(itemField.Key));
+                        graphType.AddFields(this.GenerateStringFilterFields(itemField.Key, itemField.Value.Description));
                         break;
                 }
             }
@@ -168,34 +174,34 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private GraphType GenerateSortType()
         {
             var objectType = (MergedObjectType)this.elementType;
-            var enumType = new EnumerationGraphType { Name = $"{this.OriginalTypeName}-OrderByEnum" };
-            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType))
+            var enumType = new EnumerationGraphType { Name = $"{this.OriginalTypeName}_OrderByEnum", Description = $"The list of {this.elementType.ComplexTypeName} fields that can be used as sorting functions" };
+            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray) && !p.Value.Arguments.Any()))
             {
-                enumType.AddValue($"{itemField.Key}_ASC", string.Empty, $"{itemField.Key}_ASC");
-                enumType.AddValue($"{itemField.Key}_DESC", string.Empty, $"{itemField.Key}_DESC");
+                enumType.AddValue($"{itemField.Key}_ASC", $"{itemField.Key} ascending\n{itemField.Value.Description}", $"{itemField.Key}_ASC");
+                enumType.AddValue($"{itemField.Key}_DESC", $"{itemField.Key} descending\n{itemField.Value.Description}", $"{itemField.Key}_DESC");
             }
 
-            return new ListGraphType(enumType);
+            return new ListGraphType(enumType) { Description = "The sorting instructions" };
         }
 
         /// <summary>
         /// Generates the filters for string properties of an object
         /// </summary>
         /// <param name="fieldName">The field name</param>
+        /// <param name="fieldDescription">The field description</param>
         /// <returns>The list of properties</returns>
-        private IEnumerable<FieldType> GenerateStringFilterFields(string fieldName)
+        private IEnumerable<FieldType> GenerateStringFilterFields(string fieldName, string fieldDescription)
         {
-            yield return new FieldType { Name = fieldName, ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_in", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_not_in", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_contains", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_not_contains", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_starts_with", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_not_starts_with", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_ends", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_ends_with", ResolvedType = new StringGraphType() };
-            yield return new FieldType { Name = $"{fieldName}_not_ends_with", ResolvedType = new StringGraphType() };
+            yield return new FieldType { Name = fieldName, ResolvedType = new StringGraphType(), Description = $"The {fieldName} exactly equals the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = new StringGraphType(), Description = $"The {fieldName} not equals the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_in", ResolvedType = new StringGraphType(), Description = $"The value contains the {fieldName} as substring\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_not_in", ResolvedType = new StringGraphType(), Description = $"The value not contains the {fieldName} as substring\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_contains", ResolvedType = new StringGraphType(), Description = $"The {fieldName} contains the value as substring\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_not_contains", ResolvedType = new StringGraphType(), Description = $"The {fieldName} not contains the value as substring\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_starts_with", ResolvedType = new StringGraphType(), Description = $"The {fieldName} starts with the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_not_starts_with", ResolvedType = new StringGraphType(), Description = $"The {fieldName} not starts with the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_ends_with", ResolvedType = new StringGraphType(), Description = $"The {fieldName} ends with the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_not_ends_with", ResolvedType = new StringGraphType(), Description = $"The {fieldName} not ends with the value\n{fieldDescription}" };
         }
 
         /// <summary>
@@ -204,20 +210,21 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="fieldName">
         /// The field name
         /// </param>
+        /// <param name="fieldDescription">The field description</param>
         /// <param name="graphType">
         /// The field graph Type.
         /// </param>
         /// <returns>
         /// The list of properties
         /// </returns>
-        private IEnumerable<FieldType> GenerateNumberFilterFields(string fieldName, IGraphType graphType)
+        private IEnumerable<FieldType> GenerateNumberFilterFields(string fieldName, string fieldDescription, IGraphType graphType)
         {
-            yield return new FieldType { Name = fieldName, ResolvedType = graphType };
-            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = graphType };
-            yield return new FieldType { Name = $"{fieldName}_lt", ResolvedType = graphType };
-            yield return new FieldType { Name = $"{fieldName}_lte", ResolvedType = graphType };
-            yield return new FieldType { Name = $"{fieldName}_gt", ResolvedType = graphType };
-            yield return new FieldType { Name = $"{fieldName}_gte", ResolvedType = graphType };
+            yield return new FieldType { Name = fieldName, ResolvedType = graphType, Description = $"The {fieldName} exactly equals the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = graphType, Description = $"The {fieldName} not equals the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_lt", ResolvedType = graphType, Description = $"The {fieldName} is less then the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_lte", ResolvedType = graphType, Description = $"The {fieldName} is less or equal then the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_gt", ResolvedType = graphType, Description = $"The {fieldName} is greater then the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_gte", ResolvedType = graphType, Description = $"The {fieldName} is greater or equal then the value\n{fieldDescription}" };
         }
 
         /// <summary>
@@ -226,16 +233,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="fieldName">
         /// The field name
         /// </param>
+        /// <param name="fieldDescription">The field description</param>
         /// <param name="graphType">
         /// The field graph Type.
         /// </param>
         /// <returns>
         /// The list of properties
         /// </returns>
-        private IEnumerable<FieldType> GenerateStrictEqualFilterFields(string fieldName, IGraphType graphType)
+        private IEnumerable<FieldType> GenerateStrictEqualFilterFields(string fieldName, string fieldDescription, IGraphType graphType)
         {
-            yield return new FieldType { Name = fieldName, ResolvedType = graphType };
-            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = graphType };
+            yield return new FieldType { Name = fieldName, ResolvedType = graphType, Description = $"The {fieldName} exactly equals the value\n{fieldDescription}" };
+            yield return new FieldType { Name = $"{fieldName}_not", ResolvedType = graphType, Description = $"The {fieldName} not equals the value\n{fieldDescription}" };
         }
 
         /// <summary>

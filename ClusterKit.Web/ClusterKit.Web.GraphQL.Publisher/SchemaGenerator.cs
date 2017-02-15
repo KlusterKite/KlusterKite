@@ -33,8 +33,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
         public static Schema Generate(List<ApiProvider> providers)
         {
             var api = MergeApis(providers);
-            var root = new MergedObjectType("Query");
-            root.Fields["api"] = new MergedField("api", api);
+            var root = new MergedRoot("Query");
+            root.Fields["api"] = new MergedField("api", api, description: "The united api access");
 
             var types = root.GetAllTypes().ToList();
 
@@ -68,7 +68,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                             {
                                                 Name = p.Key,
                                                 ResolvedType =
-                                                    graphTypes[p.Value.Type.ComplexTypeName]
+                                                    graphTypes[p.Value.Type.ComplexTypeName],
+                                                Description = p.Value.Description
                                             });
 
                             var resultingArguments = typeArguments.Union(fieldArguments).ToList();
@@ -86,6 +87,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                             if (f.Resolver == null)
                             {
                                 f.Resolver = fieldDescription.Type;
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(fieldDescription.Description))
+                            {
+                                f.Description = fieldDescription.Description;
                             }
                         });
 
@@ -123,13 +129,15 @@ namespace ClusterKit.Web.GraphQL.Publisher
                             new MergedField(
                                 a.Name,
                                 CreateMergedType(provider, a, null, new List<string>(), true),
-                                apiMutation.Flags));
+                                apiMutation.Flags,
+                                description: a.Description));
 
                     apiRoot.Mutations[$"{provider.Description.ApiName}_{apiMutation.Name}"] = new MergedField(
                         apiMutation.Name,
                         returnType,
                         apiMutation.Flags,
-                        arguments);
+                        arguments,
+                        apiMutation.Description);
                 }
             }
 
@@ -190,11 +198,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     foreach (var argument in apiField.Arguments)
                     {
                         var fieldArgumentType = CreateMergedType(provider, argument, null, path, true);
-                        fieldArguments[argument.Name] = new MergedField(argument.Name, fieldArgumentType, argument.Flags);
+                        fieldArguments[argument.Name] = new MergedField(argument.Name, fieldArgumentType, argument.Flags, description: argument.Description);
                     }
                 }
 
-                var field = new MergedField(apiField.Name, fieldType, apiField.Flags, fieldArguments);
+                var description =
+                    string.Join("\n", new[] { complexField?.Description, apiField.Description }.Where(s => !string.IsNullOrWhiteSpace(s)));
+                var field = new MergedField(apiField.Name, fieldType, apiField.Flags, fieldArguments, string.IsNullOrWhiteSpace(description) ? null : description);
 
                 parentType.Fields[apiField.Name] = field;
             }
@@ -226,8 +236,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 var apiFieldType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
                 var objectType = complexField?.Type as MergedObjectType
                                  ?? (createAsInput
-                                         ? new MergedInputType($"{apiField.TypeName}-{provider.Description.ApiName}")
-                                         : new MergedObjectType($"{apiField.TypeName}-{provider.Description.ApiName}"));
+                                         ? new MergedInputType($"{provider.Description.ApiName}_{apiField.TypeName}")
+                                         : new MergedObjectType($"{provider.Description.ApiName}_{apiField.TypeName}"));
                 objectType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
                 if (complexField != null)
                 {
@@ -240,9 +250,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     return null;
                 }
 
+                var fieldsToMerge = createAsInput
+                                        ? apiFieldType.Fields.Where(
+                                            f => !f.Flags.HasFlag(EnFieldFlags.IsConnection) && !f.Arguments.Any())
+                                        : apiFieldType.Fields;
+
                 MergeFields(
                     objectType,
-                    apiFieldType.Fields,
+                    fieldsToMerge,
                     provider,
                     path.Union(new[] { apiFieldType.TypeName }).ToList());
 
