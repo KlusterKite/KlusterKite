@@ -22,8 +22,6 @@ namespace ClusterKit.Web.Tests.GraphQL
     using global::GraphQL.Http;
     using global::GraphQL.Utilities;
 
-    using Newtonsoft.Json.Linq;
-
     using Xunit;
     using Xunit.Abstractions;
 
@@ -73,7 +71,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var objectType = new ApiType("object", objectFields);
 
             var api = new ApiDescription(
-                "Test-Api-1",
+                "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
                 new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
@@ -202,7 +200,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var objectType = new ApiType("object", objectFields);
 
             var api = new ApiDescription(
-                "Test-Api-1",
+                "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
                 new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
@@ -313,7 +311,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                            "object",
                                            EnFieldFlags.IsArray,
                                            getObjectsArguments),
-                                        ApiField.Object(
+                                       ApiField.Object(
                                            "getObjectConnections",
                                            "object",
                                            EnFieldFlags.IsConnection,
@@ -330,7 +328,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var objectType = new ApiType("object", objectFields);
 
             var api = new ApiDescription(
-                "Test-Api-1",
+                "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
                 new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
@@ -340,11 +338,11 @@ namespace ClusterKit.Web.Tests.GraphQL
                                    Description = api,
                                    Data =
                                        "{\"viewer\": {\"id\": 1, \"name\": \"test name\", \"getObjects\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}], \"getObjectConnections\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
-            };
+                               };
 
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine("-------- Schema -----------");
@@ -352,14 +350,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
-                                     r.Schema = scheme;
+                                     r.Schema = schema;
                                      r.Query = @"
                                 query {
                                     api {
@@ -479,13 +477,13 @@ namespace ClusterKit.Web.Tests.GraphQL
             var objectType2 = new ApiType("object2", new[] { ApiField.Scalar("id", EnScalarType.String) });
 
             var api1 = new ApiDescription(
-                "Test-Api-1",
+                "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType1, objectType1 },
                 new[] { viewerType1.CreateField("viewer"), objectType1.CreateField("object1") });
 
             var api2 = new ApiDescription(
-                "Test-Api-2",
+                "TestApi2",
                 "0.0.0.1",
                 new[] { viewerType2, objectType2 },
                 new[] { viewerType2.CreateField("viewer"), objectType2.CreateField("object2") });
@@ -565,6 +563,109 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing mutation description
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task MutationTest()
+        {
+            var viewerFields = new[]
+                                   {
+                                       ApiField.Scalar("id", EnScalarType.Integer),
+                                       ApiField.Scalar("name", EnScalarType.String),
+                                   };
+
+            var viewerType = new ApiType("viewer", viewerFields);
+
+            var objectFields = new[]
+                                   {
+                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
+                                       ApiField.Scalar("name", EnScalarType.String)
+                                   };
+
+            var objectType = new ApiType("object", objectFields);
+
+            var mutations = new[]
+                                       {
+                                           ApiField.Object("objects_create", "object", arguments: new[] { objectType.CreateField("new") }),
+                                           ApiField.Object("objects_update", "object", arguments: new[] { objectType.CreateField("new"), ApiField.Scalar("id", EnScalarType.Integer) }),
+                                           ApiField.Object("objects_delete", "object", arguments: new[] { ApiField.Scalar("id", EnScalarType.Integer) })
+            };
+
+            var api = new ApiDescription(
+                "TestApi1",
+                "0.0.0.1",
+                new[] { viewerType, objectType },
+                new[] { viewerType.CreateField("viewer"), ApiField.Object("objects", "object", EnFieldFlags.IsConnection) },
+                mutations);
+
+            var provider = new MoqProvider
+                               {
+                                   Description = api,
+                                   Data = "{\"id\": 20,  \"name\": \"new object\"}"
+            };
+
+            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+
+            using (var printer = new SchemaPrinter(scheme))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(scheme.Query);
+            Assert.Equal(1, scheme.Query.Fields.Count());
+            Assert.True(scheme.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = scheme;
+                                     r.Query = @"
+                                                    mutation M {
+                                                        insert: TestApi1_objects_create(new: {id: 1, name: ""new name""}) {
+                                                            id,
+                                                            name
+                                                        }
+                                                        update: TestApi1_objects_update(id: 1, new: {id: 2, name: ""updated name""}) {
+                                                            id,
+                                                            name
+                                                        }
+                                                        delete: TestApi1_objects_delete(id: 2) {
+                                                            id,
+                                                            name
+                                                        }
+                                                    }
+                                                    ";
+                                 }).ConfigureAwait(true);
+
+            this.output.WriteLine("-------- Response -----------");
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+        
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""insert"": {
+                                          ""id"": 20,
+                                          ""name"": ""new object""
+                                        },
+                                        ""update"": {
+                                          ""id"": 20,
+                                          ""name"": ""new object""
+                                        },
+                                        ""delete"": {
+                                          ""id"": 20,
+                                          ""name"": ""new object""
+                                        }
+                                      }
+                                    }";
+
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing generator for some simple single api
         /// </summary>
         /// <returns>The async task</returns>
@@ -576,7 +677,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
             var api = new ApiDescription(
-                "Test-Api-1",
+                "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType },
                 new[] { viewerType.CreateField("viewer") });
@@ -641,8 +742,8 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var api = new ApiDescription
                           {
-                              ApiName = "Test-Api-1",
-                              TypeName = "Test-Api-1",
+                              ApiName = "TestApi1",
+                              TypeName = "TestApi1",
                               Version = new Version("0.0.0.1"),
                           };
 

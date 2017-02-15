@@ -93,7 +93,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Name = "edges",
                                          Metadata = new Dictionary<string, object>
                                                         {
-                                                            { MetaDataTypeKey, new MergedField(this.edgeType, EnFieldFlags.IsArray) }
+                                                            { MetaDataTypeKey, new MergedField("edges", this.edgeType, EnFieldFlags.IsArray) }
                                                         }
                                      }
                              };

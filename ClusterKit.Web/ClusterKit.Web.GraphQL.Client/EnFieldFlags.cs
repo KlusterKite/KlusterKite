@@ -32,6 +32,6 @@ namespace ClusterKit.Web.GraphQL.Client
         /// <summary>
         /// This is an array of objects
         /// </summary>
-        IsArray = 4,
+        IsArray = 4
     }
 }

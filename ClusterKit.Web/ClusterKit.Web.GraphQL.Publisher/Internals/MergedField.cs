@@ -24,6 +24,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Initializes a new instance of the <see cref="MergedField"/> class.
         /// </summary>
+        /// <param name="name">
+        /// The field name.
+        /// </param>
         /// <param name="type">
         /// The type.
         /// </param>
@@ -33,12 +36,18 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="arguments">
         /// The field arguments (in case the field is method).
         /// </param>
-        public MergedField(MergedType type, EnFieldFlags flags = EnFieldFlags.None, Dictionary<string, MergedField> arguments = null)
+        public MergedField(string name, MergedType type, EnFieldFlags flags = EnFieldFlags.None, Dictionary<string, MergedField> arguments = null)
         {
+            this.FieldName = name;
             this.Type = type;
             this.Flags = flags;
             this.Arguments = (arguments ?? new Dictionary<string, MergedField>()).ToImmutableDictionary();
         }
+
+        /// <summary>
+        /// Gets the original field name
+        /// </summary>
+        public string FieldName { get; }
 
         /// <summary>
         /// Gets the list of field arguments

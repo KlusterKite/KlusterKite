@@ -230,6 +230,7 @@
     <Compile Include="GraphTypes\VirtualGraphType.cs" />
     <Compile Include="GraphTypes\VirtualInputGraphType.cs" />
     <Compile Include="Installer.cs" />
+    <Compile Include="Internals\MergedApiRoot.cs" />
     <Compile Include="Internals\MergedConnectionType.cs" />
     <Compile Include="Internals\MergedEdgeType.cs" />
     <Compile Include="Internals\MergedInputType.cs" />

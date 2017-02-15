@@ -32,7 +32,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <returns>The new GraphQL schema</returns>
         public static Schema Generate(List<ApiProvider> providers)
         {
-            var root = MergeApis(providers);
+            var api = MergeApis(providers);
+            var root = new MergedObjectType("Query");
+            root.Fields["api"] = new MergedField("api", api);
+
             var types = root.GetAllTypes().ToList();
 
             var typeNames = types.Select(t => t.ComplexTypeName).Distinct().ToList();
@@ -41,63 +44,56 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 typeName => typeName,
                 typeName => types.FirstOrDefault(t => t.ComplexTypeName == typeName)?.GenerateGraphType());
 
-            graphTypes.Values.Where(a => a is VirtualGraphType)
-                .Cast<VirtualGraphType>()
+            var mutationType = api.GenerateMutationType();
+            graphTypes[mutationType.Name] = mutationType;
+
+            graphTypes.Values.Where(a => a is IComplexGraphType)
+                .Cast<IComplexGraphType>()
                 .SelectMany(a => a.Fields)
                 .ForEach(
                     f =>
                         {
                             var fieldDescription = f.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
-                            if (fieldDescription != null)
+                            if (fieldDescription == null)
                             {
-                                var typeArguments = fieldDescription.Type.GenerateArguments(graphTypes)
-                                                    ?? new QueryArguments();
-                                var fieldArguments =
-                                    fieldDescription.Arguments.Select(
-                                        p =>
-                                            new QueryArgument(typeof(VirtualInputGraphType))
-                                                {
-                                                    Name = p.Key,
-                                                    ResolvedType =
-                                                        graphTypes[
-                                                            p.Value.Type
-                                                                .ComplexTypeName
-                                                        ]
-                                                });
+                                return;
+                            }
 
-                                var resultingArguments = typeArguments.Union(fieldArguments).ToList();
+                            var typeArguments = fieldDescription.Type.GenerateArguments(graphTypes)
+                                                ?? new QueryArguments();
+                            var fieldArguments =
+                                fieldDescription.Arguments.Select(
+                                    p =>
+                                        new QueryArgument(typeof(VirtualInputGraphType))
+                                            {
+                                                Name = p.Key,
+                                                ResolvedType =
+                                                    graphTypes[p.Value.Type.ComplexTypeName]
+                                            });
 
-                                if (resultingArguments.Any())
-                                {
-                                    f.Arguments = new QueryArguments(resultingArguments);
-                                }
+                            var resultingArguments = typeArguments.Union(fieldArguments).ToList();
 
-                                f.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
-                                                     ? new ListGraphType(
-                                                         graphTypes[fieldDescription.Type.ComplexTypeName])
-                                                     : graphTypes[fieldDescription.Type.ComplexTypeName];
+                            if (resultingArguments.Any())
+                            {
+                                f.Arguments = new QueryArguments(resultingArguments);
+                            }
+
+                            f.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
+                                                 ? new ListGraphType(
+                                                     graphTypes[fieldDescription.Type.ComplexTypeName])
+                                                 : graphTypes[fieldDescription.Type.ComplexTypeName];
+
+                            if (f.Resolver == null)
+                            {
                                 f.Resolver = fieldDescription.Type;
                             }
                         });
 
-            graphTypes.Values.Where(a => a is VirtualInputGraphType)
-                .Cast<VirtualInputGraphType>()
-                .SelectMany(a => a.Fields)
-                .ForEach(
-                    f =>
-                        {
-                            var fieldDescription = f.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
-                            if (fieldDescription != null)
-                            {
-                                f.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
-                                                     ? new ListGraphType(
-                                                         graphTypes[fieldDescription.Type.ComplexTypeName])
-                                                     : graphTypes[fieldDescription.Type.ComplexTypeName];
-                                f.Resolver = fieldDescription.Type;
-                            }
-                        });
-
-            var schema = new Schema { Query = (VirtualGraphType)graphTypes[root.ComplexTypeName], };
+            var schema = new Schema
+                             {
+                                 Query = (VirtualGraphType)graphTypes[root.ComplexTypeName],
+                                 Mutation = mutationType
+            };
 
             schema.Initialize();
             return schema;
@@ -108,27 +104,36 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// </summary>
         /// <param name="providers">The API providers descriptions</param>
         /// <returns>Merged API</returns>
-        private static MergedType MergeApis(List<ApiProvider> providers)
+        private static MergedApiRoot MergeApis(List<ApiProvider> providers)
         {
-            var rootField = new MergedObjectType("root")
-            {
-                Category = MergedObjectType.EnCategory.ApiRoot
-            };
-
-            var apiRoot = new MergedObjectType("api")
-            {
-                Category = MergedObjectType.EnCategory.ApiRoot
-            };
+            var apiRoot = new MergedApiRoot("api");
 
             apiRoot.AddProviders(providers.Select(p => new FieldProvider { Provider = p, FieldType = p.Description }));
-
+            
             foreach (var provider in providers)
             {
                 MergeFields(apiRoot, provider.Description.Fields, provider, new List<string>());
+
+                foreach (var apiMutation in provider.Description.Mutations)
+                {
+                    var returnType = CreateMergedType(provider, apiMutation, null, new List<string>(), false);
+                    var arguments = apiMutation.Arguments.ToDictionary(
+                        a => a.Name,
+                        a =>
+                            new MergedField(
+                                a.Name,
+                                CreateMergedType(provider, a, null, new List<string>(), true),
+                                apiMutation.Flags));
+
+                    apiRoot.Mutations[$"{provider.Description.ApiName}_{apiMutation.Name}"] = new MergedField(
+                        apiMutation.Name,
+                        returnType,
+                        apiMutation.Flags,
+                        arguments);
+                }
             }
 
-            rootField.Fields["api"] = new MergedField(apiRoot);
-            return rootField;
+            return apiRoot;
         }
 
         /// <summary>
@@ -185,11 +190,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     foreach (var argument in apiField.Arguments)
                     {
                         var fieldArgumentType = CreateMergedType(provider, argument, null, path, true);
-                        fieldArguments[argument.Name] = new MergedField(fieldArgumentType, argument.Flags);
+                        fieldArguments[argument.Name] = new MergedField(argument.Name, fieldArgumentType, argument.Flags);
                     }
                 }
 
-                var field = new MergedField(fieldType, apiField.Flags, fieldArguments);
+                var field = new MergedField(apiField.Name, fieldType, apiField.Flags, fieldArguments);
 
                 parentType.Fields[apiField.Name] = field;
             }
@@ -219,7 +224,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
             else
             {
                 var apiFieldType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
-                var objectType = complexField?.Type as MergedObjectType ?? (createAsInput ? new MergedInputType(apiField.TypeName) : new MergedObjectType(apiField.TypeName));
+                var objectType = complexField?.Type as MergedObjectType
+                                 ?? (createAsInput
+                                         ? new MergedInputType($"{apiField.TypeName}-{provider.Description.ApiName}")
+                                         : new MergedObjectType($"{apiField.TypeName}-{provider.Description.ApiName}"));
                 objectType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
                 if (complexField != null)
                 {
@@ -232,7 +240,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     return null;
                 }
 
-                MergeFields(objectType, apiFieldType.Fields, provider, path.Union(new[] { apiFieldType.TypeName }).ToList());
+                MergeFields(
+                    objectType,
+                    apiFieldType.Fields,
+                    provider,
+                    path.Union(new[] { apiFieldType.TypeName }).ToList());
 
                 fieldType = objectType;
 

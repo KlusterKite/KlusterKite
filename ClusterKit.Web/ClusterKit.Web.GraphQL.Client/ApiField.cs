@@ -15,7 +15,7 @@ namespace ClusterKit.Web.GraphQL.Client
     using JetBrains.Annotations;
 
     /// <summary>
-    /// The filed provider
+    /// The field provider
     /// </summary>
     public class ApiField
     {

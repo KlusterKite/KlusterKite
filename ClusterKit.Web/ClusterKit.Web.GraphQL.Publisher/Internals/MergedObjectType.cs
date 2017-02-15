@@ -9,19 +9,15 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
 
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Language.AST;
+    using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// The merged api type description
@@ -59,12 +55,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <summary>
             /// This is object that is combined from multiple API providers (some fields provided by one API, some from other)
             /// </summary>
-            MultipleApiType,
-
-            /// <summary>
-            /// This node is the api root
-            /// </summary>
-            ApiRoot
+            MultipleApiType
         }
 
         /// <summary>
@@ -127,9 +118,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             yield return this;
             foreach (var type in this.Fields.Values)
             {
-                foreach (var argumentsValue in type.Arguments.Values)
+                foreach (var argumentsValue in type.Arguments.Values.SelectMany(t => t.Type.GetAllTypes()))
                 {
-                    yield return argumentsValue.Type;
+                    yield return argumentsValue;
                 }
 
                 foreach (var subType in type.Type.GetAllTypes())
@@ -140,30 +131,32 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Resolves request value
+        /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
         /// </summary>
-        /// <param name="context">The request context</param>
-        /// <returns>Resolved value</returns>
-        public override object Resolve(ResolveFieldContext context)
+        /// <param name="description">
+        /// The api field description
+        /// </param>
+        /// <returns>
+        /// The <see cref="FieldType"/>
+        /// </returns>
+        protected FieldType ConvertApiField(KeyValuePair<string, MergedField> description)
         {
-            switch (this.Category)
-            {
-                case EnCategory.ApiRoot:
-                    return this.DoApiRequests(context);
-                case EnCategory.SingleApiType:
-                case EnCategory.MultipleApiType:
-                    return base.Resolve(context);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return this.ConvertApiField(description, null);
         }
 
         /// <summary>
         /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
         /// </summary>
-        /// <param name="description">The api field description</param>
-        /// <returns>The <see cref="FieldType"/></returns>
-        protected FieldType ConvertApiField(KeyValuePair<string, MergedField> description)
+        /// <param name="description">
+        /// The api field description
+        /// </param>
+        /// <param name="resolver">
+        /// The field resolver.
+        /// </param>
+        /// <returns>
+        /// The <see cref="FieldType"/>
+        /// </returns>
+        protected FieldType ConvertApiField(KeyValuePair<string, MergedField> description, IFieldResolver resolver)
         {
             var field = new FieldType
                             {
@@ -176,39 +169,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                 MetaDataTypeKey,
                                                 description.Value
                                             }
-                                        }
+                                        },
+                                Resolver = resolver
                             };
             return field;
-        }
-
-        /// <summary>
-        /// Creates an api requests to gather all data
-        /// </summary>
-        /// <param name="context">The request contexts</param>
-        /// <returns>The request data</returns>
-        private async Task<JObject> DoApiRequests(ResolveFieldContext context)
-        {
-            var taskList = new List<Task<string>>();
-            foreach (var provider in this.Providers.Select(fp => fp.Provider))
-            {
-                var request = this.GatherMultipleApiRequest(provider, context.FieldAst).ToList();
-                taskList.Add(provider.GetData(request));
-            }
-
-            var responses = await Task.WhenAll(taskList);
-            var options = new JsonMergeSettings
-                              {
-                                  MergeArrayHandling = MergeArrayHandling.Merge,
-                                  MergeNullValueHandling = MergeNullValueHandling.Ignore
-                              };
-
-            return responses.Select(JsonConvert.DeserializeObject).Aggregate(
-                new JObject(),
-                (seed, next) =>
-                    {
-                        seed.Merge(next, options);
-                        return seed;
-                    });
         }
 
         /// <summary>
@@ -217,7 +181,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="provider">The api provider</param>
         /// <param name="contextFieldAst">The request context</param>
         /// <returns>The list of api requests</returns>
-        private IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst)
+        protected IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst)
         {
             var usedFields =
                 contextFieldAst.SelectionSet.Selections.Where(s => s is Field)
@@ -247,16 +211,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         /// <param name="contextFieldAst">The request context</param>
         /// <returns>The list of api requests</returns>
-        private IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        protected IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
         {
             foreach (var field in contextFieldAst.SelectionSet.Selections.Where(s => s is Field).Cast<Field>())
             {
                 var request = new ApiRequest
-                                  {
-                                      Arguments = field.Arguments,
-                                      Name = field.Name,
-                                      Fields = this.GatherSingleApiRequest(field).ToList()
-                                  };
+                {
+                    Arguments = field.Arguments,
+                    Name = field.Name,
+                    Fields = this.GatherSingleApiRequest(field).ToList()
+                };
                 if (request.Fields.Count == 0)
                 {
                     request.Fields = null;
