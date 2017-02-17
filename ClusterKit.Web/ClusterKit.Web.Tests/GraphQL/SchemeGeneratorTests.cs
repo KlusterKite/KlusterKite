@@ -99,9 +99,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             }"
             };
 
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine("-------- Schema -----------");
@@ -109,14 +109,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
-                                     r.Schema = scheme;
+                                     r.Schema = schema;
                                      r.Query = @"
                                 query {
                                     api {
@@ -212,9 +212,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
                                };
 
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine("-------- Schema -----------");
@@ -222,14 +222,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
-                                     r.Schema = scheme;
+                                     r.Schema = schema;
                                      r.Query = @"
                                 query {
                                     api {
@@ -359,7 +359,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  {
                                      r.Schema = schema;
                                      r.Query = @"
-                                query {
+                                query TestQuery {
                                     api {
                                         viewer {
                                             id,
@@ -502,9 +502,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                         "{\"viewer\": {\"description\": \"test description\"}, \"object2\": {\"id\": 123}}"
                                 };
 
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider1, provider2 });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider1, provider2 });
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine("-------- Schema -----------");
@@ -512,14 +512,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
-                                     r.Schema = scheme;
+                                     r.Schema = schema;
                                      r.Query = @"
                                 query {
                                     api {
@@ -610,9 +610,9 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var provider = new MoqProvider { Description = api, Data = "{\"id\": 20,  \"name\": \"new object\"}" };
 
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine("-------- Schema -----------");
@@ -620,14 +620,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
-                                     r.Schema = scheme;
+                                     r.Schema = schema;
                                      r.Query = @"
                                                     mutation M {
                                                         insert: TestApi1_objects_create(new: {id: 1, name: ""new name""}) {
@@ -693,9 +693,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                    Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}}"
                                };
 
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine("-------- Schema -----------");
@@ -703,14 +703,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
-                                     r.Schema = scheme;
+                                     r.Schema = schema;
                                      r.Query = @"
                                 query {
                                     api {
@@ -791,12 +791,12 @@ namespace ClusterKit.Web.Tests.GraphQL
                 mutations) { Description = "The test api" };
 
             var provider = new MoqProvider { Description = api };
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                              {
-                                 r.Schema = scheme;
+                                 r.Schema = schema;
                                  r.Query = Resources.IntrospectionQuery;
                              }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
@@ -818,29 +818,29 @@ namespace ClusterKit.Web.Tests.GraphQL
                           };
 
             var provider = new MoqProvider { Description = api };
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine(description);
                 Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
-            Assert.NotNull(scheme.Query);
-            Assert.Equal(1, scheme.Query.Fields.Count());
-            Assert.True(scheme.Query.HasField("api"));
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
         }
 
         /// <summary>
-        /// Testing trivial scheme generator
+        /// Testing trivial schema generator
         /// </summary>
         [Fact]
         public void TrivialTest()
         {
-            var scheme = SchemaGenerator.Generate(new List<ApiProvider>());
+            var schema = SchemaGenerator.Generate(new List<ApiProvider>());
 
-            using (var printer = new SchemaPrinter(scheme))
+            using (var printer = new SchemaPrinter(schema))
             {
                 var description = printer.Print();
                 this.output.WriteLine(description);

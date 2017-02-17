@@ -9,9 +9,12 @@
 
 namespace ClusterKit.Web.GraphQL.Client
 {
+    using System;
+
     /// <summary>
     /// The list of field flags
     /// </summary>
+    [Flags]
     public enum EnFieldFlags
     {
         /// <summary>

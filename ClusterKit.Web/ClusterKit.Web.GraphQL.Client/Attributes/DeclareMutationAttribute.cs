@@ -1,21 +1,21 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PublishToApiAttribute.cs" company="ClusterKit">
+// <copyright file="DeclareMutationAttribute.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Marks class properties and methods to be published in GraphQL api
+//   Defines the DeclareMutationAttribute type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Client
+namespace ClusterKit.Web.GraphQL.Client.Attributes
 {
     using System;
 
     /// <summary>
-    /// Marks class properties and methods to be published in GraphQL api
+    /// Declare method as published to api and a data mutation
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
-    public class PublishToApiAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public class DeclareMutationAttribute : ApiDescriptionAttribute
     {
     }
 }
