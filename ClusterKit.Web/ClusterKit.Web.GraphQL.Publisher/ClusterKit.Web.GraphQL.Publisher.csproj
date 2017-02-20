@@ -218,7 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiProvider.cs" />
-    <Compile Include="ApiRequest.cs" />
+    <Compile Include="TempApiRequest.cs" />
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.resx</DependentUpon>
       <AutoGen>True</AutoGen>

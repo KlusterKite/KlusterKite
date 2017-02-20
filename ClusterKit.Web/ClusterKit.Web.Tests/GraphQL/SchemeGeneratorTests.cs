@@ -873,7 +873,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             public string Data { get; set; }
 
             /// <inheritdoc />
-            public override Task<string> GetData(List<ApiRequest> requests)
+            public override Task<string> GetData(List<TempApiRequest> requests)
             {
                 return Task.FromResult(this.Data);
             }

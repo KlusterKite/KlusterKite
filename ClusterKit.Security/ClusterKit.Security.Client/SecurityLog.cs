@@ -77,13 +77,13 @@ namespace ClusterKit.Security.Client
         /// </summary>
         /// <param name="recordType">The record type</param>
         /// <param name="severity">The data severity</param>
-        /// <param name="requestDescription">The request description</param>
+        /// <param name="requestContext">The request description</param>
         /// <param name="format">The message format</param>
         /// <param name="parameters">Additional message parameters</param>
         public static void CreateRecord(
             EnType recordType,
             EnSeverity severity,
-            RequestDescription requestDescription,
+            RequestContext requestContext,
             string format,
             params object[] parameters)
         {
@@ -100,9 +100,9 @@ namespace ClusterKit.Security.Client
             record.AddPropertyIfAbsent(new LogEventProperty("SecurityRecordType", new ScalarValue(recordType)));
             record.AddPropertyIfAbsent(new LogEventProperty("SecuritySeverity", new ScalarValue(severity)));
 
-            if (requestDescription != null)
+            if (requestContext != null)
             {
-                record.AddPropertyIfAbsent(new LogEventProperty("SecurityRequest", CreateLogValue(requestDescription)));
+                record.AddPropertyIfAbsent(new LogEventProperty("SecurityRequest", CreateLogValue(requestContext)));
             }
 
             Serilog.Log.Logger.Write(record);
@@ -111,36 +111,36 @@ namespace ClusterKit.Security.Client
         /// <summary>
         /// Creates log description from the request description
         /// </summary>
-        /// <param name="requestDescription">The request description</param>
+        /// <param name="requestContext">The request description</param>
         /// <returns>The log description</returns>
-        private static LogEventPropertyValue CreateLogValue(RequestDescription requestDescription)
+        private static LogEventPropertyValue CreateLogValue(RequestContext requestContext)
         {
             var dictionary = new Dictionary<ScalarValue, LogEventPropertyValue>();
 
-            if (!string.IsNullOrWhiteSpace(requestDescription.RemoteAddress))
+            if (!string.IsNullOrWhiteSpace(requestContext.RemoteAddress))
             {
-                dictionary[new ScalarValue("RemoteAddress")] = new ScalarValue(requestDescription.RemoteAddress);
+                dictionary[new ScalarValue("RemoteAddress")] = new ScalarValue(requestContext.RemoteAddress);
             }
 
-            if (requestDescription.Headers != null)
+            if (requestContext.Headers != null)
             {
                 dictionary[new ScalarValue("Headers")] =
                     new DictionaryValue(
-                        requestDescription.Headers.Select(
+                        requestContext.Headers.Select(
                             p =>
                                 new KeyValuePair<ScalarValue, LogEventPropertyValue>(
                                     new ScalarValue(p.Key),
                                     new ScalarValue(p.Value))));
             }
 
-            if (!string.IsNullOrWhiteSpace(requestDescription.RequestedLocalUrl))
+            if (!string.IsNullOrWhiteSpace(requestContext.RequestedLocalUrl))
             {
-                dictionary[new ScalarValue("LocalUrl")] = new ScalarValue(requestDescription.RequestedLocalUrl);
+                dictionary[new ScalarValue("LocalUrl")] = new ScalarValue(requestContext.RequestedLocalUrl);
             }
 
-            if (requestDescription.Authentication != null)
+            if (requestContext.Authentication != null)
             {
-                var auth = requestDescription.Authentication;
+                var auth = requestContext.Authentication;
                 var authenticationDictionary = new Dictionary<ScalarValue, LogEventPropertyValue>();
                 if (auth.User != null)
                 {

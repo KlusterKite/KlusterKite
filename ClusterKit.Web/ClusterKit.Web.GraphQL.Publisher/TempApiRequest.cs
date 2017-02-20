@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiRequest.cs" company="ClusterKit">
+// <copyright file="TempApiRequest.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -16,7 +16,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
     /// <summary>
     /// The api request
     /// </summary>
-    public class ApiRequest
+    public class TempApiRequest
     {
         /// <summary>
         /// Gets or sets the field arguments
@@ -31,6 +31,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <summary>
         /// Gets or sets the list of requested subfields
         /// </summary>
-        public List<ApiRequest> Fields { get; set; }
+        public List<TempApiRequest> Fields { get; set; }
     }
 }

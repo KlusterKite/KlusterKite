@@ -50,7 +50,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// <remarks>
         /// This can be used for further authorization checks
         /// </remarks>
-        public RequestDescription RequestDescription { get; set; }
+        public RequestContext RequestContext { get; set; }
 
         /// <summary>
         /// Gets or sets some extra data, that will be returned with the response

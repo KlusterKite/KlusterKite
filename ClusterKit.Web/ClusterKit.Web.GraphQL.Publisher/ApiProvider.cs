@@ -29,6 +29,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// </summary>
         /// <param name="requests">The request</param>
         /// <returns>The resolved data</returns>
-        public abstract Task<string> GetData(List<ApiRequest> requests);
+        public abstract Task<string> GetData(List<TempApiRequest> requests);
     }
 }

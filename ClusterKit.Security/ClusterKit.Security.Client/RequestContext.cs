@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequestDescription.cs" company="ClusterKit">
+// <copyright file="RequestContext.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -16,7 +16,7 @@ namespace ClusterKit.Security.Client
     /// <summary>
     /// The full operation request description
     /// </summary>
-    public class RequestDescription
+    public class RequestContext
     {
         /// <summary>
         /// Gets or sets the authentication description

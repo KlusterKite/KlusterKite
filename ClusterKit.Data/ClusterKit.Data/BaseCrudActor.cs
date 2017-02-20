@@ -312,7 +312,7 @@ namespace ClusterKit.Data
                                 SecurityLog.CreateRecord(
                                     SecurityLog.EnType.DataCreateGranted,
                                     entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                    request.RequestDescription,
+                                    request.RequestContext,
                                     "{ObjectType} with {ObjectId} id was created",
                                     typeof(TObject).FullName,
                                     factory.GetId(entity));
@@ -361,7 +361,7 @@ namespace ClusterKit.Data
                                     SecurityLog.CreateRecord(
                                         SecurityLog.EnType.DataUpdateGranted,
                                         entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                        request.RequestDescription,
+                                        request.RequestContext,
                                         "{ObjectType} with id {ObjectId} was updated. New id is {NewObjectId}",
                                         typeof(TObject).FullName,
                                         factory.GetId(oldObject),
@@ -372,7 +372,7 @@ namespace ClusterKit.Data
                                     SecurityLog.CreateRecord(
                                         SecurityLog.EnType.DataUpdateGranted,
                                         entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                        request.RequestDescription,
+                                        request.RequestContext,
                                         "{ObjectType} with id {ObjectId} was updated.",
                                         typeof(TObject).FullName,
                                         factory.GetId(entity));
@@ -430,7 +430,7 @@ namespace ClusterKit.Data
                             SecurityLog.CreateRecord(
                                 SecurityLog.EnType.DataDeleteGranted,
                                 oldObject.Value is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                request.RequestDescription,
+                                request.RequestContext,
                                 "{ObjectType} with id {ObjectId} was deleted.",
                                 typeof(TObject).FullName,
                                 factory.GetId(oldObject));

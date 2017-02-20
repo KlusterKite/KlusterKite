@@ -37,6 +37,10 @@
       <HintPath>..\..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\FAKE\tools\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,9 +53,11 @@
   <ItemGroup>
     <Compile Include="ApiDescription.cs" />
     <Compile Include="ApiField.cs" />
+    <Compile Include="ApiRequest.cs" />
     <Compile Include="ApiType.cs" />
     <Compile Include="Attributes\ApiDescriptionAttribute.cs" />
     <Compile Include="Attributes\DeclareConnectionAttribute.cs" />
+    <Compile Include="Attributes\DeclareFieldAttribute.cs" />
     <Compile Include="Attributes\DeclareMutationAttribute.cs" />
     <Compile Include="Attributes\PublishToApiAttribute.cs" />
     <Compile Include="EnFieldFlags.cs" />

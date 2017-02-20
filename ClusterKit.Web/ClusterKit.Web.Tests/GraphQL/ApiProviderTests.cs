@@ -10,19 +10,25 @@
 namespace ClusterKit.Web.Tests.GraphQL
 {
     using System;
+    using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using Castle.Core.Internal;
+
+    using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.API;
+    using ClusterKit.Web.GraphQL.API.Resolvers;
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Client.Attributes;
 
     using JetBrains.Annotations;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -55,6 +61,13 @@ namespace ClusterKit.Web.Tests.GraphQL
         public void DescriptionGenerationTest()
         {
             var provider = new TestApi();
+
+            provider.GenerationErrors.ForEach(e => this.output.WriteLine($"Generation error: {e}"));
+            provider.GenerationWarnings.ForEach(w => this.output.WriteLine($"Generation warning: {w}"));
+
+            Assert.Equal(0, provider.GenerationErrors.Count);
+            Assert.Equal(0, provider.GenerationWarnings.Count);
+
             var description = provider.ApiDescription;
             Assert.NotNull(description);
 
@@ -115,36 +128,91 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Pretests the compiling capabilities
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task CompileTest()
+        {
+            var comDomProvider = CodeDomProvider.CreateProvider("C#");
+            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = false };
+            compilerParameters.ReferencedAssemblies.AddRange(
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => !a.IsDynamic)
+                    .Select(
+                        a => a.CodeBase.Replace("file:\\", string.Empty).Replace("file:///", string.Empty))
+                    .ToArray());
+            
+            var code = @"
+                namespace ClusterKit.Web.GraphQL.Dynamic {
+                    using System.Threading.Tasks;
+                    using System.Collections.Generic;
+
+                    using Newtonsoft.Json;
+                    using Newtonsoft.Json.Linq;
+                    
+                    using ClusterKit.Security.Client;
+                    using ClusterKit.Web.GraphQL.Client;
+                    using ClusterKit.Web.GraphQL.API.Resolvers;
+
+                    public class Resolver_E3EA3942A7CF40359011147A82607E51 : PropertyResolver {
+                        public override Task<JToken> Resolve(object source, ApiRequest query, RequestContext context) {
+                            return Task.FromResult<JToken>(new JValue(((ClusterKit.Web.Tests.GraphQL.ApiProviderTests.NodeObject)source).Id));
+                        }
+                    }
+                }
+            ";
+
+            var compiledResult = comDomProvider.CompileAssemblyFromSource(compilerParameters, code);
+
+            foreach (var error in compiledResult.Errors)
+            {
+                this.output.WriteLine(error.ToString());
+            }
+
+            Assert.False(compiledResult.Errors.HasErrors);
+
+            var resolver =
+                (PropertyResolver)
+                compiledResult.CompiledAssembly.CreateInstance("ClusterKit.Web.GraphQL.Dynamic.Resolver_E3EA3942A7CF40359011147A82607E51");
+
+            Assert.NotNull(resolver);
+            
+            var node = new NodeObject { Id = Guid.NewGuid() };
+            Assert.Equal(node.Id, await resolver.Resolve(node, null, null));
+        }
+
+        /// <summary>
         /// The test node object
         /// </summary>
-        private class NodeObject
+        public class NodeObject
         {
             /// <summary>
             /// Gets or sets the node object id
             /// </summary>
             [UsedImplicitly]
-            [PublishToApi(Description = "the object uid")]
+            [DeclareField(Description = "the object uid")]
             public Guid Id { get; set; }
 
             /// <summary>
             /// Gets or sets the integer value
             /// </summary>
             [UsedImplicitly]
-            [PublishToApi(Description = "the integer property")]
+            [DeclareField(Description = "the integer property")]
             public int IntValue { get; set; }
 
             /// <summary>
             /// Gets or sets the integer value
             /// </summary>
             [UsedImplicitly]
-            [PublishToApi(Description = "the nullable integer property")]
+            [DeclareField(Description = "the nullable integer property")]
             public int? IntNullableValue { get; set; }
 
             /// <summary>
             /// Gets the string array
             /// </summary>
             [UsedImplicitly]
-            [PublishToApi]
+            [DeclareField(Description = "the string array")]
             public string[] StringArray => new[] { "object test 1", "object test 2" };
 
             /// <summary>
@@ -154,7 +222,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <param name="argument2">String argument number 2</param>
             /// <returns>The test string</returns>
             [UsedImplicitly]
-            [PublishToApi]
+            [DeclareField(Description = "the scalar method")]
             public string PublishedStringMethod(string argument1, int argument2) => "Published string method";
         }
 
@@ -168,7 +236,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <summary>
             /// Gets or sets the node object id
             /// </summary>
-            [PublishToApi]
+            [DeclareField]
             [UsedImplicitly]
             public Guid Id { get; set; }
         }
@@ -188,28 +256,28 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// Gets just the array of objects
             /// </summary>
             [UsedImplicitly]
-            [PublishToApi(Description = "An array of objects")]
+            [DeclareField(Description = "An array of objects")]
             public Task<IEnumerable<NodeObject>> ArrayedObjects => Task.FromResult((IEnumerable<NodeObject>)new[] { new NodeObject(), new NodeObject() });
 
             /// <summary>
             /// Gets the list of connected objects
             /// </summary>
             [UsedImplicitly]
-            [DeclareConnectionAttribute(Description = "The connected objects", CanCreate = true, CanUpdate = true, CanDelete = true)]
+            [DeclareConnection(Description = "The connected objects", CanCreate = true, CanUpdate = true, CanDelete = true)]
             public INodeConnection<NodeObject, Guid> ConnectedObjects => this.nodeObjectConnection;
 
             /// <summary>
             /// The published string property.
             /// </summary>
             [UsedImplicitly]
-            [PublishToApi(Description = "Published string")]
+            [DeclareField(Description = "Published string")]
             public string PublishedStringProperty => "Published string";
 
             /// <summary>
             /// Gets the string array
             /// </summary>
             [UsedImplicitly]
-            [PublishToApi(Description = "Published string array")]
+            [DeclareField(Description = "Published string array")]
             public string[] StringArray => new[] { "test 1", "test 2" };
 
             /// <summary>
@@ -225,7 +293,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <param name="argument2">String argument number 2</param>
             /// <returns>The test string</returns>
             [UsedImplicitly]
-            [PublishToApi(Description = "Published string method")]
+            [DeclareField(Description = "Published string method")]
             public string PublishedStringMethod(
                 [ApiDescription(Description = "first argument")] string argument1,
                 [ApiDescription(Description = "second argument")] int argument2) => "Published string method";
@@ -237,7 +305,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <param name="properties">An array argument</param>
             /// <returns>The scalar value </returns>
             [UsedImplicitly]
-            [PublishToApi(Description = "Published method with complex arguments")]
+            [DeclareField(Description = "Published method with complex arguments")]
             public bool ValidateNode(NodeObject node, List<string> properties)
             {
                 return true;
@@ -316,6 +384,101 @@ namespace ClusterKit.Web.Tests.GraphQL
                     return oldNode;
                 }
             }
+        }
+
+        /// <summary>
+        /// Just class to demonstrate api declaration
+        /// </summary>
+        [ApiDescription(Name = "DemoApi", Description = "Just class do demonstrate api declaration")]
+        private class DemoApi : ApiProvider
+        {
+            /// <summary>
+            /// The published scalar property.
+            /// </summary>
+            /// <remarks>
+            /// The result will be transformed to <see cref="JValue"/>
+            /// </remarks>
+            [UsedImplicitly]
+            [DeclareField(Description = "The published scalar property")]
+            public string PublishedStringProperty => "Published string";
+
+            /// <summary>
+            /// Some nested api
+            /// </summary>
+            /// <remarks>
+            /// The result will be resolved for each nested field / method
+            /// </remarks>
+            [UsedImplicitly]
+            [DeclareField(Description = "The published nested api")]
+            public TestApi Viewer => new TestApi();
+
+            /// <summary>
+            /// The regular api method
+            /// </summary>
+            /// <remarks>
+            /// The result will be resolved for each nested field / method
+            /// </remarks>
+            /// <param name="nodeUid">
+            /// The node Uid.
+            /// </param>
+            /// <returns>Some object</returns>
+            [UsedImplicitly]
+            [DeclareField(Description = "The regular api method")]
+            public NodeObject JustMethod([ApiDescription(Description = "The node uid")]Guid nodeUid) => new NodeObject { Id = nodeUid };
+
+            /// <summary>
+            /// The api method with context usage. Context argument is not published to api.
+            /// </summary>
+            /// <remarks>
+            /// The result will be resolved for each nested field / method
+            /// </remarks>
+            /// <param name="context">
+            /// The context.
+            /// </param>
+            /// <param name="nodeUid">
+            /// The node Uid.
+            /// </param>
+            /// <returns>
+            /// Some object
+            /// </returns>
+            [UsedImplicitly]
+            [DeclareField(Description = "The api method with context usage")]
+            public NodeObject JustMethodWithContext(RequestContext context, [ApiDescription(Description = "The node uid")]Guid nodeUid) => new NodeObject { Id = nodeUid };
+
+            /// <summary>
+            /// The api method with sub-request parsing
+            /// </summary>
+            /// <param name="subRequest">
+            /// The sub-request
+            /// </param>
+            /// <param name="nodeUid">
+            /// The node Uid.
+            /// </param>
+            /// <returns>
+            /// Some object
+            /// </returns>
+            [UsedImplicitly]
+            [DeclareField(Description = "The api method with subrequest parsing")]
+            public NodeObject JustMethodWithSubRequest(ApiRequest subRequest, [ApiDescription(Description = "The node uid")]Guid nodeUid) => new NodeObject { Id = nodeUid };
+
+            /// <summary>
+            /// This method is considered as forwarding to some other api provider. T
+            /// </summary>
+            /// <remarks>
+            /// The result will be forward back to requester with no further process
+            /// </remarks>
+            /// <param name="subRequest">
+            /// The sub-request
+            /// </param>
+            /// <param name="nodeUid">
+            /// The node Uid.
+            /// </param>
+            /// <returns>
+            /// Some object
+            /// </returns>
+            [UsedImplicitly]
+            [DeclareField(Description = "The api method with context usage")]
+            public JObject ApiResolveForward(ApiRequest subRequest, [ApiDescription(Description = "The node uid")]Guid nodeUid) => new JObject();
         }
     }
 }

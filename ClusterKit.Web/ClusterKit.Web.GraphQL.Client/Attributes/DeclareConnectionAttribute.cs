@@ -15,7 +15,7 @@ namespace ClusterKit.Web.GraphQL.Client.Attributes
     /// Declares current method as a node connection
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
-    public class DeclareConnectionAttribute : PublishToApiAttribute
+    public class DeclareConnectionAttribute : DeclareFieldAttribute
     {
         /// <summary>
         /// Gets or sets a value indicating whether new node creation is possible

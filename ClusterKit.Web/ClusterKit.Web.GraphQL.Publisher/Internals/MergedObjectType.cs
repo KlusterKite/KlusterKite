@@ -190,7 +190,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="provider">The api provider</param>
         /// <param name="contextFieldAst">The request context</param>
         /// <returns>The list of api requests</returns>
-        protected IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst)
+        protected IEnumerable<TempApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst)
         {
             var usedFields =
                 contextFieldAst.SelectionSet.Selections.Where(s => s is Field)
@@ -204,7 +204,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
             foreach (var usedField in usedFields)
             {
-                var request = new ApiRequest { Arguments = usedField.Ast.Arguments, Name = usedField.Ast.Name };
+                var request = new TempApiRequest { Arguments = usedField.Ast.Arguments, Name = usedField.Ast.Name };
                 var endType = usedField.Field.Type as MergedObjectType;
 
                 request.Fields = endType?.Category == EnCategory.MultipleApiType
@@ -220,11 +220,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         /// <param name="contextFieldAst">The request context</param>
         /// <returns>The list of api requests</returns>
-        protected IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        protected IEnumerable<TempApiRequest> GatherSingleApiRequest(Field contextFieldAst)
         {
             foreach (var field in contextFieldAst.SelectionSet.Selections.Where(s => s is Field).Cast<Field>())
             {
-                var request = new ApiRequest
+                var request = new TempApiRequest
                 {
                     Arguments = field.Arguments,
                     Name = field.Name,
