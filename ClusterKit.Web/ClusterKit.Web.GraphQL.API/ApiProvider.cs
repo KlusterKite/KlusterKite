@@ -10,16 +10,21 @@
 namespace ClusterKit.Web.GraphQL.API
 {
     using System;
+    using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
 
     using ClusterKit.Security.Client;
+    using ClusterKit.Web.GraphQL.API.Resolvers;
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Client.Attributes;
 
     using JetBrains.Annotations;
+
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Public api provider.
@@ -35,6 +40,16 @@ namespace ClusterKit.Web.GraphQL.API
         /// The list of errors gathered on generation stage
         /// </summary>
         private readonly List<string> generationWarnings = new List<string>();
+
+        /// <summary>
+        /// The list of resolvers
+        /// </summary>
+        private Dictionary<string, PropertyResolver> resolvers;
+
+        /// <summary>
+        /// Prepares serializer to deserialize arguments
+        /// </summary>
+        private JsonSerializer argumentsSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiProvider"/> class.
@@ -60,22 +75,34 @@ namespace ClusterKit.Web.GraphQL.API
         public IReadOnlyList<string> GenerationWarnings => this.generationWarnings.AsReadOnly();
 
         /// <summary>
-        /// Converts string to camel case
+        /// Resolves query
         /// </summary>
-        /// <param name="name">The property / method name</param>
-        /// <returns>The name in camel case</returns>
-        private static string ToCamelCase(string name)
+        /// <param name="requests">
+        /// The query request
+        /// </param>
+        /// <param name="context">
+        /// The request context.
+        /// </param>
+        /// <returns>
+        /// Resolved query
+        /// </returns>
+        public async Task<JObject> ResolveQuery(List<ApiRequest> requests, RequestContext context)
         {
-            name = name?.Trim();
-
-            if (string.IsNullOrEmpty(name))
+            var result = new JObject();
+            foreach (var request in requests)
             {
-                return name;
+                PropertyResolver resolver;
+                if (!this.resolvers.TryGetValue(request.FieldName, out resolver))
+                {
+                    result.Add(request.FieldName, null);
+                }
+                else
+                {
+                    result.Add(request.FieldName, await resolver.Resolve(this, request, context, this.argumentsSerializer));
+                }
             }
 
-            var array = name.ToCharArray();
-            array[0] = array[0].ToString().ToLowerInvariant().ToCharArray().First();
-            return new string(array);
+            return result;
         }
 
         /// <summary>
@@ -98,6 +125,53 @@ namespace ClusterKit.Web.GraphQL.API
             var mutations = this.GenerateMutations(root, new List<string>(), new List<string>(), assembleData);
             this.ApiDescription.Mutations = mutations.ToList();
             this.ApiDescription.Fields = root.Fields;
+
+            this.argumentsSerializer = new JsonSerializer
+                                           {
+                                               ContractResolver =
+                                                   new InputContractResolver(assembleData.FieldNames)
+                                           };
+
+            this.CompileResolvers(root, assembleData);
+        }
+
+        /// <summary>
+        /// Perform resolvers compilation
+        /// </summary>
+        /// <param name="root">
+        /// The root api description.
+        /// </param>
+        /// <param name="data">
+        /// The temporary data used during assemble process
+        /// </param>
+        private void CompileResolvers(ApiType root, AssembleTempData data)
+        {
+            var code = data.ResolverGenerators.Select(g => g.Generate()).ToList();
+            var comDomProvider = CodeDomProvider.CreateProvider("C#");
+            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = false };
+            compilerParameters.ReferencedAssemblies.AddRange(
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => !a.IsDynamic)
+                    .Select(a => a.CodeBase.Replace("file:\\", string.Empty).Replace("file:///", string.Empty))
+                    .ToArray());
+            var compiledResult = comDomProvider.CompileAssemblyFromSource(compilerParameters, code.ToArray());
+            foreach (CompilerError error in compiledResult.Errors)
+            {
+                this.generationErrors.Add(error.ToString());
+            }
+
+            this.resolvers = new Dictionary<string, PropertyResolver>();
+
+            if (!compiledResult.Errors.HasErrors)
+            {
+                foreach (var rootField in root.Fields)
+                {
+                    this.resolvers[rootField.Name] =
+                        (PropertyResolver)
+                        compiledResult.CompiledAssembly.CreateInstance(
+                            data.ResolverNames[root.TypeName][rootField.Name]);
+                }
+            }
         }
 
         /// <summary>
@@ -106,6 +180,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="method">
         /// The method to process
         /// </param>
+        /// <param name="apiType">The api type description</param>
         /// <param name="attribute">
         /// The method description attribute
         /// </param>
@@ -117,6 +192,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// </returns>
         private ApiField GenerateFieldFromMethod(
             MethodInfo method,
+            ApiType apiType,
             PublishToApiAttribute attribute,
             AssembleTempData data)
         {
@@ -133,7 +209,7 @@ namespace ClusterKit.Web.GraphQL.API
                 return null;
             }
 
-            var name = attribute.Name ?? ToCamelCase(method.Name);
+            var name = attribute.Name ?? ResolverGenerator.ToCamelCase(method.Name);
             ApiField field;
             if (metadata.ScalarType != EnScalarType.None)
             {
@@ -173,7 +249,7 @@ namespace ClusterKit.Web.GraphQL.API
                 var description =
                     parameterInfo.GetCustomAttribute(typeof(ApiDescriptionAttribute)) as ApiDescriptionAttribute;
 
-                var parameterName = description?.Name ?? ToCamelCase(parameterInfo.Name);
+                var parameterName = description?.Name ?? ResolverGenerator.ToCamelCase(parameterInfo.Name);
                 if (parameterMetadata.ScalarType != EnScalarType.None)
                 {
                     field.Arguments.Add(
@@ -195,13 +271,17 @@ namespace ClusterKit.Web.GraphQL.API
                 }
             }
 
-            // todo: create resolver
+            var resolverGenerator = new ResolverGenerator(method, metadata, type, data);
+            data.ResolverGenerators.Add(resolverGenerator);
+            data.ResolverNames[apiType.TypeName][name] = resolverGenerator.ClassName;
+
             return field;
         }
 
         /// <summary>
         /// Generates api field from type method
         /// </summary>
+        /// <param name="apiType">The type api description</param>
         /// <param name="property">
         /// The property to process
         /// </param>
@@ -215,6 +295,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// The field description
         /// </returns>
         private ApiField GenerateFieldFromProperty(
+            ApiType apiType,
             PropertyInfo property,
             PublishToApiAttribute attribute,
             AssembleTempData data)
@@ -233,16 +314,15 @@ namespace ClusterKit.Web.GraphQL.API
                 return null;
             }
 
-            var name = attribute.Name ?? ToCamelCase(property.Name);
+            var name = attribute.Name ?? ResolverGenerator.ToCamelCase(property.Name);
+            data.FieldNames[property] = name;
 
-            if (property.CanWrite && !metadata.IsAsync && !metadata.IsForwarding)
-            {
-                // todo: create input type assembler
-            }
+            var resolverGenerator = new ResolverGenerator(property, metadata, declaringType, data);
+            data.ResolverGenerators.Add(resolverGenerator);
+            data.ResolverNames[apiType.TypeName][name] = resolverGenerator.ClassName;
 
             if (metadata.ScalarType != EnScalarType.None)
             {
-                // todo: create resolver
                 return ApiField.Scalar(
                     name,
                     metadata.ScalarType,
@@ -252,7 +332,6 @@ namespace ClusterKit.Web.GraphQL.API
 
             var returnApiType = this.GenerateTypeDescription(metadata.Type, data);
 
-            // todo: create resolver
             return ApiField.Object(
                 name,
                 returnApiType.TypeName,
@@ -290,7 +369,7 @@ namespace ClusterKit.Web.GraphQL.API
                 yield break;
             }
 
-            foreach (var mutation in this.GenerateMutationsDirect(type, path, data))
+            foreach (var mutation in this.GenerateMutationsDirect(apiType, type, path, data))
             {
                 yield return mutation;
             }
@@ -309,13 +388,18 @@ namespace ClusterKit.Web.GraphQL.API
         /// <summary>
         /// Generate mutations directly declared in the type
         /// </summary>
+        /// <param name="apiType">The api type description</param>
         /// <param name="type">The type</param>
         /// <param name="path">The fields path</param>
         /// <param name="data">
         /// The temporary data used during assemble process
         /// </param>
         /// <returns>The list of mutations</returns>
-        private IEnumerable<ApiField> GenerateMutationsDirect(Type type, List<string> path, AssembleTempData data)
+        private IEnumerable<ApiField> GenerateMutationsDirect(
+            ApiType apiType,
+            Type type,
+            List<string> path,
+            AssembleTempData data)
         {
             var fields =
                 type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -328,7 +412,7 @@ namespace ClusterKit.Web.GraphQL.API
                                     (DeclareMutationAttribute)p.GetCustomAttribute(typeof(DeclareMutationAttribute))
                                 })
                     .Where(p => p.Attribute != null && !p.Method.IsGenericMethod && !p.Method.IsGenericMethodDefinition)
-                    .Select(m => this.GenerateFieldFromMethod(m.Method, m.Attribute, data))
+                    .Select(m => this.GenerateFieldFromMethod(m.Method, apiType, m.Attribute, data))
                     .Where(f => f != null);
 
             foreach (var apiField in fields)
@@ -359,7 +443,7 @@ namespace ClusterKit.Web.GraphQL.API
                     {
                         var description =
                             (DeclareConnectionAttribute)m.GetCustomAttribute(typeof(DeclareConnectionAttribute));
-                        var name = description?.Name ?? ToCamelCase(m.Name);
+                        var name = description?.Name ?? ResolverGenerator.ToCamelCase(m.Name);
                         return
                             new
                                 {
@@ -548,6 +632,8 @@ namespace ClusterKit.Web.GraphQL.API
 
             data.DiscoveredTypes[apiType.TypeName] = type;
             data.DiscoveredApiTypes[apiType.TypeName] = apiType;
+            data.ApiTypeByOriginalTypeNames[type.FullName] = apiType;
+            data.ResolverNames[apiType.TypeName] = new Dictionary<string, string>();
 
             apiType.Fields.AddRange(this.GenerateTypeProperties(type, apiType, data));
             apiType.Fields.AddRange(this.GenerateTypeMethods(type, apiType, data));
@@ -629,7 +715,7 @@ namespace ClusterKit.Web.GraphQL.API
                                     (DeclareFieldAttribute)p.GetCustomAttribute(typeof(DeclareFieldAttribute))
                                 })
                     .Where(p => p.Attribute != null && !p.Method.IsGenericMethod && !p.Method.IsGenericMethodDefinition)
-                    .Select(m => this.GenerateFieldFromMethod(m.Method, m.Attribute, data))
+                    .Select(m => this.GenerateFieldFromMethod(m.Method, apiType, m.Attribute, data))
                     .Where(f => f != null);
         }
 
@@ -656,216 +742,8 @@ namespace ClusterKit.Web.GraphQL.API
                                     (DeclareFieldAttribute)p.GetCustomAttribute(typeof(DeclareFieldAttribute))
                                 })
                     .Where(p => p.Attribute != null && p.Property.CanRead)
-                    .Select(o => this.GenerateFieldFromProperty(o.Property, o.Attribute, data))
+                    .Select(o => this.GenerateFieldFromProperty(apiType, o.Property, o.Attribute, data))
                     .Where(f => f != null);
-        }
-
-        /// <summary>
-        /// The temporary data used during assemble process
-        /// </summary>
-        private class AssembleTempData
-        {
-            /// <summary>
-            /// Gets the list of descriptions of discovered types used in API
-            /// </summary>
-            [NotNull]
-            public Dictionary<string, ApiType> DiscoveredApiTypes { get; } = new Dictionary<string, ApiType>();
-
-            /// <summary>
-            /// Gets the list of descriptions of discovered types used in API
-            /// </summary>
-            [NotNull]
-            public Dictionary<string, Type> DiscoveredTypes { get; } = new Dictionary<string, Type>();
-        }
-
-        /// <summary>
-        /// Property or method return type description
-        /// </summary>
-        private class TypeMetadata
-        {
-            /// <summary>
-            /// The return types of a field
-            /// </summary>
-            public enum EnMetaType
-            {
-                /// <summary>
-                /// This is scalar field
-                /// </summary>
-                Scalar,
-
-                /// <summary>
-                /// The field is an object
-                /// </summary>
-                Object,
-
-                /// <summary>
-                /// The field is an array
-                /// </summary>
-                Array,
-
-                /// <summary>
-                /// The field represents connection
-                /// </summary>
-                Connection
-            }
-
-            /// <summary>
-            /// Gets or sets a value indicating whether  this property / method has asynchronous access
-            /// </summary>
-            public bool IsAsync { get; set; }
-
-            /// <summary>
-            /// Gets or sets a value indicating whether this property / method forwards resolve to other API provider
-            /// </summary>
-            public bool IsForwarding { get; set; }
-
-            /// <summary>
-            /// Gets or sets the meta type
-            /// </summary>
-            public EnMetaType MetaType { get; set; }
-
-            /// <summary>
-            /// Gets or sets the parsed scalar type
-            /// </summary>
-            public EnScalarType ScalarType { get; set; }
-
-            /// <summary>
-            /// Gets or sets the true returning type
-            /// </summary>
-            public Type Type { get; set; }
-
-            /// <summary>
-            /// Checks the type to be scalar
-            /// </summary>
-            /// <param name="type">The type</param>
-            /// <returns>The corresponding scalar type</returns>
-            public static EnScalarType CheckScalarType(Type type)
-            {
-                var nullable = CheckType(type, typeof(Nullable<>));
-                if (nullable != null)
-                {
-                    type = nullable.GenericTypeArguments[0];
-                }
-
-                if (type == typeof(string))
-                {
-                    return EnScalarType.String;
-                }
-
-                if (type == typeof(bool))
-                {
-                    return EnScalarType.Boolean;
-                }
-
-                if (type == typeof(Guid))
-                {
-                    return EnScalarType.Guid;
-                }
-
-                if (type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(uint)
-                    || type == typeof(ulong) || type == typeof(ushort))
-                {
-                    return EnScalarType.Integer;
-                }
-
-                if (type == typeof(float) || type == typeof(double))
-                {
-                    return EnScalarType.Float;
-                }
-
-                if (type == typeof(decimal))
-                {
-                    return EnScalarType.Decimal;
-                }
-
-                return EnScalarType.None;
-            }
-
-            /// <summary>
-            /// Checks the interface implementation
-            /// </summary>
-            /// <param name="type">The type to check</param>
-            /// <param name="typeToCheck">The type of an interface</param>
-            /// <returns>The interface or null</returns>
-            public static Type CheckType(Type type, Type typeToCheck)
-            {
-                if (type == typeToCheck)
-                {
-                    return type;
-                }
-
-                if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeToCheck)
-                {
-                    return type;
-                }
-
-                foreach (var @interface in type.GetInterfaces())
-                {
-                    if (@interface == typeToCheck)
-                    {
-                        return @interface;
-                    }
-
-                    if (@interface.IsConstructedGenericType && @interface.GetGenericTypeDefinition() == typeToCheck)
-                    {
-                        return @interface;
-                    }
-                }
-
-                foreach (var baseType in GetBaseTypes(type))
-                {
-                    if (baseType == typeToCheck)
-                    {
-                        return baseType;
-                    }
-
-                    if (baseType.IsConstructedGenericType && baseType.GetGenericTypeDefinition() == typeToCheck)
-                    {
-                        return baseType;
-                    }
-                }
-
-                return null;
-            }
-
-            /// <summary>
-            /// Gets the <see cref="EnFieldFlags"/> from metadata
-            /// </summary>
-            /// <returns>The field flags</returns>
-            public EnFieldFlags GetFlags()
-            {
-                switch (this.MetaType)
-                {
-                    case EnMetaType.Object:
-                        return EnFieldFlags.None;
-                    case EnMetaType.Array:
-                        return EnFieldFlags.IsArray;
-                    case EnMetaType.Connection:
-                        return EnFieldFlags.IsConnection;
-                    default:
-                        // todo: report error
-                        return EnFieldFlags.None;
-                }
-            }
-
-            /// <summary>
-            /// Gets the base type hierarchy
-            /// </summary>
-            /// <param name="type">The type</param>
-            /// <returns>The list of base types</returns>
-            private static IEnumerable<Type> GetBaseTypes(Type type)
-            {
-                if (type.BaseType == null)
-                {
-                    yield break;
-                }
-
-                yield return type.BaseType;
-                foreach (var baseType in GetBaseTypes(type.BaseType))
-                {
-                    yield return baseType;
-                }
-            }
         }
     }
 }

@@ -156,7 +156,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                     using ClusterKit.Web.GraphQL.API.Resolvers;
 
                     public class Resolver_E3EA3942A7CF40359011147A82607E51 : PropertyResolver {
-                        public override Task<JToken> Resolve(object source, ApiRequest query, RequestContext context) {
+                        public override Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer) {
                             return Task.FromResult<JToken>(new JValue(((ClusterKit.Web.Tests.GraphQL.ApiProviderTests.NodeObject)source).Id));
                         }
                     }
@@ -179,7 +179,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.NotNull(resolver);
             
             var node = new NodeObject { Id = Guid.NewGuid() };
-            Assert.Equal(node.Id, await resolver.Resolve(node, null, null));
+            Assert.Equal(node.Id, await resolver.Resolve(node, null, null, null));
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         [UsedImplicitly]
         [ApiDescription(Description = "Side non-node object")]
-        private class NotNodeObject
+        public class NotNodeObject
         {
             /// <summary>
             /// Gets or sets the node object id
@@ -245,7 +245,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// Some test api
         /// </summary>
         [ApiDescription(Name = "TestApi", Description = "Test api containing all possible field / method combinations")]
-        private class TestApi : ApiProvider
+        public class TestApi : ApiProvider
         {
             /// <summary>
             /// The node object connection
@@ -390,7 +390,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// Just class to demonstrate api declaration
         /// </summary>
         [ApiDescription(Name = "DemoApi", Description = "Just class do demonstrate api declaration")]
-        private class DemoApi : ApiProvider
+        public class DemoApi : ApiProvider
         {
             /// <summary>
             /// The published scalar property.

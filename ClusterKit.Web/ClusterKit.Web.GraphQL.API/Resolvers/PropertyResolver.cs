@@ -14,6 +14,7 @@ namespace ClusterKit.Web.GraphQL.API.Resolvers
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Client;
 
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -33,9 +34,12 @@ namespace ClusterKit.Web.GraphQL.API.Resolvers
         /// <param name="context">
         /// The context.
         /// </param>
+        /// <param name="argumentsSerializer">
+        /// The json serializer used to deserialize field arguments
+        /// </param>
         /// <returns>
         /// The property value
         /// </returns>
-        public abstract Task<JToken> Resolve(object source, ApiRequest query, RequestContext context);
+        public abstract Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer);
     }
 }
