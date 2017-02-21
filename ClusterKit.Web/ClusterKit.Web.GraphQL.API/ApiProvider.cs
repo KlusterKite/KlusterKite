@@ -83,10 +83,13 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="context">
         /// The request context.
         /// </param>
+        /// <param name="onErrorCallback">
+        /// The method that will be called in case of errors
+        /// </param>
         /// <returns>
         /// Resolved query
         /// </returns>
-        public async Task<JObject> ResolveQuery(List<ApiRequest> requests, RequestContext context)
+        public async Task<JObject> ResolveQuery(List<ApiRequest> requests, RequestContext context, Action<Exception> onErrorCallback)
         {
             var result = new JObject();
             foreach (var request in requests)
@@ -98,7 +101,7 @@ namespace ClusterKit.Web.GraphQL.API
                 }
                 else
                 {
-                    result.Add(request.FieldName, await resolver.Resolve(this, request, context, this.argumentsSerializer));
+                    result.Add(request.FieldName, await resolver.Resolve(this, request, context, this.argumentsSerializer, onErrorCallback));
                 }
             }
 

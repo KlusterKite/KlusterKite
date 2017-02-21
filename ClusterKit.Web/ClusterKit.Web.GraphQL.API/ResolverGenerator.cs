@@ -57,27 +57,27 @@ namespace ClusterKit.Web.GraphQL.API
         /// <summary>
         /// Gets the <see cref="MemberInfo"/> representing field
         /// </summary>
-        public MemberInfo Member { get; }
+        private MemberInfo Member { get; }
 
         /// <summary>
         /// Gets the return type metadata
         /// </summary>
-        public TypeMetadata Metadata { get; }
+        private TypeMetadata Metadata { get; }
 
         /// <summary>
         /// Gets the source data type
         /// </summary>
-        public Type SourceType { get; }
+        private Type SourceType { get; }
 
         /// <summary>
         /// Gets the assemble data
         /// </summary>
-        public AssembleTempData Data { get; }
+        private AssembleTempData Data { get; }
 
         /// <summary>
         /// Gets the resolver uid
         /// </summary>
-        public Guid Uid { get; } = Guid.NewGuid();
+        private Guid Uid { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Creates c# code for defined parameters
@@ -85,9 +85,23 @@ namespace ClusterKit.Web.GraphQL.API
         /// <returns>The field resolver definition in C#</returns>
         public string Generate()
         {
-            var @async = this.Metadata.IsAsync || this.Metadata.ScalarType == EnScalarType.None ? "async" : string.Empty;
+            string async;
+            string returnNull;
+
+            if (this.Metadata.IsAsync || this.Metadata.ScalarType == EnScalarType.None)
+            {
+                async = "async";
+                returnNull = "null";
+            }
+            else
+            {
+                async = string.Empty;
+                returnNull = "Task.FromResult<JToken>(null)";
+            }
+
             var code = $@"
                     namespace ClusterKit.Web.GraphQL.Dynamic {{
+                        using System;
                         using System.Threading.Tasks;
                         using System.Collections.Generic;
 
@@ -102,15 +116,30 @@ namespace ClusterKit.Web.GraphQL.API
                         using ClusterKit.Web.GraphQL.API.Resolvers;
 
                         public class Resolver{this.Uid:N} : PropertyResolver {{
-                            public override {@async} Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer) {{
+                            public override {async} Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) {{
                                 var sourceTyped = source as {ToCSharpRepresentation(this.SourceType, true)};
                                 if (sourceTyped == null) {{
-                                    // todo: report error
-                                    return null;
+                                    if (onErrorCallback != null) 
+                                    {{
+                                        onErrorCallback(new Exception(""Source object of unexpected type""));
+                                    }}
+                                    return {returnNull};
                                 }}
 
-                                {this.GenerateResultSourceAcquirement()};
-                                {(this.Metadata.IsForwarding ? this.GenerateForwardedReturn() : this.GenerateRecursiveResolve())}
+                                try 
+                                {{
+                                    {this.GenerateResultSourceAcquirement()};
+                                    {(this.Metadata.IsForwarding ? this.GenerateForwardedReturn() : this.GenerateRecursiveResolve())}
+                                }}
+                                catch(Exception e)
+                                {{
+                                    if (onErrorCallback != null) 
+                                    {{
+                                        onErrorCallback(e);
+                                    }}
+
+                                    return {returnNull};
+                                }}
                             }}
                         }}
                     }}
@@ -228,7 +257,6 @@ namespace ClusterKit.Web.GraphQL.API
                 return this.GenerateResultSourceFromMethodAcquirement(method);
             }
 
-            // todo: method execution
             throw new InvalidOperationException($"Member is of the invalid type {this.Member.GetType().Name}");
         }
 
@@ -239,7 +267,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <returns>Code to acquire the source value</returns>
         private string GenerateResultSourceFromMethodAcquirement(MethodInfo method)
         {
-            var @await = this.Metadata.IsAsync ? "await" : string.Empty;
+            var await = this.Metadata.IsAsync ? "await" : string.Empty;
             List<string> codeCommands = new List<string>();
 
             var parameterIndex = 0;
@@ -262,8 +290,8 @@ namespace ClusterKit.Web.GraphQL.API
                 {
                     command = $@"
                     var prop{parameterIndex} = query.Arguments != null ? query.Arguments.Property(""{ parameterName}"") : null;
-                    var arg{parameterIndex} = prop{parameterIndex} != null 
-                            ? prop{parameterIndex}.ToObject<{ToCSharpRepresentation(parameter.ParameterType, true)}>(argumentsSerializer)
+                    var arg{parameterIndex} = prop{parameterIndex} != null && prop{parameterIndex}.Value != null
+                            ? prop{parameterIndex}.Value.ToObject<{ToCSharpRepresentation(parameter.ParameterType, true)}>(argumentsSerializer)
                             : default({ToCSharpRepresentation(parameter.ParameterType, true)});
                     ";
                 }
@@ -287,7 +315,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <returns>Code to acquire the source value</returns>
         private string GenerateResultSourceFromPropertyAcquirement(PropertyInfo property)
         {
-            var @await = this.Metadata.IsAsync ? "await" : string.Empty;
+            var await = this.Metadata.IsAsync ? "await" : string.Empty;
             return $"var resultSource = {@await} sourceTyped.{property.Name};";
         }
 
@@ -297,7 +325,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <returns>Code to return result</returns>
         private string GenerateForwardedReturn()
         {
-            return "return resultSource;";
+            return this.Metadata.IsAsync ? "return resultSource;" : "return Task.FromResult<JToken>(resultSource);";
         }
 
         /// <summary>
@@ -366,7 +394,7 @@ namespace ClusterKit.Web.GraphQL.API
                     if (fieldQuery != null)
                     {{
                         resolver = new {this.Data.ResolverNames[apiType.TypeName][apiField.Name]}();
-                        result.Add(""{apiField.Name}"", await resolver.Resolve({itemName}, fieldQuery, context, argumentsSerializer));
+                        result.Add(""{apiField.Name}"", await resolver.Resolve({itemName}, fieldQuery, context, argumentsSerializer, onErrorCallback));
                     }}
                 ";
 

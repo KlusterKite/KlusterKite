@@ -145,6 +145,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             
             var code = @"
                 namespace ClusterKit.Web.GraphQL.Dynamic {
+                    using System;
                     using System.Threading.Tasks;
                     using System.Collections.Generic;
 
@@ -156,7 +157,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                     using ClusterKit.Web.GraphQL.API.Resolvers;
 
                     public class Resolver_E3EA3942A7CF40359011147A82607E51 : PropertyResolver {
-                        public override Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer) {
+                        public override Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) {
                             return Task.FromResult<JToken>(new JValue(((ClusterKit.Web.Tests.GraphQL.ApiProviderTests.NodeObject)source).Id));
                         }
                     }
@@ -179,7 +180,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.NotNull(resolver);
             
             var node = new NodeObject { Id = Guid.NewGuid() };
-            Assert.Equal(node.Id, await resolver.Resolve(node, null, null, null));
+            Assert.Equal(node.Id, await resolver.Resolve(node, null, null, null, e => this.output.WriteLine(e.Message)));
         }
 
         /// <summary>

@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Web.GraphQL.API.Resolvers
 {
+    using System;
     using System.Threading.Tasks;
 
     using ClusterKit.Security.Client;
@@ -37,9 +38,12 @@ namespace ClusterKit.Web.GraphQL.API.Resolvers
         /// <param name="argumentsSerializer">
         /// The json serializer used to deserialize field arguments
         /// </param>
+        /// <param name="onErrorCallback">
+        /// The method that will be called in case of errors
+        /// </param>
         /// <returns>
         /// The property value
         /// </returns>
-        public abstract Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer);
+        public abstract Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback);
     }
 }
