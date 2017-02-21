@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Web.Tests.GraphQL
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace ClusterKit.Web.Tests.GraphQL
     using ClusterKit.Web.GraphQL.API;
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Client.Attributes;
+
+    using Google.ProtocolBuffers;
 
     using JetBrains.Annotations;
 
@@ -168,7 +171,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task AsyncScalarFieldTest()
         {
-            var provider = new TestProvider();
+            var provider = this.GetProvider();
             Assert.Equal(0, provider.GenerationErrors.Count);
             Assert.Equal(0, provider.GenerationWarnings.Count);
 
@@ -277,6 +280,56 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.NotNull(result);
             Assert.NotNull(result.Property("syncScalarField"));
             Assert.Equal("SyncScalarField", result.Property("syncScalarField").ToObject<string>());
+        }
+
+        /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task SyncFaultedScalarFieldTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "faultedSyncField" } };
+
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("faultedSyncField"));
+            Assert.False(result.Property("faultedSyncField").Value.HasValues);
+        }
+
+        /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task FaultedASyncMethodTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest>
+                            {
+                                new ApiRequest
+                                    {
+                                        FieldName = "faultedASyncMethod",
+                                        Fields =
+                                            new List<ApiRequest>
+                                                {
+                                                    new ApiRequest
+                                                        {
+                                                            FieldName = "syncScalarField"
+                                                        }
+                                                }
+                                    }
+                            };
+
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("faultedASyncMethod"));
+            Assert.False(result.Property("faultedASyncMethod").Value.HasValues);
         }
 
         /// <summary>
@@ -427,6 +480,30 @@ namespace ClusterKit.Web.Tests.GraphQL
             [DeclareField]
             [UsedImplicitly]
             public string SyncScalarField => "SyncScalarField";
+
+            /// <summary>
+            /// Gets a value indicating whether something is faulting
+            /// </summary>
+            [DeclareField]
+            [UsedImplicitly]
+            public bool FaultedSyncField
+            {
+                get
+                {
+                    throw new Exception("test");
+                }
+            }
+
+            /// <summary>
+            /// Faulted async method
+            /// </summary>
+            /// <returns>Faulted task</returns>
+            [DeclareField]
+            [UsedImplicitly]
+            public Task<NestedProvider> FaultedASyncMethod()
+            {
+                return Task.FromException<NestedProvider>(new Exception("test exception"));
+            }
 
             /// <summary>
             /// Some public method
