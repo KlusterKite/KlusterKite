@@ -104,7 +104,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             Assert.True(description.Fields.Any(f => f.Name == "publishedStringProperty"));
             Assert.Equal(EnScalarType.String, description.Fields.First(f => f.Name == "publishedStringProperty").ScalarType);
-            Assert.Equal(EnFieldFlags.None, description.Fields.First(f => f.Name == "publishedStringProperty").Flags);
+            Assert.Equal(EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable, description.Fields.First(f => f.Name == "publishedStringProperty").Flags);
 
             Assert.True(description.Fields.Any(f => f.Name == "stringArray"));
             Assert.Equal(EnScalarType.String, description.Fields.First(f => f.Name == "stringArray").ScalarType);

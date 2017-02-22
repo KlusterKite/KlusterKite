@@ -170,18 +170,27 @@ namespace ClusterKit.Web.GraphQL.API
         /// <returns>The field flags</returns>
         public EnFieldFlags GetFlags()
         {
+            EnFieldFlags flags;
             switch (this.MetaType)
             {
                 case EnMetaType.Object:
-                    return EnFieldFlags.None;
+                    flags = EnFieldFlags.None;
+                    break;
                 case EnMetaType.Array:
-                    return EnFieldFlags.IsArray;
+                    flags = EnFieldFlags.IsArray;
+                    break;
                 case EnMetaType.Connection:
-                    return EnFieldFlags.IsConnection;
+                    flags = EnFieldFlags.IsConnection;
+                    break;
+                case EnMetaType.Scalar:
+                    flags = EnFieldFlags.None;
+                    break;
                 default:
-                    // todo: report error
-                    return EnFieldFlags.None;
+                    flags = EnFieldFlags.None;
+                    break;
             }
+
+            return flags;
         }
 
         /// <summary>

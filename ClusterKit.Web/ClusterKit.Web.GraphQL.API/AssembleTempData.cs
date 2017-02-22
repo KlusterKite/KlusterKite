@@ -53,6 +53,12 @@ namespace ClusterKit.Web.GraphQL.API
         public Dictionary<string, Dictionary<string, string>> ResolverNames { get; } = new Dictionary<string, Dictionary<string, string>>();
 
         /// <summary>
+        /// Gets the list of properties described in API
+        /// </summary>
+        [NotNull]
+        public Dictionary<string, Dictionary<string, MemberInfo>> Members { get; } = new Dictionary<string, Dictionary<string, MemberInfo>>();
+
+        /// <summary>
         /// Gets the list of resolver generators
         /// </summary>
         public List<ResolverGenerator> ResolverGenerators { get; } = new List<ResolverGenerator>();

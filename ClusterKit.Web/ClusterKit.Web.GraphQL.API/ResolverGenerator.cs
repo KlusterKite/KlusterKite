@@ -100,7 +100,8 @@ namespace ClusterKit.Web.GraphQL.API
             }
 
             var code = $@"
-                    namespace ClusterKit.Web.GraphQL.Dynamic {{
+                    namespace ClusterKit.Web.GraphQL.Dynamic 
+                    {{
                         using System;
                         using System.Threading.Tasks;
                         using System.Collections.Generic;
@@ -115,10 +116,13 @@ namespace ClusterKit.Web.GraphQL.API
                         using ClusterKit.Web.GraphQL.Client;
                         using ClusterKit.Web.GraphQL.API.Resolvers;
 
-                        public class Resolver{this.Uid:N} : PropertyResolver {{
-                            public override {async} Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) {{
+                        public class Resolver{this.Uid:N} : PropertyResolver 
+                        {{
+                            public override {async} Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) 
+                            {{
                                 var sourceTyped = source as {ToCSharpRepresentation(this.SourceType, true)};
-                                if (sourceTyped == null) {{
+                                if (sourceTyped == null) 
+                                {{
                                     if (onErrorCallback != null) 
                                     {{
                                         onErrorCallback(new Exception(""Source object of unexpected type""));
@@ -141,6 +145,8 @@ namespace ClusterKit.Web.GraphQL.API
                                     return {returnNull};
                                 }}
                             }}
+
+                            {this.GenerateHelperMethods()}
                         }}
                     }}
                 ";
@@ -237,6 +243,263 @@ namespace ClusterKit.Web.GraphQL.API
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Generates helper properties and methods for generator
+        /// </summary>
+        /// <returns>The properties and methods C# code</returns>
+        private string GenerateHelperMethods()
+        {
+            if (this.Metadata.MetaType == TypeMetadata.EnMetaType.Connection)
+            {
+                return this.GenerateConnectionHelpers();
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Generates helpers to work with connection
+        /// </summary>
+        /// <returns>The properties and methods C# code</returns>
+        private string GenerateConnectionHelpers()
+        {
+            return $@"
+            {this.GenerateConnectionSorter()}
+            {this.GenerateConnectionFilter()}
+            ";
+        }
+
+        /// <summary>
+        /// Generates method to create sort expression
+        /// </summary>
+        /// <returns>The properties and methods C# code</returns>
+        private string GenerateConnectionSorter()
+        {
+            ApiType sortedApiType;
+            if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
+            {
+                throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not registered");
+            }
+            
+            var sortableProperties = sortedApiType.Fields
+                .Where(f => f.Flags.HasFlag(EnFieldFlags.IsSortable))
+                .Select(f => new { f.Name, Property = this.Data.Members[sortedApiType.TypeName][f.Name] as PropertyInfo})
+                .Where(d => d.Property != null)
+                .ToList();
+
+            var firstSwitches = sortableProperties.Select(d => $@"
+                     case ""{d.Name}_asc"":
+                        sort = query => query.OrderBy(e => e.{d.Property.Name});
+                        break;
+                    case ""{d.Name}_desc"":
+                        sort = query => query.OrderByDescending(e => e.{d.Property.Name});
+                        break;
+            ");
+
+            var thenSwitches = sortableProperties.Select(d => $@"
+                     case ""{d.Name}_asc"":
+                        then = query => query.ThenBy(e => e.{d.Property.Name});
+                        break;
+                    case ""{d.Name}_desc"":
+                        then = query => query.ThenByDescending(e => e.{d.Property.Name});
+                        break;
+            ");
+
+            var className = ToCSharpRepresentation(this.Metadata.Type, true);
+
+            return $@"
+            private static Expression<Func<IQueryable<{className}>, IOrderedQueryable<{className}>>> GenerateSortingExpression(JObject arguments)
+            {{                
+                Expression<Func<IQueryable<{className}>, IOrderedQueryable<{className}>>> sort = null;
+                var sortProperty = arguments.Property(""sort"");
+                if (sortProperty == null || !sortProperty.Value.HasValues)
+                {{
+                    return null;
+                }}
+
+                var sortArgs = sortProperty.Value.ToObject<string[]>();
+                var firstSort = sortArgs.FirstOrDefault();
+                var leftArgs = sortArgs.Skip(1);
+
+                if (string.IsNullOrWhiteSpace(firstSort))
+                {{
+                    return null;
+                }}
+
+                switch (firstSort)
+                {{ 
+                    {string.Join(string.Empty, firstSwitches)}  
+                    default:
+                       throw new Exception(""unknown sort instruction"");             
+                }}
+
+                foreach (var leftArg in leftArgs)
+                {{
+                    Expression<Func<IOrderedQueryable<{className}>, IOrderedQueryable<{className}>>> then;
+                    switch (leftArg)
+                    {{
+                        {string.Join(string.Empty, thenSwitches)}  
+                        default:
+                            throw new Exception(""unknown sort instruction"");
+                    }}
+
+                    var swap = new SwapVisitor(then.Parameters[0], sort.Body);
+                    sort =
+                        Expression.Lambda<Func<IQueryable<{className}>, IOrderedQueryable<{className}>>>(
+                            swap.Visit(then.Body),
+                            sort.Parameters);
+                }}
+
+                return sort;
+            }} 
+            ";
+        }
+
+        /// <summary>
+        /// Generates method to create filter expression
+        /// </summary>
+        /// <returns>The properties and methods C# code</returns>
+        private string GenerateConnectionFilter()
+        {
+            ApiType sortedApiType;
+            if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
+            {
+                throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not registered");
+            }
+
+            var className = ToCSharpRepresentation(this.Metadata.Type, true);
+            var filterable = sortedApiType.Fields
+                .Where(f => f.Flags.HasFlag(EnFieldFlags.IsFilterable))
+                .Select(f => new { f.Name, Property = this.Data.Members[sortedApiType.TypeName][f.Name] as PropertyInfo, f.ScalarType })
+                .Where(d => d.Property != null && d.ScalarType != EnScalarType.None)
+                .Select(d => new
+                                 {
+                                     ExpressionParameter = $"filterProperty_{d.Property.Name}",
+                                     ApiName = d.Name,
+                                     d.ScalarType,
+                                     d.Property
+                                 })
+                .ToList();
+
+            return $@"
+
+                private static readonly ParameterExpression filterableEntity = Expression.Parameter(typeof({className}));
+                {string.Join(
+                        "\n", 
+                        filterable.Select(f => $"private static readonly Expression {f.ExpressionParameter} "
+                                               + $"= Expression.Property(filterableEntity, typeof({className}), \"{f.Property.Name}\");"))}
+
+                private static readonly Dictionary<string, Func<JProperty, Expression>> FilterChecks 
+                    = new Dictionary<string, Func<JProperty, Expression>>
+                {{
+                        {{ ""OR"", prop =>
+                                {{
+                                    var subFilters = prop.Value as JArray;
+                                    if (subFilters != null)
+                                    {{
+                                        Expression or = Expression.Constant(false);
+                                        or = subFilters.Children()
+                                            .OfType<JObject>()
+                                            .Aggregate(
+                                                or,
+                                                (current, subFilter) =>
+                                                    Expression.Or(current, GenerateFilterExpressionPart(subFilter)));
+
+                                        return or;
+                                    }}
+
+                                    return Expression.Constant(true);
+                                }}
+                            }},
+
+                            {{ ""AND"", prop =>
+                                {{
+                                    var subFilters = prop.Value as JArray;
+                                    if (subFilters != null)
+                                    {{
+                                        Expression and = Expression.Constant(true);
+                                        and = subFilters.Children()
+                                            .OfType<JObject>()
+                                            .Aggregate(
+                                                and,
+                                                (current, subFilter) =>
+                                                    Expression.And(current, GenerateFilterExpressionPart(subFilter)));
+
+                                        return and;
+                                    }}
+
+                                    return Expression.Constant(true);
+                                }}
+                            }},
+                    {string.Join(",\n", filterable.SelectMany(d => this.GenerateConnectionFilterChecks(d.ApiName, d.ExpressionParameter, d.Property, d.ScalarType)))}
+                }};
+
+
+
+                private static Expression<Func<{className}, bool>> GenerateFilterExpression(JObject arguments)
+                {{
+                    Expression<Func<{className}, bool>> filter = null;
+                    var jproperty = arguments.Property(""filter"");
+                    if (jproperty == null)
+                    {{
+                        return null;
+                    }}
+
+                    var filterProperty = jproperty.Value as JObject;
+                    if (filterProperty == null)
+                    {{
+                        return null;
+                    }}
+
+                    var left = GenerateFilterExpressionPart(filterProperty);
+                    return Expression.Lambda<Func<{className}, bool>>(left, filterableEntity);
+                }}
+
+            
+
+            private static Expression GenerateFilterExpressionPart(JObject filterProperty)
+            {{
+                Expression left = Expression.Constant(true);
+
+                foreach (var prop in filterProperty.Properties())
+                {{
+                    Func<JProperty, Expression> check;
+                    if (FilterChecks.TryGetValue(prop.Name, out check))
+                    {{
+                        left = Expression.And(left, check(prop));
+                    }}
+                }}
+
+                return left;
+            }}
+            ";
+        }
+
+        private IEnumerable<string> GenerateConnectionFilterChecks(
+            string apiName,
+            string expressionParameter,
+            PropertyInfo property,
+            EnScalarType scalarType)
+        {
+            yield return $"{{ \"{apiName}\", prop => Expression.Equal({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType, true)}>())) }}";
+            yield return $"{{ \"{apiName}_not\", prop => Expression.NotEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType, true)}>())) }}";
+
+            switch (scalarType)
+            {
+                case EnScalarType.Float:
+                case EnScalarType.Decimal:
+                case EnScalarType.Integer:
+                    yield return $"{{ \"{apiName}_lt\", prop => Expression.LessThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType, true)}>())) }}";
+                    yield return $"{{ \"{apiName}_lte\", prop => Expression.LessThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType, true)}>())) }}";
+                    yield return $"{{ \"{apiName}_gt\", prop => Expression.GreaterThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType, true)}>())) }}";
+                    yield return $"{{ \"{apiName}_gte\", prop => Expression.GreaterThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType, true)}>())) }}";
+                    break;
+                case EnScalarType.String:
+
+                    break;
+            }
         }
 
         /// <summary>
@@ -362,7 +625,33 @@ namespace ClusterKit.Web.GraphQL.API
                 ";
             }
 
+            if (this.Metadata.MetaType == TypeMetadata.EnMetaType.Connection)
+            {
+                return this.GenerateConnectionResolve();
+            }
+
             return "return null;";
+        }
+
+        /// <summary>
+        /// Generates resolve of the request connection value
+        /// </summary>
+        /// <returns>Code to return result</returns>
+        private string GenerateConnectionResolve()
+        {
+            return $@"
+                var connectionResult = await resultSource.Query(GenerateFilterExpression(query.Arguments), GenerateSortingExpression(query.Arguments), 100, 0);
+                var connectionResultJson = new JObject();
+                connectionResultJson.Add(""count"",  connectionResult.Count);
+                var resultArray = new JArray();
+                foreach (var item in connectionResult.Items)
+                {{
+                    {(this.Metadata.ScalarType == EnScalarType.None ? this.GenerateObjectResolve("item", this.Metadata.Type) : "var result = new JValue(item);")}
+                    resultArray.Add(result);
+                }}   
+                connectionResultJson.Add(""items"",  resultArray);                            
+                return connectionResultJson;
+            ";
         }
 
         /// <summary>

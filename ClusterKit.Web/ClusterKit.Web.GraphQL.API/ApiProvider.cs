@@ -319,6 +319,7 @@ namespace ClusterKit.Web.GraphQL.API
 
             var name = attribute.Name ?? ResolverGenerator.ToCamelCase(property.Name);
             data.FieldNames[property] = name;
+            data.Members[apiType.TypeName][name] = property;
 
             var resolverGenerator = new ResolverGenerator(property, metadata, declaringType, data);
             data.ResolverGenerators.Add(resolverGenerator);
@@ -326,10 +327,21 @@ namespace ClusterKit.Web.GraphQL.API
 
             if (metadata.ScalarType != EnScalarType.None)
             {
+                var flags = metadata.GetFlags();
+                if (!metadata.IsAsync && !metadata.IsForwarding && metadata.MetaType == TypeMetadata.EnMetaType.Scalar)
+                {
+                    flags |= EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable;
+
+                    if (property.CanWrite)
+                    {
+                        flags |= EnFieldFlags.CanBeUsedInInput;
+                    }
+                }
+
                 return ApiField.Scalar(
                     name,
                     metadata.ScalarType,
-                    metadata.GetFlags(),
+                    flags,
                     description: attribute.Description);
             }
 
@@ -637,6 +649,7 @@ namespace ClusterKit.Web.GraphQL.API
             data.DiscoveredApiTypes[apiType.TypeName] = apiType;
             data.ApiTypeByOriginalTypeNames[type.FullName] = apiType;
             data.ResolverNames[apiType.TypeName] = new Dictionary<string, string>();
+            data.Members[apiType.TypeName] = new Dictionary<string, MemberInfo>();
 
             apiType.Fields.AddRange(this.GenerateTypeProperties(type, apiType, data));
             apiType.Fields.AddRange(this.GenerateTypeMethods(type, apiType, data));

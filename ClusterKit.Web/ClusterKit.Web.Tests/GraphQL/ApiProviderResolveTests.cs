@@ -12,14 +12,17 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
+
+    using Akka.TestKit;
 
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.API;
+    using ClusterKit.Web.GraphQL.API.Resolvers;
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Client.Attributes;
-
-    using Google.ProtocolBuffers;
 
     using JetBrains.Annotations;
 
@@ -28,6 +31,8 @@ namespace ClusterKit.Web.Tests.GraphQL
 
     using Xunit;
     using Xunit.Abstractions;
+
+    using NewArrayExpression = Castle.DynamicProxy.Generators.Emitters.SimpleAST.NewArrayExpression;
 
     /// <summary>
     /// Testing <see cref="ApiProvider"/> for resolving in various scenarios
@@ -48,6 +53,173 @@ namespace ClusterKit.Web.Tests.GraphQL
         public ApiProviderResolveTests(ITestOutputHelper output)
         {
             this.output = output;
+        }
+
+        /// <summary>
+        /// Testing connection resolve
+        /// </summary>
+        /// <param name="filterJson">
+        /// The filter Json.
+        /// </param>
+        /// <param name="sortJson">
+        /// The sort Json.
+        /// </param>
+        /// <param name="limit">
+        /// The limit.
+        /// </param>
+        /// <param name="offset">
+        /// The offset.
+        /// </param>
+        /// <param name="expectedCount">
+        /// The expected Count.
+        /// </param>
+        /// <param name="expectedNames">
+        /// The expected list of received object names.
+        /// </param>
+        /// <returns>
+        /// The async task
+        /// </returns>
+        [Theory]
+        [InlineData(null, null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
+        [InlineData(null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
+
+        [InlineData("{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
+        [InlineData("{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
+        [InlineData("{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
+        [InlineData("{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
+        [InlineData("{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
+        [InlineData("{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
+        public async Task ConnectionDirectTests(
+            string filterJson,
+            string sortJson,
+            int limit,
+            int offset,
+            int expectedCount,
+            string[] expectedNames)
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject { Name = "1-test", Value = 100m },
+                                         new TestObject { Name = "2-test", Value = 50m },
+                                         new TestObject { Name = "3-test", Value = 50m },
+                                         new TestObject { Name = "4-test", Value = 70m },
+                                         new TestObject { Name = "5-test", Value = 6m },
+                                     };
+
+            var provider = this.GetProvider(initialObjects);
+            var context = new RequestContext();
+            var arguments = new JObject();
+            if (!string.IsNullOrWhiteSpace(filterJson))
+            {
+                arguments.Add("filter", JsonConvert.DeserializeObject(filterJson) as JToken);
+            }
+
+            if (!string.IsNullOrWhiteSpace(sortJson))
+            {
+                arguments.Add("sort", JsonConvert.DeserializeObject(sortJson) as JToken);
+            }
+
+            arguments.Add("limit", limit);
+            arguments.Add("offset", offset);
+
+            var result = await provider.Connection.QueryWithResolve(arguments);
+            Assert.NotNull(result);
+            Assert.Equal(expectedCount, result.Count);
+            var items = result.Items.ToList();
+            Assert.Equal(expectedNames.Length, items.Count);
+            Assert.Equal(
+                string.Join(", ", expectedNames),
+                string.Join(", ", items.Select(i => i.Name)));
+        }
+
+
+        /// <summary>
+        /// Testing connection resolve
+        /// </summary>
+        /// <param name="filterJson">
+        /// The filter Json.
+        /// </param>
+        /// <param name="sortJson">
+        /// The sort Json.
+        /// </param>
+        /// <param name="limit">
+        /// The limit.
+        /// </param>
+        /// <param name="offset">
+        /// The offset.
+        /// </param>
+        /// <param name="expectedCount">
+        /// The expected Count.
+        /// </param>
+        /// <param name="expectedNames">
+        /// The expected list of received object names.
+        /// </param>
+        /// <returns>
+        /// The async task
+        /// </returns>
+        [Theory]
+        [InlineData(null, null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
+        [InlineData(null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
+
+        [InlineData("{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
+        [InlineData("{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
+        [InlineData("{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
+        [InlineData("{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
+        [InlineData("{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
+        [InlineData("{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
+        public async Task ConnectionTests(string filterJson, string sortJson, int limit, int offset, int expectedCount, string[] expectedNames)
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject { Name = "1-test", Value = 100m },
+                                         new TestObject { Name = "2-test", Value = 50m },
+                                         new TestObject { Name = "3-test", Value = 50m },
+                                         new TestObject { Name = "4-test", Value = 70m },
+                                         new TestObject { Name = "5-test", Value = 6m },
+                                     };
+
+            var provider = this.GetProvider(initialObjects);
+            var context = new RequestContext();
+
+            var objFields = new List<ApiRequest>
+                                {
+                                    new ApiRequest { FieldName = "uid" },
+                                    new ApiRequest { FieldName = "name" },
+                                    new ApiRequest { FieldName = "value" }
+                                };
+
+            var arguments = new JObject();
+            if (!string.IsNullOrWhiteSpace(filterJson))
+            {
+                arguments.Add("filter", JsonConvert.DeserializeObject(filterJson) as JToken);
+            }
+
+            if (!string.IsNullOrWhiteSpace(sortJson))
+            {
+                arguments.Add("sort", JsonConvert.DeserializeObject(sortJson) as JToken);
+            }
+
+            arguments.Add("limit", limit);
+            arguments.Add("offset", offset);
+            
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "connection", Fields = objFields, Arguments = arguments } };
+            var result = await this.Query(provider, query, context);
+
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("connection"));
+            var connectionData = result.Property("connection").Value as JObject;
+            Assert.NotNull(connectionData);
+            Assert.NotNull(connectionData.Property("count"));
+            Assert.Equal(expectedCount, connectionData.Property("count").Value);
+
+            var nodes = connectionData.Property("items")?.Value as JArray;
+            Assert.NotNull(nodes);
+            Assert.Equal(expectedNames.Length, nodes.Count);
+            Assert.Equal(
+                string.Join(", ", expectedNames),
+                string.Join(", ", nodes.Select(n => (n as JObject)?.Property("name").Value)));
         }
 
         /// <summary>
@@ -188,6 +360,40 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
+        public async Task FaultedASyncMethodTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest>
+                            {
+                                new ApiRequest
+                                    {
+                                        FieldName = "faultedASyncMethod",
+                                        Fields =
+                                            new List<ApiRequest>
+                                                {
+                                                    new ApiRequest
+                                                        {
+                                                            FieldName
+                                                                =
+                                                                "syncScalarField"
+                                                        }
+                                                }
+                                    }
+                            };
+
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("faultedASyncMethod"));
+            Assert.False(result.Property("faultedASyncMethod").Value.HasValues);
+        }
+
+        /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
         public async Task SyncArrayOfScalarFieldTest()
         {
             var provider = this.GetProvider();
@@ -204,6 +410,24 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(1, array[0]);
             Assert.Equal(2, array[1]);
             Assert.Equal(3, array[2]);
+        }
+
+        /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task SyncFaultedScalarFieldTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "faultedSyncField" } };
+
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("faultedSyncField"));
+            Assert.False(result.Property("faultedSyncField").Value.HasValues);
         }
 
         /// <summary>
@@ -287,56 +511,6 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
-        public async Task SyncFaultedScalarFieldTest()
-        {
-            var provider = this.GetProvider();
-
-            var context = new RequestContext();
-            var query = new List<ApiRequest> { new ApiRequest { FieldName = "faultedSyncField" } };
-
-            var result = await this.Query(provider, query, context);
-            Assert.NotNull(result);
-            Assert.NotNull(result.Property("faultedSyncField"));
-            Assert.False(result.Property("faultedSyncField").Value.HasValues);
-        }
-
-        /// <summary>
-        /// Testing sync scalar field
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task FaultedASyncMethodTest()
-        {
-            var provider = this.GetProvider();
-
-            var context = new RequestContext();
-            var query = new List<ApiRequest>
-                            {
-                                new ApiRequest
-                                    {
-                                        FieldName = "faultedASyncMethod",
-                                        Fields =
-                                            new List<ApiRequest>
-                                                {
-                                                    new ApiRequest
-                                                        {
-                                                            FieldName = "syncScalarField"
-                                                        }
-                                                }
-                                    }
-                            };
-
-            var result = await this.Query(provider, query, context);
-            Assert.NotNull(result);
-            Assert.NotNull(result.Property("faultedASyncMethod"));
-            Assert.False(result.Property("faultedASyncMethod").Value.HasValues);
-        }
-
-        /// <summary>
-        /// Testing sync scalar field
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
         public async Task SyncScalarMethodTest()
         {
             var provider = this.GetProvider();
@@ -364,10 +538,15 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// <summary>
         /// Gets the api provider
         /// </summary>
-        /// <returns>The api provider</returns>
-        private TestProvider GetProvider()
+        /// <param name="objects">
+        /// The initial objects list.
+        /// </param>
+        /// <returns>
+        /// The api provider
+        /// </returns>
+        private TestProvider GetProvider(List<TestObject> objects = null)
         {
-            var provider = new TestProvider();
+            var provider = new TestProvider(objects);
             foreach (var error in provider.GenerationErrors)
             {
                 this.output.WriteLine($"Error: {error}");
@@ -389,7 +568,10 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var result = await provider.ResolveQuery(query, context, e => this.output.WriteLine($"Resolve error: {e.Message}\n{e.StackTrace}"));
+            var result = await provider.ResolveQuery(
+                             query,
+                             context,
+                             e => this.output.WriteLine($"Resolve error: {e.Message}\n{e.StackTrace}"));
             stopwatch.Stop();
             this.output.WriteLine($"Resolved in {(double)stopwatch.ElapsedTicks * 1000 / Stopwatch.Frequency}ms");
             this.output.WriteLine(result.ToString(Formatting.Indented));
@@ -419,12 +601,355 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Test object
+        /// </summary>
+        public class TestObject
+        {
+            /// <summary>
+            /// Gets or sets the name of the object
+            /// </summary>
+            [DeclareField]
+            public string Name { get; set; }
+
+            /// <summary>
+            /// Gets or sets the object uid
+            /// </summary>
+            [DeclareField]
+            public Guid Uid { get; set; } = Guid.NewGuid();
+
+            /// <summary>
+            /// Gets or sets some value
+            /// </summary>
+            [DeclareField]
+            public decimal Value { get; set; }
+        }
+
+        /// <summary>
+        /// The <see cref="TestObject"/> connection provider
+        /// </summary>
+        public class TestObjectConnection : INodeConnection<TestObject, Guid>
+        {
+            /// <summary>
+            /// Gets the stored objects (virtual database)
+            /// </summary>
+            private readonly Dictionary<Guid, TestObject> objects;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TestObjectConnection"/> class.
+            /// </summary>
+            /// <param name="objects">
+            /// The initial objects state.
+            /// </param>
+            public TestObjectConnection(Dictionary<Guid, TestObject> objects)
+            {
+                this.objects = objects;
+            }
+
+            /// <inheritdoc />
+            public Task<TestObject> Create(TestObject newNode)
+            {
+                newNode.Uid = Guid.NewGuid();
+                this.objects.Add(newNode.Uid, newNode);
+                return Task.FromResult(newNode);
+            }
+
+            /// <inheritdoc />
+            public Task<TestObject> Delete(Guid id)
+            {
+                TestObject obj;
+                if (!this.objects.TryGetValue(id, out obj))
+                {
+                    throw new Exception("not found");
+                }
+
+                this.objects.Remove(id);
+                return Task.FromResult(obj);
+            }
+
+            /// <inheritdoc />
+            public Task<TestObject> GetById(Guid id)
+            {
+                TestObject obj;
+                if (this.objects.TryGetValue(id, out obj))
+                {
+                    return Task.FromResult(obj);
+                }
+
+                throw new Exception("not found");
+            }
+
+            /// <inheritdoc />
+            public Task<QueryResult<TestObject>> Query(
+                Expression<Func<TestObject, bool>> filter,
+                Expression<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>> sort,
+                int limit,
+                int offset)
+            {
+                var query = this.objects.Values.AsQueryable();
+
+                if (filter != null)
+                {
+                    query = query.Where(filter);
+                }
+
+                var count = query.Count();
+                if (sort != null)
+                {
+                    query = sort.Compile().Invoke(query);
+                }
+
+                return Task.FromResult(new QueryResult<TestObject> { Count = count, Items = query });
+            }
+
+            /// <inheritdoc />
+            public Task<QueryResult<TestObject>> QueryWithResolve(JObject arguments)
+            {
+                var filter = GenerateFilterExpression(arguments);
+                var sort = GenerateSortingExpression(arguments);
+
+                int limit = 10;
+                int offset = 0;
+
+                return this.Query(filter, sort, limit, offset);
+            }
+
+            /// <inheritdoc />
+            public Task<TestObject> Update(Guid id, TestObject newNode, List<string> updatedFields)
+            {
+                TestObject obj;
+                if (!this.objects.TryGetValue(id, out obj))
+                {
+                    throw new Exception("not found");
+                }
+
+                if (updatedFields.Contains("uid"))
+                {
+                    if (newNode.Uid != obj.Uid && this.objects.ContainsKey(newNode.Uid))
+                    {
+                        throw new Exception("duplicate key");
+                    }
+
+                    obj.Uid = newNode.Uid;
+                }
+
+                if (updatedFields.Contains("name"))
+                {
+                    obj.Name = newNode.Name;
+                }
+
+                if (updatedFields.Contains("value"))
+                {
+                    obj.Value = newNode.Value;
+                }
+
+                this.objects.Remove(id);
+                this.objects[obj.Uid] = obj;
+
+                return Task.FromResult(obj);
+            }
+
+            /// <summary>
+            /// Generates filter expression by arguments
+            /// </summary>
+            /// <param name="arguments">Field arguments</param>
+            /// <returns>The sorting expression</returns>
+            private static Expression<Func<TestObject, bool>> GenerateFilterExpression(JObject arguments)
+            {
+                Expression<Func<TestObject, bool>> filter = null;
+                var filterProperty = arguments.Property("filter")?.Value as JObject;
+                if (filterProperty == null)
+                {
+                    return null;
+                }
+
+                var left = GenerateFilterExpressionPart(filterProperty);
+                return Expression.Lambda<Func<TestObject, bool>>(left, testedObject);
+            }
+
+
+            private static readonly ParameterExpression testedObject = Expression.Parameter(typeof(TestObject));
+            private static readonly Expression uidProp = Expression.Property(testedObject, typeof(TestObject), nameof(TestObject.Uid));
+            private static readonly Expression nameProp = Expression.Property(testedObject, typeof(TestObject), nameof(TestObject.Name));
+            private static readonly Expression valueProp = Expression.Property(testedObject, typeof(TestObject), nameof(TestObject.Value));
+
+            private static readonly Dictionary<string, Func<JProperty, Expression>> FilterChecks 
+                = new Dictionary<string, Func<JProperty, Expression>>
+                      {
+                            { "value", prop => Expression.Equal(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
+                            { "value_not", prop => Expression.Not(Expression.NotEqual(valueProp, Expression.Constant(prop.Value.ToObject<decimal>()))) },
+                            { "value_lt", prop => Expression.LessThan(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
+                            { "value_lte", prop => Expression.LessThanOrEqual(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
+                            { "value_gt", prop => Expression.GreaterThan(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
+                            { "value_gte", prop => Expression.GreaterThanOrEqual(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
+                            { "name", prop => Expression.Equal(nameProp, Expression.Constant(prop.Value.ToObject<string>())) },
+                            { "name_not", prop => Expression.Not(Expression.Equal(nameProp, Expression.Constant(prop.Value.ToObject<string>()))) },
+
+                            { "OR", prop =>
+                                {
+                                    var subFilters = prop.Value as JArray;
+                                    if (subFilters != null)
+                                    {
+                                        Expression or = Expression.Constant(false);
+                                        or = subFilters.Children()
+                                            .OfType<JObject>()
+                                            .Aggregate(
+                                                or,
+                                                (current, subFilter) =>
+                                                    Expression.Or(current, GenerateFilterExpressionPart(subFilter)));
+
+                                        return or;
+                                    }
+
+                                    return Expression.Constant(true);
+                                }
+                            },
+
+                            { "AND", prop =>
+                                {
+                                    var subFilters = prop.Value as JArray;
+                                    if (subFilters != null)
+                                    {
+                                        Expression and = Expression.Constant(true);
+                                        and = subFilters.Children()
+                                            .OfType<JObject>()
+                                            .Aggregate(
+                                                and,
+                                                (current, subFilter) =>
+                                                    Expression.And(current, GenerateFilterExpressionPart(subFilter)));
+
+                                        return and;
+                                    }
+
+                                    return Expression.Constant(true);
+                                }
+                            },
+                      };
+
+
+
+            /// <summary>
+            /// Generates the part of filter expression
+            /// </summary>
+            /// <param name="filterProperty">The filter property</param>
+            /// <returns>The condition expression</returns>
+            private static Expression GenerateFilterExpressionPart(JObject filterProperty)
+            {
+                Expression left = Expression.Constant(true);
+
+                foreach (var prop in filterProperty.Properties())
+                {
+                    Func<JProperty, Expression> check;
+                    if (FilterChecks.TryGetValue(prop.Name, out check))
+                    {
+                        left = Expression.And(left, check(prop));
+                    }
+                }
+
+                return left;
+            }
+
+            /// <summary>
+            /// Generates sorting expression by arguments
+            /// </summary>
+            /// <param name="arguments">Field arguments</param>
+            /// <returns>The sorting expression</returns>
+            private static Expression<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>> GenerateSortingExpression(JObject arguments)
+            {
+                Expression<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>> sort = null;
+                var sortProperty = arguments.Property("sort");
+                if (sortProperty == null || !sortProperty.Value.HasValues)
+                {
+                    return null;
+                }
+
+                var sortArgs = sortProperty.Value.ToObject<string[]>();
+                var firstSort = sortArgs.FirstOrDefault();
+                var leftArgs = sortArgs.Skip(1);
+
+                if (string.IsNullOrWhiteSpace(firstSort))
+                {
+                    return null;
+                }
+
+                switch (firstSort)
+                {
+                    case "name_asc":
+                        sort = query => query.OrderBy(e => e.Name);
+                        break;
+                    case "name_desc":
+                        sort = query => query.OrderByDescending(e => e.Name);
+                        break;
+                    case "value_asc":
+                        sort = query => query.OrderBy(e => e.Value);
+                        break;
+                    case "value_desc":
+                        sort = query => query.OrderByDescending(e => e.Value);
+                        break;
+                    default:
+                        throw new Exception("unknown sort instruction");
+                }
+
+                foreach (var leftArg in leftArgs)
+                {
+                    Expression<Func<IOrderedQueryable<TestObject>, IOrderedQueryable<TestObject>>> then;
+                    switch (leftArg)
+                    {
+                        case "name_asc":
+                            then = query => query.ThenBy(e => e.Name);
+                            break;
+                        case "name_desc":
+                            then = query => query.ThenByDescending(e => e.Name);
+                            break;
+                        case "value_asc":
+                            then = query => query.ThenBy(e => e.Value);
+                            break;
+                        case "value_desc":
+                            then = query => query.ThenByDescending(e => e.Value);
+                            break;
+                        default:
+                            throw new Exception("unknown sort instruction");
+                    }
+
+                    var swap = new SwapVisitor(then.Parameters[0], sort.Body);
+                    sort =
+                        Expression.Lambda<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>>(
+                            swap.Visit(then.Body),
+                            sort.Parameters);
+                }
+
+                return sort;
+            }
+
+        }
+
+        /// <summary>
         /// Provider to test
         /// </summary>
         [UsedImplicitly]
         [ApiDescription(Description = "Tested API")]
         public class TestProvider : ApiProvider
         {
+            /// <summary>
+            /// The test objects connection
+            /// </summary>
+            private TestObjectConnection connection;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TestProvider"/> class.
+            /// </summary>
+            /// <param name="objects">
+            /// The list of pre-stored objects.
+            /// </param>
+            public TestProvider(List<TestObject> objects = null)
+            {
+                if (objects == null)
+                {
+                    objects = new List<TestObject>();
+                }
+
+                this.connection = new TestObjectConnection(objects.ToDictionary(o => o.Uid));
+            }
+
             /// <summary>
             /// Async scalar field
             /// </summary>
@@ -454,6 +979,26 @@ namespace ClusterKit.Web.Tests.GraphQL
             public Task<string> AsyncScalarField => Task.FromResult("AsyncScalarField");
 
             /// <summary>
+            /// Test objects connection
+            /// </summary>
+            [DeclareField]
+            [UsedImplicitly]
+            public TestObjectConnection Connection => this.connection;
+
+            /// <summary>
+            /// Gets a value indicating whether something is faulting
+            /// </summary>
+            [DeclareField]
+            [UsedImplicitly]
+            public bool FaultedSyncField
+            {
+                get
+                {
+                    throw new Exception("test");
+                }
+            }
+
+            /// <summary>
             /// Gets the forwarded array of scalars
             /// </summary>
             [DeclareField(ReturnType = typeof(int[]))]
@@ -480,30 +1025,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             [DeclareField]
             [UsedImplicitly]
             public string SyncScalarField => "SyncScalarField";
-
-            /// <summary>
-            /// Gets a value indicating whether something is faulting
-            /// </summary>
-            [DeclareField]
-            [UsedImplicitly]
-            public bool FaultedSyncField
-            {
-                get
-                {
-                    throw new Exception("test");
-                }
-            }
-
-            /// <summary>
-            /// Faulted async method
-            /// </summary>
-            /// <returns>Faulted task</returns>
-            [DeclareField]
-            [UsedImplicitly]
-            public Task<NestedProvider> FaultedASyncMethod()
-            {
-                return Task.FromException<NestedProvider>(new Exception("test exception"));
-            }
 
             /// <summary>
             /// Some public method
@@ -555,6 +1076,17 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Assert.Equal("asyncObjectMethod", apiRequest.FieldName);
 
                 return Task.FromResult(new NestedProvider { SyncScalarField = "returned type" });
+            }
+
+            /// <summary>
+            /// Faulted async method
+            /// </summary>
+            /// <returns>Faulted task</returns>
+            [DeclareField]
+            [UsedImplicitly]
+            public Task<NestedProvider> FaultedASyncMethod()
+            {
+                return Task.FromException<NestedProvider>(new Exception("test exception"));
             }
 
             /// <summary>
