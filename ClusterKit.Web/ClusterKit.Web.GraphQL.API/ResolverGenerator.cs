@@ -285,10 +285,10 @@ namespace ClusterKit.Web.GraphQL.API
             
             var sortableProperties = sortedApiType.Fields
                 .Where(f => f.Flags.HasFlag(EnFieldFlags.IsSortable))
-                .Select(f => new { f.Name, Property = this.Data.Members[sortedApiType.TypeName][f.Name] as PropertyInfo})
+                .Select(f => new { f.Name, Property = this.Data.Members[sortedApiType.TypeName][f.Name] as PropertyInfo })
                 .Where(d => d.Property != null)
                 .ToList();
-
+            
             var firstSwitches = sortableProperties.Select(d => $@"
                      case ""{d.Name}_asc"":
                         sort = query => query.OrderBy(e => e.{d.Property.Name});
@@ -384,7 +384,9 @@ namespace ClusterKit.Web.GraphQL.API
                 .ToList();
 
             return $@"
-
+                private static Expression<Func<string, string, bool>> filterStringCheckIn = (left, right) => left.Contains(right);
+                private static Expression<Func<string, string, bool>> filterStringStartsWith = (left, right) => left.StartsWith(right);
+                private static Expression<Func<string, string, bool>> filterStringEndsWith = (left, right) => left.EndsWith(right);
                 private static readonly ParameterExpression filterableEntity = Expression.Parameter(typeof({className}));
                 {string.Join(
                         "\n", 
@@ -436,8 +438,6 @@ namespace ClusterKit.Web.GraphQL.API
                     {string.Join(",\n", filterable.SelectMany(d => this.GenerateConnectionFilterChecks(d.ApiName, d.ExpressionParameter, d.Property, d.ScalarType)))}
                 }};
 
-
-
                 private static Expression<Func<{className}, bool>> GenerateFilterExpression(JObject arguments)
                 {{
                     Expression<Func<{className}, bool>> filter = null;
@@ -455,28 +455,34 @@ namespace ClusterKit.Web.GraphQL.API
 
                     var left = GenerateFilterExpressionPart(filterProperty);
                     return Expression.Lambda<Func<{className}, bool>>(left, filterableEntity);
-                }}
+                }}            
 
-            
-
-            private static Expression GenerateFilterExpressionPart(JObject filterProperty)
-            {{
-                Expression left = Expression.Constant(true);
-
-                foreach (var prop in filterProperty.Properties())
+                private static Expression GenerateFilterExpressionPart(JObject filterProperty)
                 {{
-                    Func<JProperty, Expression> check;
-                    if (FilterChecks.TryGetValue(prop.Name, out check))
-                    {{
-                        left = Expression.And(left, check(prop));
-                    }}
-                }}
+                    Expression left = Expression.Constant(true);
 
-                return left;
-            }}
+                    foreach (var prop in filterProperty.Properties())
+                    {{
+                        Func<JProperty, Expression> check;
+                        if (FilterChecks.TryGetValue(prop.Name, out check))
+                        {{
+                            left = Expression.And(left, check(prop));
+                        }}
+                    }}
+
+                    return left;
+                }}
             ";
         }
 
+        /// <summary>
+        /// Generates connection individual field checks
+        /// </summary>
+        /// <param name="apiName">The field api name</param>
+        /// <param name="expressionParameter">The expression parameter name, generated for this field</param>
+        /// <param name="property"><see cref="PropertyInfo"/> for this field</param>
+        /// <param name="scalarType">The field detected type</param>
+        /// <returns>The list of filter checks</returns>
         private IEnumerable<string> GenerateConnectionFilterChecks(
             string apiName,
             string expressionParameter,
@@ -497,7 +503,22 @@ namespace ClusterKit.Web.GraphQL.API
                     yield return $"{{ \"{apiName}_gte\", prop => Expression.GreaterThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType, true)}>())) }}";
                     break;
                 case EnScalarType.String:
-
+                    yield return
+                        $"{{ \"{apiName}_in\", prop => Expression.Invoke(filterStringCheckIn, Expression.Constant(prop.Value.ToObject<string>()), {expressionParameter}) }}";
+                    yield return
+                        $"{{ \"{apiName}_not_in\", prop => Expression.Not(Expression.Invoke(filterStringCheckIn, Expression.Constant(prop.Value.ToObject<string>()), {expressionParameter})) }}";
+                    yield return
+                        $"{{ \"{apiName}_contains\", prop => Expression.Invoke(filterStringCheckIn, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                    yield return
+                        $"{{ \"{apiName}_not_contains\", prop => Expression.Not(Expression.Invoke(filterStringCheckIn, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+                    yield return
+                        $"{{ \"{apiName}_starts_with\", prop => Expression.Invoke(filterStringStartsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                    yield return
+                        $"{{ \"{apiName}_not_starts_with\", prop => Expression.Not(Expression.Invoke(filterStringStartsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+                    yield return
+                        $"{{ \"{apiName}_ends_with\", prop => Expression.Invoke(filterStringEndsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                    yield return 
+                        $"{{ \"{apiName}_not_ends_with\", prop => Expression.Not(Expression.Invoke(filterStringEndsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>()))) }}";
                     break;
             }
         }

@@ -16,11 +16,8 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using Akka.TestKit;
-
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.API;
-    using ClusterKit.Web.GraphQL.API.Resolvers;
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Client.Attributes;
 
@@ -31,8 +28,6 @@ namespace ClusterKit.Web.Tests.GraphQL
 
     using Xunit;
     using Xunit.Abstractions;
-
-    using NewArrayExpression = Castle.DynamicProxy.Generators.Emitters.SimpleAST.NewArrayExpression;
 
     /// <summary>
     /// Testing <see cref="ApiProvider"/> for resolving in various scenarios
@@ -90,85 +85,21 @@ namespace ClusterKit.Web.Tests.GraphQL
         [InlineData("{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
         [InlineData("{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
         [InlineData("{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
-        public async Task ConnectionDirectTests(
-            string filterJson,
-            string sortJson,
-            int limit,
-            int offset,
-            int expectedCount,
-            string[] expectedNames)
-        {
-            var initialObjects = new List<TestObject>
-                                     {
-                                         new TestObject { Name = "1-test", Value = 100m },
-                                         new TestObject { Name = "2-test", Value = 50m },
-                                         new TestObject { Name = "3-test", Value = 50m },
-                                         new TestObject { Name = "4-test", Value = 70m },
-                                         new TestObject { Name = "5-test", Value = 6m },
-                                     };
 
-            var provider = this.GetProvider(initialObjects);
-            var context = new RequestContext();
-            var arguments = new JObject();
-            if (!string.IsNullOrWhiteSpace(filterJson))
-            {
-                arguments.Add("filter", JsonConvert.DeserializeObject(filterJson) as JToken);
-            }
+        [InlineData("{\"name_in\": \"1-test, 3-test\"}", null, 10, 0, 2, new[] { "1-test", "3-test" })]
+        [InlineData("{\"name_not_in\": \"1-test, 3-test\"}", null, 10, 0, 3, new[] { "2-test", "4-test", "5-test" })]
+        [InlineData("{\"name_contains\": \"tes\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData("{\"name_contains\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
+        [InlineData("{\"name_not_contains\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData("{\"name_not_contains\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 
-            if (!string.IsNullOrWhiteSpace(sortJson))
-            {
-                arguments.Add("sort", JsonConvert.DeserializeObject(sortJson) as JToken);
-            }
+        [InlineData("{\"name_starts_with\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
+        [InlineData("{\"name_starts_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData("{\"name_not_starts_with\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 
-            arguments.Add("limit", limit);
-            arguments.Add("offset", offset);
-
-            var result = await provider.Connection.QueryWithResolve(arguments);
-            Assert.NotNull(result);
-            Assert.Equal(expectedCount, result.Count);
-            var items = result.Items.ToList();
-            Assert.Equal(expectedNames.Length, items.Count);
-            Assert.Equal(
-                string.Join(", ", expectedNames),
-                string.Join(", ", items.Select(i => i.Name)));
-        }
-
-
-        /// <summary>
-        /// Testing connection resolve
-        /// </summary>
-        /// <param name="filterJson">
-        /// The filter Json.
-        /// </param>
-        /// <param name="sortJson">
-        /// The sort Json.
-        /// </param>
-        /// <param name="limit">
-        /// The limit.
-        /// </param>
-        /// <param name="offset">
-        /// The offset.
-        /// </param>
-        /// <param name="expectedCount">
-        /// The expected Count.
-        /// </param>
-        /// <param name="expectedNames">
-        /// The expected list of received object names.
-        /// </param>
-        /// <returns>
-        /// The async task
-        /// </returns>
-        [Theory]
-        [InlineData(null, null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
-        [InlineData(null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
-        [InlineData(null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
-
-        [InlineData("{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
-        [InlineData("{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
-        [InlineData("{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
-        [InlineData("{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
-        [InlineData("{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
-        [InlineData("{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
+        [InlineData("{\"name_ends_with\": \"test\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData("{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData("{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
         public async Task ConnectionTests(string filterJson, string sortJson, int limit, int offset, int expectedCount, string[] expectedNames)
         {
             var initialObjects = new List<TestObject>
@@ -212,7 +143,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var connectionData = result.Property("connection").Value as JObject;
             Assert.NotNull(connectionData);
             Assert.NotNull(connectionData.Property("count"));
-            Assert.Equal(expectedCount, connectionData.Property("count").Value);
+            Assert.Equal(expectedCount, connectionData.Property("count").Value.ToObject<int>());
 
             var nodes = connectionData.Property("items")?.Value as JArray;
             Assert.NotNull(nodes);
@@ -702,18 +633,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             /// <inheritdoc />
-            public Task<QueryResult<TestObject>> QueryWithResolve(JObject arguments)
-            {
-                var filter = GenerateFilterExpression(arguments);
-                var sort = GenerateSortingExpression(arguments);
-
-                int limit = 10;
-                int offset = 0;
-
-                return this.Query(filter, sort, limit, offset);
-            }
-
-            /// <inheritdoc />
             public Task<TestObject> Update(Guid id, TestObject newNode, List<string> updatedFields)
             {
                 TestObject obj;
@@ -747,179 +666,6 @@ namespace ClusterKit.Web.Tests.GraphQL
 
                 return Task.FromResult(obj);
             }
-
-            /// <summary>
-            /// Generates filter expression by arguments
-            /// </summary>
-            /// <param name="arguments">Field arguments</param>
-            /// <returns>The sorting expression</returns>
-            private static Expression<Func<TestObject, bool>> GenerateFilterExpression(JObject arguments)
-            {
-                Expression<Func<TestObject, bool>> filter = null;
-                var filterProperty = arguments.Property("filter")?.Value as JObject;
-                if (filterProperty == null)
-                {
-                    return null;
-                }
-
-                var left = GenerateFilterExpressionPart(filterProperty);
-                return Expression.Lambda<Func<TestObject, bool>>(left, testedObject);
-            }
-
-
-            private static readonly ParameterExpression testedObject = Expression.Parameter(typeof(TestObject));
-            private static readonly Expression uidProp = Expression.Property(testedObject, typeof(TestObject), nameof(TestObject.Uid));
-            private static readonly Expression nameProp = Expression.Property(testedObject, typeof(TestObject), nameof(TestObject.Name));
-            private static readonly Expression valueProp = Expression.Property(testedObject, typeof(TestObject), nameof(TestObject.Value));
-
-            private static readonly Dictionary<string, Func<JProperty, Expression>> FilterChecks 
-                = new Dictionary<string, Func<JProperty, Expression>>
-                      {
-                            { "value", prop => Expression.Equal(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
-                            { "value_not", prop => Expression.Not(Expression.NotEqual(valueProp, Expression.Constant(prop.Value.ToObject<decimal>()))) },
-                            { "value_lt", prop => Expression.LessThan(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
-                            { "value_lte", prop => Expression.LessThanOrEqual(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
-                            { "value_gt", prop => Expression.GreaterThan(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
-                            { "value_gte", prop => Expression.GreaterThanOrEqual(valueProp, Expression.Constant(prop.Value.ToObject<decimal>())) },
-                            { "name", prop => Expression.Equal(nameProp, Expression.Constant(prop.Value.ToObject<string>())) },
-                            { "name_not", prop => Expression.Not(Expression.Equal(nameProp, Expression.Constant(prop.Value.ToObject<string>()))) },
-
-                            { "OR", prop =>
-                                {
-                                    var subFilters = prop.Value as JArray;
-                                    if (subFilters != null)
-                                    {
-                                        Expression or = Expression.Constant(false);
-                                        or = subFilters.Children()
-                                            .OfType<JObject>()
-                                            .Aggregate(
-                                                or,
-                                                (current, subFilter) =>
-                                                    Expression.Or(current, GenerateFilterExpressionPart(subFilter)));
-
-                                        return or;
-                                    }
-
-                                    return Expression.Constant(true);
-                                }
-                            },
-
-                            { "AND", prop =>
-                                {
-                                    var subFilters = prop.Value as JArray;
-                                    if (subFilters != null)
-                                    {
-                                        Expression and = Expression.Constant(true);
-                                        and = subFilters.Children()
-                                            .OfType<JObject>()
-                                            .Aggregate(
-                                                and,
-                                                (current, subFilter) =>
-                                                    Expression.And(current, GenerateFilterExpressionPart(subFilter)));
-
-                                        return and;
-                                    }
-
-                                    return Expression.Constant(true);
-                                }
-                            },
-                      };
-
-
-
-            /// <summary>
-            /// Generates the part of filter expression
-            /// </summary>
-            /// <param name="filterProperty">The filter property</param>
-            /// <returns>The condition expression</returns>
-            private static Expression GenerateFilterExpressionPart(JObject filterProperty)
-            {
-                Expression left = Expression.Constant(true);
-
-                foreach (var prop in filterProperty.Properties())
-                {
-                    Func<JProperty, Expression> check;
-                    if (FilterChecks.TryGetValue(prop.Name, out check))
-                    {
-                        left = Expression.And(left, check(prop));
-                    }
-                }
-
-                return left;
-            }
-
-            /// <summary>
-            /// Generates sorting expression by arguments
-            /// </summary>
-            /// <param name="arguments">Field arguments</param>
-            /// <returns>The sorting expression</returns>
-            private static Expression<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>> GenerateSortingExpression(JObject arguments)
-            {
-                Expression<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>> sort = null;
-                var sortProperty = arguments.Property("sort");
-                if (sortProperty == null || !sortProperty.Value.HasValues)
-                {
-                    return null;
-                }
-
-                var sortArgs = sortProperty.Value.ToObject<string[]>();
-                var firstSort = sortArgs.FirstOrDefault();
-                var leftArgs = sortArgs.Skip(1);
-
-                if (string.IsNullOrWhiteSpace(firstSort))
-                {
-                    return null;
-                }
-
-                switch (firstSort)
-                {
-                    case "name_asc":
-                        sort = query => query.OrderBy(e => e.Name);
-                        break;
-                    case "name_desc":
-                        sort = query => query.OrderByDescending(e => e.Name);
-                        break;
-                    case "value_asc":
-                        sort = query => query.OrderBy(e => e.Value);
-                        break;
-                    case "value_desc":
-                        sort = query => query.OrderByDescending(e => e.Value);
-                        break;
-                    default:
-                        throw new Exception("unknown sort instruction");
-                }
-
-                foreach (var leftArg in leftArgs)
-                {
-                    Expression<Func<IOrderedQueryable<TestObject>, IOrderedQueryable<TestObject>>> then;
-                    switch (leftArg)
-                    {
-                        case "name_asc":
-                            then = query => query.ThenBy(e => e.Name);
-                            break;
-                        case "name_desc":
-                            then = query => query.ThenByDescending(e => e.Name);
-                            break;
-                        case "value_asc":
-                            then = query => query.ThenBy(e => e.Value);
-                            break;
-                        case "value_desc":
-                            then = query => query.ThenByDescending(e => e.Value);
-                            break;
-                        default:
-                            throw new Exception("unknown sort instruction");
-                    }
-
-                    var swap = new SwapVisitor(then.Parameters[0], sort.Body);
-                    sort =
-                        Expression.Lambda<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>>(
-                            swap.Visit(then.Body),
-                            sort.Parameters);
-                }
-
-                return sort;
-            }
-
         }
 
         /// <summary>
