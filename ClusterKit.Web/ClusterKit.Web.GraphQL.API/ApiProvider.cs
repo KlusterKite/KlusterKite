@@ -492,7 +492,7 @@ namespace ClusterKit.Web.GraphQL.API
                     typesUsed,
                     description.Method,
                     description.MetaData,
-                    this.GetType(),
+                    type,
                     data);
 
                 data.MutationResolverNames[apiField.Name] = generator.ClassName;
@@ -718,7 +718,7 @@ namespace ClusterKit.Web.GraphQL.API
                 }
 
                 var newPath = new List<string>(path) { subContainer.Name };
-                var newTypesUsed = new List<string>(typesUsed) { subContainer.Name };
+                var newTypesUsed = new List<string>(typesUsed) { apiType.TypeName };
 
                 foreach (var generateMutation in this.GenerateMutations(subType, newPath, newTypesUsed, data))
                 {

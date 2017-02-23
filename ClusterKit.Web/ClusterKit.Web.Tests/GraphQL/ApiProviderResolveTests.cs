@@ -553,6 +553,44 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing non-connection mutation
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task MutationTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+
+            const string MethodParameters = "{ \"name\": \"new name\"}";
+
+            var request = new ApiRequest
+                              {
+                                  FieldName = "nestedSync.setName",
+                                  Arguments = (JObject)JsonConvert.DeserializeObject(MethodParameters),
+                                  Fields =
+                                      new List<ApiRequest>
+                                          {
+                                              new ApiRequest { FieldName = "uid" },
+                                              new ApiRequest { FieldName = "name" },
+                                              new ApiRequest { FieldName = "value" }
+                                          }
+                              };
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var result = await provider.ResolveMutation(
+                             request,
+                             context,
+                             e => this.output.WriteLine($"Resolve error: {e.Message}\n{e.StackTrace}"));
+            stopwatch.Stop();
+            this.output.WriteLine($"Resolved in {(double)stopwatch.ElapsedTicks * 1000 / Stopwatch.Frequency}ms");
+            Assert.NotNull(result);
+            this.output.WriteLine(result.ToString(Formatting.Indented));
+        }
+
+        /// <summary>
         /// Gets the api provider
         /// </summary>
         /// <param name="objects">
@@ -615,6 +653,18 @@ namespace ClusterKit.Web.Tests.GraphQL
             [DeclareField]
             [UsedImplicitly]
             public string SyncScalarField { get; set; } = "SyncScalarField";
+
+            /// <summary>
+            /// Test nested mutation
+            /// </summary>
+            /// <param name="name">The new name of current test object</param>
+            /// <returns>Test object after mutation</returns>
+            [DeclareMutation]
+            [UsedImplicitly]
+            public TestObject SetName(string name)
+            {
+                return new TestObject { Name = name };
+            }
         }
 
         /// <summary>

@@ -109,6 +109,14 @@ namespace ClusterKit.Web.GraphQL.API
                 returnNull = "Task.FromResult<JToken>(null)";
             }
 
+            var checkQuery = this.Metadata.ScalarType == EnScalarType.None 
+                ? $@"
+                    if (query == null || query.Fields == null) 
+                    {{
+                        return {returnNull};
+                    }}"
+                : string.Empty;
+
             var code = $@"
                     namespace ClusterKit.Web.GraphQL.Dynamic 
                     {{
@@ -140,6 +148,7 @@ namespace ClusterKit.Web.GraphQL.API
                                 try 
                                 {{
                                     var resultSource = ({ToCSharpRepresentation(this.GetPropertyReturnType(), true)}){(isAsync ? " await this.GetValue(source,query,context,argumentsSerializer)" : "this.GetValue(source,query,context,argumentsSerializer).Result")};
+                                    {checkQuery}
                                     if (resultSource == null)
                                     {{
                                          return {(isAsync ? "null" : "Task.FromResult<JToken>(null)")};
