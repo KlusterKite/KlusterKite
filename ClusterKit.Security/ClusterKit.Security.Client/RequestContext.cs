@@ -13,6 +13,8 @@ namespace ClusterKit.Security.Client
 
     using JetBrains.Annotations;
 
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// The full operation request description
     /// </summary>
@@ -38,5 +40,11 @@ namespace ClusterKit.Security.Client
         ///  Gets or sets the local uri request
         /// </summary>
         public string RequestedLocalUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets additional data, that can be updated on previous steps
+        /// </summary>
+        [CanBeNull]
+        public JObject Data { get; set; } 
     }
 }

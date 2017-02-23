@@ -51,7 +51,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Testing connection resolve
+        /// Testing connection query resolve
         /// </summary>
         /// <param name="filterJson">
         /// The filter Json.
@@ -100,7 +100,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [InlineData("{\"name_ends_with\": \"test\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
         [InlineData("{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
         [InlineData("{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
-        public async Task ConnectionTests(string filterJson, string sortJson, int limit, int offset, int expectedCount, string[] expectedNames)
+        public async Task ConnectionQueryTests(string filterJson, string sortJson, int limit, int offset, int expectedCount, string[] expectedNames)
         {
             var initialObjects = new List<TestObject>
                                      {
@@ -151,6 +151,94 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(
                 string.Join(", ", expectedNames),
                 string.Join(", ", nodes.Select(n => (n as JObject)?.Property("name").Value)));
+        }
+
+        /// <summary>
+        /// Testing connection mutation resolve
+        /// </summary>
+        /// <param name="mutationName">
+        /// The mutation name to call
+        /// </param>
+        /// <param name="mutationRequest">
+        /// The mutation arguments
+        /// </param>
+        /// <param name="expectResult">
+        /// A value indicating whether to expect result or error
+        /// </param>
+        /// <param name="expectedResult">
+        /// The expected value (or errors if no result expected).
+        /// </param>
+        /// <returns>
+        /// The async task
+        /// </returns>
+        [Theory]
+        [InlineData("connection.create", "{\"newNode\": { \"name\":\"6-test\", \"value\": 1 }}", true, "{\"name\":\"6-test\",\"value\": 1.0 }")]
+        [InlineData("connection.create", "{\"newNode\": { \"value\": 1 }}", false, "[{\"field\": null, \"message\": \"Create failed\"}, {\"field\":\"name\",\"message\":\"name should be set\"}]")]
+        [InlineData("connection.create", null, false, "[{\"field\": null, \"message\": \"Create failed\"}, {\"field\": null,\"message\":\"object data was not provided\"}]")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"value\": 1.0 }}", true, "{\"name\":\"2-test\",\"value\": 1.0 }")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"uid\": \"{C12EE96B-2420-4F54-AAE5-788995B10679}\" }}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\", \"newNode\": { \"value\": 1.0 }}", false, "[{\"field\": null, \"message\": \"Update failed\"}, {\"field\":\"id\",\"message\":\"Node not found\"}]")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"uid\": \"{F0607502-5B77-4A3C-9142-E6197A7EE61E}\" }}", false, "[{\"field\": null, \"message\": \"Update failed\"}, {\"field\":\"uid\",\"message\":\"Duplicate key\"}]")]
+        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
+        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\"}", false, "[{\"field\": null, \"message\": \"Delete failed\"}, {\"field\":\"id\",\"message\":\"Node not found\"}]")]
+        public async Task ConnectionMutationTests(string mutationName, string mutationRequest, bool expectResult, string expectedResult)
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject { Uid = Guid.Parse("{3BEEE369-11DF-4A30-BF11-1D8465C87110}"), Name = "1-test", Value = 100m },
+                                         new TestObject { Uid = Guid.Parse("{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"), Name = "2-test", Value = 50m },
+                                         new TestObject { Uid = Guid.Parse("{67885BA0-B284-438F-8393-EE9A9EB299D1}"), Name = "3-test", Value = 50m },
+                                         new TestObject { Uid = Guid.Parse("{3AF2C973-D985-4F95-A0C7-AA928D276881}"), Name = "4-test", Value = 70m },
+                                         new TestObject { Uid = Guid.Parse("{F0607502-5B77-4A3C-9142-E6197A7EE61E}"), Name = "5-test", Value = 6m },
+                                     };
+
+            var provider = this.GetProvider(initialObjects);
+            var context = new RequestContext();
+            var request = new ApiRequest
+                              {
+                                  FieldName = mutationName,
+                                  Arguments = string.IsNullOrWhiteSpace(mutationRequest) ? null : JsonConvert.DeserializeObject(mutationRequest) as JObject,
+                                  Fields = new List<ApiRequest>
+                                               {
+                                                   new ApiRequest { FieldName = "result", Fields = new List<ApiRequest> { new ApiRequest { FieldName = "name" }, new ApiRequest { FieldName = "value" } } },
+                                                   new ApiRequest { FieldName = "errors", Fields = new List<ApiRequest> { new ApiRequest { FieldName = "field" }, new ApiRequest { FieldName = "message" } } },
+                                               }
+                              };
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var result = await provider.ResolveMutation(
+                             request,
+                             context,
+                             e => this.output.WriteLine($"Resolve error: {e.Message}\n{e.StackTrace}"));
+            stopwatch.Stop();
+            this.output.WriteLine($"Resolved in {(double)stopwatch.ElapsedTicks * 1000 / Stopwatch.Frequency}ms");
+            Assert.NotNull(result);
+            this.output.WriteLine(result.ToString(Formatting.Indented));
+
+            var resultObject = result.Property("result");
+            var resultErrors = result.Property("errors");
+            Assert.NotNull(resultObject);
+            Assert.NotNull(resultErrors);
+            Assert.True(resultObject.HasValues);
+            Assert.True(resultErrors.HasValues);
+
+            if (expectResult)
+            {
+                Assert.False(resultErrors.Value.HasValues);
+                Assert.True(resultObject.Value.HasValues);
+                Assert.Equal(
+                    ((JObject)JsonConvert.DeserializeObject(expectedResult)).ToString(Formatting.None), 
+                    resultObject.Value.ToString(Formatting.None));
+            }
+            else
+            {
+                Assert.True(resultErrors.Value.HasValues);
+                Assert.False(resultObject.Value.HasValues);
+                Assert.Equal(
+                    ((JArray)JsonConvert.DeserializeObject(expectedResult)).ToString(Formatting.None),
+                    resultErrors.Value.ToString(Formatting.None));
+            }
         }
 
         /// <summary>
@@ -212,9 +300,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 {
                                                     new ApiRequest
                                                         {
-                                                            FieldName
-                                                                =
-                                                                "asyncScalarField"
+                                                            FieldName = "asyncScalarField"
                                                         }
                                                 }
                                     }
@@ -577,24 +663,52 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             /// <inheritdoc />
-            public Task<TestObject> Create(TestObject newNode)
+            public Task<MutationResult<TestObject>> Create(TestObject newNode)
             {
+                if (newNode == null)
+                {
+                    var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription(null, "Create failed"),
+                                         new ErrorDescription(null, "object data was not provided")
+                                     };
+
+                    return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
+                }
+
+                if (string.IsNullOrWhiteSpace(newNode.Name))
+                {
+                    var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription(null, "Create failed"),
+                                         new ErrorDescription("name", "name should be set")
+                                     };
+
+                    return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
+                }
+
                 newNode.Uid = Guid.NewGuid();
                 this.objects.Add(newNode.Uid, newNode);
-                return Task.FromResult(newNode);
+                return Task.FromResult(new MutationResult<TestObject> { Result = newNode });
             }
 
             /// <inheritdoc />
-            public Task<TestObject> Delete(Guid id)
+            public Task<MutationResult<TestObject>> Delete(Guid id)
             {
                 TestObject obj;
                 if (!this.objects.TryGetValue(id, out obj))
                 {
-                    throw new Exception("not found");
+                    var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription(null, "Delete failed"),
+                                         new ErrorDescription("id", "Node not found")
+                                     };
+
+                    return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
                 }
 
                 this.objects.Remove(id);
-                return Task.FromResult(obj);
+                return Task.FromResult(new MutationResult<TestObject> { Result = obj });
             }
 
             /// <inheritdoc />
@@ -633,30 +747,54 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             /// <inheritdoc />
-            public Task<TestObject> Update(Guid id, TestObject newNode, List<string> updatedFields)
+            public Task<MutationResult<TestObject>> Update(Guid id, TestObject newNode, ApiRequest request)
             {
                 TestObject obj;
                 if (!this.objects.TryGetValue(id, out obj))
                 {
-                    throw new Exception("not found");
+                    var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription(null, "Update failed"),
+                                         new ErrorDescription("id", "Node not found")
+                                     };
+
+                    return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
                 }
 
-                if (updatedFields.Contains("uid"))
+                var description = request?.Arguments.Property("newNode").Value as JObject;
+                if (description == null)
+                {
+                    var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription(null, "Update failed"),
+                                         new ErrorDescription(null, "Update description not found")
+                                     };
+
+                    return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
+                }
+
+                if (description.Property("uid") != null)
                 {
                     if (newNode.Uid != obj.Uid && this.objects.ContainsKey(newNode.Uid))
                     {
-                        throw new Exception("duplicate key");
+                        var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription(null, "Update failed"),
+                                         new ErrorDescription("uid", "Duplicate key")
+                                     };
+
+                        return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
                     }
 
                     obj.Uid = newNode.Uid;
                 }
 
-                if (updatedFields.Contains("name"))
+                if (description.Property("name") != null)
                 {
                     obj.Name = newNode.Name;
                 }
 
-                if (updatedFields.Contains("value"))
+                if (description.Property("value") != null)
                 {
                     obj.Value = newNode.Value;
                 }
@@ -664,7 +802,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 this.objects.Remove(id);
                 this.objects[obj.Uid] = obj;
 
-                return Task.FromResult(obj);
+                return Task.FromResult(new MutationResult<TestObject> { Result = obj });
             }
         }
 
@@ -727,7 +865,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <summary>
             /// Test objects connection
             /// </summary>
-            [DeclareField]
+            [DeclareConnection(CanCreate = true, CanDelete = true, CanUpdate = true)]
             [UsedImplicitly]
             public TestObjectConnection Connection => this.connection;
 

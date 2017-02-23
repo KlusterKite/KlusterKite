@@ -52,8 +52,11 @@
   <ItemGroup>
     <Compile Include="ApiProvider.cs" />
     <Compile Include="AssembleTempData.cs" />
+    <Compile Include="ErrorDescription.cs" />
     <Compile Include="INodeConnection.cs" />
     <Compile Include="InputContractResolver.cs" />
+    <Compile Include="MutationResolverGenerator.cs" />
+    <Compile Include="MutationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryResult.cs" />
     <Compile Include="ResolverGenerator.cs" />

@@ -47,10 +47,16 @@ namespace ClusterKit.Web.GraphQL.API
         public Dictionary<MemberInfo, string> FieldNames { get; } = new Dictionary<MemberInfo, string>();
 
         /// <summary>
-        /// Gets the list of descriptions of discovered types used in API
+        /// Gets the list of resolver class names for the field in the type
         /// </summary>
         [NotNull]
         public Dictionary<string, Dictionary<string, string>> ResolverNames { get; } = new Dictionary<string, Dictionary<string, string>>();
+
+        /// <summary>
+        /// Gets the list of resolver class names for mutations
+        /// </summary>
+        [NotNull]
+        public Dictionary<string, string> MutationResolverNames { get; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets the list of properties described in API

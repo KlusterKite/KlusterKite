@@ -47,6 +47,11 @@ namespace ClusterKit.Web.GraphQL.API
         private Dictionary<string, PropertyResolver> resolvers;
 
         /// <summary>
+        /// The list of mutation resolvers
+        /// </summary>
+        private Dictionary<string, PropertyResolver> mutationResolvers;
+
+        /// <summary>
         /// Prepares serializer to deserialize arguments
         /// </summary>
         private JsonSerializer argumentsSerializer;
@@ -109,6 +114,35 @@ namespace ClusterKit.Web.GraphQL.API
         }
 
         /// <summary>
+        /// Resolves query
+        /// </summary>
+        /// <param name="request">
+        /// The query request
+        /// </param>
+        /// <param name="context">
+        /// The request context.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The method that will be called in case of errors
+        /// </param>
+        /// <returns>
+        /// Resolved query
+        /// </returns>
+        public async Task<JObject> ResolveMutation(
+            ApiRequest request,
+            RequestContext context,
+            Action<Exception> onErrorCallback)
+        {
+            PropertyResolver resolver;
+            if (!this.mutationResolvers.TryGetValue(request.FieldName, out resolver))
+            {
+                return null;
+            }
+
+            return (JObject)await resolver.Resolve(this, request, context, this.argumentsSerializer, onErrorCallback);
+        }
+
+        /// <summary>
         /// Generates the api description and prepares all resolvers
         /// </summary>
         private void Assemble()
@@ -121,12 +155,13 @@ namespace ClusterKit.Web.GraphQL.API
             var root = this.GenerateTypeDescription(this.GetType(), assembleData);
 
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
-            this.ApiDescription.Types =
-                assembleData.DiscoveredApiTypes.Values.Where(t => t.TypeName != root.TypeName).ToList();
             this.ApiDescription.Description = root.Description;
 
             var mutations = this.GenerateMutations(root, new List<string>(), new List<string>(), assembleData);
+
             this.ApiDescription.Mutations = mutations.ToList();
+            this.ApiDescription.Types =
+                assembleData.DiscoveredApiTypes.Values.Where(t => t.TypeName != root.TypeName).ToList();
             this.ApiDescription.Fields = root.Fields;
 
             this.argumentsSerializer = new JsonSerializer
@@ -151,7 +186,7 @@ namespace ClusterKit.Web.GraphQL.API
         {
             var code = data.ResolverGenerators.Select(g => g.Generate()).ToList();
             var comDomProvider = CodeDomProvider.CreateProvider("C#");
-            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = false };
+            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = true };
             compilerParameters.ReferencedAssemblies.AddRange(
                 AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic)
@@ -164,6 +199,7 @@ namespace ClusterKit.Web.GraphQL.API
             }
 
             this.resolvers = new Dictionary<string, PropertyResolver>();
+            this.mutationResolvers = new Dictionary<string, PropertyResolver>();
 
             if (!compiledResult.Errors.HasErrors)
             {
@@ -173,6 +209,14 @@ namespace ClusterKit.Web.GraphQL.API
                         (PropertyResolver)
                         compiledResult.CompiledAssembly.CreateInstance(
                             data.ResolverNames[root.TypeName][rootField.Name]);
+                }
+
+                foreach (var mutation in this.ApiDescription.Mutations)
+                {
+                    this.mutationResolvers[mutation.Name] = 
+                        (PropertyResolver)
+                        compiledResult.CompiledAssembly.CreateInstance(
+                            data.MutationResolverNames[mutation.Name]);
                 }
             }
         }
@@ -331,11 +375,11 @@ namespace ClusterKit.Web.GraphQL.API
                 if (!metadata.IsAsync && !metadata.IsForwarding && metadata.MetaType == TypeMetadata.EnMetaType.Scalar)
                 {
                     flags |= EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable;
+                }
 
-                    if (property.CanWrite)
-                    {
-                        flags |= EnFieldFlags.CanBeUsedInInput;
-                    }
+                if (!metadata.IsAsync && !metadata.IsForwarding && property.CanWrite && metadata.MetaType != TypeMetadata.EnMetaType.Connection)
+                {
+                    flags |= EnFieldFlags.CanBeUsedInInput;
                 }
 
                 return ApiField.Scalar(
@@ -384,7 +428,7 @@ namespace ClusterKit.Web.GraphQL.API
                 yield break;
             }
 
-            foreach (var mutation in this.GenerateMutationsDirect(apiType, type, path, data))
+            foreach (var mutation in this.GenerateMutationsDirect(apiType, type, path, typesUsed, data))
             {
                 yield return mutation;
             }
@@ -394,7 +438,7 @@ namespace ClusterKit.Web.GraphQL.API
                 yield return mutation;
             }
 
-            foreach (var apiField in this.GenerateMutationsFromConnections(type, apiType, path, data))
+            foreach (var apiField in this.GenerateMutationsFromConnections(type, apiType, path, typesUsed, data))
             {
                 yield return apiField;
             }
@@ -406,6 +450,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="apiType">The api type description</param>
         /// <param name="type">The type</param>
         /// <param name="path">The fields path</param>
+        /// <param name="typesUsed">Already used types to avoid circular references</param>
         /// <param name="data">
         /// The temporary data used during assemble process
         /// </param>
@@ -414,6 +459,7 @@ namespace ClusterKit.Web.GraphQL.API
             ApiType apiType,
             Type type,
             List<string> path,
+            List<string> typesUsed,
             AssembleTempData data)
         {
             var fields =
@@ -427,12 +473,30 @@ namespace ClusterKit.Web.GraphQL.API
                                     (DeclareMutationAttribute)p.GetCustomAttribute(typeof(DeclareMutationAttribute))
                                 })
                     .Where(p => p.Attribute != null && !p.Method.IsGenericMethod && !p.Method.IsGenericMethodDefinition)
-                    .Select(m => this.GenerateFieldFromMethod(m.Method, apiType, m.Attribute, data))
-                    .Where(f => f != null);
+                    .Select(
+                        m =>
+                            new
+                                {
+                                    ApiField = this.GenerateFieldFromMethod(m.Method, apiType, m.Attribute, data),
+                                    m.Method,
+                                    MetaData = this.GenerateTypeMetadata(m.Method.ReturnType, m.Attribute)
+                                })
+                    .Where(f => f.ApiField != null);
 
-            foreach (var apiField in fields)
+            foreach (var description in fields)
             {
+                var apiField = description.ApiField;
                 apiField.Name = string.Join(".", new List<string>(path) { apiField.Name });
+                var generator = new MutationResolverGenerator(
+                    path,
+                    typesUsed,
+                    description.Method,
+                    description.MetaData,
+                    this.GetType(),
+                    data);
+
+                data.MutationResolverNames[apiField.Name] = generator.ClassName;
+                data.ResolverGenerators.Add(generator);
                 yield return apiField;
             }
         }
@@ -443,6 +507,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="type">The type</param>
         /// <param name="apiType">The api description of the type</param>
         /// <param name="path">The fields path</param>
+        /// <param name="typesUsed">Already used types to avoid circular references</param>
         /// <param name="data">
         /// The temporary data used during assemble process
         /// </param>
@@ -451,6 +516,7 @@ namespace ClusterKit.Web.GraphQL.API
             Type type,
             ApiType apiType,
             List<string> path,
+            List<string> typesUsed,
             AssembleTempData data)
         {
             var members = type.GetMembers().Where(m => m is PropertyInfo || m is MethodInfo).Select(
@@ -492,8 +558,10 @@ namespace ClusterKit.Web.GraphQL.API
                     continue;
                 }
 
-                var idType = TypeMetadata.CheckType(connectionType, typeof(INodeConnection<,>))?.GenericTypeArguments[1];
-                if (idType == null)
+                var checkType = TypeMetadata.CheckType(connectionType, typeof(INodeConnection<,>));
+                var idType = checkType?.GenericTypeArguments[1];
+                var connectedObjectType = checkType?.GenericTypeArguments[0];
+                if (idType == null || connectedObjectType == null)
                 {
                     this.generationErrors.Add($"Wrong type on connection {connection.Name} of type {type.FullName}");
                     continue;
@@ -515,14 +583,32 @@ namespace ClusterKit.Web.GraphQL.API
                     continue;
                 }
 
+                var mutationResultType = typeof(MutationResult<>).MakeGenericType(connectedObjectType);
+                var mutationResult = this.GenerateTypeDescription(mutationResultType, data);
+
+                var connectionPath = new List<string>(path) { connection.Name };
+                var connectionTypes = new List<string>(typesUsed) { apiType.TypeName };
+
                 if (attribute.CanCreate)
                 {
                     // todo: generate resolver
                     var name = string.Join(".", new List<string>(path) { connection.Name, "create" });
+
+                    var generator = new MutationResolverGenerator(
+                        connectionPath,
+                        connectionTypes,
+                        connectionType.GetMethod("Create"),
+                        new TypeMetadata { IsAsync = true, IsForwarding = false, MetaType = TypeMetadata.EnMetaType.Object, ScalarType = EnScalarType.None, Type = mutationResultType },
+                        connectionType,
+                        data);
+
+                    data.MutationResolverNames[name] = generator.ClassName;
+                    data.ResolverGenerators.Add(generator);
+
                     yield return
                         ApiField.Object(
                             name,
-                            connection.TypeName,
+                            mutationResult.TypeName,
                             arguments:
                             new List<ApiField>
                                 {
@@ -536,12 +622,23 @@ namespace ClusterKit.Web.GraphQL.API
 
                 if (attribute.CanUpdate)
                 {
-                    // todo: generate resolver
                     var name = string.Join(".", new List<string>(path) { connection.Name, "update" });
+
+                    var generator = new MutationResolverGenerator(
+                        connectionPath,
+                        connectionTypes,
+                        connectionType.GetMethod("Update"),
+                        new TypeMetadata { IsAsync = true, IsForwarding = false, MetaType = TypeMetadata.EnMetaType.Object, ScalarType = EnScalarType.None, Type = mutationResultType },
+                        connectionType,
+                        data);
+
+                    data.MutationResolverNames[name] = generator.ClassName;
+                    data.ResolverGenerators.Add(generator);
+
                     yield return
                         ApiField.Object(
                             name,
-                            connection.TypeName,
+                            mutationResult.TypeName,
                             arguments:
                             new List<ApiField>
                                 {
@@ -558,10 +655,22 @@ namespace ClusterKit.Web.GraphQL.API
                 {
                     // todo: generate resolver
                     var name = string.Join(".", new List<string>(path) { connection.Name, "delete" });
+
+                    var generator = new MutationResolverGenerator(
+                        connectionPath,
+                        connectionTypes,
+                        connectionType.GetMethod("Delete"),
+                        new TypeMetadata { IsAsync = true, IsForwarding = false, MetaType = TypeMetadata.EnMetaType.Object, ScalarType = EnScalarType.None, Type = mutationResultType },
+                        connectionType,
+                        data);
+
+                    data.MutationResolverNames[name] = generator.ClassName;
+                    data.ResolverGenerators.Add(generator);
+
                     yield return
                         ApiField.Object(
                             name,
-                            connection.TypeName,
+                            mutationResult.TypeName,
                             arguments:
                             new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
                             description: attribute.CreateDescription);
@@ -639,7 +748,7 @@ namespace ClusterKit.Web.GraphQL.API
             }
 
             var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
-            apiType = new ApiType(descriptionAttribute?.Name ?? type.FullName)
+            apiType = new ApiType(descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type, true))
                           {
                               Description =
                                   descriptionAttribute?.Description

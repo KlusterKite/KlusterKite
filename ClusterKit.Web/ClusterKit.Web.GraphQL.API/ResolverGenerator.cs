@@ -13,8 +13,10 @@ namespace ClusterKit.Web.GraphQL.API
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
 
     using ClusterKit.Security.Client;
+    using ClusterKit.Web.GraphQL.API.Resolvers;
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Client.Attributes;
 
@@ -55,46 +57,54 @@ namespace ClusterKit.Web.GraphQL.API
         public string ClassName => $"ClusterKit.Web.GraphQL.Dynamic.Resolver{this.Uid:N}";
 
         /// <summary>
+        /// Gets a value indicating whether <see cref="PropertyResolver.GetValue"/> method should be declared as async
+        /// </summary>
+        protected virtual bool GetValueIsAsync => this.Metadata.IsAsync;
+
+        /// <summary>
         /// Gets the <see cref="MemberInfo"/> representing field
         /// </summary>
-        private MemberInfo Member { get; }
+        protected MemberInfo Member { get; }
 
         /// <summary>
         /// Gets the return type metadata
         /// </summary>
-        private TypeMetadata Metadata { get; }
+        protected TypeMetadata Metadata { get; }
 
         /// <summary>
         /// Gets the source data type
         /// </summary>
-        private Type SourceType { get; }
+        protected Type SourceType { get; }
 
         /// <summary>
         /// Gets the assemble data
         /// </summary>
-        private AssembleTempData Data { get; }
+        protected AssembleTempData Data { get; }
 
         /// <summary>
         /// Gets the resolver uid
         /// </summary>
-        private Guid Uid { get; } = Guid.NewGuid();
+        protected Guid Uid { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Creates c# code for defined parameters
         /// </summary>
         /// <returns>The field resolver definition in C#</returns>
-        public string Generate()
+        public virtual string Generate()
         {
+            bool isAsync;
             string async;
             string returnNull;
 
             if (this.Metadata.IsAsync || this.Metadata.ScalarType == EnScalarType.None)
             {
+                isAsync = true;
                 async = "async";
                 returnNull = "null";
             }
             else
             {
+                isAsync = false;
                 async = string.Empty;
                 returnNull = "Task.FromResult<JToken>(null)";
             }
@@ -116,23 +126,25 @@ namespace ClusterKit.Web.GraphQL.API
                         using ClusterKit.Web.GraphQL.Client;
                         using ClusterKit.Web.GraphQL.API.Resolvers;
 
+                        // {this.GetType().Name} for {ToCSharpRepresentation(this.SourceType, true)} property {this.Member.Name}
                         public class Resolver{this.Uid:N} : PropertyResolver 
                         {{
+                            public override {(this.GetValueIsAsync ? "async" : string.Empty)} Task<object> GetValue(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer) 
+                            {{
+                                {this.GenerateResultSourceAcquirement()}
+                                return {(this.GetValueIsAsync ? "resultSource" : "Task.FromResult<object>(resultSource)")};
+                            }}
+
                             public override {async} Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) 
                             {{
-                                var sourceTyped = source as {ToCSharpRepresentation(this.SourceType, true)};
-                                if (sourceTyped == null) 
-                                {{
-                                    if (onErrorCallback != null) 
-                                    {{
-                                        onErrorCallback(new Exception(""Source object of unexpected type""));
-                                    }}
-                                    return {returnNull};
-                                }}
-
                                 try 
                                 {{
-                                    {this.GenerateResultSourceAcquirement()};
+                                    var resultSource = ({ToCSharpRepresentation(this.GetPropertyReturnType(), true)}){(isAsync ? " await this.GetValue(source,query,context,argumentsSerializer)" : "this.GetValue(source,query,context,argumentsSerializer).Result")};
+                                    if (resultSource == null)
+                                    {{
+                                         return {(isAsync ? "null" : "Task.FromResult<JToken>(null)")};
+                                    }}
+
                                     {(this.Metadata.IsForwarding ? this.GenerateForwardedReturn() : this.GenerateRecursiveResolve())}
                                 }}
                                 catch(Exception e)
@@ -182,7 +194,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="type">The type</param>
         /// <param name="trimArgCount">A value indicating whether to trim arguments count</param>
         /// <returns>A valid C# name</returns>
-        private static string ToCSharpRepresentation(Type type, bool trimArgCount)
+        internal static string ToCSharpRepresentation(Type type, bool trimArgCount)
         {
             if (type.IsGenericType)
             {
@@ -194,62 +206,10 @@ namespace ClusterKit.Web.GraphQL.API
         }
 
         /// <summary>
-        /// Creates valid type name representation
-        /// </summary>
-        /// <remarks>
-        /// Original code: <see href="http://stackoverflow.com/questions/2579734/get-the-type-name"/>
-        /// </remarks>
-        /// <param name="type">The type</param>
-        /// <param name="trimArgCount">A value indicating whether to trim arguments count</param>
-        /// <param name="availableArguments">The list of type parameters for generic classes</param>
-        /// <returns>A valid C# name</returns>
-        private static string ToCSharpRepresentation(Type type, bool trimArgCount, List<Type> availableArguments)
-        {
-            if (!type.IsGenericType)
-            {
-                return type.FullName.Replace("+", ".");
-            }
-
-            var value = type.FullName.Replace("+", ".");
-            if (trimArgCount && value.IndexOf("`", StringComparison.InvariantCulture) > -1)
-            {
-                value = value.Substring(0, value.IndexOf("`", StringComparison.InvariantCulture));
-            }
-
-            if (type.DeclaringType != null)
-            {
-                // This is a nested type, build the nesting type first
-                value = ToCSharpRepresentation(type.DeclaringType, trimArgCount, availableArguments) + "+" + value;
-            }
-
-            // Build the type arguments (if any)
-            var argString = string.Empty;
-            var thisTypeArgs = type.GetGenericArguments();
-            for (var i = 0; i < thisTypeArgs.Length && availableArguments.Count > 0; i++)
-            {
-                if (i != 0)
-                {
-                    argString += ", ";
-                }
-
-                argString += ToCSharpRepresentation(availableArguments[0], trimArgCount);
-                availableArguments.RemoveAt(0);
-            }
-
-            // If there are type arguments, add them with < >
-            if (argString.Length > 0)
-            {
-                value += "<" + argString + ">";
-            }
-
-            return value;
-        }
-
-        /// <summary>
         /// Generates helper properties and methods for generator
         /// </summary>
         /// <returns>The properties and methods C# code</returns>
-        private string GenerateHelperMethods()
+        protected virtual string GenerateHelperMethods()
         {
             if (this.Metadata.MetaType == TypeMetadata.EnMetaType.Connection)
             {
@@ -263,7 +223,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// Generates helpers to work with connection
         /// </summary>
         /// <returns>The properties and methods C# code</returns>
-        private string GenerateConnectionHelpers()
+        protected virtual string GenerateConnectionHelpers()
         {
             return $@"
             {this.GenerateConnectionSorter()}
@@ -275,7 +235,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// Generates method to create sort expression
         /// </summary>
         /// <returns>The properties and methods C# code</returns>
-        private string GenerateConnectionSorter()
+        protected virtual string GenerateConnectionSorter()
         {
             ApiType sortedApiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
@@ -361,7 +321,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// Generates method to create filter expression
         /// </summary>
         /// <returns>The properties and methods C# code</returns>
-        private string GenerateConnectionFilter()
+        protected virtual string GenerateConnectionFilter()
         {
             ApiType sortedApiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
@@ -382,7 +342,7 @@ namespace ClusterKit.Web.GraphQL.API
                                      d.Property
                                  })
                 .ToList();
-
+            
             return $@"
                 private static Expression<Func<string, string, bool>> filterStringCheckIn = (left, right) => left.Contains(right);
                 private static Expression<Func<string, string, bool>> filterStringStartsWith = (left, right) => left.StartsWith(right);
@@ -483,7 +443,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="property"><see cref="PropertyInfo"/> for this field</param>
         /// <param name="scalarType">The field detected type</param>
         /// <returns>The list of filter checks</returns>
-        private IEnumerable<string> GenerateConnectionFilterChecks(
+        protected virtual IEnumerable<string> GenerateConnectionFilterChecks(
             string apiName,
             string expressionParameter,
             PropertyInfo property,
@@ -527,18 +487,47 @@ namespace ClusterKit.Web.GraphQL.API
         /// Generates the execution of property / method of source value
         /// </summary>
         /// <returns>Code to acquire the source value</returns>
-        private string GenerateResultSourceAcquirement()
+        protected virtual string GenerateResultSourceAcquirement()
         {
+            var init = $@"
+                        var sourceTyped = source as {ToCSharpRepresentation(this.SourceType, true)};
+                        if (sourceTyped == null) 
+                        {{
+                            throw new Exception(""Source object of unexpected type"");
+                        }}
+                       ";
+
             var property = this.Member as PropertyInfo;
             if (property != null)
             {
-                return this.GenerateResultSourceFromPropertyAcquirement(property);
+                return $"{init}{this.GenerateResultSourceFromPropertyAcquirement(property)}";
             }
 
             var method = this.Member as MethodInfo;
             if (method != null)
             {
-                return this.GenerateResultSourceFromMethodAcquirement(method);
+                return $"{init}{this.GenerateResultSourceFromMethodAcquirement(method)}";
+            }
+
+            throw new InvalidOperationException($"Member is of the invalid type {this.Member.GetType().Name}");
+        }
+
+        /// <summary>
+        /// Gets the property return type
+        /// </summary>
+        /// <returns>The type</returns>
+        protected virtual Type GetPropertyReturnType()
+        {
+            var property = this.Member as PropertyInfo;
+            if (property != null)
+            {
+                return this.Metadata.IsAsync ? TypeMetadata.CheckType(property.PropertyType, typeof(Task<>)).GenericTypeArguments[0] : property.PropertyType;
+            }
+
+            var method = this.Member as MethodInfo;
+            if (method != null)
+            {
+                return this.Metadata.IsAsync ? TypeMetadata.CheckType(method.ReturnType, typeof(Task<>)).GenericTypeArguments[0] : method.ReturnType;
             }
 
             throw new InvalidOperationException($"Member is of the invalid type {this.Member.GetType().Name}");
@@ -549,7 +538,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// </summary>
         /// <param name="method">The method</param>
         /// <returns>Code to acquire the source value</returns>
-        private string GenerateResultSourceFromMethodAcquirement(MethodInfo method)
+        protected virtual string GenerateResultSourceFromMethodAcquirement(MethodInfo method)
         {
             var await = this.Metadata.IsAsync ? "await" : string.Empty;
             List<string> codeCommands = new List<string>();
@@ -597,7 +586,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// </summary>
         /// <param name="property">The property</param>
         /// <returns>Code to acquire the source value</returns>
-        private string GenerateResultSourceFromPropertyAcquirement(PropertyInfo property)
+        protected virtual string GenerateResultSourceFromPropertyAcquirement(PropertyInfo property)
         {
             var await = this.Metadata.IsAsync ? "await" : string.Empty;
             return $"var resultSource = {@await} sourceTyped.{property.Name};";
@@ -607,7 +596,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// Generates resolve of the forwarded request
         /// </summary>
         /// <returns>Code to return result</returns>
-        private string GenerateForwardedReturn()
+        protected virtual string GenerateForwardedReturn()
         {
             return this.Metadata.IsAsync ? "return resultSource;" : "return Task.FromResult<JToken>(resultSource);";
         }
@@ -616,7 +605,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// Generates resolve of the request value recursively
         /// </summary>
         /// <returns>Code to return result</returns>
-        private string GenerateRecursiveResolve()
+        protected virtual string GenerateRecursiveResolve()
         {
             var isSync = !this.Metadata.IsAsync && this.Metadata.ScalarType != EnScalarType.None;
 
@@ -658,7 +647,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// Generates resolve of the request connection value
         /// </summary>
         /// <returns>Code to return result</returns>
-        private string GenerateConnectionResolve()
+        protected virtual string GenerateConnectionResolve()
         {
             return $@"
                 var connectionResult = await resultSource.Query(GenerateFilterExpression(query.Arguments), GenerateSortingExpression(query.Arguments), 100, 0);
@@ -681,7 +670,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="itemName">The item variable name</param>
         /// <param name="type">The item type</param>
         /// <returns>Code to return result</returns>
-        private string GenerateObjectResolve(string itemName, Type type)
+        protected virtual string GenerateObjectResolve(string itemName, Type type)
         {
             var prefix = @"
                 var result = new JObject();
@@ -712,6 +701,58 @@ namespace ClusterKit.Web.GraphQL.API
             }
 
             return string.Join("\r\n", codeCommands);
+        }
+
+        /// <summary>
+        /// Creates valid type name representation
+        /// </summary>
+        /// <remarks>
+        /// Original code: <see href="http://stackoverflow.com/questions/2579734/get-the-type-name"/>
+        /// </remarks>
+        /// <param name="type">The type</param>
+        /// <param name="trimArgCount">A value indicating whether to trim arguments count</param>
+        /// <param name="availableArguments">The list of type parameters for generic classes</param>
+        /// <returns>A valid C# name</returns>
+        private static string ToCSharpRepresentation(Type type, bool trimArgCount, List<Type> availableArguments)
+        {
+            if (!type.IsGenericType)
+            {
+                return type.FullName.Replace("+", ".");
+            }
+
+            var value = type.FullName.Replace("+", ".");
+            if (trimArgCount && value.IndexOf("`", StringComparison.InvariantCulture) > -1)
+            {
+                value = value.Substring(0, value.IndexOf("`", StringComparison.InvariantCulture));
+            }
+
+            if (type.DeclaringType != null)
+            {
+                // This is a nested type, build the nesting type first
+                value = ToCSharpRepresentation(type.DeclaringType, trimArgCount, availableArguments) + "+" + value;
+            }
+
+            // Build the type arguments (if any)
+            var argString = string.Empty;
+            var thisTypeArgs = type.GetGenericArguments();
+            for (var i = 0; i < thisTypeArgs.Length && availableArguments.Count > 0; i++)
+            {
+                if (i != 0)
+                {
+                    argString += ", ";
+                }
+
+                argString += ToCSharpRepresentation(availableArguments[0], trimArgCount);
+                availableArguments.RemoveAt(0);
+            }
+
+            // If there are type arguments, add them with < >
+            if (argString.Length > 0)
+            {
+                value += "<" + argString + ">";
+            }
+
+            return value;
         }
     }
 }

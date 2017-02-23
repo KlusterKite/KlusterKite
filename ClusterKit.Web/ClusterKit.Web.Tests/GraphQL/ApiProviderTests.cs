@@ -14,7 +14,6 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using System.Threading.Tasks;
 
     using Castle.Core.Internal;
@@ -79,7 +78,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             Assert.Equal("TestApi", description.ApiName);
             Assert.Equal(this.GetType().Assembly.GetName().Version, description.Version);
-            Assert.Equal(1, description.Types.Count);
+            Assert.Equal(3, description.Types.Count);
 
             var nodeType = description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("nodeobject"));
             Assert.NotNull(nodeType);
@@ -92,14 +91,14 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(nodeType.TypeName, description.Fields.First(f => f.Name == "connectedObjects").TypeName);
             Assert.Equal(EnFieldFlags.IsConnection, description.Fields.First(f => f.Name == "connectedObjects").Flags);
             Assert.True(description.Mutations.Any(m => m.Name == "connectedObjects.create"));
-            Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.create").TypeName);
+            //// Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.create").TypeName);
             Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.create").Arguments.First().TypeName);
             Assert.True(description.Mutations.Any(m => m.Name == "connectedObjects.update"));
-            Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.update").TypeName);
+            //// Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.update").TypeName);
             Assert.Equal(EnScalarType.Guid, description.Mutations.First(m => m.Name == "connectedObjects.update").Arguments.First().ScalarType);
             Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.update").Arguments.Skip(1).First().TypeName);
             Assert.True(description.Mutations.Any(m => m.Name == "connectedObjects.delete"));
-            Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.delete").TypeName);
+            //// Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.delete").TypeName);
             Assert.Equal(EnScalarType.Guid, description.Mutations.First(m => m.Name == "connectedObjects.delete").Arguments.First().ScalarType);
 
             Assert.True(description.Fields.Any(f => f.Name == "publishedStringProperty"));
@@ -158,7 +157,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
                     public class Resolver_E3EA3942A7CF40359011147A82607E51 : PropertyResolver {
                         public override Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) {
-                            return Task.FromResult<JToken>(new JValue(((ClusterKit.Web.Tests.GraphQL.ApiProviderTests.NodeObject)source).Id));
+                            return Task.FromResult<JToken>(new JValue(this.GetValue(source, query, context, argumentsSerializer).Result));
+                        }
+
+                        public override Task<object> GetValue(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer) {
+                            return Task.FromResult<object>(((ClusterKit.Web.Tests.GraphQL.ApiProviderTests.NodeObject)source).Id);
                         }
                     }
                 }
@@ -181,6 +184,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             
             var node = new NodeObject { Id = Guid.NewGuid() };
             Assert.Equal(node.Id, await resolver.Resolve(node, null, null, null, e => this.output.WriteLine(e.Message)));
+            Assert.Equal(node.Id, await resolver.GetValue(node, null, null, null));
         }
 
         /// <summary>
@@ -350,31 +354,21 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
 
                 /// <inheritdoc />
-                public Task<NodeObject> Create(NodeObject newNode)
+                public Task<MutationResult<NodeObject>> Create(NodeObject newNode)
                 {
                     newNode.Id = Guid.NewGuid();
                     this.nodes.Add(newNode);
-                    return Task.FromResult(newNode);
+                    return Task.FromResult(new MutationResult<NodeObject> { Result = newNode });
                 }
 
                 /// <inheritdoc />
-                public async Task<NodeObject> Update(Guid id, NodeObject newNode, List<string> updatedFields)
+                public Task<MutationResult<NodeObject>> Update(Guid id, NodeObject newNode, ApiRequest request)
                 {
-                    var oldNode = await this.GetById(id);
-                    var updatedProperties = updatedFields
-                        .Select(p => typeof(NodeObject).GetProperty(p, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase))
-                        .Where(p => p != null && p.CanRead && p.CanWrite);
-
-                    foreach (var property in updatedProperties)
-                    {
-                        property.SetValue(oldNode, property.GetValue(newNode));
-                    }
-
-                    return newNode;
+                    return Task.FromResult(new MutationResult<NodeObject> { Result = newNode });
                 }
 
                 /// <inheritdoc />
-                public async Task<NodeObject> Delete(Guid id)
+                public async Task<MutationResult<NodeObject>> Delete(Guid id)
                 {
                     var oldNode = await this.GetById(id);
                     if (oldNode != null)
@@ -382,7 +376,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                         this.nodes.Remove(oldNode);
                     }
 
-                    return oldNode;
+                    return new MutationResult<NodeObject> { Result = oldNode };
                 }
             }
         }

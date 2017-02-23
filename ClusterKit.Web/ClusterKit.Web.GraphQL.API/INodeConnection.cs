@@ -10,10 +10,13 @@
 namespace ClusterKit.Web.GraphQL.API
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
+
+    using ClusterKit.Web.GraphQL.Client;
+
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Describes node connection
@@ -28,6 +31,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// </summary>
         /// <param name="id">The node id</param>
         /// <returns>The node or null if nothing found</returns>
+        [UsedImplicitly]
         Task<T> GetById(TId id);
 
         /// <summary>
@@ -48,6 +52,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// <returns>
         /// The nodes list
         /// </returns>
+        [UsedImplicitly]
         Task<QueryResult<T>> Query(Expression<Func<T, bool>> filter, Expression<Func<IQueryable<T>, IOrderedQueryable<T>>> sort,  int limit, int offset);
 
         /// <summary>
@@ -55,7 +60,8 @@ namespace ClusterKit.Web.GraphQL.API
         /// </summary>
         /// <param name="newNode">The new node data</param>
         /// <returns>The new node after creation</returns>
-        Task<T> Create(T newNode);
+        [UsedImplicitly]
+        Task<MutationResult<T>> Create(T newNode);
 
         /// <summary>
         /// Updates a node
@@ -66,19 +72,21 @@ namespace ClusterKit.Web.GraphQL.API
         /// <param name="newNode">
         /// The new node data
         /// </param>
-        /// <param name="updatedFields">
+        /// <param name="request">
         /// The list of an updated Fields.
         /// </param>
         /// <returns>
         /// The new node after update
         /// </returns>
-        Task<T> Update(TId id, T newNode, List<string> updatedFields);
+        [UsedImplicitly]
+        Task<MutationResult<T>> Update(TId id, T newNode, ApiRequest request);
 
         /// <summary>
         /// Removes a node from the data store
         /// </summary>
         /// <param name="id">The node id</param>
         /// <returns>The old node data</returns>
-        Task<T> Delete(TId id);
+        [UsedImplicitly]
+        Task<MutationResult<T>> Delete(TId id);
     }
 }
