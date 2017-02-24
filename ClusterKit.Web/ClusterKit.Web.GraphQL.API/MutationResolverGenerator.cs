@@ -75,7 +75,6 @@ namespace ClusterKit.Web.GraphQL.API
         /// <inheritdoc />
         protected override string GenerateResultSourceAcquirement()
         {
-            // todo: generate property last property retrieval and method execution
             if (this.FieldsPath.Count != this.TypesPath.Count)
             {
                 throw new Exception("FieldsPath and TypesPath lengths should be equal");

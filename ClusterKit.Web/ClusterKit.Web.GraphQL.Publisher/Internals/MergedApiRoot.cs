@@ -13,12 +13,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Linq;
     using System.Threading.Tasks;
 
+    using ClusterKit.Security.Client;
+    using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -77,25 +78,36 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Resolves request value
         /// </summary>
-        /// <param name="context">The request context</param>
-        /// <returns>Resolved value</returns>
+        /// <param name="context">
+        /// The request context
+        /// </param>
+        /// <returns>
+        /// Resolved value
+        /// </returns>
         public override object Resolve(ResolveFieldContext context)
         {
-            return this.DoApiRequests(context);
+            return this.DoApiRequests(context, context.UserContext as RequestContext);
         }
 
         /// <summary>
         /// Creates an api requests to gather all data
         /// </summary>
-        /// <param name="context">The request contexts</param>
-        /// <returns>The request data</returns>
-        private async Task<JObject> DoApiRequests(ResolveFieldContext context)
+        /// <param name="context">
+        /// The request contexts
+        /// </param>
+        /// <param name="requestContext">
+        /// The request Context.
+        /// </param>
+        /// <returns>
+        /// The request data
+        /// </returns>
+        private async Task<JObject> DoApiRequests(ResolveFieldContext context, RequestContext requestContext)
         {
-            var taskList = new List<Task<string>>();
+            var taskList = new List<Task<JObject>>();
             foreach (var provider in this.Providers.Select(fp => fp.Provider))
             {
                 var request = this.GatherMultipleApiRequest(provider, context.FieldAst).ToList();
-                taskList.Add(provider.GetData(request));
+                taskList.Add(provider.GetData(request, requestContext));
             }
 
             var responses = await Task.WhenAll(taskList);
@@ -105,7 +117,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                   MergeNullValueHandling = MergeNullValueHandling.Ignore
                               };
 
-            return responses.Select(JsonConvert.DeserializeObject).Aggregate(
+            return responses.Aggregate(
                 new JObject(),
                 (seed, next) =>
                     {
@@ -152,19 +164,25 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// </returns>
             public object Resolve(ResolveFieldContext context)
             {
-                return this.DoApiRequests(context);
+                return this.DoApiRequests(context, context.UserContext as RequestContext);
             }
 
             /// <summary>
             /// Creates an api requests to gather all data
             /// </summary>
-            /// <param name="context">The request contexts</param>
-            /// <returns>The request data</returns>
-            private async Task<JObject> DoApiRequests(ResolveFieldContext context)
+            /// <param name="context">
+            /// The request contexts
+            /// </param>
+            /// <param name="requestContext">
+            /// The request Context.
+            /// </param>
+            /// <returns>
+            /// The request data
+            /// </returns>
+            private Task<JObject> DoApiRequests(ResolveFieldContext context, RequestContext requestContext)
             {
-                var request = new TempApiRequest { Arguments = context.FieldAst.Arguments, Name = this.mergedField.FieldName };
-                var response = await this.provider.GetData(new List<TempApiRequest> { request });
-                return (JObject)JsonConvert.DeserializeObject(response);
+                var request = new ApiRequest { Arguments = new JObject(context.FieldAst.Arguments), FieldName = this.mergedField.FieldName };
+                return this.provider.GetData(new List<ApiRequest> { request }, requestContext);
             }
         }
     }

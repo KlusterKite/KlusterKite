@@ -218,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiProvider.cs" />
+    <Compile Include="Internals\Converter.cs" />
     <Compile Include="TempApiRequest.cs" />
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.resx</DependentUpon>

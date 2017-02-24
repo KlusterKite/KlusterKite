@@ -67,8 +67,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                         new QueryArgument(typeof(VirtualInputGraphType))
                                             {
                                                 Name = p.Key,
-                                                ResolvedType =
-                                                    graphTypes[p.Value.Type.ComplexTypeName],
+                                                ResolvedType = p.Value.Flags.HasFlag(EnFieldFlags.IsArray)
+                                                    ? new ListGraphType(graphTypes[p.Value.Type.ComplexTypeName])
+                                                    : graphTypes[p.Value.Type.ComplexTypeName],
                                                 Description = p.Value.Description
                                             });
 

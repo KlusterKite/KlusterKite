@@ -9,10 +9,14 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Client;
+
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// The description of the API provider
@@ -27,8 +31,15 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <summary>
         /// Retrieves specified data for api request
         /// </summary>
-        /// <param name="requests">The request</param>
-        /// <returns>The resolved data</returns>
-        public abstract Task<string> GetData(List<TempApiRequest> requests);
+        /// <param name="requests">
+        /// The request
+        /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <returns>
+        /// The resolved data
+        /// </returns>
+        public abstract Task<JObject> GetData(List<ApiRequest> requests, RequestContext context);
     }
 }

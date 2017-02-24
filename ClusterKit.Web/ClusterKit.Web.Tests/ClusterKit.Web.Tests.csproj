@@ -230,6 +230,7 @@
   <ItemGroup>
     <Compile Include="Auth\AuthenticationTests.cs" />
     <Compile Include="Auth\AuthorizationTests.cs" />
+    <Compile Include="GraphQL\ApiProviderPublishResolveIntegration.cs" />
     <Compile Include="GraphQL\ApiProviderResolveTests.cs" />
     <Compile Include="GraphQL\ApiProviderTests.cs" />
     <Compile Include="GraphQL\GraphQlControllerTests.cs" />

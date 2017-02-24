@@ -280,13 +280,11 @@ namespace ClusterKit.Web.GraphQL.API
             {
                 if (parameterInfo.ParameterType == typeof(RequestContext))
                 {
-                    // todo: take context in account
                     continue;
                 }
 
                 if (parameterInfo.ParameterType == typeof(ApiRequest))
                 {
-                    // todo: take request in account
                     continue;
                 }
 
@@ -591,7 +589,6 @@ namespace ClusterKit.Web.GraphQL.API
 
                 if (attribute.CanCreate)
                 {
-                    // todo: generate resolver
                     var name = string.Join(".", new List<string>(path) { connection.Name, "create" });
 
                     var generator = new MutationResolverGenerator(
@@ -653,7 +650,6 @@ namespace ClusterKit.Web.GraphQL.API
 
                 if (attribute.CanCreate)
                 {
-                    // todo: generate resolver
                     var name = string.Join(".", new List<string>(path) { connection.Name, "delete" });
 
                     var generator = new MutationResolverGenerator(

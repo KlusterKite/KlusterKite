@@ -177,8 +177,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             var enumType = new EnumerationGraphType { Name = $"{this.OriginalTypeName}_OrderByEnum", Description = $"The list of {this.elementType.ComplexTypeName} fields that can be used as sorting functions" };
             foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray) && !p.Value.Arguments.Any()))
             {
-                enumType.AddValue($"{itemField.Key}_ASC", $"{itemField.Key} ascending\n{itemField.Value.Description}", $"{itemField.Key}_ASC");
-                enumType.AddValue($"{itemField.Key}_DESC", $"{itemField.Key} descending\n{itemField.Value.Description}", $"{itemField.Key}_DESC");
+                enumType.AddValue($"{itemField.Key}_asc", $"{itemField.Key} ascending\n{itemField.Value.Description}", $"{itemField.Key}_asc");
+                enumType.AddValue($"{itemField.Key}_desc", $"{itemField.Key} descending\n{itemField.Value.Description}", $"{itemField.Key}_desc");
             }
 
             return new ListGraphType(enumType) { Description = "The sorting instructions" };

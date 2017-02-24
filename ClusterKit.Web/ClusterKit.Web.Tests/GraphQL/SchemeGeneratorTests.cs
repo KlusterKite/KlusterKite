@@ -12,15 +12,18 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
+    using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Publisher;
 
     using global::GraphQL;
     using global::GraphQL.Http;
     using global::GraphQL.Utilities;
+
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -855,11 +858,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// <returns>Cleaned json string</returns>
         private static string CleanResponse(string response)
         {
-            return Regex.Replace(
-                response,
-                "[ \t\r\n]",
-                string.Empty,
-                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            return JsonConvert.DeserializeObject<JObject>(response).ToString(Formatting.None);
         }
 
         /// <summary>
@@ -873,9 +872,9 @@ namespace ClusterKit.Web.Tests.GraphQL
             public string Data { get; set; }
 
             /// <inheritdoc />
-            public override Task<string> GetData(List<TempApiRequest> requests)
+            public override Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
             {
-                return Task.FromResult(this.Data);
+                return Task.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
             }
         }
     }
