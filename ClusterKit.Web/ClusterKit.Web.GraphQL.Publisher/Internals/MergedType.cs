@@ -11,8 +11,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
 
+    using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
+    using global::GraphQL.Language.AST;
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
@@ -105,6 +107,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public virtual IEnumerable<QueryArgument> GenerateArguments(Dictionary<string, IGraphType> registeredTypes)
         {
             return null;
+        }
+
+        /// <summary>
+        /// Gather request parameters
+        /// </summary>
+        /// <param name="contextFieldAst">The request context</param>
+        /// <returns>The list of api requests</returns>
+        public virtual IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        {
+            yield break;
         }
     }
 }

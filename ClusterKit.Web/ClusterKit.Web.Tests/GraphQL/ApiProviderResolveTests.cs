@@ -128,6 +128,12 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     new ApiRequest { FieldName = "value" }
                                 };
 
+            var connectionFields = new List<ApiRequest>
+            {
+                new ApiRequest { FieldName = "count" },
+                new ApiRequest { FieldName = "items", Fields = objFields }
+            };
+
             var arguments = new JObject();
             if (!string.IsNullOrWhiteSpace(filterJson))
             {
@@ -142,7 +148,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             arguments.Add("limit", limit);
             arguments.Add("offset", offset);
             
-            var query = new List<ApiRequest> { new ApiRequest { FieldName = "connection", Fields = objFields, Arguments = arguments } };
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "connection", Fields = connectionFields, Arguments = arguments } };
             var result = await this.Query(provider, query, context);
 
             Assert.NotNull(result);
@@ -688,7 +694,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <summary>
             /// Gets or sets the object uid
             /// </summary>
-            [DeclareField]
+            [DeclareField(IsKey = true)]
             public Guid Uid { get; set; } = Guid.NewGuid();
 
             /// <summary>

@@ -186,12 +186,18 @@ namespace ClusterKit.Web.GraphQL.API
         {
             var code = data.ResolverGenerators.Select(g => g.Generate()).ToList();
             var comDomProvider = CodeDomProvider.CreateProvider("C#");
+#if DEBUG
             var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = true };
+#else
+            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = false };
+#endif
+
             compilerParameters.ReferencedAssemblies.AddRange(
                 AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic)
                     .Select(a => a.CodeBase.Replace("file:\\", string.Empty).Replace("file:///", string.Empty))
                     .ToArray());
+
             var compiledResult = comDomProvider.CompileAssemblyFromSource(compilerParameters, code.ToArray());
             foreach (CompilerError error in compiledResult.Errors)
             {
@@ -378,6 +384,11 @@ namespace ClusterKit.Web.GraphQL.API
                 if (!metadata.IsAsync && !metadata.IsForwarding && property.CanWrite && metadata.MetaType != TypeMetadata.EnMetaType.Connection)
                 {
                     flags |= EnFieldFlags.CanBeUsedInInput;
+                }
+
+                if ((attribute as DeclareFieldAttribute)?.IsKey == true)
+                {
+                    flags |= EnFieldFlags.IsKey;
                 }
 
                 return ApiField.Scalar(

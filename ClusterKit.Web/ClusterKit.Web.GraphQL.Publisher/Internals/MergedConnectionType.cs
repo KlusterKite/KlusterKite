@@ -14,6 +14,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
+    using global::GraphQL.Language.AST;
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
@@ -124,6 +125,34 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             yield return new QueryArgument(typeof(GraphType)) { Name = "limit", ResolvedType = new IntGraphType(), Description = "The maximum number of objects to return" };
 
             yield return new QueryArgument(typeof(GraphType)) { Name = "offset", ResolvedType = new IntGraphType(), Description = "The number of objects to skip from the start of list" };
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        {
+            foreach (var field in contextFieldAst.SelectionSet.Selections.OfType<Field>())
+            {
+                switch (field.Name)
+                {
+                    case "count":
+                        yield return new ApiRequest { FieldName = "count" };
+                        break;
+                    case "edges":
+                        {
+                            var nodeSelection =
+                                field.SelectionSet.Selections.OfType<Field>()
+                                    .FirstOrDefault(f => f.Name == "node");
+
+                            var fields = nodeSelection != null
+                                             ? this.elementType.GatherSingleApiRequest(nodeSelection).ToList()
+                                             : null;
+
+                            yield return new ApiRequest { FieldName = "items", Fields = fields };
+                        }
+
+                        break;
+                }
+            }
         }
 
         /// <summary>

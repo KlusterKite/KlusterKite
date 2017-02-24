@@ -19,8 +19,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
-    using Newtonsoft.Json.Linq;
-
     /// <summary>
     /// The merged api type description
     /// </summary>
@@ -69,12 +67,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets combined name from all provider
         /// </summary>
         public override string ComplexTypeName
-            =>
-                this.Providers.Any()
-                    ? string.Join(
-                        "_",
-                        this.Providers.Select(p => $"{p.Provider.Description.ApiName}_{p.FieldType.TypeName}").Distinct().OrderBy(s => s).ToArray())
-                    : this.OriginalTypeName;
+        {
+            get
+            {
+                if (this.Providers.Any())
+                {
+                    var providersNames = this.Providers.Select(p => $"{p.Provider.Description.ApiName}_{p.FieldType.TypeName}")
+                        .Distinct()
+                        .OrderBy(s => s)
+                        .ToArray();
+
+                    return string.Join("_", providersNames);
+                }
+
+                return this.OriginalTypeName;
+            }
+        }
 
         /// <inheritdoc />
         public override string Description
@@ -82,7 +90,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 this.Providers.Any()
                     ? string.Join(
                         "\n",
-                        this.Providers.Select(p => p.FieldType.Description).Distinct().OrderBy(s => s).ToArray()) : null;
+                        this.Providers.Select(p => p.FieldType.Description).Distinct().OrderBy(s => s).ToArray())
+                    : null;
 
         /// <summary>
         /// Gets the list of subfields
@@ -110,6 +119,37 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public void AddProviders(IEnumerable<FieldProvider> newProviders)
         {
             this.providers.AddRange(newProviders);
+        }
+
+        /// <summary>
+        /// Gather request parameters
+        /// </summary>
+        /// <param name="contextFieldAst">The request context</param>
+        /// <returns>The list of api requests</returns>
+        public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        {
+            foreach (var field in contextFieldAst.SelectionSet.Selections.Where(s => s is Field).Cast<Field>())
+            {
+                MergedField localField;
+
+                if (!this.Fields.TryGetValue(field.Name, out localField))
+                {
+                    continue;
+                }
+
+                var request = new ApiRequest
+                                  {
+                                      Arguments = field.Arguments.ToJson(),
+                                      FieldName = field.Name,
+                                      Fields = localField.Type.GatherSingleApiRequest(field).ToList()
+                                  };
+                if (request.Fields.Count == 0)
+                {
+                    request.Fields = null;
+                }
+
+                yield return request;
+            }
         }
 
         /// <inheritdoc />
@@ -173,13 +213,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                 Name = description.Key,
                                 Type = typeof(VirtualGraphType), // to workaround internal library checks
                                 Metadata =
-                                    new Dictionary<string, object>
-                                        {
-                                            {
-                                                MetaDataTypeKey,
-                                                description.Value
-                                            }
-                                        },
+                                    new Dictionary<string, object> { { MetaDataTypeKey, description.Value } },
                                 Resolver = resolver,
                                 Description = description.Value.Description
                             };
@@ -206,36 +240,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
             foreach (var usedField in usedFields)
             {
-                var request = new ApiRequest { Arguments = usedField.Ast.Arguments.ToJson(), FieldName = usedField.Ast.Name };
+                var request = new ApiRequest
+                                  {
+                                      Arguments = usedField.Ast.Arguments.ToJson(),
+                                      FieldName = usedField.Ast.Name
+                                  };
                 var endType = usedField.Field.Type as MergedObjectType;
 
                 request.Fields = endType?.Category == EnCategory.MultipleApiType
                                      ? endType.GatherMultipleApiRequest(provider, usedField.Ast).ToList()
-                                     : this.GatherSingleApiRequest(usedField.Ast).ToList();
-
-                yield return request;
-            }
-        }
-
-        /// <summary>
-        /// Gather request parameters
-        /// </summary>
-        /// <param name="contextFieldAst">The request context</param>
-        /// <returns>The list of api requests</returns>
-        protected IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
-        {
-            foreach (var field in contextFieldAst.SelectionSet.Selections.Where(s => s is Field).Cast<Field>())
-            {
-                var request = new ApiRequest
-                {
-                    Arguments = field.Arguments.ToJson(),
-                    FieldName = field.Name,
-                    Fields = this.GatherSingleApiRequest(field).ToList()
-                };
-                if (request.Fields.Count == 0)
-                {
-                    request.Fields = null;
-                }
+                                     : usedField.Field.Type.GatherSingleApiRequest(usedField.Ast).ToList();
 
                 yield return request;
             }

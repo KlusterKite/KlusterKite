@@ -181,7 +181,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// </returns>
             private Task<JObject> DoApiRequests(ResolveFieldContext context, RequestContext requestContext)
             {
-                var request = new ApiRequest { Arguments = new JObject(context.FieldAst.Arguments), FieldName = this.mergedField.FieldName };
+                var request = new ApiRequest { Arguments = context.FieldAst.Arguments.ToJson(), FieldName = this.mergedField.FieldName };
                 return this.provider.GetData(new List<ApiRequest> { request }, requestContext);
             }
         }

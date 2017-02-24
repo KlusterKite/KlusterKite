@@ -20,7 +20,6 @@ namespace ClusterKit.Web.GraphQL.Client.Attributes
     /// <remarks>
     /// Method arguments of types RequestContext and <see cref="ApiRequest"/> will be provided with values automatically from request context
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
     public abstract class PublishToApiAttribute : ApiDescriptionAttribute
     {
         /// <summary>

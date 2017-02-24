@@ -17,5 +17,9 @@ namespace ClusterKit.Web.GraphQL.Client.Attributes
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
     public class DeclareFieldAttribute : PublishToApiAttribute
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether current property is entity identification key.
+        /// </summary>
+        public bool IsKey { get; set; }
     }
 }

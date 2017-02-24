@@ -79,6 +79,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     .With<FloatValue>(v => new JValue(v.Value))
                     .With<BooleanValue>(v => new JValue(v.Value))
                     .With<LongValue>(v => new JValue(v.Value))
+                    .With<EnumValue>(v => new JValue(v.Name))
                     .With<ListValue>(v => new JArray(v.Values.Select(ToJson)))
                     .With<ObjectValue>(ToJson)
                     .ResultOrDefault(v => null);

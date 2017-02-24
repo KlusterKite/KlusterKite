@@ -679,11 +679,16 @@ namespace ClusterKit.Web.GraphQL.API
                 var connectionResultJson = new JObject();
                 connectionResultJson.Add(""count"",  connectionResult.Count);
                 var resultArray = new JArray();
-                foreach (var item in connectionResult.Items)
+        
+                var itemsQuery = query.Fields.FirstOrDefault(f => f.FieldName == ""items"");
+                if (itemsQuery != null) 
                 {{
-                    {(this.Metadata.ScalarType == EnScalarType.None ? this.GenerateObjectResolve("item", this.Metadata.Type) : "var result = new JValue(item);")}
-                    resultArray.Add(result);
-                }}   
+                    foreach (var item in connectionResult.Items)
+                    {{
+                        {(this.Metadata.ScalarType == EnScalarType.None ? this.GenerateObjectResolve("item", this.Metadata.Type, "itemsQuery") : "var result = new JValue(item);")}
+                        resultArray.Add(result);
+                    }} 
+                }}  
                 connectionResultJson.Add(""items"",  resultArray);                            
                 return connectionResultJson;
             ";
@@ -694,8 +699,9 @@ namespace ClusterKit.Web.GraphQL.API
         /// </summary>
         /// <param name="itemName">The item variable name</param>
         /// <param name="type">The item type</param>
+        /// <param name="queryVariableName">The variable name with query stored</param>
         /// <returns>Code to return result</returns>
-        protected virtual string GenerateObjectResolve(string itemName, Type type)
+        protected virtual string GenerateObjectResolve(string itemName, Type type, string queryVariableName = "query")
         {
             var prefix = @"
                 var result = new JObject();
@@ -714,7 +720,7 @@ namespace ClusterKit.Web.GraphQL.API
             foreach (var apiField in apiType.Fields)
             {
                 var command = $@"
-                    fieldQuery = query.Fields.FirstOrDefault(f => f.FieldName == ""{apiField.Name}"");
+                    fieldQuery = {queryVariableName}.Fields.FirstOrDefault(f => f.FieldName == ""{apiField.Name}"");
                     if (fieldQuery != null)
                     {{
                         resolver = new {this.Data.ResolverNames[apiType.TypeName][apiField.Name]}();

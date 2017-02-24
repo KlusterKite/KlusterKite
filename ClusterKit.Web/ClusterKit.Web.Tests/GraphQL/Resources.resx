@@ -1250,9 +1250,13 @@
                   "name": "intArrayArg",
                   "description": null,
                   "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
                   },
                   "defaultValue": null
                 },
@@ -1750,37 +1754,37 @@
           "interfaces": null,
           "enumValues": [
             {
-              "name": "name_ASC",
+              "name": "name_asc",
               "description": "name ascending\n",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "name_DESC",
+              "name": "name_desc",
               "description": "name descending\n",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "uid_ASC",
+              "name": "uid_asc",
               "description": "uid ascending\n",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "uid_DESC",
+              "name": "uid_desc",
               "description": "uid descending\n",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "value_ASC",
+              "name": "value_asc",
               "description": "value ascending\n",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "value_DESC",
+              "name": "value_desc",
               "description": "value descending\n",
               "isDeprecated": false,
               "deprecationReason": null
@@ -3600,25 +3604,25 @@
           "interfaces": null,
           "enumValues": [
             {
-              "name": "uid_ASC",
+              "name": "uid_asc",
               "description": "uid ascending\nThe object unique identifier",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "uid_DESC",
+              "name": "uid_desc",
               "description": "uid descending\nThe object unique identifier",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "name_ASC",
+              "name": "name_asc",
               "description": "name ascending\nThe object name",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "name_DESC",
+              "name": "name_desc",
               "description": "name descending\nThe object name",
               "isDeprecated": false,
               "deprecationReason": null
