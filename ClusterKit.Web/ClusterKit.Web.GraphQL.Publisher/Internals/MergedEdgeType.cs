@@ -49,7 +49,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override string ComplexTypeName => $"{this.OriginalTypeName}_Edge";
+        public override string ComplexTypeName => $"{EscapeName(this.OriginalTypeName)}_Edge";
 
         /// <inheritdoc />
         public override string Description => $"The {this.objectType.ComplexTypeName} in a connected list\n {this.objectType.Description}";

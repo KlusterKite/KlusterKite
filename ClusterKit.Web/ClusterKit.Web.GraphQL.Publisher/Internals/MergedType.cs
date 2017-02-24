@@ -10,6 +10,7 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
@@ -42,6 +43,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
+        /// Gets combined name from all provider
+        /// </summary>
+        public abstract string ComplexTypeName { get; }
+
+        /// <summary>
         /// Gets the type description
         /// </summary>
         public virtual string Description => null;
@@ -52,47 +58,33 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public string OriginalTypeName { get; }
 
         /// <summary>
-        /// Gets combined name from all provider
-        /// </summary>
-        public abstract string ComplexTypeName { get; }
-
-        /// <summary>
         /// Gets the list of providers
         /// </summary>
-        public abstract IEnumerable<FieldProvider> Providers { get;  }
+        public abstract IEnumerable<FieldProvider> Providers { get; }
 
         /// <summary>
-        /// Resolves request value
+        /// Removes special symbols from type and field names
         /// </summary>
-        /// <param name="context">The request context</param>
-        /// <returns>Resolved value</returns>
-        public virtual object Resolve(ResolveFieldContext context)
+        /// <param name="name">The original name</param>
+        /// <returns>The safe name</returns>
+        public static string EscapeName(string name)
         {
-            var parentData = context.Source as JObject;
-            if (context.ParentType is IArrayContainerGraph && parentData?.Parent?.Type == JTokenType.Array)
+            if (string.IsNullOrWhiteSpace(name))
             {
-                return parentData;
+                return name;
             }
 
-            return parentData?.GetValue(context.FieldName);
+            return Regex.Replace(name, "[.<>+\\- \t]", "_", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         }
 
         /// <summary>
-        /// Get all included types recursively
+        /// Gather request parameters
         /// </summary>
-        /// <returns>The list of all defined types</returns>
-        public abstract IEnumerable<MergedType> GetAllTypes();
-
-        /// <summary>
-        /// Generates a new <see cref="IGraphType"/>
-        /// </summary>
-        /// <returns>The representing <see cref="IGraphType"/></returns>
-        public abstract IGraphType GenerateGraphType();
-
-        /// <inheritdoc />
-        public override string ToString()
+        /// <param name="contextFieldAst">The request context</param>
+        /// <returns>The list of api requests</returns>
+        public virtual IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
         {
-            return this.ComplexTypeName;
+            yield break;
         }
 
         /// <summary>
@@ -110,13 +102,37 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Gather request parameters
+        /// Generates a new <see cref="IGraphType"/>
         /// </summary>
-        /// <param name="contextFieldAst">The request context</param>
-        /// <returns>The list of api requests</returns>
-        public virtual IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        /// <returns>The representing <see cref="IGraphType"/></returns>
+        public abstract IGraphType GenerateGraphType();
+
+        /// <summary>
+        /// Get all included types recursively
+        /// </summary>
+        /// <returns>The list of all defined types</returns>
+        public abstract IEnumerable<MergedType> GetAllTypes();
+
+        /// <summary>
+        /// Resolves request value
+        /// </summary>
+        /// <param name="context">The request context</param>
+        /// <returns>Resolved value</returns>
+        public virtual object Resolve(ResolveFieldContext context)
         {
-            yield break;
+            var parentData = context.Source as JObject;
+            if (context.ParentType is IArrayContainerGraph && parentData?.Parent?.Type == JTokenType.Array)
+            {
+                return parentData;
+            }
+
+            return parentData?.GetValue(context.FieldName);
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return this.ComplexTypeName;
         }
     }
 }

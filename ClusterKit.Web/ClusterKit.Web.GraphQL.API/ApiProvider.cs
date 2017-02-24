@@ -621,7 +621,7 @@ namespace ClusterKit.Web.GraphQL.API
                             new List<ApiField>
                                 {
                                     ApiField.Object(
-                                        "new",
+                                        "newNode",
                                         connection.TypeName,
                                         description: "The object's data")
                                 },
@@ -652,7 +652,7 @@ namespace ClusterKit.Web.GraphQL.API
                                 {
                                     ApiField.Scalar("id", idScalarType, description: "The object's id"),
                                     ApiField.Object(
-                                        "new",
+                                        "newNode",
                                         connection.TypeName,
                                         description: "The object's data")
                                 },

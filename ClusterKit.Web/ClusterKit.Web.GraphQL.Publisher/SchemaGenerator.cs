@@ -133,7 +133,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                 apiMutation.Flags,
                                 description: a.Description));
 
-                    apiRoot.Mutations[$"{provider.Description.ApiName}_{apiMutation.Name}"] = new MergedField(
+                    apiRoot.Mutations[$"{MergedType.EscapeName(provider.Description.ApiName)}_{MergedType.EscapeName(apiMutation.Name)}"] = new MergedField(
                         apiMutation.Name,
                         returnType,
                         apiMutation.Flags,

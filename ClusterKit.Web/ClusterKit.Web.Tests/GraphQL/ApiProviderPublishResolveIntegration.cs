@@ -222,6 +222,97 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing call of simple mutation
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task MutationSimpleRequestTest()
+        {
+            var internalApiProvider = new ApiProviderResolveTests.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"                          
+            mutation M {
+                    call: ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_nestedAsync_setName(name: ""hello world"") {
+                        name
+                    }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                                        r =>
+                                        {
+                                            r.Schema = schema;
+                                            r.Query = query;
+                                            r.UserContext = new RequestContext();
+                                        }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""call"": {
+                                ""name"": ""hello world""
+                            }
+                          }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing call of simple mutation
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task MutationConnectionRequestTest()
+        {
+            var internalApiProvider = new ApiProviderResolveTests.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"                          
+            mutation M {
+                    call: ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_connection_create(newNode: {name: ""hello world"", value: 10}) {
+                        result {
+                            name,
+                            value
+                        },
+                        errors {
+                            field,
+                            message
+                        }
+                    }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                                        r =>
+                                        {
+                                            r.Schema = schema;
+                                            r.Query = query;
+                                            r.UserContext = new RequestContext();
+                                        }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""call"": {     
+                                ""result"": {                              
+                                    ""name"": ""hello world"",
+                                    ""value"": 10.0
+                                },
+                                ""errors"": []
+                            }
+                          }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing simple fields requests from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
@@ -367,9 +458,27 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             /// <inheritdoc />
-            public override Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
+            public override async Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
             {
-                return this.provider.ResolveQuery(
+                var mutations = requests.OfType<MutationApiRequest>().ToList();
+                if (mutations.Count > 0)
+                {
+                    var result = new JObject();
+                    foreach (var mutation in mutations)
+                    {
+                        var midResult = await this.provider.ResolveMutation(
+                                            mutation,
+                                            context,
+                                            exception =>
+                                                this.output.WriteLine(
+                                                    $"Resolve error: {exception.Message}\n{exception.StackTrace}"));
+                        result.Merge(midResult);
+                    }
+
+                    return result;
+                }
+
+                return await this.provider.ResolveQuery(
                     requests,
                     context,
                     exception => this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));

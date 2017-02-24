@@ -72,7 +72,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 if (this.Providers.Any())
                 {
-                    var providersNames = this.Providers.Select(p => $"{p.Provider.Description.ApiName}_{p.FieldType.TypeName}")
+                    var providersNames = this.Providers.Select(p => $"{EscapeName(p.Provider.Description.ApiName)}_{EscapeName(p.FieldType.TypeName)}")
                         .Distinct()
                         .OrderBy(s => s)
                         .ToArray();
@@ -80,7 +80,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     return string.Join("_", providersNames);
                 }
 
-                return this.OriginalTypeName;
+                return EscapeName(this.OriginalTypeName);
             }
         }
 

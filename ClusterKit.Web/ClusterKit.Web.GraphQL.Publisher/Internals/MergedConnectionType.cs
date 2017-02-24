@@ -63,7 +63,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string Description => $"The list of connected {this.elementType.ComplexTypeName}\n {this.elementType.Description}";
 
         /// <inheritdoc />
-        public override string ComplexTypeName => $"{this.OriginalTypeName}_Connection";
+        public override string ComplexTypeName => $"{EscapeName(this.OriginalTypeName)}_Connection";
 
         /// <inheritdoc />
         public override IEnumerable<FieldProvider> Providers => new[]
