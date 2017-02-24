@@ -53,7 +53,7 @@ namespace ClusterKit.Web.GraphQL.API
         /// The nodes list
         /// </returns>
         [UsedImplicitly]
-        Task<QueryResult<T>> Query(Expression<Func<T, bool>> filter, Expression<Func<IQueryable<T>, IOrderedQueryable<T>>> sort,  int limit, int offset);
+        Task<QueryResult<T>> Query(Expression<Func<T, bool>> filter, Expression<Func<IQueryable<T>, IOrderedQueryable<T>>> sort,  int? limit, int? offset);
 
         /// <summary>
         /// Creates a new node

@@ -100,7 +100,14 @@ namespace ClusterKit.Web.Tests.GraphQL
         [InlineData("{\"name_ends_with\": \"test\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
         [InlineData("{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
         [InlineData("{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
-        public async Task ConnectionQueryTests(string filterJson, string sortJson, int limit, int offset, int expectedCount, string[] expectedNames)
+
+        [InlineData(null, null, 3, null, 5, new[] { "1-test", "2-test", "3-test" })]
+        [InlineData(null, null, 3, 1, 5, new[] { "2-test", "3-test", "4-test" })]
+        [InlineData(null, null, 3, 2, 5, new[] { "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, null, 2, 5, new[] { "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, 3, 3, 5, new[] { "4-test", "5-test" })]
+        [InlineData(null, null, 3, 10, 5, new string[0])]
+        public async Task ConnectionQueryTests(string filterJson, string sortJson, int? limit, int? offset, int expectedCount, string[] expectedNames)
         {
             var initialObjects = new List<TestObject>
                                      {
@@ -777,8 +784,8 @@ namespace ClusterKit.Web.Tests.GraphQL
             public Task<QueryResult<TestObject>> Query(
                 Expression<Func<TestObject, bool>> filter,
                 Expression<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>> sort,
-                int limit,
-                int offset)
+                int? limit,
+                int? offset)
             {
                 var query = this.objects.Values.AsQueryable();
 
@@ -791,6 +798,16 @@ namespace ClusterKit.Web.Tests.GraphQL
                 if (sort != null)
                 {
                     query = sort.Compile().Invoke(query);
+                }
+
+                if (offset.HasValue)
+                {
+                    query = query.Skip(offset.Value);
+                }
+
+                if (limit.HasValue)
+                {
+                    query = query.Take(limit.Value);
                 }
 
                 return Task.FromResult(new QueryResult<TestObject> { Count = count, Items = query });

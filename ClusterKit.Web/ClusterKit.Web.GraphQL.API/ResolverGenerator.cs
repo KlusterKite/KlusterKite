@@ -659,7 +659,23 @@ namespace ClusterKit.Web.GraphQL.API
         protected virtual string GenerateConnectionResolve()
         {
             return $@"
-                var connectionResult = await resultSource.Query(GenerateFilterExpression(query.Arguments), GenerateSortingExpression(query.Arguments), 100, 0);
+                int? limit = null;
+                int? offset = null;
+
+                var limitArgument = query.Arguments.Property(""limit"");
+                var offsetArgument = query.Arguments.Property(""offset"");
+
+                if (limitArgument != null && limitArgument.HasValues && limitArgument.Value != null && limitArgument.Value.Type != JTokenType.Null)
+                {{
+                    limit = limitArgument.Value.ToObject<int>();
+                }}
+
+                if (offsetArgument != null && offsetArgument.HasValues && offsetArgument.Value != null && offsetArgument.Value.Type != JTokenType.Null)
+                {{
+                    offset = offsetArgument.Value.ToObject<int>();
+                }}
+
+                var connectionResult = await resultSource.Query(GenerateFilterExpression(query.Arguments), GenerateSortingExpression(query.Arguments), limit, offset);
                 var connectionResultJson = new JObject();
                 connectionResultJson.Add(""count"",  connectionResult.Count);
                 var resultArray = new JArray();

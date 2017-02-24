@@ -345,12 +345,32 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
 
                 /// <inheritdoc />
-                public Task<QueryResult<NodeObject>> Query(Expression<Func<NodeObject, bool>> filter, Expression<Func<IQueryable<NodeObject>, IOrderedQueryable<NodeObject>>> sort, int limit, int offset)
+                public Task<QueryResult<NodeObject>> Query(Expression<Func<NodeObject, bool>> filter, Expression<Func<IQueryable<NodeObject>, IOrderedQueryable<NodeObject>>> sort, int? limit, int? offset)
                 {
-                    var query = this.nodes.AsQueryable().Where(filter);
+                    var query = this.nodes.AsQueryable();
+
+                    if (filter != null)
+                    {
+                        query = query.Where(filter);
+                    }
+
                     var count = query.Count();
-                    var items = sort.Compile().Invoke(query).Skip(offset).Take(limit);
-                    return Task.FromResult(new QueryResult<NodeObject> { Count = count, Items = items });
+                    if (sort != null)
+                    {
+                        query = sort.Compile().Invoke(query);
+                    }
+
+                    if (offset.HasValue)
+                    {
+                        query = query.Skip(offset.Value);
+                    }
+
+                    if (limit.HasValue)
+                    {
+                        query = query.Take(limit.Value);
+                    }
+
+                    return Task.FromResult(new QueryResult<NodeObject> { Count = count, Items = query.ToList() });
                 }
 
                 /// <inheritdoc />
