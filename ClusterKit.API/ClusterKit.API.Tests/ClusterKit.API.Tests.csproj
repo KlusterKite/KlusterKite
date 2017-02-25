@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{45219CB4-7189-49C6-A95B-AEBBAED4645E}</ProjectGuid>
+    <ProjectGuid>{2126CED2-507D-4C77-A79A-5E07D59B4712}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClusterKit.Web.GraphQL.Publisher</RootNamespace>
-    <AssemblyName>ClusterKit.Web.GraphQL.Publisher</AssemblyName>
+    <RootNamespace>ClusterKit.API.Tests</RootNamespace>
+    <AssemblyName>ClusterKit.API.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\ClusterKit.Web.GraphQL.Publisher.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\ClusterKit.API.Tests.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,33 +30,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\ClusterKit.Web.GraphQL.Publisher.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\ClusterKit.API.Tests.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj">
-      <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
-      <Name>ClusterKit.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj">
-      <Project>{6adfbddf-e452-46fc-a037-6d57300be561}</Project>
-      <Name>ClusterKit.Web.Authorization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj">
-      <Project>{8e543ea4-65de-475f-8045-c094cde58e29}</Project>
-      <Name>ClusterKit.Web.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj">
-      <Project>{39ca45b9-b12c-48c6-b2f6-1355f151bdcc}</Project>
-      <Name>ClusterKit.Web.Descriptor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.GraphQL.Client\ClusterKit.Web.GraphQL.Client.csproj">
-      <Project>{f9757ef8-1bb7-4a3e-84e0-57e2f8255ea1}</Project>
-      <Name>ClusterKit.Web.GraphQL.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web\ClusterKit.Web.csproj">
-      <Project>{477b201a-a30c-4360-b56a-6f61c049bb04}</Project>
-      <Name>ClusterKit.Web</Name>
-    </ProjectReference>
     <Reference Include="Akka">
       <HintPath>..\..\packages\Akka.1.1.3\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
@@ -81,6 +57,10 @@
       <HintPath>..\..\packages\Akka.DI.Core.1.1.3\lib\net45\Akka.DI.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Akka.DI.TestKit">
+      <HintPath>..\..\packages\Akka.DI.TestKit.1.1.3\lib\net45\Akka.DI.TestKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Akka.Logger.Serilog">
       <HintPath>..\..\packages\Akka.Logger.Serilog.1.1.2\lib\net45\Akka.Logger.Serilog.dll</HintPath>
       <Private>True</Private>
@@ -95,6 +75,14 @@
     </Reference>
     <Reference Include="Akka.Serialization.Hyperion">
       <HintPath>..\..\packages\Akka.Serialization.Hyperion.1.1.3.32-beta\lib\net45\Akka.Serialization.Hyperion.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.TestKit">
+      <HintPath>..\..\packages\Akka.TestKit.1.1.3\lib\net45\Akka.TestKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Akka.TestKit.Xunit2">
+      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.1.3\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Castle.Core">
@@ -117,14 +105,6 @@
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GraphQL">
-      <HintPath>..\..\packages\GraphQL.0.14.6.657\lib\net45\GraphQL.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="GraphQL-Parser">
-      <HintPath>..\..\packages\GraphQL-Parser.2.0.0\lib\net45\GraphQL-Parser.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Helios">
       <HintPath>..\..\packages\Helios.2.1.3\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
@@ -137,44 +117,24 @@
       <HintPath>..\..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin">
-      <HintPath>..\..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Host.HttpListener">
-      <HintPath>..\..\packages\Microsoft.Owin.Host.HttpListener.3.0.1\lib\net45\Microsoft.Owin.Host.HttpListener.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Hosting">
-      <HintPath>..\..\packages\Microsoft.Owin.Hosting.3.0.1\lib\net45\Microsoft.Owin.Hosting.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security">
-      <HintPath>..\..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth">
-      <HintPath>..\..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure">
-      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Owin">
-      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Serilog">
       <HintPath>..\..\packages\Serilog.2.3.0\lib\net46\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.Sinks.ColoredConsole">
+      <HintPath>..\..\packages\Serilog.Sinks.ColoredConsole.2.0.0\lib\net45\Serilog.Sinks.ColoredConsole.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.Sinks.TextWriter">
+      <HintPath>..\..\packages\Serilog.Sinks.TextWriter.2.1.0\lib\net45\Serilog.Sinks.TextWriter.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -185,77 +145,61 @@
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http.Formatting">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Cors">
-      <HintPath>..\..\packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Http">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Http.Cors">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Cors.5.2.3\lib\net45\System.Web.Http.Cors.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Http.Owin">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="xunit.abstractions">
+      <HintPath>..\..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.assert">
+      <HintPath>..\..\packages\xunit.assert.2.2.0-beta5-build3474\lib\netstandard1.0\xunit.assert.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.core">
+      <HintPath>..\..\packages\xunit.extensibility.core.2.2.0-beta5-build3474\lib\net45\xunit.core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.execution.desktop">
+      <HintPath>..\..\packages\xunit.extensibility.execution.2.2.0-beta5-build3474\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
+      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
+      <Name>ClusterKit.Core</Name>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj">
+      <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
+      <Name>ClusterKit.Core.TestKit</Name>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiProvider.cs" />
-    <Compile Include="Internals\Converter.cs" />
-    <Compile Include="TempApiRequest.cs" />
-    <Compile Include="Configuration.Designer.cs">
-      <DependentUpon>Configuration.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="EndpointController.cs" />
-    <Compile Include="GraphTypes\GuidGraphType.cs" />
-    <Compile Include="GraphTypes\IArrayContainerGraph.cs" />
-    <Compile Include="GraphTypes\VirtualGraphType.cs" />
-    <Compile Include="GraphTypes\VirtualInputGraphType.cs" />
-    <Compile Include="Installer.cs" />
-    <Compile Include="Internals\MergedApiRoot.cs" />
-    <Compile Include="Internals\MergedConnectionType.cs" />
-    <Compile Include="Internals\MergedEdgeType.cs" />
-    <Compile Include="Internals\MergedInputType.cs" />
-    <Compile Include="Internals\MergedObjectType.cs" />
-    <Compile Include="Internals\MergedField.cs" />
-    <Compile Include="Internals\MergedRoot.cs" />
-    <Compile Include="Internals\MergedScalarType.cs" />
-    <Compile Include="Internals\MergedType.cs" />
-    <Compile Include="Internals\FieldProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SchemaGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="Resources\akka.hocon">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Configuration.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <ProjectReference Include="..\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
+      <Project>{2a6edcc4-c729-4bee-9bb5-ac6f76b3bac8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.API.Endpoint\ClusterKit.API.Endpoint.csproj">
+      <Project>{55bda508-f204-4b3b-8431-be02a4b7ec92}</Project>
+      <Name>ClusterKit.API.Endpoint</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj">
+      <Project>{ddc4b9d1-49ac-4cd6-9fc5-fe4a02c54871}</Project>
+      <Name>ClusterKit.API.Provider</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

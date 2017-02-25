@@ -22,7 +22,12 @@ let projects = [|
 
     new ProjectDescription("ClusterKit.LargeObjects", "./ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"|]))
     new ProjectDescription("ClusterKit.LargeObjects", "./ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.LargeObjects.Client"|]))   
-    new ProjectDescription("ClusterKit.LargeObjects", "./ClusterKit.LargeObjects/ClusterKit.LargeObjects.Tests/ClusterKit.LargeObjects.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"|]))   
+    new ProjectDescription("ClusterKit.LargeObjects", "./ClusterKit.LargeObjects/ClusterKit.LargeObjects.Tests/ClusterKit.LargeObjects.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Core.TestKit"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"|]))
+
+    new ProjectDescription("ClusterKit.API", "./ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([||]))
+    new ProjectDescription("ClusterKit.API", "./ClusterKit.API/ClusterKit.API.Provider/ClusterKit.API.Provider.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Security.Client"; "ClusterKit.API.Client";|]))
+    new ProjectDescription("ClusterKit.API", "./ClusterKit.API/ClusterKit.API.Endpoint/ClusterKit.API.Endpoint.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Security.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Provider"|]))
+    new ProjectDescription("ClusterKit.API", "./ClusterKit.API/ClusterKit.API.Tests/ClusterKit.API.Tests.csproj", ProjectDescription.EnProjectType.XUnitTests, ([|"ClusterKit.Core"; "ClusterKit.Security.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Provider"; "ClusterKit.API.Endpoint"; "ClusterKit.Core.TestKit"|]))
 
     new ProjectDescription("ClusterKit.Data", "./ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.LargeObjects.Client"; "ClusterKit.Security.Client";|]))
     new ProjectDescription("ClusterKit.Data", "./ClusterKit.Data/ClusterKit.Data/ClusterKit.Data.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client";|]))
@@ -47,7 +52,7 @@ let projects = [|
 
     new ProjectDescription("ClusterKit.Web", "./ClusterKit.Web/ClusterKit.Web.GraphQL.Client/ClusterKit.Web.GraphQL.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([||]))
     new ProjectDescription("ClusterKit.Web", "./ClusterKit.Web/ClusterKit.Web.GraphQL.API/ClusterKit.Web.GraphQL.API.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Web.GraphQL.Client"|]))
-    new ProjectDescription("ClusterKit.Web", "./ClusterKit.Web/ClusterKit.Web.GraphQL.Publisher/ClusterKit.Web.GraphQL.Publisher.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.Security.Client"; "ClusterKit.Web.Authorization"; "ClusterKit.Web.GraphQL.Client"|]))
+    new ProjectDescription("ClusterKit.Web", "./ClusterKit.Web/ClusterKit.Web.GraphQL.Publisher/ClusterKit.Web.GraphQL.Publisher.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Web.Client"; "ClusterKit.Web.Descriptor"; "ClusterKit.Web"; "ClusterKit.Security.Client"; "ClusterKit.Web.Authorization"; "ClusterKit.Web.GraphQL.Client"; "ClusterKit.API.Client"|]))
     
     new ProjectDescription(
         "ClusterKit.Web", 
@@ -70,6 +75,8 @@ let projects = [|
              "ClusterKit.Web.GraphQL.Client";
              "ClusterKit.Web.GraphQL.API";
              "ClusterKit.Web.GraphQL.Publisher";
+             "ClusterKit.API.Client";
+             "ClusterKit.API.Provider";
          |]))
 
     new ProjectDescription("ClusterKit.Monitoring", "./ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Security.Client"|]))
