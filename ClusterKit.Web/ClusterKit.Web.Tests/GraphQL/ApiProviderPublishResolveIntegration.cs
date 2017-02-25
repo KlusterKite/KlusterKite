@@ -14,8 +14,8 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Linq;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Security.Client;
-    using ClusterKit.Web.GraphQL.Client;
     using ClusterKit.Web.GraphQL.Publisher;
 
     using global::GraphQL;
@@ -28,7 +28,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using Xunit;
     using Xunit.Abstractions;
 
-    using ApiProvider = ClusterKit.Web.GraphQL.API.ApiProvider;
+    using ApiProvider = ClusterKit.API.Provider.ApiProvider;
 
     /// <summary>
     /// Testing publishing and resolving integration
@@ -58,7 +58,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task SchemaGenerationTest()
         {
-            var internalApiProvider = new ApiProviderResolveTests.TestProvider();
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
 
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
@@ -93,7 +93,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task SimpleFieldsRequestTest()
         {
-            var internalApiProvider = new ApiProviderResolveTests.TestProvider();
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
@@ -180,7 +180,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task MethodsRequestTest()
         {
-            var internalApiProvider = new ApiProviderResolveTests.TestProvider();
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
@@ -228,13 +228,13 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task MutationSimpleRequestTest()
         {
-            var internalApiProvider = new ApiProviderResolveTests.TestProvider();
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
-                    call: ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_nestedAsync_setName(name: ""hello world"") {
+                    call: ClusterKit_API_Tests_Mock_TestProvider_nestedAsync_setName(name: ""hello world"") {
                         name
                     }
             }            
@@ -268,13 +268,13 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task MutationConnectionRequestTest()
         {
-            var internalApiProvider = new ApiProviderResolveTests.TestProvider();
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
-                    call: ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_connection_create(newNode: {name: ""hello world"", value: 10}) {
+                    call: ClusterKit_API_Tests_Mock_TestProvider_connection_create(newNode: {name: ""hello world"", value: 10}) {
                         result {
                             name,
                             value
@@ -319,33 +319,33 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task ConnectionQueryTest()
         {
-            var initialObjects = new List<ApiProviderResolveTests.TestObject>
+            var initialObjects = new List<API.Tests.Mock.TestObject>
                                      {
-                                         new ApiProviderResolveTests.TestObject
+                                         new API.Tests.Mock.TestObject
                                              {
                                                  Uid = Guid.Parse("{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
                                                  Name = "1-test",
                                                  Value = 100m
                                              },
-                                         new ApiProviderResolveTests.TestObject
+                                         new API.Tests.Mock.TestObject
                                              {
                                                  Uid = Guid.Parse("{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"),
                                                  Name = "2-test",
                                                  Value = 50m
                                              },
-                                         new ApiProviderResolveTests.TestObject
+                                         new API.Tests.Mock.TestObject
                                              {
                                                  Uid = Guid.Parse("{67885BA0-B284-438F-8393-EE9A9EB299D1}"),
                                                  Name = "3-test",
                                                  Value = 50m
                                              },
-                                         new ApiProviderResolveTests.TestObject
+                                         new API.Tests.Mock.TestObject
                                              {
                                                  Uid = Guid.Parse("{3AF2C973-D985-4F95-A0C7-AA928D276881}"),
                                                  Name = "4-test",
                                                  Value = 70m
                                              },
-                                         new ApiProviderResolveTests.TestObject
+                                         new API.Tests.Mock.TestObject
                                              {
                                                  Uid = Guid.Parse("{F0607502-5B77-4A3C-9142-E6197A7EE61E}"),
                                                  Name = "5-test",
@@ -353,7 +353,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new ApiProviderResolveTests.TestProvider(initialObjects);
+            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 

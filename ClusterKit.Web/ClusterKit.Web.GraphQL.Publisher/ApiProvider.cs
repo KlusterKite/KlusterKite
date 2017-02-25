@@ -12,8 +12,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Security.Client;
-    using ClusterKit.Web.GraphQL.Client;
 
     using Newtonsoft.Json.Linq;
 

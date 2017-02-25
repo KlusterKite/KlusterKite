@@ -33,6 +33,10 @@
     <DocumentationFile>bin\Release\ClusterKit.Web.GraphQL.Publisher.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
+      <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj">
       <Project>{ba97beed-b078-499d-8c00-6a3d4a0635f2}</Project>
       <Name>ClusterKit.Core</Name>
@@ -48,10 +52,6 @@
     <ProjectReference Include="..\ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj">
       <Project>{39ca45b9-b12c-48c6-b2f6-1355f151bdcc}</Project>
       <Name>ClusterKit.Web.Descriptor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.GraphQL.Client\ClusterKit.Web.GraphQL.Client.csproj">
-      <Project>{f9757ef8-1bb7-4a3e-84e0-57e2f8255ea1}</Project>
-      <Name>ClusterKit.Web.GraphQL.Client</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web\ClusterKit.Web.csproj">
       <Project>{477b201a-a30c-4360-b56a-6f61c049bb04}</Project>

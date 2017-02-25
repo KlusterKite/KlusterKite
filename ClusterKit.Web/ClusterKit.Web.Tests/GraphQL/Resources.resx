@@ -1048,7 +1048,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1062,7 +1062,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider",
           "description": "Tested API",
           "fields": [
             {
@@ -1099,7 +1099,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1126,7 +1126,7 @@
                   "description": "The filtering conditions",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestProvider_ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestObject_Filter",
+                    "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1139,7 +1139,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestProvider_ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestObject_OrderByEnum",
+                      "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_OrderByEnum",
                       "ofType": null
                     }
                   },
@@ -1168,7 +1168,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_Connection",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1224,7 +1224,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1275,7 +1275,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider_Input",
+                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1293,7 +1293,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1305,7 +1305,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1330,7 +1330,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider_Input",
+                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1362,7 +1362,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
           "description": "Nested API",
           "fields": [
             {
@@ -1397,8 +1397,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_Connection",
-          "description": "The list of connected ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject\n ",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Connection",
+          "description": "The list of connected ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject\n ",
           "fields": [
             {
               "name": "count",
@@ -1421,7 +1421,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_Edge",
+                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Edge",
                   "ofType": null
                 }
               },
@@ -1436,8 +1436,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_Edge",
-          "description": "The ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject in a connected list\n ",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Edge",
+          "description": "The ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject in a connected list\n ",
           "fields": [
             {
               "name": "cursor",
@@ -1457,7 +1457,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1471,7 +1471,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
           "description": "",
           "fields": [
             {
@@ -1528,8 +1528,8 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestProvider_ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestObject_Filter",
-          "description": "The filter conditions for a ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject connected objects",
+          "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
+          "description": "The filter conditions for a ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject connected objects",
           "fields": null,
           "inputFields": [
             {
@@ -1540,7 +1540,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestProvider_ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestObject_Filter",
+                  "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
                   "ofType": null
                 }
               },
@@ -1554,7 +1554,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestProvider_ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestObject_Filter",
+                  "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
                   "ofType": null
                 }
               },
@@ -1747,8 +1747,8 @@
         },
         {
           "kind": "ENUM",
-          "name": "ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestProvider_ClusterKit.Web.Tests.GraphQL.ApiProviderResolveTests.TestObject_OrderByEnum",
-          "description": "The list of ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject fields that can be used as sorting functions",
+          "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_OrderByEnum",
+          "description": "The list of ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject fields that can be used as sorting functions",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -1794,7 +1794,7 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_NestedProvider_Input",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider_Input",
           "description": "Nested API",
           "fields": null,
           "inputFields": [
@@ -1829,7 +1829,7 @@
           "description": "The list of all detected mutations",
           "fields": [
             {
-              "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_nestedAsync_setName",
+              "name": "ClusterKit_API_Tests_Mock_TestProvider_nestedAsync_setName",
               "description": null,
               "args": [
                 {
@@ -1845,14 +1845,14 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_nestedSync_setName",
+              "name": "ClusterKit_API_Tests_Mock_TestProvider_nestedSync_setName",
               "description": null,
               "args": [
                 {
@@ -1868,14 +1868,14 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_faultedASyncMethod_setName",
+              "name": "ClusterKit_API_Tests_Mock_TestProvider_faultedASyncMethod_setName",
               "description": null,
               "args": [
                 {
@@ -1891,14 +1891,14 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_connection_create",
+              "name": "ClusterKit_API_Tests_Mock_TestProvider_connection_create",
               "description": null,
               "args": [
                 {
@@ -1906,7 +1906,7 @@
                   "description": "The object's data",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_Input",
+                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1914,14 +1914,14 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_GraphQL_API_MutationResult_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_connection_update",
+              "name": "ClusterKit_API_Tests_Mock_TestProvider_connection_update",
               "description": null,
               "args": [
                 {
@@ -1939,7 +1939,7 @@
                   "description": "The object's data",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_Input",
+                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1947,14 +1947,14 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_GraphQL_API_MutationResult_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_connection_delete",
+              "name": "ClusterKit_API_Tests_Mock_TestProvider_connection_delete",
               "description": null,
               "args": [
                 {
@@ -1970,7 +1970,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_GraphQL_API_MutationResult_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1984,7 +1984,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_GraphQL_API_MutationResult_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
           "description": "",
           "fields": [
             {
@@ -1993,7 +1993,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -2008,7 +2008,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_GraphQL_API_ErrorDescription",
+                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_ErrorDescription",
                   "ofType": null
                 }
               },
@@ -2023,7 +2023,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_GraphQL_API_ErrorDescription",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_ErrorDescription",
           "description": "The mutation error description",
           "fields": [
             {
@@ -2058,7 +2058,7 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestProvider_ClusterKit_Web_Tests_GraphQL_ApiProviderResolveTests_TestObject_Input",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Input",
           "description": "",
           "fields": null,
           "inputFields": [

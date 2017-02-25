@@ -12,7 +12,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Collections.Generic;
     using System.Collections.Immutable;
 
-    using ClusterKit.Web.GraphQL.Client;
+    using ClusterKit.API.Client;
 
     using JetBrains.Annotations;
 

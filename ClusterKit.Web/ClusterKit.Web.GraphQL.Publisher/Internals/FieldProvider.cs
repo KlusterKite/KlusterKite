@@ -9,7 +9,7 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
-    using ClusterKit.Web.GraphQL.Client;
+    using ClusterKit.API.Client;
 
     /// <summary>
     /// The field description as a pair of field type description and api provider

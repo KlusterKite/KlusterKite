@@ -12,7 +12,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
-    using ClusterKit.Web.GraphQL.Client;
+    using ClusterKit.API.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Language.AST;
