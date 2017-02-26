@@ -10,9 +10,12 @@
 
         serializers {
           hyperion = "Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion"
+          json = "Akka.Serialization.NewtonSoftJsonSerializer"
         }
+
         serialization-bindings {
-          "System.Object" = hyperion
+           "System.Object" = hyperion
+           "Newtonsoft.Json.Linq.JObject, Newtonsoft.Json" = json
         } 
 
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"

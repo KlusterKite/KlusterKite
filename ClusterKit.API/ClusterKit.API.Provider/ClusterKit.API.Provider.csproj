@@ -131,14 +131,16 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
-      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
-      <Name>ClusterKit.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
-      <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
-      <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
+    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\net45\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Security.Client, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Security.Client.0.0.0-local\lib\net45\ClusterKit.Security.Client.dll</HintPath>
+      <Private>True</Private>
+</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiProvider.cs" />

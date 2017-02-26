@@ -87,6 +87,31 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.2.0-beta5-build3474\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\net45\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Core.TestKit, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.TestKit.0.0.0-local\lib\net45\ClusterKit.Core.TestKit.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.LargeObjects.Client, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.LargeObjects.Client.0.0.0-local\lib\net45\ClusterKit.LargeObjects.Client.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.LargeObjects, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.LargeObjects.0.0.0-local\lib\net45\ClusterKit.LargeObjects.dll</HintPath>
+      <Private>True</Private>
+</Reference>
+    <Reference Include="ClusterKit.Security.Client, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Security.Client.0.0.0-local\lib\net45\ClusterKit.Security.Client.dll</HintPath>
+      <Private>True</Private>
+</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContextFactoryTest.cs" />

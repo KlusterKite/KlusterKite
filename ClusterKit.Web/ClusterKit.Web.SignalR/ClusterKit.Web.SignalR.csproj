@@ -179,10 +179,11 @@
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
-      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
-      <Name>ClusterKit.Core</Name>
-</ProjectReference>
+    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
+     <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\net45\ClusterKit.Core.dll</HintPath>
+      <Private>True</Private>
+</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.Designer.cs">

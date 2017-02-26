@@ -1,0 +1,129 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ApiHandlerActorTests.cs" company="ClusterKit">
+//   All rights reserved
+// </copyright>
+// <summary>
+//   Testing the <see cref="ApiHandlerActor" />
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ClusterKit.API.Tests
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using Akka.Actor;
+
+    using ClusterKit.API.Client;
+    using ClusterKit.API.Endpoint;
+    using ClusterKit.API.Tests.Mock;
+    using ClusterKit.Core;
+    using ClusterKit.Core.TestKit;
+    using ClusterKit.Core.Utils;
+    using ClusterKit.Security.Client;
+
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+
+    using Xunit;
+    using Xunit.Abstractions;
+
+    /// <summary>
+    /// Testing the <see cref="ApiHandlerActor"/>
+    /// </summary>
+    public class ApiHandlerActorTests : BaseActorTest<ApiPublisherActorTests.Configurator>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiHandlerActorTests"/> class.
+        /// </summary>
+        /// <param name="output">
+        /// The output.
+        /// </param>
+        public ApiHandlerActorTests(ITestOutputHelper output)
+            : base(output)
+        {
+        }
+
+        /// <summary>
+        /// Checking the discovery request
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task QueryHandleTest()
+        {
+            this.ExpectNoMsg();
+            var actor =
+                this.ActorOfAsTestActorRef<ApiHandlerActor>(Props.Create(() => new ApiHandlerActor(new TestProvider(null))));
+
+            var context = new RequestContext();
+            var queryFields = new List<ApiRequest> { new ApiRequest { FieldName = "asyncScalarField" } };
+            var query = new QueriApiRequest { Context = context, Fields = queryFields };
+
+            var result = await actor.Ask<JObject>(query, TimeSpan.FromSeconds(1));
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("asyncScalarField"));
+            Assert.Equal("AsyncScalarField", result.Property("asyncScalarField").ToObject<string>());
+        }
+
+        /// <summary>
+        /// Checking the discovery request
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task MutationHandleTest()
+        {
+            this.ExpectNoMsg();
+            var actor =
+                this.ActorOfAsTestActorRef<ApiHandlerActor>(Props.Create(() => new ApiHandlerActor(new TestProvider(null))));
+
+            var context = new RequestContext();
+
+            const string MethodParameters = "{ \"name\": \"new name\"}";
+
+            var request = new MutationApiRequest
+            {
+                
+                FieldName = "nestedSync.setName",
+                Arguments = (JObject)JsonConvert.DeserializeObject(MethodParameters),
+                Fields = new List<ApiRequest>
+                                          {
+                                              new ApiRequest { FieldName = "uid" },
+                                              new ApiRequest { FieldName = "name" },
+                                              new ApiRequest { FieldName = "value" }
+                                          },
+                Context = context
+            };
+
+
+            var serializedJson = ((JObject)JsonConvert.DeserializeObject(MethodParameters)).SerializeToAkka(this.Sys);
+            var serializedObject = request.SerializeToAkka(this.Sys);
+            /*
+            var result = await actor.Ask<JObject>(request, TimeSpan.FromSeconds(1));
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("name"));
+            Assert.Equal("new name", result.Property("name").ToObject<string>());
+            */
+        }
+
+        /// <summary>
+        /// Configures current test system
+        /// </summary>
+        public class Configurator : TestConfigurator
+        {
+            /// <summary>
+            /// Gets list of all used plugin installers
+            /// </summary>
+            /// <returns>The list of installers</returns>
+            public override List<BaseInstaller> GetPluginInstallers()
+            {
+                var pluginInstallers = new List<BaseInstaller>
+                                           {
+                                               new Core.Installer(),
+                                               new Core.TestKit.Installer()
+                                           };
+                return pluginInstallers;
+            }
+        }
+    }
+} 
