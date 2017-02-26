@@ -33,52 +33,63 @@
     <DocumentationFile>bin\Release\ClusterKit.Security.Tests.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka">
-      <HintPath>..\..\packages\Akka.1.1.3\lib\net45\Akka.dll</HintPath>
+    <Reference Include="Akka, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.1.1.3.344-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster">
-      <HintPath>..\..\packages\Akka.Cluster.1.1.3\lib\net45\Akka.Cluster.dll</HintPath>
+    <Reference Include="Akka.Cluster, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.1.1.3.344-beta\lib\net45\Akka.Cluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster.Sharding">
-      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.1.3.32-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
+    <Reference Include="Akka.Cluster.Sharding, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.Sharding.1.1.3.344-beta\lib\net45\Akka.Cluster.Sharding.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster.Tools">
-      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.3.32-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
+    <Reference Include="Akka.Cluster.Tools, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.3.344-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.DI.CastleWindsor">
       <HintPath>..\..\packages\Akka.DI.CastleWindsor.1.0.8.191-beta\lib\net45\Akka.DI.CastleWindsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.Core">
-      <HintPath>..\..\packages\Akka.DI.Core.1.1.3\lib\net45\Akka.DI.Core.dll</HintPath>
+    <Reference Include="Akka.DI.Core, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.DI.Core.1.1.3.344-beta\lib\net45\Akka.DI.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Logger.Serilog">
-      <HintPath>..\..\packages\Akka.Logger.Serilog.1.1.2\lib\net45\Akka.Logger.Serilog.dll</HintPath>
+    <Reference Include="Akka.Logger.Serilog, Version=1.1.3.12, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Logger.Serilog.1.1.3.12-beta\lib\net45\Akka.Logger.Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Persistence">
-      <HintPath>..\..\packages\Akka.Persistence.1.1.3.32-beta\lib\net45\Akka.Persistence.dll</HintPath>
+    <Reference Include="Akka.Persistence, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Persistence.1.1.3.344-beta\lib\net45\Akka.Persistence.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Remote">
-      <HintPath>..\..\packages\Akka.Remote.1.1.3\lib\net45\Akka.Remote.dll</HintPath>
+    <Reference Include="Akka.Remote, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Remote.1.1.3.344-beta\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Serialization.Hyperion">
-      <HintPath>..\..\packages\Akka.Serialization.Hyperion.1.1.3.32-beta\lib\net45\Akka.Serialization.Hyperion.dll</HintPath>
+    <Reference Include="Akka.Serialization.Hyperion, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Serialization.Hyperion.1.1.3.344-beta\lib\net45\Akka.Serialization.Hyperion.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.TestKit">
-      <HintPath>..\..\packages\Akka.TestKit.1.1.3\lib\net45\Akka.TestKit.dll</HintPath>
+    <Reference Include="Akka.TestKit, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.TestKit.1.1.3.344-beta\lib\net45\Akka.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.TestKit.Xunit2">
-      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.1.3\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
+    <Reference Include="Akka.TestKit.Xunit2, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.1.3.344-beta\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Castle.Core">
@@ -113,6 +124,26 @@
       <HintPath>..\..\packages\CommonServiceLocator.WindsorAdapter.1.0\lib\NET35\CommonServiceLocator.WindsorAdapter.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DotNetty.Buffers">
+      <HintPath>..\..\packages\DotNetty.Buffers.0.3.2\lib\net45\DotNetty.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Codecs">
+      <HintPath>..\..\packages\DotNetty.Codecs.0.3.2\lib\net45\DotNetty.Codecs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Common">
+      <HintPath>..\..\packages\DotNetty.Common.0.3.2\lib\net45\DotNetty.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Handlers">
+      <HintPath>..\..\packages\DotNetty.Handlers.0.3.2\lib\net45\DotNetty.Handlers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Transport">
+      <HintPath>..\..\packages\DotNetty.Transport.0.3.2\lib\net45\DotNetty.Transport.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Google.ProtocolBuffers">
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.dll</HintPath>
       <Private>True</Private>
@@ -141,8 +172,9 @@
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog">
-      <HintPath>..\..\packages\Serilog.2.3.0\lib\net46\Serilog.dll</HintPath>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Serilog.2.4.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog.Sinks.ColoredConsole">
@@ -173,11 +205,10 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.2.0-beta5-build3474\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\net45\ClusterKit.Core.dll</HintPath>
-      <Private>True</Private>
-</Reference>
+    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
+      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
+      <Name>ClusterKit.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PrivilegeDescriptionTests.cs" />

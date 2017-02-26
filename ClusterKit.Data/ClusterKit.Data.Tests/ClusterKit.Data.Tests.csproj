@@ -30,12 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka">
-      <HintPath>..\..\packages\Akka.1.1.3\lib\net45\Akka.dll</HintPath>
+    <Reference Include="Akka, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.1.1.3.344-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Serialization.Hyperion">
-      <HintPath>..\..\packages\Akka.Serialization.Hyperion.1.1.3.32-beta\lib\net45\Akka.Serialization.Hyperion.dll</HintPath>
+    <Reference Include="Akka.Serialization.Hyperion, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Serialization.Hyperion.1.1.3.344-beta\lib\net45\Akka.Serialization.Hyperion.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -87,31 +89,26 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.2.0-beta5-build3474\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Core, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.0.0.0-local\lib\net45\ClusterKit.Core.dll</HintPath>
-      <Private>True</Private>
-</Reference>
-    <Reference Include="ClusterKit.Core.TestKit, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Core.TestKit.0.0.0-local\lib\net45\ClusterKit.Core.TestKit.dll</HintPath>
-      <Private>True</Private>
-</Reference>
-    <Reference Include="ClusterKit.LargeObjects.Client, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.LargeObjects.Client.0.0.0-local\lib\net45\ClusterKit.LargeObjects.Client.dll</HintPath>
-      <Private>True</Private>
-</Reference>
-    <Reference Include="ClusterKit.LargeObjects, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.LargeObjects.0.0.0-local\lib\net45\ClusterKit.LargeObjects.dll</HintPath>
-      <Private>True</Private>
-</Reference>
-    <Reference Include="ClusterKit.Security.Client, Version=0.0.0, Culture=neutral, processorArchitecture=MSIL">
-     <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ClusterKit.Security.Client.0.0.0-local\lib\net45\ClusterKit.Security.Client.dll</HintPath>
-      <Private>True</Private>
-</Reference>
+    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
+      <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
+      <Name>ClusterKit.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj">
+      <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
+      <Name>ClusterKit.Core.TestKit</Name>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj">
+      <Project>{7DE19EFC-58C5-4DBF-8A2A-E81E54AF5623}</Project>
+      <Name>ClusterKit.LargeObjects.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
+      <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
+      <Name>ClusterKit.LargeObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
+      <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
+      <Name>ClusterKit.Security.Client</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContextFactoryTest.cs" />
