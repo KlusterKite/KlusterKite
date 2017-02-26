@@ -139,12 +139,14 @@ namespace ClusterKit.API.Provider
                         {{
                             public override {(this.GetValueIsAsync ? "async" : string.Empty)} Task<object> GetValue(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer) 
                             {{
+                                var arguments = (JObject)query.Arguments;
                                 {this.GenerateResultSourceAcquirement()}
                                 return {(this.GetValueIsAsync ? "resultSource" : "Task.FromResult<object>(resultSource)")};
                             }}
 
                             public override {async} Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) 
                             {{
+                                var arguments = (JObject)query.Arguments;
                                 try 
                                 {{
                                     var resultSource = ({ToCSharpRepresentation(this.GetPropertyReturnType(), true)}){(isAsync ? " await this.GetValue(source,query,context,argumentsSerializer)" : "this.GetValue(source,query,context,argumentsSerializer).Result")};
@@ -571,7 +573,7 @@ namespace ClusterKit.API.Provider
                 else
                 {
                     command = $@"
-                    var prop{parameterIndex} = query.Arguments != null ? query.Arguments.Property(""{ parameterName}"") : null;
+                    var prop{parameterIndex} = arguments != null ? arguments.Property(""{ parameterName}"") : null;
                     var arg{parameterIndex} = prop{parameterIndex} != null && prop{parameterIndex}.Value != null
                             ? prop{parameterIndex}.Value.ToObject<{ToCSharpRepresentation(parameter.ParameterType, true)}>(argumentsSerializer)
                             : default({ToCSharpRepresentation(parameter.ParameterType, true)});
@@ -662,8 +664,8 @@ namespace ClusterKit.API.Provider
                 int? limit = null;
                 int? offset = null;
 
-                var limitArgument = query.Arguments.Property(""limit"");
-                var offsetArgument = query.Arguments.Property(""offset"");
+                var limitArgument = arguments.Property(""limit"");
+                var offsetArgument = arguments.Property(""offset"");
 
                 if (limitArgument != null && limitArgument.HasValues && limitArgument.Value != null && limitArgument.Value.Type != JTokenType.Null)
                 {{
@@ -675,7 +677,7 @@ namespace ClusterKit.API.Provider
                     offset = offsetArgument.Value.ToObject<int>();
                 }}
 
-                var connectionResult = await resultSource.Query(GenerateFilterExpression(query.Arguments), GenerateSortingExpression(query.Arguments), limit, offset);
+                var connectionResult = await resultSource.Query(GenerateFilterExpression(arguments), GenerateSortingExpression(arguments), limit, offset);
                 var connectionResultJson = new JObject();
                 connectionResultJson.Add(""count"",  connectionResult.Count);
                 var resultArray = new JArray();

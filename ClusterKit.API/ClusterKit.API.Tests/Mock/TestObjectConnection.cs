@@ -149,7 +149,7 @@ namespace ClusterKit.API.Tests.Mock
                 return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
             }
 
-            var description = request?.Arguments.Property("newNode").Value as JObject;
+            var description = ((JObject)request?.Arguments).Property("newNode").Value as JObject;
             if (description == null)
             {
                 var errors = new List<ErrorDescription>

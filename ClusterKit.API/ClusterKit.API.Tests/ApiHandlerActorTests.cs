@@ -16,11 +16,11 @@ namespace ClusterKit.API.Tests
     using Akka.Actor;
 
     using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Messages;
     using ClusterKit.API.Endpoint;
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Core.Utils;
     using ClusterKit.Security.Client;
 
     using Newtonsoft.Json;
@@ -60,7 +60,7 @@ namespace ClusterKit.API.Tests
             var queryFields = new List<ApiRequest> { new ApiRequest { FieldName = "asyncScalarField" } };
             var query = new QueriApiRequest { Context = context, Fields = queryFields };
 
-            var result = await actor.Ask<JObject>(query, TimeSpan.FromSeconds(1));
+            var result = (JObject)await actor.Ask<SurrogatableJObject>(query, TimeSpan.FromSeconds(1));
             Assert.NotNull(result);
             Assert.NotNull(result.Property("asyncScalarField"));
             Assert.Equal("AsyncScalarField", result.Property("asyncScalarField").ToObject<string>());
@@ -83,7 +83,6 @@ namespace ClusterKit.API.Tests
 
             var request = new MutationApiRequest
             {
-                
                 FieldName = "nestedSync.setName",
                 Arguments = (JObject)JsonConvert.DeserializeObject(MethodParameters),
                 Fields = new List<ApiRequest>
@@ -95,15 +94,10 @@ namespace ClusterKit.API.Tests
                 Context = context
             };
 
-
-            var serializedJson = ((JObject)JsonConvert.DeserializeObject(MethodParameters)).SerializeToAkka(this.Sys);
-            var serializedObject = request.SerializeToAkka(this.Sys);
-            /*
-            var result = await actor.Ask<JObject>(request, TimeSpan.FromSeconds(1));
+            var result = (JObject)await actor.Ask<SurrogatableJObject>(request, TimeSpan.FromSeconds(1));
             Assert.NotNull(result);
             Assert.NotNull(result.Property("name"));
             Assert.Equal("new name", result.Property("name").ToObject<string>());
-            */
         }
 
         /// <summary>

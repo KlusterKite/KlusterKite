@@ -15,7 +15,6 @@
 
         serialization-bindings {
            "System.Object" = hyperion
-           "Newtonsoft.Json.Linq.JObject, Newtonsoft.Json" = json
         } 
 
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"

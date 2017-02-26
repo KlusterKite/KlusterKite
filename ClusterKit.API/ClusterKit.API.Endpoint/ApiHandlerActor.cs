@@ -15,6 +15,7 @@ namespace ClusterKit.API.Endpoint
     using Akka.Event;
 
     using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Messages;
     using ClusterKit.API.Provider;
 
     using Newtonsoft.Json.Linq;
@@ -53,7 +54,14 @@ namespace ClusterKit.API.Endpoint
                     request,
                     request.Context,
                     exception => context.GetLogger().Error(exception, "{Type}: mutation resolve exception"))
-                .PipeTo(this.Sender, this.Self, failure: e => this.HandleResolveException(e, context));
+                .PipeTo(
+                    this.Sender,
+                    this.Self,
+                    json =>
+                        {
+                            return (SurrogatableJObject)json;
+                        },
+                    e => this.HandleResolveException(e, context));
         }
 
         /// <summary>
@@ -67,7 +75,7 @@ namespace ClusterKit.API.Endpoint
                     request.Fields,
                     request.Context,
                     exception => context.GetLogger().Error(exception, "{Type}: query resolve exception"))
-                .PipeTo(this.Sender, this.Self, failure: e => this.HandleResolveException(e, context));
+                .PipeTo(this.Sender, this.Self, json => (SurrogatableJObject)json, e => this.HandleResolveException(e, context));
         }
 
         /// <summary>
@@ -79,7 +87,7 @@ namespace ClusterKit.API.Endpoint
         private object HandleResolveException(Exception exception, IActorContext context)
         {
             context.GetLogger().Error(exception, "{Type}: execution exception");
-            return new JObject();
+            return (SurrogatableJObject)new JObject();
         }
     }
 }

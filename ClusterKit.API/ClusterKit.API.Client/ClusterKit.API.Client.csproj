@@ -84,6 +84,8 @@
     <Compile Include="INodeConnection.cs" />
     <Compile Include="Messages\ApiDiscoverRequest.cs" />
     <Compile Include="Messages\ApiDiscoverResponse.cs" />
+    <Compile Include="Messages\SurrogatableJObject.cs" />
+    <Compile Include="Messages\SurrogateJObject.cs" />
     <Compile Include="MutationApiRequest.cs" />
     <Compile Include="MutationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

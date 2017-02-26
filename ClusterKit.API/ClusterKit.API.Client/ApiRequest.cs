@@ -11,7 +11,7 @@ namespace ClusterKit.API.Client
 {
     using System.Collections.Generic;
 
-    using Newtonsoft.Json.Linq;
+    using ClusterKit.API.Client.Messages;
 
     /// <summary>
     /// The request partial description
@@ -26,7 +26,7 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// Gets or sets the argument values for methods
         /// </summary>
-        public JObject Arguments { get; set; }
+        public SurrogatableJObject Arguments { get; set; }
 
         /// <summary>
         /// Gets or sets the list of requested fields
