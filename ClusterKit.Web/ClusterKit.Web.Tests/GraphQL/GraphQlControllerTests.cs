@@ -22,6 +22,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Security.Client;
+    using ClusterKit.Web.GraphQL.Publisher;
 
     using RestSharp;
 
@@ -34,6 +35,11 @@ namespace ClusterKit.Web.Tests.GraphQL
     public class GraphQlControllerTests : BaseActorTest<GraphQlControllerTests.Configurator>
     {
         /// <summary>
+        /// The test output
+        /// </summary>
+        private ITestOutputHelper output;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="GraphQlControllerTests"/> class.
         /// </summary>
         /// <param name="output">
@@ -42,6 +48,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public GraphQlControllerTests(ITestOutputHelper output)
             : base(output)
         {
+            this.output = output;
         }
 
         /// <summary>
@@ -54,19 +61,141 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
-        public async Task CheckRequest()  
+        public async Task SchemaUninitializedTest()
         {
             this.ExpectNoMsg();
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
-            
-            var request = new RestRequest { Method = Method.GET, Resource = "test" };
+
+            var request = new RestRequest { Method = Method.POST };
             request.AddHeader("Accept", "application/json, text/json");
+
+            var query = @"
+            {                
+                api {
+                    asyncArrayOfScalarField,
+                    asyncForwardedScalar,
+                    nestedAsync {
+                        asyncScalarField,
+                        syncScalarField                        
+                    },
+                    asyncScalarField,
+                    faultedSyncField,
+                    forwardedArray,
+                    syncArrayOfScalarField,
+                    nestedSync {
+                        asyncScalarField,
+                        syncScalarField  
+                    },
+                    syncScalarField,
+                    faultedASyncMethod {
+                        asyncScalarField,
+                        syncScalarField 
+                    }
+                }
+            }";
+
+            request.AddBody(new EndpointController.QueryRequest { Query = query });
+
             var result = await client.ExecuteTaskAsync(request);
 
             Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, result.StatusCode);
             this.Sys.Log.Info("Response {Response}", result.Content);
+        }
+
+        /// <summary>
+        /// Just generic test
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task SchemaInitializedTest()
+        {
+            this.ExpectNoMsg();
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new ApiProviderPublishResolveIntegration.TestProvider(internalApiProvider, this.output);
+            var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
+            schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
+
+            var request = new RestRequest { Method = Method.POST };
+            request.AddHeader("Accept", "application/json, text/json");
+
+            var query = @"
+            {                
+                api {
+                    asyncArrayOfScalarField,
+                    asyncForwardedScalar,
+                    nestedAsync {
+                        asyncScalarField,
+                        syncScalarField                        
+                    },
+                    asyncScalarField,
+                    faultedSyncField,
+                    forwardedArray,
+                    syncArrayOfScalarField,
+                    nestedSync {
+                        asyncScalarField,
+                        syncScalarField  
+                    },
+                    syncScalarField,
+                    faultedASyncMethod {
+                        asyncScalarField,
+                        syncScalarField 
+                    }
+                }
+            }";
+
+            request.AddBody(new EndpointController.QueryRequest { Query = query });
+
+            var result = await client.ExecuteTaskAsync(request);
+
+            Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
+            this.Sys.Log.Info("Response {Response}", result.Content);
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""asyncArrayOfScalarField"": [
+                                4.0,
+                                5.0
+                              ],
+                              ""asyncForwardedScalar"": ""AsyncForwardedScalar"",
+                              ""nestedAsync"": {
+                                ""asyncScalarField"": ""AsyncScalarField"",
+                                ""syncScalarField"": ""SyncScalarField""
+                              },
+                              ""asyncScalarField"": ""AsyncScalarField"",
+                              ""faultedSyncField"": false,
+                              ""forwardedArray"": [
+                                5,
+                                6,
+                                7
+                              ],
+                              ""syncArrayOfScalarField"": [
+                                1,
+                                2,
+                                3
+                              ],
+                              ""nestedSync"": {
+                                ""asyncScalarField"": ""AsyncScalarField"",
+                                ""syncScalarField"": ""SyncScalarField""
+                              },
+                              ""syncScalarField"": ""SyncScalarField"",
+                              ""faultedASyncMethod"": {
+                                ""asyncScalarField"": null,
+                                ""syncScalarField"": null
+                              }
+                            }
+                          }
+                        }
+                        ";
+            Assert.Equal(
+                ApiProviderPublishResolveIntegration.CleanResponse(expectedResult), 
+                ApiProviderPublishResolveIntegration.CleanResponse(result.Content));
         }
 
         /// <summary>

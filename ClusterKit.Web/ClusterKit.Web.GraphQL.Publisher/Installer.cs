@@ -19,6 +19,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
     using ClusterKit.Core;
 
+    using global::GraphQL;
+    using global::GraphQL.Http;
+
     /// <summary>
     /// Installing components from current library
     /// </summary>
@@ -54,6 +57,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+
+            container.Register(Component.For<SchemaProvider>().ImplementedBy<SchemaProvider>().LifestyleSingleton());
+
+            var documentExecuter = new DocumentExecuter();
+            var writer = new DocumentWriter(false);
+
+            container.Register(Component.For<IDocumentExecuter>().Instance(documentExecuter));
+            container.Register(Component.For<IDocumentWriter>().Instance(writer));
         }
     }
 }

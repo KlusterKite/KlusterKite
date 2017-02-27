@@ -81,6 +81,7 @@
     <Compile Include="EnFieldFlags.cs" />
     <Compile Include="EnScalarType.cs" />
     <Compile Include="ErrorDescription.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="INodeConnection.cs" />
     <Compile Include="Messages\ApiDiscoverRequest.cs" />
     <Compile Include="Messages\ApiDiscoverResponse.cs" />

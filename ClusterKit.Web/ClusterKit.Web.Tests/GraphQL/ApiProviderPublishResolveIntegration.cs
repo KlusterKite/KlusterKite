@@ -15,6 +15,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
+    using ClusterKit.API.Tests.Mock;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher;
 
@@ -52,264 +53,13 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Testing correct schema generation from generated <see cref="ApiDescription"/>
+        /// Removes formatting values from response json
         /// </summary>
-        /// <returns>Async task</returns>
-        [Fact]
-        public async Task SchemaGenerationTest()
+        /// <param name="response">The json string</param>
+        /// <returns>Cleaned json string</returns>
+        public static string CleanResponse(string response)
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
-
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
-
-            Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
-            Assert.True(schema.Query.HasField("api"));
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                             r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = Resources.IntrospectionQuery;
-                             }).ConfigureAwait(true);
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-            Assert.Equal(CleanResponse(Resources.ApiProviderResolveTestProviderSchemaSnapshot), CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Testing simple fields requests from <see cref="ApiDescription"/>
-        /// </summary>
-        /// <returns>Async task</returns>
-        [Fact]
-        public async Task SimpleFieldsRequestTest()
-        {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
-
-            var query = @"
-            {                
-                api {
-                    asyncArrayOfScalarField,
-                    asyncForwardedScalar,
-                    nestedAsync {
-                        asyncScalarField,
-                        syncScalarField                        
-                    },
-                    asyncScalarField,
-                    faultedSyncField,
-                    forwardedArray,
-                    syncArrayOfScalarField,
-                    nestedSync {
-                        asyncScalarField,
-                        syncScalarField  
-                    },
-                    syncScalarField,
-                    faultedASyncMethod {
-                        asyncScalarField,
-                        syncScalarField 
-                    }
-                }
-            }
-            ";
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                                        r =>
-                                        {
-                                            r.Schema = schema;
-                                            r.Query = query;
-                                        }).ConfigureAwait(true);
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-
-            var expectedResult = @"
-                        {
-                          ""data"": {
-                            ""api"": {
-                              ""asyncArrayOfScalarField"": [
-                                4.0,
-                                5.0
-                              ],
-                              ""asyncForwardedScalar"": ""AsyncForwardedScalar"",
-                              ""nestedAsync"": {
-                                ""asyncScalarField"": ""AsyncScalarField"",
-                                ""syncScalarField"": ""SyncScalarField""
-                              },
-                              ""asyncScalarField"": ""AsyncScalarField"",
-                              ""faultedSyncField"": false,
-                              ""forwardedArray"": [
-                                5,
-                                6,
-                                7
-                              ],
-                              ""syncArrayOfScalarField"": [
-                                1,
-                                2,
-                                3
-                              ],
-                              ""nestedSync"": {
-                                ""asyncScalarField"": ""AsyncScalarField"",
-                                ""syncScalarField"": ""SyncScalarField""
-                              },
-                              ""syncScalarField"": ""SyncScalarField"",
-                              ""faultedASyncMethod"": {
-                                ""asyncScalarField"": null,
-                                ""syncScalarField"": null
-                              }
-                            }
-                          }
-                        }
-                        ";
-            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Testing simple fields requests from <see cref="ApiDescription"/>
-        /// </summary>
-        /// <returns>Async task</returns>
-        [Fact]
-        public async Task MethodsRequestTest()
-        {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
-
-            var query = @"
-            {                
-                api {
-                    syncScalarMethod(intArg: 1, stringArg: ""test"", objArg: { syncScalarField: ""nested test"" }),
-                    asyncObjectMethod(intArg: 1, stringArg: ""test"", objArg: { syncScalarField: ""nested test"" }, intArrayArg: [7, 8, 9]) {
-                        syncScalarField,
-                        asyncScalarField
-                    },
-                }
-            }
-            ";
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                                        r =>
-                                        {
-                                            r.Schema = schema;
-                                            r.Query = query;
-                                            r.UserContext = new RequestContext();
-                                        }).ConfigureAwait(true);
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-
-            var expectedResult = @"
-                        {
-                          ""data"": {
-                            ""api"": {
-                              ""syncScalarMethod"": ""ok"",
-                              ""asyncObjectMethod"": {
-                                ""syncScalarField"": ""returned type"",
-                                ""asyncScalarField"": ""AsyncScalarField""
-                              }
-                            }
-                          }
-                        }";
-            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Testing call of simple mutation
-        /// </summary>
-        /// <returns>Async task</returns>
-        [Fact]
-        public async Task MutationSimpleRequestTest()
-        {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
-
-            var query = @"                          
-            mutation M {
-                    call: ClusterKit_API_Tests_Mock_TestProvider_nestedAsync_setName(name: ""hello world"") {
-                        name
-                    }
-            }            
-            ";
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                                        r =>
-                                        {
-                                            r.Schema = schema;
-                                            r.Query = query;
-                                            r.UserContext = new RequestContext();
-                                        }).ConfigureAwait(true);
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-
-            var expectedResult = @"
-                        {
-                          ""data"": {
-                            ""call"": {
-                                ""name"": ""hello world""
-                            }
-                          }
-                        }";
-            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Testing call of simple mutation
-        /// </summary>
-        /// <returns>Async task</returns>
-        [Fact]
-        public async Task MutationConnectionRequestTest()
-        {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
-
-            var query = @"                          
-            mutation M {
-                    call: ClusterKit_API_Tests_Mock_TestProvider_connection_create(newNode: {name: ""hello world"", value: 10}) {
-                        result {
-                            name,
-                            value
-                        },
-                        errors {
-                            field,
-                            message
-                        }
-                    }
-            }            
-            ";
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                                        r =>
-                                        {
-                                            r.Schema = schema;
-                                            r.Query = query;
-                                            r.UserContext = new RequestContext();
-                                        }).ConfigureAwait(true);
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-
-            var expectedResult = @"
-                        {
-                          ""data"": {
-                            ""call"": {     
-                                ""result"": {                              
-                                    ""name"": ""hello world"",
-                                    ""value"": 10.0
-                                },
-                                ""errors"": []
-                            }
-                          }
-                        }";
-            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+            return JsonConvert.DeserializeObject<JObject>(response).ToString(Formatting.None);
         }
 
         /// <summary>
@@ -319,35 +69,45 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task ConnectionQueryTest()
         {
-            var initialObjects = new List<API.Tests.Mock.TestObject>
+            var initialObjects = new List<TestObject>
                                      {
-                                         new API.Tests.Mock.TestObject
+                                         new TestObject
                                              {
-                                                 Uid = Guid.Parse("{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Uid =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
                                                  Name = "1-test",
                                                  Value = 100m
                                              },
-                                         new API.Tests.Mock.TestObject
+                                         new TestObject
                                              {
-                                                 Uid = Guid.Parse("{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"),
+                                                 Uid =
+                                                     Guid.Parse(
+                                                         "{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"),
                                                  Name = "2-test",
                                                  Value = 50m
                                              },
-                                         new API.Tests.Mock.TestObject
+                                         new TestObject
                                              {
-                                                 Uid = Guid.Parse("{67885BA0-B284-438F-8393-EE9A9EB299D1}"),
+                                                 Uid =
+                                                     Guid.Parse(
+                                                         "{67885BA0-B284-438F-8393-EE9A9EB299D1}"),
                                                  Name = "3-test",
                                                  Value = 50m
                                              },
-                                         new API.Tests.Mock.TestObject
+                                         new TestObject
                                              {
-                                                 Uid = Guid.Parse("{3AF2C973-D985-4F95-A0C7-AA928D276881}"),
+                                                 Uid =
+                                                     Guid.Parse(
+                                                         "{3AF2C973-D985-4F95-A0C7-AA928D276881}"),
                                                  Name = "4-test",
                                                  Value = 70m
                                              },
-                                         new API.Tests.Mock.TestObject
+                                         new TestObject
                                              {
-                                                 Uid = Guid.Parse("{F0607502-5B77-4A3C-9142-E6197A7EE61E}"),
+                                                 Uid =
+                                                     Guid.Parse(
+                                                         "{F0607502-5B77-4A3C-9142-E6197A7EE61E}"),
                                                  Name = "5-test",
                                                  Value = 6m
                                              },
@@ -417,29 +177,280 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Removes formatting values from response json
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
         /// </summary>
-        /// <param name="response">The json string</param>
-        /// <returns>Cleaned json string</returns>
-        private static string CleanResponse(string response)
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task MethodsRequestTest()
         {
-            return JsonConvert.DeserializeObject<JObject>(response).ToString(Formatting.None);
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"
+            {                
+                api {
+                    syncScalarMethod(intArg: 1, stringArg: ""test"", objArg: { syncScalarField: ""nested test"" }),
+                    asyncObjectMethod(intArg: 1, stringArg: ""test"", objArg: { syncScalarField: ""nested test"" }, intArrayArg: [7, 8, 9]) {
+                        syncScalarField,
+                        asyncScalarField
+                    },
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""syncScalarMethod"": ""ok"",
+                              ""asyncObjectMethod"": {
+                                ""syncScalarField"": ""returned type"",
+                                ""asyncScalarField"": ""AsyncScalarField""
+                              }
+                            }
+                          }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
         /// <summary>
-        /// Test provider to unite GraphQL publishing and <see cref="ApiProvider"/>
+        /// Testing call of simple mutation
         /// </summary>
-        private class TestProvider : Web.GraphQL.Publisher.ApiProvider
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task MutationConnectionRequestTest()
         {
-            /// <summary>
-            /// The provider.
-            /// </summary>
-            private readonly ApiProvider provider;
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
+            var query = @"                          
+            mutation M {
+                    call: ClusterKit_API_Tests_Mock_TestProvider_connection_create(newNode: {name: ""hello world"", value: 10}) {
+                        result {
+                            name,
+                            value
+                        },
+                        errors {
+                            field,
+                            message
+                        }
+                    }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""call"": {     
+                                ""result"": {                              
+                                    ""name"": ""hello world"",
+                                    ""value"": 10.0
+                                },
+                                ""errors"": []
+                            }
+                          }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing call of simple mutation
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task MutationSimpleRequestTest()
+        {
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"                          
+            mutation M {
+                    call: ClusterKit_API_Tests_Mock_TestProvider_nestedAsync_setName(name: ""hello world"") {
+                        name
+                    }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""call"": {
+                                ""name"": ""hello world""
+                            }
+                          }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing correct schema generation from generated <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task SchemaGenerationTest()
+        {
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            using (var printer = new SchemaPrinter(schema))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = Resources.IntrospectionQuery;
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            Assert.Equal(CleanResponse(Resources.ApiProviderResolveTestProviderSchemaSnapshot), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task SimpleFieldsRequestTest()
+        {
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"
+            {                
+                api {
+                    asyncArrayOfScalarField,
+                    asyncForwardedScalar,
+                    nestedAsync {
+                        asyncScalarField,
+                        syncScalarField                        
+                    },
+                    asyncScalarField,
+                    faultedSyncField,
+                    forwardedArray,
+                    syncArrayOfScalarField,
+                    nestedSync {
+                        asyncScalarField,
+                        syncScalarField  
+                    },
+                    syncScalarField,
+                    faultedASyncMethod {
+                        asyncScalarField,
+                        syncScalarField 
+                    }
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""asyncArrayOfScalarField"": [
+                                4.0,
+                                5.0
+                              ],
+                              ""asyncForwardedScalar"": ""AsyncForwardedScalar"",
+                              ""nestedAsync"": {
+                                ""asyncScalarField"": ""AsyncScalarField"",
+                                ""syncScalarField"": ""SyncScalarField""
+                              },
+                              ""asyncScalarField"": ""AsyncScalarField"",
+                              ""faultedSyncField"": false,
+                              ""forwardedArray"": [
+                                5,
+                                6,
+                                7
+                              ],
+                              ""syncArrayOfScalarField"": [
+                                1,
+                                2,
+                                3
+                              ],
+                              ""nestedSync"": {
+                                ""asyncScalarField"": ""AsyncScalarField"",
+                                ""syncScalarField"": ""SyncScalarField""
+                              },
+                              ""syncScalarField"": ""SyncScalarField"",
+                              ""faultedASyncMethod"": {
+                                ""asyncScalarField"": null,
+                                ""syncScalarField"": null
+                              }
+                            }
+                          }
+                        }
+                        ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Test provider to unite GraphQL publishing and <see cref="API.Provider.ApiProvider"/>
+        /// </summary>
+        public class TestProvider : Web.GraphQL.Publisher.ApiProvider
+        {
             /// <summary>
             /// The test output
             /// </summary>
             private readonly ITestOutputHelper output;
+
+            /// <summary>
+            /// The provider.
+            /// </summary>
+            private readonly ApiProvider provider;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="TestProvider"/> class.
@@ -479,9 +490,10 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
 
                 return await this.provider.ResolveQuery(
-                    requests,
-                    context,
-                    exception => this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
+                           requests,
+                           context,
+                           exception =>
+                               this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
             }
         }
     }

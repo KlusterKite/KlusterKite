@@ -247,8 +247,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActorSystemApiProvider.cs" />
+    <Compile Include="ApiBrowserActor.cs" />
     <Compile Include="ApiProvider.cs" />
     <Compile Include="Internals\Converter.cs" />
+    <Compile Include="SchemaProvider.cs" />
     <Compile Include="TempApiRequest.cs" />
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.resx</DependentUpon>

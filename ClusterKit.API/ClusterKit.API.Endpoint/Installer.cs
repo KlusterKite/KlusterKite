@@ -9,6 +9,8 @@
 
 namespace ClusterKit.API.Endpoint
 {
+    using System.Collections.Generic;
+
     using Akka.Actor;
     using Akka.Configuration;
 
@@ -34,6 +36,12 @@ namespace ClusterKit.API.Endpoint
         /// </summary>
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+
+        /// <inheritdoc />
+        protected override IEnumerable<string> GetRoles()
+        {
+            yield return "ClusterKit.API.Endpoint";
+        }
 
         /// <summary>
         /// Registering DI components

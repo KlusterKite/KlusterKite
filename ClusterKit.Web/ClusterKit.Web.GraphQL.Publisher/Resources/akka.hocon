@@ -1,4 +1,16 @@
-{		
+{	
+	akka.actor.deployment {	
+        /ClusterKit {
+	        IsNameSpace = true
+	    }
+        /ClusterKit/Web {
+	        type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+	    }
+        /ClusterKit/Web/GraphQLBrowser {
+	        type = "ClusterKit.Web.GraphQL.Publisher.ApiBrowserActor, ClusterKit.Web.GraphQL.Publisher"
+	    }	    	    
+	}
+
 	ClusterKit.Web {
 		Services {
 			GraphQL { 
