@@ -10,9 +10,12 @@
 namespace ClusterKit.Data.CRUD.ActionMessages
 {
     using System;
-    
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+
     using Akka.Routing;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
@@ -40,7 +43,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// Gets or sets the number of objects to skip in select
         /// </summary>
         [UsedImplicitly]
-        public int Skip { get; set; }
+        public int? Skip { get; set; }
 
         /// <summary>
         /// Gets or sets some extra data, that will be returned with the response
@@ -74,5 +77,14 @@ namespace ClusterKit.Data.CRUD.ActionMessages
     // ReSharper disable once StyleCop.SA1402
     public class CollectionRequest<TObject> : CollectionRequest
     {
+        /// <summary>
+        /// Gets or sets the filtering condition
+        /// </summary>
+        public Expression<Func<TObject, bool>> Filter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sorting function
+        /// </summary>
+        public List<SortingCondition> Sort { get; set; }
     }
 }

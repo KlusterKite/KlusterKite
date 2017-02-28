@@ -9,6 +9,7 @@
 namespace ClusterKit.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -156,19 +157,60 @@ namespace ClusterKit.Data
         protected virtual async Task OnCollectionRequest<TObject, TId>(CollectionRequest<TObject> collectionRequest)
             where TObject : class
         {
-            using (var ds = await this.GetContext())
+            try
             {
-                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
-                var objects = await factory.GetList(collectionRequest.Skip, collectionRequest.Count);
+                using (var ds = await this.GetContext())
+                {
+                    var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+                    var response = await factory.GetList(
+                                       collectionRequest.Filter,
+                                       collectionRequest.Sort,
+                                       collectionRequest.Skip,
+                                       collectionRequest.Count);
 
+                    if (collectionRequest.AcceptAsParcel)
+                    {
+                        Context.GetParcelManager()
+                            .Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
+                    }
+                    else
+                    {
+                        this.Sender.Tell(response);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                try
+                {
+                    Context.GetLogger()
+                        .Error(
+                            exception,
+                            "{Type}: Exception on processing CollectionRequest\n\t filter: {FilterExpression}\n\t sort: {SortExpression}\n\t limit: {Limit}\n\t offset: {Offset}",
+                            $"BaseCrudActor<{typeof(TObject).Name}>",
+                            collectionRequest.Filter?.ToString(),
+                            collectionRequest.Sort?.ToString(),
+                            collectionRequest.Count,
+                            collectionRequest.Skip);
+                }
+                catch
+                {
+                    Context.GetLogger()
+                        .Error(
+                            exception,
+                            "{Type}: Exception on processing CollectionRequest",
+                            $"BaseCrudActor<{typeof(TObject).Name}>");
+                }
+
+                var response = new CollectionResponse<TObject> { Items = new List<TObject>() };
                 if (collectionRequest.AcceptAsParcel)
                 {
                     Context.GetParcelManager()
-                        .Tell(new Parcel { Payload = objects, Recipient = this.Sender }, this.Self);
+                        .Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
                 }
                 else
                 {
-                    this.Sender.Tell(objects);
+                    this.Sender.Tell(response);
                 }
             }
         }

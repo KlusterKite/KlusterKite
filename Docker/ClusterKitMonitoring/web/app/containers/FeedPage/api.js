@@ -3,7 +3,7 @@ import instance, { processError } from '../../utils/connection';
 export function getFeeds() {
   return instance.then(result => {
     return result.get('/api/1.x/clusterkit/nodemanager/nugetFeed')
-      .then(r => r.data)
+      .then(r => r.data.Items)
       .catch(e => { processError(e) });
   }, error => {
       throw new Error('Authorization error', error);

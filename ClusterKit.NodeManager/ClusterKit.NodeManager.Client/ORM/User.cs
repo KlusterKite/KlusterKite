@@ -14,12 +14,15 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Linq;
 
     using BCrypt.Net;
-    
+
+    using ClusterKit.API.Client.Attributes;
+
     using JetBrains.Annotations;
 
     /// <summary>
     /// The web ui user
     /// </summary>
+    [ApiDescription(Description = "The web ui user")]
     public class User : UserDescription
     {
         /// <summary>
@@ -31,6 +34,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of roles assigned to this user
         /// </summary>
+        [DeclareField(Description = "The list of roles assigned to this user")]
         public List<Role> Roles { get; set; } = new List<Role>();
 
         /// <summary>
@@ -38,6 +42,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [Key]
         [UsedImplicitly]
+        [DeclareField(Description = "The user uid", IsKey = true)]
         public Guid Uid { get; set; }
 
         /// <summary>

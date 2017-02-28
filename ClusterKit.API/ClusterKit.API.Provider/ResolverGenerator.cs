@@ -260,70 +260,35 @@ namespace ClusterKit.API.Provider
                 .Where(d => d.Property != null)
                 .ToList();
             
-            var firstSwitches = sortableProperties.Select(d => $@"
-                     case ""{d.Name}_asc"":
-                        sort = query => query.OrderBy(e => e.{d.Property.Name});
-                        break;
-                    case ""{d.Name}_desc"":
-                        sort = query => query.OrderByDescending(e => e.{d.Property.Name});
-                        break;
+            var sortingConditions = sortableProperties.Select(s => $@"
+                {{""{s.Name}_asc"", new SortingCondition(""{s.Property.Name}"", SortingCondition.EnDirection.Asc)}},
+                {{""{s.Name}_desc"", new SortingCondition(""{s.Property.Name}"", SortingCondition.EnDirection.Desc)}},
             ");
-
-            var thenSwitches = sortableProperties.Select(d => $@"
-                     case ""{d.Name}_asc"":
-                        then = query => query.ThenBy(e => e.{d.Property.Name});
-                        break;
-                    case ""{d.Name}_desc"":
-                        then = query => query.ThenByDescending(e => e.{d.Property.Name});
-                        break;
-            ");
-
-            var className = ToCSharpRepresentation(this.Metadata.Type, true);
 
             return $@"
-            private static Expression<Func<IQueryable<{className}>, IOrderedQueryable<{className}>>> GenerateSortingExpression(JObject arguments)
+            private static Dictionary<string, SortingCondition> SortingConditions = new Dictionary<string, SortingCondition>()
+            {{
+                {string.Join(string.Empty, sortingConditions)}
+            }};
+
+
+            private static IEnumerable<SortingCondition> GenerateSortingExpression(JObject arguments)
             {{                
-                Expression<Func<IQueryable<{className}>, IOrderedQueryable<{className}>>> sort = null;
                 var sortProperty = arguments.Property(""sort"");
                 if (sortProperty == null || !sortProperty.Value.HasValues)
                 {{
-                    return null;
+                    yield break;
                 }}
 
                 var sortArgs = sortProperty.Value.ToObject<string[]>();
-                var firstSort = sortArgs.FirstOrDefault();
-                var leftArgs = sortArgs.Skip(1);
-
-                if (string.IsNullOrWhiteSpace(firstSort))
+                foreach (var sort in sortArgs)
                 {{
-                    return null;
-                }}
-
-                switch (firstSort)
-                {{ 
-                    {string.Join(string.Empty, firstSwitches)}  
-                    default:
-                       throw new Exception(""unknown sort instruction"");             
-                }}
-
-                foreach (var leftArg in leftArgs)
-                {{
-                    Expression<Func<IOrderedQueryable<{className}>, IOrderedQueryable<{className}>>> then;
-                    switch (leftArg)
+                    SortingCondition condition;
+                    if (SortingConditions.TryGetValue(sort, out condition))
                     {{
-                        {string.Join(string.Empty, thenSwitches)}  
-                        default:
-                            throw new Exception(""unknown sort instruction"");
-                    }}
-
-                    var swap = new SwapVisitor(then.Parameters[0], sort.Body);
-                    sort =
-                        Expression.Lambda<Func<IQueryable<{className}>, IOrderedQueryable<{className}>>>(
-                            swap.Visit(then.Body),
-                            sort.Parameters);
-                }}
-
-                return sort;
+                        yield return condition;
+                    }}                                      
+                }}                
             }} 
             ";
         }

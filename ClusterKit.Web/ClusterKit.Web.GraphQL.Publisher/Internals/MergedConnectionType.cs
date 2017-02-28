@@ -162,7 +162,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private GraphType GenerateFilterType()
         {
             var objectType = (MergedObjectType)this.elementType;
-            var graphType = new VirtualInputGraphType($"{this.OriginalTypeName}_Filter") { Description = $"The filter conditions for a {this.elementType.ComplexTypeName} connected objects" };
+            var graphType = new VirtualInputGraphType($"{EscapeName(this.OriginalTypeName)}_Filter") { Description = $"The filter conditions for a {this.elementType.ComplexTypeName} connected objects" };
             graphType.AddField(new FieldType { Name = "AND", ResolvedType = new ListGraphType(graphType), Description = "The filtering conditions that will pass if all internal conditions are passed" });
             graphType.AddField(new FieldType { Name = "OR", ResolvedType = new ListGraphType(graphType), Description = "The filtering conditions that will pass if any of internal conditions is passed" });
             foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray) && !p.Value.Arguments.Any()))
@@ -203,7 +203,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private GraphType GenerateSortType()
         {
             var objectType = (MergedObjectType)this.elementType;
-            var enumType = new EnumerationGraphType { Name = $"{this.OriginalTypeName}_OrderByEnum", Description = $"The list of {this.elementType.ComplexTypeName} fields that can be used as sorting functions" };
+            var enumType = new EnumerationGraphType { Name = $"{EscapeName(this.OriginalTypeName)}_OrderByEnum", Description = $"The list of {this.elementType.ComplexTypeName} fields that can be used as sorting functions" };
             foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray) && !p.Value.Arguments.Any()))
             {
                 enumType.AddValue($"{itemField.Key}_asc", $"{itemField.Key} ascending\n{itemField.Value.Description}", $"{itemField.Key}_asc");

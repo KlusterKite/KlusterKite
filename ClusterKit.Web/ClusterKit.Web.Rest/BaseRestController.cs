@@ -12,6 +12,7 @@ namespace ClusterKit.Web.Rest
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace ClusterKit.Web.Rest
 
     using Akka.Actor;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Core;
     using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
@@ -67,9 +69,18 @@ namespace ClusterKit.Web.Rest
         /// Gets a value indicating whether the individual data stored in entity is large enough to be send via parcels.
         /// </summary>
         [UsedImplicitly]
-
         // ReSharper disable once StaticMemberInGenericType
         protected static bool DataIsLarge { get; private set; }
+
+        /// <summary>
+        /// Gets the filtering condition
+        /// </summary>
+        protected abstract Expression<Func<TObject, bool>> DefaultFilter { get; }
+
+        /// <summary>
+        /// Gets the sorting function
+        /// </summary>
+        protected abstract List<SortingCondition> DefaultSort { get; }
 
         /// <summary>
         /// Gets timeout for actor system requests
@@ -179,10 +190,12 @@ namespace ClusterKit.Web.Rest
         [Route("")]
         [HttpGet]
         [UsedImplicitly]
-        public virtual async Task<List<TObject>> GetList(int count = 100, int skip = 0)
+        public virtual async Task<CollectionResponse<TObject>> GetList(int count = 100, int skip = 0)
         {
             var collectionRequest = new CollectionRequest<TObject>
                                         {
+                                            Filter = this.DefaultFilter,
+                                            Sort = this.DefaultSort,
                                             Count = count,
                                             Skip = skip,
                                             RequestContext =
@@ -190,30 +203,35 @@ namespace ClusterKit.Web.Rest
                                                     .GetRequestDescription()
                                         };
 
-            List<TObject> objects;
+            CollectionResponse<TObject> response;
             if (this.DataListIsLarge || DataIsLarge)
             {
                 collectionRequest.AcceptAsParcel = true;
                 var notification =
                     await this.System.ActorSelection(this.GetDbActorProxyPath())
                         .Ask<ParcelNotification>(collectionRequest, this.AkkaTimeout);
-                objects = (List<TObject>)await notification.Receive(this.System);
+                response = (CollectionResponse<TObject>)await notification.Receive(this.System);
             }
             else
             {
                 collectionRequest.AcceptAsParcel = false;
-                objects = await this.System.ActorSelection(this.GetDbActorProxyPath())
-                           .Ask<List<TObject>>(collectionRequest, this.AkkaTimeout);
+                response =
+                    await this.System.ActorSelection(this.GetDbActorProxyPath())
+                        .Ask<CollectionResponse<TObject>>(collectionRequest, this.AkkaTimeout);
             }
+
+            var severity = typeof(TObject).GetInterfaces().Any(i => i == typeof(ICrucialObject))
+                                 ? EnSeverity.Crucial
+                                 : EnSeverity.Trivial;
 
             SecurityLog.CreateRecord(
                 SecurityLog.EnType.DataReadGranted,
-                typeof(TObject).GetInterfaces().Any(i => i == typeof(ICrucialObject)) ? EnSeverity.Crucial : EnSeverity.Trivial,
+                severity,
                 this.Request.GetOwinContext().GetRequestDescription(),
                 "The list of {ObjectType} was read.",
                 typeof(TObject).FullName);
 
-            return objects;
+            return response;
         }
 
         /// <summary>

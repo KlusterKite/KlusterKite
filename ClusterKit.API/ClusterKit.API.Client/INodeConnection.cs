@@ -10,7 +10,7 @@
 namespace ClusterKit.API.Client
 {
     using System;
-    using System.Linq;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
@@ -51,7 +51,7 @@ namespace ClusterKit.API.Client
         /// The nodes list
         /// </returns>
         [UsedImplicitly]
-        Task<QueryResult<T>> Query(Expression<Func<T, bool>> filter, Expression<Func<IQueryable<T>, IOrderedQueryable<T>>> sort,  int? limit, int? offset);
+        Task<QueryResult<T>> Query(Expression<Func<T, bool>> filter, IEnumerable<SortingCondition> sort,  int? limit, int? offset);
 
         /// <summary>
         /// Creates a new node

@@ -10,6 +10,7 @@ namespace ClusterKit.Build
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -717,6 +718,7 @@ EndGlobal
         /// <param name="project">
         /// The project to publish
         /// </param>
+        [UsedImplicitly]
         public static void CreateNuget(ProjectDescription project)
         {
             if (!project.ProjectType.HasFlag(ProjectDescription.EnProjectType.NugetPackage))
@@ -738,17 +740,16 @@ EndGlobal
                 Directory.CreateDirectory(PackageOutputDirectory);
             }
 
-            Func<NuGetHelper.NuGetParams, NuGetHelper.NuGetParams> provider = defaults =>
-            {
-                defaults.SetFieldValue("Version", Version);
-                defaults.SetFieldValue("WorkingDir", project.CleanBuildDirectory);
-                defaults.SetFieldValue("OutputPath", PackageOutputDirectory);
-                return defaults;
-            };
+            Func<ProcessStartInfo, Unit> execParameters = defaults =>
+                {
+                    defaults.FileName = "nuget.exe";
+                    defaults.Arguments = $"pack -Version {Version} "
+                                         + $"-OutputDirectory \"{PackageOutputDirectory}\""
+                                         + $" \"{generatedNuspecFile}\"";
+                    return null;
+                };
 
-            NuGetHelper.NuGetPackDirectly(provider.ToFSharpFunc(), generatedNuspecFile);
-
-            // ReSharper restore PossibleNullReferenceException
+            ProcessHelper.ExecProcess(execParameters.ToFSharpFunc(), TimeSpan.FromMinutes(1));
         }
 
         /// <summary>

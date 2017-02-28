@@ -11,7 +11,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
     using System.Data.Entity;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
@@ -22,7 +21,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     /// <summary>
     /// Data factory to work with <see cref="Role"/>
     /// </summary>
-    public class RoleFactory : EntityDataFactory<ConfigurationContext, Role, Guid>
+    public class RoleFactory : EntityDataFactorySync<ConfigurationContext, Role, Guid>
     {
         /// <inheritdoc />
         public RoleFactory(ConfigurationContext context)
@@ -41,9 +40,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
         /// <inheritdoc />
         public override Expression<Func<Role, bool>> GetIdValidationExpression(Guid id) => obj => id == obj.Uid;
-
-        /// <inheritdoc />
-        public override IOrderedQueryable<Role> GetSortFunction(IQueryable<Role> set) => set.OrderBy(r => r.Name);
 
         /// <inheritdoc />
         protected override DbSet<Role> GetDbSet() => this.Context.Roles;

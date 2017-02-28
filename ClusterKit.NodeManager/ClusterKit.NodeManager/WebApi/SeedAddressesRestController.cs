@@ -9,10 +9,14 @@
 
 namespace ClusterKit.NodeManager.WebApi
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
     using System.Web.Http;
 
     using Akka.Actor;
 
+    using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Security.Client;
@@ -34,9 +38,16 @@ namespace ClusterKit.NodeManager.WebApi
         /// The system.
         /// </param>
         public SeedAddressesRestController(ActorSystem system)
-                    : base(system)
+            : base(system)
         {
         }
+
+        /// <inheritdoc />
+        protected override Expression<Func<SeedAddress, bool>> DefaultFilter => null;
+
+        /// <inheritdoc />
+        protected override List<SortingCondition> DefaultSort
+            => new List<SortingCondition> { new SortingCondition(nameof(SeedAddress.Id), SortingCondition.EnDirection.Asc) };
 
         /// <summary>
         /// Gets akka actor path for database worker

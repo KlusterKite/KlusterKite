@@ -28,7 +28,7 @@ namespace ClusterKit.API.Endpoint
         /// <summary>
         /// The api provider
         /// </summary>
-        private ApiProvider apiProvider;
+        private readonly ApiProvider apiProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiHandlerActor"/> class.
@@ -41,6 +41,22 @@ namespace ClusterKit.API.Endpoint
             this.apiProvider = apiProvider;
             this.Receive<MutationApiRequest>(m => this.HandleMutation(m));
             this.Receive<QueriApiRequest>(m => this.HandleQuery(m));
+
+            foreach (var generationError in apiProvider.GenerationErrors)
+            {
+                Context.GetLogger().Error(
+                    "{Type}  generationError error: {GenerationError}",
+                    apiProvider.GetType().Name,
+                    generationError);
+            }
+
+            foreach (var generationWarning in apiProvider.GenerationErrors)
+            {
+                Context.GetLogger().Warning(
+                    "{Type}  generationError warning: {GenerationError}",
+                    apiProvider.GetType().Name,
+                    generationWarning);
+            }
         }
 
         /// <summary>
@@ -49,19 +65,16 @@ namespace ClusterKit.API.Endpoint
         /// <param name="request">The request</param>
         private void HandleMutation(MutationApiRequest request)
         {
-            var context = Context;
+            var system = Context.System;
             this.apiProvider.ResolveMutation(
                     request,
                     request.Context,
-                    exception => context.GetLogger().Error(exception, "{Type}: mutation resolve exception"))
+                    exception => system.Log.Error(exception, "{Type}: mutation resolve exception", this.GetType().Name))
                 .PipeTo(
                     this.Sender,
                     this.Self,
-                    json =>
-                        {
-                            return (SurrogatableJObject)json;
-                        },
-                    e => this.HandleResolveException(e, context));
+                    json => (SurrogatableJObject)json,
+                    e => this.HandleResolveException(e, system));
         }
 
         /// <summary>
@@ -70,23 +83,32 @@ namespace ClusterKit.API.Endpoint
         /// <param name="request">The query request</param>
         private void HandleQuery(QueriApiRequest request)
         {
-            var context = Context;
+            var system = Context.System;
+            system.Log.Info(
+                "{Type}: Resolving query for API {ApiName}",
+                this.GetType().Name,
+                this.apiProvider.ApiDescription.ApiName);
+
             this.apiProvider.ResolveQuery(
                     request.Fields,
                     request.Context,
-                    exception => context.GetLogger().Error(exception, "{Type}: query resolve exception"))
-                .PipeTo(this.Sender, this.Self, json => (SurrogatableJObject)json, e => this.HandleResolveException(e, context));
+                    exception => system.Log.Error(exception, "{Type}: query resolve exception", this.GetType().Name))
+                .PipeTo(
+                    this.Sender,
+                    this.Self,
+                    json => (SurrogatableJObject)json,
+                    e => this.HandleResolveException(e, system));
         }
 
         /// <summary>
         /// Handles the execution exception
         /// </summary>
         /// <param name="exception">The exception</param>
-        /// <param name="context">The actor context</param>
+        /// <param name="system">The actor system</param>
         /// <returns>Result to send</returns>
-        private object HandleResolveException(Exception exception, IActorContext context)
+        private object HandleResolveException(Exception exception, ActorSystem system)
         {
-            context.GetLogger().Error(exception, "{Type}: execution exception");
+            system.Log.Error(exception, "{Type}: execution exception", this.GetType().Name);
             return (SurrogatableJObject)new JObject();
         }
     }

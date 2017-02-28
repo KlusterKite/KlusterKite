@@ -225,6 +225,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
+      <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj">
       <Project>{6adfbddf-e452-46fc-a037-6d57300be561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>

@@ -20,7 +20,9 @@ namespace ClusterKit.Data.EF
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Core.Monads;
+    using ClusterKit.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
 
@@ -84,30 +86,38 @@ namespace ClusterKit.Data.EF
         [UsedImplicitly]
         public abstract Expression<Func<TObject, bool>> GetIdValidationExpression(TId id);
 
-        /// <summary>
-        /// Gets a list of objects from datasource
-        /// </summary>
-        /// <param name="skip">The number of objects to skip from select</param>
-        /// <param name="count">The maximum number of objects to return. Returns all on null.</param>
-        /// <returns>The list of objects from datasource</returns>
-        public override Task<List<TObject>> GetList(int skip, int? count)
+        /// <inheritdoc />
+        public override Task<CollectionResponse<TObject>> GetList(
+            Expression<Func<TObject, bool>> filter,
+            List<SortingCondition> sort,
+            int? skip,
+            int? count)
         {
-            var query = this.GetSortFunction(this.GetDbQuery()).Skip(skip);
+            var query = this.GetDbQuery() as IQueryable<TObject>;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            var result = new CollectionResponse<TObject> { Count = query.Count() };
+            if (sort != null)
+            {
+                query = query.ApplySorting(sort);
+            }
+
+            if (skip.HasValue && query is IOrderedQueryable<TObject>)
+            {
+                query = query.Skip(skip.Value);
+            }
+
             if (count.HasValue)
             {
                 query = query.Take(count.Value);
             }
 
-            return Task.FromResult(query.ToList());
+            result.Items = query.ToList();
+            return Task.FromResult(result);
         }
-
-        /// <summary>
-        /// Gets sort function to get an ordered list from datasource
-        /// </summary>
-        /// <param name="set">The unordered set of objects</param>
-        /// <returns>The ordered set of objects</returns>
-        [UsedImplicitly]
-        public abstract IOrderedQueryable<TObject> GetSortFunction(IQueryable<TObject> set);
 
         /// <summary>
         /// Adds an object to datasource

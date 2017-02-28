@@ -104,7 +104,7 @@ namespace ClusterKit.API.Tests.Mock
         /// <inheritdoc />
         public Task<QueryResult<TestObject>> Query(
             Expression<Func<TestObject, bool>> filter,
-            Expression<Func<IQueryable<TestObject>, IOrderedQueryable<TestObject>>> sort,
+            IEnumerable<SortingCondition> sort,
             int? limit,
             int? offset)
         {
@@ -118,7 +118,7 @@ namespace ClusterKit.API.Tests.Mock
             var count = query.Count();
             if (sort != null)
             {
-                query = sort.Compile().Invoke(query);
+                query = query.ApplySorting(sort);
             }
 
             if (offset.HasValue)

@@ -357,17 +357,17 @@ namespace ClusterKit.NodeManager
             {
                 DataFactory<ConfigurationContext, NodeTemplate, int>
                     .CreateFactory(context)
-                    .GetList(0, null).Result
+                    .GetList(null, null, null, null).Result.Items
                     .ForEach(t => this.nodeTemplates[t.Code] = t);
 
                 DataFactory<ConfigurationContext, SeedAddress, int>
                     .CreateFactory(context)
-                    .GetList(0, null).Result
+                    .GetList(null, null, null, null).Result.Items
                     .ForEach(s => this.seedAddresses[s.Id] = s);
 
                 DataFactory<ConfigurationContext, NugetFeed, int>
                     .CreateFactory(context)
-                    .GetList(0, null).Result
+                    .GetList(null, null, null, null).Result.Items
                     .ForEach(f => this.nugetFeeds[f.Id] = f);
             }
         }
@@ -1022,7 +1022,7 @@ namespace ClusterKit.NodeManager
             var feedUrl = Context.System.Settings.Config.GetString(PackageRepositoryUrlPath);
             var factory = DataFactory<string, IPackage, string>.CreateFactory(feedUrl);
 
-            this.packages = factory.GetList(0, null).Result.ToDictionary(p => p.Id);
+            this.packages = factory.GetList(null, null, 0, null).Result.Items.ToDictionary(p => p.Id);
 
             foreach (var node in this.nodeDescriptions.Values)
             {

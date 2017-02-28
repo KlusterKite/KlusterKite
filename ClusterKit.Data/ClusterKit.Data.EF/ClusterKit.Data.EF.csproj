@@ -190,6 +190,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
+      <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj">
+      <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
+      <Name>ClusterKit.Data.CRUD</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Data\ClusterKit.Data.csproj">
       <Project>{0D6871D1-5A69-4533-BA4B-073B876232C5}</Project>
       <Name>ClusterKit.Data</Name>

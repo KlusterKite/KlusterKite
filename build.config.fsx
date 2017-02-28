@@ -83,9 +83,9 @@ let projects = [|
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher.Messages/ClusterKit.NodeManager.Launcher.Messages.csproj", ProjectDescription.EnProjectType.NugetPackage)
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.NodeManager.Launcher.Messages"|]))
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.FallbackPackageDependencyFixer/ClusterKit.NodeManager.FallbackPackageDependencyFixer.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.NodeManager.Launcher.Messages"|]))
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.Security.Client"|]))
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Authentication/ClusterKit.NodeManager.Authentication.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Client"; "ClusterKit.Security.Client"|]))
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.NodeManager.Client"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Monitoring.Client"|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.Security.Client"; "ClusterKit.API.Client"|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Authentication/ClusterKit.NodeManager.Authentication.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Client"; "ClusterKit.Security.Client"; "ClusterKit.API.Client"|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.NodeManager.Client"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"|]))
 
     new ProjectDescription(
         "ClusterKit.NodeManager",
@@ -109,7 +109,9 @@ let projects = [|
             "ClusterKit.Security.Client";
             "ClusterKit.Web.Authorization";           
             "ClusterKit.Web.Swagger.Messages"; 
-            "ClusterKit.Monitoring.Client"
+            "ClusterKit.Monitoring.Client";
+            "ClusterKit.API.Client"; 
+            "ClusterKit.API.Provider"
             |]))
     new ProjectDescription(
         "ClusterKit.NodeManager",
@@ -138,7 +140,9 @@ let projects = [|
             "ClusterKit.Security.Client";
             "ClusterKit.Web.Authorization";
             "ClusterKit.Web.Swagger.Messages"; 
-            "ClusterKit.Monitoring.Client"
+            "ClusterKit.Monitoring.Client";
+            "ClusterKit.API.Client"; 
+            "ClusterKit.API.Provider"
           |]))
 
 |]

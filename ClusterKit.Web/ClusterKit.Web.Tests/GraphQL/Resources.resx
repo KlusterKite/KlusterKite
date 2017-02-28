@@ -1126,7 +1126,7 @@
                   "description": "The filtering conditions",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
+                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1139,7 +1139,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_OrderByEnum",
+                      "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_OrderByEnum",
                       "ofType": null
                     }
                   },
@@ -1528,7 +1528,7 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
           "description": "The filter conditions for a ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject connected objects",
           "fields": null,
           "inputFields": [
@@ -1540,7 +1540,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
+                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
                   "ofType": null
                 }
               },
@@ -1554,7 +1554,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_Filter",
+                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
                   "ofType": null
                 }
               },
@@ -1747,7 +1747,7 @@
         },
         {
           "kind": "ENUM",
-          "name": "ClusterKit.API.Tests.Mock.TestProvider_ClusterKit.API.Tests.Mock.TestObject_OrderByEnum",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_OrderByEnum",
           "description": "The list of ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject fields that can be used as sorting functions",
           "fields": null,
           "inputFields": null,

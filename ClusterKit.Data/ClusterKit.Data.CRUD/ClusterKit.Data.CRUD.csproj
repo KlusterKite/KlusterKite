@@ -33,6 +33,10 @@
     <DocumentationFile>bin\Release\ClusterKit.Data.CRUD.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
+      <Project>{2a6edcc4-c729-4bee-9bb5-ac6f76b3bac8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
     <Reference Include="Akka, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Akka.1.1.3.344-beta\lib\net45\Akka.dll</HintPath>
@@ -140,10 +144,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionMessages\CollectionRequest.cs" />
+    <Compile Include="ActionMessages\CollectionResponse.cs" />
     <Compile Include="ActionMessages\EnActionType.cs" />
     <Compile Include="ActionMessages\ICrudActionMessage.cs" />
     <Compile Include="ActionMessages\CrudActionMessage.cs" />
     <Compile Include="ActionMessages\CrudActionResponse.cs" />
+    <Compile Include="Connection.cs" />
     <Compile Include="Exceptions\BeforeActionException.cs" />
     <Compile Include="Exceptions\DatasourceInnerException.cs" />
     <Compile Include="Exceptions\EntityNotFoundException.cs" />

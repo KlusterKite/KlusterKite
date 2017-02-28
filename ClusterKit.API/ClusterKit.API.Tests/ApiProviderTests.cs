@@ -345,7 +345,7 @@ namespace ClusterKit.API.Tests
                 }
 
                 /// <inheritdoc />
-                public Task<QueryResult<NodeObject>> Query(Expression<Func<NodeObject, bool>> filter, Expression<Func<IQueryable<NodeObject>, IOrderedQueryable<NodeObject>>> sort, int? limit, int? offset)
+                public Task<QueryResult<NodeObject>> Query(Expression<Func<NodeObject, bool>> filter, IEnumerable<SortingCondition> sort, int? limit, int? offset)
                 {
                     var query = this.nodes.AsQueryable();
 
@@ -357,7 +357,7 @@ namespace ClusterKit.API.Tests
                     var count = query.Count();
                     if (sort != null)
                     {
-                        query = sort.Compile().Invoke(query);
+                        query = query.ApplySorting(sort);
                     }
 
                     if (offset.HasValue)

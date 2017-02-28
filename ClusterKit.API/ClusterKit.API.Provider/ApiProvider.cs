@@ -94,7 +94,7 @@ namespace ClusterKit.API.Provider
         /// <returns>
         /// Resolved query
         /// </returns>
-        public async Task<JObject> ResolveQuery(List<ApiRequest> requests, RequestContext context, Action<Exception> onErrorCallback)
+        public virtual async Task<JObject> ResolveQuery(List<ApiRequest> requests, RequestContext context, Action<Exception> onErrorCallback)
         {
             var result = new JObject();
             foreach (var request in requests)
@@ -128,7 +128,7 @@ namespace ClusterKit.API.Provider
         /// <returns>
         /// Resolved query
         /// </returns>
-        public async Task<JObject> ResolveMutation(
+        public virtual async Task<JObject> ResolveMutation(
             ApiRequest request,
             RequestContext context,
             Action<Exception> onErrorCallback)
@@ -195,7 +195,8 @@ namespace ClusterKit.API.Provider
             compilerParameters.ReferencedAssemblies.AddRange(
                 AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic)
-                    .Select(a => a.CodeBase.Replace("file:\\", string.Empty).Replace("file:///", string.Empty))
+                    .Select(a => a.CodeBase.Replace("file:\\", string.Empty).Replace(
+                        Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX ? "file://" : "file:///", string.Empty))
                     .ToArray());
 
             var compiledResult = comDomProvider.CompileAssemblyFromSource(compilerParameters, code.ToArray());

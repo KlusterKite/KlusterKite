@@ -12,10 +12,13 @@ namespace ClusterKit.NodeManager
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Core.Monads;
     using ClusterKit.Data;
+    using ClusterKit.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
 
@@ -71,20 +74,40 @@ namespace ClusterKit.NodeManager
         /// </returns>
         public override string GetId(IPackage obj) => obj.Id;
 
-        /// <summary>
-        /// Gets a list of objects from datasource
-        /// </summary>
-        /// <param name="skip">The number of objects to skip from select</param><param name="count">The maximum number of objects to return. Returns all on null.</param>
-        /// <returns>
-        /// The list of objects from datasource
-        /// </returns>
-        public override async Task<List<IPackage>> GetList(int skip, int? count)
+        /// <inheritdoc />
+        public override Task<CollectionResponse<IPackage>> GetList(
+            Expression<Func<IPackage, bool>> filter,
+            List<SortingCondition> sort,
+            int? skip,
+            int? count)
         {
             var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(this.Context);
+            var query = nugetRepository.Search(string.Empty, true).AsQueryable().Where(p => p.IsLatestVersion);
 
-            return
-                await Task.Run(
-                    () => nugetRepository.Search(string.Empty, true).Where(p => p.IsLatestVersion).ToList());
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            var result = new CollectionResponse<IPackage> { Count = query.Count() };
+            if (sort != null)
+            {
+                query = query.ApplySorting(sort);
+            }
+
+            if (skip.HasValue && query is IOrderedQueryable<IPackage>)
+            {
+                query = query.Skip(skip.Value);
+            }
+
+            if (count.HasValue)
+            {
+                query = query.Take(count.Value);
+            }
+
+            result.Items = query.ToList();
+
+            return Task.FromResult(result);
         }
 
         /// <summary>

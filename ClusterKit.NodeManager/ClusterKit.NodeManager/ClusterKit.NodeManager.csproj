@@ -272,6 +272,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiProvider.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -284,6 +285,7 @@
     <Compile Include="Messages\TemplatesUsageStatistics.cs" />
     <Compile Include="NodeManagerActor.cs" />
     <Compile Include="Installer.cs" />
+    <Compile Include="NodeManagerApi.cs" />
     <Compile Include="NugetPackagesFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebApi\AuthenticationController.cs" />
@@ -304,6 +306,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
+      <Project>{2a6edcc4-c729-4bee-9bb5-ac6f76b3bac8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj">
+      <Project>{ddc4b9d1-49ac-4cd6-9fc5-fe4a02c54871}</Project>
+      <Name>ClusterKit.API.Provider</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
       <Project>{983daeb9-b058-41a9-8403-29851f2244b7}</Project>
       <Name>ClusterKit.NodeManager.Client</Name>

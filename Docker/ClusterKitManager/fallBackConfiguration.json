@@ -5,6 +5,11 @@
   "Packages": [
     {
       "BuildDate": null,
+      "Id": "ClusterKit.API.Endpoint",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
       "Id": "ClusterKit.Core.Service",
       "Version": "0.0.0-local"
     },
@@ -55,6 +60,11 @@
     },
     {
       "BuildDate": null,
+      "Id": "ClusterKit.Web.GraphQL.Publisher",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
       "Id": "ClusterKit.Web.Swagger",
       "Version": "0.0.0-local"
     },
@@ -66,22 +76,22 @@
     {
       "BuildDate": null,
       "Id": "Akka",
-      "Version": "1.1.3"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster",
-      "Version": "1.1.3"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Sharding",
-      "Version": "1.1.3.32-beta"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Cluster.Tools",
-      "Version": "1.1.3.32-beta"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
@@ -91,27 +101,27 @@
     {
       "BuildDate": null,
       "Id": "Akka.DI.Core",
-      "Version": "1.1.3"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Logger.Serilog",
-      "Version": "1.1.2"
+      "Version": "1.1.3.12-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Persistence",
-      "Version": "1.1.3.32-beta"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Remote",
-      "Version": "1.1.3"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
       "Id": "Akka.Serialization.Hyperion",
-      "Version": "1.1.3.32-beta"
+      "Version": "1.1.3.344-beta"
     },
     {
       "BuildDate": null,
@@ -127,6 +137,16 @@
       "BuildDate": null,
       "Id": "Castle.Windsor",
       "Version": "3.4.0"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.API.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.API.Provider",
+      "Version": "0.0.0-local"
     },
     {
       "BuildDate": null,
@@ -225,6 +245,31 @@
     },
     {
       "BuildDate": null,
+      "Id": "DotNetty.Buffers",
+      "Version": "0.3.2"
+    },
+    {
+      "BuildDate": null,
+      "Id": "DotNetty.Codecs",
+      "Version": "0.3.2"
+    },
+    {
+      "BuildDate": null,
+      "Id": "DotNetty.Common",
+      "Version": "0.3.2"
+    },
+    {
+      "BuildDate": null,
+      "Id": "DotNetty.Handlers",
+      "Version": "0.3.2"
+    },
+    {
+      "BuildDate": null,
+      "Id": "DotNetty.Transport",
+      "Version": "0.3.2"
+    },
+    {
+      "BuildDate": null,
       "Id": "Elasticsearch.Net",
       "Version": "5.0.1"
     },
@@ -242,6 +287,16 @@
       "BuildDate": null,
       "Id": "Google.ProtocolBuffers",
       "Version": "2.4.1.555"
+    },
+    {
+      "BuildDate": null,
+      "Id": "GraphQL",
+      "Version": "0.14.6.657"
+    },
+    {
+      "BuildDate": null,
+      "Id": "GraphQL-Parser",
+      "Version": "2.0.0"
     },
     {
       "BuildDate": null,
@@ -391,7 +446,7 @@
     {
       "BuildDate": null,
       "Id": "Serilog",
-      "Version": "2.3.0"
+      "Version": "2.4.0"
     },
     {
       "BuildDate": null,
