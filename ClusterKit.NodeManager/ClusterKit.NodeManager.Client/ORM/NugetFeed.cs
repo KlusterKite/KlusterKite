@@ -17,7 +17,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// Link to the nuget feed to download updates
     /// </summary>
-    [ApiDescription(Description = "The link to the nuget feed to download updates")]
+    [ApiDescription(Description = "The link to the nuget feed to download updates", Name = "ClusterKitNugetFeed")]
     public class NugetFeed
     {
         /// <summary>

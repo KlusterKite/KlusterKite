@@ -24,7 +24,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// The amount of privileges assigned to the user
     /// </summary>
-    [ApiDescription(Description = "Security role. The amount of privileges assigned to the user")]
+    [ApiDescription(Description = "Security role. The amount of privileges assigned to the user", Name = "ClusterKitRole")]
     public class Role
     {
         /// <summary>
@@ -97,7 +97,8 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of users assigned to this role
         /// </summary>
-        [DeclareField(Description = "The list of users assigned to this role")]
+        /// TODO: support recursive type refs
+        /// [DeclareField(Description = "The list of users assigned to this role")]
         public List<User> Users { get; set; }
     }
 }

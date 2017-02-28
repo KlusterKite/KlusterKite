@@ -14,10 +14,12 @@ namespace ClusterKit.NodeManager.Client.ORM
 
     using ClusterKit.API.Client.Attributes;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// The address of fixed cluster seed for new node configuration
     /// </summary>
-    [ApiDescription(Description = "The address of fixed cluster seed for new node configuration")]
+    [ApiDescription(Description = "The address of fixed cluster seed for new node configuration", Name = "ClusterKitSeedAddress")]
     public class SeedAddress
     {
         /// <summary>
@@ -31,6 +33,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [DeclareField(Description = "The unique address identification number", IsKey = true)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
+        [UsedImplicitly]
         public int Id { get; set; }
     }
 }

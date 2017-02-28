@@ -9,24 +9,17 @@
 
 namespace ClusterKit.NodeManager
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
     using Akka.Actor;
 
-    using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
 
-    using Newtonsoft.Json.Linq;
-
     /// <summary>
     /// The node manager API provider
     /// </summary>
-    [ApiDescription(Description = "The root provider")]
+    [ApiDescription(Description = "The root provider", Name = "ClusterKitNodeApi")]
     public class ApiProvider : API.Provider.ApiProvider
     {
         /// <summary>
@@ -65,30 +58,13 @@ namespace ClusterKit.NodeManager
             }
         }
 
-        /// <inheritdoc />
-        public override async Task<JObject> ResolveQuery(
-            List<ApiRequest> requests,
-            RequestContext context,
-            Action<Exception> onErrorCallback)
-        {
-            try
-            {
-                this.actorSystem.Log.Info("{Type} ResolveQuery execution", this.GetType().Name);
-                var resolveQuery = await base.ResolveQuery(
-                                       requests,
-                                       context,
-                                       e => this.actorSystem.Log.Error(e, "{Type}: resolve error", this.GetType().Name));
-                this.actorSystem.Log.Info(
-                    "{Type} ResolveQuery execution succeeded: {JSON}",
-                    this.GetType().Name,
-                    resolveQuery.ToString());
-                return resolveQuery;
-            }
-            catch (Exception exception)
-            {
-                this.actorSystem.Log.Error(exception, "{Type} exception during query resolve", this.GetType().Name);
-                throw;
-            }
-        }
+        /// <summary>
+        /// Gets the current user data API
+        /// </summary>
+        /// <param name="context">The request context</param>
+        /// <returns>The current user API</returns>
+        [UsedImplicitly]
+        [DeclareField(Description = "The current user")]
+        public CurrentUserApi Me(RequestContext context) => new CurrentUserApi(context);
     }
 }

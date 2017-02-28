@@ -26,7 +26,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// Node template description
     /// </summary>
     [UsedImplicitly]
-    [ApiDescription(Description = "Node template description")]
+    [ApiDescription(Description = "Node template description", Name = "ClusterKitNodeTemplate")]
     public class NodeTemplate
     {
         /// <summary>

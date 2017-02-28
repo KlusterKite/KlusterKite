@@ -278,6 +278,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
+    <Compile Include="CurrentUserApi.cs" />
     <Compile Include="Messages\ActiveNodeDescriptionsRequest.cs" />
     <Compile Include="Messages\AvailableTemplatesRequest.cs" />
     <Compile Include="Messages\NodeUpgradeRequest.cs" />

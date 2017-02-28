@@ -18,6 +18,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// The short public user description
     /// </summary>
+    [ApiDescription(Description = "Short user description", Name = "ClusterKitUserDescription")]
     public class UserDescription : IUser
     {
         /// <summary>

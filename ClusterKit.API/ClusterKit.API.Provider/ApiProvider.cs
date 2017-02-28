@@ -202,7 +202,14 @@ namespace ClusterKit.API.Provider
             var compiledResult = comDomProvider.CompileAssemblyFromSource(compilerParameters, code.ToArray());
             foreach (CompilerError error in compiledResult.Errors)
             {
-                this.generationErrors.Add(error.ToString());
+                if (error.IsWarning)
+                {
+                    this.generationWarnings.Add(error.ToString());
+                }
+                else
+                {
+                    this.generationErrors.Add(error.ToString());
+                }
             }
 
             this.resolvers = new Dictionary<string, PropertyResolver>();

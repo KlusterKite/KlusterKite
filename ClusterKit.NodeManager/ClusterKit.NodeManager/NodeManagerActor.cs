@@ -1235,8 +1235,8 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
                 this.ReceiveAsync<CollectionRequest<SeedAddress>>(this.OnCollectionRequest<SeedAddress, int>);
                 this.ReceiveAsync<CollectionRequest<NugetFeed>>(this.OnCollectionRequest<NugetFeed, int>);
-                this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, int>);
-                this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, int>);
+                this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, Guid>);
+                this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, Guid>);
 
                 this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
                 this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);

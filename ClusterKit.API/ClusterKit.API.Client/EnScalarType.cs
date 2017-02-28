@@ -53,5 +53,10 @@ namespace ClusterKit.API.Client
         /// <see cref="System.Guid"/> values
         /// </summary>
         Guid,
+
+        /// <summary>
+        /// <see cref="System.DateTime"/> or <see cref="System.DateTimeOffset"/>
+        /// </summary>
+        DateTime,
     }
 }

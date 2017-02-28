@@ -68,6 +68,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     return new StringGraphType();
                 case EnScalarType.Guid:
                     return new GuidGraphType();
+                case EnScalarType.DateTime:
+                    return new DateGraphType();
                 default:
                     throw new ArgumentOutOfRangeException();
             }

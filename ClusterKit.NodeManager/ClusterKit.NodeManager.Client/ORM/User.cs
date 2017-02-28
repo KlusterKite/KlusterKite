@@ -22,7 +22,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// The web ui user
     /// </summary>
-    [ApiDescription(Description = "The web ui user")]
+    [ApiDescription(Description = "The web ui user", Name = "ClusterKitUser")]
     public class User : UserDescription
     {
         /// <summary>
@@ -34,7 +34,8 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of roles assigned to this user
         /// </summary>
-        [DeclareField(Description = "The list of roles assigned to this user")]
+        /// TODO: support recursive type refs
+        /// [DeclareField(Description = "The list of roles assigned to this user")]
         public List<Role> Roles { get; set; } = new List<Role>();
 
         /// <summary>

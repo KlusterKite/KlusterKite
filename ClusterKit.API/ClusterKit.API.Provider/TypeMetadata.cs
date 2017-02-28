@@ -114,6 +114,11 @@ namespace ClusterKit.API.Provider
                 return EnScalarType.Decimal;
             }
 
+            if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
+            {
+                return EnScalarType.DateTime;
+            }
+
             return EnScalarType.None;
         }
 
