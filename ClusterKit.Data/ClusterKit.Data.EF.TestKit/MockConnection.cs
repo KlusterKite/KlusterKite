@@ -53,7 +53,7 @@ namespace ClusterKit.Data.EF.TestKit
         {
             get
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
         }
 
@@ -68,7 +68,7 @@ namespace ClusterKit.Data.EF.TestKit
         {
             get
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
         }
 
@@ -115,7 +115,7 @@ namespace ClusterKit.Data.EF.TestKit
         /// <param name="isolationLevel">Specifies the isolation level for the transaction.</param>
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace ClusterKit.Data.EF.TestKit
         /// </returns>
         protected override DbCommand CreateDbCommand()
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
     }
 }

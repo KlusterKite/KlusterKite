@@ -621,7 +621,7 @@ namespace ClusterKit.NodeManager.Tests
             };
             router.RegisterVirtualNode(node2.Address.Address, node2.Client);
             node2.GoUp();
-
+            this.ExpectNoMsg();
             stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
             Assert.NotNull(stats);
             Assert.Equal(2, stats.Templates.Count);
@@ -636,6 +636,7 @@ namespace ClusterKit.NodeManager.Tests
 
             node1.Description.Modules[0].Version = "0.1.0.0";
             node1.GoUp();
+            this.ExpectNoMsg();
 
             stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
             Assert.NotNull(stats);

@@ -116,7 +116,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
             Context.GetLogger()
                 .Info("{Type}: API endpoint node {NodeAddress} was removed", this.GetType().Name, address.ToString());
 
-            // todo: handle node removal
             List<string> apiNames;
             if (this.knownActiveNodes.TryGetValue(address, out apiNames))
             {

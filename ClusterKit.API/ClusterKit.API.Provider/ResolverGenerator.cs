@@ -109,7 +109,7 @@ namespace ClusterKit.API.Provider
                 returnNull = "Task.FromResult<JToken>(null)";
             }
 
-            var checkQuery = this.Metadata.ScalarType == EnScalarType.None 
+            var checkQuery = this.Metadata.ScalarType == EnScalarType.None && !this.Metadata.Type.IsSubclassOf(typeof(Enum))
                 ? $@"
                     if (query == null || query.Fields == null) 
                     {{
@@ -248,13 +248,19 @@ namespace ClusterKit.API.Provider
         /// <returns>The properties and methods C# code</returns>
         protected virtual string GenerateConnectionSorter()
         {
-            ApiObjectType sortedApiType;
+            ApiType sortedApiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
             {
                 throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not registered");
             }
+
+            var sortedApiObjectType = sortedApiType as ApiObjectType;
+            if (sortedApiObjectType == null)
+            {
+                throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not an object type");
+            }
             
-            var sortableProperties = sortedApiType.Fields
+            var sortableProperties = sortedApiObjectType.Fields
                 .Where(f => f.Flags.HasFlag(EnFieldFlags.IsSortable))
                 .Select(f => new { f.Name, Property = this.Data.Members[sortedApiType.TypeName][f.Name] as PropertyInfo })
                 .Where(d => d.Property != null)
@@ -299,17 +305,23 @@ namespace ClusterKit.API.Provider
         /// <returns>The properties and methods C# code</returns>
         protected virtual string GenerateConnectionFilter()
         {
-            ApiObjectType sortedApiType;
+            ApiType sortedApiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
             {
                 throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not registered");
             }
 
+            var sortedApiObjectType = sortedApiType as ApiObjectType;
+            if (sortedApiObjectType == null)
+            {
+                throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not an object type");
+            }
+
             var className = ToCSharpRepresentation(this.Metadata.Type, true);
-            var filterable = sortedApiType.Fields
+            var filterable = sortedApiObjectType.Fields
                 .Where(f => f.Flags.HasFlag(EnFieldFlags.IsFilterable))
                 .Select(f => new { f.Name, Property = this.Data.Members[sortedApiType.TypeName][f.Name] as PropertyInfo, f.ScalarType })
-                .Where(d => d.Property != null && d.ScalarType != EnScalarType.None)
+                .Where(d => d.Property != null /*&& d.ScalarType != EnScalarType.None*/)
                 .Select(d => new
                                  {
                                      ExpressionParameter = $"filterProperty_{d.Property.Name}",
@@ -587,7 +599,9 @@ namespace ClusterKit.API.Provider
 
             if (this.Metadata.MetaType == TypeMetadata.EnMetaType.Scalar)
             {
-                return isSync ? "return Task.FromResult<JToken>(new JValue(resultSource));" : "return new JValue(resultSource);";
+                return isSync 
+                    ? $"return Task.FromResult<JToken>(new JValue(({ToCSharpRepresentation(this.Metadata.Type, true)})resultSource));" 
+                    : $"return new JValue(({ToCSharpRepresentation(this.Metadata.Type, true)})resultSource);";
             }
 
             if (this.Metadata.MetaType == TypeMetadata.EnMetaType.Object)
@@ -670,6 +684,24 @@ namespace ClusterKit.API.Provider
         /// <returns>Code to return result</returns>
         protected virtual string GenerateObjectResolve(string itemName, Type type, string queryVariableName = "query")
         {
+            ApiType apiType;
+            if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(type.FullName, out apiType))
+            {
+                throw new InvalidOperationException($"Type {type.FullName} was not described as API type");
+            }
+
+            var apiObjectEnum = apiType as ApiEnumType;
+            if (apiObjectEnum != null)
+            {
+                return $"var result = new JValue({itemName}.ToString());\r\n";
+            }
+
+            var apiObjectType = apiType as ApiObjectType;
+            if (apiObjectType == null)
+            { 
+                throw new InvalidOperationException($"Type {type.FullName} is not an object type");
+            }
+
             var prefix = @"
                 var result = new JObject();
                 ApiRequest fieldQuery;
@@ -678,13 +710,7 @@ namespace ClusterKit.API.Provider
 
             List<string> codeCommands = new List<string> { prefix };
 
-            ApiObjectType apiType;
-            if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(type.FullName, out apiType))
-            {
-                throw new InvalidOperationException($"Type {type.FullName} was not described as API type");
-            }
-
-            foreach (var apiField in apiType.Fields)
+            foreach (var apiField in apiObjectType.Fields)
             {
                 var command = $@"
                     fieldQuery = {queryVariableName}.Fields.FirstOrDefault(f => f.FieldName == ""{apiField.Name}"");

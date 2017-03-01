@@ -76,6 +76,8 @@ namespace ClusterKit.API.Tests
         [InlineData(null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
         [InlineData(null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
 
+        [InlineData(null, "[\"type_asc\", \"name_asc\"]", 10, 0, 5, new[] { "1-test", "3-test", "5-test", "2-test", "4-test" })]
+
         [InlineData("{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
         [InlineData("{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
         [InlineData("{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
@@ -98,6 +100,8 @@ namespace ClusterKit.API.Tests
         [InlineData("{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
         [InlineData("{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
 
+        [InlineData("{\"type\": \"Good\"}", null, 10, 0, 3, new[] { "1-test", "3-test", "5-test" })]
+
         [InlineData(null, null, 3, null, 5, new[] { "1-test", "2-test", "3-test" })]
         [InlineData(null, null, 3, 1, 5, new[] { "2-test", "3-test", "4-test" })]
         [InlineData(null, null, 3, 2, 5, new[] { "3-test", "4-test", "5-test" })]
@@ -108,11 +112,11 @@ namespace ClusterKit.API.Tests
         {
             var initialObjects = new List<TestObject>
                                      {
-                                         new TestObject { Name = "1-test", Value = 100m },
-                                         new TestObject { Name = "2-test", Value = 50m },
-                                         new TestObject { Name = "3-test", Value = 50m },
-                                         new TestObject { Name = "4-test", Value = 70m },
-                                         new TestObject { Name = "5-test", Value = 6m },
+                                         new TestObject { Name = "1-test", Value = 100m, Type = TestObject.EnObjectType.Good },
+                                         new TestObject { Name = "2-test", Value = 50m, Type = TestObject.EnObjectType.Bad },
+                                         new TestObject { Name = "3-test", Value = 50m, Type = TestObject.EnObjectType.Good },
+                                         new TestObject { Name = "4-test", Value = 70m, Type = TestObject.EnObjectType.Bad },
+                                         new TestObject { Name = "5-test", Value = 6m, Type = TestObject.EnObjectType.Good },
                                      };
 
             var provider = this.GetProvider(initialObjects);
@@ -531,6 +535,30 @@ namespace ClusterKit.API.Tests
             Assert.NotNull(result);
             Assert.NotNull(result.Property("syncScalarField"));
             Assert.Equal("SyncScalarField", result.Property("syncScalarField").ToObject<string>());
+        }
+
+        /// <summary>
+        /// Testing sync scalar enum field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task SyncScalarEnumFieldTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest>
+                            {
+                                new ApiRequest { FieldName = "syncEnumField" },
+                                new ApiRequest { FieldName = "syncFlagsField" }
+                            };
+
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("syncEnumField"));
+            Assert.Equal("EnumItem1", result.Property("syncEnumField").ToObject<string>());
+            Assert.NotNull(result.Property("syncFlagsField"));
+            Assert.Equal(1, result.Property("syncFlagsField").ToObject<int>());
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace ClusterKit.API.Client
     using JetBrains.Annotations;
 
     /// <summary>
-    /// The api provided type
+    /// The api provided type of object with fields
     /// </summary>
     public class ApiObjectType : ApiType
     {

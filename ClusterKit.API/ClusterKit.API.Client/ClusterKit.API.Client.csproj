@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiDescription.cs" />
+    <Compile Include="ApiEnumType.cs" />
     <Compile Include="ApiField.cs" />
     <Compile Include="ApiRequest.cs" />
     <Compile Include="ApiObjectType.cs" />

@@ -39,7 +39,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// <summary>
         /// The test output
         /// </summary>
-        private ITestOutputHelper output;
+        private readonly ITestOutputHelper output;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphQlControllerTests"/> class.

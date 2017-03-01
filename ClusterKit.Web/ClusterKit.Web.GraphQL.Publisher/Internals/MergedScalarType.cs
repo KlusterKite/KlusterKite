@@ -39,10 +39,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public FieldProvider Provider { get; }
 
         /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers => new[]
-                                                                    {
-                                                                        this.Provider
-                                                                    };
+        public override IEnumerable<FieldProvider> Providers
+        {
+            get
+            {
+                yield return this.Provider;
+            }
+        }
 
         /// <summary>
         /// Gets the scalar type
@@ -56,8 +59,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 case EnScalarType.Boolean:
                     return new BooleanGraphType();
-                case EnScalarType.Enum:
-                    throw new NotImplementedException();
                 case EnScalarType.Float:
                     return new FloatGraphType();
                 case EnScalarType.Decimal:
@@ -73,6 +74,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        /// <inheritdoc />
+        public override object Resolve(ResolveFieldContext context)
+        {
+            var resolve = base.Resolve(context);
+            return resolve;
         }
 
         /// <inheritdoc />

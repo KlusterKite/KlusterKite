@@ -25,11 +25,6 @@ namespace ClusterKit.API.Client
         Boolean,
 
         /// <summary>
-        /// Enumeration type
-        /// </summary>
-        Enum,
-
-        /// <summary>
         /// Floating point values
         /// </summary>
         Float,

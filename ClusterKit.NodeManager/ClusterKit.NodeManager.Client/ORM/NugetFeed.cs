@@ -58,7 +58,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets type of feed
         /// </summary>
-        /// todo: publish field after enum support implementation
+        [DeclareField(Description = "The  type of feed")]
         public EnFeedType Type { get; set; }
 
         /// <summary>

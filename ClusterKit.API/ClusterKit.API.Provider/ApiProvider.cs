@@ -152,7 +152,7 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.Mutations.Clear();
 
             var assembleData = new AssembleTempData();
-            var root = this.GenerateTypeDescription(this.GetType(), assembleData);
+            var root = (ApiObjectType)this.GenerateTypeDescription(this.GetType(), assembleData);
 
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
             this.ApiDescription.Description = root.Description;
@@ -187,7 +187,7 @@ namespace ClusterKit.API.Provider
             var code = data.ResolverGenerators.Select(g => g.Generate()).ToList();
             var comDomProvider = CodeDomProvider.CreateProvider("C#");
 #if DEBUG
-            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = true };
+            var compilerParameters = new CompilerParameters { GenerateInMemory = false, IncludeDebugInformation = true };
 #else
             var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = false };
 #endif
@@ -381,29 +381,30 @@ namespace ClusterKit.API.Provider
             data.ResolverGenerators.Add(resolverGenerator);
             data.ResolverNames[apiType.TypeName][name] = resolverGenerator.ClassName;
 
+            var flags = metadata.GetFlags();
+
+            if ((metadata.Type.IsSubclassOf(typeof(Enum)) || metadata.ScalarType != EnScalarType.None)
+                && !metadata.IsAsync && !metadata.IsForwarding
+                && (metadata.MetaType == TypeMetadata.EnMetaType.Object
+                    || metadata.MetaType == TypeMetadata.EnMetaType.Scalar))
+            {
+                flags |= EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable;
+            }
+
+            if (!metadata.IsAsync && !metadata.IsForwarding && property.CanWrite
+                && metadata.MetaType != TypeMetadata.EnMetaType.Connection)
+            {
+                flags |= EnFieldFlags.CanBeUsedInInput;
+            }
+
             if (metadata.ScalarType != EnScalarType.None)
             {
-                var flags = metadata.GetFlags();
-                if (!metadata.IsAsync && !metadata.IsForwarding && metadata.MetaType == TypeMetadata.EnMetaType.Scalar)
-                {
-                    flags |= EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable;
-                }
-
-                if (!metadata.IsAsync && !metadata.IsForwarding && property.CanWrite && metadata.MetaType != TypeMetadata.EnMetaType.Connection)
-                {
-                    flags |= EnFieldFlags.CanBeUsedInInput;
-                }
-
                 if ((attribute as DeclareFieldAttribute)?.IsKey == true)
                 {
                     flags |= EnFieldFlags.IsKey;
                 }
 
-                return ApiField.Scalar(
-                    name,
-                    metadata.ScalarType,
-                    flags,
-                    description: attribute.Description);
+                return ApiField.Scalar(name, metadata.ScalarType, flags, description: attribute.Description);
             }
 
             var returnApiType = this.GenerateTypeDescription(metadata.Type, data);
@@ -411,7 +412,7 @@ namespace ClusterKit.API.Provider
             return ApiField.Object(
                 name,
                 returnApiType.TypeName,
-                metadata.GetFlags(),
+                flags,
                 description: attribute.Description);
         }
 
@@ -592,7 +593,7 @@ namespace ClusterKit.API.Provider
                     continue;
                 }
 
-                ApiObjectType connectionApiType;
+                ApiType connectionApiType;
                 if (!data.DiscoveredApiTypes.TryGetValue(connection.TypeName, out connectionApiType))
                 {
                     this.generationErrors.Add(
@@ -725,17 +726,24 @@ namespace ClusterKit.API.Provider
                     continue;
                 }
 
-                ApiObjectType subType;
+                ApiType subType;
                 if (!data.DiscoveredApiTypes.TryGetValue(subContainer.TypeName, out subType))
                 {
                     this.generationErrors.Add($"Could not find declared api type {subContainer.TypeName}");
                     continue;
                 }
 
+                var subObjectType = subType as ApiObjectType;
+
+                if (subObjectType == null)
+                {
+                    continue;
+                }
+
                 var newPath = new List<string>(path) { subContainer.Name };
                 var newTypesUsed = new List<string>(typesUsed) { apiType.TypeName };
 
-                foreach (var generateMutation in this.GenerateMutations(subType, newPath, newTypesUsed, data))
+                foreach (var generateMutation in this.GenerateMutations(subObjectType, newPath, newTypesUsed, data))
                 {
                     yield return generateMutation;
                 }
@@ -754,31 +762,43 @@ namespace ClusterKit.API.Provider
         /// <returns>
         /// The api type description
         /// </returns>
-        private ApiObjectType GenerateTypeDescription([NotNull] Type type, [NotNull] AssembleTempData data)
+        private ApiType GenerateTypeDescription([NotNull] Type type, [NotNull] AssembleTempData data)
         {
-            ApiObjectType apiType;
+            ApiType apiType;
             if (data.DiscoveredApiTypes.TryGetValue(type.FullName, out apiType))
             {
                 return apiType;
             }
 
             var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
-            apiType = new ApiObjectType(descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type, true))
+            
+            if (type.IsSubclassOf(typeof(Enum)))
+            {
+                var apiEnumType =
+                    new ApiEnumType(
+                        descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type, true),
+                        Enum.GetNames(type)) { Description = descriptionAttribute?.Description };
+                data.DiscoveredTypes[apiEnumType.TypeName] = type;
+                data.DiscoveredApiTypes[apiEnumType.TypeName] = apiEnumType;
+                data.ApiTypeByOriginalTypeNames[type.FullName] = apiEnumType;
+                return apiEnumType;
+            }
+
+            var apiObjectType = new ApiObjectType(descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type, true))
                           {
                               Description =
                                   descriptionAttribute?.Description
                           };
 
-            data.DiscoveredTypes[apiType.TypeName] = type;
-            data.DiscoveredApiTypes[apiType.TypeName] = apiType;
-            data.ApiTypeByOriginalTypeNames[type.FullName] = apiType;
-            data.ResolverNames[apiType.TypeName] = new Dictionary<string, string>();
-            data.Members[apiType.TypeName] = new Dictionary<string, MemberInfo>();
+            data.DiscoveredTypes[apiObjectType.TypeName] = type;
+            data.DiscoveredApiTypes[apiObjectType.TypeName] = apiObjectType;
+            data.ApiTypeByOriginalTypeNames[type.FullName] = apiObjectType;
 
-            apiType.Fields.AddRange(this.GenerateTypeProperties(type, apiType, data));
-            apiType.Fields.AddRange(this.GenerateTypeMethods(type, apiType, data));
-
-            return apiType;
+            data.ResolverNames[apiObjectType.TypeName] = new Dictionary<string, string>();
+            data.Members[apiObjectType.TypeName] = new Dictionary<string, MemberInfo>();
+            apiObjectType.Fields.AddRange(this.GenerateTypeProperties(type, apiObjectType, data));
+            apiObjectType.Fields.AddRange(this.GenerateTypeMethods(type, apiObjectType, data));
+            return apiObjectType;
         }
 
         /// <summary>
@@ -827,6 +847,11 @@ namespace ClusterKit.API.Provider
                 {
                     metadata.MetaType = TypeMetadata.EnMetaType.Object;
                 }
+            }
+
+            if (scalarType != EnScalarType.None && type.IsSubclassOf(typeof(Enum)))
+            {
+                type = Enum.GetUnderlyingType(type);
             }
 
             // todo: check forwarding type

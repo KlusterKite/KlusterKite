@@ -19,6 +19,22 @@ namespace ClusterKit.API.Tests.Mock
     public class TestObject
     {
         /// <summary>
+        /// The type of object as enum
+        /// </summary>
+        public enum EnObjectType
+        {
+            /// <summary>
+            /// This is good object
+            /// </summary>
+            Good = 1,
+
+            /// <summary>
+            /// This is bad object
+            /// </summary>
+            Bad = 2
+        }
+
+        /// <summary>
         /// Gets or sets the name of the object
         /// </summary>
         [DeclareField]
@@ -35,5 +51,11 @@ namespace ClusterKit.API.Tests.Mock
         /// </summary>
         [DeclareField]
         public decimal Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets some value
+        /// </summary>
+        [DeclareField]
+        public EnObjectType Type { get; set; } = EnObjectType.Good;
     }
 }

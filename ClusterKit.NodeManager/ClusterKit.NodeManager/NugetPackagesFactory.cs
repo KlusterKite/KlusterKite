@@ -50,7 +50,7 @@ namespace ClusterKit.NodeManager
         /// </returns>
         public override Task<Maybe<IPackage>> Delete(string id)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace ClusterKit.NodeManager
         /// </returns>
         public override Task<Maybe<IPackage>> Get(string id)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace ClusterKit.NodeManager
         /// </returns>
         public override Task Insert(IPackage obj)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace ClusterKit.NodeManager
         /// </returns>
         public override Task Update(IPackage newData, IPackage oldData)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
     }
 }

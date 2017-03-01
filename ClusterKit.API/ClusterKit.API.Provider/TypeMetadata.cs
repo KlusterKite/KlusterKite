@@ -11,6 +11,7 @@ namespace ClusterKit.API.Provider
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
 
     using ClusterKit.API.Client;
 
@@ -99,7 +100,8 @@ namespace ClusterKit.API.Provider
             }
 
             if (type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(uint)
-                || type == typeof(ulong) || type == typeof(ushort))
+                || type == typeof(ulong) || type == typeof(ushort)
+                || (type.IsSubclassOf(typeof(Enum)) && type.GetCustomAttribute(typeof(FlagsAttribute)) != null))
             {
                 return EnScalarType.Integer;
             }

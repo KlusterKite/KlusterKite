@@ -54,6 +54,41 @@ namespace ClusterKit.API.Tests.Mock
         }
 
         /// <summary>
+        /// Test enum
+        /// </summary>
+        [ApiDescription(Description = "The test enum")]
+        public enum EnTest
+        {
+            /// <summary>
+            /// Test enum item1
+            /// </summary>
+            EnumItem1 = 1,
+
+            /// <summary>
+            /// Test enum item2
+            /// </summary>
+            EnumItem2 = 2
+        }
+
+        /// <summary>
+        /// Test enum
+        /// </summary>
+        [ApiDescription(Description = "The test flags")]
+        [Flags]
+        public enum EnFlags
+        {
+            /// <summary>
+            /// Test enum item1
+            /// </summary>
+            FlagsItem1 = 1,
+
+            /// <summary>
+            /// Test enum item2
+            /// </summary>
+            FlagsItem2 = 2
+        }
+
+        /// <summary>
         /// Async scalar field
         /// </summary>
         [DeclareField]
@@ -128,6 +163,20 @@ namespace ClusterKit.API.Tests.Mock
         [DeclareField]
         [UsedImplicitly]
         public string SyncScalarField => "SyncScalarField";
+
+        /// <summary>
+        /// Sync scalar field
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public EnTest SyncEnumField => EnTest.EnumItem1;
+
+        /// <summary>
+        /// Sync scalar field
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public EnFlags SyncFlagsField => EnFlags.FlagsItem1;
 
         /// <summary>
         /// Some public method

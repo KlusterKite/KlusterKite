@@ -1243,6 +1243,30 @@
               "deprecationReason": null
             },
             {
+              "name": "syncEnumField",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider_EnTest",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "syncFlagsField",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "asyncObjectMethod",
               "description": null,
               "args": [
@@ -1509,6 +1533,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -1524,6 +1560,29 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "Good",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "Bad",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
           "possibleTypes": null
         },
         {
@@ -1557,6 +1616,26 @@
                   "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "type",
+              "description": "The type exactly equals the value\n",
+              "type": {
+                "kind": "ENUM",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "type_not",
+              "description": "The type not equals the value\n",
+              "type": {
+                "kind": "ENUM",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -1786,6 +1865,41 @@
             {
               "name": "value_desc",
               "description": "value descending\n",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type_asc",
+              "description": "type ascending\n",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type_desc",
+              "description": "type descending\n",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider_EnTest",
+          "description": "The test enum",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "EnumItem1",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "EnumItem2",
+              "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             }
@@ -2088,6 +2202,16 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "Decimal",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "type",
+              "description": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
                 "ofType": null
               },
               "defaultValue": null

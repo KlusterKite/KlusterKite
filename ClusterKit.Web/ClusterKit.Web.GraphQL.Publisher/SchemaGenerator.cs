@@ -230,47 +230,52 @@ namespace ClusterKit.Web.GraphQL.Publisher
             MergedType fieldType;
             if (apiField.ScalarType != EnScalarType.None)
             {
-                fieldType = new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
+                return new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
             }
-            else
+
+            var apiType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
+            var apiEnumType = apiType as ApiEnumType;
+            if (apiEnumType != null)
             {
-                var apiFieldType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
-                var objectType = complexField?.Type as MergedObjectType
-                                 ?? (createAsInput
-                                         ? new MergedInputType($"{provider.Description.ApiName}_{apiField.TypeName}")
-                                         : new MergedObjectType($"{provider.Description.ApiName}_{apiField.TypeName}"));
-                objectType.AddProvider(new FieldProvider { FieldType = apiFieldType, Provider = provider });
-                if (complexField != null)
-                {
-                    objectType.Category = MergedObjectType.EnCategory.MultipleApiType;
-                }
+                return new MergedEnumType(apiEnumType, new FieldProvider { Provider = provider });
+            }
 
-                if (path.Contains(apiFieldType.TypeName))
-                {
-                    // todo: write circular reference error
-                    return null;
-                }
+            var apiObjectType = (ApiObjectType)apiType;
+            var objectType = complexField?.Type as MergedObjectType
+                             ?? (createAsInput
+                                     ? new MergedInputType($"{provider.Description.ApiName}_{apiField.TypeName}")
+                                     : new MergedObjectType($"{provider.Description.ApiName}_{apiField.TypeName}"));
+            objectType.AddProvider(new FieldProvider { FieldType = apiObjectType, Provider = provider });
+            if (complexField != null)
+            {
+                objectType.Category = MergedObjectType.EnCategory.MultipleApiType;
+            }
 
-                var fieldsToMerge = createAsInput
-                                        ? apiFieldType.Fields.Where(
-                                            f => !f.Flags.HasFlag(EnFieldFlags.IsConnection) && !f.Arguments.Any())
-                                        : apiFieldType.Fields;
+            if (path.Contains(apiObjectType.TypeName))
+            {
+                // todo: write circular reference error
+                return null;
+            }
 
-                MergeFields(
-                    objectType,
-                    fieldsToMerge,
-                    provider,
-                    path.Union(new[] { apiFieldType.TypeName }).ToList());
+            var fieldsToMerge = createAsInput
+                                    ? apiObjectType.Fields.Where(
+                                        f => !f.Flags.HasFlag(EnFieldFlags.IsConnection) && !f.Arguments.Any())
+                                    : apiObjectType.Fields;
 
-                fieldType = objectType;
+            MergeFields(
+                objectType,
+                fieldsToMerge,
+                provider,
+                path.Union(new[] { apiObjectType.TypeName }).ToList());
 
-                if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
-                {
-                    fieldType = new MergedConnectionType(
-                        objectType.OriginalTypeName,
-                        new FieldProvider { Provider = provider, FieldType = apiFieldType },
-                        objectType);
-                }
+            fieldType = objectType;
+
+            if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
+            {
+                fieldType = new MergedConnectionType(
+                    objectType.OriginalTypeName,
+                    new FieldProvider { Provider = provider, FieldType = apiObjectType },
+                    objectType);
             }
 
             return fieldType;

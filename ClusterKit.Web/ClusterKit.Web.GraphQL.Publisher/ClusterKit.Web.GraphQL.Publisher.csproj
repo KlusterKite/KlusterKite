@@ -255,6 +255,7 @@
     <Compile Include="ApiBrowserActor.cs" />
     <Compile Include="ApiProvider.cs" />
     <Compile Include="Internals\Converter.cs" />
+    <Compile Include="Internals\MergedEnumType.cs" />
     <Compile Include="OwinConfigurator.cs" />
     <Compile Include="SchemaProvider.cs" />
     <Compile Include="TempApiRequest.cs" />

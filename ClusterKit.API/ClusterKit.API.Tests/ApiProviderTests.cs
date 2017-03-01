@@ -78,7 +78,10 @@ namespace ClusterKit.API.Tests
 
             Assert.Equal("TestApi", description.ApiName);
             Assert.Equal(this.GetType().Assembly.GetName().Version, description.Version);
-            Assert.Equal(3, description.Types.Count);
+            Assert.Equal(4, description.Types.Count);
+
+            Assert.NotNull(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnTest".ToLower())));
+            Assert.Null(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnFlags".ToLower())));
 
             var nodeType = description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("nodeobject"));
             Assert.NotNull(nodeType);
@@ -256,6 +259,41 @@ namespace ClusterKit.API.Tests
             /// The node object connection
             /// </summary>
             private readonly NodeObjectConnection nodeObjectConnection = new NodeObjectConnection();
+            
+            /// <summary>
+            /// Test enum
+            /// </summary>
+            [ApiDescription(Description = "The test enum")]
+            public enum EnTest
+            {
+                /// <summary>
+                /// Test enum item1
+                /// </summary>
+                EnumItem1,
+
+                /// <summary>
+                /// Test enum item2
+                /// </summary>
+                EnumItem2
+            }
+
+            /// <summary>
+            /// Test enum
+            /// </summary>
+            [ApiDescription(Description = "The test enum")]
+            [Flags]
+            public enum EnFlags
+            {
+                /// <summary>
+                /// Test enum item1
+                /// </summary>
+                EnumItem1 = 1,
+
+                /// <summary>
+                /// Test enum item2
+                /// </summary>
+                EnumItem2 = 2
+            }
 
             /// <summary>
             /// Gets just the array of objects
@@ -277,6 +315,20 @@ namespace ClusterKit.API.Tests
             [UsedImplicitly]
             [DeclareField(Description = "Published string")]
             public string PublishedStringProperty => "Published string";
+
+            /// <summary>
+            /// The published string property.
+            /// </summary>
+            [UsedImplicitly]
+            [DeclareField(Description = "Published enum")]
+            public EnTest PublishedEnumProperty => EnTest.EnumItem1;
+
+            /// <summary>
+            /// The published string property.
+            /// </summary>
+            [UsedImplicitly]
+            [DeclareField(Description = "Published flag")]
+            public EnFlags PublishedFlagsProperty => EnFlags.EnumItem1 | EnFlags.EnumItem2;
 
             /// <summary>
             /// Gets the string array

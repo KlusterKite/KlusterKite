@@ -162,10 +162,50 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private GraphType GenerateFilterType()
         {
             var objectType = (MergedObjectType)this.elementType;
-            var graphType = new VirtualInputGraphType($"{EscapeName(this.OriginalTypeName)}_Filter") { Description = $"The filter conditions for a {this.elementType.ComplexTypeName} connected objects" };
-            graphType.AddField(new FieldType { Name = "AND", ResolvedType = new ListGraphType(graphType), Description = "The filtering conditions that will pass if all internal conditions are passed" });
-            graphType.AddField(new FieldType { Name = "OR", ResolvedType = new ListGraphType(graphType), Description = "The filtering conditions that will pass if any of internal conditions is passed" });
-            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray) && !p.Value.Arguments.Any()))
+            var graphType = new VirtualInputGraphType($"{EscapeName(this.OriginalTypeName)}_Filter")
+                                {
+                                    Description =
+                                        $"The filter conditions for a {this.elementType.ComplexTypeName} connected objects"
+                                };
+            graphType.AddField(
+                new FieldType
+                    {
+                        Name = "AND",
+                        ResolvedType = new ListGraphType(graphType),
+                        Description =
+                            "The filtering conditions that will pass if all internal conditions are passed"
+                    });
+            graphType.AddField(
+                new FieldType
+                    {
+                        Name = "OR",
+                        ResolvedType = new ListGraphType(graphType),
+                        Description =
+                            "The filtering conditions that will pass if any of internal conditions is passed"
+                    });
+
+            var enumFields =
+                objectType.Fields.Where(
+                    p =>
+                        p.Value.Type is MergedEnumType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray)
+                        && !p.Value.Arguments.Any());
+
+            foreach (var itemField in enumFields)
+            {
+                graphType.AddFields(
+                    this.GenerateStrictEqualFilterFields(
+                        itemField.Key,
+                        itemField.Value.Description,
+                        itemField.Value.Type.GenerateGraphType()));
+            }
+
+            var scalarFields =
+                objectType.Fields.Where(
+                    p =>
+                        p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray)
+                        && !p.Value.Arguments.Any());
+
+            foreach (var itemField in scalarFields)
             {
                 var type = (MergedScalarType)itemField.Value.Type;
                 if (type == null)
@@ -173,19 +213,25 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     continue;
                 }
 
+                // todo: work with enum
                 switch (type.ScalarType)
                 {
                     case EnScalarType.Guid:
                     case EnScalarType.Boolean:
-                        graphType.AddFields(this.GenerateStrictEqualFilterFields(itemField.Key, itemField.Value.Description, type.GenerateGraphType()));
-                        break;
-                    case EnScalarType.Enum:
-                        // todo: work with enum
+                        graphType.AddFields(
+                            this.GenerateStrictEqualFilterFields(
+                                itemField.Key,
+                                itemField.Value.Description,
+                                type.GenerateGraphType()));
                         break;
                     case EnScalarType.Float:
                     case EnScalarType.Decimal:
                     case EnScalarType.Integer:
-                        graphType.AddFields(this.GenerateNumberFilterFields(itemField.Key, itemField.Value.Description, type.GenerateGraphType()));
+                        graphType.AddFields(
+                            this.GenerateNumberFilterFields(
+                                itemField.Key,
+                                itemField.Value.Description,
+                                type.GenerateGraphType()));
                         break;
                     case EnScalarType.String:
                         graphType.AddFields(this.GenerateStringFilterFields(itemField.Key, itemField.Value.Description));
@@ -203,11 +249,29 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private GraphType GenerateSortType()
         {
             var objectType = (MergedObjectType)this.elementType;
-            var enumType = new EnumerationGraphType { Name = $"{EscapeName(this.OriginalTypeName)}_OrderByEnum", Description = $"The list of {this.elementType.ComplexTypeName} fields that can be used as sorting functions" };
-            foreach (var itemField in objectType.Fields.Where(p => p.Value.Type is MergedScalarType && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray) && !p.Value.Arguments.Any()))
+            var enumType = new EnumerationGraphType
+                               {
+                                   Name = $"{EscapeName(this.OriginalTypeName)}_OrderByEnum",
+                                   Description =
+                                       $"The list of {this.elementType.ComplexTypeName} fields that can be used as sorting functions"
+                               };
+            var sortableFields =
+                objectType.Fields.Where(
+                    p =>
+                        (p.Value.Type is MergedScalarType || p.Value.Type is MergedEnumType) 
+                        && !p.Value.Flags.HasFlag(EnFieldFlags.IsArray)
+                        && !p.Value.Arguments.Any());
+
+            foreach (var itemField in sortableFields)
             {
-                enumType.AddValue($"{itemField.Key}_asc", $"{itemField.Key} ascending\n{itemField.Value.Description}", $"{itemField.Key}_asc");
-                enumType.AddValue($"{itemField.Key}_desc", $"{itemField.Key} descending\n{itemField.Value.Description}", $"{itemField.Key}_desc");
+                enumType.AddValue(
+                    $"{itemField.Key}_asc",
+                    $"{itemField.Key} ascending\n{itemField.Value.Description}",
+                    $"{itemField.Key}_asc");
+                enumType.AddValue(
+                    $"{itemField.Key}_desc",
+                    $"{itemField.Key} descending\n{itemField.Value.Description}",
+                    $"{itemField.Key}_desc");
             }
 
             return new ListGraphType(enumType) { Description = "The sorting instructions" };

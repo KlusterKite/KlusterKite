@@ -382,7 +382,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                     faultedASyncMethod {
                         asyncScalarField,
                         syncScalarField 
-                    }
+                    },
+                    syncEnumField,
+                    syncFlagsField
                 }
             }
             ";
@@ -429,7 +431,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                               ""faultedASyncMethod"": {
                                 ""asyncScalarField"": null,
                                 ""syncScalarField"": null
-                              }
+                              },
+                              ""syncEnumField"": ""EnumItem1"",
+                              ""syncFlagsField"": 1,
                             }
                           }
                         }

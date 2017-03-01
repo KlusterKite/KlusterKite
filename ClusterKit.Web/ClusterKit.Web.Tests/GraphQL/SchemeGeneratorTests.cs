@@ -83,23 +83,23 @@ namespace ClusterKit.Web.Tests.GraphQL
             {
                 Description = api,
                 Data = @"{
-	                                            ""viewer"": {
-		                                            ""id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
-		                                            ""name"": ""test name"",
-		                                            ""numbers"": [1, 2, 3],
-                                                    ""objects"": [
-			                                            {""id"": 30, ""name"": ""test name""}, 
-			                                            {""id"": 40, ""name"": ""test name2""}
-		                                            ]
-	                                            }, 
-	                                            ""object"": {
-		                                            ""count"": 2, 
-		                                            ""items"": [
-			                                            {""id"": 10}, 
-			                                            {""id"": 20}
-		                                            ]
-	                                            }
-                                            }"
+	                    ""viewer"": {
+		                    ""id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
+		                    ""name"": ""test name"",
+		                    ""numbers"": [1, 2, 3],
+                            ""objects"": [
+			                    {""id"": 30, ""name"": ""test name""}, 
+			                    {""id"": 40, ""name"": ""test name2""}
+		                    ]
+	                    }, 
+	                    ""object"": {
+		                    ""count"": 2, 
+		                    ""items"": [
+			                    {""id"": 10}, 
+			                    {""id"": 20}
+		                    ]
+	                    }
+                    }"
             };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
@@ -293,6 +293,58 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing generator for some api with enum
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task EnumApiTest()
+        {
+            var enumType = new ApiEnumType("EnumType", new[] { "item1", "item2" });
+
+            var api = new ApiDescription(
+                "TestApi1",
+                "0.0.0.1",
+                new ApiType[] { enumType },
+                new[] { ApiField.Object("enumField", enumType.TypeName) });
+
+            var provider = new MoqProvider { Description = api, Data = "{\"enumField\": \"item2\"}" };
+
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            using (var printer = new SchemaPrinter(schema))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(schema.Query);
+            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = "query { api { enumField } } ";
+                                 }).ConfigureAwait(true);
+
+            this.output.WriteLine("-------- Response -----------");
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                            ""enumField"": ""item2"" 
+                                        }
+                                     }                                      
+                                    }";
+
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing generator for some api with arrays - filtering support
         /// </summary>
         /// <returns>The async task</returns>
@@ -474,7 +526,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                 "viewer1",
                 new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
-            var viewerType2 = new ApiObjectType("viewer2", new[] { ApiField.Scalar("description", EnScalarType.String) });
+            var viewerType2 = new ApiObjectType(
+                "viewer2",
+                new[] { ApiField.Scalar("description", EnScalarType.String) });
 
             var objectType1 = new ApiObjectType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
             var objectType2 = new ApiObjectType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
@@ -750,12 +804,12 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task SchemaDescriptionTest()
         {
             var checkAttributeArguments = new[]
-                                {
-                                    ApiField.Scalar(
-                                        "attribute",
-                                        EnScalarType.String,
-                                        description: "attribute to check")
-                                };
+                                              {
+                                                  ApiField.Scalar(
+                                                      "attribute",
+                                                      EnScalarType.String,
+                                                      description: "attribute to check")
+                                              };
 
             var objectFields = new[]
                                    {
@@ -787,21 +841,23 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 };
 
             var api = new ApiDescription(
-                "TestApi", 
-                "0.0.0.1",
-                new[] { objectType },
-                new[] { objectType.CreateField("objects", EnFieldFlags.IsConnection, "The objects dataset") },
-                mutations) { Description = "The test api" };
+                          "TestApi",
+                          "0.0.0.1",
+                          new[] { objectType },
+                          new[] { objectType.CreateField("objects", EnFieldFlags.IsConnection, "The objects dataset") },
+                          mutations) {
+                                        Description = "The test api" 
+                                     };
 
             var provider = new MoqProvider { Description = api };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = Resources.IntrospectionQuery;
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = Resources.IntrospectionQuery;
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             Assert.Equal(CleanResponse(Resources.SchemaDescriptionTestSnapshot), CleanResponse(response));
