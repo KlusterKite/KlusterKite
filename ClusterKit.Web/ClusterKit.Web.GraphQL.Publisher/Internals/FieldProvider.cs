@@ -19,7 +19,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets or sets the field type
         /// </summary>
-        public ApiType FieldType { get; set; }
+        public ApiObjectType FieldType { get; set; }
 
         /// <summary>
         /// Gets or sets the provider

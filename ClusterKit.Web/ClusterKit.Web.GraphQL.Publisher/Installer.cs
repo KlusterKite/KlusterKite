@@ -55,6 +55,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<IOwinStartupConfigurator>().ImplementedBy(typeof(OwinConfigurator)));
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
 

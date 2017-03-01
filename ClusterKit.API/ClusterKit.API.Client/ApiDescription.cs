@@ -17,7 +17,7 @@ namespace ClusterKit.API.Client
     /// <summary>
     /// The generic provided api description
     /// </summary>
-    public class ApiDescription : ApiType
+    public class ApiDescription : ApiObjectType
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiDescription"/> class.
@@ -44,7 +44,7 @@ namespace ClusterKit.API.Client
         /// <param name="mutations">
         /// The list of mutations.
         /// </param>
-        public ApiDescription(string apiName, string version, IEnumerable<ApiType> types, IEnumerable<ApiField> fields = null, IEnumerable<ApiField> mutations = null)
+        public ApiDescription(string apiName, string version, IEnumerable<ApiObjectType> types, IEnumerable<ApiField> fields = null, IEnumerable<ApiField> mutations = null)
             : base(apiName, fields)
         {
             this.ApiName = apiName;
@@ -75,7 +75,7 @@ namespace ClusterKit.API.Client
         /// </summary>
         [NotNull]
         [UsedImplicitly]
-        public List<ApiType> Types { get; set; } = new List<ApiType>();
+        public List<ApiObjectType> Types { get; set; } = new List<ApiObjectType>();
 
         /// <summary>
         /// Gets or sets the api version. Usually this the defining assembly version

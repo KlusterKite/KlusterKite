@@ -26,13 +26,13 @@ namespace ClusterKit.API.Provider
         /// Gets the list of descriptions of discovered types used in API
         /// </summary>
         [NotNull]
-        public Dictionary<string, ApiType> DiscoveredApiTypes { get; } = new Dictionary<string, ApiType>();
+        public Dictionary<string, ApiObjectType> DiscoveredApiTypes { get; } = new Dictionary<string, ApiObjectType>();
 
         /// <summary>
         /// Gets the list of descriptions of described types by original type full names
         /// </summary>
         [NotNull]
-        public Dictionary<string, ApiType> ApiTypeByOriginalTypeNames { get; } = new Dictionary<string, ApiType>();
+        public Dictionary<string, ApiObjectType> ApiTypeByOriginalTypeNames { get; } = new Dictionary<string, ApiObjectType>();
 
         /// <summary>
         /// Gets the list of descriptions of discovered types used in API

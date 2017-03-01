@@ -16,7 +16,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
     using global::GraphQL.Types;
 
     /// <summary>
-    /// The virtual graph type used to convert <see cref="ApiType"/> to <see cref="InputObjectGraphType"/>
+    /// The virtual graph type used to convert <see cref="ApiObjectType"/> to <see cref="InputObjectGraphType"/>
     /// </summary>
     internal class VirtualInputGraphType : InputObjectGraphType
     {

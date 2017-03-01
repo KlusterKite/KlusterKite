@@ -182,7 +182,7 @@ namespace ClusterKit.API.Provider
         /// <param name="data">
         /// The temporary data used during assemble process
         /// </param>
-        private void CompileResolvers(ApiType root, AssembleTempData data)
+        private void CompileResolvers(ApiObjectType root, AssembleTempData data)
         {
             var code = data.ResolverGenerators.Select(g => g.Generate()).ToList();
             var comDomProvider = CodeDomProvider.CreateProvider("C#");
@@ -253,7 +253,7 @@ namespace ClusterKit.API.Provider
         /// </returns>
         private ApiField GenerateFieldFromMethod(
             MethodInfo method,
-            ApiType apiType,
+            ApiObjectType apiType,
             PublishToApiAttribute attribute,
             AssembleTempData data)
         {
@@ -354,7 +354,7 @@ namespace ClusterKit.API.Provider
         /// The field description
         /// </returns>
         private ApiField GenerateFieldFromProperty(
-            ApiType apiType,
+            ApiObjectType apiType,
             PropertyInfo property,
             PublishToApiAttribute attribute,
             AssembleTempData data)
@@ -434,7 +434,7 @@ namespace ClusterKit.API.Provider
         /// The list of mutations
         /// </returns>
         private IEnumerable<ApiField> GenerateMutations(
-            ApiType apiType,
+            ApiObjectType apiType,
             List<string> path,
             List<string> typesUsed,
             AssembleTempData data)
@@ -473,7 +473,7 @@ namespace ClusterKit.API.Provider
         /// </param>
         /// <returns>The list of mutations</returns>
         private IEnumerable<ApiField> GenerateMutationsDirect(
-            ApiType apiType,
+            ApiObjectType apiType,
             Type type,
             List<string> path,
             List<string> typesUsed,
@@ -531,7 +531,7 @@ namespace ClusterKit.API.Provider
         /// <returns>The list of mutations</returns>
         private IEnumerable<ApiField> GenerateMutationsFromConnections(
             Type type,
-            ApiType apiType,
+            ApiObjectType apiType,
             List<string> path,
             List<string> typesUsed,
             AssembleTempData data)
@@ -592,7 +592,7 @@ namespace ClusterKit.API.Provider
                     continue;
                 }
 
-                ApiType connectionApiType;
+                ApiObjectType connectionApiType;
                 if (!data.DiscoveredApiTypes.TryGetValue(connection.TypeName, out connectionApiType))
                 {
                     this.generationErrors.Add(
@@ -704,7 +704,7 @@ namespace ClusterKit.API.Provider
         /// </param>
         /// <returns>The list of mutations</returns>
         private IEnumerable<ApiField> GenerateMutationsFromFields(
-            ApiType apiType,
+            ApiObjectType apiType,
             List<string> path,
             List<string> typesUsed,
             AssembleTempData data)
@@ -725,7 +725,7 @@ namespace ClusterKit.API.Provider
                     continue;
                 }
 
-                ApiType subType;
+                ApiObjectType subType;
                 if (!data.DiscoveredApiTypes.TryGetValue(subContainer.TypeName, out subType))
                 {
                     this.generationErrors.Add($"Could not find declared api type {subContainer.TypeName}");
@@ -754,16 +754,16 @@ namespace ClusterKit.API.Provider
         /// <returns>
         /// The api type description
         /// </returns>
-        private ApiType GenerateTypeDescription([NotNull] Type type, [NotNull] AssembleTempData data)
+        private ApiObjectType GenerateTypeDescription([NotNull] Type type, [NotNull] AssembleTempData data)
         {
-            ApiType apiType;
+            ApiObjectType apiType;
             if (data.DiscoveredApiTypes.TryGetValue(type.FullName, out apiType))
             {
                 return apiType;
             }
 
             var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
-            apiType = new ApiType(descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type, true))
+            apiType = new ApiObjectType(descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type, true))
                           {
                               Description =
                                   descriptionAttribute?.Description
@@ -842,7 +842,7 @@ namespace ClusterKit.API.Provider
         /// <param name="apiType">The type api description</param>
         /// <param name="data">The temporary data used during assemble process</param>
         /// <returns>The field api description</returns>
-        private IEnumerable<ApiField> GenerateTypeMethods(Type type, ApiType apiType, [NotNull] AssembleTempData data)
+        private IEnumerable<ApiField> GenerateTypeMethods(Type type, ApiObjectType apiType, [NotNull] AssembleTempData data)
         {
             return
                 type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -868,7 +868,7 @@ namespace ClusterKit.API.Provider
         /// <returns>The field api description</returns>
         private IEnumerable<ApiField> GenerateTypeProperties(
             Type type,
-            ApiType apiType,
+            ApiObjectType apiType,
             [NotNull] AssembleTempData data)
         {
             return

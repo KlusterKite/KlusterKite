@@ -18,6 +18,7 @@ namespace ClusterKit.Web.Authentication
     using ClusterKit.Security.Client;
 
     using Microsoft.Owin;
+    using Microsoft.Owin.Cors;
     using Microsoft.Owin.Security.DataProtection;
     using Microsoft.Owin.Security.OAuth;
 
@@ -52,6 +53,7 @@ namespace ClusterKit.Web.Authentication
         /// <inheritdoc />
         public void ConfigureApp(IAppBuilder appBuilder)
         {
+            appBuilder.UseCors(CorsOptions.AllowAll);
             Serilog.Log.Logger.Information("------------ Setting up authorization server -------------");
             var config = this.container.Resolve<Config>();
 

@@ -181,7 +181,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
+        /// Creates <see cref="FieldType"/> from <see cref="ApiObjectType"/>
         /// </summary>
         /// <param name="description">
         /// The api field description
@@ -195,7 +195,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Creates <see cref="FieldType"/> from <see cref="ApiType"/>
+        /// Creates <see cref="FieldType"/> from <see cref="ApiObjectType"/>
         /// </summary>
         /// <param name="description">
         /// The api field description

@@ -248,7 +248,7 @@ namespace ClusterKit.API.Provider
         /// <returns>The properties and methods C# code</returns>
         protected virtual string GenerateConnectionSorter()
         {
-            ApiType sortedApiType;
+            ApiObjectType sortedApiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
             {
                 throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not registered");
@@ -299,7 +299,7 @@ namespace ClusterKit.API.Provider
         /// <returns>The properties and methods C# code</returns>
         protected virtual string GenerateConnectionFilter()
         {
-            ApiType sortedApiType;
+            ApiObjectType sortedApiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out sortedApiType))
             {
                 throw new InvalidOperationException($"The returned type of connection {this.Metadata.Type.FullName} is not registered");
@@ -678,7 +678,7 @@ namespace ClusterKit.API.Provider
 
             List<string> codeCommands = new List<string> { prefix };
 
-            ApiType apiType;
+            ApiObjectType apiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(type.FullName, out apiType))
             {
                 throw new InvalidOperationException($"Type {type.FullName} was not described as API type");

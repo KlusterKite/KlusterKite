@@ -72,6 +72,7 @@
     <Compile Include="ApiDescription.cs" />
     <Compile Include="ApiField.cs" />
     <Compile Include="ApiRequest.cs" />
+    <Compile Include="ApiObjectType.cs" />
     <Compile Include="ApiType.cs" />
     <Compile Include="Attributes\ApiDescriptionAttribute.cs" />
     <Compile Include="Attributes\DeclareConnectionAttribute.cs" />

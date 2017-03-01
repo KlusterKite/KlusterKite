@@ -63,7 +63,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        ApiField.Scalar("numbers", EnScalarType.Integer, EnFieldFlags.IsArray),
                                        ApiField.Object("objects", "object", EnFieldFlags.IsArray)
                                    };
-            var viewerType = new ApiType("viewer", viewerFields);
+            var viewerType = new ApiObjectType("viewer", viewerFields);
 
             var objectFields = new[]
                                    {
@@ -71,7 +71,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        ApiField.Scalar("name", EnScalarType.String)
                                    };
 
-            var objectType = new ApiType("object", objectFields);
+            var objectType = new ApiObjectType("object", objectFields);
 
             var api = new ApiDescription(
                 "TestApi1",
@@ -190,7 +190,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task ConnectionsArgumentsApiTest()
         {
-            var viewerType = new ApiType(
+            var viewerType = new ApiObjectType(
                 "viewer",
                 new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
@@ -200,7 +200,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        ApiField.Scalar("name", EnScalarType.String)
                                    };
 
-            var objectType = new ApiType("object", objectFields);
+            var objectType = new ApiObjectType("object", objectFields);
 
             var api = new ApiDescription(
                 "TestApi1",
@@ -320,7 +320,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                            EnFieldFlags.IsConnection,
                                            getObjectsArguments),
                                    };
-            var viewerType = new ApiType("viewer", viewerFields);
+            var viewerType = new ApiObjectType("viewer", viewerFields);
 
             var objectFields = new[]
                                    {
@@ -328,7 +328,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        ApiField.Scalar("name", EnScalarType.String)
                                    };
 
-            var objectType = new ApiType("object", objectFields);
+            var objectType = new ApiObjectType("object", objectFields);
 
             var api = new ApiDescription(
                 "TestApi1",
@@ -470,14 +470,14 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task MultipleApiTest()
         {
-            var viewerType1 = new ApiType(
+            var viewerType1 = new ApiObjectType(
                 "viewer1",
                 new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
-            var viewerType2 = new ApiType("viewer2", new[] { ApiField.Scalar("description", EnScalarType.String) });
+            var viewerType2 = new ApiObjectType("viewer2", new[] { ApiField.Scalar("description", EnScalarType.String) });
 
-            var objectType1 = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
-            var objectType2 = new ApiType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
+            var objectType1 = new ApiObjectType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
+            var objectType2 = new ApiObjectType("object", new[] { ApiField.Scalar("id", EnScalarType.String) });
 
             var api1 = new ApiDescription(
                 "TestApi1",
@@ -578,7 +578,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        ApiField.Scalar("name", EnScalarType.String),
                                    };
 
-            var viewerType = new ApiType("viewer", viewerFields);
+            var viewerType = new ApiObjectType("viewer", viewerFields);
 
             var objectFields = new[]
                                    {
@@ -586,7 +586,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        ApiField.Scalar("name", EnScalarType.String)
                                    };
 
-            var objectType = new ApiType("object", objectFields);
+            var objectType = new ApiObjectType("object", objectFields);
 
             var mutations = new[]
                                 {
@@ -680,7 +680,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task NonEmptyApiTest()
         {
-            var viewerType = new ApiType(
+            var viewerType = new ApiObjectType(
                 "viewer",
                 new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
 
@@ -776,7 +776,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                            description: "checks the attribute")
                                    };
 
-            var objectType = new ApiType("object", objectFields) { Description = "Some abstract object" };
+            var objectType = new ApiObjectType("object", objectFields) { Description = "Some abstract object" };
             var mutations = new[]
                                 {
                                     ApiField.Object(
