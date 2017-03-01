@@ -9,6 +9,8 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
+    using System;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -22,6 +24,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using global::GraphQL.Instrumentation;
 
     using JetBrains.Annotations;
+
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// GraphQL endpoint controller
@@ -71,8 +75,40 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <returns>GraphQL response</returns>
         [HttpPost]
         [Route]
-        public async Task<HttpResponseMessage> Post(HttpRequestMessage request, QueryRequest query)
+        public async Task<HttpResponseMessage> Post(HttpRequestMessage request, JObject query)
         {
+            var queryToExecute =
+                (string)
+                (query.Properties()
+                         .FirstOrDefault(p => p.Name.Equals("query", StringComparison.InvariantCultureIgnoreCase))
+                         ?.Value as JValue);
+
+            if (string.IsNullOrWhiteSpace(queryToExecute))
+            {
+                return request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            var operationName =
+                (string)
+                (query.Properties()
+                     .FirstOrDefault(p => p.Name.Equals("OperationName", StringComparison.InvariantCultureIgnoreCase))
+                     ?.Value as JValue);
+
+            var variablesToken =
+                query.Properties()
+                    .FirstOrDefault(
+                        p => p.Name.Equals("variables", StringComparison.InvariantCultureIgnoreCase))?.Value;
+
+            Inputs inputs = null;
+            if (variablesToken is JObject)
+            {
+                inputs = variablesToken.ToString().ToInputs();
+            }
+            else if (variablesToken is JValue)
+            {
+                inputs = ((string)variablesToken).ToInputs();
+            }
+
             var requestContext = this.GetRequestDescription();
             var schema = this.schemaProvider.CurrentSchema;
             if (schema == null)
@@ -80,15 +116,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 return request.CreateResponse(HttpStatusCode.ServiceUnavailable);
             }
 
-            var inputs = query.Variables.ToInputs();
-            var queryToExecute = query.Query;
-
             var result = await this.executer.ExecuteAsync(
                              options =>
                                  {
                                      options.Schema = schema;
                                      options.Query = queryToExecute;
-                                     options.OperationName = query.OperationName;
+                                     options.OperationName = operationName;
                                      options.Inputs = inputs;
                                      options.UserContext = requestContext;
 

@@ -24,6 +24,8 @@ namespace ClusterKit.Web.Tests.GraphQL
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher;
 
+    using Newtonsoft.Json;
+
     using RestSharp;
 
     using Xunit;
@@ -95,12 +97,53 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
             }";
 
-            request.AddBody(new EndpointController.QueryRequest { Query = query });
+            request.AddJsonBody(new EndpointController.QueryRequest { Query = query });
 
             var result = await client.ExecuteTaskAsync(request);
 
             Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
             Assert.Equal(HttpStatusCode.ServiceUnavailable, result.StatusCode);
+            this.Sys.Log.Info("Response {Response}", result.Content);
+        }
+
+        /// <summary>
+        /// Just generic test
+        /// </summary>
+        /// <param name="variables">
+        /// The raw variables representation.
+        /// </param>
+        /// <returns>
+        /// The async task
+        /// </returns>
+        [Theory]
+        [InlineData("null")]
+        [InlineData("{}")]
+        [InlineData("\"{}\"")]
+        public async Task EmptyVariablesTest(string variables)
+        {
+            this.ExpectNoMsg();
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new ApiProviderPublishResolveIntegration.TestProvider(internalApiProvider, this.output);
+            var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
+            schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
+
+            var request = new RestRequest { Method = Method.POST };
+            request.AddHeader("Accept", "application/json, text/json");
+            
+            var query = @"
+            {                
+                api {
+                    syncScalarField
+                }
+            }";
+
+            var body = $"{{\"query\": {JsonConvert.SerializeObject(query)}, \"variables\": {variables}}}";
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
+            var result = await client.ExecuteTaskAsync(request);
+            Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             this.Sys.Log.Info("Response {Response}", result.Content);
         }
 
@@ -147,7 +190,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
             }";
 
-            request.AddBody(new EndpointController.QueryRequest { Query = query });
+            request.AddJsonBody(new EndpointController.QueryRequest { Query = query });
 
             var result = await client.ExecuteTaskAsync(request);
 
