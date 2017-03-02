@@ -137,6 +137,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                   {
                                       Arguments = field.Arguments.ToJson(),
                                       FieldName = field.Name,
+                                      Alias = field.Alias,
                                       Fields = localField.Type.GatherSingleApiRequest(field, context).ToList()
                                   };
                 if (request.Fields.Count == 0)
@@ -247,6 +248,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var request = new ApiRequest
                                   {
                                       Arguments = usedField.Ast.Arguments.ToJson(),
+                                      Alias = usedField.Ast.Alias,
                                       FieldName = usedField.Ast.Name
                                   };
                 var endType = usedField.Field.Type as MergedObjectType;

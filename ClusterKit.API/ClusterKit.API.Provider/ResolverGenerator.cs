@@ -169,7 +169,7 @@ namespace ClusterKit.API.Provider
                                 }}
                             }}
 
-                            {this.GenerateHelperMethods()}
+                            {string.Join(string.Empty, this.GenerateHelperMethods())}
                         }}
                     }}
                 ";
@@ -193,6 +193,7 @@ namespace ClusterKit.API.Provider
 
             var array = name.ToCharArray();
             array[0] = array[0].ToString().ToLowerInvariant().ToCharArray().First();
+
             return new string(array);
         }
 
@@ -220,14 +221,22 @@ namespace ClusterKit.API.Provider
         /// Generates helper properties and methods for generator
         /// </summary>
         /// <returns>The properties and methods C# code</returns>
-        protected virtual string GenerateHelperMethods()
+        protected virtual IEnumerable<string> GenerateHelperMethods()
         {
             if (this.Metadata.MetaType == TypeMetadata.EnMetaType.Connection)
             {
-                return this.GenerateConnectionHelpers();
+                yield return this.GenerateConnectionHelpers();
             }
 
-            return string.Empty;
+            ApiType apiType;
+            if (this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.Metadata.Type.FullName, out apiType))
+            {
+                var apiObjectType = apiType as ApiObjectType;
+                if (apiObjectType != null)
+                {
+                    yield return this.GenerateObjectHelpers(apiObjectType);
+                }
+            }
         }
 
         /// <summary>
@@ -239,6 +248,31 @@ namespace ClusterKit.API.Provider
             return $@"
             {this.GenerateConnectionSorter()}
             {this.GenerateConnectionFilter()}
+            ";
+        }
+
+        /// <summary>
+        /// Generate resolve helpers for objects with fields
+        /// </summary>
+        /// <param name="apiObjectType">The api description of an object type</param>
+        /// <returns>Resolvers dictionary</returns>
+        protected virtual string GenerateObjectHelpers(ApiObjectType apiObjectType)
+        {
+            var fieldResolvers = apiObjectType.Fields.Select(f => $@"
+            {{
+                ""{f.Name}"", 
+                (source, fieldQuery, context, argumentsSerializer, onErrorCallback) 
+                    => new {this.Data.ResolverNames[apiObjectType.TypeName][f.Name]}()
+                    .Resolve(source, fieldQuery, context, argumentsSerializer, onErrorCallback)
+            }}
+            ");
+
+            return $@"
+            private static Dictionary<string, Func<object, ApiRequest, RequestContext, JsonSerializer, Action<Exception>, Task<JToken>>> FieldResolvers 
+                = new Dictionary<string, Func<object, ApiRequest, RequestContext, JsonSerializer, Action<Exception>, Task<JToken>>>
+            {{
+                {string.Join(",", fieldResolvers)}
+            }};            
             ";
         }
 
@@ -658,19 +692,28 @@ namespace ClusterKit.API.Provider
 
                 var connectionResult = await resultSource.Query(GenerateFilterExpression(arguments), GenerateSortingExpression(arguments), limit, offset);
                 var connectionResultJson = new JObject();
-                connectionResultJson.Add(""count"",  connectionResult.Count);
-                var resultArray = new JArray();
-        
-                var itemsQuery = query.Fields.FirstOrDefault(f => f.FieldName == ""items"");
-                if (itemsQuery != null) 
+
+                foreach(var queryField in query.Fields) 
                 {{
-                    foreach (var item in connectionResult.Items)
+                    if (queryField.FieldName == ""count"") 
                     {{
-                        {(this.Metadata.ScalarType == EnScalarType.None ? this.GenerateObjectResolve("item", this.Metadata.Type, "itemsQuery") : "var result = new JValue(item);")}
-                        resultArray.Add(result);
-                    }} 
-                }}  
-                connectionResultJson.Add(""items"",  resultArray);                            
+                        onErrorCallback(new Exception(""field count""));
+                        connectionResultJson.Add(queryField.Alias ?? queryField.FieldName,  connectionResult.Count);
+                    }}
+                    
+                    if (queryField.FieldName == ""items"") 
+                    {{
+                        var resultArray = new JArray();
+                        foreach (var item in connectionResult.Items)
+                        {{
+                            {(this.Metadata.ScalarType == EnScalarType.None ? this.GenerateObjectResolve("item", this.Metadata.Type, "queryField") : "var result = new JValue(item);")}
+                            resultArray.Add(result);
+                        }} 
+
+                        connectionResultJson.Add(queryField.Alias ?? queryField.FieldName,  resultArray);
+                    }}
+                }}
+                
                 return connectionResultJson;
             ";
         }
@@ -702,29 +745,15 @@ namespace ClusterKit.API.Provider
                 throw new InvalidOperationException($"Type {type.FullName} is not an object type");
             }
 
-            var prefix = @"
+            return $@"
                 var result = new JObject();
                 ApiRequest fieldQuery;
-                PropertyResolver resolver;                
+                PropertyResolver resolver; 
+                foreach (var field in {queryVariableName}.Fields)
+                {{
+                    result.Add(field.Alias ?? field.FieldName, await FieldResolvers[field.FieldName]({itemName}, field, context, argumentsSerializer, onErrorCallback));
+                }}  
             ";
-
-            List<string> codeCommands = new List<string> { prefix };
-
-            foreach (var apiField in apiObjectType.Fields)
-            {
-                var command = $@"
-                    fieldQuery = {queryVariableName}.Fields.FirstOrDefault(f => f.FieldName == ""{apiField.Name}"");
-                    if (fieldQuery != null)
-                    {{
-                        resolver = new {this.Data.ResolverNames[apiType.TypeName][apiField.Name]}();
-                        result.Add(""{apiField.Name}"", await resolver.Resolve({itemName}, fieldQuery, context, argumentsSerializer, onErrorCallback));
-                    }}
-                ";
-
-                codeCommands.Add(command);
-            }
-
-            return string.Join("\r\n", codeCommands);
         }
 
         /// <summary>

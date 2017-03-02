@@ -134,7 +134,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 return parentData;
             }
 
-            return parentData?.GetValue(context.FieldName);
+            return parentData?.GetValue(context.FieldAst.Alias ?? context.FieldName);
         }
 
         /// <inheritdoc />

@@ -24,6 +24,11 @@ namespace ClusterKit.API.Client
         public string FieldName { get; set; }
 
         /// <summary>
+        /// Gets or sets the requested field / method name
+        /// </summary>
+        public string Alias { get; set; }
+
+        /// <summary>
         /// Gets or sets the argument values for methods
         /// </summary>
         public SurrogatableJObject Arguments { get; set; }

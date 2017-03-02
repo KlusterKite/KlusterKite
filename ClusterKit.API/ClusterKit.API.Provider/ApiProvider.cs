@@ -100,13 +100,14 @@ namespace ClusterKit.API.Provider
             foreach (var request in requests)
             {
                 PropertyResolver resolver;
+                var fieldName = request.Alias ?? request.FieldName;
                 if (!this.resolvers.TryGetValue(request.FieldName, out resolver))
                 {
-                    result.Add(request.FieldName, null);
+                    result.Add(fieldName, null);
                 }
                 else
                 {
-                    result.Add(request.FieldName, await resolver.Resolve(this, request, context, this.argumentsSerializer, onErrorCallback));
+                    result.Add(fieldName, await resolver.Resolve(this, request, context, this.argumentsSerializer, onErrorCallback));
                 }
             }
 
