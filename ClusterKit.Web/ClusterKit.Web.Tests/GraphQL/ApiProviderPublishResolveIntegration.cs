@@ -442,6 +442,50 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing requests with use of fragments from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task RequestWithFragmentsTest()
+        {
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"
+            query FragmentsRequest {                
+                api {
+                   ...F
+                }
+            }
+
+            fragment F on ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider {
+                    syncScalarField
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""syncScalarField"": ""SyncScalarField""
+                            }
+                          }
+                        }
+                        ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Test provider to unite GraphQL publishing and <see cref="API.Provider.ApiProvider"/>
         /// </summary>
         public class TestProvider : Web.GraphQL.Publisher.ApiProvider

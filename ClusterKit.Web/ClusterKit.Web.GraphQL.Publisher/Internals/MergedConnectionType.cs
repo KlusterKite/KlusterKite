@@ -128,9 +128,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
-            foreach (var field in contextFieldAst.SelectionSet.Selections.OfType<Field>())
+            foreach (var field in this.GetRequestedFields(contextFieldAst.SelectionSet, context))
             {
                 switch (field.Name)
                 {
@@ -140,11 +140,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     case "edges":
                         {
                             var nodeSelection =
-                                field.SelectionSet.Selections.OfType<Field>()
+                                this.GetRequestedFields(field.SelectionSet, context)
                                     .FirstOrDefault(f => f.Name == "node");
 
                             var fields = nodeSelection != null
-                                             ? this.elementType.GatherSingleApiRequest(nodeSelection).ToList()
+                                             ? this.elementType.GatherSingleApiRequest(nodeSelection, context).ToList()
                                              : null;
 
                             yield return new ApiRequest { FieldName = "items", Fields = fields };

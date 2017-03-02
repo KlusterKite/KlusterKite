@@ -106,7 +106,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             var taskList = new List<Task<JObject>>();
             foreach (var provider in this.Providers.Select(fp => fp.Provider))
             {
-                var request = this.GatherMultipleApiRequest(provider, context.FieldAst).ToList();
+                var request = this.GatherMultipleApiRequest(provider, context.FieldAst, context).ToList();
                 taskList.Add(provider.GetData(request, requestContext));
             }
 
@@ -187,7 +187,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                       FieldName = this.mergedField.FieldName,
                                       Fields =
                                           this.mergedField.Type.GatherSingleApiRequest(
-                                              context.FieldAst).ToList()
+                                              context.FieldAst, context).ToList()
                                   };
                 return this.provider.GetData(new List<ApiRequest> { request }, requestContext);
             }

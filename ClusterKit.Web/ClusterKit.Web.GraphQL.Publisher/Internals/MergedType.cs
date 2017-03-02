@@ -10,6 +10,7 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.RegularExpressions;
 
     using ClusterKit.API.Client;
@@ -80,9 +81,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gather request parameters
         /// </summary>
-        /// <param name="contextFieldAst">The request context</param>
-        /// <returns>The list of api requests</returns>
-        public virtual IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        /// <param name="contextFieldAst">
+        /// The request context
+        /// </param>
+        /// <param name="context">
+        /// The resolve context.
+        /// </param>
+        /// <returns>
+        /// The list of api requests
+        /// </returns>
+        public virtual IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
             yield break;
         }
@@ -133,6 +141,33 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string ToString()
         {
             return this.ComplexTypeName;
+        }
+
+        /// <summary>
+        /// Gets the list of requested fields from parent <seealso cref="Field"/>
+        /// </summary>
+        /// <param name="selectionSet">The parent field selection set</param>
+        /// <param name="context">The request context</param>
+        /// <returns>The list of fields</returns>
+        protected virtual IEnumerable<Field> GetRequestedFields(SelectionSet selectionSet, ResolveFieldContext context)
+        {
+            var directFields = selectionSet.Selections.OfType<Field>();
+            foreach (var field in directFields)
+            {
+                yield return field;
+            }
+
+            var fragmentsUsed =
+                selectionSet.Selections.OfType<FragmentSpread>()
+                    .Select(fs => context.Fragments.FindDefinition(fs.Name));
+
+            foreach (var fragment in fragmentsUsed)
+            {
+                foreach (var field in this.GetRequestedFields(fragment.SelectionSet, context))
+                {
+                    yield return field;
+                }
+            }
         }
     }
 }

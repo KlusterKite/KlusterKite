@@ -121,12 +121,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             this.providers.AddRange(newProviders);
         }
 
-        /// <summary>
-        /// Gather request parameters
-        /// </summary>
-        /// <param name="contextFieldAst">The request context</param>
-        /// <returns>The list of api requests</returns>
-        public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst)
+        /// <inheritdoc />
+        public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
             foreach (var field in contextFieldAst.SelectionSet.Selections.Where(s => s is Field).Cast<Field>())
             {
@@ -141,7 +137,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                   {
                                       Arguments = field.Arguments.ToJson(),
                                       FieldName = field.Name,
-                                      Fields = localField.Type.GatherSingleApiRequest(field).ToList()
+                                      Fields = localField.Type.GatherSingleApiRequest(field, context).ToList()
                                   };
                 if (request.Fields.Count == 0)
                 {
@@ -223,14 +219,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gather request parameters for the specified api provider
         /// </summary>
-        /// <param name="provider">The api provider</param>
-        /// <param name="contextFieldAst">The request context</param>
-        /// <returns>The list of api requests</returns>
-        protected IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst)
+        /// <param name="provider">
+        /// The api provider
+        /// </param>
+        /// <param name="contextFieldAst">
+        /// The request context
+        /// </param>
+        /// <param name="context">
+        /// The resolve context.
+        /// </param>
+        /// <returns>
+        /// The list of api requests
+        /// </returns>
+        protected IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst, ResolveFieldContext context)
         {
             var usedFields =
-                contextFieldAst.SelectionSet.Selections.Where(s => s is Field)
-                    .Cast<Field>()
+                this.GetRequestedFields(contextFieldAst.SelectionSet, context)
                     .Join(
                         this.Fields.Where(f => f.Value.Type.Providers.Any(fp => fp.Provider == provider)),
                         s => s.Name,
@@ -248,8 +252,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var endType = usedField.Field.Type as MergedObjectType;
 
                 request.Fields = endType?.Category == EnCategory.MultipleApiType
-                                     ? endType.GatherMultipleApiRequest(provider, usedField.Ast).ToList()
-                                     : usedField.Field.Type.GatherSingleApiRequest(usedField.Ast).ToList();
+                                     ? endType.GatherMultipleApiRequest(provider, usedField.Ast, context).ToList()
+                                     : usedField.Field.Type.GatherSingleApiRequest(usedField.Ast, context).ToList();
 
                 yield return request;
             }
