@@ -65,8 +65,8 @@ namespace ClusterKit.API.Tests.Mock
                 return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
             }
 
-            newNode.Uid = Guid.NewGuid();
-            this.objects.Add(newNode.Uid, newNode);
+            newNode.Id = Guid.NewGuid();
+            this.objects.Add(newNode.Id, newNode);
             return Task.FromResult(new MutationResult<TestObject> { Result = newNode });
         }
 
@@ -161,9 +161,9 @@ namespace ClusterKit.API.Tests.Mock
                 return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
             }
 
-            if (description.Property("uid") != null)
+            if (description.Property("id") != null)
             {
-                if (newNode.Uid != obj.Uid && this.objects.ContainsKey(newNode.Uid))
+                if (newNode.Id != obj.Id && this.objects.ContainsKey(newNode.Id))
                 {
                     var errors = new List<ErrorDescription>
                                      {
@@ -174,7 +174,7 @@ namespace ClusterKit.API.Tests.Mock
                     return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
                 }
 
-                obj.Uid = newNode.Uid;
+                obj.Id = newNode.Id;
             }
 
             if (description.Property("name") != null)
@@ -188,7 +188,7 @@ namespace ClusterKit.API.Tests.Mock
             }
 
             this.objects.Remove(id);
-            this.objects[obj.Uid] = obj;
+            this.objects[obj.Id] = obj;
 
             return Task.FromResult(new MutationResult<TestObject> { Result = obj });
         }

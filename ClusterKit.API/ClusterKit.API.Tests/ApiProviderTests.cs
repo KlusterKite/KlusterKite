@@ -486,7 +486,7 @@ namespace ClusterKit.API.Tests
             /// The result will be resolved for each nested field / method
             /// </remarks>
             /// <param name="nodeUid">
-            /// The node Uid.
+            /// The node Id.
             /// </param>
             /// <returns>Some object</returns>
             [UsedImplicitly]
@@ -503,7 +503,7 @@ namespace ClusterKit.API.Tests
             /// The context.
             /// </param>
             /// <param name="nodeUid">
-            /// The node Uid.
+            /// The node Id.
             /// </param>
             /// <returns>
             /// Some object
@@ -519,7 +519,7 @@ namespace ClusterKit.API.Tests
             /// The sub-request
             /// </param>
             /// <param name="nodeUid">
-            /// The node Uid.
+            /// The node Id.
             /// </param>
             /// <returns>
             /// Some object
@@ -538,7 +538,7 @@ namespace ClusterKit.API.Tests
             /// The sub-request
             /// </param>
             /// <param name="nodeUid">
-            /// The node Uid.
+            /// The node Id.
             /// </param>
             /// <returns>
             /// Some object

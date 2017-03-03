@@ -16,11 +16,13 @@ namespace ClusterKit.API.Tests.Mock
     /// <summary>
     /// Test object
     /// </summary>
+    [ApiDescription(Description = "test object", Name = "TestObject")]
     public class TestObject
     {
         /// <summary>
         /// The type of object as enum
         /// </summary>
+        [ApiDescription(Description = "The type of object as enum", Name = "EnObjectType")]
         public enum EnObjectType
         {
             /// <summary>
@@ -44,7 +46,7 @@ namespace ClusterKit.API.Tests.Mock
         /// Gets or sets the object uid
         /// </summary>
         [DeclareField(IsKey = true)]
-        public Guid Uid { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// Gets or sets some value

@@ -19,7 +19,7 @@ namespace ClusterKit.API.Tests.Mock
     /// Nested API
     /// </summary>
     [UsedImplicitly]
-    [ApiDescription(Description = "Nested API")]
+    [ApiDescription(Description = "Nested API", Name = "NestedProvider")]
     public class NestedProvider
     {
         /// <summary>

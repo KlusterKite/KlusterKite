@@ -29,7 +29,7 @@ namespace ClusterKit.API.Tests.Mock
     /// Test api provider
     /// </summary>
     [UsedImplicitly]
-    [ApiDescription(Description = "Tested API")]
+    [ApiDescription(Description = "Tested API", Name = "TestApi")]
     public class TestProvider : ApiProvider
     {
         /// <summary>
@@ -50,13 +50,13 @@ namespace ClusterKit.API.Tests.Mock
                 objects = new List<TestObject>();
             }
 
-            this.connection = new TestObjectConnection(objects.ToDictionary(o => o.Uid));
+            this.connection = new TestObjectConnection(objects.ToDictionary(o => o.Id));
         }
 
         /// <summary>
         /// Test enum
         /// </summary>
-        [ApiDescription(Description = "The test enum")]
+        [ApiDescription(Description = "The test enum", Name = "EnTest")]
         public enum EnTest
         {
             /// <summary>

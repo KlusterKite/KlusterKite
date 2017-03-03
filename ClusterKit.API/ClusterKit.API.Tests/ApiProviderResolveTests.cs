@@ -124,7 +124,7 @@ namespace ClusterKit.API.Tests
 
             var objFields = new List<ApiRequest>
                                 {
-                                    new ApiRequest { FieldName = "uid" },
+                                    new ApiRequest { FieldName = "id" },
                                     new ApiRequest { FieldName = "name" },
                                     new ApiRequest { FieldName = "value" }
                                 };
@@ -186,24 +186,24 @@ namespace ClusterKit.API.Tests
         /// The async task
         /// </returns>
         [Theory]
-        [InlineData("connection.create", "{\"newNode\": { \"name\":\"6-test\", \"value\": 1 }}", true, "{\"name\":\"6-test\",\"value\": 1.0 }")]
-        [InlineData("connection.create", "{\"newNode\": { \"value\": 1 }}", false, "[{\"field\": null, \"message\": \"Create failed\"}, {\"field\":\"name\",\"message\":\"name should be set\"}]")]
-        [InlineData("connection.create", null, false, "[{\"field\": null, \"message\": \"Create failed\"}, {\"field\": null,\"message\":\"object data was not provided\"}]")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"value\": 1.0 }}", true, "{\"name\":\"2-test\",\"value\": 1.0 }")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"uid\": \"{C12EE96B-2420-4F54-AAE5-788995B10679}\" }}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\", \"newNode\": { \"value\": 1.0 }}", false, "[{\"field\": null, \"message\": \"Update failed\"}, {\"field\":\"id\",\"message\":\"Node not found\"}]")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"uid\": \"{F0607502-5B77-4A3C-9142-E6197A7EE61E}\" }}", false, "[{\"field\": null, \"message\": \"Update failed\"}, {\"field\":\"uid\",\"message\":\"Duplicate key\"}]")]
-        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
-        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\"}", false, "[{\"field\": null, \"message\": \"Delete failed\"}, {\"field\":\"id\",\"message\":\"Node not found\"}]")]
+        [InlineData("connection.create", "{\"newNode\": { \"name\":\"6-test\", \"value\": 1 }}", true, "{\"name\":\"6-test\",\"value\": 1.0, \"__request\":{\"f\":\"result\"} }")]
+        [InlineData("connection.create", "{\"newNode\": { \"value\": 1 }}", false, "[{\"field\": null, \"message\": \"Create failed\", \"__request\":{\"f\":\"errors\"}}, {\"field\":\"name\",\"message\":\"name should be set\", \"__request\":{\"f\":\"errors\"}}]")]
+        [InlineData("connection.create", null, false, "[{\"field\": null, \"message\": \"Create failed\", \"__request\":{\"f\":\"errors\"}}, {\"field\": null,\"message\":\"object data was not provided\", \"__request\":{\"f\":\"errors\"}}]")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"value\": 1.0 }}", true, "{\"name\":\"2-test\",\"value\": 1.0, \"__request\":{\"f\":\"result\"} }")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{C12EE96B-2420-4F54-AAE5-788995B10679}\" }}", true, "{\"name\":\"2-test\",\"value\": 50.0, \"__request\":{\"f\":\"result\"} }")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\", \"newNode\": { \"value\": 1.0 }}", false, "[{\"field\": null, \"message\": \"Update failed\", \"__request\":{\"f\":\"errors\"}}, {\"field\":\"id\",\"message\":\"Node not found\", \"__request\":{\"f\":\"errors\"}}]")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{F0607502-5B77-4A3C-9142-E6197A7EE61E}\" }}", false, "[{\"field\": null, \"message\": \"Update failed\", \"__request\":{\"f\":\"errors\"}}, {\"field\":\"uid\",\"message\":\"Duplicate key\", \"__request\":{\"f\":\"errors\"}}]")]
+        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0, \"__request\":{\"f\":\"result\"} }")]
+        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\"}", false, "[{\"field\": null, \"message\": \"Delete failed\", \"__request\":{\"f\":\"errors\"}}, {\"field\":\"id\",\"message\":\"Node not found\", \"__request\":{\"f\":\"errors\"}}]")]
         public async Task ConnectionMutationTests(string mutationName, string mutationRequest, bool expectResult, string expectedResult)
         {
             var initialObjects = new List<TestObject>
                                      {
-                                         new TestObject { Uid = Guid.Parse("{3BEEE369-11DF-4A30-BF11-1D8465C87110}"), Name = "1-test", Value = 100m },
-                                         new TestObject { Uid = Guid.Parse("{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"), Name = "2-test", Value = 50m },
-                                         new TestObject { Uid = Guid.Parse("{67885BA0-B284-438F-8393-EE9A9EB299D1}"), Name = "3-test", Value = 50m },
-                                         new TestObject { Uid = Guid.Parse("{3AF2C973-D985-4F95-A0C7-AA928D276881}"), Name = "4-test", Value = 70m },
-                                         new TestObject { Uid = Guid.Parse("{F0607502-5B77-4A3C-9142-E6197A7EE61E}"), Name = "5-test", Value = 6m },
+                                         new TestObject { Id = Guid.Parse("{3BEEE369-11DF-4A30-BF11-1D8465C87110}"), Name = "1-test", Value = 100m },
+                                         new TestObject { Id = Guid.Parse("{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"), Name = "2-test", Value = 50m },
+                                         new TestObject { Id = Guid.Parse("{67885BA0-B284-438F-8393-EE9A9EB299D1}"), Name = "3-test", Value = 50m },
+                                         new TestObject { Id = Guid.Parse("{3AF2C973-D985-4F95-A0C7-AA928D276881}"), Name = "4-test", Value = 70m },
+                                         new TestObject { Id = Guid.Parse("{F0607502-5B77-4A3C-9142-E6197A7EE61E}"), Name = "5-test", Value = 6m },
                                      };
 
             var provider = this.GetProvider(initialObjects);
@@ -610,7 +610,7 @@ namespace ClusterKit.API.Tests
                                   Fields =
                                       new List<ApiRequest>
                                           {
-                                              new ApiRequest { FieldName = "uid" },
+                                              new ApiRequest { FieldName = "id" },
                                               new ApiRequest { FieldName = "name" },
                                               new ApiRequest { FieldName = "value" }
                                           }

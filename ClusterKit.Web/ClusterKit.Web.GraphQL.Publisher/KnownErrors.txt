@@ -1,0 +1,76 @@
+﻿Сергей Пуриков, [02.03.17 13:32]
+На всякий: в getActiveNodeDescriptions поля isClusterLeader и isInitialized (возможно и isObsolete) всегда приходят false, даже если в реальности должно быть true.
+--------------------
+Сергей Пуриков, [02.03.17 15:43]
+С фрагментами интересный момент… Судя по демо-приложению по покемонам, второй запрос должен работать.
+
+Работает:
+
+query RoutesList {
+  api {
+    ...F0
+  }
+}
+fragment F0 on ClusterKitNodeApi_ClusterKitNodeApi { 
+  nodeManagerData {
+    getActiveNodeDescriptions {
+      containerType,
+      isClusterLeader,
+      isObsolete,
+      isInitialized,
+      leaderInRoles,
+      nodeId,
+      nodeTemplate,
+      nodeTemplateVersion,
+      roles,
+      startTimeStamp,
+    }
+  }
+}
+
+Не работает (возвращает null вместо данных getActiveNodeDescriptions):
+
+query RoutesList {
+  api {
+    nodeManagerData {
+      ...F0
+    }
+  }
+}
+fragment F0 on ClusterKitNodeApi_ClusterKitNodeManagement {
+  getActiveNodeDescriptions {
+    containerType,
+    isClusterLeader,
+    isObsolete,
+    isInitialized,
+    leaderInRoles,
+    nodeId,
+    nodeTemplate,
+    nodeTemplateVersion,
+    roles,
+    startTimeStamp,
+  }
+}
+--------------------------
+Сергей Пуриков, [03.03.17 12:52]
+А вот такой запрос должен выполняться? Или это что-то невалидное?
+
+query RoutesList {
+  api {
+    nodeManagerData {
+      getActiveNodeDescriptions {
+        nodeTemplate
+      }
+    }
+    nodeManagerData {
+      nodeTemplates {
+        edges {
+          node {
+            code
+          }
+        }
+      }
+    }
+  }
+}
+---------------------------

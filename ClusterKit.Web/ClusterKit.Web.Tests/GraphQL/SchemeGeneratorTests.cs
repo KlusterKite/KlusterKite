@@ -97,7 +97,10 @@ namespace ClusterKit.Web.Tests.GraphQL
 		                    ""items"": [
 			                    {""id"": 10}, 
 			                    {""id"": 20}
-		                    ]
+		                    ],
+                            ""__request"": {
+                                ""f"": ""object""
+                            }
 	                    }
                     }"
             };
@@ -137,7 +140,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             edges {
                                                 cursor,                                                
                                                 node {
-                                                    id
+                                                    __id
                                                 }
                                             }
                                         }
@@ -165,13 +168,13 @@ namespace ClusterKit.Web.Tests.GraphQL
                                               {
                                                 ""cursor"": 10,
                                                 ""node"": {
-                                                  ""id"": 10
+                                                  ""__id"": 10
                                                 }
                                               },
                                               {
                                                 ""cursor"": 20,
                                                 ""node"": {
-                                                  ""id"": 20
+                                                  ""__id"": 20
                                                 }
                                               }
                                             ]
@@ -245,7 +248,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             edges {
                                                 cursor,                                                
                                                 node {
-                                                    id,
+                                                    __id,
                                                     name
                                                 }
                                             }
@@ -272,14 +275,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                                               {
                                                 ""cursor"": 10,
                                                 ""node"": {
-                                                  ""id"": 10,
+                                                  ""__id"": 10,
                                                   ""name"": ""test object1""
                                                 }
                                               },
                                               {
                                                 ""cursor"": 20,
                                                 ""node"": {
-                                                  ""id"": 20,
+                                                  ""__id"": 20,
                                                   ""name"": ""test object2""
                                                 }
                                               }
@@ -428,7 +431,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 edges {
                                                     cursor,                                                
                                                     node {
-                                                        id,
+                                                        __id,
                                                         name
                                                     }
                                                 }
@@ -439,10 +442,10 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             edges {
                                                 cursor,                                                
                                                 node {
-                                                    id,
+                                                    __id,
                                                     name
                                                 }
-                                            }
+                                             }
                                         }
                                     }
                                 }            
@@ -475,14 +478,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 {
                                                   ""cursor"": 10,
                                                   ""node"": {
-                                                    ""id"": 10,
+                                                    ""__id"": 10,
                                                     ""name"": ""test object1""
                                                   }
                                                 },
                                                 {
                                                   ""cursor"": 20,
                                                   ""node"": {
-                                                    ""id"": 20,
+                                                    ""__id"": 20,
                                                     ""name"": ""test object2""
                                                   }
                                                 }
@@ -495,14 +498,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                                               {
                                                 ""cursor"": 10,
                                                 ""node"": {
-                                                  ""id"": 10,
+                                                  ""__id"": 10,
                                                   ""name"": ""test object1""
                                                 }
                                               },
                                               {
                                                 ""cursor"": 20,
                                                 ""node"": {
-                                                  ""id"": 20,
+                                                  ""__id"": 20,
                                                   ""name"": ""test object2""
                                                 }
                                               }

@@ -73,7 +73,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      {
                                          new TestObject
                                              {
-                                                 Uid =
+                                                 Id =
                                                      Guid.Parse(
                                                          "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
                                                  Name = "1-test",
@@ -81,7 +81,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                          new TestObject
                                              {
-                                                 Uid =
+                                                 Id =
                                                      Guid.Parse(
                                                          "{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"),
                                                  Name = "2-test",
@@ -89,7 +89,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                          new TestObject
                                              {
-                                                 Uid =
+                                                 Id =
                                                      Guid.Parse(
                                                          "{67885BA0-B284-438F-8393-EE9A9EB299D1}"),
                                                  Name = "3-test",
@@ -97,7 +97,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                          new TestObject
                                              {
-                                                 Uid =
+                                                 Id =
                                                      Guid.Parse(
                                                          "{3AF2C973-D985-4F95-A0C7-AA928D276881}"),
                                                  Name = "4-test",
@@ -105,7 +105,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                          new TestObject
                                              {
-                                                 Uid =
+                                                 Id =
                                                      Guid.Parse(
                                                          "{F0607502-5B77-4A3C-9142-E6197A7EE61E}"),
                                                  Name = "5-test",
@@ -117,6 +117,16 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
+            /*
+            using (var printer = new SchemaPrinter(schema))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+            */
+
             var query = @"
             {                
                 api {
@@ -125,7 +135,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                             edges {
                                 cursor,
                                 node {
-                                    uid,
+                                    id,
+                                    __id,
                                     name,
                                     value
                                 }                    
@@ -144,35 +155,35 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-
             var expectedResult = @"
-                                    {
-                                      ""data"": {
-                                        ""api"": {
-                                          ""connection"": {
-                                            ""count"": 4,
-                                            ""edges"": [
-                                              {
-                                                ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                                ""node"": {
-                                                  ""uid"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                                  ""name"": ""3-test"",
-                                                  ""value"": 50.0
-                                                }
-                                              },
-                                              {
-                                                ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                                ""node"": {
-                                                  ""uid"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                                  ""name"": ""4-test"",
-                                                  ""value"": 70.0
-                                                }
-                                              }
-                                            ]
-                                          }
+                            {
+                              ""data"": {
+                                ""api"": {
+                                  ""connection"": {
+                                    ""count"": 4,
+                                    ""edges"": [
+                                      {
+                                        ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                        ""node"": {
+                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                          ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                          ""name"": ""3-test"",
+                                          ""value"": 50.0
+                                        }
+                                      },
+                                      {
+                                        ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                        ""node"": {
+                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
+                                          ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                          ""name"": ""4-test"",
+                                          ""value"": 70.0
                                         }
                                       }
-                                    }";
+                                    ]
+                                  }
+                                }
+                              }";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -237,7 +248,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: ClusterKit_API_Tests_Mock_TestProvider_connection_create(newNode: {name: ""hello world"", value: 10}) {
+                    call: TestApi_connection_create(newNode: {name: ""hello world"", value: 10}) {
                         result {
                             name,
                             value
@@ -288,7 +299,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: ClusterKit_API_Tests_Mock_TestProvider_nestedAsync_setName(name: ""hello world"") {
+                    call: TestApi_nestedAsync_setName(name: ""hello world"") {
                         name
                     }
             }            
@@ -344,6 +355,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  {
                                      r.Schema = schema;
                                      r.Query = Resources.IntrospectionQuery;
+                                     r.UserContext = new RequestContext();
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
@@ -394,6 +406,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  {
                                      r.Schema = schema;
                                      r.Query = query;
+                                     r.UserContext = new RequestContext();
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
@@ -459,7 +472,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
             }
 
-            fragment F on ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider {
+            fragment F on TestApi_TestApi {
                     syncScalarField
             }
             ";
@@ -469,6 +482,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                              {
                                  r.Schema = schema;
                                  r.Query = query;
+                                 r.UserContext = new RequestContext();
                              }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
@@ -515,6 +529,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                              {
                                  r.Schema = schema;
                                  r.Query = query;
+                                 r.UserContext = new RequestContext();
                              }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);

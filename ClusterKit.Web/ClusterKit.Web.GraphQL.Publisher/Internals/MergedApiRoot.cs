@@ -117,13 +117,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                   MergeNullValueHandling = MergeNullValueHandling.Ignore
                               };
 
-            return responses.Aggregate(
+            var response = responses.Aggregate(
                 new JObject(),
                 (seed, next) =>
                     {
                         seed.Merge(next, options);
                         return seed;
                     });
+
+            return response;
         }
 
         /// <summary>

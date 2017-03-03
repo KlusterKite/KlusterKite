@@ -697,7 +697,6 @@ namespace ClusterKit.API.Provider
                 {{
                     if (queryField.FieldName == ""count"") 
                     {{
-                        onErrorCallback(new Exception(""field count""));
                         connectionResultJson.Add(queryField.Alias ?? queryField.FieldName,  connectionResult.Count);
                     }}
                     
@@ -706,14 +705,33 @@ namespace ClusterKit.API.Provider
                         var resultArray = new JArray();
                         foreach (var item in connectionResult.Items)
                         {{
-                            {(this.Metadata.ScalarType == EnScalarType.None ? this.GenerateObjectResolve("item", this.Metadata.Type, "queryField") : "var result = new JValue(item);")}
+                            {(this.Metadata.ScalarType == EnScalarType.None ? this.GenerateObjectResolve("item", this.Metadata.Type, "queryField", false) : "var result = new JValue(item);")}
                             resultArray.Add(result);
                         }} 
 
                         connectionResultJson.Add(queryField.Alias ?? queryField.FieldName,  resultArray);
                     }}
                 }}
+
+                var requestData = new JObject();
+                requestData.Add(""f"", query.FieldName);
+                var argumentProperties = arguments.Properties()
+                    .Where(p => 
+                            p.Name != ""filter"" 
+                            && p.Name != ""sort"" 
+                            && p.Name != ""limit"" 
+                            && p.Name != ""offset"").ToList();
+                if (argumentProperties.Count > 0) 
+                {{
+                    var requestArguments = new JObject();
+                    foreach(var argument in argumentProperties)
+                    {{
+                        requestArguments.Add(argument.Name, argument.Value);
+                    }} 
+                    requestData.Add(""a"", requestArguments);                   
+                }}
                 
+                connectionResultJson.Add(""__request"", requestData);
                 return connectionResultJson;
             ";
         }
@@ -724,8 +742,9 @@ namespace ClusterKit.API.Provider
         /// <param name="itemName">The item variable name</param>
         /// <param name="type">The item type</param>
         /// <param name="queryVariableName">The variable name with query stored</param>
+        /// <param name="generateRequestData">A value indicating whether to add the request data to the object</param>
         /// <returns>Code to return result</returns>
-        protected virtual string GenerateObjectResolve(string itemName, Type type, string queryVariableName = "query")
+        protected virtual string GenerateObjectResolve(string itemName, Type type, string queryVariableName = "query", bool generateRequestData = true)
         {
             ApiType apiType;
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(type.FullName, out apiType))
@@ -745,6 +764,17 @@ namespace ClusterKit.API.Provider
                 throw new InvalidOperationException($"Type {type.FullName} is not an object type");
             }
 
+            var requestData = generateRequestData 
+                ? $@"
+                var requestData = new JObject();
+                requestData.Add(""f"", query.FieldName);
+                if (query.Arguments != null) 
+                {{
+                    requestData.Add(""a"", (JObject)query.Arguments);
+                }}
+                result.Add(""__request"", requestData);" 
+                : string.Empty;
+
             return $@"
                 var result = new JObject();
                 ApiRequest fieldQuery;
@@ -752,7 +782,8 @@ namespace ClusterKit.API.Provider
                 foreach (var field in {queryVariableName}.Fields)
                 {{
                     result.Add(field.Alias ?? field.FieldName, await FieldResolvers[field.FieldName]({itemName}, field, context, argumentsSerializer, onErrorCallback));
-                }}  
+                }}
+                {requestData}
             ";
         }
 

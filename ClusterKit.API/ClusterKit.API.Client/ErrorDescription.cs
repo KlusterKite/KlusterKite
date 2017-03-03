@@ -16,7 +16,7 @@ namespace ClusterKit.API.Client
     /// <summary>
     /// The error description
     /// </summary>
-    [ApiDescription(Description = "The mutation error description")]
+    [ApiDescription(Description = "The mutation error description", Name = "ErrorDescription")]
     public class ErrorDescription
     {
         /// <summary>

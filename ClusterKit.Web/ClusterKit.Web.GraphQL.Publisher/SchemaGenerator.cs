@@ -47,60 +47,61 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var mutationType = api.GenerateMutationType();
             graphTypes[mutationType.Name] = mutationType;
 
-            graphTypes.Values.Where(a => a is IComplexGraphType)
-                .Cast<IComplexGraphType>()
-                .SelectMany(a => a.Fields)
-                .ForEach(
-                    f =>
+            graphTypes.Values.OfType<IComplexGraphType>().SelectMany(a => a.Fields).ForEach(
+                f =>
+                    {
+                        var fieldDescription = f.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
+                        if (fieldDescription == null)
                         {
-                            var fieldDescription = f.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
-                            if (fieldDescription == null)
-                            {
-                                return;
-                            }
+                            return;
+                        }
 
-                            var typeArguments = fieldDescription.Type.GenerateArguments(graphTypes)
-                                                ?? new QueryArguments();
-                            var fieldArguments =
-                                fieldDescription.Arguments.Select(
-                                    p =>
-                                        new QueryArgument(typeof(VirtualInputGraphType))
-                                            {
-                                                Name = p.Key,
-                                                ResolvedType = p.Value.Flags.HasFlag(EnFieldFlags.IsArray)
-                                                    ? new ListGraphType(graphTypes[p.Value.Type.ComplexTypeName])
+                        var typeArguments = fieldDescription.Type.GenerateArguments(graphTypes) ?? new QueryArguments();
+                        var fieldArguments =
+                            fieldDescription.Arguments.Select(
+                                p =>
+                                    new QueryArgument(typeof(VirtualInputGraphType))
+                                        {
+                                            Name = p.Key,
+                                            ResolvedType =
+                                                p.Value.Flags.HasFlag(
+                                                    EnFieldFlags.IsArray)
+                                                    ? new ListGraphType(
+                                                        graphTypes[p.Value.Type.ComplexTypeName])
                                                     : graphTypes[p.Value.Type.ComplexTypeName],
-                                                Description = p.Value.Description
-                                            });
+                                            Description =
+                                                p.Value.Description
+                                        });
 
-                            var resultingArguments = typeArguments.Union(fieldArguments).ToList();
+                        var resultingArguments = typeArguments.Union(fieldArguments).ToList();
 
-                            if (resultingArguments.Any())
-                            {
-                                f.Arguments = new QueryArguments(resultingArguments);
-                            }
+                        if (resultingArguments.Any())
+                        {
+                            f.Arguments = new QueryArguments(resultingArguments);
+                        }
 
-                            f.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
-                                                 ? new ListGraphType(
-                                                     graphTypes[fieldDescription.Type.ComplexTypeName])
-                                                 : graphTypes[fieldDescription.Type.ComplexTypeName];
+                        f.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
+                                             ? new ListGraphType(graphTypes[fieldDescription.Type.ComplexTypeName])
+                                             : graphTypes[fieldDescription.Type.ComplexTypeName];
 
-                            if (f.Resolver == null)
-                            {
-                                f.Resolver = fieldDescription.Type;
-                            }
+                        if (f.Resolver == null)
+                        {
+                            f.Resolver = fieldDescription.Type;
+                        }
 
-                            if (!string.IsNullOrWhiteSpace(fieldDescription.Description))
-                            {
-                                f.Description = fieldDescription.Description;
-                            }
-                        });
+                        if (!string.IsNullOrWhiteSpace(fieldDescription.Description))
+                        {
+                            f.Description = fieldDescription.Description;
+                        }
+                    });
 
             var schema = new Schema
                              {
                                  Query = (VirtualGraphType)graphTypes[root.ComplexTypeName],
                                  Mutation = mutationType
-            };
+                             };
+
+            schema.RegisterTypes(new NodeInterface());
 
             schema.Initialize();
             return schema;

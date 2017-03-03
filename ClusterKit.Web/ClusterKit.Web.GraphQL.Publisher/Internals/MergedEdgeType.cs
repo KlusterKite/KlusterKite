@@ -42,7 +42,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="objectType">
         /// The end Type.
         /// </param>
-        public MergedEdgeType(string originalTypeName, FieldProvider provider, MergedType objectType) : base(originalTypeName)
+        public MergedEdgeType(string originalTypeName, FieldProvider provider, MergedNodeType objectType) : base(originalTypeName)
         {
             this.objectType = objectType;
             this.Provider = provider;
@@ -60,10 +60,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public FieldProvider Provider { get; }
 
         /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers => new[]
-                                                                    {
-                                                                        this.Provider
-                                                                    };
+        public override IEnumerable<FieldProvider> Providers
+        {
+            get
+            {
+                yield return this.Provider;
+            }
+        }
 
         /// <inheritdoc />
         public override IGraphType GenerateGraphType()
@@ -127,7 +130,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// </param>
             public CursorResolver(MergedType objectType)
             {
-                this.keyName = (objectType as MergedObjectType)?.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
+                this.keyName = (objectType as MergedFieldedType)?.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
+
+                if (this.keyName == "__id")
+                {
+                    this.keyName = "id";
+                }
             }
 
             /// <inheritdoc />

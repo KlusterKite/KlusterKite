@@ -211,6 +211,7 @@
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -254,8 +255,11 @@
     <Compile Include="ActorSystemApiProvider.cs" />
     <Compile Include="ApiBrowserActor.cs" />
     <Compile Include="ApiProvider.cs" />
+    <Compile Include="GraphTypes\NodeInterface.cs" />
     <Compile Include="Internals\Converter.cs" />
     <Compile Include="Internals\MergedEnumType.cs" />
+    <Compile Include="Internals\MergedFieldedType.cs" />
+    <Compile Include="MergedNodeType.cs" />
     <Compile Include="OwinConfigurator.cs" />
     <Compile Include="SchemaProvider.cs" />
     <Compile Include="TempApiRequest.cs" />
@@ -295,6 +299,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="KnownErrors.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

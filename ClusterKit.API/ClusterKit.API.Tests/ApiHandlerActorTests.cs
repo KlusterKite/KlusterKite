@@ -87,7 +87,7 @@ namespace ClusterKit.API.Tests
                 Arguments = (JObject)JsonConvert.DeserializeObject(MethodParameters),
                 Fields = new List<ApiRequest>
                                           {
-                                              new ApiRequest { FieldName = "uid" },
+                                              new ApiRequest { FieldName = "id" },
                                               new ApiRequest { FieldName = "name" },
                                               new ApiRequest { FieldName = "value" }
                                           },

@@ -69,7 +69,7 @@ namespace ClusterKit.API.Tests
             Assert.NotNull(description);
             Assert.NotNull(description.Handler);
             Assert.NotNull(description.Description);
-            Assert.Equal("ClusterKit.API.Tests.Mock.TestProvider", description.Description.ApiName);
+            Assert.Equal("TestApi", description.Description.ApiName);
             Assert.Equal("Tested API", description.Description.Description);
         }
 
