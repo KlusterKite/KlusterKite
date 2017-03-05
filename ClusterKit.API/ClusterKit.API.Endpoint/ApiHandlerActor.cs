@@ -41,6 +41,7 @@ namespace ClusterKit.API.Endpoint
             this.apiProvider = apiProvider;
             this.Receive<MutationApiRequest>(m => this.HandleMutation(m));
             this.Receive<QueriApiRequest>(m => this.HandleQuery(m));
+            this.Receive<NodeSearchApiRequest>(m => this.HandleNodeSearch(m));
 
             foreach (var generationError in apiProvider.GenerationErrors)
             {
@@ -84,15 +85,34 @@ namespace ClusterKit.API.Endpoint
         private void HandleQuery(QueriApiRequest request)
         {
             var system = Context.System;
+            this.apiProvider.ResolveQuery(
+                    request.Fields,
+                    request.Context,
+                    exception => system.Log.Error(exception, "{Type}: query resolve exception", this.GetType().Name))
+                .PipeTo(
+                    this.Sender,
+                    this.Self,
+                    json => (SurrogatableJObject)json,
+                    e => this.HandleResolveException(e, system));
+        }
+
+        /// <summary>
+        /// Handles node search requests
+        /// </summary>
+        /// <param name="request">The query request</param>
+        private void HandleNodeSearch(NodeSearchApiRequest request)
+        {
+            var system = Context.System;
             system.Log.Info(
                 "{Type}: Resolving query for API {ApiName}",
                 this.GetType().Name,
                 this.apiProvider.ApiDescription.ApiName);
 
-            this.apiProvider.ResolveQuery(
-                    request.Fields,
+            this.apiProvider.SearchNode(
+                    request.Id,
+                    request.Path,
                     request.Context,
-                    exception => system.Log.Error(exception, "{Type}: query resolve exception", this.GetType().Name))
+                    exception => system.Log.Error(exception, "{Type}: node search exception", this.GetType().Name))
                 .PipeTo(
                     this.Sender,
                     this.Self,
@@ -108,7 +128,7 @@ namespace ClusterKit.API.Endpoint
         /// <returns>Result to send</returns>
         private object HandleResolveException(Exception exception, ActorSystem system)
         {
-            system.Log.Error(exception, "{Type}: execution exception", this.GetType().Name);
+            system.Log.Error(exception, "{Type}: resolve exception", this.GetType().Name);
             return (SurrogatableJObject)new JObject();
         }
     }

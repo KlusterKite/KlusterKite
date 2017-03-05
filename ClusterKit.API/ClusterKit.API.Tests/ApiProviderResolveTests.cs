@@ -17,6 +17,7 @@ namespace ClusterKit.API.Tests
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Provider;
+    using ClusterKit.API.Provider.Resolvers;
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Security.Client;
 
@@ -518,6 +519,18 @@ namespace ClusterKit.API.Tests
             var nested = (JObject)result.Property("nestedSync").Value;
             Assert.Equal("SyncScalarField", nested.Property("syncScalarField")?.ToObject<string>());
         }
+
+      //private static Dictionary<string, Func<ClusterKit.API.Tests.Mock.TestProvider,JObject, RequestContext, JsonSerializer, Task<ObjectResolver.ResolvePropertyResult>>>
+        private static Dictionary<string, Func<ClusterKit.API.Tests.Mock.TestProvider,JObject, RequestContext, JsonSerializer, Task<ObjectResolver.ResolvePropertyResult>>> PropertyResolvers 
+
+
+            = new Dictionary<string, Func<ClusterKit.API.Tests.Mock.TestProvider,JObject, RequestContext, JsonSerializer, Task<ObjectResolver.ResolvePropertyResult>>>
+                  {
+                      
+                  };
+
+
+
 
         /// <summary>
         /// Testing sync scalar field

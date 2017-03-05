@@ -33,9 +33,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
         public static Schema Generate(List<ApiProvider> providers)
         {
             var api = MergeApis(providers);
-            var root = new MergedRoot("Query");
+            var root = new MergedRoot("Query", providers);
             root.Fields["api"] = new MergedField("api", api, description: "The united api access");
-
             var types = root.GetAllTypes().ToList();
 
             var typeNames = types.Select(t => t.ComplexTypeName).Distinct().ToList();
@@ -46,7 +45,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
             var mutationType = api.GenerateMutationType();
             graphTypes[mutationType.Name] = mutationType;
-
             graphTypes.Values.OfType<IComplexGraphType>().SelectMany(a => a.Fields).ForEach(
                 f =>
                     {
@@ -100,9 +98,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                  Query = (VirtualGraphType)graphTypes[root.ComplexTypeName],
                                  Mutation = mutationType
                              };
-
-            schema.RegisterTypes(new NodeInterface());
-
+            
             schema.Initialize();
             return schema;
         }

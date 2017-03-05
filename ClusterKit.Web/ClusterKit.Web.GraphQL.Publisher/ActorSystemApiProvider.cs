@@ -61,13 +61,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <inheritdoc />
         public override async Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
         {
-            var endpoints = this.Endpoints.Values.ToList();
-            if (endpoints.Count == 0)
+            var endpoint = this.GetEndpoint();
+            if (endpoint == null)
             {
                 return null;
             }
-
-            var endpoint = endpoints[this.random.Next(0, endpoints.Count)];
 
             var mutations = requests.OfType<MutationApiRequest>().ToList();
             if (mutations.Count > 0)
@@ -88,6 +86,40 @@ namespace ClusterKit.Web.GraphQL.Publisher
             // todo: repeat ask in case of exception
             var query = new QueriApiRequest { Context = context, Fields = requests };
             return await endpoint.Ask<SurrogatableJObject>(query, this.timeout);
+        }
+
+        /// <inheritdoc />
+        public override async Task<JObject> SearchNode(string id, List<RequestPathElement> path, RequestContext context)
+        {
+            var endpoint = this.GetEndpoint();
+            if (endpoint == null)
+            {
+                return null;
+            }
+
+            var query = new NodeSearchApiRequest
+                            {
+                                Id = id,
+                                Context = context,
+                                Path = path.Select(p => p.ToApiRequest()).ToList()
+                            };
+            return await endpoint.Ask<SurrogatableJObject>(query, this.timeout);
+        }
+
+        /// <summary>
+        /// Selects the endpoint to solve the request
+        /// </summary>
+        /// <returns>The endpoint to solve</returns>
+        private IActorRef GetEndpoint()
+        {
+            var endpoints = this.Endpoints.Values.ToList();
+            if (endpoints.Count == 0)
+            {
+                return null;
+            }
+
+            var endpoint = endpoints[this.random.Next(0, endpoints.Count)];
+            return endpoint;
         }
     }
 }

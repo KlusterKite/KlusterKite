@@ -47,10 +47,16 @@ namespace ClusterKit.API.Provider
         public Dictionary<MemberInfo, string> FieldNames { get; } = new Dictionary<MemberInfo, string>();
 
         /// <summary>
-        /// Gets the list of resolver class names for the field in the type
+        /// Gets the list of resolver class names for types
         /// </summary>
         [NotNull]
-        public Dictionary<string, Dictionary<string, string>> ResolverNames { get; } = new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, string> ObjectResolverNames { get; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Gets the list of resolver class names for connections
+        /// </summary>
+        [NotNull]
+        public Dictionary<string, string> ConnectionResolverNames { get; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets the list of resolver class names for mutations

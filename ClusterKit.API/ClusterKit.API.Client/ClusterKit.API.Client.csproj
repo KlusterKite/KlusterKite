@@ -91,9 +91,11 @@
     <Compile Include="Messages\SurrogateJObject.cs" />
     <Compile Include="MutationApiRequest.cs" />
     <Compile Include="MutationResult.cs" />
+    <Compile Include="NodeSearchApiRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueriApiRequest.cs" />
     <Compile Include="QueryResult.cs" />
+    <Compile Include="RequestPathElement.cs" />
     <Compile Include="SortingCondition.cs" />
     <Compile Include="SortingHelper.cs" />
   </ItemGroup>

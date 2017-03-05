@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MutationResolverGenerator.cs" company="ClusterKit">
+// <copyright file="MutationPropertyResolverGenerator.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Initializes a new instance of the <see cref="ResolverGenerator" /> class.
+//   Initializes a new instance of the <see cref="PropertyResolverGenerator" /> class.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,10 +16,10 @@ namespace ClusterKit.API.Provider
     /// <summary>
     /// Creates resolver for the mutations
     /// </summary>
-    internal class MutationResolverGenerator : ResolverGenerator
+    internal class MutationPropertyResolverGenerator : PropertyResolverGenerator
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MutationResolverGenerator"/> class.
+        /// Initializes a new instance of the <see cref="MutationPropertyResolverGenerator"/> class.
         /// </summary>
         /// <param name="fieldsPath">
         /// The fields Path.
@@ -39,7 +39,7 @@ namespace ClusterKit.API.Provider
         /// <param name="data">
         /// The data.
         /// </param>
-        public MutationResolverGenerator(
+        public MutationPropertyResolverGenerator(
             List<string> fieldsPath,
             List<string> typesPath,
             MethodInfo member, 
@@ -75,6 +75,8 @@ namespace ClusterKit.API.Provider
         /// <inheritdoc />
         protected override string GenerateResultSourceAcquirement()
         {
+            return string.Empty;
+            /*
             if (this.FieldsPath.Count != this.TypesPath.Count)
             {
                 throw new Exception("FieldsPath and TypesPath lengths should be equal");
@@ -98,6 +100,7 @@ namespace ClusterKit.API.Provider
                 {string.Join("\n", valueRetrievals)}
                 source = source{this.FieldsPath.Count};
                 {base.GenerateResultSourceAcquirement()}";
+                */
         }
     }
 }

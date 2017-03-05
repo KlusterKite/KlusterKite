@@ -117,16 +117,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
-            /*
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
-            */
-
             var query = @"
             {                
                 api {
@@ -155,6 +145,97 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
+            var expectedResult = @"
+                            {
+                              ""data"": {
+                                ""api"": {
+                                  ""connection"": {
+                                    ""count"": 4,
+                                    ""edges"": [
+                                      {
+                                        ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                        ""node"": {
+                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                          ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                          ""name"": ""3-test"",
+                                          ""value"": 50.0
+                                        }
+                                      },
+                                      {
+                                        ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                        ""node"": {
+                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
+                                          ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                          ""name"": ""4-test"",
+                                          ""value"": 70.0
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task NodeQueryTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d1"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            /*
+            var query = @"
+            { 
+                node(id: ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"") {
+                    ...FO
+                }
+
+                fragmentFO on TestApi_TestObject_Node {
+                    __id,
+                    id,
+                    name,
+                    value
+                }            
+            }            
+            ";
+            */
+            var query = @"
+            { 
+                node(id: ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"") {
+                   id
+                }
+
+                           
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            return;
             var expectedResult = @"
                             {
                               ""data"": {
@@ -347,7 +428,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -608,6 +689,20 @@ namespace ClusterKit.Web.Tests.GraphQL
 
                 return await this.provider.ResolveQuery(
                            requests,
+                           context,
+                           exception =>
+                               this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
+            }
+
+            /// <inheritdoc />
+            public override async Task<JObject> SearchNode(
+                string id,
+                List<RequestPathElement> path,
+                RequestContext context)
+            {
+                return await this.provider.SearchNode(
+                           id,
+                           path.Select(p => p.ToApiRequest()).ToList(),
                            context,
                            exception =>
                                this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));

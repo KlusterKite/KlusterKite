@@ -259,6 +259,7 @@
     <Compile Include="Internals\Converter.cs" />
     <Compile Include="Internals\MergedEnumType.cs" />
     <Compile Include="Internals\MergedFieldedType.cs" />
+    <Compile Include="Internals\NodeSearcher.cs" />
     <Compile Include="MergedNodeType.cs" />
     <Compile Include="OwinConfigurator.cs" />
     <Compile Include="SchemaProvider.cs" />

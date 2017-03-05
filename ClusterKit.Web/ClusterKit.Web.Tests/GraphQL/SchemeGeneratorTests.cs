@@ -935,6 +935,12 @@ namespace ClusterKit.Web.Tests.GraphQL
             {
                 return Task.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
             }
+
+            /// <inheritdoc />
+            public override Task<JObject> SearchNode(string id, List<RequestPathElement> path, RequestContext context)
+            {
+                return Task.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
+            }
         }
     }
 }
