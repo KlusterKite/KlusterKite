@@ -72,6 +72,16 @@ namespace ClusterKit.API.Provider
         public Type Type { get; set; }
 
         /// <summary>
+        /// Gets or sets the type of node if for connections
+        /// </summary>
+        public Type TypeOfId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type name to look for resolver
+        /// </summary>
+        public string TypeName { get; set; }
+
+        /// <summary>
         /// Checks the type to be scalar
         /// </summary>
         /// <param name="type">The type</param>

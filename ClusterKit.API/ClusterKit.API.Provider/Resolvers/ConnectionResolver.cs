@@ -10,6 +10,8 @@
 namespace ClusterKit.API.Provider.Resolvers
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
@@ -21,17 +23,83 @@ namespace ClusterKit.API.Provider.Resolvers
     /// <summary>
     /// Resolves requests to the connection
     /// </summary>
-    public abstract class ConnectionResolver : IResolver
+    /// <typeparam name="T">The type of node</typeparam>
+    /// <typeparam name="TId">The type of node id</typeparam>
+    public abstract class ConnectionResolver<T, TId> : IResolver where T : class, new() 
     {
+        /// <summary>
+        /// Gets the node object resolver
+        /// </summary>
+        protected abstract IResolver NodeResolver { get; }
+
         /// <inheritdoc />
-        public Task<JToken> ResolveQuery(
+        public virtual async Task<JToken> ResolveQuery(
             object source,
             ApiRequest request,
             RequestContext context,
             JsonSerializer argumentsSerializer,
             Action<Exception> onErrorCallback)
         {
-            throw new NotImplementedException();
+            var connection = source as INodeConnection<T, TId>;
+            if (connection == null)
+            {
+                onErrorCallback?.Invoke(new Exception("Source is not a node connection"));
+                return JValue.CreateNull();
+            }
+
+            var arguments = (JObject)request.Arguments;
+            var filterArgument = arguments?.Property("filter")?.Value as JObject;
+            var sortArgument = arguments?.Property("sort")?.Value as JArray;
+            var limit = (int?)(arguments?.Property("limit")?.Value as JValue);
+            var offset = (int?)(arguments?.Property("offset")?.Value as JValue);
+
+            var filter = filterArgument != null ? this.CreateFilter(filterArgument) : null;
+            var sort = sortArgument != null ? this.CreateSort(sortArgument) : null;
+            var items = await connection.Query(filter, sort, limit, offset);
+
+            if (items == null)
+            {
+                return JValue.CreateNull();
+            }
+
+            var result = new JObject();
+            foreach (var requestField in request.Fields)
+            {
+                switch (requestField.FieldName)
+                {
+                    case "count":
+                        result.Add(requestField.Alias ?? requestField.FieldName, new JValue(items.Count));
+                        break;
+                    case "items":
+                        {
+                            var itemsValue = await new CollectionResolver(this.NodeResolver).ResolveQuery(
+                                                 items.Items,
+                                                 requestField,
+                                                 context,
+                                                 argumentsSerializer,
+                                                 onErrorCallback);
+                            result.Add(requestField.Alias ?? requestField.FieldName, itemsValue);
+                        }
+
+                        break;
+                }
+            }
+
+            return result;
         }
+
+        /// <summary>
+        /// Creates filter expression by filter request
+        /// </summary>
+        /// <param name="filter">The filter request</param>
+        /// <returns>The filter expression</returns>
+        protected abstract Expression<Func<T, bool>> CreateFilter(JObject filter);
+
+        /// <summary>
+        /// Creates the list of sorting conditions by sorting request
+        /// </summary>
+        /// <param name="sortArguments">The sorting request</param>
+        /// <returns>The list of sorting conditions</returns>
+        protected abstract IEnumerable<SortingCondition> CreateSort(JArray sortArguments);
     }
 }

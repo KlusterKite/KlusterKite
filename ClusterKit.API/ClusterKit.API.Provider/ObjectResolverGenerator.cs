@@ -140,12 +140,6 @@ namespace ClusterKit.API.Provider
                     propertyInfo?.PropertyType ?? methodInfo?.ReturnType,
                     member.GetCustomAttribute<PublishToApiAttribute>());
 
-                if (field.Flags.HasFlag(EnFieldFlags.IsConnection))
-                {
-                    // todo: introduce connections
-                    continue;
-                }
-
                 var asyncPrefix = metaData.IsAsync ? "async" : string.Empty;
                 var returnResult = metaData.IsAsync
                                        ? "new ResolvePropertyResult { Value = fieldValue, Resolver = resolver }"
@@ -182,6 +176,11 @@ namespace ClusterKit.API.Provider
             if (metaData.IsForwarding)
             {
                 return "var resolver = new ForwarderResolver();";
+            }
+
+            if (metaData.MetaType == TypeMetadata.EnMetaType.Connection)
+            {
+                return $"var resolver = new {this.Data.ConnectionResolverNames[metaData.TypeName]}();";
             }
 
             var endTypeResolver = metaData.ScalarType != EnScalarType.None

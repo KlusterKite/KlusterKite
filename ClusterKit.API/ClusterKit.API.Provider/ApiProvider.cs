@@ -192,6 +192,69 @@ namespace ClusterKit.API.Provider
             */
         }
 
+
+        /// <summary>
+        /// Parses the metadata of returning type for the field
+        /// </summary>
+        /// <param name="type">The original field return type</param>
+        /// <param name="attribute">The description attribute</param>
+        /// <returns>The type metadata</returns>
+        internal static TypeMetadata GenerateTypeMetadata(Type type, PublishToApiAttribute attribute)
+        {
+            var metadata = new TypeMetadata();
+            var asyncType = TypeMetadata.CheckType(type, typeof(Task<>));
+            if (asyncType != null)
+            {
+                metadata.IsAsync = true;
+                type = asyncType.GenericTypeArguments[0];
+            }
+
+            if (attribute.ReturnType != null)
+            {
+                type = attribute.ReturnType;
+                metadata.IsForwarding = true;
+            }
+
+            var scalarType = TypeMetadata.CheckScalarType(type);
+            metadata.MetaType = TypeMetadata.EnMetaType.Scalar;
+            if (scalarType == EnScalarType.None)
+            {
+                var enumerable = TypeMetadata.CheckType(type, typeof(IEnumerable<>));
+                var connection = TypeMetadata.CheckType(type, typeof(INodeConnection<,>));
+
+                if (connection != null)
+                {
+                    metadata.MetaType = TypeMetadata.EnMetaType.Connection;
+                    metadata.TypeOfId = connection.GenericTypeArguments[1];
+                    type = connection.GenericTypeArguments[0];
+                    scalarType = TypeMetadata.CheckScalarType(type);
+                }
+                else if (enumerable != null)
+                {
+                    metadata.MetaType = TypeMetadata.EnMetaType.Array;
+                    type = enumerable.GenericTypeArguments[0];
+                    scalarType = TypeMetadata.CheckScalarType(type);
+                }
+                else
+                {
+                    metadata.MetaType = TypeMetadata.EnMetaType.Object;
+                }
+            }
+
+            if (scalarType != EnScalarType.None && type.IsSubclassOf(typeof(Enum)))
+            {
+                type = Enum.GetUnderlyingType(type);
+            }
+
+            // todo: check forwarding type
+            metadata.ScalarType = scalarType;
+            metadata.Type = type;
+
+            var typeName = type.GetCustomAttribute<ApiDescriptionAttribute>()?.Name ?? type.FullName;
+            metadata.TypeName = metadata.TypeOfId != null ? $"{typeName}_{metadata.TypeOfId.FullName}" : typeName;
+            return metadata;
+        }
+
         /// <summary>
         /// Generates the api description and prepares all resolvers
         /// </summary>
@@ -202,7 +265,14 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.Mutations.Clear();
 
             var assembleData = new AssembleTempData();
-            var root = (ApiObjectType)this.GenerateTypeDescription(this.GetType(), assembleData);
+            var root = (ApiObjectType)this.GenerateTypeDescription(
+                new TypeMetadata
+                    {
+                        Type = this.GetType(),
+                        MetaType = TypeMetadata.EnMetaType.Object,
+                        ScalarType = EnScalarType.None
+                    }, 
+                assembleData);
 
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
             this.ApiDescription.Description = root.Description;
@@ -339,7 +409,7 @@ namespace ClusterKit.API.Provider
             }
             else
             {
-                var returnApiType = this.GenerateTypeDescription(metadata.Type, data);
+                var returnApiType = this.GenerateTypeDescription(metadata, data);
                 field = ApiField.Object(
                     name,
                     returnApiType.TypeName,
@@ -377,7 +447,7 @@ namespace ClusterKit.API.Provider
                 }
                 else
                 {
-                    var parameterApiType = this.GenerateTypeDescription(parameterMetadata.Type, data);
+                    var parameterApiType = this.GenerateTypeDescription(parameterMetadata, data);
                     field.Arguments.Add(
                         ApiField.Object(
                             parameterName,
@@ -456,7 +526,7 @@ namespace ClusterKit.API.Provider
                 return ApiField.Scalar(name, metadata.ScalarType, flags, description: attribute.Description);
             }
 
-            var returnApiType = this.GenerateTypeDescription(metadata.Type, data);
+            var returnApiType = this.GenerateTypeDescription(metadata, data);
 
             return ApiField.Object(
                 name,
@@ -650,6 +720,7 @@ namespace ClusterKit.API.Provider
                     continue;
                 }
 
+                /*
                 var mutationResultType = typeof(MutationResult<>).MakeGenericType(connectedObjectType);
                 var mutationResult = this.GenerateTypeDescription(mutationResultType, data);
 
@@ -740,6 +811,8 @@ namespace ClusterKit.API.Provider
                             new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
                             description: attribute.CreateDescription);
                 }
+                */
+                yield break;
             }
         }
 
@@ -802,7 +875,7 @@ namespace ClusterKit.API.Provider
         /// <summary>
         /// Generates type description
         /// </summary>
-        /// <param name="type">
+        /// <param name="typeMetaData">
         /// The type to describe
         /// </param>
         /// <param name="data">
@@ -811,21 +884,33 @@ namespace ClusterKit.API.Provider
         /// <returns>
         /// The api type description
         /// </returns>
-        private ApiType GenerateTypeDescription([NotNull] Type type, [NotNull] AssembleTempData data)
+        private ApiType GenerateTypeDescription([NotNull] TypeMetadata typeMetaData, [NotNull] AssembleTempData data)
         {
+            var type = typeMetaData.Type;
+            var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
+            var typeName = descriptionAttribute?.Name ?? PropertyResolverGenerator.ToCSharpRepresentation(type, true);
+
+            if (typeMetaData.MetaType == TypeMetadata.EnMetaType.Connection)
+            {
+                if (!data.ConnectionResolverNames.ContainsKey(typeMetaData.TypeName))
+                {
+                    var connectionResolverGenerator = new ConnectionResolverGenerator(typeMetaData, data);
+                    data.ConnectionResolverNames[typeMetaData.TypeName] = connectionResolverGenerator.FullClassName;
+                    data.ResolverGenerators.Add(connectionResolverGenerator);
+                }
+            }
+
             ApiType apiType;
             if (data.DiscoveredApiTypes.TryGetValue(type.FullName, out apiType))
             {
                 return apiType;
             }
 
-            var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
-            
             if (type.IsSubclassOf(typeof(Enum)))
             {
                 var apiEnumType =
                     new ApiEnumType(
-                        descriptionAttribute?.Name ?? PropertyResolverGenerator.ToCSharpRepresentation(type, true),
+                        typeName,
                         Enum.GetNames(type)) { Description = descriptionAttribute?.Description };
                 data.DiscoveredTypes[apiEnumType.TypeName] = type;
                 data.DiscoveredApiTypes[apiEnumType.TypeName] = apiEnumType;
@@ -833,7 +918,7 @@ namespace ClusterKit.API.Provider
                 return apiEnumType;
             }
 
-            var apiObjectType = new ApiObjectType(descriptionAttribute?.Name ?? PropertyResolverGenerator.ToCSharpRepresentation(type, true))
+            var apiObjectType = new ApiObjectType(typeName)
                           {
                               Description =
                                   descriptionAttribute?.Description
@@ -851,65 +936,6 @@ namespace ClusterKit.API.Provider
             apiObjectType.Fields.AddRange(this.GenerateTypeProperties(type, apiObjectType, data));
             apiObjectType.Fields.AddRange(this.GenerateTypeMethods(type, apiObjectType, data));
             return apiObjectType;
-        }
-
-        /// <summary>
-        /// Parses the metadata of returning type for the field
-        /// </summary>
-        /// <param name="type">The original field return type</param>
-        /// <param name="attribute">The description attribute</param>
-        /// <returns>The type metadata</returns>
-        internal static TypeMetadata GenerateTypeMetadata(Type type, PublishToApiAttribute attribute)
-        {
-            var metadata = new TypeMetadata();
-
-            var asyncType = TypeMetadata.CheckType(type, typeof(Task<>));
-            if (asyncType != null)
-            {
-                metadata.IsAsync = true;
-                type = asyncType.GenericTypeArguments[0];
-            }
-
-            if (attribute.ReturnType != null)
-            {
-                type = attribute.ReturnType;
-                metadata.IsForwarding = true;
-            }
-
-            var scalarType = TypeMetadata.CheckScalarType(type);
-            metadata.MetaType = TypeMetadata.EnMetaType.Scalar;
-            if (scalarType == EnScalarType.None)
-            {
-                var enumerable = TypeMetadata.CheckType(type, typeof(IEnumerable<>));
-                var connection = TypeMetadata.CheckType(type, typeof(INodeConnection<,>));
-
-                if (connection != null)
-                {
-                    metadata.MetaType = TypeMetadata.EnMetaType.Connection;
-                    type = connection.GenericTypeArguments[0];
-                    scalarType = TypeMetadata.CheckScalarType(type);
-                }
-                else if (enumerable != null)
-                {
-                    metadata.MetaType = TypeMetadata.EnMetaType.Array;
-                    type = enumerable.GenericTypeArguments[0];
-                    scalarType = TypeMetadata.CheckScalarType(type);
-                }
-                else
-                {
-                    metadata.MetaType = TypeMetadata.EnMetaType.Object;
-                }
-            }
-
-            if (scalarType != EnScalarType.None && type.IsSubclassOf(typeof(Enum)))
-            {
-                type = Enum.GetUnderlyingType(type);
-            }
-
-            // todo: check forwarding type
-            metadata.ScalarType = scalarType;
-            metadata.Type = type;
-            return metadata;
         }
 
         /// <summary>
