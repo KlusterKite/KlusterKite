@@ -17,6 +17,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
     using global::GraphQL.Types;
 
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// The merged type representing scalar value
     /// </summary>
@@ -80,7 +82,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override object Resolve(ResolveFieldContext context)
         {
             var resolve = base.Resolve(context);
-            return resolve;
+            if (resolve is JArray)
+            {
+                return resolve;
+            }
+
+            return (resolve as JValue)?.Value; 
         }
 
         /// <inheritdoc />

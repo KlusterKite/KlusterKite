@@ -116,7 +116,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -229,7 +229,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -322,7 +322,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -340,6 +340,57 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       ""data"": {
                                         ""api"": {
                                             ""enumField"": ""item2"" 
+                                        }
+                                     }                                      
+                                    }";
+
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
+        }
+
+
+        /// <summary>
+        /// Testing generator for some api with boolean field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task BoolTest()
+        {
+            var api = new ApiDescription(
+                "TestApi1",
+                "0.0.0.1",
+                new ApiType[] { },
+                new[] { ApiField.Scalar("boolField", EnScalarType.Boolean) });
+
+            var provider = new MoqProvider { Description = api, Data = "{\"boolField\": true}" };
+
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
+            using (var printer = new SchemaPrinter(schema))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.NotNull(schema.Query);
+            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.True(schema.Query.HasField("api"));
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = "query { api { boolField } } ";
+                             }).ConfigureAwait(true);
+
+            this.output.WriteLine("-------- Response -----------");
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResponse = @"{
+                                      ""data"": {
+                                        ""api"": {
+                                            ""boolField"": true 
                                         }
                                      }                                      
                                     }";
@@ -409,7 +460,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -573,7 +624,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -764,7 +815,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -890,7 +941,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
         }
 

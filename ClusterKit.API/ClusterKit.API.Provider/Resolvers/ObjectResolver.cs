@@ -86,36 +86,17 @@ namespace ClusterKit.API.Provider.Resolvers
 
             var result = new JObject();
 
-            // todo: merge fields in case of multiple field request (check that arguments are equal or error)
+            var mergeSettings = new JsonMergeSettings
+                                    {
+                                        MergeArrayHandling = MergeArrayHandling.Concat,
+                                        MergeNullValueHandling = MergeNullValueHandling.Merge
+                                    };
+
             foreach (var fieldRequest in request.Fields)
             {
-                var fieldName = fieldRequest.Alias ?? fieldRequest.FieldName;
-
-                try
-                {
-                    var propertyValue = await this.ResolvePropertyValue(
-                                            source,
-                                            fieldRequest,
-                                            context,
-                                            argumentsSerializer,
-                                            onErrorCallback);
-
-                    var resolvedProperty = propertyValue?.Value == null
-                                               ? JValue.CreateNull()
-                                               : await propertyValue.Resolver.ResolveQuery(
-                                                     propertyValue.Value,
-                                                     fieldRequest,
-                                                     context,
-                                                     argumentsSerializer,
-                                                     onErrorCallback);
-
-                    result.Add(fieldName, resolvedProperty);
-                }
-                catch (Exception exception)
-                {
-                    onErrorCallback?.Invoke(exception);
-                    result.Add(fieldName, JValue.CreateNull());
-                }
+                result.Merge(
+                    await this.ResolveFieldQuery(source, context, argumentsSerializer, onErrorCallback, fieldRequest),
+                    mergeSettings);
             }
 
             if (request.FieldName != null)
@@ -141,6 +122,52 @@ namespace ClusterKit.API.Provider.Resolvers
             Action<Exception> onErrorCallback)
         {
             return await this.ResolveQuery(source, request, context, argumentsSerializer, onErrorCallback);
+        }
+
+        /// <summary>
+        /// Resolves query for a field
+        /// </summary>
+        /// <param name="source">The source data object</param>
+        /// <param name="context">The request context</param>
+        /// <param name="argumentsSerializer">The arguments serializer</param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <param name="fieldRequest">The field request</param>
+        /// <returns>The resolved request</returns>
+        private async Task<JObject> ResolveFieldQuery(
+            object source,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback,
+            ApiRequest fieldRequest)
+        {
+            var fieldName = fieldRequest.Alias ?? fieldRequest.FieldName;
+
+            try
+            {
+                var propertyValue = await this.ResolvePropertyValue(
+                                        source,
+                                        fieldRequest,
+                                        context,
+                                        argumentsSerializer,
+                                        onErrorCallback);
+
+                var resolvedProperty = propertyValue?.Value == null
+                                           ? JValue.CreateNull()
+                                           : await propertyValue.Resolver.ResolveQuery(
+                                                 propertyValue.Value,
+                                                 fieldRequest,
+                                                 context,
+                                                 argumentsSerializer,
+                                                 onErrorCallback);
+                return new JObject { { fieldName, resolvedProperty } };
+            }
+            catch (Exception exception)
+            {
+                onErrorCallback?.Invoke(exception);
+                return new JObject { { fieldName, JValue.CreateNull() } };
+            }
         }
 
         /// <summary>

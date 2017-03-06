@@ -1,6 +1,10 @@
-﻿Сергей Пуриков, [02.03.17 13:32]
+﻿DONE - fixed
+
+Сергей Пуриков, [02.03.17 13:32]
 На всякий: в getActiveNodeDescriptions поля isClusterLeader и isInitialized (возможно и isObsolete) всегда приходят false, даже если в реальности должно быть true.
 --------------------
+
+DONE - CANNOT REPRODUCE
 Сергей Пуриков, [02.03.17 15:43]
 С фрагментами интересный момент… Судя по демо-приложению по покемонам, второй запрос должен работать.
 
@@ -11,7 +15,7 @@ query RoutesList {
     ...F0
   }
 }
-fragment F0 on ClusterKitNodeApi_ClusterKitNodeApi { 
+fragment F0 on ClusterKitNodeApi_ClusterKitNo deApi { 
   nodeManagerData {
     getActiveNodeDescriptions {
       containerType,
@@ -51,6 +55,7 @@ fragment F0 on ClusterKitNodeApi_ClusterKitNodeManagement {
     startTimeStamp,
   }
 }
+
 --------------------------
 Сергей Пуриков, [03.03.17 12:52]
 А вот такой запрос должен выполняться? Или это что-то невалидное?
@@ -74,6 +79,4 @@ query RoutesList {
   }
 }
 ---------------------------
-Сергей Пуриков, [03.03.17 17:18]
-Про курсор пока ничего не знаю. Думаю, пофиг, что там, лишь бы строка.
----------------------------
+
