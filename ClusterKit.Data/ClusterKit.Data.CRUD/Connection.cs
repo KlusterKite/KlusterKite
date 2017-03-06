@@ -137,12 +137,19 @@ namespace ClusterKit.Data.CRUD
             int? offset)
         {
             this.actorSystem.Log.Info("{Type}: Query launched", this.GetType().Name);
+            var sortingConditions = sort?.ToList() ?? new List<SortingCondition>();
+
+            if (sortingConditions.Count == 0)
+            {
+                offset = null;
+            }
+
             var request = new CollectionRequest<TObject>
                               {
                                   Count = limit,
                                   Skip = offset,
                                   Filter = filter,
-                                  Sort = sort.ToList(),
+                                  Sort = sortingConditions,
                                   AcceptAsParcel = true
                               };
 

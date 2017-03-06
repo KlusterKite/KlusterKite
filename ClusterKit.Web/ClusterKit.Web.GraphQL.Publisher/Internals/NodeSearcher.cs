@@ -9,7 +9,6 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -34,12 +33,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// The list of api providers
         /// </summary>
-        private List<ApiProvider> providers;
+        private readonly List<ApiProvider> providers;
 
         /// <summary>
         /// The api root.
         /// </summary>
-        private MergedApiRoot apiRoot;
+        private readonly MergedApiRoot apiRoot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeSearcher"/> class.
@@ -123,6 +122,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
             if (searchNode != null)
             {
+                searchNode = connectionType.ElementType.ResolveData(searchNode);
                 searchNode.Add("__resolvedType", connectionType.ElementType.ComplexTypeName);
                 searchNode.Add("__globalId", serializedId);
             }

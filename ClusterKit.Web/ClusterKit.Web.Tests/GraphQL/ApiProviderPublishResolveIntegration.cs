@@ -203,29 +203,17 @@ namespace ClusterKit.Web.Tests.GraphQL
             var query = @"
             { 
                 node(id: ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"") {
-                    ...FO
-                }
-
-                fragmentFO on TestApi_TestObject_Node {
-                    __id,
-                    id,
-                    name,
-                    value
+                    ...F0
                 }            
+            }
+
+            fragment F0 on TestApi_TestObject_Node {
+                __id,
+                id,
+                name,
+                value
             }            
             ";
-           
-            /*
-            var query = @"
-            { 
-                node(id: ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"") {
-                   __typename,
-                   id
-                }
-
-                           
-            }            
-            ";*/
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
@@ -236,36 +224,17 @@ namespace ClusterKit.Web.Tests.GraphQL
                              }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-            return;
             var expectedResult = @"
                             {
                               ""data"": {
-                                ""api"": {
-                                  ""connection"": {
-                                    ""count"": 4,
-                                    ""edges"": [
-                                      {
-                                        ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                        ""node"": {
-                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
-                                          ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                          ""name"": ""3-test"",
-                                          ""value"": 50.0
-                                        }
-                                      },
-                                      {
-                                        ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                        ""node"": {
-                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
-                                          ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                          ""name"": ""4-test"",
-                                          ""value"": 70.0
-                                        }
-                                      }
-                                    ]
-                                  }
+                                ""node"": {
+                                  ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                  ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                  ""name"": ""1-test"",
+                                  ""value"": 100.0
                                 }
-                              }";
+                              }
+                            }";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 

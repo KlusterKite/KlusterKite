@@ -95,7 +95,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                Name = "id",
                                Type = typeof(IdGraphType),
                                Description = "The node global id",
-                               Resolver = new GlobalIdResolver(this.keyName, this.Provider.Provider.Description.ApiName)
+                               Resolver = new GlobalIdResolver(this.isIdSubstitute ? "__id" : this.keyName, this.Provider.Provider.Description.ApiName)
                            });
             var graphType = new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
             graphType.AddResolvedInterface(nodeInterface);
@@ -125,17 +125,27 @@ namespace ClusterKit.Web.GraphQL.Publisher
         public override object Resolve(ResolveFieldContext context)
         {
             var resolve = base.Resolve(context) as JObject;
+            return this.ResolveData(resolve);
+        }
+
+        /// <summary>
+        /// Modifies resolved data
+        /// </summary>
+        /// <param name="source">The node data</param>
+        /// <returns>The adapted node data</returns>
+        public JObject ResolveData(JObject source)
+        {
             if (this.isIdSubstitute)
             {
-                var idProperty = resolve?.Property("id");
+                var idProperty = source?.Property("id");
                 if (idProperty != null)
                 {
-                    resolve.Remove("id");
-                    resolve.Add("__id", idProperty.Value);
+                    source.Remove("id");
+                    source.Add("__id", idProperty.Value);
                 }
             }
 
-            return resolve;
+            return source;
         }
 
         /// <inheritdoc />
