@@ -26,11 +26,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private readonly NodeSearcher searcher;
 
         /// <summary>
-        /// The node interface
-        /// </summary>
-        private readonly NodeInterface nodeInterface;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="MergedRoot"/> class.
         /// </summary>
         /// <param name="originalTypeName">
@@ -42,15 +37,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="root">
         /// The root.
         /// </param>
-        /// <param name="nodeInterface">
-        /// The node interface
-        /// </param>
-        public MergedRoot(string originalTypeName, List<ApiProvider> providers, MergedApiRoot root, NodeInterface nodeInterface)
+        public MergedRoot(string originalTypeName, List<ApiProvider> providers, MergedApiRoot root)
             : base(originalTypeName)
         {
             this.searcher = new NodeSearcher(providers, root);
             this.Fields["api"] = new MergedField("api", root, description: "The united api access");
-            this.nodeInterface = nodeInterface;
         }
 
         /// <inheritdoc />

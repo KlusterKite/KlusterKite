@@ -34,7 +34,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         {
             var api = MergeApis(providers);
             var nodeInterface = new NodeInterface();
-            var root = new MergedRoot("Query", providers, api, nodeInterface);
+            var root = new MergedRoot("Query", providers, api);
             var types = root.GetAllTypes().ToList();
 
             var typeNames = types.Select(t => t.ComplexTypeName).Distinct().ToList();
