@@ -69,7 +69,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var fields = new List<FieldType>
                              {

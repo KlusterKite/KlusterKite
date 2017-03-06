@@ -63,7 +63,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// Testing connection query request from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
         [Fact]
@@ -174,7 +174,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                   }
                                 }
                               }";
-            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
         /// <summary>
@@ -200,7 +200,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
-            /*
             var query = @"
             { 
                 node(id: ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"") {
@@ -215,16 +214,18 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }            
             }            
             ";
-            */
+           
+            /*
             var query = @"
             { 
                 node(id: ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"") {
+                   __typename,
                    id
                 }
 
                            
             }            
-            ";
+            ";*/
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
@@ -698,11 +699,13 @@ namespace ClusterKit.Web.Tests.GraphQL
             public override async Task<JObject> SearchNode(
                 string id,
                 List<RequestPathElement> path,
+                ApiRequest request,
                 RequestContext context)
             {
                 return await this.provider.SearchNode(
                            id,
                            path.Select(p => p.ToApiRequest()).ToList(),
+                           request,
                            context,
                            exception =>
                                this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));

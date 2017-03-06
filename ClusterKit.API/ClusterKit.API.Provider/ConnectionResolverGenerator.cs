@@ -74,7 +74,7 @@ namespace ClusterKit.API.Provider
                         public class {this.ClassName} : ConnectionResolver<{ToCSharpRepresentation(this.ObjectType)},{ToCSharpRepresentation(this.typeMetadata.TypeOfId)}>
                         {{  
                             private IResolver nodeResolver = new {this.Data.ObjectResolverNames[nodeApiType.TypeName]}();
-                            protected override IResolver NodeResolver {{ get {{ return this.nodeResolver; }} }}
+                            public override IResolver NodeResolver {{ get {{ return this.nodeResolver; }} }}
           
                             protected override Expression<Func<{ToCSharpRepresentation(this.ObjectType)}, bool>> CreateFilter(JObject filter) 
                             {{
@@ -92,7 +92,6 @@ namespace ClusterKit.API.Provider
                     }}
             ";
         }
-
 
         /// <summary>
         /// Generates method to create filter expression

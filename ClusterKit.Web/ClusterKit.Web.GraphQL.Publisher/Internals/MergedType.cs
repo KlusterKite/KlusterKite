@@ -112,8 +112,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Generates a new <see cref="IGraphType"/>
         /// </summary>
-        /// <returns>The representing <see cref="IGraphType"/></returns>
-        public abstract IGraphType GenerateGraphType();
+        /// <param name="nodeInterface">
+        /// The node Interface.
+        /// </param>
+        /// <returns>
+        /// The representing <see cref="IGraphType"/>
+        /// </returns>
+        public abstract IGraphType GenerateGraphType(NodeInterface nodeInterface);
 
         /// <summary>
         /// Get all included types recursively

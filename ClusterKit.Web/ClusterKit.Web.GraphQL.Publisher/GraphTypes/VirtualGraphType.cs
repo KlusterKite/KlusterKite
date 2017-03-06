@@ -13,6 +13,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
 
     using ClusterKit.API.Client;
 
+    using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
     /// <summary>
@@ -20,6 +21,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
     /// </summary>
     internal class VirtualGraphType : ObjectGraphType
     {
+        /// <summary>
+        /// Storage of field resolvers
+        /// </summary>
+        private readonly Dictionary<string, IFieldResolver> storedResolvers = new Dictionary<string, IFieldResolver>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VirtualGraphType"/> class.
         /// </summary>
@@ -37,6 +43,33 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
                 foreach (var field in fields)
                 {
                     this.AddField(field);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stores the field resolvers
+        /// </summary>
+        public void StoreFieldResolvers()
+        {
+            this.storedResolvers.Clear();
+            foreach (var fieldType in this.Fields)
+            {
+                this.storedResolvers[fieldType.Name] = fieldType.Resolver;
+            }
+        }
+
+        /// <summary>
+        /// Stores the field resolvers
+        /// </summary>
+        public void RestoreFieldResolvers()
+        {
+            foreach (var fieldType in this.Fields)
+            {
+                IFieldResolver resolver;
+                if (this.storedResolvers.TryGetValue(fieldType.Name, out resolver))
+                {
+                    fieldType.Resolver = resolver;
                 }
             }
         }

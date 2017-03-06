@@ -23,7 +23,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// The node searcher
         /// </summary>
-        private NodeSearcher searcher;
+        private readonly NodeSearcher searcher;
+
+        /// <summary>
+        /// The node interface
+        /// </summary>
+        private readonly NodeInterface nodeInterface;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MergedRoot"/> class.
@@ -34,22 +39,30 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="providers">
         /// The providers.
         /// </param>
-        public MergedRoot(string originalTypeName, List<ApiProvider> providers)
+        /// <param name="root">
+        /// The root.
+        /// </param>
+        /// <param name="nodeInterface">
+        /// The node interface
+        /// </param>
+        public MergedRoot(string originalTypeName, List<ApiProvider> providers, MergedApiRoot root, NodeInterface nodeInterface)
             : base(originalTypeName)
         {
-            this.searcher = new NodeSearcher(providers);
+            this.searcher = new NodeSearcher(providers, root);
+            this.Fields["api"] = new MergedField("api", root, description: "The united api access");
+            this.nodeInterface = nodeInterface;
         }
 
         /// <inheritdoc />
         public override string Description => "The root query type";
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
-            var graphType = (VirtualGraphType)base.GenerateGraphType();
+            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
             var nodeFieldType = new FieldType();
             nodeFieldType.Name = "node";
-            nodeFieldType.ResolvedType = new NodeInterface();
+            nodeFieldType.ResolvedType = nodeInterface;
             nodeFieldType.Description = "The node global searcher according to Relay specification";
             nodeFieldType.Arguments =
                 new QueryArguments(

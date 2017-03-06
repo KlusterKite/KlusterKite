@@ -118,6 +118,17 @@ namespace ClusterKit.API.Provider.Resolvers
                 }
             }
 
+            if (request.FieldName != null)
+            {
+                var requestDescription = new JObject { { "f", request.FieldName } };
+                if (request.Arguments != null)
+                {
+                    requestDescription.Add("a", request.Arguments);
+                }
+
+                result.Add("__request", requestDescription);
+            }
+
             return result;
         }
 

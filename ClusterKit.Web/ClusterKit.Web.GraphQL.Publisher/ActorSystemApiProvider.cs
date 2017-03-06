@@ -89,7 +89,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
         }
 
         /// <inheritdoc />
-        public override async Task<JObject> SearchNode(string id, List<RequestPathElement> path, RequestContext context)
+        public override async Task<JObject> SearchNode(
+            string id, 
+            List<RequestPathElement> path, 
+            ApiRequest request,
+            RequestContext context)
         {
             var endpoint = this.GetEndpoint();
             if (endpoint == null)
@@ -101,7 +105,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                             {
                                 Id = id,
                                 Context = context,
-                                Path = path.Select(p => p.ToApiRequest()).ToList()
+                                Path = path.Select(p => p.ToApiRequest()).ToList(),
+                                Request = request
                             };
             return await endpoint.Ask<SurrogatableJObject>(query, this.timeout);
         }

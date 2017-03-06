@@ -32,11 +32,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private readonly MergedEdgeType edgeType;
 
         /// <summary>
-        /// The object end type
-        /// </summary>
-        private readonly MergedNodeType elementType;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="MergedConnectionType"/> class.
         /// </summary>
         /// <param name="originalTypeName">
@@ -51,9 +46,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedConnectionType(string originalTypeName, FieldProvider provider, MergedObjectType elementType)
             : base(originalTypeName)
         {
-            this.elementType = new MergedNodeType(provider, elementType);
+            this.ElementType = new MergedNodeType(provider, elementType);
             this.Provider = provider;
-            this.edgeType = new MergedEdgeType(this.OriginalTypeName, provider, this.elementType);
+            this.edgeType = new MergedEdgeType(this.OriginalTypeName, provider, this.ElementType);
         }
 
         /// <inheritdoc />
@@ -61,7 +56,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
         /// <inheritdoc />
         public override string Description
-            => $"The list of connected {this.elementType.ComplexTypeName}\n {this.elementType.Description}";
+            => $"The list of connected {this.ElementType.ComplexTypeName}\n {this.ElementType.Description}";
+
+        /// <summary>
+        /// Gets the object end type
+        /// </summary>
+        public MergedNodeType ElementType { get; }
 
         /// <summary>
         /// Gets the field provider
@@ -90,7 +90,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                     .FirstOrDefault(f => f.Name == "node");
 
                             var fields = nodeSelection != null
-                                             ? this.elementType.GatherSingleApiRequest(nodeSelection, context).ToList()
+                                             ? this.ElementType.GatherSingleApiRequest(nodeSelection, context).ToList()
                                              : null;
 
                             yield return new ApiRequest { FieldName = "items", Fields = fields };
@@ -141,7 +141,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var fields = new List<FieldType>
                              {
@@ -159,7 +159,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Description =
                                              "The list of edges according to filtering and paging conditions",
                                          ResolvedType = new VirtualGraphType("tmp"),
-                                         Metadata = new Dictionary<string, object>
+                                         Metadata =
+                                             new Dictionary<string, object>
                                                  {
                                                      {
                                                          MetaDataTypeKey,
@@ -195,38 +196,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Resolves provided request path to the current connection
-        /// </summary>
-        /// <param name="source">The source element</param>
-        /// <returns>The list of requests in path</returns>
-        private IEnumerable<JObject> ResolveRequestPath(JToken source)
-        {
-            if (source.Parent != null)
-            {
-                foreach (var element in this.ResolveRequestPath(source.Parent))
-                {
-                    yield return element;
-                }
-            }
-
-            var request = (source as JObject)?.Property("__request")?.Value as JObject;
-            if (request != null)
-            {
-                yield return request;
-            }
-        }
-
-        /// <summary>
         /// Generates filter graph type object
         /// </summary>
         /// <returns>The filter graph type</returns>
         private GraphType GenerateFilterType()
         {
-            var objectType = this.elementType;
+            var objectType = this.ElementType;
             var graphType = new VirtualInputGraphType($"{EscapeName(this.OriginalTypeName)}_Filter")
                                 {
                                     Description =
-                                        $"The filter conditions for a {this.elementType.ComplexTypeName} connected objects"
+                                        $"The filter conditions for a {this.ElementType.ComplexTypeName} connected objects"
                                 };
             graphType.AddField(
                 new FieldType
@@ -257,7 +236,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     this.GenerateStrictEqualFilterFields(
                         itemField.Key,
                         itemField.Value.Description,
-                        itemField.Value.Type.GenerateGraphType()));
+                        itemField.Value.Type.GenerateGraphType(null)));
             }
 
             var scalarFields =
@@ -288,7 +267,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                             this.GenerateStrictEqualFilterFields(
                                 fieldName,
                                 itemField.Value.Description,
-                                type.GenerateGraphType()));
+                                type.GenerateGraphType(null)));
                         break;
                     case EnScalarType.Float:
                     case EnScalarType.Decimal:
@@ -297,7 +276,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                             this.GenerateNumberFilterFields(
                                 fieldName,
                                 itemField.Value.Description,
-                                type.GenerateGraphType()));
+                                type.GenerateGraphType(null)));
                         break;
                     case EnScalarType.String:
                         graphType.AddFields(this.GenerateStringFilterFields(fieldName, itemField.Value.Description));
@@ -377,12 +356,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The filter graph type</returns>
         private GraphType GenerateSortType()
         {
-            var objectType = this.elementType;
+            var objectType = this.ElementType;
             var enumType = new EnumerationGraphType
                                {
                                    Name = $"{EscapeName(this.OriginalTypeName)}_OrderByEnum",
                                    Description =
-                                       $"The list of {this.elementType.ComplexTypeName} fields that can be used as sorting functions"
+                                       $"The list of {this.ElementType.ComplexTypeName} fields that can be used as sorting functions"
                                };
             var sortableFields =
                 objectType.Fields.Where(
@@ -525,6 +504,28 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         ResolvedType = new StringGraphType(),
                         Description = $"The {fieldName} not ends with the value\n{fieldDescription}"
                     };
+        }
+
+        /// <summary>
+        /// Resolves provided request path to the current connection
+        /// </summary>
+        /// <param name="source">The source element</param>
+        /// <returns>The list of requests in path</returns>
+        private IEnumerable<JObject> ResolveRequestPath(JToken source)
+        {
+            if (source.Parent != null)
+            {
+                foreach (var element in this.ResolveRequestPath(source.Parent))
+                {
+                    yield return element;
+                }
+            }
+
+            var request = (source as JObject)?.Property("__request")?.Value as JObject;
+            if (request != null)
+            {
+                yield return request;
+            }
         }
 
         /// <summary>

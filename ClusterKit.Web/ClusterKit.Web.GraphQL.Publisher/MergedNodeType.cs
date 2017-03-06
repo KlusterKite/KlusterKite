@@ -52,7 +52,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         {
             this.Provider = provider;
             this.Fields = objectType.Fields;
-
+            this.keyName = objectType.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
             MergedField conflictingField;
             if (objectType.Fields.TryGetValue("id", out conflictingField))
             {
@@ -66,8 +66,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 this.Fields["__id"] = substitute;
                 this.isIdSubstitute = true;
             }
-
-            this.keyName = objectType.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
         }
 
         /// <summary>
@@ -88,11 +86,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var fields = this.Fields.Select(this.ConvertApiField).ToList();
             
-            // todo: handle field name collisions
             fields.Add(new FieldType
                            {
                                Name = "id",
@@ -101,7 +98,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                Resolver = new GlobalIdResolver(this.keyName, this.Provider.Provider.Description.ApiName)
                            });
             var graphType = new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
-            graphType.AddResolvedInterface(new NodeInterface());
+            graphType.AddResolvedInterface(nodeInterface);
+            nodeInterface.AddImplementedType(this.ComplexTypeName, graphType);
             return graphType;
         }
 
@@ -143,7 +141,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <inheritdoc />
         public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
-            var requests = base.GatherSingleApiRequest(contextFieldAst, context);
+            var requests = base.GatherSingleApiRequest(contextFieldAst, context).ToList();
             if (this.isIdSubstitute)
             {
                 var list = requests.ToList();
@@ -152,7 +150,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     idField.FieldName = "id";
                 }
 
-                return list;
+                requests = list;
+            }
+
+            if (requests.All(r => r.FieldName != this.keyName)
+                && this.GetRequestedFields(contextFieldAst.SelectionSet, context).Any(f => f.Name == "id"))
+            {
+                requests.Add(new ApiRequest { FieldName = this.keyName });
             }
 
             return requests;
@@ -191,8 +195,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                var requestPath = (((JObject)context.Source).Parent.Parent.Parent as JObject)?.GetValue("__requestPath") as JArray;
-                var id = ((JObject)context.Source).GetValue(this.keyName);
+                var presetGlobalId = ((JObject)context.Source)?.GetValue("__globalId");
+                if (presetGlobalId != null)
+                {
+                    return presetGlobalId;
+                }
+
+                var requestPath = (((JObject)context.Source)?.Parent?.Parent?.Parent as JObject)?.GetValue("__requestPath") as JArray;
+                var id = ((JObject)context.Source)?.GetValue(this.keyName);
                 if (requestPath == null || id == null)
                 {
                     return null;

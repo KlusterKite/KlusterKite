@@ -111,6 +111,7 @@ namespace ClusterKit.API.Endpoint
             this.apiProvider.SearchNode(
                     request.Id,
                     request.Path,
+                    request.Request,
                     request.Context,
                     exception => system.Log.Error(exception, "{Type}: node search exception", this.GetType().Name))
                 .PipeTo(

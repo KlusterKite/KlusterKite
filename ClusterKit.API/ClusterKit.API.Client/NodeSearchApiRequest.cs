@@ -29,6 +29,11 @@ namespace ClusterKit.API.Client
         public List<ApiRequest> Path { get; set; }
 
         /// <summary>
+        /// Gets or sets the request to the node value
+        /// </summary>
+        public ApiRequest Request { get; set; }
+
+        /// <summary>
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Context { get; set; }

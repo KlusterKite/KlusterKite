@@ -70,7 +70,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var fields = this.Fields.Select(this.ConvertApiField);
             return new VirtualGraphType(this.ComplexTypeName, fields.ToList()) { Description = this.Description };

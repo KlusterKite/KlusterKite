@@ -937,7 +937,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             /// <inheritdoc />
-            public override Task<JObject> SearchNode(string id, List<RequestPathElement> path, RequestContext context)
+            public override Task<JObject> SearchNode(string id, List<RequestPathElement> path, ApiRequest request, RequestContext context)
             {
                 return Task.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
             }

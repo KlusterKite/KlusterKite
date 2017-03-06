@@ -35,7 +35,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string ComplexTypeName => $"{base.ComplexTypeName}_Input";
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var fields = this.Fields.Select(this.ConvertApiField);
             var inputGraphType = new VirtualInputGraphType(this.ComplexTypeName) { Description = this.Description };

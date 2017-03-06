@@ -53,7 +53,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public EnScalarType ScalarType { get; }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             switch (this.ScalarType)
             {

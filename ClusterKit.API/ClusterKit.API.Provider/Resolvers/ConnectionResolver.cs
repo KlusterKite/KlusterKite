@@ -11,6 +11,7 @@ namespace ClusterKit.API.Provider.Resolvers
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
@@ -25,12 +26,13 @@ namespace ClusterKit.API.Provider.Resolvers
     /// </summary>
     /// <typeparam name="T">The type of node</typeparam>
     /// <typeparam name="TId">The type of node id</typeparam>
-    public abstract class ConnectionResolver<T, TId> : IResolver where T : class, new() 
+    public abstract class ConnectionResolver<T, TId> : IResolver, IConnectionResolver 
+        where T : class, new() 
     {
         /// <summary>
         /// Gets the node object resolver
         /// </summary>
-        protected abstract IResolver NodeResolver { get; }
+        public abstract IResolver NodeResolver { get; }
 
         /// <inheritdoc />
         public virtual async Task<JToken> ResolveQuery(
@@ -85,7 +87,49 @@ namespace ClusterKit.API.Provider.Resolvers
                 }
             }
 
+
+            if (request.FieldName != null)
+            {
+                var requestDescription = new JObject { { "f", request.FieldName } };
+                if (request.Arguments != null)
+                {
+                    var reservedNames = new[] { "filter", "sort", "limit", "offset" };
+                    var requestArguments =
+                        ((JObject)request.Arguments).Properties().Where(p => !reservedNames.Contains(p.Name)).ToList();
+                    if (requestArguments.Count > 0)
+                    {
+                        var requestArgumentsObject = new JObject();
+                        requestArguments.ForEach(ra => requestArgumentsObject.Add(ra.Name, ra.Value));
+                        requestDescription.Add("a", requestArgumentsObject);
+                    }
+                }
+
+                result.Add("__request", requestDescription);
+            }
+
             return result;
+        }
+
+        /// <inheritdoc />
+        public async Task<object> GetNodeById(object nodeConnection, string id)
+        {
+            var connection = nodeConnection as INodeConnection<T, TId>;
+            if (connection == null)
+            {
+                return null;
+            }
+
+            TId realId;
+            try
+            {
+                realId = JsonConvert.DeserializeObject<TId>(id);
+            }
+            catch
+            {
+                return null;
+            }
+
+            return await connection.GetById(realId);
         }
 
         /// <summary>

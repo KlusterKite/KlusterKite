@@ -49,7 +49,7 @@ namespace ClusterKit.API.Provider
         /// <summary>
         /// The list of mutation resolvers
         /// </summary>
-        private Dictionary<string, PropertyResolver> mutationResolvers;
+        // private Dictionary<string, PropertyResolver> mutationResolvers;
 
         /// <summary>
         /// Prepares serializer to deserialize arguments
@@ -127,13 +127,7 @@ namespace ClusterKit.API.Provider
             RequestContext context,
             Action<Exception> onErrorCallback)
         {
-            PropertyResolver resolver;
-            if (!this.mutationResolvers.TryGetValue(request.FieldName, out resolver))
-            {
-                return null;
-            }
-
-            return (JObject)await resolver.Resolve(this, request, context, this.argumentsSerializer, onErrorCallback);
+            return null;
         }
 
         /// <summary>
@@ -145,6 +139,7 @@ namespace ClusterKit.API.Provider
         /// <param name="path">
         /// The node connection path in API
         /// </param>
+        /// <param name="nodeRequest">The request to the node value</param>
         /// <param name="context">
         /// The request context.
         /// </param>
@@ -157,12 +152,10 @@ namespace ClusterKit.API.Provider
         public async Task<JObject> SearchNode(
             string id,
             List<ApiRequest> path,
+            ApiRequest nodeRequest,
             RequestContext context,
             Action<Exception> onErrorCallback)
         {
-            return null;
-
-            /*
             try
             {
                 if (path.Count == 0)
@@ -171,27 +164,42 @@ namespace ClusterKit.API.Provider
                 }
 
                 var queue = new Queue<ApiRequest>(path);
-                var field = queue.Peek();
+                object source = this;
+                IResolver sourceResolver = this.resolver;
+                while (queue.Count > 0)
+                {
+                    var objectResolver = sourceResolver as ObjectResolver;
+                    if (objectResolver == null)
+                    {
+                        return null;
+                    }
 
-                PropertyResolver resolver;
-                if (!this.resolvers.TryGetValue(field.FieldName, out resolver))
+                    var field = queue.Dequeue();
+                    var result = await objectResolver.ResolvePropertyValue(source, field, context, this.argumentsSerializer, onErrorCallback);
+                    if (result == null)
+                    {
+                        return null;
+                    }
+
+                    source = result.Value;
+                    sourceResolver = result.Resolver;
+                }
+
+                var connectionResolver = sourceResolver as IConnectionResolver;
+                if (connectionResolver == null)
                 {
                     return null;
                 }
 
-                var connection = await resolver.GetValueRecursive(this, queue, context, this.argumentsSerializer);
-
-                // todo: split resolvers for field resolver and type resolver or switch to type resolver
-                return null;
+                var node = await connectionResolver.GetNodeById(source, id);
+                return (JObject)await connectionResolver.NodeResolver.ResolveQuery(node, nodeRequest, context, this.argumentsSerializer, onErrorCallback);
             }
             catch (Exception e)
             {
                 onErrorCallback?.Invoke(e);
                 return null;
             }
-            */
         }
-
 
         /// <summary>
         /// Parses the metadata of returning type for the field
@@ -333,7 +341,7 @@ namespace ClusterKit.API.Provider
             }
 
             // this.resolvers = new Dictionary<string, PropertyResolver>();
-            this.mutationResolvers = new Dictionary<string, PropertyResolver>();
+            // this.mutationResolvers = new Dictionary<string, PropertyResolver>();
 
             if (!compiledResult.Errors.HasErrors)
             {
@@ -394,7 +402,7 @@ namespace ClusterKit.API.Provider
                 return null;
             }
 
-            var name = attribute.Name ?? PropertyResolverGenerator.ToCamelCase(method.Name);
+            var name = attribute.Name ?? ResolverGenerator.ToCamelCase(method.Name);
             data.FieldNames[method] = name;
             data.Members[apiType.TypeName][name] = method;
 
@@ -435,7 +443,7 @@ namespace ClusterKit.API.Provider
                 var description =
                     parameterInfo.GetCustomAttribute(typeof(ApiDescriptionAttribute)) as ApiDescriptionAttribute;
 
-                var parameterName = description?.Name ?? PropertyResolverGenerator.ToCamelCase(parameterInfo.Name);
+                var parameterName = description?.Name ?? ResolverGenerator.ToCamelCase(parameterInfo.Name);
                 if (parameterMetadata.ScalarType != EnScalarType.None)
                 {
                     field.Arguments.Add(
@@ -496,7 +504,7 @@ namespace ClusterKit.API.Provider
                 return null;
             }
 
-            var name = attribute.Name ?? PropertyResolverGenerator.ToCamelCase(property.Name);
+            var name = attribute.Name ?? ResolverGenerator.ToCamelCase(property.Name);
             data.FieldNames[property] = name;
             data.Members[apiType.TypeName][name] = property;
 
@@ -624,16 +632,17 @@ namespace ClusterKit.API.Provider
             {
                 var apiField = description.ApiField;
                 apiField.Name = string.Join(".", new List<string>(path) { apiField.Name });
+                /*
                 var generator = new MutationPropertyResolverGenerator(
                     path,
                     typesUsed,
                     description.Method,
                     description.MetaData,
                     type,
-                    data);
+                    data);*/
 
-                //data.MutationResolverNames[apiField.Name] = generator.ClassName;
-                //data.ResolverGenerators.Add(generator);
+                ////data.MutationResolverNames[apiField.Name] = generator.ClassName;
+                ////data.ResolverGenerators.Add(generator);
                 yield return apiField;
             }
         }
@@ -661,7 +670,7 @@ namespace ClusterKit.API.Provider
                     {
                         var description =
                             (DeclareConnectionAttribute)m.GetCustomAttribute(typeof(DeclareConnectionAttribute));
-                        var name = description?.Name ?? PropertyResolverGenerator.ToCamelCase(m.Name);
+                        var name = description?.Name ?? ResolverGenerator.ToCamelCase(m.Name);
                         return
                             new
                                 {
@@ -888,7 +897,7 @@ namespace ClusterKit.API.Provider
         {
             var type = typeMetaData.Type;
             var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
-            var typeName = descriptionAttribute?.Name ?? PropertyResolverGenerator.ToCSharpRepresentation(type, true);
+            var typeName = descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type);
 
             if (typeMetaData.MetaType == TypeMetadata.EnMetaType.Connection)
             {

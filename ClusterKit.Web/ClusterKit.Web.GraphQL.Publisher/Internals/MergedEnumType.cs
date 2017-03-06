@@ -12,6 +12,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Collections.Generic;
     
     using ClusterKit.API.Client;
+    using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Types;
 
@@ -60,7 +61,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType()
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var graphType = new EnumerationGraphType
                                 {

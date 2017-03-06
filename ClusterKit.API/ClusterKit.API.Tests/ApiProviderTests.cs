@@ -130,67 +130,6 @@ namespace ClusterKit.API.Tests
         }
 
         /// <summary>
-        /// Pretests the compiling capabilities
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task CompileTest()
-        {
-            var comDomProvider = CodeDomProvider.CreateProvider("C#");
-            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = false };
-            compilerParameters.ReferencedAssemblies.AddRange(
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(a => !a.IsDynamic)
-                    .Select(
-                        a => a.CodeBase.Replace("file:\\", string.Empty).Replace("file:///", string.Empty))
-                    .ToArray());
-            
-            var code = @"
-                namespace ClusterKit.API.Dynamic {
-                    using System;
-                    using System.Threading.Tasks;
-                    using System.Collections.Generic;
-
-                    using Newtonsoft.Json;
-                    using Newtonsoft.Json.Linq;
-                    
-                    using ClusterKit.Security.Client;
-                    using ClusterKit.API.Client;
-                    using ClusterKit.API.Provider.Resolvers;
-
-                    public class Resolver_E3EA3942A7CF40359011147A82607E51 : PropertyResolver {
-                        public override Task<JToken> Resolve(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback) {
-                            return Task.FromResult<JToken>(new JValue(this.GetValue(source, query, context, argumentsSerializer).Result));
-                        }
-
-                        public override Task<object> GetValue(object source, ApiRequest query, RequestContext context, JsonSerializer argumentsSerializer) {
-                            return Task.FromResult<object>(((ClusterKit.API.Tests.ApiProviderTests.NodeObject)source).Id);
-                        }
-                    }
-                }
-            ";
-
-            var compiledResult = comDomProvider.CompileAssemblyFromSource(compilerParameters, code);
-
-            foreach (var error in compiledResult.Errors)
-            {
-                this.output.WriteLine(error.ToString());
-            }
-
-            Assert.False(compiledResult.Errors.HasErrors);
-
-            var resolver =
-                (PropertyResolver)
-                compiledResult.CompiledAssembly.CreateInstance("ClusterKit.API.Dynamic.Resolver_E3EA3942A7CF40359011147A82607E51");
-
-            Assert.NotNull(resolver);
-            
-            var node = new NodeObject { Id = Guid.NewGuid() };
-            Assert.Equal(node.Id, await resolver.Resolve(node, null, null, null, e => this.output.WriteLine(e.Message)));
-            Assert.Equal(node.Id, await resolver.GetValue(node, null, null, null));
-        }
-
-        /// <summary>
         /// The test node object
         /// </summary>
         public class NodeObject
