@@ -732,7 +732,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(1, schema.Query.Fields.Count());
+            Assert.Equal(2, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(

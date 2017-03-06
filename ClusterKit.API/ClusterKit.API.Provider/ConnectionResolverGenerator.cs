@@ -52,6 +52,18 @@ namespace ClusterKit.API.Provider
         public override string Generate()
         {
             var nodeApiType = this.Data.ApiTypeByOriginalTypeNames[this.typeMetadata.Type.FullName];
+            var mutationResultType = typeof(MutationResult<>).MakeGenericType(this.typeMetadata.Type);
+
+            ApiType mutationResultApiType;
+            string mutationResultResolverDeclaration;
+            if (this.Data.ApiTypeByOriginalTypeNames.TryGetValue(mutationResultType.FullName, out mutationResultApiType))
+            {
+                mutationResultResolverDeclaration = $"new {this.Data.ObjectResolverNames[nodeApiType.TypeName]}()";
+            }
+            else
+            {
+                mutationResultResolverDeclaration = "null";
+            }
 
             return $@"
                     namespace ClusterKit.API.Provider.Dynamic 
@@ -75,6 +87,9 @@ namespace ClusterKit.API.Provider
                         {{  
                             private IResolver nodeResolver = new {this.Data.ObjectResolverNames[nodeApiType.TypeName]}();
                             public override IResolver NodeResolver {{ get {{ return this.nodeResolver; }} }}
+
+                            private IResolver mutationResultResolver = {mutationResultResolverDeclaration};
+                            public override IResolver MutationResultResolver {{ get {{ return this.mutationResultResolver; }} }}
           
                             protected override Expression<Func<{ToCSharpRepresentation(this.ObjectType)}, bool>> CreateFilter(JObject filter) 
                             {{

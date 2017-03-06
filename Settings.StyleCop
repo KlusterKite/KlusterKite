@@ -18,6 +18,7 @@
       <Value>Sharding</Value>
       <Value>sharded</Value>
       <Value>Owin</Value>
+      <Value>parameterless</Value>
       <Value>postgres</Value>
       <Value>precompiled</Value>
       <Value>tcp</Value>

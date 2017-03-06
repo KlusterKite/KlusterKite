@@ -53,9 +53,9 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// Gets or sets the list of direct mutations
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         [UsedImplicitly]
-        public List<ApiField> Mutations { get; set; } = new List<ApiField>();
+        public List<ApiField> DirectMutations { get; set; }
 
         /// <summary>
         /// Creates a field of this type

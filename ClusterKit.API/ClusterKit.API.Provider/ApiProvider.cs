@@ -52,6 +52,11 @@ namespace ClusterKit.API.Provider
         private JsonSerializer argumentsSerializer;
 
         /// <summary>
+        /// The list of generated mutations
+        /// </summary>
+        private Dictionary<string, MutationDescription> mutations;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ApiProvider"/> class.
         /// </summary>
         protected ApiProvider()
@@ -122,7 +127,53 @@ namespace ClusterKit.API.Provider
             RequestContext context,
             Action<Exception> onErrorCallback)
         {
-            return null;
+            try
+            {
+                MutationDescription mutation;
+
+                if (!this.mutations.TryGetValue(request.FieldName, out mutation))
+                {
+                    return null;
+                }
+
+                var resolveResult = await this.GetPropertyRecursive(mutation.Path, context, onErrorCallback);
+                if (resolveResult == null)
+                {
+                    return null;
+                }
+                request.FieldName = mutation.Field.Name;
+                var rootRequest = new ApiRequest { Fields = new List<ApiRequest> { request } };
+
+                var objectResolver = resolveResult.Resolver as ObjectResolver;
+                if (objectResolver != null)
+                {
+                    var result = await objectResolver.ResolveQuery(
+                               resolveResult.Value,
+                               rootRequest,
+                               context,
+                               this.argumentsSerializer,
+                               onErrorCallback);
+                    return result?.Property(request.FieldName)?.Value as JObject;
+                }
+
+                var connectionResolver = resolveResult.Resolver as IConnectionResolver;
+                if (connectionResolver != null)
+                {
+                    return await connectionResolver.ResolveMutation(
+                               resolveResult.Value,
+                               request,
+                               context,
+                               this.argumentsSerializer,
+                               onErrorCallback);
+                }
+
+                return null;
+            }
+            catch (Exception e)
+            {
+                onErrorCallback?.Invoke(e);
+                return null;
+            }
         }
 
         /// <summary>
@@ -153,40 +204,14 @@ namespace ClusterKit.API.Provider
         {
             try
             {
-                if (path.Count == 0)
-                {
-                    return null;
-                }
-
-                var queue = new Queue<ApiRequest>(path);
-                object source = this;
-                IResolver sourceResolver = this.resolver;
-                while (queue.Count > 0)
-                {
-                    var objectResolver = sourceResolver as ObjectResolver;
-                    if (objectResolver == null)
-                    {
-                        return null;
-                    }
-
-                    var field = queue.Dequeue();
-                    var result = await objectResolver.ResolvePropertyValue(source, field, context, this.argumentsSerializer, onErrorCallback);
-                    if (result == null)
-                    {
-                        return null;
-                    }
-
-                    source = result.Value;
-                    sourceResolver = result.Resolver;
-                }
-
-                var connectionResolver = sourceResolver as IConnectionResolver;
+                var resolveResult = await this.GetPropertyRecursive(path, context, onErrorCallback);
+                var connectionResolver = resolveResult?.Resolver as IConnectionResolver;
                 if (connectionResolver == null)
                 {
                     return null;
                 }
 
-                var node = await connectionResolver.GetNodeById(source, id);
+                var node = await connectionResolver.GetNodeById(resolveResult.Value, id);
                 return (JObject)await connectionResolver.NodeResolver.ResolveQuery(node, nodeRequest, context, this.argumentsSerializer, onErrorCallback);
             }
             catch (Exception e)
@@ -280,9 +305,10 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
             this.ApiDescription.Description = root.Description;
 
-            var mutations = this.GenerateMutations(root, new List<string>(), new List<string>(), assembleData);
+            this.mutations = this.GenerateMutations(root, new List<string>(), new List<string>(), assembleData)
+                .ToDictionary(m => m.MutationName);
 
-            this.ApiDescription.Mutations = mutations.ToList();
+            this.ApiDescription.Mutations = this.mutations.Values.Select(d => d.CreateMutationField()).ToList();
             this.ApiDescription.Types =
                 assembleData.DiscoveredApiTypes.Values.Where(t => t.TypeName != root.TypeName).ToList();
             this.ApiDescription.Fields = root.Fields;
@@ -335,30 +361,10 @@ namespace ClusterKit.API.Provider
                 }
             }
 
-            // this.resolvers = new Dictionary<string, PropertyResolver>();
-            // this.mutationResolvers = new Dictionary<string, PropertyResolver>();
-
             if (!compiledResult.Errors.HasErrors)
             {
                 this.resolver = (ObjectResolver)compiledResult.CompiledAssembly.CreateInstance(
                             data.ObjectResolverNames[root.TypeName]);
-                /*
-                foreach (var rootField in root.Fields)
-                {
-                    this.resolvers[rootField.Name] =
-                        (PropertyResolver)
-                        compiledResult.CompiledAssembly.CreateInstance(
-                            data.ResolverNames[root.TypeName][rootField.Name]);
-                }
-
-                foreach (var mutation in this.ApiDescription.Mutations)
-                {
-                    this.mutationResolvers[mutation.Name] = 
-                        (PropertyResolver)
-                        compiledResult.CompiledAssembly.CreateInstance(
-                            data.MutationResolverNames[mutation.Name]);
-                }
-                */
             }
         }
 
@@ -556,7 +562,7 @@ namespace ClusterKit.API.Provider
         /// <returns>
         /// The list of mutations
         /// </returns>
-        private IEnumerable<ApiField> GenerateMutations(
+        private IEnumerable<MutationDescription> GenerateMutations(
             ApiObjectType apiType,
             List<string> path,
             List<string> typesUsed,
@@ -594,12 +600,28 @@ namespace ClusterKit.API.Provider
         /// The temporary data used during assemble process
         /// </param>
         /// <returns>The list of mutations</returns>
-        private IEnumerable<ApiField> GenerateMutationsDirect(
+        private IEnumerable<MutationDescription> GenerateMutationsDirect(
             ApiObjectType apiType,
             Type type,
             List<string> path,
             AssembleTempData data)
         {
+            if (apiType.DirectMutations != null)
+            {
+                foreach (var field in apiType.DirectMutations)
+                {
+                    yield return
+                        new MutationDescription
+                            {
+                                Field = field,
+                                Path = path.Select(p => new ApiRequest { FieldName = p }).ToList()
+                            };
+                }
+
+                yield break;
+            }
+
+            apiType.DirectMutations = new List<ApiField>();
             var fields =
                 type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .Select(
@@ -623,10 +645,13 @@ namespace ClusterKit.API.Provider
 
             foreach (var description in fields)
             {
-                apiType.Mutations.Add(description.ApiField);
-                var apiField = description.ApiField.Clone();
-                apiField.Name = string.Join(".", new List<string>(path) { apiField.Name });
-                yield return apiField;
+                apiType.DirectMutations.Add(description.ApiField);
+                yield return
+                    new MutationDescription
+                    {
+                        Field = description.ApiField,
+                        Path = path.Select(p => new ApiRequest { FieldName = p }).ToList()
+                    };
             }
         }
 
@@ -640,7 +665,7 @@ namespace ClusterKit.API.Provider
         /// The temporary data used during assemble process
         /// </param>
         /// <returns>The list of mutations</returns>
-        private IEnumerable<ApiField> GenerateMutationsFromConnections(
+        private IEnumerable<MutationDescription> GenerateMutationsFromConnections(
             Type type,
             ApiObjectType apiType,
             List<string> path,
@@ -713,59 +738,54 @@ namespace ClusterKit.API.Provider
                 var mutationResultType = typeof(MutationResult<>).MakeGenericType(connectedObjectType);
                 var mutationResultMetadata = GenerateTypeMetadata(mutationResultType, new DeclareFieldAttribute { Description = "The mutation result" });
                 var mutationResult = this.GenerateTypeDescription(mutationResultMetadata, data);
+                var requestPath = new List<string>(path) { connection.Name }.Select(p => new ApiRequest { FieldName = p }).ToList();
 
                 if (attribute.CanCreate)
                 {
-                    var name = string.Join(".", new List<string>(path) { connection.Name, "create" });
+                    var field = ApiField.Object(
+                        "create",
+                        mutationResult.TypeName,
+                        arguments:
+                        new List<ApiField>
+                            {
+                                ApiField.Object(
+                                    "newNode",
+                                    connection.TypeName,
+                                    description: "The object's data")
+                            },
+                        description: attribute.CreateDescription);
 
-                    yield return
-                        ApiField.Object(
-                            name,
-                            mutationResult.TypeName,
-                            arguments:
-                            new List<ApiField>
-                                {
-                                    ApiField.Object(
-                                        "newNode",
-                                        connection.TypeName,
-                                        description: "The object's data")
-                                },
-                            description: attribute.CreateDescription);
+                    yield return new MutationDescription { Field = field, Path = requestPath };
                 }
 
                 if (attribute.CanUpdate)
                 {
-                    var name = string.Join(".", new List<string>(path) { connection.Name, "update" });
-                    yield return
-                        ApiField.Object(
-                            name,
-                            mutationResult.TypeName,
-                            arguments:
-                            new List<ApiField>
-                                {
-                                    ApiField.Scalar("id", idScalarType, description: "The object's id"),
-                                    ApiField.Object(
-                                        "newNode",
-                                        connection.TypeName,
-                                        description: "The object's data")
-                                },
-                            description: attribute.CreateDescription);
+                    var field = ApiField.Object(
+                        "update",
+                        mutationResult.TypeName,
+                        arguments:
+                        new List<ApiField>
+                            {
+                                ApiField.Scalar("id", idScalarType, description: "The object's id"),
+                                ApiField.Object(
+                                    "newNode",
+                                    connection.TypeName,
+                                    description: "The object's data")
+                            },
+                        description: attribute.CreateDescription);
+                    yield return new MutationDescription { Field = field, Path = requestPath };
                 }
 
-                if (attribute.CanCreate)
+                if (attribute.CanDelete)
                 {
-                    var name = string.Join(".", new List<string>(path) { connection.Name, "delete" });
-
-                    yield return
-                        ApiField.Object(
-                            name,
-                            mutationResult.TypeName,
-                            arguments:
-                            new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
-                            description: attribute.CreateDescription);
+                    var field = ApiField.Object(
+                        "delete",
+                        mutationResult.TypeName,
+                        arguments:
+                        new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
+                        description: attribute.CreateDescription);
+                    yield return new MutationDescription { Field = field, Path = requestPath };
                 }
-                
-                yield break;
             }
         }
 
@@ -779,7 +799,7 @@ namespace ClusterKit.API.Provider
         /// The temporary data used during assemble process
         /// </param>
         /// <returns>The list of mutations</returns>
-        private IEnumerable<ApiField> GenerateMutationsFromFields(
+        private IEnumerable<MutationDescription> GenerateMutationsFromFields(
             ApiObjectType apiType,
             List<string> path,
             List<string> typesUsed,
@@ -943,17 +963,49 @@ namespace ClusterKit.API.Provider
         }
 
         /// <summary>
+        /// Resolves api property by it's request path (suitable for parameterless fields)
+        /// </summary>
+        /// <param name="path">The request path</param>
+        /// <param name="context">The request context</param>
+        /// <param name="onErrorCallback">
+        /// The method that will be called in case of errors
+        /// </param>
+        /// <returns>The data / resolver pair of requested property or null</returns>
+        private async Task<ObjectResolver.ResolvePropertyResult> GetPropertyRecursive(List<ApiRequest> path, RequestContext context, Action<Exception> onErrorCallback)
+        {
+            if (path.Count == 0)
+            {
+                return null;
+            }
+
+            var result = new ObjectResolver.ResolvePropertyResult { Resolver = this.resolver, Value = this };
+            var queue = new Queue<ApiRequest>(path);
+            while (queue.Count > 0)
+            {
+                var objectResolver = result.Resolver as ObjectResolver;
+                if (objectResolver == null)
+                {
+                    return null;
+                }
+
+                var field = queue.Dequeue();
+                result = await objectResolver.ResolvePropertyValue(result.Value, field, context, this.argumentsSerializer, onErrorCallback);
+                if (result == null)
+                {
+                    return null;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// The internal description of published mutation
         /// </summary>
         private class MutationDescription
         {
-            public enum EnMutationType
-            {
-            }
-             
-
             /// <summary>
-            /// Gets or sets the mutation field name
+            /// Gets or sets the mutation field
             /// </summary>
             public ApiField Field { get; set; }
 
@@ -961,6 +1013,22 @@ namespace ClusterKit.API.Provider
             /// Gets or sets the path to mutation container
             /// </summary>
             public List<ApiRequest> Path { get; set; }
+
+            /// <summary>
+            /// Gets the mutation virtual field name
+            /// </summary>
+            public string MutationName => string.Join(".", new List<string>(this.Path.Select(p => p?.FieldName)) { this.Field.Name });
+
+            /// <summary>
+            /// Creates virtual mutation field to describe mutation
+            /// </summary>
+            /// <returns>The mutation field</returns>
+            public ApiField CreateMutationField()
+            {
+                var field = this.Field.Clone();
+                field.Name = this.MutationName;
+                return field;
+            }
         }
     }
 }

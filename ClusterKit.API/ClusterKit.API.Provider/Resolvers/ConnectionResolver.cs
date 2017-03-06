@@ -34,6 +34,11 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </summary>
         public abstract IResolver NodeResolver { get; }
 
+        /// <summary>
+        /// Gets the mutation result resolver
+        /// </summary>
+        public abstract IResolver MutationResultResolver { get; }
+
         /// <inheritdoc />
         public virtual async Task<JToken> ResolveQuery(
             object source,
@@ -87,7 +92,6 @@ namespace ClusterKit.API.Provider.Resolvers
                 }
             }
 
-
             if (request.FieldName != null)
             {
                 var requestDescription = new JObject { { "f", request.FieldName } };
@@ -132,6 +136,33 @@ namespace ClusterKit.API.Provider.Resolvers
             return await connection.GetById(realId);
         }
 
+        /// <inheritdoc />
+        public Task<JObject> ResolveMutation(
+            object nodeConnection, 
+            ApiRequest request,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            var connection = nodeConnection as INodeConnection<T, TId>;
+            if (connection == null)
+            {
+                return Task.FromResult<JObject>(null);
+            }
+
+            switch (request.FieldName)
+            {
+                case "create":
+                    return this.MutationCreate(connection, request, context, argumentsSerializer, onErrorCallback);
+                case "update":
+                    return this.MutationUpdate(connection, request, context, argumentsSerializer, onErrorCallback);
+                case "delete":
+                    return this.MutationDelete(connection, request, context, argumentsSerializer, onErrorCallback);
+                default:
+                    return Task.FromResult<JObject>(null);
+            }
+        }
+
         /// <summary>
         /// Creates filter expression by filter request
         /// </summary>
@@ -145,5 +176,91 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <param name="sortArguments">The sorting request</param>
         /// <returns>The list of sorting conditions</returns>
         protected abstract IEnumerable<SortingCondition> CreateSort(JArray sortArguments);
+
+        /// <summary>
+        /// Runs the creation mutation
+        /// </summary>
+        /// <param name="connection">The connection</param>
+        /// <param name="request">The request</param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The arguments serializer.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <returns>The resolved data</returns>
+        private async Task<JObject> MutationCreate(
+            INodeConnection<T, TId> connection,
+            ApiRequest request,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            var serializedData = ((JObject)request.Arguments)?.Property("newNode")?.Value as JObject;
+            var newNode = serializedData?.ToObject<T>();
+            var result = await connection.Create(newNode);
+            return (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+        }
+
+        /// <summary>
+        /// Runs the creation mutation
+        /// </summary>
+        /// <param name="connection">The connection</param>
+        /// <param name="request">The request</param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The arguments serializer.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <returns>The resolved data</returns>
+        private async Task<JObject> MutationUpdate(
+            INodeConnection<T, TId> connection,
+            ApiRequest request,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            var serializedData = ((JObject)request.Arguments)?.Property("newNode")?.Value as JObject;
+            var serializedId = ((JObject)request.Arguments)?.Property("id")?.Value;
+            var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
+            var newNode = serializedData?.ToObject<T>();
+            var result = await connection.Update(id, newNode, request);
+            return (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+        }
+
+        /// <summary>
+        /// Runs the creation mutation
+        /// </summary>
+        /// <param name="connection">The connection</param>
+        /// <param name="request">The request</param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The arguments serializer.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <returns>The resolved data</returns>
+        private async Task<JObject> MutationDelete(
+            INodeConnection<T, TId> connection,
+            ApiRequest request,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            var serializedId = ((JObject)request.Arguments)?.Property("id")?.Value;
+            var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
+            var result = await connection.Delete(id);
+            return (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+        }
     }
 }
