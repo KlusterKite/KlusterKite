@@ -171,5 +171,20 @@ namespace ClusterKit.API.Client
         {
             return $"{this.Name}: {this.TypeName}";
         }
+
+        /// <summary>
+        /// Creates a clone of the current object
+        /// </summary>
+        /// <returns>The cloned instance</returns>
+        public ApiField Clone()
+        {
+            return new ApiField(this.Name, this.Flags)
+                       {
+                           Arguments = new List<ApiField>(this.Arguments),
+                           Description = this.Description,
+                           ScalarType = this.ScalarType,
+                           TypeName = this.TypeName
+                       };
+        }
     }
 }

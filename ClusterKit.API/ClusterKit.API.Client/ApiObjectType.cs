@@ -51,6 +51,13 @@ namespace ClusterKit.API.Client
         public List<ApiField> Fields { get; set; } = new List<ApiField>();
 
         /// <summary>
+        /// Gets or sets the list of direct mutations
+        /// </summary>
+        [NotNull]
+        [UsedImplicitly]
+        public List<ApiField> Mutations { get; set; } = new List<ApiField>();
+
+        /// <summary>
         /// Creates a field of this type
         /// </summary>
         /// <param name="name">The field name</param>

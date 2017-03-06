@@ -47,11 +47,6 @@ namespace ClusterKit.API.Provider
         private ObjectResolver resolver;
 
         /// <summary>
-        /// The list of mutation resolvers
-        /// </summary>
-        // private Dictionary<string, PropertyResolver> mutationResolvers;
-
-        /// <summary>
         /// Prepares serializer to deserialize arguments
         /// </summary>
         private JsonSerializer argumentsSerializer;
@@ -573,7 +568,7 @@ namespace ClusterKit.API.Provider
                 yield break;
             }
 
-            foreach (var mutation in this.GenerateMutationsDirect(apiType, type, path, typesUsed, data))
+            foreach (var mutation in this.GenerateMutationsDirect(apiType, type, path, data))
             {
                 yield return mutation;
             }
@@ -583,7 +578,7 @@ namespace ClusterKit.API.Provider
                 yield return mutation;
             }
 
-            foreach (var apiField in this.GenerateMutationsFromConnections(type, apiType, path, typesUsed, data))
+            foreach (var apiField in this.GenerateMutationsFromConnections(type, apiType, path, data))
             {
                 yield return apiField;
             }
@@ -595,7 +590,6 @@ namespace ClusterKit.API.Provider
         /// <param name="apiType">The api type description</param>
         /// <param name="type">The type</param>
         /// <param name="path">The fields path</param>
-        /// <param name="typesUsed">Already used types to avoid circular references</param>
         /// <param name="data">
         /// The temporary data used during assemble process
         /// </param>
@@ -604,7 +598,6 @@ namespace ClusterKit.API.Provider
             ApiObjectType apiType,
             Type type,
             List<string> path,
-            List<string> typesUsed,
             AssembleTempData data)
         {
             var fields =
@@ -630,19 +623,9 @@ namespace ClusterKit.API.Provider
 
             foreach (var description in fields)
             {
-                var apiField = description.ApiField;
+                apiType.Mutations.Add(description.ApiField);
+                var apiField = description.ApiField.Clone();
                 apiField.Name = string.Join(".", new List<string>(path) { apiField.Name });
-                /*
-                var generator = new MutationPropertyResolverGenerator(
-                    path,
-                    typesUsed,
-                    description.Method,
-                    description.MetaData,
-                    type,
-                    data);*/
-
-                ////data.MutationResolverNames[apiField.Name] = generator.ClassName;
-                ////data.ResolverGenerators.Add(generator);
                 yield return apiField;
             }
         }
@@ -653,7 +636,6 @@ namespace ClusterKit.API.Provider
         /// <param name="type">The type</param>
         /// <param name="apiType">The api description of the type</param>
         /// <param name="path">The fields path</param>
-        /// <param name="typesUsed">Already used types to avoid circular references</param>
         /// <param name="data">
         /// The temporary data used during assemble process
         /// </param>
@@ -662,7 +644,6 @@ namespace ClusterKit.API.Provider
             Type type,
             ApiObjectType apiType,
             List<string> path,
-            List<string> typesUsed,
             AssembleTempData data)
         {
             var members = type.GetMembers().Where(m => m is PropertyInfo || m is MethodInfo).Select(
@@ -729,27 +710,13 @@ namespace ClusterKit.API.Provider
                     continue;
                 }
 
-                /*
                 var mutationResultType = typeof(MutationResult<>).MakeGenericType(connectedObjectType);
-                var mutationResult = this.GenerateTypeDescription(mutationResultType, data);
-
-                var connectionPath = new List<string>(path) { connection.Name };
-                var connectionTypes = new List<string>(typesUsed) { apiType.TypeName };
+                var mutationResultMetadata = GenerateTypeMetadata(mutationResultType, new DeclareFieldAttribute { Description = "The mutation result" });
+                var mutationResult = this.GenerateTypeDescription(mutationResultMetadata, data);
 
                 if (attribute.CanCreate)
                 {
                     var name = string.Join(".", new List<string>(path) { connection.Name, "create" });
-
-                    var generator = new MutationPropertyResolverGenerator(
-                        connectionPath,
-                        connectionTypes,
-                        connectionType.GetMethod("Create"),
-                        new TypeMetadata { IsAsync = true, IsForwarding = false, MetaType = TypeMetadata.EnMetaType.Object, ScalarType = EnScalarType.None, Type = mutationResultType },
-                        connectionType,
-                        data);
-
-                    //data.MutationResolverNames[name] = generator.ClassName;
-                    //data.ResolverGenerators.Add(generator);
 
                     yield return
                         ApiField.Object(
@@ -769,18 +736,6 @@ namespace ClusterKit.API.Provider
                 if (attribute.CanUpdate)
                 {
                     var name = string.Join(".", new List<string>(path) { connection.Name, "update" });
-
-                    var generator = new MutationPropertyResolverGenerator(
-                        connectionPath,
-                        connectionTypes,
-                        connectionType.GetMethod("Update"),
-                        new TypeMetadata { IsAsync = true, IsForwarding = false, MetaType = TypeMetadata.EnMetaType.Object, ScalarType = EnScalarType.None, Type = mutationResultType },
-                        connectionType,
-                        data);
-
-                    //data.MutationResolverNames[name] = generator.ClassName;
-                    //data.ResolverGenerators.Add(generator);
-
                     yield return
                         ApiField.Object(
                             name,
@@ -801,17 +756,6 @@ namespace ClusterKit.API.Provider
                 {
                     var name = string.Join(".", new List<string>(path) { connection.Name, "delete" });
 
-                    var generator = new MutationPropertyResolverGenerator(
-                        connectionPath,
-                        connectionTypes,
-                        connectionType.GetMethod("Delete"),
-                        new TypeMetadata { IsAsync = true, IsForwarding = false, MetaType = TypeMetadata.EnMetaType.Object, ScalarType = EnScalarType.None, Type = mutationResultType },
-                        connectionType,
-                        data);
-
-                    //data.MutationResolverNames[name] = generator.ClassName;
-                    //data.ResolverGenerators.Add(generator);
-
                     yield return
                         ApiField.Object(
                             name,
@@ -820,7 +764,7 @@ namespace ClusterKit.API.Provider
                             new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
                             description: attribute.CreateDescription);
                 }
-                */
+                
                 yield break;
             }
         }
@@ -996,6 +940,27 @@ namespace ClusterKit.API.Provider
                     .Where(p => p.Attribute != null && p.Property.CanRead)
                     .Select(o => this.GenerateFieldFromProperty(apiType, o.Property, o.Attribute, data))
                     .Where(f => f != null);
+        }
+
+        /// <summary>
+        /// The internal description of published mutation
+        /// </summary>
+        private class MutationDescription
+        {
+            public enum EnMutationType
+            {
+            }
+             
+
+            /// <summary>
+            /// Gets or sets the mutation field name
+            /// </summary>
+            public ApiField Field { get; set; }
+
+            /// <summary>
+            /// Gets or sets the path to mutation container
+            /// </summary>
+            public List<ApiRequest> Path { get; set; }
         }
     }
 }

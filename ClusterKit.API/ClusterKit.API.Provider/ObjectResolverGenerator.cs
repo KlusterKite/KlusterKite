@@ -125,7 +125,7 @@ namespace ClusterKit.API.Provider
                 throw new Exception($"{ToCSharpRepresentation(this.ObjectType)} is not an object type");
             }
 
-            foreach (var field in apiObjectType.Fields)
+            foreach (var field in apiObjectType.Fields/*.Union(apiObjectType.Mutations)*/)
             {
                 MemberInfo member;
                 if (!members.TryGetValue(field.Name, out member))
