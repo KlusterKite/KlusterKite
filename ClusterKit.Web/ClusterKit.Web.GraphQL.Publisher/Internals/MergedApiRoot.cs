@@ -20,6 +20,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -166,7 +167,95 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// </returns>
             public object Resolve(ResolveFieldContext context)
             {
+                if (this.mergedField.Type is MergedConnectionMutationResultType)
+                {
+                    return this.DoConnectionMutationApiRequests(
+                        context,
+                        context.UserContext as RequestContext,
+                        (MergedConnectionMutationResultType)this.mergedField.Type);
+                }
+
                 return this.DoApiRequests(context, context.UserContext as RequestContext);
+            }
+
+            /// <summary>
+            /// Creates an api requests to gather all data
+            /// </summary>
+            /// <param name="context">
+            /// The request contexts
+            /// </param>
+            /// <param name="requestContext">
+            /// The request Context.
+            /// </param>
+            /// <param name="responseType">response type</param>
+            /// <returns>
+            /// The request data
+            /// </returns>
+            private async Task<JObject> DoConnectionMutationApiRequests(
+                ResolveFieldContext context,
+                RequestContext requestContext,
+                MergedConnectionMutationResultType responseType)
+            {
+                var edgeType = responseType.EdgeType;
+                var nodeType = responseType.EdgeType.ObjectType;
+                List<ApiRequest> requestedFields = new List<ApiRequest>();
+
+                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context).ToList();
+
+                var nodeRequests = topFields.Where(f => f.Name == "node" || f.Name == "edge" || f.Name == "deletedId").ToList();
+                if (nodeRequests.Count > 0)
+                {
+                    var resultFields = new List<ApiRequest>();
+
+                    // todo: resolve alias collisions
+                    foreach (var nodeRequest in nodeRequests)
+                    {
+                        switch (nodeRequest.Name)
+                        {
+                            case "node":
+                                resultFields.AddRange(nodeType.GatherSingleApiRequest(nodeRequest, context));
+                                break;
+                            case "edge":
+                                resultFields.AddRange(edgeType.GatherSingleApiRequest(nodeRequest, context));
+                                break;
+                            case "deletedId":
+                                resultFields.Add(new ApiRequest { FieldName = nodeType.KeyName });
+                                break;
+                        }
+                    }
+
+                    var resultRequest = new ApiRequest
+                                            {
+                                                FieldName = "result",
+                                                Fields = resultFields
+                                            };
+                    requestedFields.Add(resultRequest);
+                }
+                
+                var request = new MutationApiRequest
+                {
+                    Arguments = context.FieldAst.Arguments.ToJson(),
+                    FieldName = this.mergedField.FieldName,
+                    Fields = requestedFields
+                };
+
+                // todo: gather api request from all subvalues
+                var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
+                var path = data?.Property("__requestPath")?.Value as JArray;
+                var result = data?.Property("result")?.Value as JObject;
+                
+                if (path != null && result != null)
+                {
+                    var globalId = new JObject
+                                       {
+                                           { "p", path },
+                                           { "api", this.provider.Description.ApiName },
+                                           { "id", result.Property(nodeType.KeyName)?.Value }
+                                       };
+                    result.Add("__globalId", globalId.ToString(Formatting.None));
+                }
+
+                return data;
             }
 
             /// <summary>
@@ -191,7 +280,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                           this.mergedField.Type.GatherSingleApiRequest(
                                               context.FieldAst, context).ToList()
                                   };
-                return this.provider.GetData(new List<ApiRequest> { request }, requestContext);
+
+                var apiRequests = this.provider.GetData(new List<ApiRequest> { request }, requestContext);
+                return apiRequests;
             }
         }
     }

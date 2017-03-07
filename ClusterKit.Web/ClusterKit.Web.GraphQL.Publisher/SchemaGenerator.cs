@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -93,7 +94,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
                         }
                     });
 
-
             graphTypes.Values.OfType<VirtualGraphType>().ForEach(vgt => vgt.StoreFieldResolvers());
 
             var schema = new Schema
@@ -120,29 +120,116 @@ namespace ClusterKit.Web.GraphQL.Publisher
             foreach (var provider in providers)
             {
                 MergeFields(apiRoot, provider.Description.Fields, provider, new List<string>());
-
+                
                 foreach (var apiMutation in provider.Description.Mutations)
                 {
-                    var returnType = CreateMergedType(provider, apiMutation, null, new List<string>(), false);
-                    var arguments = apiMutation.Arguments.ToDictionary(
-                        a => a.Name,
-                        a =>
-                            new MergedField(
-                                a.Name,
-                                CreateMergedType(provider, a, null, new List<string>(), true),
-                                apiMutation.Flags,
-                                description: a.Description));
+                    var mutationName = $"{MergedType.EscapeName(provider.Description.ApiName)}_{MergedType.EscapeName(apiMutation.Name)}";
+                    MergedField mutation = null;
+                    switch (apiMutation.Type)
+                    {
+                        case ApiMutation.EnType.ConnectionCreate:
+                        case ApiMutation.EnType.ConnectionUpdate:
+                        case ApiMutation.EnType.ConnectionDelete:
+                            mutation = RegisterConnectionMutation(provider, apiMutation, apiRoot);
+                            break;
+                        case ApiMutation.EnType.Untyped:
+                            mutation = RegisterUntypedMutation(provider, apiMutation, apiRoot);
+                            break;
+                    }
 
-                    apiRoot.Mutations[$"{MergedType.EscapeName(provider.Description.ApiName)}_{MergedType.EscapeName(apiMutation.Name)}"] = new MergedField(
-                        apiMutation.Name,
-                        returnType,
-                        apiMutation.Flags,
-                        arguments,
-                        apiMutation.Description);
+                    if (mutation != null)
+                    {
+                        apiRoot.Mutations[mutationName] = mutation;
+                    }
                 }
             }
 
             return apiRoot;
+        }
+
+        /// <summary>
+        /// Register the mutation
+        /// </summary>
+        /// <param name="provider">The mutation api provider</param>
+        /// <param name="apiMutation">The mutation description</param>
+        /// <param name="apiRoot">The api root</param>
+        /// <returns>The mutation as merged field </returns>
+        private static MergedField RegisterUntypedMutation(
+            ApiProvider provider,
+            ApiMutation apiMutation,
+            MergedApiRoot apiRoot)
+        {
+            var returnType = CreateMergedType(provider, apiMutation, null, new List<string>(), false);
+            var arguments = apiMutation.Arguments.ToDictionary(
+                a => a.Name,
+                a =>
+                    new MergedField(
+                        a.Name,
+                        CreateMergedType(provider, a, null, new List<string>(), true),
+                        apiMutation.Flags,
+                        description: a.Description));
+
+            return new MergedField(apiMutation.Name, returnType, apiMutation.Flags, arguments, apiMutation.Description);
+        }
+
+        /// <summary>
+        /// Register the mutation
+        /// </summary>
+        /// <param name="provider">The mutation api provider</param>
+        /// <param name="apiMutation">The mutation description</param>
+        /// <param name="apiRoot">The api root</param>
+        /// <returns>The mutation as merged field </returns>
+        private static MergedField RegisterConnectionMutation(
+            ApiProvider provider,
+            ApiMutation apiMutation,
+            MergedApiRoot apiRoot)
+        {
+            var path = apiMutation.Name.Split('.').ToList();
+            path.RemoveAt(path.Count - 1);
+            MergedObjectType type = apiRoot;
+            MergedField field = null;
+            var queue = new Queue<string>(path);
+            while (queue.Count > 0)
+            {
+                if (type == null)
+                {
+                    return null;
+                }
+
+                var fieldName = queue.Dequeue();
+                if (!type.Fields.TryGetValue(fieldName, out field))
+                {
+                    return null;
+                }
+
+                type = field.Type as MergedObjectType;
+            }
+
+            var connectionType = field?.Type as MergedConnectionType;
+            if (connectionType == null)
+            {
+                return null;
+            }
+
+            var returnType = new MergedConnectionMutationResultType(
+                connectionType.ElementType,
+                apiRoot,
+                new FieldProvider { Provider = provider, FieldType = null });
+            var arguments = apiMutation.Arguments.ToDictionary(
+                a => a.Name,
+                a =>
+                    new MergedField(
+                        a.Name,
+                        CreateMergedType(provider, a, null, new List<string>(), true),
+                        apiMutation.Flags,
+                        description: a.Description));
+
+            arguments["clientMutationId"] = new MergedField(
+                "clientMutationId",
+                new MergedScalarType(EnScalarType.String, new FieldProvider { Provider = provider }));
+
+
+            return new MergedField(apiMutation.Name, returnType, apiMutation.Flags, arguments, apiMutation.Description);
         }
 
         /// <summary>

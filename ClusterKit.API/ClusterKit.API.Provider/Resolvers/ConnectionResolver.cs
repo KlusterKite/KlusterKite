@@ -18,6 +18,8 @@ namespace ClusterKit.API.Provider.Resolvers
     using ClusterKit.API.Client;
     using ClusterKit.Security.Client;
 
+    using JetBrains.Annotations;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -26,6 +28,7 @@ namespace ClusterKit.API.Provider.Resolvers
     /// </summary>
     /// <typeparam name="T">The type of node</typeparam>
     /// <typeparam name="TId">The type of node id</typeparam>
+    [UsedImplicitly]
     public abstract class ConnectionResolver<T, TId> : IResolver, IConnectionResolver 
         where T : class, new() 
     {

@@ -131,7 +131,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         protected IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst, ResolveFieldContext context)
         {
             var usedFields =
-                this.GetRequestedFields(contextFieldAst.SelectionSet, context)
+                GetRequestedFields(contextFieldAst.SelectionSet, context)
                     .Join(
                         this.Fields.Where(f => f.Value.Type.Providers.Any(fp => fp.Provider == provider)),
                         s => s.Name,

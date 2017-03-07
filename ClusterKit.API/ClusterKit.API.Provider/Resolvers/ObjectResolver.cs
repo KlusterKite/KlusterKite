@@ -126,7 +126,6 @@ namespace ClusterKit.API.Provider.Resolvers
                                                      argumentsSerializer,
                                                      onErrorCallback);
                     result.Add(fieldName, resolvedProperty);
-                    
                 }
                 catch (Exception exception)
                 {

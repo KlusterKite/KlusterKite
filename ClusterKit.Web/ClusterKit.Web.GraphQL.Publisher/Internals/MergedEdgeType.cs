@@ -26,11 +26,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     internal class MergedEdgeType : MergedType
     {
         /// <summary>
-        /// The end type
-        /// </summary>
-        private readonly MergedType objectType;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="MergedEdgeType"/> class.
         /// </summary>
         /// <param name="originalTypeName">
@@ -44,7 +39,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </param>
         public MergedEdgeType(string originalTypeName, FieldProvider provider, MergedNodeType objectType) : base(originalTypeName)
         {
-            this.objectType = objectType;
+            this.ObjectType = objectType;
             this.Provider = provider;
         }
 
@@ -52,7 +47,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string ComplexTypeName => $"{EscapeName(this.OriginalTypeName)}_Edge";
 
         /// <inheritdoc />
-        public override string Description => $"The {this.objectType.ComplexTypeName} in a connected list\n {this.objectType.Description}";
+        public override string Description => $"The {this.ObjectType.ComplexTypeName} in a connected list\n {this.ObjectType.Description}";
+
+        /// <summary>
+        /// Gets the end type
+        /// </summary>
+        public MergedNodeType ObjectType { get; }
 
         /// <summary>
         /// Gets the field provider
@@ -77,7 +77,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      {
                                          Name = "cursor",
                                          ResolvedType = new StringGraphType(),
-                                         Resolver = new CursorResolver(this.objectType),
+                                         Resolver = new CursorResolver(this.ObjectType),
                                          Description = "A value to use with paging positioning"
                                      },
                                  new FieldType
@@ -87,19 +87,19 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Metadata =
                                              new Dictionary<string, object>
                                                  {
-                                                     { MetaDataTypeKey, new MergedField("node", this.objectType, description: this.objectType.Description) }
+                                                     { MetaDataTypeKey, new MergedField("node", this.ObjectType, description: this.ObjectType.Description) }
                                                  }
                                      }
                              };
 
-            return new VirtualGraphType.Array(this.ComplexTypeName, fields) { Description = this.Description };
+            return new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
         }
 
         /// <inheritdoc />
         public override IEnumerable<MergedType> GetAllTypes()
         {
             yield return this;
-            foreach (var type in this.objectType.GetAllTypes())
+            foreach (var type in this.ObjectType.GetAllTypes())
             {
                 yield return type;
             }

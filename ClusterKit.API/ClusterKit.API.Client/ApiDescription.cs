@@ -44,7 +44,7 @@ namespace ClusterKit.API.Client
         /// <param name="mutations">
         /// The list of mutations.
         /// </param>
-        public ApiDescription(string apiName, string version, IEnumerable<ApiType> types, IEnumerable<ApiField> fields = null, IEnumerable<ApiField> mutations = null)
+        public ApiDescription(string apiName, string version, IEnumerable<ApiType> types, IEnumerable<ApiField> fields = null, IEnumerable<ApiMutation> mutations = null)
             : base(apiName, fields)
         {
             this.ApiName = apiName;
@@ -68,7 +68,7 @@ namespace ClusterKit.API.Client
         /// </summary>
         [NotNull]
         [UsedImplicitly]
-        public List<ApiField> Mutations { get; set; } = new List<ApiField>();
+        public List<ApiMutation> Mutations { get; set; } = new List<ApiMutation>();
 
         /// <summary>
         /// Gets or sets the list of registered types

@@ -257,6 +257,7 @@
     <Compile Include="ApiProvider.cs" />
     <Compile Include="GraphTypes\NodeInterface.cs" />
     <Compile Include="Internals\Converter.cs" />
+    <Compile Include="Internals\MergedConnectionMutationResultType.cs" />
     <Compile Include="Internals\MergedEnumType.cs" />
     <Compile Include="Internals\MergedFieldedType.cs" />
     <Compile Include="Internals\NodeSearcher.cs" />

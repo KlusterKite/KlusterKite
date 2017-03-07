@@ -37,7 +37,7 @@ namespace ClusterKit.API.Client
         /// <param name="flags">
         /// The flags.
         /// </param>
-        private ApiField(string name, EnFieldFlags flags)
+        protected ApiField(string name, EnFieldFlags flags)
         {
             this.Name = name;
             this.Flags = flags;

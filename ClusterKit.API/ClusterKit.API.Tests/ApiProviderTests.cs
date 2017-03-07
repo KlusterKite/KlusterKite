@@ -10,7 +10,6 @@
 namespace ClusterKit.API.Tests
 {
     using System;
-    using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -21,7 +20,6 @@ namespace ClusterKit.API.Tests
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Provider;
-    using ClusterKit.API.Provider.Resolvers;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;

@@ -44,7 +44,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <inheritdoc />
         public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
-            foreach (var field in this.GetRequestedFields(contextFieldAst.SelectionSet, context))
+            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context))
             {
                 MergedField localField;
 

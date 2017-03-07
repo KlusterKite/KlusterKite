@@ -58,7 +58,7 @@ namespace ClusterKit.API.Provider
             string mutationResultResolverDeclaration;
             if (this.Data.ApiTypeByOriginalTypeNames.TryGetValue(mutationResultType.FullName, out mutationResultApiType))
             {
-                mutationResultResolverDeclaration = $"new {this.Data.ObjectResolverNames[nodeApiType.TypeName]}()";
+                mutationResultResolverDeclaration = $"new {this.Data.ObjectResolverNames[mutationResultApiType.TypeName]}()";
             }
             else
             {

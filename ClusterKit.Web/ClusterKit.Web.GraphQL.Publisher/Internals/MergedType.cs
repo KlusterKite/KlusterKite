@@ -64,6 +64,33 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public abstract IEnumerable<FieldProvider> Providers { get; }
 
         /// <summary>
+        /// Gets the list of requested fields from parent <seealso cref="Field"/>
+        /// </summary>
+        /// <param name="selectionSet">The parent field selection set</param>
+        /// <param name="context">The request context</param>
+        /// <returns>The list of fields</returns>
+        public static IEnumerable<Field> GetRequestedFields(SelectionSet selectionSet, ResolveFieldContext context)
+        {
+            var directFields = selectionSet.Selections.OfType<Field>();
+            foreach (var field in directFields)
+            {
+                yield return field;
+            }
+
+            var fragmentsUsed =
+                selectionSet.Selections.OfType<FragmentSpread>()
+                    .Select(fs => context.Fragments.FindDefinition(fs.Name));
+
+            foreach (var fragment in fragmentsUsed)
+            {
+                foreach (var field in GetRequestedFields(fragment.SelectionSet, context))
+                {
+                    yield return field;
+                }
+            }
+        }
+
+        /// <summary>
         /// Removes special symbols from type and field names
         /// </summary>
         /// <param name="name">The original name</param>
@@ -146,33 +173,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string ToString()
         {
             return this.ComplexTypeName;
-        }
-
-        /// <summary>
-        /// Gets the list of requested fields from parent <seealso cref="Field"/>
-        /// </summary>
-        /// <param name="selectionSet">The parent field selection set</param>
-        /// <param name="context">The request context</param>
-        /// <returns>The list of fields</returns>
-        protected virtual IEnumerable<Field> GetRequestedFields(SelectionSet selectionSet, ResolveFieldContext context)
-        {
-            var directFields = selectionSet.Selections.OfType<Field>();
-            foreach (var field in directFields)
-            {
-                yield return field;
-            }
-
-            var fragmentsUsed =
-                selectionSet.Selections.OfType<FragmentSpread>()
-                    .Select(fs => context.Fragments.FindDefinition(fs.Name));
-
-            foreach (var fragment in fragmentsUsed)
-            {
-                foreach (var field in this.GetRequestedFields(fragment.SelectionSet, context))
-                {
-                    yield return field;
-                }
-            }
         }
     }
 }

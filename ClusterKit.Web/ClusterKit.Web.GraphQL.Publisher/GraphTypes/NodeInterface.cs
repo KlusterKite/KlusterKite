@@ -12,7 +12,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
     using System;
     using System.Collections.Generic;
 
-    using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
     using Newtonsoft.Json.Linq;

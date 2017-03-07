@@ -347,7 +347,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
         }
 
-
         /// <summary>
         /// Testing generator for some api with boolean field
         /// </summary>
@@ -698,18 +697,24 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var mutations = new[]
                                 {
-                                    ApiField.Object(
-                                        "objects_create",
-                                        "object",
-                                        arguments: new[] { objectType.CreateField("new") }),
-                                    ApiField.Object(
-                                        "objects_update",
-                                        "object",
-                                        arguments: new[] { objectType.CreateField("new"), ApiField.Scalar("id", EnScalarType.Integer) }),
-                                    ApiField.Object(
-                                        "objects_delete",
-                                        "object",
-                                        arguments: new[] { ApiField.Scalar("id", EnScalarType.Integer) })
+                                    ApiMutation.CreateFromField(
+                                        ApiField.Object(
+                                            "objects_create",
+                                            "object",
+                                            arguments: new[] { objectType.CreateField("new") }),
+                                        ApiMutation.EnType.ConnectionCreate),
+                                    ApiMutation.CreateFromField(
+                                        ApiField.Object(
+                                            "objects_update",
+                                            "object",
+                                            arguments: new[] { objectType.CreateField("new"), ApiField.Scalar("id", EnScalarType.Integer) }),
+                                        ApiMutation.EnType.ConnectionUpdate),
+                                    ApiMutation.CreateFromField(
+                                        ApiField.Object(
+                                            "objects_delete",
+                                            "object",
+                                            arguments: new[] { ApiField.Scalar("id", EnScalarType.Integer) }),
+                                        ApiMutation.EnType.ConnectionDelete)
                                 };
 
             var api = new ApiDescription(
@@ -887,11 +892,13 @@ namespace ClusterKit.Web.Tests.GraphQL
             var objectType = new ApiObjectType("object", objectFields) { Description = "Some abstract object" };
             var mutations = new[]
                                 {
-                                    ApiField.Object(
+                                    ApiMutation.CreateFromField(
+                                        ApiField.Object(
                                         "objects_create",
                                         "object",
                                         arguments: new[] { objectType.CreateField("new", description: "The new object data") },
-                                        description: "creates a new object")
+                                        description: "creates a new object"), 
+                                        ApiMutation.EnType.ConnectionCreate)
                                 };
 
             var api = new ApiDescription(

@@ -141,6 +141,7 @@ namespace ClusterKit.API.Provider
                 {
                     return null;
                 }
+
                 request.FieldName = mutation.Field.Name;
                 var rootRequest = new ApiRequest { Fields = new List<ApiRequest> { request } };
 
@@ -159,12 +160,16 @@ namespace ClusterKit.API.Provider
                 var connectionResolver = resolveResult.Resolver as IConnectionResolver;
                 if (connectionResolver != null)
                 {
-                    return await connectionResolver.ResolveMutation(
-                               resolveResult.Value,
-                               request,
-                               context,
-                               this.argumentsSerializer,
-                               onErrorCallback);
+                    var resolvedMutation = await connectionResolver.ResolveMutation(
+                                              resolveResult.Value,
+                                              request,
+                                              context,
+                                              this.argumentsSerializer,
+                                              onErrorCallback);
+
+                    var path = new JArray(mutation.Path.Select(p => new JObject { { "f", p.FieldName } }));
+                    resolvedMutation.Add("__requestPath", path);
+                    return resolvedMutation;
                 }
 
                 return null;
@@ -614,7 +619,8 @@ namespace ClusterKit.API.Provider
                         new MutationDescription
                             {
                                 Field = field,
-                                Path = path.Select(p => new ApiRequest { FieldName = p }).ToList()
+                                Path = path.Select(p => new ApiRequest { FieldName = p }).ToList(),
+                                Type = ApiMutation.EnType.Untyped
                             };
                 }
 
@@ -650,7 +656,8 @@ namespace ClusterKit.API.Provider
                     new MutationDescription
                     {
                         Field = description.ApiField,
-                        Path = path.Select(p => new ApiRequest { FieldName = p }).ToList()
+                        Path = path.Select(p => new ApiRequest { FieldName = p }).ToList(),
+                        Type = ApiMutation.EnType.Untyped
                     };
             }
         }
@@ -755,7 +762,7 @@ namespace ClusterKit.API.Provider
                             },
                         description: attribute.CreateDescription);
 
-                    yield return new MutationDescription { Field = field, Path = requestPath };
+                    yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionCreate };
                 }
 
                 if (attribute.CanUpdate)
@@ -773,7 +780,7 @@ namespace ClusterKit.API.Provider
                                     description: "The object's data")
                             },
                         description: attribute.CreateDescription);
-                    yield return new MutationDescription { Field = field, Path = requestPath };
+                    yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionUpdate };
                 }
 
                 if (attribute.CanDelete)
@@ -784,7 +791,7 @@ namespace ClusterKit.API.Provider
                         arguments:
                         new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
                         description: attribute.CreateDescription);
-                    yield return new MutationDescription { Field = field, Path = requestPath };
+                    yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionDelete };
                 }
             }
         }
@@ -1020,12 +1027,17 @@ namespace ClusterKit.API.Provider
             public string MutationName => string.Join(".", new List<string>(this.Path.Select(p => p?.FieldName)) { this.Field.Name });
 
             /// <summary>
+            /// Gets or sets the mutation type
+            /// </summary>
+            public ApiMutation.EnType Type { get; set; }
+
+            /// <summary>
             /// Creates virtual mutation field to describe mutation
             /// </summary>
             /// <returns>The mutation field</returns>
-            public ApiField CreateMutationField()
+            public ApiMutation CreateMutationField()
             {
-                var field = this.Field.Clone();
+                var field = ApiMutation.CreateFromField(this.Field, this.Type);
                 field.Name = this.MutationName;
                 return field;
             }

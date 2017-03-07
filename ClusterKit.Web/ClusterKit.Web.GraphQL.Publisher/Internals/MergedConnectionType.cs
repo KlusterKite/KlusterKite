@@ -26,10 +26,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     /// </summary>
     internal class MergedConnectionType : MergedType
     {
-        /// <summary>
-        /// The type of the edge
-        /// </summary>
-        private readonly MergedEdgeType edgeType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MergedConnectionType"/> class.
@@ -48,7 +44,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         {
             this.ElementType = new MergedNodeType(provider, elementType);
             this.Provider = provider;
-            this.edgeType = new MergedEdgeType(this.OriginalTypeName, provider, this.ElementType);
+            this.EdgeType = new MergedEdgeType(this.OriginalTypeName, provider, this.ElementType);
         }
 
         /// <inheritdoc />
@@ -64,6 +60,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedNodeType ElementType { get; }
 
         /// <summary>
+        /// Gets the type of the edge
+        /// </summary>
+        public MergedEdgeType EdgeType { get; }
+
+        /// <summary>
         /// Gets the field provider
         /// </summary>
         public FieldProvider Provider { get; }
@@ -76,7 +77,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             Field contextFieldAst,
             ResolveFieldContext context)
         {
-            foreach (var field in this.GetRequestedFields(contextFieldAst.SelectionSet, context))
+            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context))
             {
                 switch (field.Name)
                 {
@@ -86,7 +87,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     case "edges":
                         {
                             var nodeSelection =
-                                this.GetRequestedFields(field.SelectionSet, context)
+                                GetRequestedFields(field.SelectionSet, context)
                                     .FirstOrDefault(f => f.Name == "node");
 
                             var fields = nodeSelection != null
@@ -166,7 +167,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                          MetaDataTypeKey,
                                                          new MergedField(
                                                              "edges",
-                                                             this.edgeType,
+                                                             this.EdgeType,
                                                              EnFieldFlags.IsArray,
                                                              description: "The list of edges according to filtering and paging conditions")
                                                      }
@@ -181,7 +182,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override IEnumerable<MergedType> GetAllTypes()
         {
             yield return this;
-            foreach (var type in this.edgeType.GetAllTypes())
+            foreach (var type in this.EdgeType.GetAllTypes())
             {
                 yield return type;
             }

@@ -29,11 +29,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
     internal class MergedNodeType : MergedFieldedType
     {
         /// <summary>
-        /// The name of original object key field
-        /// </summary>
-        private readonly string keyName;
-
-        /// <summary>
         /// A value indicating whether the original id field was substituted
         /// </summary>
         private readonly bool isIdSubstitute;
@@ -52,7 +47,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         {
             this.Provider = provider;
             this.Fields = objectType.Fields;
-            this.keyName = objectType.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
+            this.KeyName = objectType.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
             MergedField conflictingField;
             if (objectType.Fields.TryGetValue("id", out conflictingField))
             {
@@ -67,6 +62,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 this.isIdSubstitute = true;
             }
         }
+
+        /// <summary>
+        /// Gets the name of original object key field
+        /// </summary>
+        public string KeyName { get; }
 
         /// <summary>
         /// Gets the field provider
@@ -95,7 +95,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                Name = "id",
                                Type = typeof(IdGraphType),
                                Description = "The node global id",
-                               Resolver = new GlobalIdResolver(this.isIdSubstitute ? "__id" : this.keyName, this.Provider.Provider.Description.ApiName)
+                               Resolver = new GlobalIdResolver(this.isIdSubstitute ? "__id" : this.KeyName, this.Provider.Provider.Description.ApiName)
                            });
             var graphType = new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
             graphType.AddResolvedInterface(nodeInterface);
@@ -124,7 +124,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <inheritdoc />
         public override object Resolve(ResolveFieldContext context)
         {
-            var resolve = base.Resolve(context) as JObject;
+            var resolve = context.Source as JObject;
             return this.ResolveData(resolve);
         }
 
@@ -163,10 +163,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 requests = list;
             }
 
-            if (requests.All(r => r.FieldName != this.keyName)
-                && this.GetRequestedFields(contextFieldAst.SelectionSet, context).Any(f => f.Name == "id"))
+            if (requests.All(r => r.FieldName != this.KeyName)
+                && GetRequestedFields(contextFieldAst.SelectionSet, context).Any(f => f.Name == "id"))
             {
-                requests.Add(new ApiRequest { FieldName = this.keyName });
+                requests.Add(new ApiRequest { FieldName = this.KeyName });
             }
 
             return requests;
