@@ -158,6 +158,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="ILargeObject.cs" />
     <Compile Include="IMessageWithExtraData.cs" />
+    <Compile Include="IObjectWithId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

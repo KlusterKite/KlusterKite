@@ -31,7 +31,7 @@ namespace ClusterKit.Data.CRUD
     /// <typeparam name="TId">
     /// The type of object id
     /// </typeparam>
-    public class Connection<TObject, TId> : INodeConnection<TObject, TId> where TObject : class, new()
+    public class Connection<TObject, TId> : INodeConnection<TObject, TId> where TObject : class, IObjectWithId<TId>, new()
     {
         /// <summary>
         /// The actor system
@@ -185,6 +185,12 @@ namespace ClusterKit.Data.CRUD
             }
 
             return new MutationResult<TObject> { Result = result.Data };
+        }
+
+        /// <inheritdoc />
+        public TId GetId(TObject node)
+        {
+            return node.GetId();
         }
     }
 }

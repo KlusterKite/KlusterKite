@@ -387,6 +387,12 @@ namespace ClusterKit.API.Tests
 
                     return new MutationResult<NodeObject> { Result = oldNode };
                 }
+
+                /// <inheritdoc />
+                public Guid GetId(NodeObject node)
+                {
+                    return node.Id;
+                }
             }
         }
 

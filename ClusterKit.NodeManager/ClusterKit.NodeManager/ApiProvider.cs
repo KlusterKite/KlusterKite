@@ -23,16 +23,6 @@ namespace ClusterKit.NodeManager
     public class ApiProvider : API.Provider.ApiProvider
     {
         /// <summary>
-        /// The actor system.
-        /// </summary>
-        private readonly ActorSystem actorSystem;
-
-        /// <summary>
-        /// The node manager data.
-        /// </summary>
-        private readonly NodeManagerApi nodeManagerData;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ApiProvider"/> class.
         /// </summary>
         /// <param name="actorSystem">
@@ -40,8 +30,7 @@ namespace ClusterKit.NodeManager
         /// </param>
         public ApiProvider(ActorSystem actorSystem)
         {
-            this.actorSystem = actorSystem;
-            this.nodeManagerData = new NodeManagerApi(actorSystem);
+            this.NodeManagerData = new NodeManagerApi(actorSystem);
         }
 
         /// <summary>
@@ -49,14 +38,7 @@ namespace ClusterKit.NodeManager
         /// </summary>
         [UsedImplicitly]
         [DeclareField(Description = "The ClusterKit node managing API")]
-        public NodeManagerApi NodeManagerData
-        {
-            get
-            {
-                this.actorSystem.Log.Info("{Type}: NodeManagerData accessed", this.GetType().Name);
-                return this.nodeManagerData;
-            }
-        }
+        public NodeManagerApi NodeManagerData { get; }
 
         /// <summary>
         /// Gets the current user data API

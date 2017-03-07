@@ -26,7 +26,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     /// </summary>
     internal class MergedConnectionType : MergedType
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MergedConnectionType"/> class.
         /// </summary>

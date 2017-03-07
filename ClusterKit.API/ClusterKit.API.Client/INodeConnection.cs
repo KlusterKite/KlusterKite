@@ -33,6 +33,13 @@ namespace ClusterKit.API.Client
         Task<T> GetById(TId id);
 
         /// <summary>
+        /// Gets an id from node object
+        /// </summary>
+        /// <param name="node">The node object</param>
+        /// <returns>The id of node object</returns>
+        TId GetId(T node);
+
+        /// <summary>
         /// Query the datasource for nodes
         /// </summary>
         /// <param name="filter">

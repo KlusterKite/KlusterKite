@@ -210,6 +210,10 @@
       <Project>{2a6edcc4-c729-4bee-9bb5-ac6f76b3bac8}</Project>
       <Name>ClusterKit.API.Client</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj">
+      <Project>{fda59712-9625-4cdf-b8fd-6df19960c8c0}</Project>
+      <Name>ClusterKit.Data.CRUD</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj">
       <Project>{874ac41b-a084-4eed-9b7f-6b82efc416ee}</Project>
       <Name>ClusterKit.NodeManager.Launcher.Messages</Name>

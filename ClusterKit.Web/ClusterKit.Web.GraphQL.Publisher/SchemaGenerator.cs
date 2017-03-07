@@ -9,7 +9,6 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -36,6 +35,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var api = MergeApis(providers);
             var nodeInterface = new NodeInterface();
             var root = new MergedRoot("Query", providers, api);
+            
             var types = root.GetAllTypes().ToList();
 
             var typeNames = types.Select(t => t.ComplexTypeName).Distinct().ToList();
@@ -43,7 +43,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var graphTypes = typeNames.ToDictionary(
                 typeName => typeName,
                 typeName => types.FirstOrDefault(t => t.ComplexTypeName == typeName)?.GenerateGraphType(nodeInterface));
-            
+
             var mutationType = api.GenerateMutationType();
             graphTypes[mutationType.Name] = mutationType;
             graphTypes.Values.OfType<IComplexGraphType>().SelectMany(a => a.Fields).ForEach(
@@ -163,7 +163,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var arguments = apiMutation.Arguments.ToDictionary(
                 a => a.Name,
                 a =>
-                    new MergedField(
+                    new MergedField( 
                         a.Name,
                         CreateMergedType(provider, a, null, new List<string>(), true),
                         apiMutation.Flags,
@@ -211,9 +211,22 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 return null;
             }
 
+            var errorDescriptionApiType = provider.Description.Types.FirstOrDefault(t => t.TypeName == "ErrorDescription") as ApiObjectType;
+            MergedType errorDescriptionType = null;
+            if (errorDescriptionApiType != null)
+            {
+                errorDescriptionType = CreateMergedType(
+                    provider,
+                    errorDescriptionApiType.CreateField("error"),
+                    null,
+                    new List<string>(),
+                    false);
+            }
+
             var returnType = new MergedConnectionMutationResultType(
                 connectionType.ElementType,
                 apiRoot,
+                errorDescriptionType,
                 new FieldProvider { Provider = provider, FieldType = null });
             var arguments = apiMutation.Arguments.ToDictionary(
                 a => a.Name,
@@ -227,7 +240,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
             arguments["clientMutationId"] = new MergedField(
                 "clientMutationId",
                 new MergedScalarType(EnScalarType.String, new FieldProvider { Provider = provider }));
-
 
             return new MergedField(apiMutation.Name, returnType, apiMutation.Flags, arguments, apiMutation.Description);
         }
@@ -314,7 +326,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
             ICollection<string> path,
             bool createAsInput)
         {
-            MergedType fieldType;
             if (apiField.ScalarType != EnScalarType.None)
             {
                 return new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
@@ -355,7 +366,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 provider,
                 path.Union(new[] { apiObjectType.TypeName }).ToList());
 
-            fieldType = objectType;
+            MergedType fieldType = objectType;
 
             if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
             {

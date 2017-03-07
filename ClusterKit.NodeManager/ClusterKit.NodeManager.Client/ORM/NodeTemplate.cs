@@ -17,6 +17,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Xml.Serialization;
 
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
 
     using JetBrains.Annotations;
 
@@ -27,7 +28,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [UsedImplicitly]
     [ApiDescription(Description = "Node template description", Name = "ClusterKitNodeTemplate")]
-    public class NodeTemplate
+    public class NodeTemplate : IObjectWithId<int>
     {
         /// <summary>
         /// Gets or sets the program readable node template name
@@ -131,5 +132,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [DeclareField(Description = "The template version")]
         public int Version { get; set; }
+
+        /// <inheritdoc />
+        int IObjectWithId<int>.GetId()
+        {
+            return this.Id;
+        }
     }
 }

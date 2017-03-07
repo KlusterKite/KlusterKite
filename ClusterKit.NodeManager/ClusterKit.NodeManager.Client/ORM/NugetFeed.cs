@@ -13,12 +13,13 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations.Schema;
 
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
 
     /// <summary>
     /// Link to the nuget feed to download updates
     /// </summary>
     [ApiDescription(Description = "The link to the nuget feed to download updates", Name = "ClusterKitNugetFeed")]
-    public class NugetFeed
+    public class NugetFeed : IObjectWithId<int>
     {
         /// <summary>
         /// Type of NuGet feed
@@ -66,5 +67,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [DeclareField(Description = "The username for basic authentication")]
         public string UserName { get; set; }
+
+        /// <inheritdoc />
+        int IObjectWithId<int>.GetId()
+        {
+            return this.Id;
+        }
     }
 }

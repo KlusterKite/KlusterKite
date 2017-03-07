@@ -11,6 +11,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Resolvers;
@@ -18,7 +19,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
     using JetBrains.Annotations;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -31,12 +31,31 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         private readonly MergedApiRoot root;
 
-        /// <inheritdoc />
-        public MergedConnectionMutationResultType(MergedNodeType nodeType, MergedApiRoot root, FieldProvider provider)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MergedConnectionMutationResultType"/> class.
+        /// </summary>
+        /// <param name="nodeType">
+        /// The node type.
+        /// </param>
+        /// <param name="root">
+        /// The root.
+        /// </param>
+        /// <param name="errorType">
+        /// The error type.
+        /// </param>
+        /// <param name="provider">
+        /// The provider.
+        /// </param>
+        public MergedConnectionMutationResultType(
+            MergedNodeType nodeType, 
+            MergedApiRoot root,
+            MergedType errorType, 
+            FieldProvider provider)
             : base(nodeType.OriginalTypeName)
         {
             this.EdgeType = new MergedEdgeType(nodeType.OriginalTypeName, provider, nodeType);
             this.root = root;
+            this.ErrorType = errorType;
             this.Provider = provider;
         }
 
@@ -50,6 +69,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets the root type
         /// </summary>
         public MergedEdgeType EdgeType { get; }
+        
+        /// <summary>
+        /// Gets the error type
+        /// </summary>
+        public MergedType ErrorType { get; }
 
         /// <inheritdoc />
         public override IEnumerable<FieldProvider> Providers
@@ -64,12 +88,21 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string ComplexTypeName => $"{this.OriginalTypeName}_NodeMutationPayload";
 
         /// <inheritdoc />
+        public override IEnumerable<MergedType> GetAllTypes()
+        {
+            yield return this;
+            yield return this.ErrorType;
+        }
+
+        /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var graphType = new VirtualGraphType(this.ComplexTypeName);
             graphType.AddField(new FieldType { Name = "deletedId", ResolvedType = new IdGraphType(), Resolver = new DeletedIdResolver() });
             graphType.AddField(this.CreateField("node", this.EdgeType.ObjectType, new ResultNodeResolver(this.EdgeType.ObjectType)));
             graphType.AddField(this.CreateField("edge", this.EdgeType, new ResultEdgeResolver()));
+            graphType.AddField(this.CreateField("errors", this.ErrorType, new ResultErrorsResolver(), EnFieldFlags.IsArray));
+            graphType.AddField(new FieldType { Name = "clientMutationId", ResolvedType = new StringGraphType(), Resolver = new ClientMutationIdIdResolver() });
             graphType.AddField(this.CreateField("api", this.root, this.root));
             return graphType;
         }
@@ -84,13 +117,24 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Creates virtual field
         /// </summary>
-        /// <param name="name">The field name</param>
-        /// <param name="type">The field type</param>
-        /// <param name="resolver">The field resolver</param>
-        /// <returns>The field</returns>
-        private FieldType CreateField(string name, MergedType type, IFieldResolver resolver = null)
+        /// <param name="name">
+        /// The field name
+        /// </param>
+        /// <param name="type">
+        /// The field type
+        /// </param>
+        /// <param name="resolver">
+        /// The field resolver
+        /// </param>
+        /// <param name="flags">
+        /// The field flags.
+        /// </param>
+        /// <returns>
+        /// The field
+        /// </returns>
+        private FieldType CreateField(string name, MergedType type, IFieldResolver resolver = null, EnFieldFlags flags = EnFieldFlags.None)
         {
-            var mergedField = new MergedField(name, type);
+            var mergedField = new MergedField(name, type, flags);
             return this.ConvertApiField(new KeyValuePair<string, MergedField>(name, mergedField), resolver);
         }
 
@@ -131,9 +175,27 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                return ((JObject)context.Source)?.Property("result")?.Value?.DeepClone();
+                var result = ((JObject)context.Source)?.Property("result")?.Value?.DeepClone();
+                if (result == null || !result.HasValues)
+                {
+                    return null;
+                }
+
+                return result;
             }
         }
+
+        /// <summary>
+        /// Resolves data for edge value
+        /// </summary>
+        private class ResultErrorsResolver : IFieldResolver
+        {
+            /// <inheritdoc />
+            public object Resolve(ResolveFieldContext context)
+            {
+                return ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldName)?.Value?.DeepClone();
+            }
+        } 
 
         /// <summary>
         /// Resolves data for node value
@@ -143,7 +205,19 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                return (((JObject)context.Source)?.Property("result")?.Value as JObject)?.Property("__globalId")?.Value;
+                return ((context.Source as JObject)?.Property("result")?.Value as JObject)?.Property("deletedId")?.Value;
+            }
+        }
+
+        /// <summary>
+        /// Resolves data for node value
+        /// </summary>
+        private class ClientMutationIdIdResolver : IFieldResolver
+        {
+            /// <inheritdoc />
+            public object Resolve(ResolveFieldContext context)
+            {
+                return (context.Source as JObject)?.Property("clientMutationId")?.Value;
             }
         }
     }

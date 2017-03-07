@@ -16,6 +16,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Xml.Serialization;
 
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
 
     using JetBrains.Annotations;
 
@@ -25,7 +26,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The amount of privileges assigned to the user
     /// </summary>
     [ApiDescription(Description = "Security role. The amount of privileges assigned to the user", Name = "ClusterKitRole")]
-    public class Role
+    public class Role : IObjectWithId<Guid>
     {
         /// <summary>
         /// Gets or sets the role uid
@@ -100,5 +101,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// TODO: support recursive type refs
         /// [DeclareField(Description = "The list of users assigned to this role")]
         public List<User> Users { get; set; }
+
+        /// <inheritdoc />
+        Guid IObjectWithId<Guid>.GetId()
+        {
+            return this.Uid;
+        }
     }
 }

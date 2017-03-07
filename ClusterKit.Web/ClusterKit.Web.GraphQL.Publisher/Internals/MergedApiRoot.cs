@@ -221,6 +221,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                             case "deletedId":
                                 resultFields.Add(new ApiRequest { FieldName = nodeType.KeyName });
                                 break;
+                            case "errors":
+                                if (responseType.ErrorType != null)
+                                {
+                                    resultFields.AddRange(responseType.ErrorType.GatherSingleApiRequest(nodeRequest, context));
+                                }
+
+                                break;
                         }
                     }
 
@@ -231,7 +238,24 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                             };
                     requestedFields.Add(resultRequest);
                 }
-                
+
+                if (responseType.ErrorType != null)
+                {
+                    var errorsRequest = topFields.Where(f => f.Name == "errors");
+                    foreach (var field in errorsRequest)
+                    {
+                        requestedFields.Add(
+                            new ApiRequest
+                                {
+                                    FieldName = "errors",
+                                    Alias = field.Alias,
+                                    Fields =
+                                        responseType.ErrorType.GatherSingleApiRequest(field, context)
+                                            .ToList()
+                                });
+                    }
+                }
+
                 var request = new MutationApiRequest
                 {
                     Arguments = context.FieldAst.Arguments.ToJson(),
@@ -246,15 +270,30 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 
                 if (path != null && result != null)
                 {
+                    var id = result.Property(nodeType.KeyName)?.Value;
                     var globalId = new JObject
                                        {
                                            { "p", path },
                                            { "api", this.provider.Description.ApiName },
-                                           { "id", result.Property(nodeType.KeyName)?.Value }
+                                           { "id", id }
                                        };
+
                     result.Add("__globalId", globalId.ToString(Formatting.None));
+
+                    var deletedId = data.Property("__deletedId")?.Value;
+                    if (deletedId != null)
+                    {
+                        var deletedGlobalId = new JObject
+                                       {
+                                           { "p", path },
+                                           { "api", this.provider.Description.ApiName },
+                                           { "id", deletedId }
+                                       };
+                        result.Add("deletedId", deletedGlobalId.ToString(Formatting.None));
+                    }
                 }
 
+                data?.Add("clientMutationId", context.GetArgument<string>("clientMutationId"));
                 return data;
             }
 

@@ -21,6 +21,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using ClusterKit.API.Client.Messages;
     using ClusterKit.Security.Client;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -77,7 +79,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     
                     // todo: repeat ask in case of exception
                     var midResult = await endpoint.Ask<SurrogatableJObject>(mutation, this.timeout);
-                    result.Merge(midResult);
+                    result.Merge((JObject)midResult);
                 }
 
                 return result;

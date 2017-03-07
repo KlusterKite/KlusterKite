@@ -65,7 +65,11 @@ namespace ClusterKit.API.Tests.Mock
                 return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
             }
 
-            newNode.Id = Guid.NewGuid();
+            if (newNode.Id == default(Guid))
+            {
+                newNode.Id = Guid.NewGuid();
+            }
+
             this.objects.Add(newNode.Id, newNode);
             return Task.FromResult(new MutationResult<TestObject> { Result = newNode });
         }
@@ -191,6 +195,12 @@ namespace ClusterKit.API.Tests.Mock
             this.objects[obj.Id] = obj;
 
             return Task.FromResult(new MutationResult<TestObject> { Result = obj });
+        }
+
+        /// <inheritdoc />
+        public Guid GetId(TestObject node)
+        {
+            return node.Id;
         }
     }
 }

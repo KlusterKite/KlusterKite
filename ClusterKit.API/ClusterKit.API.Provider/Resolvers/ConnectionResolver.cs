@@ -205,7 +205,8 @@ namespace ClusterKit.API.Provider.Resolvers
             var serializedData = ((JObject)request.Arguments)?.Property("newNode")?.Value as JObject;
             var newNode = serializedData?.ToObject<T>();
             var result = await connection.Create(newNode);
-            return (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            var mutationCreate = (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            return mutationCreate;
         }
 
         /// <summary>
@@ -235,7 +236,16 @@ namespace ClusterKit.API.Provider.Resolvers
             var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
             var newNode = serializedData?.ToObject<T>();
             var result = await connection.Update(id, newNode, request);
-            return (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            var mutationUpdate = (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            if (result.Result != null)
+            {
+                if (id != null && !id.Equals(connection.GetId(result.Result)))
+                {
+                    mutationUpdate.Add("__deletedId", JsonConvert.SerializeObject(id));
+                }
+            }
+
+            return mutationUpdate;
         }
 
         /// <summary>
@@ -263,7 +273,13 @@ namespace ClusterKit.API.Provider.Resolvers
             var serializedId = ((JObject)request.Arguments)?.Property("id")?.Value;
             var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
             var result = await connection.Delete(id);
-            return (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            var mutationDelete = (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            if (result.Result != null)
+            {
+                mutationDelete.Add("__deletedId", JsonConvert.SerializeObject(id));
+            }
+
+            return mutationDelete;
         }
     }
 }

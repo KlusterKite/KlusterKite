@@ -13,6 +13,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations.Schema;
 
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
 
     using JetBrains.Annotations;
 
@@ -20,7 +21,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The address of fixed cluster seed for new node configuration
     /// </summary>
     [ApiDescription(Description = "The address of fixed cluster seed for new node configuration", Name = "ClusterKitSeedAddress")]
-    public class SeedAddress
+    public class SeedAddress : IObjectWithId<int>
     {
         /// <summary>
         /// Gets or sets seed address in format of akka url
@@ -35,5 +36,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
         [UsedImplicitly]
         public int Id { get; set; }
+
+        /// <inheritdoc />
+        int IObjectWithId<int>.GetId()
+        {
+            return this.Id;
+        }
     }
 }

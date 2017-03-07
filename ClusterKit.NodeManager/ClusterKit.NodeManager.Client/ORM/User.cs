@@ -16,6 +16,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using BCrypt.Net;
 
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
 
     using JetBrains.Annotations;
 
@@ -23,7 +24,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The web ui user
     /// </summary>
     [ApiDescription(Description = "The web ui user", Name = "ClusterKitUser")]
-    public class User : UserDescription
+    public class User : UserDescription, IObjectWithId<Guid>
     {
         /// <summary>
         /// Gets or sets the password hash
@@ -95,6 +96,12 @@ namespace ClusterKit.NodeManager.Client.ORM
                            IsBlocked = this.IsBlocked,
                            IsDeleted = this.IsDeleted
                        };
+        }
+
+        /// <inheritdoc />
+        Guid IObjectWithId<Guid>.GetId()
+        {
+            return this.Uid;
         }
     }
 }
