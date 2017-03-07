@@ -1048,7 +1048,30 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider",
+                "name": "TestApi_TestApi",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "The node global searcher according to Relay specification",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "The node global id",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "Node",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1062,7 +1085,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider",
+          "name": "TestApi_TestApi",
           "description": "Tested API",
           "fields": [
             {
@@ -1099,7 +1122,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
+                "name": "TestApi_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1126,7 +1149,7 @@
                   "description": "The filtering conditions",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
+                    "name": "TestApi_TestObject_Filter",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1139,7 +1162,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_OrderByEnum",
+                      "name": "TestApi_TestObject_OrderByEnum",
                       "ofType": null
                     }
                   },
@@ -1168,7 +1191,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Connection",
+                "name": "TestApi_TestObject_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1224,7 +1247,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
+                "name": "TestApi_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1248,7 +1271,7 @@
               "args": [],
               "type": {
                 "kind": "ENUM",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider_EnTest",
+                "name": "TestApi_EnTest",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1299,7 +1322,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider_Input",
+                    "name": "TestApi_NestedProvider_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1317,7 +1340,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
+                "name": "TestApi_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1329,7 +1352,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
+                "name": "TestApi_NestedProvider",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1354,7 +1377,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider_Input",
+                    "name": "TestApi_NestedProvider_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1386,7 +1409,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider",
+          "name": "TestApi_NestedProvider",
           "description": "Nested API",
           "fields": [
             {
@@ -1421,8 +1444,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Connection",
-          "description": "The list of connected ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject\n ",
+          "name": "TestApi_TestObject_Connection",
+          "description": "The list of connected TestApi_TestObject_Node\n ",
           "fields": [
             {
               "name": "count",
@@ -1445,7 +1468,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Edge",
+                  "name": "TestApi_TestObject_Edge",
                   "ofType": null
                 }
               },
@@ -1460,8 +1483,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Edge",
-          "description": "The ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject in a connected list\n ",
+          "name": "TestApi_TestObject_Edge",
+          "description": "The TestApi_TestObject_Node in a connected list\n ",
           "fields": [
             {
               "name": "cursor",
@@ -1481,7 +1504,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
+                "name": "TestApi_TestObject_Node",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1495,8 +1518,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
-          "description": "",
+          "name": "TestApi_TestObject_Node",
+          "description": null,
           "fields": [
             {
               "name": "name",
@@ -1511,7 +1534,7 @@
               "deprecationReason": null
             },
             {
-              "name": "uid",
+              "name": "__id",
               "description": null,
               "args": [],
               "type": {
@@ -1540,7 +1563,19 @@
               "args": [],
               "type": {
                 "kind": "ENUM",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+                "name": "TestApi_EnObjectType",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "The node global id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1548,7 +1583,13 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -1564,8 +1605,8 @@
         },
         {
           "kind": "ENUM",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
-          "description": null,
+          "name": "TestApi_EnObjectType",
+          "description": "The type of object as enum",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -1587,8 +1628,8 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
-          "description": "The filter conditions for a ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject connected objects",
+          "name": "TestApi_TestObject_Filter",
+          "description": "The filter conditions for a TestApi_TestObject_Node connected objects",
           "fields": null,
           "inputFields": [
             {
@@ -1599,7 +1640,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
+                  "name": "TestApi_TestObject_Filter",
                   "ofType": null
                 }
               },
@@ -1613,7 +1654,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Filter",
+                  "name": "TestApi_TestObject_Filter",
                   "ofType": null
                 }
               },
@@ -1624,7 +1665,7 @@
               "description": "The type exactly equals the value\n",
               "type": {
                 "kind": "ENUM",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+                "name": "TestApi_EnObjectType",
                 "ofType": null
               },
               "defaultValue": null
@@ -1634,7 +1675,7 @@
               "description": "The type not equals the value\n",
               "type": {
                 "kind": "ENUM",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+                "name": "TestApi_EnObjectType",
                 "ofType": null
               },
               "defaultValue": null
@@ -1740,8 +1781,8 @@
               "defaultValue": null
             },
             {
-              "name": "uid",
-              "description": "The uid exactly equals the value\n",
+              "name": "id",
+              "description": "The id exactly equals the value\n",
               "type": {
                 "kind": "SCALAR",
                 "name": "Uid",
@@ -1750,8 +1791,8 @@
               "defaultValue": null
             },
             {
-              "name": "uid_not",
-              "description": "The uid not equals the value\n",
+              "name": "id_not",
+              "description": "The id not equals the value\n",
               "type": {
                 "kind": "SCALAR",
                 "name": "Uid",
@@ -1826,8 +1867,8 @@
         },
         {
           "kind": "ENUM",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_OrderByEnum",
-          "description": "The list of ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject fields that can be used as sorting functions",
+          "name": "TestApi_TestObject_OrderByEnum",
+          "description": "The list of TestApi_TestObject_Node fields that can be used as sorting functions",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -1845,14 +1886,14 @@
               "deprecationReason": null
             },
             {
-              "name": "uid_asc",
-              "description": "uid ascending\n",
+              "name": "id_asc",
+              "description": "id ascending\n",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "uid_desc",
-              "description": "uid descending\n",
+              "name": "id_desc",
+              "description": "id descending\n",
               "isDeprecated": false,
               "deprecationReason": null
             },
@@ -1885,7 +1926,7 @@
         },
         {
           "kind": "ENUM",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestProvider_EnTest",
+          "name": "TestApi_EnTest",
           "description": "The test enum",
           "fields": null,
           "inputFields": null,
@@ -1908,7 +1949,7 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_NestedProvider_Input",
+          "name": "TestApi_NestedProvider_Input",
           "description": "Nested API",
           "fields": null,
           "inputFields": [
@@ -1938,12 +1979,41 @@
           "possibleTypes": null
         },
         {
+          "kind": "INTERFACE",
+          "name": "Node",
+          "description": "The Node interface as described in Relay documentation",
+          "fields": [
+            {
+              "name": "id",
+              "description": "The node id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "TestApi_TestObject_Node",
+              "ofType": null
+            }
+          ]
+        },
+        {
           "kind": "OBJECT",
           "name": "Mutations",
           "description": "The list of all detected mutations",
           "fields": [
             {
-              "name": "ClusterKit_API_Tests_Mock_TestProvider_nestedAsync_setName",
+              "name": "TestApi_nestedAsync_setName",
               "description": null,
               "args": [
                 {
@@ -1955,22 +2025,9 @@
                     "ofType": null
                   },
                   "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "ClusterKit_API_Tests_Mock_TestProvider_nestedSync_setName",
-              "description": null,
-              "args": [
+                },
                 {
-                  "name": "name",
+                  "name": "clientMutationId",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -1982,14 +2039,14 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
+                "name": "TestApi_TestObject_MutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_API_Tests_Mock_TestProvider_faultedASyncMethod_setName",
+              "name": "TestApi_nestedSync_setName",
               "description": null,
               "args": [
                 {
@@ -2001,26 +2058,79 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "clientMutationId",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
+                "name": "TestApi_TestObject_MutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_API_Tests_Mock_TestProvider_connection_create",
+              "name": "TestApi_faultedASyncMethod_setName",
               "description": null,
               "args": [
+                {
+                  "name": "name",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "clientMutationId",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TestApi_TestObject_MutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TestApi_connection_create",
+              "description": null,
+              "args": [
+                {
+                  "name": "clientMutationId",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
                 {
                   "name": "newNode",
                   "description": "The object's data",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Input",
+                    "name": "TestApi_TestObject_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -2028,16 +2138,26 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
+                "name": "TestApi_TestObject_NodeMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_API_Tests_Mock_TestProvider_connection_update",
+              "name": "TestApi_connection_update",
               "description": null,
               "args": [
+                {
+                  "name": "clientMutationId",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
                 {
                   "name": "id",
                   "description": "The object's id",
@@ -2053,7 +2173,7 @@
                   "description": "The object's data",
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Input",
+                    "name": "TestApi_TestObject_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -2061,16 +2181,26 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
+                "name": "TestApi_TestObject_NodeMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "ClusterKit_API_Tests_Mock_TestProvider_connection_delete",
+              "name": "TestApi_connection_delete",
               "description": null,
               "args": [
+                {
+                  "name": "clientMutationId",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
                 {
                   "name": "id",
                   "description": "The object's id",
@@ -2084,7 +2214,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
+                "name": "TestApi_TestObject_NodeMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -2098,16 +2228,146 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_MutationResult_ClusterKit_API_Tests_Mock_TestObject_",
-          "description": "",
+          "name": "TestApi_TestObject_MutationPayload",
+          "description": null,
           "fields": [
             {
               "name": "result",
-              "description": "The mutated object result",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject",
+                "name": "TestApi_TestObject",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "api",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TestApi_TestApi",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "TestApi_TestObject",
+          "description": "test object",
+          "fields": [
+            {
+              "name": "name",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "value",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Decimal",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "TestApi_EnObjectType",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "TestApi_TestObject_NodeMutationPayload",
+          "description": null,
+          "fields": [
+            {
+              "name": "deletedId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TestApi_TestObject_Node",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edge",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TestApi_TestObject_Edge",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -2115,16 +2375,40 @@
             },
             {
               "name": "errors",
-              "description": "The list of mutation errors",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "LIST",
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_ErrorDescription",
+                  "name": "TestApi_ErrorDescription",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "api",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TestApi_TestApi",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -2137,7 +2421,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Client_ErrorDescription",
+          "name": "TestApi_ErrorDescription",
           "description": "The mutation error description",
           "fields": [
             {
@@ -2172,8 +2456,8 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_Input",
-          "description": "",
+          "name": "TestApi_TestObject_Input",
+          "description": "test object",
           "fields": null,
           "inputFields": [
             {
@@ -2187,7 +2471,7 @@
               "defaultValue": null
             },
             {
-              "name": "uid",
+              "name": "id",
               "description": null,
               "type": {
                 "kind": "SCALAR",
@@ -2211,7 +2495,7 @@
               "description": null,
               "type": {
                 "kind": "ENUM",
-                "name": "ClusterKit_API_Tests_Mock_TestProvider_ClusterKit_API_Tests_Mock_TestObject_EnObjectType",
+                "name": "TestApi_EnObjectType",
                 "ofType": null
               },
               "defaultValue": null
@@ -3327,6 +3611,29 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "The node global searcher according to Relay specification",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "The node global id",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "Node",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -3405,7 +3712,7 @@
         {
           "kind": "OBJECT",
           "name": "TestApi_object_Connection",
-          "description": "The list of connected TestApi_object\n Some abstract object",
+          "description": "The list of connected TestApi_object_Node\n ",
           "fields": [
             {
               "name": "count",
@@ -3444,7 +3751,7 @@
         {
           "kind": "OBJECT",
           "name": "TestApi_object_Edge",
-          "description": "The TestApi_object in a connected list\n Some abstract object",
+          "description": "The TestApi_object_Node in a connected list\n ",
           "fields": [
             {
               "name": "cursor",
@@ -3460,11 +3767,11 @@
             },
             {
               "name": "node",
-              "description": "Some abstract object",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "TestApi_object",
+                "name": "TestApi_object_Node",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3478,8 +3785,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "TestApi_object",
-          "description": "Some abstract object",
+          "name": "TestApi_object_Node",
+          "description": null,
           "fields": [
             {
               "name": "uid",
@@ -3543,10 +3850,28 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "The node global id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -3563,7 +3888,7 @@
         {
           "kind": "INPUT_OBJECT",
           "name": "TestApi_object_Filter",
-          "description": "The filter conditions for a TestApi_object connected objects",
+          "description": "The filter conditions for a TestApi_object_Node connected objects",
           "fields": null,
           "inputFields": [
             {
@@ -3722,7 +4047,7 @@
         {
           "kind": "ENUM",
           "name": "TestApi_object_OrderByEnum",
-          "description": "The list of TestApi_object fields that can be used as sorting functions",
+          "description": "The list of TestApi_object_Node fields that can be used as sorting functions",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -3755,28 +4080,17 @@
           "possibleTypes": null
         },
         {
-          "kind": "OBJECT",
-          "name": "Mutations",
-          "description": "The list of all detected mutations",
+          "kind": "INTERFACE",
+          "name": "Node",
+          "description": "The Node interface as described in Relay documentation",
           "fields": [
             {
-              "name": "TestApi_objects_create",
-              "description": "creates a new object",
-              "args": [
-                {
-                  "name": "new",
-                  "description": "The new object data",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "TestApi_object_Input",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
+              "name": "id",
+              "description": "The node id",
+              "args": [],
               "type": {
-                "kind": "OBJECT",
-                "name": "TestApi_object",
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3784,52 +4098,23 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "TestApi_object_Node",
+              "ofType": null
+            }
+          ]
         },
         {
-          "kind": "INPUT_OBJECT",
-          "name": "TestApi_object_Input",
-          "description": "Some abstract object",
-          "fields": null,
-          "inputFields": [
-            {
-              "name": "uid",
-              "description": "The object unique identifier",
-              "type": {
-                "kind": "SCALAR",
-                "name": "Uid",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "name",
-              "description": "The object name",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "attributes",
-              "description": "The object attributes",
-              "type": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            }
-          ],
-          "interfaces": null,
+          "kind": "OBJECT",
+          "name": "Mutations",
+          "description": "The list of all detected mutations",
+          "fields": [],
+          "inputFields": null,
+          "interfaces": [],
           "enumValues": null,
           "possibleTypes": null
         }

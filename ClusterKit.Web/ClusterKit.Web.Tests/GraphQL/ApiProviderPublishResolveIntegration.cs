@@ -897,8 +897,14 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_nestedAsync_setName(name: ""hello world"") {
-                        name
+                    call: TestApi_nestedAsync_setName(name: ""hello world"", clientMutationId: ""test client id"") {
+                        result {
+                            name
+                        },
+                        clientMutationId,
+                        api {
+                            syncScalarField
+                        }
                     }
             }            
             ";
@@ -917,7 +923,13 @@ namespace ClusterKit.Web.Tests.GraphQL
                         {
                           ""data"": {
                             ""call"": {
-                                ""name"": ""hello world""
+                                ""result"": {
+                                    ""name"": ""hello world""
+                                },
+                                ""clientMutationId"": ""test client id"",
+                                ""api"": {
+                                    ""syncScalarField"": ""SyncScalarField""
+                                }
                             }
                           }
                         }";

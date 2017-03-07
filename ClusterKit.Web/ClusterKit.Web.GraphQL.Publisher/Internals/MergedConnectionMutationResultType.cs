@@ -141,6 +141,18 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Resolves data for node value
         /// </summary>
+        internal class ClientMutationIdIdResolver : IFieldResolver
+        {
+            /// <inheritdoc />
+            public object Resolve(ResolveFieldContext context)
+            {
+                return (context.Source as JObject)?.Property("clientMutationId")?.Value;
+            }
+        }
+
+        /// <summary>
+        /// Resolves data for node value
+        /// </summary>
         private class ResultNodeResolver : IFieldResolver
         {
             /// <summary>
@@ -206,18 +218,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             public object Resolve(ResolveFieldContext context)
             {
                 return ((context.Source as JObject)?.Property("result")?.Value as JObject)?.Property("deletedId")?.Value;
-            }
-        }
-
-        /// <summary>
-        /// Resolves data for node value
-        /// </summary>
-        private class ClientMutationIdIdResolver : IFieldResolver
-        {
-            /// <inheritdoc />
-            public object Resolve(ResolveFieldContext context)
-            {
-                return (context.Source as JObject)?.Property("clientMutationId")?.Value;
             }
         }
     }

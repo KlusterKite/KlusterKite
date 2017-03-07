@@ -167,12 +167,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// </returns>
             public object Resolve(ResolveFieldContext context)
             {
-                if (this.mergedField.Type is MergedConnectionMutationResultType)
+                var connectionMutationResultType = this.mergedField.Type as MergedConnectionMutationResultType;
+                if (connectionMutationResultType != null)
                 {
                     return this.DoConnectionMutationApiRequests(
                         context,
                         context.UserContext as RequestContext,
-                        (MergedConnectionMutationResultType)this.mergedField.Type);
+                        connectionMutationResultType);
+                }
+
+                var untypedMutationResultType = this.mergedField.Type as MergedUntypedMutationResult;
+                if (untypedMutationResultType != null)
+                {
+                    return this.DoUntypedMutationApiRequests(
+                        context,
+                        context.UserContext as RequestContext,
+                        untypedMutationResultType);
                 }
 
                 return this.DoApiRequests(context, context.UserContext as RequestContext);
@@ -263,7 +273,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     Fields = requestedFields
                 };
 
-                // todo: gather api request from all subvalues
                 var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
                 var path = data?.Property("__requestPath")?.Value as JArray;
                 var result = data?.Property("result")?.Value as JObject;
@@ -293,6 +302,47 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     }
                 }
 
+                data?.Add("clientMutationId", context.GetArgument<string>("clientMutationId"));
+                return data;
+            }
+
+            /// <summary>
+            /// Creates an api requests to gather all data
+            /// </summary>
+            /// <param name="context">
+            /// The request contexts
+            /// </param>
+            /// <param name="requestContext">
+            /// The request Context.
+            /// </param>
+            /// <param name="responseType">
+            /// The response type
+            /// </param>
+            /// <returns>
+            /// The request data
+            /// </returns>
+            private async Task<JObject> DoUntypedMutationApiRequests(
+                ResolveFieldContext context, 
+                RequestContext requestContext,
+                MergedUntypedMutationResult responseType)
+            {
+                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context).ToList();
+                var requestedFields = new List<ApiRequest>();
+                
+                // todo: resolve alias collisions
+                foreach (var topField in topFields.Where(f => f.Name == "result"))
+                {
+                    requestedFields.AddRange(responseType.OriginalReturnType.GatherSingleApiRequest(topField, context));
+                }
+
+                var request = new MutationApiRequest
+                {
+                    Arguments = context.FieldAst.Arguments.ToJson(),
+                    FieldName = this.mergedField.FieldName,
+                    Fields = requestedFields
+                };
+
+                var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
                 data?.Add("clientMutationId", context.GetArgument<string>("clientMutationId"));
                 return data;
             }

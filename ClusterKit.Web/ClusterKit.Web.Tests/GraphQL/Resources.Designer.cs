@@ -153,7 +153,8 @@ namespace ClusterKit.Web.Tests.GraphQL {
         ///          &quot;possibleTypes&quot;: null
         ///        },
         ///        {
-        ///          &quot;kind&quot;: &quot;SCALAR&quot;, [rest of string was truncated]&quot;;.
+        ///          &quot;kind&quot;: &quot;SCALAR&quot;,
+        ///          &quot;name&quot;: &quot;Bo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SchemaDescriptionTestSnapshot {
             get {

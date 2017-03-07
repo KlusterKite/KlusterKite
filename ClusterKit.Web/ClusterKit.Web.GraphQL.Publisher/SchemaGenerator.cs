@@ -159,7 +159,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             ApiMutation apiMutation,
             MergedApiRoot apiRoot)
         {
-            var returnType = CreateMergedType(provider, apiMutation, null, new List<string>(), false);
+            var returnType = (MergedObjectType)CreateMergedType(provider, apiMutation, null, new List<string>(), false);
             var arguments = apiMutation.Arguments.ToDictionary(
                 a => a.Name,
                 a =>
@@ -168,8 +168,15 @@ namespace ClusterKit.Web.GraphQL.Publisher
                         CreateMergedType(provider, a, null, new List<string>(), true),
                         apiMutation.Flags,
                         description: a.Description));
+            arguments["clientMutationId"] = new MergedField(
+                "clientMutationId",
+                new MergedScalarType(EnScalarType.String, new FieldProvider { Provider = provider }));
 
-            return new MergedField(apiMutation.Name, returnType, apiMutation.Flags, arguments, apiMutation.Description);
+            var payload = new MergedUntypedMutationResult(returnType, apiRoot, new FieldProvider { Provider = provider });
+
+            var untypedMutation = new MergedField(apiMutation.Name, payload, apiMutation.Flags, arguments, apiMutation.Description);
+
+            return untypedMutation;
         }
 
         /// <summary>
@@ -184,27 +191,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             ApiMutation apiMutation,
             MergedApiRoot apiRoot)
         {
-            var path = apiMutation.Name.Split('.').ToList();
-            path.RemoveAt(path.Count - 1);
-            MergedObjectType type = apiRoot;
-            MergedField field = null;
-            var queue = new Queue<string>(path);
-            while (queue.Count > 0)
-            {
-                if (type == null)
-                {
-                    return null;
-                }
-
-                var fieldName = queue.Dequeue();
-                if (!type.Fields.TryGetValue(fieldName, out field))
-                {
-                    return null;
-                }
-
-                type = field.Type as MergedObjectType;
-            }
-
+            var field = FindContainer(apiMutation, apiRoot);
             var connectionType = field?.Type as MergedConnectionType;
             if (connectionType == null)
             {
@@ -242,6 +229,38 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 new MergedScalarType(EnScalarType.String, new FieldProvider { Provider = provider }));
 
             return new MergedField(apiMutation.Name, returnType, apiMutation.Flags, arguments, apiMutation.Description);
+        }
+
+        /// <summary>
+        /// Searches current api for true mutation container
+        /// </summary>
+        /// <param name="apiMutation">The mutation</param>
+        /// <param name="apiRoot">The api root</param>
+        /// <returns>The mutation container</returns>
+        private static MergedField FindContainer(ApiMutation apiMutation, MergedApiRoot apiRoot)
+        {
+            var path = apiMutation.Name.Split('.').ToList();
+            path.RemoveAt(path.Count - 1);
+            MergedObjectType type = apiRoot;
+            MergedField field = null;
+            var queue = new Queue<string>(path);
+            while (queue.Count > 0)
+            {
+                if (type == null)
+                {
+                    return null;
+                }
+
+                var fieldName = queue.Dequeue();
+                if (!type.Fields.TryGetValue(fieldName, out field))
+                {
+                    return null;
+                }
+
+                type = field.Type as MergedObjectType;
+            }
+
+            return field;
         }
 
         /// <summary>

@@ -21,8 +21,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using ClusterKit.API.Client.Messages;
     using ClusterKit.Security.Client;
 
-    using Microsoft.Practices.ServiceLocation;
-
     using Newtonsoft.Json.Linq;
 
     /// <summary>
