@@ -76,7 +76,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             Field contextFieldAst,
             ResolveFieldContext context)
         {
-            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context))
+            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName))
             {
                 switch (field.Name)
                 {
@@ -86,7 +86,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     case "edges":
                         {
                             var nodeSelection =
-                                GetRequestedFields(field.SelectionSet, context)
+                                GetRequestedFields(field.SelectionSet, context, this.ElementType.ComplexTypeName)
                                     .FirstOrDefault(f => f.Name == "node");
 
                             var fields = nodeSelection != null

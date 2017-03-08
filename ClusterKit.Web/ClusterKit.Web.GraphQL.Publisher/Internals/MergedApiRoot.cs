@@ -210,7 +210,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var nodeType = responseType.EdgeType.ObjectType;
                 List<ApiRequest> requestedFields = new List<ApiRequest>();
 
-                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context).ToList();
+                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type.ComplexTypeName).ToList();
 
                 var nodeRequests = topFields.Where(f => f.Name == "node" || f.Name == "edge" || f.Name == "deletedId").ToList();
                 if (nodeRequests.Count > 0)
@@ -326,7 +326,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 RequestContext requestContext,
                 MergedUntypedMutationResult responseType)
             {
-                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context).ToList();
+                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type.ComplexTypeName).ToList();
                 var requestedFields = new List<ApiRequest>();
                 
                 // todo: resolve alias collisions

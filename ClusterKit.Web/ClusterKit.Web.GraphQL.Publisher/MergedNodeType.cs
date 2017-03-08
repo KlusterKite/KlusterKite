@@ -164,7 +164,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             }
 
             if (requests.All(r => r.FieldName != this.KeyName)
-                && GetRequestedFields(contextFieldAst.SelectionSet, context).Any(f => f.Name == "id"))
+                && GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName).Any(f => f.Name == "id"))
             {
                 requests.Add(new ApiRequest { FieldName = this.KeyName });
             }

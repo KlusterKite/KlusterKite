@@ -64,38 +64,45 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public abstract IEnumerable<FieldProvider> Providers { get; }
 
         /// <summary>
-        /// Gets the list of requested fields from parent <seealso cref="Field"/>
+        /// Gets the list of requested fields from parent 
+        /// <seealso cref="Field"/>
         /// </summary>
-        /// <param name="selectionSet">The parent field selection set</param>
-        /// <param name="context">The request context</param>
-        /// <returns>The list of fields</returns>
-        public static IEnumerable<Field> GetRequestedFields(SelectionSet selectionSet, ResolveFieldContext context)
+        /// <param name="selectionSet">
+        /// The parent field selection set
+        /// </param>
+        /// <param name="context">
+        /// The request context
+        /// </param>
+        /// <param name="currentTypeName">
+        /// The current type name.
+        /// </param>
+        /// <returns>
+        /// The list of fields
+        /// </returns>
+        public static IEnumerable<Field> GetRequestedFields(SelectionSet selectionSet, ResolveFieldContext context, string currentTypeName)
         {
-
             var directFields = selectionSet.Selections.OfType<Field>();
             foreach (var field in directFields)
             {
                 yield return field;
             }
 
-            // todo: check type conditions
-            var inlineFragments = selectionSet.Selections.OfType<InlineFragment>();
+            var inlineFragments = selectionSet.Selections.OfType<InlineFragment>().Where(f => f.Type.Name == currentTypeName);
             foreach (var fragment in inlineFragments)
             {
-                foreach (var field in GetRequestedFields(fragment.SelectionSet, context))
+                foreach (var field in GetRequestedFields(fragment.SelectionSet, context, currentTypeName))
                 {
                     yield return field;
                 }
             }
-            
 
             var fragmentsUsed =
                 selectionSet.Selections.OfType<FragmentSpread>()
-                    .Select(fs => context.Fragments.FindDefinition(fs.Name));
+                    .Select(fs => context.Fragments.FindDefinition(fs.Name)).Where(f => f.Type.Name == currentTypeName);
 
             foreach (var fragment in fragmentsUsed)
             {
-                foreach (var field in GetRequestedFields(fragment.SelectionSet, context))
+                foreach (var field in GetRequestedFields(fragment.SelectionSet, context, currentTypeName))
                 {
                     yield return field;
                 }
