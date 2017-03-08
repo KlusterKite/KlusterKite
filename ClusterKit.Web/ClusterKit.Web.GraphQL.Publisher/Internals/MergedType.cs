@@ -71,11 +71,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The list of fields</returns>
         public static IEnumerable<Field> GetRequestedFields(SelectionSet selectionSet, ResolveFieldContext context)
         {
+
             var directFields = selectionSet.Selections.OfType<Field>();
             foreach (var field in directFields)
             {
                 yield return field;
             }
+
+            // todo: check type conditions
+            var inlineFragments = selectionSet.Selections.OfType<InlineFragment>();
+            foreach (var fragment in inlineFragments)
+            {
+                foreach (var field in GetRequestedFields(fragment.SelectionSet, context))
+                {
+                    yield return field;
+                }
+            }
+            
 
             var fragmentsUsed =
                 selectionSet.Selections.OfType<FragmentSpread>()

@@ -1,12 +1,1 @@
-﻿Сергей Пуриков, [07.03.17 12:07]
-query RoutesList {
-  node(id: "{\"p\":[{\"f\":\"nodeManagerData\",\"a\":{}},{\"f\":\"nugetFeeds\"}],\"api\":\"ClusterKitNodeApi\",\"id\":1}"){
-    id
-    ...on ClusterKitNodeApi_ClusterKitNugetFeed_Node {
-      address
-      type
-    }
-  }
-}
-
--------------------------------
+﻿
