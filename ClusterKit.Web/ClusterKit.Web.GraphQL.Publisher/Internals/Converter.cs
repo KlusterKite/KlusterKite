@@ -16,7 +16,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Language.AST;
     using global::GraphQL.Types;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
