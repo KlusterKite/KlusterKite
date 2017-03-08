@@ -55,7 +55,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 var request = new ApiRequest
                                   {
-                                      Arguments = field.Arguments.ToJson(),
+                                      Arguments = field.Arguments.ToJson(context),
                                       FieldName = field.Name,
                                       Alias = field.Alias,
                                       Fields = localField.Type.GatherSingleApiRequest(field, context).ToList()

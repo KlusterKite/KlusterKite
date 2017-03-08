@@ -14,7 +14,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using Akka;
 
     using global::GraphQL.Language.AST;
+    using global::GraphQL.Types;
 
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -25,14 +27,21 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Converts arguments to JSON object
         /// </summary>
-        /// <param name="arguments">Arguments list</param>
-        /// <returns>The corresponding JSON</returns>
-        public static JObject ToJson(this Arguments arguments)
+        /// <param name="arguments">
+        /// Arguments list
+        /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <returns>
+        /// The corresponding JSON
+        /// </returns>
+        public static JObject ToJson(this Arguments arguments, ResolveFieldContext context)
         {
             var result = new JObject();
             foreach (var argument in arguments)
             {
-                var value = ToJson(argument.Value);
+                var value = ToJson(argument.Value, context);
                 result.Add(argument.Name, value);
             }
 
@@ -45,15 +54,18 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="objectValue">
         /// The object value.
         /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
         /// <returns>
         /// The <see cref="JToken"/>.
         /// </returns>
-        private static JToken ToJson(ObjectValue objectValue)
+        private static JToken ToJson(ObjectValue objectValue, ResolveFieldContext context)
         {
             var result = new JObject();
             foreach (var field in objectValue.ObjectFields)
             {
-                var value = ToJson(field.Value);
+                var value = ToJson(field.Value, context);
                 result.Add(field.Name, value);
             }
 
@@ -66,12 +78,21 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="value">
         /// The abstract value.
         /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
         /// <returns>
         /// The <see cref="JToken"/>.
         /// </returns>
-        private static JToken ToJson(IValue value)
+        private static JToken ToJson(IValue value, ResolveFieldContext context)
         {
             return value.Match<JToken>()
+                    .With<VariableReference>(r =>
+                    {
+                        var variableValue = context.Variables.ValueFor(r.Name);
+                        var token = JToken.FromObject(variableValue);
+                        return token;
+                    })
                     .With<IntValue>(v => new JValue(v.Value))
                     .With<FloatValue>(v => new JValue(v.Value))
                     .With<StringValue>(v => new JValue(v.Value))
@@ -80,8 +101,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     .With<BooleanValue>(v => new JValue(v.Value))
                     .With<LongValue>(v => new JValue(v.Value))
                     .With<EnumValue>(v => new JValue(v.Name))
-                    .With<ListValue>(v => new JArray(v.Values.Select(ToJson)))
-                    .With<ObjectValue>(ToJson)
+                    .With<ListValue>(v => new JArray(v.Values.Select(sv => ToJson(sv, context))))
+                    .With<ObjectValue>(sv => ToJson(sv, context))
                     .ResultOrDefault(v => null);
         }
     }

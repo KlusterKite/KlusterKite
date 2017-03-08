@@ -885,6 +885,67 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task VariablesRequestTest()
+        {
+            var internalApiProvider = new API.Tests.Mock.TestProvider();
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var query = @"
+            query Request($intArg: Int, $stringArg: String, $intArrayArg: [Int], $objArg: TestApi_NestedProvider_Input){                
+                api {
+                    syncScalarMethod(intArg: $intArg, stringArg: $stringArg, objArg: $objArg),
+                    asyncObjectMethod(intArg: $intArg, stringArg: $stringArg, intArrayArg: $intArrayArg, objArg: $objArg) {
+                        syncScalarField,
+                        asyncScalarField
+                    },
+                }
+            }
+            ";
+
+            var variables = @"
+            {
+                ""intArg"": 1,
+                ""stringArg"": ""test"",
+                ""objArg"": { ""syncScalarField"": ""nested test"" },
+                ""intArrayArg"": [7, 8, 9]
+            }
+            ";
+
+            var inputs = variables.ToInputs();
+
+            Action<ExecutionOptions> configure = r =>
+                {
+                    r.Schema = schema;
+                    r.Query = query;
+                    r.Inputs = inputs;
+                    r.UserContext = new RequestContext();
+                };
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             configure).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""syncScalarMethod"": ""ok"",
+                              ""asyncObjectMethod"": {
+                                ""syncScalarField"": ""returned type"",
+                                ""asyncScalarField"": ""AsyncScalarField""
+                              }
+                            }
+                          }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing call of simple mutation
         /// </summary>
         /// <returns>Async task</returns>

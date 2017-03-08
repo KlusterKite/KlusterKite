@@ -268,7 +268,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 var request = new MutationApiRequest
                 {
-                    Arguments = context.FieldAst.Arguments.ToJson(),
+                    Arguments = context.FieldAst.Arguments.ToJson(context),
                     FieldName = this.mergedField.FieldName,
                     Fields = requestedFields
                 };
@@ -337,7 +337,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 var request = new MutationApiRequest
                 {
-                    Arguments = context.FieldAst.Arguments.ToJson(),
+                    Arguments = context.FieldAst.Arguments.ToJson(context),
                     FieldName = this.mergedField.FieldName,
                     Fields = requestedFields
                 };
@@ -363,7 +363,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 var request = new MutationApiRequest
                                   {
-                                      Arguments = context.FieldAst.Arguments.ToJson(),
+                                      Arguments = context.FieldAst.Arguments.ToJson(context),
                                       FieldName = this.mergedField.FieldName,
                                       Fields =
                                           this.mergedField.Type.GatherSingleApiRequest(

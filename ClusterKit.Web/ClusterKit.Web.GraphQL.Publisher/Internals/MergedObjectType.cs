@@ -143,7 +143,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 var request = new ApiRequest
                 {
-                    Arguments = usedField.Ast.Arguments.ToJson(),
+                    Arguments = usedField.Ast.Arguments.ToJson(context),
                     Alias = usedField.Ast.Alias,
                     FieldName = usedField.Ast.Name
                 };
