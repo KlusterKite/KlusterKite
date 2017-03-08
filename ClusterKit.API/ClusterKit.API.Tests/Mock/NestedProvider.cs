@@ -11,6 +11,7 @@ namespace ClusterKit.API.Tests.Mock
 {
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
 
     using JetBrains.Annotations;
@@ -46,6 +47,18 @@ namespace ClusterKit.API.Tests.Mock
         public TestObject SetName(string name)
         {
             return new TestObject { Name = name };
+        }
+
+        /// <summary>
+        /// Test nested mutation
+        /// </summary>
+        /// <param name="name">The new name of current test object</param>
+        /// <returns>Test object after mutation</returns>
+        [DeclareMutation]
+        [UsedImplicitly]
+        public MutationResult<bool> Check(string name)
+        {
+            return new MutationResult<bool> { Result = true };
         }
     }
 }

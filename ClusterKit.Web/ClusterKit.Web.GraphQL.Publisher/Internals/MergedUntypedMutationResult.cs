@@ -68,7 +68,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string Description => this.OriginalReturnType.Description;
 
         /// <inheritdoc />
-        public override string ComplexTypeName => $"{this.OriginalTypeName}_MutationPayload";
+        public override string ComplexTypeName => $"{EscapeName(this.OriginalTypeName)}_MutationPayload";
 
         /// <summary>
         /// Gets the original return type
