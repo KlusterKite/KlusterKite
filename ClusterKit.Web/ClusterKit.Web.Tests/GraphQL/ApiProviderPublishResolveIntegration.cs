@@ -1193,6 +1193,74 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         /// <returns>Async task</returns>
         [Fact]
+        public async Task NodeQueryWithVariableTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d1"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"
+            query ($id: ID){ 
+                node(id: $id) {
+                    ...F0
+                }            
+            }
+
+            fragment F0 on TestApi_TestObject_Node {
+                __id,
+                id,
+                name,
+                value
+            }            
+            ";
+
+            var variables = @"
+            {
+                ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}""
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                                 r.Inputs = variables.ToInputs();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = @"
+                            {
+                              ""data"": {
+                                ""node"": {
+                                  ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                  ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                  ""name"": ""1-test"",
+                                  ""value"": 100.0
+                                }
+                              }
+                            }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
         public async Task MethodsRequestTest()
         {
             var internalApiProvider = new API.Tests.Mock.TestProvider();

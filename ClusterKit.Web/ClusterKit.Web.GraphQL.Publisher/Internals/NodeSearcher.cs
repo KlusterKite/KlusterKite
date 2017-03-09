@@ -68,7 +68,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The searched node</returns>
         private async Task<JObject> SearchNode(ResolveFieldContext context)
         {
-            var serializedId = (context.FieldAst.Arguments.ValueFor("id") as StringValue)?.Value;
+            var arguments = context.FieldAst.Arguments.ToJson(context);
+            var serializedId = arguments?.Property("id")?.Value?.ToObject<string>();
             if (string.IsNullOrWhiteSpace(serializedId))
             {
                 return null;
