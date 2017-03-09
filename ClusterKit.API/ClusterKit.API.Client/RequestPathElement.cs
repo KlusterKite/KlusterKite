@@ -21,6 +21,11 @@ namespace ClusterKit.API.Client
     public class RequestPathElement
     {
         /// <summary>
+        /// The field argument list
+        /// </summary>
+        private JObject arguments;
+
+        /// <summary>
         /// Gets or sets the field name
         /// </summary>
         [JsonProperty("f")]
@@ -32,7 +37,18 @@ namespace ClusterKit.API.Client
         /// </summary>
         [JsonProperty("a")]
         [UsedImplicitly]
-        public JObject Arguments { get; set; }
+        public JObject Arguments
+        {
+            get
+            {
+                return this.arguments;
+            }
+
+            set
+            {
+                this.arguments = value != null && value.HasValues ? value : null;
+            }
+        }
 
         /// <summary>
         /// Converts path element to the api request

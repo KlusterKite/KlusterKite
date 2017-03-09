@@ -242,10 +242,25 @@ namespace ClusterKit.API.Provider
                 type = asyncType.GenericTypeArguments[0];
             }
 
+            var converter = (attribute as DeclareFieldAttribute)?.Converter;
             if (attribute.ReturnType != null)
             {
                 type = attribute.ReturnType;
                 metadata.IsForwarding = true;
+            }
+            else if (converter != null)
+            {
+                var valueConverter =
+                    converter
+                        .GetInterfaces()
+                        .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueConverter<>));
+                if (valueConverter == null)
+                {
+                    throw new InvalidOperationException($"Converter {converter.FullName} should implement the IValueConverter<>");
+                }
+
+                type = valueConverter.GenericTypeArguments[0];
+                metadata.ConverterType = converter;
             }
 
             var scalarType = TypeMetadata.CheckScalarType(type);
@@ -524,7 +539,7 @@ namespace ClusterKit.API.Provider
                 flags |= EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable;
             }
 
-            if (!metadata.IsAsync && !metadata.IsForwarding && property.CanWrite
+            if (!metadata.IsAsync && !metadata.IsForwarding && metadata.ConverterType == null && property.CanWrite
                 && metadata.MetaType != TypeMetadata.EnMetaType.Connection)
             {
                 flags |= EnFieldFlags.CanBeUsedInInput;

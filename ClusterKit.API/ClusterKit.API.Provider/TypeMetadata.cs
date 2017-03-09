@@ -72,6 +72,11 @@ namespace ClusterKit.API.Provider
         public Type Type { get; set; }
 
         /// <summary>
+        /// Gets or sets the converter type
+        /// </summary>
+        public Type ConverterType { get; set; }
+
+        /// <summary>
         /// Gets or sets the type of node if for connections
         /// </summary>
         public Type TypeOfId { get; set; }

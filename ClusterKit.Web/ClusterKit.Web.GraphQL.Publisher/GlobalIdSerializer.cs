@@ -50,29 +50,36 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <returns>Unpacked global id as string</returns>
         public static string UnpackGlobalId(this string packed)
         {
-            var zipped = System.Convert.FromBase64String(packed);
-            using (var memIn = new MemoryStream())
+            try
             {
-                memIn.Write(zipped, 0, zipped.Length);
-                memIn.Position = 0;
-
-                const int BufferSize = 4096;
-                byte[] buffer = new byte[BufferSize];
-                using (var memOut = new MemoryStream())
-                using (var zip = new GZipStream(memIn, CompressionMode.Decompress))
+                var zipped = System.Convert.FromBase64String(packed);
+                using (var memIn = new MemoryStream())
                 {
-                    int count;
-                    do
+                    memIn.Write(zipped, 0, zipped.Length);
+                    memIn.Position = 0;
+
+                    const int BufferSize = 4096;
+                    byte[] buffer = new byte[BufferSize];
+                    using (var memOut = new MemoryStream())
+                    using (var zip = new GZipStream(memIn, CompressionMode.Decompress))
                     {
-                        count = zip.Read(buffer, 0, BufferSize);
-                        if (count > 0)
+                        int count;
+                        do
                         {
-                            memOut.Write(buffer, 0, count);
+                            count = zip.Read(buffer, 0, BufferSize);
+                            if (count > 0)
+                            {
+                                memOut.Write(buffer, 0, count);
+                            }
                         }
+                        while (count > 0);
+                        return Encoding.UTF8.GetString(memOut.ToArray());
                     }
-                    while (count > 0);
-                    return Encoding.UTF8.GetString(memOut.ToArray());
                 }
+            }
+            catch
+            {
+                return null;
             }
         }
     }

@@ -199,7 +199,6 @@ namespace ClusterKit.API.Provider
                 case TypeMetadata.EnMetaType.Array:
                     return $"var resolver = new CollectionResolver({endTypeResolver});";
                 case TypeMetadata.EnMetaType.Connection:
-                    // todo: generate connection resolver
                     return $"var resolver = {endTypeResolver};";
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -247,12 +246,15 @@ namespace ClusterKit.API.Provider
                 parameterIndex++;
             }
 
+            var execution = $@" {@await} source.{method.Name}({string.Join(", ",
+                Enumerable.Range(0, method.GetParameters().Length).Select(n => $"arg{n}"))})";
+            var acquirement = metadata.ConverterType == null
+                ? $"var fieldValue = {execution};"
+                : $"var fieldValue = new {ToCSharpRepresentation(metadata.ConverterType)}().Convert({execution});";
             return $@"
                 JObject arguments = request.Arguments;
                 {string.Join("\r\n", codeCommands)}
-                var fieldValue = {@await} source.{method.Name}({string.Join(
-                ", ",
-                Enumerable.Range(0, method.GetParameters().Length).Select(n => $"arg{n}"))});
+                {acquirement}
             ";
         }
 
@@ -265,7 +267,10 @@ namespace ClusterKit.API.Provider
         protected string GenerateResultSourceFromPropertyAcquirement(TypeMetadata metadata, PropertyInfo property)
         {
             var await = metadata.IsAsync ? "await" : string.Empty;
-            return $"var fieldValue = {@await} source.{property.Name};";
+            var acquirement = metadata.ConverterType == null
+                                  ? $"var fieldValue = {@await} source.{property.Name};"
+                                  : $"var fieldValue = new {ToCSharpRepresentation(metadata.ConverterType)}().Convert({@await} source.{property.Name});";
+            return acquirement;
         }
     }
 }

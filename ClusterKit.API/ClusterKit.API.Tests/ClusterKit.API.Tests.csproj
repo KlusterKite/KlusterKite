@@ -222,6 +222,7 @@
     <Compile Include="Mock\TestObject.cs" />
     <Compile Include="Mock\TestObjectConnection.cs" />
     <Compile Include="Mock\TestProvider.cs" />
+    <Compile Include="Mock\ThirdPartyObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

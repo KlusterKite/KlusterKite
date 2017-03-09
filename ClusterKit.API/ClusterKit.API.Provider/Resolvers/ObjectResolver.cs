@@ -137,7 +137,7 @@ namespace ClusterKit.API.Provider.Resolvers
             if (request.FieldName != null)
             {
                 var requestDescription = new JObject { { "f", request.FieldName } };
-                if (request.Arguments != null)
+                if (request.Arguments?.Json != null && request.Arguments.Json.HasValues)
                 {
                     requestDescription.Add("a", request.Arguments);
                 }

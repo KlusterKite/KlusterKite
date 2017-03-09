@@ -579,6 +579,49 @@ namespace ClusterKit.API.Tests
         }
 
         /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task ConverterTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "thirdParty" } };
+
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("thirdParty"));
+            Assert.Equal("Third party", result.Property("thirdParty").ToObject<string>());
+        }
+
+        /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task ConverterListTest()
+        {
+            var provider = this.GetProvider();
+            provider.ThirdParties = new List<ThirdPartyObject>
+                                        {
+                                            new ThirdPartyObject("test1"),
+                                            new ThirdPartyObject("test2")
+                                        };
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "thirdParties" } };
+
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("thirdParties"));
+            Assert.Equal(
+                "test1, test2", 
+                string.Join(", ", result.Property("thirdParties").Value.ToObject<string[]>()));
+        }
+
+        /// <summary>
         /// Testing sync scalar enum field
         /// </summary>
         /// <returns>The async task</returns>

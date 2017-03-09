@@ -16,6 +16,7 @@ namespace ClusterKit.API.Tests.Mock
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Client.Converters;
     using ClusterKit.API.Provider;
     using ClusterKit.Security.Client;
 
@@ -177,6 +178,20 @@ namespace ClusterKit.API.Tests.Mock
         [DeclareField]
         [UsedImplicitly]
         public EnFlags SyncFlagsField => EnFlags.FlagsItem1;
+
+        /// <summary>
+        /// Gets or sets the third party object
+        /// </summary>
+        [DeclareField(Converter = typeof(StringConverter))]
+        [UsedImplicitly]
+        public ThirdPartyObject ThirdParty { get; set; } = new ThirdPartyObject { Contents = "Third party" };
+
+        /// <summary>
+        /// Gets or sets the list of third party objects
+        /// </summary>
+        [DeclareField(Converter = typeof(ArrayConverter<StringConverter, string>))]
+        [UsedImplicitly]
+        public List<ThirdPartyObject> ThirdParties { get; set; }
 
         /// <summary>
         /// Some public method

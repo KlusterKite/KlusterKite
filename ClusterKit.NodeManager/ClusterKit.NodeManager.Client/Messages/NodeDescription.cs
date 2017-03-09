@@ -15,6 +15,8 @@ namespace ClusterKit.NodeManager.Client.Messages
     using Akka.Actor;
 
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Client.Converters;
+    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
@@ -60,13 +62,15 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// <summary>
         /// Gets or sets the list of descriptions of installed modules
         /// </summary>
-        /// TODO: set up api surrogates
+        [DeclareField(
+            Description = "The list of descriptions of installed modules", 
+            Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
         public List<PackageDescription> Modules { get; set; }
 
         /// <summary>
         /// Gets or sets node's address
         /// </summary>
-        /// TODO: set up api surrogates
+        [DeclareField(Description = "The node's address", Converter = typeof(AkkaAddressSurrogate.Converter))]
         public Address NodeAddress { get; set; }
 
         /// <summary>

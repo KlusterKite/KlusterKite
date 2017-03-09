@@ -21,5 +21,13 @@ namespace ClusterKit.API.Client.Attributes
         /// Gets or sets a value indicating whether current property is entity identification key.
         /// </summary>
         public bool IsKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the converter type. It will be used to transfer property / method value to the API representable values
+        /// </summary>
+        /// <remarks>
+        /// Only implementations of <see cref="IValueConverter{T}"/> can be used
+        /// </remarks>
+        public Type Converter { get; set; }
     }
 }

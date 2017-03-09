@@ -168,6 +168,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiSurrogates\AkkaAddressSurrogate.cs" />
+    <Compile Include="ApiSurrogates\PackageDescriptionSurrogate.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
