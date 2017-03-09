@@ -155,7 +155,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       {
                                         ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                         ""node"": {
-                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                          ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                           ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                           ""name"": ""3-test"",
                                           ""value"": 50.0
@@ -164,7 +164,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       {
                                         ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                         ""node"": {
-                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
+                                          ""id"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
                                           ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                           ""name"": ""4-test"",
                                           ""value"": 70.0
@@ -173,7 +173,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     ]
                                   }
                                 }
-                              }";
+                              }
+                            }
+                            ";
              Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -279,72 +281,72 @@ namespace ClusterKit.Web.Tests.GraphQL
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             var expectedResult = @"
-                                {
-                                  ""data"": {
-                                    ""api"": {
-                                      ""list"": {
-                                        ""total"": 4,
-                                        ""total2"": 4,
-                                        ""items"": [
-                                          {
-                                            ""location"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                            ""location2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                            ""item"": {
-                                              ""globalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
-                                              ""naming"": ""3-test""
-                                            },
-                                            ""item2"": {
-                                              ""id2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                              ""v2"": 50.0
-                                            }
-                                          },
-                                          {
-                                            ""location"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                            ""location2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                            ""item"": {
-                                              ""globalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
-                                              ""naming"": ""4-test""
-                                            },
-                                            ""item2"": {
-                                              ""id2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                              ""v2"": 70.0
-                                            }
+                                    {
+                                      ""data"": {
+                                        ""api"": {
+                                          ""list"": {
+                                            ""total"": 4,
+                                            ""total2"": 4,
+                                            ""items"": [
+                                              {
+                                                ""location"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                                ""location2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                                ""item"": {
+                                                  ""globalId"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
+                                                  ""naming"": ""3-test""
+                                                },
+                                                ""item2"": {
+                                                  ""id2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                                  ""v2"": 50.0
+                                                }
+                                              },
+                                              {
+                                                ""location"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                                ""location2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                                ""item"": {
+                                                  ""globalId"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
+                                                  ""naming"": ""4-test""
+                                                },
+                                                ""item2"": {
+                                                  ""id2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                                  ""v2"": 70.0
+                                                }
+                                              }
+                                            ],
+                                            ""items2"": [
+                                              {
+                                                ""location"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                                ""location2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                                ""item"": {
+                                                  ""type"": ""Good""
+                                                },
+                                                ""item2"": {
+                                                  ""globalId2"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
+                                                  ""id2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                                  ""naming2"": ""3-test"",
+                                                  ""v2"": 50.0,
+                                                  ""type"": ""Good""
+                                                }
+                                              },
+                                              {
+                                                ""location"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                                ""location2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                                ""item"": {
+                                                  ""type"": ""Good""
+                                                },
+                                                ""item2"": {
+                                                  ""globalId2"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
+                                                  ""id2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                                  ""naming2"": ""4-test"",
+                                                  ""v2"": 70.0,
+                                                  ""type"": ""Good""
+                                                }
+                                              }
+                                            ]
                                           }
-                                        ],
-                                        ""items2"": [
-                                          {
-                                            ""location"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                            ""location2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                            ""item"": {
-                                              ""type"": ""Good""
-                                            },
-                                            ""item2"": {
-                                              ""globalId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
-                                              ""id2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                              ""naming2"": ""3-test"",
-                                              ""v2"": 50.0,
-                                              ""type"": ""Good""
-                                            }
-                                          },
-                                          {
-                                            ""location"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                            ""location2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                            ""item"": {
-                                              ""type"": ""Good""
-                                            },
-                                            ""item2"": {
-                                              ""globalId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
-                                              ""id2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                              ""naming2"": ""4-test"",
-                                              ""v2"": 70.0,
-                                              ""type"": ""Good""
-                                            }
-                                          }
-                                        ]
+                                        }
                                       }
                                     }
-                                  }
-                                }
                                 ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
@@ -458,7 +460,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                         ""call"": {
                                           ""clientMutationId"": ""testClientMutationId"",
                                           ""node"": {
-                                            ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                            ""id"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
                                             ""__id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                             ""name"": ""hello world"",
                                             ""value"": 13.0
@@ -466,7 +468,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                           ""edge"": {
                                             ""cursor"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                             ""node"": {
-                                              ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                              ""id"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
                                               ""__id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                               ""name"": ""hello world"",
                                               ""value"": 13.0
@@ -480,7 +482,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 {
                                                   ""cursor"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                                   ""node"": {
-                                                    ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                                    ""id"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
                                                     ""__id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                                     ""name"": ""hello world"",
                                                     ""value"": 13.0
@@ -491,7 +493,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                                           }
                                         }
                                       }
-                                    }";
+                                    }
+                                    ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -616,62 +619,63 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.output.WriteLine(response);
 
             var expectedResult = @"
-                                {
-                                  ""data"": {
-                                    ""call"": {
-                                      ""mutationId"": ""testClientMutationId"",
-                                      ""nodeElement"": {
-                                        ""globalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                        ""realId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                        ""elementName"": ""hello world"",
-                                        ""value"": 13.0
-                                      },
-                                      ""nodeElement2"": {
-                                        ""globalId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                        ""realId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                        ""elementName2"": ""hello world"",
-                                        ""value"": 13.0
-                                      },
-                                      ""edgeObject"": {
-                                        ""id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                        ""object"": {
-                                          ""longId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                          ""edgeName"": ""hello world""
-                                        },
-                                        ""object2"": {
-                                          ""shortId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                          ""value"": 13.0
-                                        }
-                                      },
-                                      ""edgeObject2"": {
-                                        ""id2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                        ""object2"": {
-                                          ""longId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                          ""shortId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                          ""edgeName2"": ""hello world"",
-                                          ""value"": 13.0
-                                        }
-                                      },
-                                      ""removedId"": null,
-                                      ""root"": {
-                                        ""apiObjects"": {
-                                          ""total"": 1,
-                                          ""list"": [
-                                            {
-                                              ""itemId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                              ""element"": {
-                                                ""elementGlobalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                                ""elementId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                                ""elementName"": ""hello world"",
-                                                ""elementValue"": 13.0
-                                              }
+                                    {
+                                      ""data"": {
+                                        ""call"": {
+                                          ""mutationId"": ""testClientMutationId"",
+                                          ""nodeElement"": {
+                                            ""globalId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                            ""realId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                            ""elementName"": ""hello world"",
+                                            ""value"": 13.0
+                                          },
+                                          ""nodeElement2"": {
+                                            ""globalId2"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                            ""realId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                            ""elementName2"": ""hello world"",
+                                            ""value"": 13.0
+                                          },
+                                          ""edgeObject"": {
+                                            ""id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                            ""object"": {
+                                              ""longId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                              ""edgeName"": ""hello world""
+                                            },
+                                            ""object2"": {
+                                              ""shortId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                              ""value"": 13.0
                                             }
-                                          ]
+                                          },
+                                          ""edgeObject2"": {
+                                            ""id2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                            ""object2"": {
+                                              ""longId2"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                              ""shortId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                              ""edgeName2"": ""hello world"",
+                                              ""value"": 13.0
+                                            }
+                                          },
+                                          ""removedId"": null,
+                                          ""root"": {
+                                            ""apiObjects"": {
+                                              ""total"": 1,
+                                              ""list"": [
+                                                {
+                                                  ""itemId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                                  ""element"": {
+                                                    ""elementGlobalId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                                    ""elementId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                                    ""elementName"": ""hello world"",
+                                                    ""elementValue"": 13.0
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
                                         }
                                       }
                                     }
-                                  }
-                                }";
+                                    ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -782,7 +786,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                   ""data"": {
                                     ""call"": {
                                       ""node"": {
-                                        ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3beee369-11df-4a30-bf11-1d8465c87110\""}"",
+                                        ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhImKKKde7AzFnyGhAZItCPsXbp7bkfDcXckHAi1FA5frgXjEXAtz3nx+52zBHKc1J6ZtdklUUxycVpJn4gkRbuYNdiNSGH8PdZUnlYAAAA="",
                                         ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
                                         ""name"": ""1-test"",
                                         ""value"": 100.0
@@ -790,13 +794,13 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       ""edge"": {
                                         ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
                                         ""node"": {
-                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3beee369-11df-4a30-bf11-1d8465c87110\""}"",
+                                          ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhImKKKde7AzFnyGhAZItCPsXbp7bkfDcXckHAi1FA5frgXjEXAtz3nx+52zBHKc1J6ZtdklUUxycVpJn4gkRbuYNdiNSGH8PdZUnlYAAAA="",
                                           ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
                                           ""name"": ""1-test"",
                                           ""value"": 100.0
                                         }
                                       },
-                                      ""deletedId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""\\\""3beee369-11df-4a30-bf11-1d8465c87110\\\""\""}"",
+                                      ""deletedId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8WhI2KCqdd7ATC4QloUES6Qh3l27eNBSYqyHCwL85s6/pzej3BFfSmCd/9Rg1IYVBC/Uws9K7IApRzE5J8UQiQWGb9eK3lUhaoP+q2DHnWgAAAA=="",
                                       ""api"": {
                                         ""connection"": {
                                           ""count"": 4,
@@ -804,7 +808,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             {
                                               ""cursor"": ""f0607502-5b77-4a3c-9142-e6197a7ee61e"",
                                               ""node"": {
-                                                ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""f0607502-5b77-4a3c-9142-e6197a7ee61e\""}"",
+                                                ""id"": ""H4sIAAAAAAAEAA2IOw6AIBAF7/JqNwEFNtp5BztjgbgkNEAiHfHuUs2no2I7OyI2hJKzhJZKxndN8DWNecjb9mET0jMyKqfYqpnszUzGL4FWbWYSp1f2LIOC7wdhM18gVgAAAA=="",
                                                 ""__id"": ""f0607502-5b77-4a3c-9142-e6197a7ee61e"",
                                                 ""name"": ""5-test"",
                                                 ""value"": 6.0
@@ -813,7 +817,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             {
                                               ""cursor"": ""b500ca20-f649-4dcd-bda8-1fa5031ecdd3"",
                                               ""node"": {
-                                                ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""b500ca20-f649-4dcd-bda8-1fa5031ecdd3\""}"",
+                                                ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlAbpKpgUFyopGBbpqZiaWuSUpyim5SSqKFrmFaoqmBsWFqckqKsVItAKGn6lFWAAAA"",
                                                 ""__id"": ""b500ca20-f649-4dcd-bda8-1fa5031ecdd3"",
                                                 ""name"": ""2-test"",
                                                 ""value"": 50.0
@@ -822,7 +826,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             {
                                               ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                               ""node"": {
-                                                ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                                ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                                 ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                                 ""name"": ""3-test"",
                                                 ""value"": 50.0
@@ -831,7 +835,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             {
                                               ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                               ""node"": {
-                                                ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
+                                                ""id"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
                                                 ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                                 ""name"": ""4-test"",
                                                 ""value"": 70.0
@@ -949,44 +953,44 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.output.WriteLine(response);
             
             var expectedResult = @"
-                                {
-                                  ""data"": {
-                                    ""call"": {
-                                      ""node"": {
-                                        ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3beee369-11df-4a30-bf11-1d8465c87111\""}"",
-                                        ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
-                                        ""name"": ""hello world"",
-                                        ""value"": 13.0
-                                      },
-                                      ""edge"": {
-                                        ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
-                                        ""node"": {
-                                          ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3beee369-11df-4a30-bf11-1d8465c87111\""}"",
-                                          ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
-                                          ""name"": ""hello world"",
-                                          ""value"": 13.0
-                                        }
-                                      },
-                                      ""deletedId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""\\\""3beee369-11df-4a30-bf11-1d8465c87110\\\""\""}"",
-                                      ""api"": {
-                                        ""connection"": {
-                                          ""count"": 1,
-                                          ""edges"": [
-                                            {
-                                              ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
-                                              ""node"": {
-                                                ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3beee369-11df-4a30-bf11-1d8465c87111\""}"",
-                                                ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
-                                                ""name"": ""hello world"",
-                                                ""value"": 13.0
-                                              }
+                                    {
+                                      ""data"": {
+                                        ""call"": {
+                                          ""node"": {
+                                            ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhInKCKde7AzFnyGhAZIpCPuXbp77kCDvQcSLEIthUPPteB7BFzLc1789nOWQI6TyjOz0ockikmuTi3SJyJJ0ax6C2YnInw/CryWn1YAAAA="",
+                                            ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                            ""name"": ""hello world"",
+                                            ""value"": 13.0
+                                          },
+                                          ""edge"": {
+                                            ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                            ""node"": {
+                                              ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhInKCKde7AzFnyGhAZIpCPuXbp77kCDvQcSLEIthUPPteB7BFzLc1789nOWQI6TyjOz0ockikmuTi3SJyJJ0ax6C2YnInw/CryWn1YAAAA="",
+                                              ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                              ""name"": ""hello world"",
+                                              ""value"": 13.0
                                             }
-                                          ]
+                                          },
+                                          ""deletedId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8WhI2KCqdd7ATC4QloUES6Qh3l27eNBSYqyHCwL85s6/pzej3BFfSmCd/9Rg1IYVBC/Uws9K7IApRzE5J8UQiQWGb9eK3lUhaoP+q2DHnWgAAAA=="",
+                                          ""api"": {
+                                            ""connection"": {
+                                              ""count"": 1,
+                                              ""edges"": [
+                                                {
+                                                  ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                                  ""node"": {
+                                                    ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhInKCKde7AzFnyGhAZIpCPuXbp77kCDvQcSLEIthUPPteB7BFzLc1789nOWQI6TyjOz0ockikmuTi3SJyJJ0ax6C2YnInw/CryWn1YAAAA="",
+                                                    ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                                    ""name"": ""hello world"",
+                                                    ""value"": 13.0
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
                                         }
                                       }
                                     }
-                                  }
-                                }
                                 ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
@@ -1150,20 +1154,30 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new TestProvider(internalApiProvider, this.output);
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
 
-            var query = @"
-            { 
-                node(id: ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"") {
-                    ...F0
-                }            
-            }
+            var globalId = ((JObject)JsonConvert
+                .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
+                                   + ",\"api\":\"TestApi\""
+                                   + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
+                                   .PackGlobalId();
 
-            fragment F0 on TestApi_TestObject_Node {
-                __id,
-                id,
-                name,
-                value
-            }            
+            var query = $@"
+                {{
+                    node(id: ""{globalId.Replace("\"", "\\\"")}"") 
+                    {{
+                    ...F0
+                    }}
+                }}
+
+                fragment F0 on TestApi_TestObject_Node 
+                {{
+                    __id,
+                    id,
+                    name,
+                    value
+                }}            
             ";
+
+            this.output.WriteLine(query);
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
@@ -1226,10 +1240,16 @@ namespace ClusterKit.Web.Tests.GraphQL
             }            
             ";
 
-            var variables = @"
-            {
-                ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}""
-            }
+            var globalId = ((JObject)JsonConvert
+                .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
+                                   + ",\"api\":\"TestApi\""
+                                   + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
+                                   .PackGlobalId();
+
+            var variables = $@"
+            {{
+                ""id"": ""{globalId}""
+            }}
             ";
 
             var result = await new DocumentExecuter().ExecuteAsync(

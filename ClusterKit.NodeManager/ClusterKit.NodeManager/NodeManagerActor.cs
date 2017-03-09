@@ -452,7 +452,7 @@ namespace ClusterKit.NodeManager
             }
 
             NodeDescription leader;
-            if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+            if (message.Leader != null && this.nodeDescriptions.TryGetValue(message.Leader, out leader))
             {
                 leader.IsClusterLeader = true;
             }

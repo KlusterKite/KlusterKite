@@ -212,7 +212,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 ""syncScalarField"": ""SyncScalarField""
                               },
                               ""asyncScalarField"": ""AsyncScalarField"",
-                              ""faultedSyncField"": false,
+                              ""faultedSyncField"": null,
                               ""forwardedArray"": [
                                 5,
                                 6,

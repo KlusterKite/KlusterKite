@@ -255,6 +255,7 @@
     <Compile Include="ActorSystemApiProvider.cs" />
     <Compile Include="ApiBrowserActor.cs" />
     <Compile Include="ApiProvider.cs" />
+    <Compile Include="GlobalIdSerializer.cs" />
     <Compile Include="GraphTypes\NodeInterface.cs" />
     <Compile Include="Internals\Converter.cs" />
     <Compile Include="Internals\MergedConnectionMutationResultType.cs" />

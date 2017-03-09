@@ -20,7 +20,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -166,7 +165,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                     { "p", requestPath },
                                     { "api", this.Provider.Provider.Description.ApiName },
                                     { "id", id }
-                                }.ToString(Formatting.None);
+                                }.PackGlobalId();
                     }
                 }
 

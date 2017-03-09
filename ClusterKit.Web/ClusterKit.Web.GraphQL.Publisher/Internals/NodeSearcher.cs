@@ -16,7 +16,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using ClusterKit.API.Client;
     using ClusterKit.Security.Client;
 
-    using global::GraphQL.Language.AST;
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
@@ -69,7 +68,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private async Task<JObject> SearchNode(ResolveFieldContext context)
         {
             var arguments = context.FieldAst.Arguments.ToJson(context);
-            var serializedId = arguments?.Property("id")?.Value?.ToObject<string>();
+            var serializedId = arguments?.Property("id")?.Value?.ToObject<string>()?.UnpackGlobalId();
             if (string.IsNullOrWhiteSpace(serializedId))
             {
                 return null;

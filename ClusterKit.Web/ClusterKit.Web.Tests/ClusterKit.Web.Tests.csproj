@@ -274,6 +274,7 @@
     <Compile Include="Auth\AuthorizationTests.cs" />
     <Compile Include="GraphQL\ApiBrowserActorTest.cs" />
     <Compile Include="GraphQL\ApiProviderPublishResolveIntegration.cs" />
+    <Compile Include="GraphQL\GlobalIdTests.cs" />
     <Compile Include="GraphQL\GraphQlControllerTests.cs" />
     <Compile Include="GraphQL\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

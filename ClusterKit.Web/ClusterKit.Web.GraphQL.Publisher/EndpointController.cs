@@ -106,7 +106,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             }
             else if (variablesToken is JValue)
             {
-                inputs = ((string)variablesToken).ToInputs();
+                inputs = ((JValue)variablesToken).ToObject<string>()?.ToInputs();
             }
 
             var requestContext = this.GetRequestDescription();

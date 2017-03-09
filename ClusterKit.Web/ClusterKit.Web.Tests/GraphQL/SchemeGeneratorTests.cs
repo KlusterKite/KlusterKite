@@ -94,9 +94,9 @@ namespace ClusterKit.Web.Tests.GraphQL
 	                    }, 
 	                    ""object"": {
 		                    ""count"": 2, 
-		                    ""items"": [
-			                    {""id"": 10}, 
-			                    {""id"": 20}
+		                    ""edges"": [
+			                    {""__id"": 10}, 
+			                    {""__id"": 20}
 		                    ],
                             ""__request"": {
                                 ""f"": ""object""
@@ -215,8 +215,15 @@ namespace ClusterKit.Web.Tests.GraphQL
                                {
                                    Description = api,
                                    Data =
-                                       "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
-                               };
+                                       @"{
+                                            ""viewer"": {""id"": 1, ""name"": ""test name""}, 
+                                            ""object"": { 
+                                                ""count"": 2, 
+                                                ""edges"": [
+                                                    {""__id"": 10,  ""node_name"": ""test object1""}, 
+                                                    {""__id"": 20,  ""node_name"": ""test object2""}
+                                            ]}}"
+            };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
@@ -444,9 +451,35 @@ namespace ClusterKit.Web.Tests.GraphQL
             var provider = new MoqProvider
                                {
                                    Description = api,
-                                   Data =
-                                       "{\"viewer\": {\"id\": 1, \"name\": \"test name\", \"getObjects\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}], \"getObjectConnections\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}, \"object\": { \"count\": 2, \"items\": [{\"id\": 10,  \"name\": \"test object1\"}, {\"id\": 20,  \"name\": \"test object2\"}]}}"
-                               };
+                                   Data = @"
+                            {
+                                ""viewer"": 
+                                    {
+                                        ""id"": 1, 
+                                        ""name"": ""test name"", 
+                                        ""getObjects"": 
+                                        [
+                                            {""id"": 10,  ""name"": ""test object1""}, 
+                                            {""id"": 20,  ""name"": ""test object2""}
+                                        ], 
+                                        ""getObjectConnections"": 
+                                        {
+                                            ""count"": 2, 
+                                            ""edges"": 
+                                                [
+                                                    {""__id"": 10,  ""node_name"": ""test object1""}, 
+                                                    {""__id"": 20,  ""node_name"": ""test object2""}
+                                                ]
+                                        }
+                                    }, 
+                                    ""object"": { 
+                                        ""count"": 2, 
+                                        ""edges"": [
+                                            {""__id"": 10,  ""node_name"": ""test object1""}, 
+                                            {""__id"": 20,  ""node_name"": ""test object2""}
+                                        ]
+                                    }}"
+            };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
@@ -669,120 +702,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                         }
                                       }
                                     }";
-            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Testing mutation description
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task MutationTest()
-        {
-            var viewerFields = new[]
-                                   {
-                                       ApiField.Scalar("id", EnScalarType.Integer),
-                                       ApiField.Scalar("name", EnScalarType.String),
-                                   };
-
-            var viewerType = new ApiObjectType("viewer", viewerFields);
-
-            var objectFields = new[]
-                                   {
-                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
-                                       ApiField.Scalar("name", EnScalarType.String)
-                                   };
-
-            var objectType = new ApiObjectType("object", objectFields);
-
-            var mutations = new[]
-                                {
-                                    ApiMutation.CreateFromField(
-                                        ApiField.Object(
-                                            "objects_create",
-                                            "object",
-                                            arguments: new[] { objectType.CreateField("new") }),
-                                        ApiMutation.EnType.ConnectionCreate),
-                                    ApiMutation.CreateFromField(
-                                        ApiField.Object(
-                                            "objects_update",
-                                            "object",
-                                            arguments: new[] { objectType.CreateField("new"), ApiField.Scalar("id", EnScalarType.Integer) }),
-                                        ApiMutation.EnType.ConnectionUpdate),
-                                    ApiMutation.CreateFromField(
-                                        ApiField.Object(
-                                            "objects_delete",
-                                            "object",
-                                            arguments: new[] { ApiField.Scalar("id", EnScalarType.Integer) }),
-                                        ApiMutation.EnType.ConnectionDelete)
-                                };
-
-            var api = new ApiDescription(
-                "TestApi1",
-                "0.0.0.1",
-                new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), ApiField.Object("objects", "object", EnFieldFlags.IsConnection) },
-                mutations);
-
-            var provider = new MoqProvider { Description = api, Data = "{\"id\": 20,  \"name\": \"new object\"}" };
-
-            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
-
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
-
-            Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
-            Assert.True(schema.Query.HasField("api"));
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                             r =>
-                                 {
-                                     r.Schema = schema;
-                                     r.Query = @"
-                                                    mutation M {
-                                                        insert: TestApi1_objects_create(new: {id: 1, name: ""new name""}) {
-                                                            id,
-                                                            name
-                                                        }
-                                                        update: TestApi1_objects_update(id: 1, new: {id: 2, name: ""updated name""}) {
-                                                            id,
-                                                            name
-                                                        }
-                                                        delete: TestApi1_objects_delete(id: 2) {
-                                                            id,
-                                                            name
-                                                        }
-                                                    }
-                                                    ";
-                                 }).ConfigureAwait(true);
-
-            this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-
-            var expectedResponse = @"{
-                                      ""data"": {
-                                        ""insert"": {
-                                          ""id"": 20,
-                                          ""name"": ""new object""
-                                        },
-                                        ""update"": {
-                                          ""id"": 20,
-                                          ""name"": ""new object""
-                                        },
-                                        ""delete"": {
-                                          ""id"": 20,
-                                          ""name"": ""new object""
-                                        }
-                                      }
-                                    }";
-
             Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
         }
 

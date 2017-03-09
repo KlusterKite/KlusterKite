@@ -20,7 +20,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -306,7 +305,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                            { "id", id }
                                        };
 
-                    var globalIdString = globalId.ToString(Formatting.None);
+                    var globalIdString = globalId.PackGlobalId();
                     foreach (var nodeAlias in nodeAliases)
                     {
                         (data.Property(nodeAlias)?.Value as JObject)?.Add("__globalId", globalIdString);
@@ -323,7 +322,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                        };
                         foreach (var field in topFields.Where(f => f.Name == "deletedId"))
                         {
-                            data.Add(field.Alias ?? field.Name, deletedGlobalId.ToString(Formatting.None));
+                            data.Add(field.Alias ?? field.Name, deletedGlobalId.PackGlobalId());
                         }
                     }
                 }
