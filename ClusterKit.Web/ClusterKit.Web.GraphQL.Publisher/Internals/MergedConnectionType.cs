@@ -81,19 +81,35 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 switch (field.Name)
                 {
                     case "count":
-                        yield return new ApiRequest { FieldName = "count" };
+                        yield return new ApiRequest { FieldName = "count", Alias = field.Alias };
                         break;
                     case "edges":
                         {
-                            var nodeSelection =
+                            var fields = new List<ApiRequest>
+                                             {
+                                                 new ApiRequest { FieldName = this.ElementType.KeyName, Alias = "__id" }
+                                             };
+                            foreach (var nodeRequest in
                                 GetRequestedFields(field.SelectionSet, context, this.ElementType.ComplexTypeName)
-                                    .FirstOrDefault(f => f.Name == "node");
+                                    .Where(f => f.Name == "node"))
+                            {
+                                fields.AddRange(
+                                    this.ElementType.GatherSingleApiRequest(nodeRequest, context).Select(
+                                        f =>
+                                            {
+                                                f.Alias =
+                                                    $"{nodeRequest.Alias ?? nodeRequest.Name}_{f.Alias ?? f.FieldName}";
+                                                return f;
+                                            }).ToList());
+                            }
 
-                            var fields = nodeSelection != null
-                                             ? this.ElementType.GatherSingleApiRequest(nodeSelection, context).ToList()
-                                             : null;
-
-                            yield return new ApiRequest { FieldName = "items", Fields = fields };
+                            yield return
+                                new ApiRequest
+                                {
+                                    FieldName = "items",
+                                    Alias = field.Alias ?? field.Name,
+                                    Fields = fields
+                                };
                         }
 
                         break;
@@ -537,7 +553,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             public object Resolve(ResolveFieldContext context)
             {
                 var parentData = context.Source as JObject;
-                return parentData?.GetValue("count");
+                return parentData?.GetValue(context.FieldAst.Alias ?? context.FieldAst.Name);
             }
         }
     }

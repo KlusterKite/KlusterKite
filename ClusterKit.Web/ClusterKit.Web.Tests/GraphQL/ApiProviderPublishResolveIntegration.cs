@@ -178,6 +178,178 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing connection query request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task ConnectionQueryWithAliasesTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"),
+                                                 Name = "2-test",
+                                                 Value = 50m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{67885BA0-B284-438F-8393-EE9A9EB299D1}"),
+                                                 Name = "3-test",
+                                                 Value = 50m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3AF2C973-D985-4F95-A0C7-AA928D276881}"),
+                                                 Name = "4-test",
+                                                 Value = 70m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{F0607502-5B77-4A3C-9142-E6197A7EE61E}"),
+                                                 Name = "5-test",
+                                                 Value = 6m
+                                             },
+                                     };
+
+            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
+            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+
+            var query = @"
+            {                
+                api {
+                        list: connection(sort: [value_asc, name_asc], filter: {value_gt: 10}, offset: 1, limit: 2) {
+                            total: count,
+                            total2: count,
+                            items: edges {
+                                location: cursor,
+                                location2: cursor,
+                                item: node {
+                                    globalId: id,
+                                    naming: name,
+                                },
+                                item2: node {
+                                    id2: __id,
+                                    v2: value
+                                },                      
+                            },
+                            items2: edges {
+                                location: cursor,
+                                location2: cursor,
+                                item: node {
+                                    type
+                                },
+                                item2: node {
+                                    globalId2: id,
+                                    id2: __id,
+                                    naming2: name,
+                                    v2: value,
+                                    type
+                                },                      
+                            }
+                        }
+                }                
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = @"
+                                {
+                                  ""data"": {
+                                    ""api"": {
+                                      ""list"": {
+                                        ""total"": 4,
+                                        ""total2"": 4,
+                                        ""items"": [
+                                          {
+                                            ""location"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                            ""location2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                            ""item"": {
+                                              ""globalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                              ""naming"": ""3-test""
+                                            },
+                                            ""item2"": {
+                                              ""id2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                              ""v2"": 50.0
+                                            }
+                                          },
+                                          {
+                                            ""location"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                            ""location2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                            ""item"": {
+                                              ""globalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
+                                              ""naming"": ""4-test""
+                                            },
+                                            ""item2"": {
+                                              ""id2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                              ""v2"": 70.0
+                                            }
+                                          }
+                                        ],
+                                        ""items2"": [
+                                          {
+                                            ""location"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                            ""location2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                            ""item"": {
+                                              ""type"": ""Good""
+                                            },
+                                            ""item2"": {
+                                              ""globalId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                              ""id2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                              ""naming2"": ""3-test"",
+                                              ""v2"": 50.0,
+                                              ""type"": ""Good""
+                                            }
+                                          },
+                                          {
+                                            ""location"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                            ""location2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                            ""item"": {
+                                              ""type"": ""Good""
+                                            },
+                                            ""item2"": {
+                                              ""globalId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""3af2c973-d985-4f95-a0c7-aa928d276881\""}"",
+                                              ""id2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                              ""naming2"": ""4-test"",
+                                              ""v2"": 70.0,
+                                              ""type"": ""Good""
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                                ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing connection create request from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
@@ -388,12 +560,29 @@ namespace ClusterKit.Web.Tests.GraphQL
                         elementName: name,
                         value
                     },
+                    nodeElement2: node {
+                        globalId2: id,
+                        realId2: __id,
+                        elementName2: name,
+                        value
+                    },
                     edgeObject: edge {
                         id: cursor,
                         object: node {
                             longId: id,
-                            shortId: __id,
                             edgeName: name,
+                        },
+                        object2: node {
+                            shortId: __id,
+                            value
+                        },
+                    },
+                    edgeObject2: edge {
+                        id2: cursor,
+                        object2: node {
+                            longId2: id,
+                            shortId2: __id,
+                            edgeName2: name,
                             value
                         }
                     },
@@ -408,7 +597,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     elementId: __id,
                                     elementName: name,
                                     elementValue: value
-                                }                    
+                                }             
                             }
                         }
                     }
@@ -427,45 +616,62 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.output.WriteLine(response);
 
             var expectedResult = @"
-                                    {
-                                      ""data"": {
-                                        ""call"": {
-                                          ""mutationId"": ""testClientMutationId"",
-                                          ""nodeElement"": {
-                                            ""globalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                            ""realId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                            ""elementName"": ""hello world"",
-                                            ""value"": 13.0
-                                          },
-                                          ""edgeObject"": {
-                                            ""id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                            ""object"": {
-                                              ""longId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                              ""shortId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                              ""edgeName"": ""hello world"", 
-                                              ""value"": 13.0
+                                {
+                                  ""data"": {
+                                    ""call"": {
+                                      ""mutationId"": ""testClientMutationId"",
+                                      ""nodeElement"": {
+                                        ""globalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                        ""realId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                        ""elementName"": ""hello world"",
+                                        ""value"": 13.0
+                                      },
+                                      ""nodeElement2"": {
+                                        ""globalId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                        ""realId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                        ""elementName2"": ""hello world"",
+                                        ""value"": 13.0
+                                      },
+                                      ""edgeObject"": {
+                                        ""id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                        ""object"": {
+                                          ""longId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                          ""edgeName"": ""hello world""
+                                        },
+                                        ""object2"": {
+                                          ""shortId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                          ""value"": 13.0
+                                        }
+                                      },
+                                      ""edgeObject2"": {
+                                        ""id2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                        ""object2"": {
+                                          ""longId2"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                          ""shortId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                          ""edgeName2"": ""hello world"",
+                                          ""value"": 13.0
+                                        }
+                                      },
+                                      ""removedId"": null,
+                                      ""root"": {
+                                        ""apiObjects"": {
+                                          ""total"": 1,
+                                          ""list"": [
+                                            {
+                                              ""itemId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                              ""element"": {
+                                                ""elementGlobalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
+                                                ""elementId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
+                                                ""elementName"": ""hello world"",
+                                                ""elementValue"": 13.0
+                                              }
                                             }
-                                          },
-                                          ""removedId"": null,
-                                          ""root"": {
-                                            ""apiObjects"": {
-                                              ""total"": 1,
-                                              ""list"": [
-                                                {
-                                                  ""itemId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                                  ""element"": {
-                                                    ""elementGlobalId"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""251feea8-d3ac-461d-a385-0cf2ba7a74e8\""}"",
-                                                    ""elementId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                                    ""elementName"": ""hello world"",
-                                                    ""elementValue"": 13.0
-                                                  }
-                                                }
-                                              ]
-                                            }
-                                          }
+                                          ]
                                         }
                                       }
-                                    }";
+                                    }
+                                  }
+                                }";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 

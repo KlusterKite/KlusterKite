@@ -95,7 +95,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                Name = "id",
                                Type = typeof(IdGraphType),
                                Description = "The node global id",
-                               Resolver = new GlobalIdResolver(this.isIdSubstitute ? "__id" : this.KeyName, this.Provider.Provider.Description.ApiName)
+                               Resolver = new GlobalIdResolver()
                            });
             var graphType = new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
             graphType.AddResolvedInterface(nodeInterface);
@@ -125,24 +125,57 @@ namespace ClusterKit.Web.GraphQL.Publisher
         public override object Resolve(ResolveFieldContext context)
         {
             var resolve = context.Source as JObject;
-            return this.ResolveData(resolve);
+            return this.ResolveData(resolve, context.FieldAst.Alias ?? context.FieldAst.Name);
         }
 
         /// <summary>
         /// Modifies resolved data
         /// </summary>
-        /// <param name="source">The node data</param>
-        /// <returns>The adapted node data</returns>
-        public JObject ResolveData(JObject source)
+        /// <param name="source">
+        /// The node data
+        /// </param>
+        /// <param name="fieldName">
+        /// The containing field name.
+        /// </param>
+        /// <returns>
+        /// The adapted node data
+        /// </returns>
+        public JObject ResolveData(JObject source, string fieldName = null)
         {
-            if (this.isIdSubstitute)
+            if (fieldName != null)
             {
-                var idProperty = source?.Property("id");
-                if (idProperty != null)
+                var filteredSource = new JObject();
+                var prefix = $"{fieldName}_";
+                foreach (var property in source.Properties().Where(p => p.Name.StartsWith(prefix)))
                 {
-                    source.Remove("id");
-                    source.Add("__id", idProperty.Value);
+                    filteredSource.Add(property.Name.Substring(prefix.Length), property.Value);
                 }
+
+                filteredSource.Add("__id", source.Property("__id")?.Value);
+
+                var globalId = source.Property("__globalId")?.Value.ToObject<string>();
+                if (globalId == null)
+                {
+                    var requestPath = (source.Parent?.Parent?.Parent as JObject)?.GetValue("__requestPath") as JArray;
+                    var id = source.Property("__id")?.Value;
+                    if (requestPath != null && id != null)
+                    {
+                        globalId =
+                            new JObject
+                                {
+                                    { "p", requestPath },
+                                    { "api", this.Provider.Provider.Description.ApiName },
+                                    { "id", id }
+                                }.ToString(Formatting.None);
+                    }
+                }
+
+                if (globalId != null)
+                {
+                    filteredSource.Add("__globalId", globalId);
+                }
+
+                source = filteredSource;
             }
 
             return source;
@@ -163,63 +196,18 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 requests = list;
             }
 
-            if (requests.All(r => r.FieldName != this.KeyName)
-                && GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName).Any(f => f.Name == "id"))
-            {
-                requests.Add(new ApiRequest { FieldName = this.KeyName });
-            }
-
             return requests;
         }
-
+        
         /// <summary>
         /// The resolver for the global id
         /// </summary>
         private class GlobalIdResolver : IFieldResolver
         {
-            /// <summary>
-            /// The name of original object key field
-            /// </summary>
-            private readonly string keyName;
-
-            /// <summary>
-            /// The api name.
-            /// </summary>
-            private readonly string apiName;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="GlobalIdResolver"/> class.
-            /// </summary>
-            /// <param name="keyName">
-            /// The name of original object key field
-            /// </param>
-            /// <param name="apiName">
-            /// The api Name.
-            /// </param>
-            public GlobalIdResolver(string keyName, string apiName)
-            {
-                this.keyName = keyName;
-                this.apiName = apiName;
-            }
-
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                var presetGlobalId = ((JObject)context.Source)?.GetValue("__globalId");
-                if (presetGlobalId != null)
-                {
-                    return presetGlobalId;
-                }
-
-                var requestPath = (((JObject)context.Source)?.Parent?.Parent?.Parent as JObject)?.GetValue("__requestPath") as JArray;
-                var id = ((JObject)context.Source)?.GetValue(this.keyName);
-                if (requestPath == null || id == null)
-                {
-                    return null;
-                }
-
-                var globalId = new JObject { { "p", requestPath }, { "api", this.apiName }, { "id", id } };
-                return globalId.ToString(Formatting.None);
+                return ((JObject)context.Source)?.GetValue("__globalId");
             }
         }
     }

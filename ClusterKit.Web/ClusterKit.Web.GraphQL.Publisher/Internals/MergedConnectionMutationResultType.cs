@@ -10,7 +10,7 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
-
+    
     using ClusterKit.API.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -174,8 +174,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                var source = ((JObject)context.Source)?.Property("result")?.Value?.DeepClone() as JObject;
-                return source == null ? null : this.nodeType.ResolveData(source);
+                var source = ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value as JObject;
+                return source == null ? null : this.nodeType.ResolveData((JObject)source.DeepClone());
             }
         }
 
@@ -187,13 +187,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                var result = ((JObject)context.Source)?.Property("result")?.Value?.DeepClone();
-                if (result == null || !result.HasValues)
-                {
-                    return null;
-                }
-
-                return result;
+                return ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value as JObject; 
             }
         }
 
@@ -217,7 +211,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                return ((context.Source as JObject)?.Property("result")?.Value as JObject)?.Property("deletedId")?.Value;
+                return ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value;
             }
         }
     }

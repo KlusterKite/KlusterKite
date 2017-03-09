@@ -209,44 +209,63 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var edgeType = responseType.EdgeType;
                 var nodeType = responseType.EdgeType.ObjectType;
                 List<ApiRequest> requestedFields = new List<ApiRequest>();
+                var idSubRequestRequest = new List<ApiRequest>
+                                              {
+                                                  new ApiRequest { FieldName = nodeType.KeyName, Alias = "__id" }
+                                              };
+                var idRequestRequest = new ApiRequest
+                {
+                    Alias = "__idRequest",
+                    FieldName = "result",
+                    Fields = idSubRequestRequest
+                };
+                requestedFields.Add(idRequestRequest);
 
                 var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type.ComplexTypeName).ToList();
 
-                var nodeRequests = topFields.Where(f => f.Name == "node" || f.Name == "edge" || f.Name == "deletedId").ToList();
-                if (nodeRequests.Count > 0)
+                var nodeRequests = topFields.Where(f => f.Name == "node" || f.Name == "edge").ToList();
+
+                var nodeAliases = new List<string>();
+                foreach (var nodeRequest in nodeRequests)
                 {
-                    var resultFields = new List<ApiRequest>();
-
-                    // todo: resolve alias collisions
-                    foreach (var nodeRequest in nodeRequests)
+                    var nodeAlias = nodeRequest.Alias ?? nodeRequest.Name;
+                    nodeAliases.Add(nodeAlias);
+                    switch (nodeRequest.Name)
                     {
-                        switch (nodeRequest.Name)
-                        {
-                            case "node":
-                                resultFields.AddRange(nodeType.GatherSingleApiRequest(nodeRequest, context));
-                                break;
-                            case "edge":
-                                resultFields.AddRange(edgeType.GatherSingleApiRequest(nodeRequest, context));
-                                break;
-                            case "deletedId":
-                                resultFields.Add(new ApiRequest { FieldName = nodeType.KeyName });
-                                break;
-                            case "errors":
-                                if (responseType.ErrorType != null)
-                                {
-                                    resultFields.AddRange(responseType.ErrorType.GatherSingleApiRequest(nodeRequest, context));
-                                }
-
-                                break;
-                        }
-                    }
-
-                    var resultRequest = new ApiRequest
+                        case "node":
+                            var nodeFields = nodeType.GatherSingleApiRequest(nodeRequest, context).ToList();
+                            nodeFields.Add(new ApiRequest { Alias = "__id", FieldName = nodeType.KeyName });
+                            requestedFields.Add(
+                                new ApiRequest
+                                    {
+                                        Alias = nodeAlias,
+                                        FieldName = "result",
+                                        Fields =
+                                            nodeFields
+                                    });
+                            break;
+                        case "edge":
+                            var edgeFields = new List<ApiRequest>();
+                            foreach (var edgeNodeRequests in
+                                GetRequestedFields(nodeRequest.SelectionSet, context, edgeType.ComplexTypeName)
+                                    .Where(f => f.Name == "node"))
+                            {
+                                edgeFields.AddRange(nodeType.GatherSingleApiRequest(edgeNodeRequests, context)
+                                    .Select(
+                                        f =>
                                             {
-                                                FieldName = "result",
-                                                Fields = resultFields
-                                            };
-                    requestedFields.Add(resultRequest);
+                                                f.Alias =
+                                                    $"{edgeNodeRequests.Alias ?? edgeNodeRequests.Name}_{f.Alias ?? f.FieldName}";
+                                                return f;
+                                            }));
+                            }
+
+                            edgeFields.Add(new ApiRequest { Alias = "__id", FieldName = nodeType.KeyName });
+                            requestedFields.Add(
+                                new ApiRequest { Alias = nodeAlias, FieldName = "result", Fields = edgeFields });
+
+                            break;
+                    }
                 }
 
                 if (responseType.ErrorType != null)
@@ -275,11 +294,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
                 var path = data?.Property("__requestPath")?.Value as JArray;
-                var result = data?.Property("result")?.Value as JObject;
+                var result = data?.Property("__idRequest")?.Value as JObject;
                 
                 if (path != null && result != null)
                 {
-                    var id = result.Property(nodeType.KeyName)?.Value;
+                    var id = result.Property("__id")?.Value;
                     var globalId = new JObject
                                        {
                                            { "p", path },
@@ -287,7 +306,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                            { "id", id }
                                        };
 
-                    result.Add("__globalId", globalId.ToString(Formatting.None));
+                    var globalIdString = globalId.ToString(Formatting.None);
+                    foreach (var nodeAlias in nodeAliases)
+                    {
+                        (data.Property(nodeAlias)?.Value as JObject)?.Add("__globalId", globalIdString);
+                    }
 
                     var deletedId = data.Property("__deletedId")?.Value;
                     if (deletedId != null)
@@ -298,7 +321,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                            { "api", this.provider.Description.ApiName },
                                            { "id", deletedId }
                                        };
-                        result.Add("deletedId", deletedGlobalId.ToString(Formatting.None));
+                        foreach (var field in topFields.Where(f => f.Name == "deletedId"))
+                        {
+                            data.Add(field.Alias ?? field.Name, deletedGlobalId.ToString(Formatting.None));
+                        }
                     }
                 }
 

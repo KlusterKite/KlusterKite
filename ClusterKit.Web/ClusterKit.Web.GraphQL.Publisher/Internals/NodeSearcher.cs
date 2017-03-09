@@ -112,7 +112,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 return null;
             }
 
-            var nodeRequest = connectionType.ElementType.GatherSingleApiRequest(context.FieldAst, context);
+            var nodeRequest = connectionType.ElementType.GatherSingleApiRequest(context.FieldAst, context).ToList();
+            nodeRequest.Add(new ApiRequest { Alias = "__id", FieldName = connectionType.ElementType.KeyName });
+
             var searchNode = await 
                 api.SearchNode(
                     globalId.Id.ToString(Formatting.None),
@@ -122,9 +124,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
             if (searchNode != null)
             {
-                searchNode = connectionType.ElementType.ResolveData(searchNode);
                 searchNode.Add("__resolvedType", connectionType.ElementType.ComplexTypeName);
                 searchNode.Add("__globalId", serializedId);
+                searchNode = connectionType.ElementType.ResolveData(searchNode);
             }
 
             return searchNode;

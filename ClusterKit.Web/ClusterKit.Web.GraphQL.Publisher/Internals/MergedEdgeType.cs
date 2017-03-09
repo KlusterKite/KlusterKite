@@ -10,9 +10,7 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
-    using System.Linq;
-
-    using ClusterKit.API.Client;
+    
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Resolvers;
@@ -77,7 +75,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      {
                                          Name = "cursor",
                                          ResolvedType = new StringGraphType(),
-                                         Resolver = new CursorResolver(this.ObjectType),
+                                         Resolver = new CursorResolver(),
                                          Description = "A value to use with paging positioning"
                                      },
                                  new FieldType
@@ -109,7 +107,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override object Resolve(ResolveFieldContext context)
         {
             var parentData = context.Source as JObject;
-            return parentData?.GetValue("items");
+            return parentData?.GetValue(context.FieldAst.Alias ?? context.FieldAst.Name);
         }
 
         /// <summary>
@@ -117,37 +115,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         private class CursorResolver : IFieldResolver
         {
-            /// <summary>
-            /// The objects key name
-            /// </summary>
-            private readonly string keyName;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="CursorResolver"/> class.
-            /// </summary>
-            /// <param name="objectType">
-            /// The end type.
-            /// </param>
-            public CursorResolver(MergedType objectType)
-            {
-                this.keyName = (objectType as MergedFieldedType)?.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
-
-                if (this.keyName == "__id")
-                {
-                    this.keyName = "id";
-                }
-            }
-
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                if (this.keyName == null)
-                {
-                    return null;
-                }
-
-                var parentData = context.Source as JObject;
-                return parentData?.GetValue(this.keyName);
+                return (context.Source as JObject)?.GetValue("__id");
             }
         }
     }
