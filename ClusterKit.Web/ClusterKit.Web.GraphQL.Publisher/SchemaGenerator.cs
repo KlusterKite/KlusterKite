@@ -457,6 +457,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 }
             }
 
+            var nodeSearcher = new NodeSearcher(providers, apiRoot);
+            apiRoot.NodeSearher = nodeSearcher;
             return apiRoot;
         }
 

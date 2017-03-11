@@ -43,6 +43,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         public Dictionary<string, MergedField> Mutations { get; } = new Dictionary<string, MergedField>();
 
+        /// <summary>
+        /// Gets or sets the node searcher
+        /// </summary>
+        public NodeSearcher NodeSearher { get; internal set; }
+
         /// <inheritdoc />
         public override MergedObjectType Clone()
         {
@@ -80,6 +85,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return this.DoApiRequests(context, context.UserContext as RequestContext);
         }
 
+        /// <inheritdoc />
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        {
+            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
+            var nodeFieldType = new FieldType();
+            nodeFieldType.Name = "__node";
+            nodeFieldType.ResolvedType = nodeInterface;
+            nodeFieldType.Description = "The node global searcher according to Relay specification";
+            nodeFieldType.Arguments =
+                new QueryArguments(
+                    new QueryArgument(typeof(IdGraphType)) { Name = "id", Description = "The node global id" });
+            nodeFieldType.Resolver = this.NodeSearher;
+            graphType.AddField(nodeFieldType);
+
+            return graphType;
+        }
+
         /// <summary>
         /// Creates an api requests to gather all data
         /// </summary>
@@ -98,7 +120,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             foreach (var provider in this.Providers.Select(fp => fp.Provider))
             {
                 var request = this.GatherMultipleApiRequest(provider, context.FieldAst, context).ToList();
-                taskList.Add(provider.GetData(request, requestContext));
+                if (request.Count > 0)
+                {
+                    taskList.Add(provider.GetData(request, requestContext));
+                }
+            }
+
+            if (taskList.Count == 0)
+            {
+                return new JObject();
             }
 
             var responses = await Task.WhenAll(taskList);

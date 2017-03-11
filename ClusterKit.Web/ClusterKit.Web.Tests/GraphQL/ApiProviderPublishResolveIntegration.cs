@@ -1130,7 +1130,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// Testing node requests from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
         [Fact]
@@ -1194,6 +1194,84 @@ namespace ClusterKit.Web.Tests.GraphQL
                                   ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                   ""name"": ""1-test"",
                                   ""value"": 100.0
+                                }
+                              }
+                            }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing nested node requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task NodeNestedQueryTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d1"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var globalId =
+                ((JObject)
+                    JsonConvert.DeserializeObject(
+                        "{\"p\":[{\"f\":\"connection\"}]" + ",\"api\":\"TestApi\""
+                        + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}")).PackGlobalId();
+
+            var query = $@"
+                {{
+                    api {{
+                        
+                        __node(id: ""{globalId.Replace("\"", "\\\"")}"") 
+                        {{
+                            ...F0
+                        }}
+                    }}
+                }}
+
+                fragment F0 on TestApi_TestObject_Node 
+                {{
+                    __id,
+                    id,
+                    name,
+                    value
+                }}            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = @"
+                            {
+                              ""data"": {
+                                ""api"": {
+                                    ""__node"": {
+                                      ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                      ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
+                                      ""name"": ""1-test"",
+                                      ""value"": 100.0
+                                    }
                                 }
                               }
                             }";

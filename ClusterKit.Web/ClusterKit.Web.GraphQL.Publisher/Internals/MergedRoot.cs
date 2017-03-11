@@ -21,9 +21,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     /// </summary>
     internal class MergedRoot : MergedObjectType
     {
-        /// <summary>
-        /// The node searcher
-        /// </summary>
         private readonly NodeSearcher searcher;
 
         /// <summary>
@@ -46,7 +43,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 return;
             }
 
-            this.searcher = new NodeSearcher(providers, root);
+            this.searcher = root.NodeSearher;
             var apiField = new MergedField("api", root, providers.First(), description: "The united api access");
             apiField.AddProviders(providers.Skip(1));
             this.Fields["api"] = apiField;
