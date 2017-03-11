@@ -21,6 +21,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     /// </summary>
     internal class MergedRoot : MergedObjectType
     {
+        /// <summary>
+        /// The node searcher
+        /// </summary>
         private readonly NodeSearcher searcher;
 
         /// <summary>

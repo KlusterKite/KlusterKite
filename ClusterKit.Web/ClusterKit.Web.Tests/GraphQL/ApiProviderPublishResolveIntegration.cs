@@ -1656,6 +1656,53 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// Testing simple fields requests from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
+        [Fact]
+        public async Task DateTimeTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            {                
+                api {
+                    dateTimeField,
+                    dateTimeOffsetField,
+                    dateTimeMethod(date: ""1980-09-25T10:00:00Z""),
+                    dateTimeOffsetMethod(date: ""1980-09-25T10:00:00Z"")
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""dateTimeField"": ""1980-09-25T10:00:00Z"",                             
+                              ""dateTimeOffsetField"": ""1980-09-25T10:00:00Z"",                             
+                              ""dateTimeMethod"": true,                             
+                              ""dateTimeOffsetMethod"": true                           
+                            }
+                          }
+                        }
+                        ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
         [Fact(Skip = "Core lib problem")]
         public async Task SimpleFieldsMergeWithRootTest()
         {

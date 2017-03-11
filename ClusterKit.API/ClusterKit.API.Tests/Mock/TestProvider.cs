@@ -187,6 +187,34 @@ namespace ClusterKit.API.Tests.Mock
         public string SyncScalarField => "SyncScalarField";
 
         /// <summary>
+        /// Gets the DateTime
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public DateTime DateTimeField
+        {
+            get
+            {
+                var date = new DateTime(1980, 9, 25, 10, 0, 0, DateTimeKind.Utc);
+                return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
+            }
+        }
+
+        /// <summary>
+        /// Gets the DateTimeOffset
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public DateTimeOffset DateTimeOffsetField
+        {
+            get
+            {
+                var date = new DateTimeOffset(1980, 9, 25, 13, 0, 0, TimeSpan.FromHours(3));
+                return date;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the list of third party objects
         /// </summary>
         [DeclareField(Converter = typeof(ArrayConverter<StringConverter, string>))]
@@ -199,6 +227,30 @@ namespace ClusterKit.API.Tests.Mock
         [DeclareField(Converter = typeof(StringConverter))]
         [UsedImplicitly]
         public ThirdPartyObject ThirdParty { get; set; } = new ThirdPartyObject { Contents = "Third party" };
+
+        /// <summary>
+        /// The method with <seealso cref="DateTime"/> argument
+        /// </summary>
+        /// <param name="date">The date</param>
+        /// <returns>Whether specified date is 1980-09-25 10:00 UTC</returns>
+        [DeclareField]
+        [UsedImplicitly]
+        public bool DateTimeMethod(DateTime date)
+        {
+            return date == new DateTime(1980, 9, 25, 10, 00, 00, DateTimeKind.Utc);
+        }
+
+        /// <summary>
+        /// The method with <seealso cref="DateTimeOffset"/> argument
+        /// </summary>
+        /// <param name="date">The date</param>
+        /// <returns>Whether specified date is 1980-09-25 10:00 UTC</returns>
+        [DeclareField]
+        [UsedImplicitly]
+        public bool DateTimeOffsetMethod(DateTimeOffset date)
+        {
+            return date == new DateTimeOffset(1980, 9, 25, 10, 00, 00, TimeSpan.Zero);
+        }
 
         /// <summary>
         /// Some public method
