@@ -123,7 +123,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             this.ExpectNoMsg();
             var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
@@ -156,7 +156,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             this.ExpectNoMsg();
             var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 

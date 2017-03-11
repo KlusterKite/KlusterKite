@@ -63,7 +63,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(0, api.GenerationErrors.Count);
             Assert.Equal(0, api.GenerationWarnings.Count);
 
-            var webApiProvider = new DirectProvider(api, this.output.WriteLine);
+            var webApiProvider = new DirectProvider(api, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { webApiProvider });
             var hasSchemaErrors = false;
             foreach (var error in SchemaGenerator.CheckSchema(schema))

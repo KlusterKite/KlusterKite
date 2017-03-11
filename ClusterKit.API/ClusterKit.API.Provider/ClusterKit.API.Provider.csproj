@@ -185,6 +185,7 @@
     <Compile Include="Resolvers\ObjectResolver.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="Resolvers\ScalarResolver.cs" />
+    <Compile Include="Resolvers\StringResolver.cs" />
     <Compile Include="Resolvers\SwapVisitor.cs" />
     <Compile Include="TypeMetadata.cs" />
   </ItemGroup>

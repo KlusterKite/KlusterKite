@@ -76,7 +76,7 @@ namespace ClusterKit.API.Tests
 
             Assert.Equal("TestApi", description.ApiName);
             Assert.Equal(this.GetType().Assembly.GetName().Version, description.Version);
-            Assert.Equal(4, description.Types.Count);
+            Assert.Equal(5, description.Types.Count);
 
             Assert.NotNull(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnTest".ToLower())));
             Assert.Null(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnFlags".ToLower())));

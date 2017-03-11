@@ -188,7 +188,7 @@ namespace ClusterKit.API.Provider
                                       : metaData.Type.IsSubclassOf(typeof(Enum))
                                           ? metaData.Type.GetCustomAttribute<FlagsAttribute>() != null
                                                 ? $"new ScalarResolver<{ToCSharpRepresentation(Enum.GetUnderlyingType(metaData.Type))}>()"
-                                                : $"new ScalarResolver<{ToCSharpRepresentation(metaData.Type)}>()"
+                                                : "new StringResolver()"
                                           : $"new {this.Data.ObjectResolverNames[field.TypeName]}()";
 
             switch (metaData.MetaType)

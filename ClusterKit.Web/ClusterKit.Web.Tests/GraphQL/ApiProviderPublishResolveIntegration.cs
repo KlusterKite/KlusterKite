@@ -112,7 +112,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -229,7 +229,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -401,7 +401,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
@@ -548,7 +548,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
@@ -729,7 +729,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
@@ -900,7 +900,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
@@ -1045,7 +1045,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
@@ -1149,7 +1149,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var globalId = ((JObject)JsonConvert
@@ -1220,7 +1220,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1282,7 +1282,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task MethodsRequestTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1330,7 +1330,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task VariablesRequestTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
             var query = @"
             query Request($intArg: Int, $stringArg: String, $intArrayArg: [Int], $objArg: TestApi_NestedProvider_Input){                
@@ -1391,7 +1391,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task MutationSimpleRequestTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
@@ -1443,9 +1443,19 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task SchemaGenerationTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var errors = SchemaGenerator.CheckSchema(schema).Select(e => $"Schema type error: {e}")
+                .Union(SchemaGenerator.CheckSchemaIntrospection(schema)).Select(e => $"Schema introspection error: {e}");
+
+            var hasErrors = false;
+            foreach (var error in errors)
+            {
+                hasErrors = true;
+                this.output.WriteLine(error);
+            }
 
             using (var printer = new SchemaPrinter(schema))
             {
@@ -1468,8 +1478,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-            
-            Assert.Equal(CleanResponse(Resources.ApiProviderResolveTestProviderSchemaSnapshot), CleanResponse(response));
+
+            Assert.False(hasErrors);
         }
 
         /// <summary>
@@ -1480,7 +1490,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task SimpleFieldsRequestTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1572,7 +1582,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task SimpleFieldsMergeWithRootTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1671,7 +1681,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task SimpleFieldsMergeTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1744,7 +1754,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task RequestWithFragmentsTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1789,7 +1799,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task RequestWithFragmentsAnonymousTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1832,7 +1842,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task RecursiveFieldsTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1889,7 +1899,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         public async Task RequestWithAliasesTest()
         {
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"

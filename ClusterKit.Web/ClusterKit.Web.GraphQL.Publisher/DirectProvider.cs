@@ -50,13 +50,22 @@ namespace ClusterKit.Web.GraphQL.Publisher
             this.Description = provider.ApiDescription;
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the result from provider should be packed to string and then restored to <see cref="JObject"/>
+        /// </summary>
+        /// <remarks>
+        /// This is useful in tests to check that all data a serialized correctly
+        /// </remarks>
+        public bool UseJsonRepack { get; set; }
+
         /// <inheritdoc />
         public override async Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
         {
+            JObject result;
             var mutations = requests.OfType<MutationApiRequest>().ToList();
             if (mutations.Count > 0)
             {
-                var result = new JObject();
+                result = new JObject();
                 foreach (var mutation in mutations)
                 {
                     var midResult = await this.provider.ResolveMutation(
@@ -68,14 +77,15 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     result.Merge(midResult);
                 }
 
-                return result;
+                return this.UseJsonRepack ? Repack(result) : result;
             }
 
-            return await this.provider.ResolveQuery(
+            result = await this.provider.ResolveQuery(
                        requests,
                        context,
                        exception =>
                            this.errorOutput?.Invoke($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
+            return this.UseJsonRepack ? Repack(result) : result;
         }
 
         /// <inheritdoc />
@@ -85,13 +95,25 @@ namespace ClusterKit.Web.GraphQL.Publisher
             ApiRequest request,
             RequestContext context)
         {
-            return await this.provider.SearchNode(
-                       id,
-                       path.Select(p => p.ToApiRequest()).ToList(),
-                       request,
-                       context,
-                       exception =>
-                           this.errorOutput?.Invoke($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
+            var result = await this.provider.SearchNode(
+                                 id,
+                                 path.Select(p => p.ToApiRequest()).ToList(),
+                                 request,
+                                 context,
+                                 exception =>
+                                     this.errorOutput?.Invoke($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
+
+            return this.UseJsonRepack ? Repack(result) : result;
+        }
+
+        /// <summary>
+        /// Packs the <see cref="JObject"/> to the string and then restores it
+        /// </summary>
+        /// <param name="source">The source object</param>
+        /// <returns>The repacked object</returns>
+        private static JObject Repack(JObject source)
+        {
+            return JObject.Parse(source.ToString());
         }
     }
 }
