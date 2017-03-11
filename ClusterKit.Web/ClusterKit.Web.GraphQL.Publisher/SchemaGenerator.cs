@@ -9,16 +9,22 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using Akka.Util.Internal;
 
     using ClusterKit.API.Client;
+    using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
     using ClusterKit.Web.GraphQL.Publisher.Internals;
 
+    using global::GraphQL;
+    using global::GraphQL.Http;
     using global::GraphQL.Types;
+
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Generator of the GraphQL scheme from api providers
@@ -32,11 +38,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <returns>The new GraphQL schema</returns>
         public static Schema Generate(List<ApiProvider> providers)
         {
-            var api = MergeApis(providers);
+            var createdTypes = new Dictionary<string, MergedType>();
+            var api = MergeApis(providers, createdTypes);
             var nodeInterface = new NodeInterface();
             var root = new MergedRoot("Query", providers, api);
-            
-            var types = root.GetAllTypes().ToList();
+            createdTypes[root.ComplexTypeName] = root;
+            createdTypes[api.ComplexTypeName] = api;
+
+            var types = createdTypes.Values.ToList();
 
             var typeNames = types.Select(t => t.ComplexTypeName).Distinct().ToList();
 
@@ -101,25 +110,329 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                  Query = (VirtualGraphType)graphTypes[root.ComplexTypeName],
                                  Mutation = mutationType
                              };
-            
+
             schema.Initialize();
             return schema;
         }
 
         /// <summary>
+        /// Check the generated schema for possible errors
+        /// </summary>
+        /// <param name="schema">The generated schema</param>
+        /// <returns>The list of errors</returns>
+        public static IEnumerable<string> CheckSchema(Schema schema)
+        {
+            var types = schema.AllTypes.ToDictionary(t => t.Name);
+            var checkedInputGraphTypes = new List<string>();
+            foreach (
+                var graphType in
+                types.Values.OfType<IComplexGraphType>()
+                    .Where(g => !g.GetType().FullName.StartsWith("GraphQL.Introspection")))
+            {
+                foreach (var field in graphType.Fields)
+                {
+                    var resolvedType = GetResolvedType(field.ResolvedType);
+                    if (resolvedType?.Name == null || !types.ContainsKey(resolvedType.Name))
+                    {
+                        yield return $"Field {field.Name} of type {graphType.Name} has unregistered type";
+                    }
+
+                    if (field.Arguments == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var argument in field.Arguments)
+                    {
+                        resolvedType = GetResolvedType(argument.ResolvedType);
+                        IGraphType argumentType;
+                        if (resolvedType?.Name == null
+                            || !types.TryGetValue(resolvedType.Name, out argumentType))
+                        {
+                            yield return
+                                $"Field {field.Name} of type {graphType.Name} has argument {argument.Name} unregistered type";
+                            continue;
+                        }
+
+                        if (!(argumentType is ScalarGraphType) && !(argumentType is IInputGraphType) && !(argumentType is InputObjectGraphType))
+                        {
+                            yield return
+                                $"Field {field.Name} of type {graphType.Name} has argument {argument.Name} has invalid type {argumentType.Name}";
+                            continue;
+                        }
+
+                        var complexGraphType = argumentType as IComplexGraphType;
+                        if (complexGraphType == null)
+                        {
+                            continue;
+                        }
+
+                        foreach (var error in CheckInputGraphType(complexGraphType, checkedInputGraphTypes))
+                        {
+                            yield return error;
+                        }
+                    }
+                }
+
+                if (!graphType.Fields.Any())
+                {
+                    yield return $"Type {graphType.Name} has no fields";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check the schema against introspection query
+        /// </summary>
+        /// <param name="schema">The schema</param>
+        /// <returns>List of errors</returns>
+        public static IEnumerable<string> CheckSchemaIntrospection(Schema schema)
+        {
+            var result = new DocumentExecuter().ExecuteAsync(
+                                         r =>
+                                         {
+                                             r.Schema = schema;
+                                             r.Query = Queries.IntrospectionQuery;
+                                             r.UserContext = new RequestContext();
+                                         }).Result;
+            var response = new DocumentWriter(true).Write(result);
+            var json = JObject.Parse(response);
+            var types = (json.SelectToken("data.__schema.types") as JArray)?.ToDictionary(p => ((JObject)p).Property("name")?.Value, p => (JObject)p);
+            if (types == null)
+            {
+                yield return "Could not get types list via introspection";
+                yield break;
+            }
+
+            var inputTypesChecked = new List<string>();
+            foreach (var type in types.Values.Where(t => !t.Property("name").Value.ToObject<string>().StartsWith("__")))
+            {
+                var typeName = type.Property("name").Value.ToObject<string>();
+                var fields = type.Property("fields")?.Value as JArray;
+                if (fields != null)
+                {
+                    foreach (var field in fields)
+                    {
+                        var fieldType = field.SelectToken("type.kind")?.ToObject<string>() == "LIST"
+                            ? field.SelectToken("type.ofType.name")?.ToObject<string>()
+                            : field.SelectToken("type.name")?.ToObject<string>();
+                        var fieldName = field.SelectToken("name")?.ToObject<string>();
+                        if (!types.ContainsKey(fieldType ?? string.Empty))
+                        {
+                            yield return $"{typeName} property {fieldName} has unknown type {fieldType}";
+                        }
+
+                        var arguments = field.SelectToken("args") as JArray;
+                        if (arguments == null || arguments.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        foreach (var argument in arguments)
+                        {
+                            var argumentType = argument.SelectToken("type.kind")?.ToObject<string>() == "LIST"
+                                                   ? argument.SelectToken("type.ofType.name")?.ToObject<string>()
+                                                   : argument.SelectToken("type.name")?.ToObject<string>();
+                            var argumentName = argument.SelectToken("name")?.ToObject<string>();
+
+                            JObject argumentTypeJson;
+                            if (!types.TryGetValue(argumentType ?? string.Empty, out argumentTypeJson))
+                            {
+                                yield return
+                                    $"{typeName} property {fieldName} has argument {argumentName} of unknown type {argumentType}";
+                            }
+                            else
+                            {
+                                var argumentTypeKind = argumentTypeJson.SelectToken("kind").ToObject<string>();
+                                if (argumentTypeKind != "SCALAR" && argumentTypeKind != "ENUM"
+                                    && argumentTypeKind != "INPUT_OBJECT")
+                                {
+                                    yield return
+                                        $"{typeName} property {fieldName} has argument {argumentName} of type {argumentType} of unsupported kind {argumentTypeKind}";
+                                }
+                                else if (argumentTypeKind == "INPUT_OBJECT")
+                                {
+                                    foreach (var error in CheckIntrospectionInputType(argumentTypeJson, types, inputTypesChecked))
+                                    {
+                                        yield return error;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks input type received via introspection query for correctness
+        /// </summary>
+        /// <param name="graphType">
+        /// The type to check
+        /// </param>
+        /// <param name="checkedInputTypes">
+        /// The types already checked (to limit the recursion)
+        /// </param>
+        /// <returns>
+        /// The list of found errors
+        /// </returns>
+        private static IEnumerable<string> CheckInputGraphType(
+            IComplexGraphType graphType,
+            ICollection<string> checkedInputTypes)
+        {
+            if (checkedInputTypes.Contains(graphType.Name))
+            {
+                yield break;
+            }
+
+            checkedInputTypes.Add(graphType.Name);
+
+            if (graphType.Fields == null || !graphType.Fields.Any())
+            {
+                yield return $"Input type {graphType.Name} has no fields";
+                yield break;
+            }
+
+            foreach (var field in graphType.Fields)
+            {
+                var fieldResolvedType = GetResolvedType(field.ResolvedType);
+                if (fieldResolvedType == null)
+                {
+                    yield return $"Input type {graphType.Name} has field {field.Name} of unknown type";
+                    continue;
+                }
+
+                if (!(fieldResolvedType is ScalarGraphType) && !(fieldResolvedType is IInputGraphType) && !(fieldResolvedType is InputObjectGraphType))
+                {
+                    yield return
+                        $"Field {field.Name} of type {graphType.Name} has argument {field.Name} has invalid type {fieldResolvedType.Name}";
+                    continue;
+                }
+
+                var complexGraphType = fieldResolvedType as IComplexGraphType;
+                if (complexGraphType != null)
+                {
+                    foreach (var error in CheckInputGraphType(complexGraphType, checkedInputTypes))
+                    {
+                        yield return error;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks input type received via introspection query for correctness
+        /// </summary>
+        /// <param name="type">
+        /// The type data to check
+        /// </param>
+        /// <param name="types">
+        /// The list of defined types in schema
+        /// </param>
+        /// <param name="typesChecked">
+        /// The types already checked (to limit the recursion)
+        /// </param>
+        /// <returns>
+        /// The list of found errors
+        /// </returns>
+        private static IEnumerable<string> CheckIntrospectionInputType(
+            JObject type,
+            IReadOnlyDictionary<JToken, JObject> types,
+            ICollection<string> typesChecked)
+        {
+            var kind = type.SelectToken("kind").ToObject<string>();
+            var typeName = type.Property("name").Value.ToObject<string>();
+            if (typesChecked.Contains(typeName))
+            {
+                yield break;
+            }
+
+            typesChecked.Add(typeName);
+
+            if (kind != "SCALAR" && kind != "ENUM" && kind != "INPUT_OBJECT")
+            {
+                yield return $"{typeName} is not a valid input type";
+            }
+
+            if (kind != "INPUT_OBJECT")
+            {
+                yield break;
+            }
+
+            var fields = type.Property("inputFields")?.Value as JArray;
+            if (fields == null || fields.Count == 0)
+            {
+                yield return $"{typeName} has no fields";
+                yield break;
+            }
+
+            foreach (var field in fields)
+            {
+                var fieldTypeName = field.SelectToken("type.kind")?.ToObject<string>() == "LIST"
+                                        ? field.SelectToken("type.ofType.name")?.ToObject<string>()
+                                        : field.SelectToken("type.name")?.ToObject<string>();
+                var fieldName = field.SelectToken("name")?.ToObject<string>();
+                JObject fieldType;
+                if (!types.TryGetValue(fieldTypeName ?? string.Empty, out fieldType))
+                {
+                    yield return $"{typeName} property {fieldName} has unknown type {fieldTypeName}";
+                    continue;
+                }
+
+                var fieldKind = fieldType.SelectToken("kind").ToObject<string>();
+                if (fieldKind != "SCALAR" && fieldKind != "ENUM" && fieldKind != "INPUT_OBJECT")
+                {
+                    yield return
+                        $"Input type {typeName} property {fieldName} of type {fieldTypeName} of unsupported kind {fieldKind}";
+                }
+                else if (fieldKind == "INPUT_OBJECT")
+                {
+                    foreach (var error in CheckIntrospectionInputType(fieldType, types, typesChecked))
+                    {
+                        yield return error;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Resolves end-type
+        /// </summary>
+        /// <param name="type">The original resolved type</param>
+        /// <returns>The end type</returns>
+        private static IGraphType GetResolvedType(IGraphType type)
+        {
+            if (type is ListGraphType)
+            {
+                type = ((ListGraphType)type).ResolvedType;
+            }
+
+            return type;
+        }
+
+        /// <summary>
         /// Merges schemes from multiple APIs
         /// </summary>
-        /// <param name="providers">The API providers descriptions</param>
-        /// <returns>Merged API</returns>
-        private static MergedApiRoot MergeApis(List<ApiProvider> providers)
+        /// <param name="providers">
+        /// The API providers descriptions
+        /// </param>
+        /// <param name="createdTypes">
+        /// The list of created types.
+        /// <remarks>
+        /// This is the mutation dictionary and will be filled during creation process
+        /// </remarks>
+        /// </param>
+        /// <returns>
+        /// Merged API
+        /// </returns>
+        private static MergedApiRoot MergeApis(List<ApiProvider> providers, Dictionary<string, MergedType> createdTypes)
         {
             var apiRoot = new MergedApiRoot("api");
-
             apiRoot.AddProviders(providers.Select(p => new FieldProvider { Provider = p, FieldType = p.Description }));
             
             foreach (var provider in providers)
             {
-                MergeFields(apiRoot, provider.Description.Fields, provider, new List<string>());
+                MergeFields(apiRoot, provider.Description.Fields, provider, new List<string>(), false, createdTypes);
                 
                 foreach (var apiMutation in provider.Description.Mutations)
                 {
@@ -130,10 +443,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
                         case ApiMutation.EnType.ConnectionCreate:
                         case ApiMutation.EnType.ConnectionUpdate:
                         case ApiMutation.EnType.ConnectionDelete:
-                            mutation = RegisterConnectionMutation(provider, apiMutation, apiRoot);
+                            mutation = RegisterConnectionMutation(provider, apiMutation, apiRoot, createdTypes);
                             break;
                         case ApiMutation.EnType.Untyped:
-                            mutation = RegisterUntypedMutation(provider, apiMutation, apiRoot);
+                            mutation = RegisterUntypedMutation(provider, apiMutation, apiRoot, createdTypes);
                             break;
                     }
 
@@ -153,28 +466,33 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="provider">The mutation api provider</param>
         /// <param name="apiMutation">The mutation description</param>
         /// <param name="apiRoot">The api root</param>
+        /// <param name="typesCreated">The list of created types</param>
         /// <returns>The mutation as merged field </returns>
         private static MergedField RegisterUntypedMutation(
             ApiProvider provider,
             ApiMutation apiMutation,
-            MergedApiRoot apiRoot)
+            MergedApiRoot apiRoot,
+            Dictionary<string, MergedType> typesCreated)
         {
-            var returnType = (MergedObjectType)CreateMergedType(provider, apiMutation, null, new List<string>(), false);
+            var returnType = (MergedObjectType)CreateMergedType(provider, apiMutation, null, new List<string>(), false, typesCreated);
             var arguments = apiMutation.Arguments.ToDictionary(
                 a => a.Name,
                 a =>
                     new MergedField( 
                         a.Name,
-                        CreateMergedType(provider, a, null, new List<string>(), true),
+                        CreateMergedType(provider, a, null, new List<string>(), true, typesCreated),
+                        provider,
                         apiMutation.Flags,
                         description: a.Description));
             arguments["clientMutationId"] = new MergedField(
                 "clientMutationId",
-                new MergedScalarType(EnScalarType.String, new FieldProvider { Provider = provider }));
+                CreateScalarType(EnScalarType.String, typesCreated),
+                provider);
 
-            var payload = new MergedUntypedMutationResult(returnType, apiRoot, new FieldProvider { Provider = provider });
+            var payload = new MergedUntypedMutationResult(returnType, apiRoot, provider);
+            typesCreated[payload.ComplexTypeName] = payload;
 
-            var untypedMutation = new MergedField(apiMutation.Name, payload, apiMutation.Flags, arguments, apiMutation.Description);
+            var untypedMutation = new MergedField(apiMutation.Name, payload, provider, apiMutation.Flags, arguments, apiMutation.Description);
 
             return untypedMutation;
         }
@@ -185,11 +503,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="provider">The mutation api provider</param>
         /// <param name="apiMutation">The mutation description</param>
         /// <param name="apiRoot">The api root</param>
+        /// <param name="typesCreated">The list of created types</param>
         /// <returns>The mutation as merged field </returns>
         private static MergedField RegisterConnectionMutation(
             ApiProvider provider,
             ApiMutation apiMutation,
-            MergedApiRoot apiRoot)
+            MergedApiRoot apiRoot,
+            Dictionary<string, MergedType> typesCreated)
         {
             var field = FindContainer(apiMutation, apiRoot);
             var connectionType = field?.Type as MergedConnectionType;
@@ -207,28 +527,32 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     errorDescriptionApiType.CreateField("error"),
                     null,
                     new List<string>(),
-                    false);
+                    false,
+                    typesCreated);
             }
 
             var returnType = new MergedConnectionMutationResultType(
                 connectionType.ElementType,
                 apiRoot,
                 errorDescriptionType,
-                new FieldProvider { Provider = provider, FieldType = null });
+                provider);
+            typesCreated[returnType.ComplexTypeName] = returnType;
             var arguments = apiMutation.Arguments.ToDictionary(
                 a => a.Name,
                 a =>
                     new MergedField(
                         a.Name,
-                        CreateMergedType(provider, a, null, new List<string>(), true),
+                        CreateMergedType(provider, a, null, new List<string>(), true, typesCreated),
+                        provider,
                         apiMutation.Flags,
                         description: a.Description));
 
             arguments["clientMutationId"] = new MergedField(
                 "clientMutationId",
-                new MergedScalarType(EnScalarType.String, new FieldProvider { Provider = provider }));
+                CreateScalarType(EnScalarType.String, typesCreated),
+                provider);
 
-            return new MergedField(apiMutation.Name, returnType, apiMutation.Flags, arguments, apiMutation.Description);
+            return new MergedField(apiMutation.Name, returnType, provider, apiMutation.Flags, arguments, apiMutation.Description);
         }
 
         /// <summary>
@@ -279,23 +603,23 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// The types names path to avoid circular references.
         /// </param>
         /// <param name="createAsInput">A value indicating that an input type is assembled</param>
+        /// <param name="typesCreated">The list of previously created types</param>
         private static void MergeFields(
             MergedObjectType parentType,
             IEnumerable<ApiField> apiFields,
             ApiProvider provider,
             ICollection<string> path,
-            bool createAsInput = false)
+            bool createAsInput,
+            Dictionary<string, MergedType> typesCreated)
         {
             foreach (var apiField in apiFields)
             {
                 MergedField complexField;
                 if (parentType.Fields.TryGetValue(apiField.Name, out complexField))
                 {
-                    if (apiField.ScalarType != EnScalarType.None 
-                        || createAsInput
+                    if (apiField.ScalarType != EnScalarType.None || createAsInput
                         || apiField.Flags.HasFlag(EnFieldFlags.IsConnection)
-                        || apiField.Flags.HasFlag(EnFieldFlags.IsArray) 
-                        || !(complexField.Type is MergedObjectType)
+                        || apiField.Flags.HasFlag(EnFieldFlags.IsArray) || !(complexField.Type is MergedObjectType)
                         || complexField.Arguments.Any() || apiField.Arguments.Any())
                     {
                         // todo: write merge error
@@ -303,7 +627,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     }
                 }
 
-                var fieldType = CreateMergedType(provider, apiField, complexField, path, createAsInput);
+                var fieldType = CreateMergedType(provider, apiField, complexField, path, createAsInput, typesCreated);
 
                 if (fieldType == null)
                 {
@@ -316,14 +640,30 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 {
                     foreach (var argument in apiField.Arguments)
                     {
-                        var fieldArgumentType = CreateMergedType(provider, argument, null, path, true);
-                        fieldArguments[argument.Name] = new MergedField(argument.Name, fieldArgumentType, argument.Flags, description: argument.Description);
+                        var fieldArgumentType = CreateMergedType(provider, argument, null, path, true, typesCreated);
+                        fieldArguments[argument.Name] = new MergedField(
+                            argument.Name,
+                            fieldArgumentType,
+                            provider,
+                            argument.Flags,
+                            description: argument.Description);
                     }
                 }
 
-                var description =
-                    string.Join("\n", new[] { complexField?.Description, apiField.Description }.Where(s => !string.IsNullOrWhiteSpace(s)));
-                var field = new MergedField(apiField.Name, fieldType, apiField.Flags, fieldArguments, string.IsNullOrWhiteSpace(description) ? null : description);
+                var description = string.Join(
+                    "\n",
+                    new[] { complexField?.Description, apiField.Description }.Where(s => !string.IsNullOrWhiteSpace(s)));
+                var field = new MergedField(
+                    apiField.Name,
+                    fieldType,
+                    provider,
+                    apiField.Flags,
+                    fieldArguments,
+                    string.IsNullOrWhiteSpace(description) ? null : description);
+                if (complexField != null)
+                {
+                    field.AddProviders(complexField.Providers);
+                }
 
                 parentType.Fields[apiField.Name] = field;
             }
@@ -337,28 +677,41 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="complexField">The same field merged from previous api descriptions</param>
         /// <param name="path">The list of processed types</param>
         /// <param name="createAsInput">A value indicating that an input type is assembled</param>
+        /// <param name="typesCreated">The list of already created types</param>
         /// <returns>The field description</returns>
         private static MergedType CreateMergedType(
             ApiProvider provider,
             ApiField apiField,
             MergedField complexField,
             ICollection<string> path,
-            bool createAsInput)
+            bool createAsInput,
+            Dictionary<string, MergedType> typesCreated)
         {
+            MergedType createdType;
             if (apiField.ScalarType != EnScalarType.None)
             {
-                return new MergedScalarType(apiField.ScalarType, new FieldProvider { Provider = provider });
+                return CreateScalarType(apiField.ScalarType, typesCreated);
             }
 
-            var apiType = provider.Description.Types.First(t => t.TypeName == apiField.TypeName);
+            var apiType = provider.Description.Types.FirstOrDefault(t => t.TypeName == apiField.TypeName);
+            if (apiType == null)
+            {
+                throw new Exception("type was not found");
+            }
+
             var apiEnumType = apiType as ApiEnumType;
             if (apiEnumType != null)
             {
-                return new MergedEnumType(apiEnumType, new FieldProvider { Provider = provider });
+                return CreateEnumType(apiEnumType, provider, typesCreated);
             }
 
             var apiObjectType = (ApiObjectType)apiType;
-            var objectType = complexField?.Type as MergedObjectType
+            if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
+            {
+                return CreateConnectionType(apiObjectType, provider, typesCreated);
+            }
+
+            var objectType = (complexField?.Type as MergedObjectType)?.Clone()
                              ?? (createAsInput
                                      ? new MergedInputType($"{provider.Description.ApiName}_{apiField.TypeName}")
                                      : new MergedObjectType($"{provider.Description.ApiName}_{apiField.TypeName}"));
@@ -368,11 +721,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 objectType.Category = MergedObjectType.EnCategory.MultipleApiType;
             }
 
-            if (path.Contains(apiObjectType.TypeName))
+            if (typesCreated.TryGetValue(objectType.ComplexTypeName, out createdType))
             {
-                // todo: write circular reference error
-                return null;
+                return createdType;
             }
+
+            typesCreated[objectType.ComplexTypeName] = objectType;
 
             var fieldsToMerge = createAsInput
                                     ? apiObjectType.Fields.Where(
@@ -383,19 +737,82 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 objectType,
                 fieldsToMerge,
                 provider,
-                path.Union(new[] { apiObjectType.TypeName }).ToList());
+                path.Union(new[] { apiObjectType.TypeName }).ToList(),
+                createAsInput,
+                typesCreated);
 
-            MergedType fieldType = objectType;
+            return objectType;
+        }
 
-            if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
+        /// <summary>
+        /// Creates a connection type
+        /// </summary>
+        /// <param name="apiObjectType">The node object type</param>
+        /// <param name="provider">The api provider</param>
+        /// <param name="typesCreated">The list of types created to fill</param>
+        /// <returns>The connection type</returns>
+        private static MergedType CreateConnectionType(
+            ApiObjectType apiObjectType,
+            ApiProvider provider,
+            Dictionary<string, MergedType> typesCreated)
+        {
+            MergedType createdType;
+            var nodeType =
+                (MergedObjectType)
+                CreateMergedType(provider, apiObjectType.CreateField("node"), null, new List<string>(), false, typesCreated);
+
+            var connectionType = new MergedConnectionType(nodeType.OriginalTypeName, provider, nodeType);
+
+            if (typesCreated.TryGetValue(connectionType.ComplexTypeName, out createdType))
             {
-                fieldType = new MergedConnectionType(
-                    objectType.OriginalTypeName,
-                    new FieldProvider { Provider = provider, FieldType = apiObjectType },
-                    objectType);
+                return createdType;
             }
 
-            return fieldType;
+            typesCreated[connectionType.ComplexTypeName] = connectionType;
+            typesCreated[connectionType.EdgeType.ComplexTypeName] = connectionType.EdgeType;
+            typesCreated[connectionType.ElementType.ComplexTypeName] = connectionType.ElementType;
+            return connectionType;
+        }
+
+        /// <summary>
+        /// Creates the enum type definition
+        /// </summary>
+        /// <param name="apiEnumType">Api enum type definition</param>
+        /// <param name="provider">The api provider</param>
+        /// <param name="typesCreated">The list of types created to fill</param>
+        /// <returns>The enum type</returns>
+        private static MergedType CreateEnumType(ApiEnumType apiEnumType, ApiProvider provider, Dictionary<string, MergedType> typesCreated)
+        {
+            MergedType createdType;
+            var mergedEnumType = new MergedEnumType(apiEnumType, provider);
+            if (typesCreated.TryGetValue(mergedEnumType.ComplexTypeName, out createdType))
+            {
+                return createdType;
+            }
+
+            typesCreated[mergedEnumType.ComplexTypeName] = mergedEnumType;
+
+            return mergedEnumType;
+        }
+
+        /// <summary>
+        /// Creates the scalar type definition
+        /// </summary>
+        /// <param name="scalarType">The type of scalar</param>
+        /// <param name="typesCreated">The list of types created to fill</param>
+        /// <returns>The scalar type</returns>
+        private static MergedType CreateScalarType(EnScalarType scalarType, Dictionary<string, MergedType> typesCreated)
+        {
+            MergedType createdType;
+            var mergedScalarType = new MergedScalarType(scalarType);
+
+            if (typesCreated.TryGetValue(mergedScalarType.ComplexTypeName, out createdType))
+            {
+                return createdType;
+            }
+
+            typesCreated[mergedScalarType.ComplexTypeName] = mergedScalarType;
+            return mergedScalarType;
         }
     }
 }

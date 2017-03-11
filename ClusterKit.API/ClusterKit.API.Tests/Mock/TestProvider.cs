@@ -57,23 +57,6 @@ namespace ClusterKit.API.Tests.Mock
         /// <summary>
         /// Test enum
         /// </summary>
-        [ApiDescription(Description = "The test enum", Name = "EnTest")]
-        public enum EnTest
-        {
-            /// <summary>
-            /// Test enum item1
-            /// </summary>
-            EnumItem1 = 1,
-
-            /// <summary>
-            /// Test enum item2
-            /// </summary>
-            EnumItem2 = 2
-        }
-
-        /// <summary>
-        /// Test enum
-        /// </summary>
         [ApiDescription(Description = "The test flags")]
         [Flags]
         public enum EnFlags
@@ -87,6 +70,23 @@ namespace ClusterKit.API.Tests.Mock
             /// Test enum item2
             /// </summary>
             FlagsItem2 = 2
+        }
+
+        /// <summary>
+        /// Test enum
+        /// </summary>
+        [ApiDescription(Description = "The test enum", Name = "EnTest")]
+        public enum EnTest
+        {
+            /// <summary>
+            /// Test enum item1
+            /// </summary>
+            EnumItem1 = 1,
+
+            /// <summary>
+            /// Test enum item2
+            /// </summary>
+            EnumItem2 = 2
         }
 
         /// <summary>
@@ -145,25 +145,18 @@ namespace ClusterKit.API.Tests.Mock
         public JArray ForwardedArray => new JArray(new[] { 5, 6, 7 });
 
         /// <summary>
+        /// Testing circular refs
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public TestProvider Recursion => this;
+
+        /// <summary>
         /// Async nested provider
         /// </summary>
         [DeclareField]
         [UsedImplicitly]
         public int[] SyncArrayOfScalarField => new[] { 1, 2, 3 };
-
-        /// <summary>
-        /// Sync nested provider
-        /// </summary>
-        [DeclareField(Name = "nestedSync")]
-        [UsedImplicitly]
-        public NestedProvider SyncNestedProvider => new NestedProvider();
-
-        /// <summary>
-        /// Sync scalar field
-        /// </summary>
-        [DeclareField]
-        [UsedImplicitly]
-        public string SyncScalarField => "SyncScalarField";
 
         /// <summary>
         /// Sync scalar field
@@ -180,11 +173,18 @@ namespace ClusterKit.API.Tests.Mock
         public EnFlags SyncFlagsField => EnFlags.FlagsItem1;
 
         /// <summary>
-        /// Gets or sets the third party object
+        /// Sync nested provider
         /// </summary>
-        [DeclareField(Converter = typeof(StringConverter))]
+        [DeclareField(Name = "nestedSync")]
         [UsedImplicitly]
-        public ThirdPartyObject ThirdParty { get; set; } = new ThirdPartyObject { Contents = "Third party" };
+        public NestedProvider SyncNestedProvider => new NestedProvider();
+
+        /// <summary>
+        /// Sync scalar field
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public string SyncScalarField => "SyncScalarField";
 
         /// <summary>
         /// Gets or sets the list of third party objects
@@ -192,6 +192,13 @@ namespace ClusterKit.API.Tests.Mock
         [DeclareField(Converter = typeof(ArrayConverter<StringConverter, string>))]
         [UsedImplicitly]
         public List<ThirdPartyObject> ThirdParties { get; set; }
+
+        /// <summary>
+        /// Gets or sets the third party object
+        /// </summary>
+        [DeclareField(Converter = typeof(StringConverter))]
+        [UsedImplicitly]
+        public ThirdPartyObject ThirdParty { get; set; } = new ThirdPartyObject { Contents = "Third party" };
 
         /// <summary>
         /// Some public method

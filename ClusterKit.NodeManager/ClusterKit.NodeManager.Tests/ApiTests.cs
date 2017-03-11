@@ -9,13 +9,19 @@
 
 namespace ClusterKit.NodeManager.Tests
 {
+    using System.Collections.Generic;
+
     using Akka.Actor;
+
+    using ClusterKit.Web.GraphQL.Publisher;
 
     using Xunit;
     using Xunit.Abstractions;
 
+    using ApiProvider = ClusterKit.NodeManager.ApiProvider;
+
     /// <summary>
-    /// Testing <see cref="ApiProvider"/>
+    /// Testing <see cref="NodeManager.ApiProvider"/>
     /// </summary>
     public class ApiTests
     {
@@ -56,6 +62,26 @@ namespace ClusterKit.NodeManager.Tests
 
             Assert.Equal(0, api.GenerationErrors.Count);
             Assert.Equal(0, api.GenerationWarnings.Count);
+
+            var webApiProvider = new DirectProvider(api, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { webApiProvider });
+            var hasSchemaErrors = false;
+            foreach (var error in SchemaGenerator.CheckSchema(schema))
+            {
+                hasSchemaErrors = true;
+                this.output.WriteLine($"Schema error: {error}");
+            }
+
+            Assert.False(hasSchemaErrors);
+
+            hasSchemaErrors = false;
+            foreach (var error in SchemaGenerator.CheckSchemaIntrospection(schema))
+            {
+                hasSchemaErrors = true;
+                this.output.WriteLine($"Schema introspection error: {error}");
+            }
+
+            Assert.False(hasSchemaErrors);
         }
     }
 }

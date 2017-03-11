@@ -41,11 +41,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="objectType">
         /// The object Type.
         /// </param>
-        public MergedNodeType(FieldProvider provider, MergedObjectType objectType)
+        public MergedNodeType(ApiProvider provider, MergedObjectType objectType)
             : base(objectType.OriginalTypeName)
         {
             this.Provider = provider;
-            this.Fields = objectType.Fields;
+            this.Fields = objectType.Fields.ToDictionary(f => f.Key, f => f.Value.Clone());
             this.KeyName = objectType.Fields.FirstOrDefault(f => f.Value.Flags.HasFlag(EnFieldFlags.IsKey)).Key;
             MergedField conflictingField;
             if (objectType.Fields.TryGetValue("id", out conflictingField))
@@ -54,6 +54,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 var substitute = new MergedField(
                     "__id",
                     conflictingField.Type,
+                    this.Provider,
                     conflictingField.Flags,
                     conflictingField.Arguments.ToDictionary(p => p.Key, p => p.Value),
                     conflictingField.Description);
@@ -70,19 +71,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <summary>
         /// Gets the field provider
         /// </summary>
-        public FieldProvider Provider { get; }
+        public ApiProvider Provider { get; }
 
         /// <inheritdoc />
         public override string ComplexTypeName => $"{EscapeName(this.OriginalTypeName)}_Node";
-
-        /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers
-        {
-            get
-            {
-                yield return this.Provider;
-            }
-        }
 
         /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
@@ -100,24 +92,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
             graphType.AddResolvedInterface(nodeInterface);
             nodeInterface.AddImplementedType(this.ComplexTypeName, graphType);
             return graphType;
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
-            foreach (var type in this.Fields.Values)
-            {
-                foreach (var argumentsValue in type.Arguments.Values.SelectMany(t => t.Type.GetAllTypes()))
-                {
-                    yield return argumentsValue;
-                }
-
-                foreach (var subType in type.Type.GetAllTypes())
-                {
-                    yield return subType;
-                }
-            }
         }
 
         /// <inheritdoc />
@@ -163,7 +137,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                             new JObject
                                 {
                                     { "p", requestPath },
-                                    { "api", this.Provider.Provider.Description.ApiName },
+                                    { "api", this.Provider.Description.ApiName },
                                     { "id", id }
                                 }.PackGlobalId();
                     }

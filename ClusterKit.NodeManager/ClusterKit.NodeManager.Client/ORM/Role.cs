@@ -98,8 +98,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of users assigned to this role
         /// </summary>
-        /// TODO: support recursive type refs
-        /// [DeclareField(Description = "The list of users assigned to this role")]
+        [DeclareField(Description = "The list of users assigned to this role")]
         public List<User> Users { get; set; }
 
         /// <inheritdoc />

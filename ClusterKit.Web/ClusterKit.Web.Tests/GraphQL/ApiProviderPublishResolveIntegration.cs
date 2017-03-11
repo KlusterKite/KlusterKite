@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ApiProviderPublishResolveIntegration.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -28,8 +28,6 @@ namespace ClusterKit.Web.Tests.GraphQL
 
     using Xunit;
     using Xunit.Abstractions;
-
-    using ApiProvider = ClusterKit.API.Provider.ApiProvider;
 
     /// <summary>
     /// Testing publishing and resolving integration
@@ -113,9 +111,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             {                
@@ -176,7 +174,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                               }
                             }
                             ";
-             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
         /// <summary>
@@ -230,9 +228,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             {                
@@ -273,11 +271,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             var expectedResult = @"
@@ -402,9 +400,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
@@ -446,11 +444,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             
@@ -549,9 +547,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
@@ -610,11 +608,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -730,9 +728,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
@@ -773,11 +771,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             
@@ -901,9 +899,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
@@ -944,11 +942,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             
@@ -1046,9 +1044,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              },
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
@@ -1093,11 +1091,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -1150,15 +1148,15 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              }
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var globalId = ((JObject)JsonConvert
-                .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
-                                   + ",\"api\":\"TestApi\""
-                                   + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
-                                   .PackGlobalId();
+                                   .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
+                                                      + ",\"api\":\"TestApi\""
+                                                      + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
+                .PackGlobalId();
 
             var query = $@"
                 {{
@@ -1181,11 +1179,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             var expectedResult = @"
@@ -1193,7 +1191,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                               ""data"": {
                                 ""node"": {
                                   ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                  ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                  ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                   ""name"": ""1-test"",
                                   ""value"": 100.0
                                 }
@@ -1221,9 +1219,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              }
                                      };
 
-            var internalApiProvider = new API.Tests.Mock.TestProvider(initialObjects);
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             query ($id: ID){ 
@@ -1241,10 +1239,10 @@ namespace ClusterKit.Web.Tests.GraphQL
             ";
 
             var globalId = ((JObject)JsonConvert
-                .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
-                                   + ",\"api\":\"TestApi\""
-                                   + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
-                                   .PackGlobalId();
+                                   .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
+                                                      + ",\"api\":\"TestApi\""
+                                                      + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
+                .PackGlobalId();
 
             var variables = $@"
             {{
@@ -1254,12 +1252,12 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                                 r.Inputs = variables.ToInputs();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                     r.Inputs = variables.ToInputs();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             var expectedResult = @"
@@ -1267,7 +1265,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                               ""data"": {
                                 ""node"": {
                                   ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                  ""id"": ""{\""p\"":[{\""f\"":\""connection\""}],\""api\"":\""TestApi\"",\""id\"":\""67885ba0-b284-438f-8393-ee9a9eb299d1\""}"",
+                                  ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                   ""name"": ""1-test"",
                                   ""value"": 100.0
                                 }
@@ -1283,9 +1281,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task MethodsRequestTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             {                
@@ -1331,9 +1329,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task VariablesRequestTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
             var query = @"
             query Request($intArg: Int, $stringArg: String, $intArrayArg: [Int], $objArg: TestApi_NestedProvider_Input){                
                 api {
@@ -1392,9 +1390,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task MutationSimpleRequestTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"                          
             mutation M {
@@ -1444,10 +1442,10 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task SchemaGenerationTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
 
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             using (var printer = new SchemaPrinter(schema))
             {
@@ -1481,9 +1479,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task SimpleFieldsRequestTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             {                
@@ -1573,9 +1571,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact(Skip = "Core lib problem")]
         public async Task SimpleFieldsMergeWithRootTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             {                
@@ -1613,11 +1611,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -1672,9 +1670,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task SimpleFieldsMergeTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             {                
@@ -1697,11 +1695,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -1745,9 +1743,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task RequestWithFragmentsTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             query FragmentsRequest {                
@@ -1763,11 +1761,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -1790,9 +1788,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public async Task RequestWithFragmentsAnonymousTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             query FragmentsRequest {                
@@ -1806,11 +1804,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -1831,11 +1829,68 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         /// <returns>Async task</returns>
         [Fact]
+        public async Task RecursiveFieldsTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            query FragmentsRequest {                
+                api {
+                   recursion {
+                        recursion {
+                            recursion {
+                                syncScalarField
+                            }
+                        }
+                   }
+                }
+            }
+            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                                ""recursion"" : {
+                                    ""recursion"" : {
+                                        ""recursion"" : {
+                                            ""syncScalarField"" : ""SyncScalarField""                               
+                                        }
+                                    }
+                                }
+                              }
+                           }
+                         }                        
+                        ";
+
+            Assert.Equal(
+                CleanResponse(expectedResult),
+                CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing requests with use of fragments from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
         public async Task RequestWithAliasesTest()
         {
-            var internalApiProvider = new API.Tests.Mock.TestProvider();
-            var publishingProvider = new TestProvider(internalApiProvider, this.output);
-            var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { publishingProvider });
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine);
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
             query FragmentsRequest {                
@@ -1853,11 +1908,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -1879,82 +1934,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(
                 CleanResponse(expectedResult), 
                 CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Test provider to unite GraphQL publishing and <see cref="API.Provider.ApiProvider"/>
-        /// </summary>
-        public class TestProvider : Web.GraphQL.Publisher.ApiProvider
-        {
-            /// <summary>
-            /// The test output
-            /// </summary>
-            private readonly ITestOutputHelper output;
-
-            /// <summary>
-            /// The provider.
-            /// </summary>
-            private readonly ApiProvider provider;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TestProvider"/> class.
-            /// </summary>
-            /// <param name="provider">
-            /// The provider.
-            /// </param>
-            /// <param name="output">
-            /// The test output.
-            /// </param>
-            public TestProvider(ApiProvider provider, ITestOutputHelper output)
-            {
-                this.provider = provider;
-                this.Description = provider.ApiDescription;
-                this.output = output;
-            }
-
-            /// <inheritdoc />
-            public override async Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
-            {
-                var mutations = requests.OfType<MutationApiRequest>().ToList();
-                if (mutations.Count > 0)
-                {
-                    var result = new JObject();
-                    foreach (var mutation in mutations)
-                    {
-                        var midResult = await this.provider.ResolveMutation(
-                                            mutation,
-                                            context,
-                                            exception =>
-                                                this.output.WriteLine(
-                                                    $"Resolve error: {exception.Message}\n{exception.StackTrace}"));
-                        result.Merge(midResult);
-                    }
-
-                    return result;
-                }
-
-                return await this.provider.ResolveQuery(
-                           requests,
-                           context,
-                           exception =>
-                               this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
-            }
-
-            /// <inheritdoc />
-            public override async Task<JObject> SearchNode(
-                string id,
-                List<RequestPathElement> path,
-                ApiRequest request,
-                RequestContext context)
-            {
-                return await this.provider.SearchNode(
-                           id,
-                           path.Select(p => p.ToApiRequest()).ToList(),
-                           request,
-                           context,
-                           exception =>
-                               this.output.WriteLine($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
-            }
         }
     }
 }

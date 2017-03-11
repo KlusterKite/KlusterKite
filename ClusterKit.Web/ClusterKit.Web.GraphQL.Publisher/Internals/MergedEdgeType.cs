@@ -35,7 +35,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="objectType">
         /// The end Type.
         /// </param>
-        public MergedEdgeType(string originalTypeName, FieldProvider provider, MergedNodeType objectType) : base(originalTypeName)
+        public MergedEdgeType(string originalTypeName, ApiProvider provider, MergedNodeType objectType) : base(originalTypeName)
         {
             this.ObjectType = objectType;
             this.Provider = provider;
@@ -55,16 +55,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets the field provider
         /// </summary>
-        public FieldProvider Provider { get; }
-
-        /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers
-        {
-            get
-            {
-                yield return this.Provider;
-            }
-        }
+        public ApiProvider Provider { get; }
 
         /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
@@ -85,22 +76,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Metadata =
                                              new Dictionary<string, object>
                                                  {
-                                                     { MetaDataTypeKey, new MergedField("node", this.ObjectType, description: this.ObjectType.Description) }
+                                                     { MetaDataTypeKey, new MergedField("node", this.ObjectType, this.Provider, description: this.ObjectType.Description) }
                                                  }
                                      }
                              };
 
             return new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
-            foreach (var type in this.ObjectType.GetAllTypes())
-            {
-                yield return type;
-            }
         }
 
         /// <inheritdoc />

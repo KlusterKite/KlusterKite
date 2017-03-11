@@ -10,6 +10,7 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -40,8 +41,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedRoot(string originalTypeName, List<ApiProvider> providers, MergedApiRoot root)
             : base(originalTypeName)
         {
+            if (providers == null || providers.Count == 0)
+            {
+                return;
+            }
+
             this.searcher = new NodeSearcher(providers, root);
-            this.Fields["api"] = new MergedField("api", root, description: "The united api access");
+            var apiField = new MergedField("api", root, providers.First(), description: "The united api access");
+            apiField.AddProviders(providers.Skip(1));
+            this.Fields["api"] = apiField;
         }
 
         /// <inheritdoc />

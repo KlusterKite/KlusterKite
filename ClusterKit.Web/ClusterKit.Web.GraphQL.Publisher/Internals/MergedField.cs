@@ -11,6 +11,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
 
     using ClusterKit.API.Client;
 
@@ -22,6 +23,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     internal class MergedField 
     {
         /// <summary>
+        /// the list of providers
+        /// </summary>
+        private readonly List<ApiProvider> providers = new List<ApiProvider>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MergedField"/> class.
         /// </summary>
         /// <param name="name">
@@ -29,6 +35,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </param>
         /// <param name="type">
         /// The type.
+        /// </param>
+        /// <param name="provider">
+        /// The api provider for the field
         /// </param>
         /// <param name="flags">
         /// The flags.
@@ -42,8 +51,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedField(
             string name,
             MergedType type,
+            ApiProvider provider,
             EnFieldFlags flags = EnFieldFlags.None,
-            Dictionary<string, MergedField> arguments = null,
+            IReadOnlyDictionary<string, MergedField> arguments = null,
             string description = null)
         {
             this.FieldName = name;
@@ -51,6 +61,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             this.Flags = flags;
             this.Arguments = (arguments ?? new Dictionary<string, MergedField>()).ToImmutableDictionary();
             this.Description = description;
+            this.providers.Add(provider);
         }
 
         /// <summary>
@@ -78,5 +89,45 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets the field type
         /// </summary>
         public MergedType Type { get; }
+
+        /// <summary>
+        /// Gets or sets the list of providers
+        /// </summary>
+        public IEnumerable<ApiProvider> Providers => this.providers;
+
+        /// <summary>
+        /// Adds a provider to the provider list
+        /// </summary>
+        /// <param name="provider">The provider</param>
+        public void AddProvider(ApiProvider provider)
+        {
+            this.providers.Add(provider);
+        }
+
+        /// <summary>
+        /// Adds the list of providers to the provider list
+        /// </summary>
+        /// <param name="newProviders">The list of providers</param>
+        public void AddProviders(IEnumerable<ApiProvider> newProviders)
+        {
+            this.providers.AddRange(newProviders);
+        }
+
+        /// <summary>
+        /// Creates a copy of the current object
+        /// </summary>
+        /// <returns>The field clone</returns>
+        public MergedField Clone()
+        {
+            var mergedField = new MergedField(
+                this.FieldName,
+                this.Type,
+                this.providers.First(),
+                this.Flags,
+                this.Arguments,
+                this.Description);
+            mergedField.providers.AddRange(this.providers.Skip(1));
+            return mergedField;
+        }
     }
 }

@@ -44,25 +44,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public Dictionary<string, MergedField> Mutations { get; } = new Dictionary<string, MergedField>();
 
         /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
+        public override MergedObjectType Clone()
         {
-            foreach (var type in this.Mutations.Values)
+            var clone = new MergedApiRoot(this.OriginalTypeName);
+            this.FillWithMyFields(clone);
+            foreach (var mutation in this.Mutations)
             {
-                foreach (var argumentsValue in type.Arguments.Values.SelectMany(t => t.Type.GetAllTypes()))
-                {
-                    yield return argumentsValue;
-                }
-
-                foreach (var subType in type.Type.GetAllTypes())
-                {
-                    yield return subType;
-                }
+                clone.Mutations[mutation.Key] = mutation.Value.Clone();
             }
 
-            foreach (var type in base.GetAllTypes())
-            {
-                yield return type;
-            }
+            return clone;
         }
 
         /// <summary>
@@ -152,7 +143,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             public MutationResolver(MergedField mergedField)
             {
                 this.mergedField = mergedField;
-                this.provider = this.mergedField.Type.Providers.First().Provider;
+                this.provider = this.mergedField.Providers.First();
             }
 
             /// <summary>

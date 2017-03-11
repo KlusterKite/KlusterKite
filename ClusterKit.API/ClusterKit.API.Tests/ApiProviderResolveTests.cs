@@ -565,6 +565,33 @@ namespace ClusterKit.API.Tests
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
+        public async Task RecursionFieldTest()
+        {
+            var provider = this.GetProvider();
+
+            var context = new RequestContext();
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "syncScalarField" } };
+            query = new List<ApiRequest> { new ApiRequest { FieldName = "recursion", Fields = query } };
+            query = new List<ApiRequest> { new ApiRequest { FieldName = "recursion", Fields = query } };
+
+            var result = await this.Query(provider, query, context);
+            
+            Assert.NotNull(result);
+
+            result = result.Property("recursion")?.Value as JObject;
+            Assert.NotNull(result);
+
+            result = result.Property("recursion")?.Value as JObject;
+            Assert.NotNull(result);
+
+            Assert.Equal("SyncScalarField", result.Property("syncScalarField").ToObject<string>());
+        }
+
+        /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
         public async Task SyncScalarFieldTest()
         {
             var provider = this.GetProvider();

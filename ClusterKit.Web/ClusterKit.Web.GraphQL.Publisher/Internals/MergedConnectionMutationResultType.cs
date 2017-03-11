@@ -49,8 +49,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedConnectionMutationResultType(
             MergedNodeType nodeType, 
             MergedApiRoot root,
-            MergedType errorType, 
-            FieldProvider provider)
+            MergedType errorType,
+            ApiProvider provider)
             : base(nodeType.OriginalTypeName)
         {
             this.EdgeType = new MergedEdgeType(nodeType.OriginalTypeName, provider, nodeType);
@@ -63,7 +63,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets the field provider
         /// </summary>
         [UsedImplicitly]
-        public FieldProvider Provider { get; }
+        public ApiProvider Provider { get; }
 
         /// <summary>
         /// Gets the root type
@@ -76,23 +76,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedType ErrorType { get; }
 
         /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers
-        {
-            get
-            {
-                yield return this.Provider;
-            }
-        }
-
-        /// <inheritdoc />
         public override string ComplexTypeName => $"{this.OriginalTypeName}_NodeMutationPayload";
-
-        /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
-            yield return this.ErrorType;
-        }
 
         /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
@@ -134,7 +118,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </returns>
         private FieldType CreateField(string name, MergedType type, IFieldResolver resolver = null, EnFieldFlags flags = EnFieldFlags.None)
         {
-            var mergedField = new MergedField(name, type, flags);
+            var mergedField = new MergedField(name, type, this.Provider, flags);
             return this.ConvertApiField(new KeyValuePair<string, MergedField>(name, mergedField), resolver);
         }
 

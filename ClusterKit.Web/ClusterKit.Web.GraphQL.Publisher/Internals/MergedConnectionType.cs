@@ -38,7 +38,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="elementType">
         /// The end Type.
         /// </param>
-        public MergedConnectionType(string originalTypeName, FieldProvider provider, MergedObjectType elementType)
+        public MergedConnectionType(string originalTypeName, ApiProvider provider, MergedObjectType elementType)
             : base(originalTypeName)
         {
             this.ElementType = new MergedNodeType(provider, elementType);
@@ -66,10 +66,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets the field provider
         /// </summary>
-        public FieldProvider Provider { get; }
-
-        /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers => new[] { this.Provider };
+        public ApiProvider Provider { get; }
 
         /// <inheritdoc />
         public override IEnumerable<ApiRequest> GatherSingleApiRequest(
@@ -183,6 +180,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                          new MergedField(
                                                              "edges",
                                                              this.EdgeType,
+                                                             this.Provider,
                                                              EnFieldFlags.IsArray,
                                                              description: "The list of edges according to filtering and paging conditions")
                                                      }
@@ -191,16 +189,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                              };
 
             return new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
-            foreach (var type in this.EdgeType.GetAllTypes())
-            {
-                yield return type;
-            }
         }
 
         /// <inheritdoc />

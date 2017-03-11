@@ -9,8 +9,6 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
-    using System.Collections.Generic;
-    
     using ClusterKit.API.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -35,7 +33,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="provider">
         /// The provider.
         /// </param>
-        public MergedEnumType(ApiEnumType apiEnumType, FieldProvider provider)
+        public MergedEnumType(ApiEnumType apiEnumType, ApiProvider provider)
             : base(apiEnumType.TypeName)
         {
             this.apiEnumType = apiEnumType;
@@ -44,21 +42,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
         /// <inheritdoc />
         public override string ComplexTypeName
-            => $"{EscapeName(this.Provider.Provider.Description.ApiName)}_{EscapeName(this.OriginalTypeName)}";
+            => $"{EscapeName(this.Provider.Description.ApiName)}_{EscapeName(this.OriginalTypeName)}";
 
         /// <summary>
         /// Gets the field provider
         /// </summary>
-        public FieldProvider Provider { get; }
-
-        /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers
-        {
-            get
-            {
-                yield return this.Provider;
-            }
-        }
+        public ApiProvider Provider { get; }
 
         /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
@@ -74,12 +63,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             return graphType;
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
         }
     }
 }

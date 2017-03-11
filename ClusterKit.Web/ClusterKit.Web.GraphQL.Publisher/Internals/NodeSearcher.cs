@@ -68,7 +68,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private async Task<JObject> SearchNode(ResolveFieldContext context)
         {
             var arguments = context.FieldAst.Arguments.ToJson(context);
-            var serializedId = arguments?.Property("id")?.Value?.ToObject<string>()?.UnpackGlobalId();
+            var packedId = arguments?.Property("id")?.Value?.ToObject<string>();
+            var serializedId = packedId?.UnpackGlobalId();
             if (string.IsNullOrWhiteSpace(serializedId))
             {
                 return null;
@@ -125,7 +126,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             if (searchNode != null)
             {
                 searchNode.Add("__resolvedType", connectionType.ElementType.ComplexTypeName);
-                searchNode.Add("__globalId", serializedId);
+                searchNode.Add("__globalId", packedId);
                 searchNode = connectionType.ElementType.ResolveData(searchNode);
             }
 

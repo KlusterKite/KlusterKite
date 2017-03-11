@@ -140,6 +140,7 @@ let projects = [|
             "ClusterKit.Security.Client";
             "ClusterKit.Web.Authorization";
             "ClusterKit.Web.Swagger.Messages"; 
+            "ClusterKit.Web.GraphQL.Publisher";
             "ClusterKit.Monitoring.Client";
             "ClusterKit.API.Client"; 
             "ClusterKit.API.Provider"

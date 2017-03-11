@@ -330,7 +330,7 @@ namespace ClusterKit.API.Provider
 
             this.ApiDescription.Mutations = this.mutations.Values.Select(d => d.CreateMutationField()).ToList();
             this.ApiDescription.Types =
-                assembleData.DiscoveredApiTypes.Values.Where(t => t.TypeName != root.TypeName).ToList();
+                assembleData.DiscoveredApiTypes.Values.ToList();
             this.ApiDescription.Fields = root.Fields;
 
             this.argumentsSerializer = new JsonSerializer
@@ -838,8 +838,6 @@ namespace ClusterKit.API.Provider
                 if (typesUsed.Contains(subContainer.TypeName))
                 {
                     // circular type use
-                    this.generationWarnings.Add(
-                        $"Circular property found for type {apiType.TypeName} field {subContainer.Name}");
                     continue;
                 }
 
@@ -896,7 +894,7 @@ namespace ClusterKit.API.Provider
             }
 
             ApiType apiType;
-            if (data.DiscoveredApiTypes.TryGetValue(type.FullName, out apiType))
+            if (data.ApiTypeByOriginalTypeNames.TryGetValue(type.FullName, out apiType))
             {
                 return apiType;
             }

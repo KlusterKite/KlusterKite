@@ -33,6 +33,10 @@
     <DocumentationFile>bin\Release\ClusterKit.Web.GraphQL.Publisher.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj">
+      <Project>{ddc4b9d1-49ac-4cd6-9fc5-fe4a02c54871}</Project>
+      <Name>ClusterKit.API.Provider</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj">
       <Project>{6adfbddf-e452-46fc-a037-6d57300be561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>
@@ -255,6 +259,7 @@
     <Compile Include="ActorSystemApiProvider.cs" />
     <Compile Include="ApiBrowserActor.cs" />
     <Compile Include="ApiProvider.cs" />
+    <Compile Include="DirectProvider.cs" />
     <Compile Include="GlobalIdSerializer.cs" />
     <Compile Include="GraphTypes\NodeInterface.cs" />
     <Compile Include="Internals\Converter.cs" />
@@ -265,6 +270,11 @@
     <Compile Include="Internals\NodeSearcher.cs" />
     <Compile Include="MergedNodeType.cs" />
     <Compile Include="OwinConfigurator.cs" />
+    <Compile Include="Queries.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Queries.resx</DependentUpon>
+    </Compile>
     <Compile Include="SchemaProvider.cs" />
     <Compile Include="TempApiRequest.cs" />
     <Compile Include="Configuration.Designer.cs">
@@ -303,9 +313,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="KnownErrors.txt" />
+    <EmbeddedResource Include="Queries.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Queries.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

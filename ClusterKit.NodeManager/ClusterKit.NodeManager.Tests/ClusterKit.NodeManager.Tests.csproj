@@ -144,6 +144,14 @@
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="GraphQL">
+      <HintPath>..\..\packages\GraphQL.0.14.6.657\lib\net45\GraphQL.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GraphQL-Parser">
+      <HintPath>..\..\packages\GraphQL-Parser.2.0.0\lib\net45\GraphQL-Parser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Helios, Version=2.1.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Helios.2.1.3\lib\net45\Helios.dll</HintPath>
       <Private>True</Private>
@@ -368,6 +376,10 @@
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj">
       <Project>{ddc4b9d1-49ac-4cd6-9fc5-fe4a02c54871}</Project>
       <Name>ClusterKit.API.Provider</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.GraphQL.Publisher\ClusterKit.Web.GraphQL.Publisher.csproj">
+      <Project>{45219cb4-7189-49c6-a95b-aebbaed4645e}</Project>
+      <Name>ClusterKit.Web.GraphQL.Publisher</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
       <Project>{983daeb9-b058-41a9-8403-29851f2244b7}</Project>

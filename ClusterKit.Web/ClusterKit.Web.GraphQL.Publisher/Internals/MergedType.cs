@@ -59,11 +59,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public string OriginalTypeName { get; }
 
         /// <summary>
-        /// Gets the list of providers
-        /// </summary>
-        public abstract IEnumerable<FieldProvider> Providers { get; }
-
-        /// <summary>
         /// Gets the list of requested fields from parent 
         /// <seealso cref="Field"/>
         /// </summary>
@@ -165,12 +160,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// The representing <see cref="IGraphType"/>
         /// </returns>
         public abstract IGraphType GenerateGraphType(NodeInterface nodeInterface);
-
-        /// <summary>
-        /// Get all included types recursively
-        /// </summary>
-        /// <returns>The list of all defined types</returns>
-        public abstract IEnumerable<MergedType> GetAllTypes();
 
         /// <summary>
         /// Resolves request value

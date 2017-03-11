@@ -77,27 +77,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Get all included types recursively
-        /// </summary>
-        /// <returns>The list of all defined types</returns>
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
-            foreach (var type in this.Fields.Values)
-            {
-                foreach (var argumentsValue in type.Arguments.Values.SelectMany(t => t.Type.GetAllTypes()))
-                {
-                    yield return argumentsValue;
-                }
-
-                foreach (var subType in type.Type.GetAllTypes())
-                {
-                    yield return subType;
-                }
-            }
-        }
-
-        /// <summary>
         /// Creates <see cref="FieldType"/> from <see cref="ApiObjectType"/>
         /// </summary>
         /// <param name="description">

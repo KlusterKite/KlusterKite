@@ -93,7 +93,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets or sets the list of providers
         /// </summary>
-        public override IEnumerable<FieldProvider> Providers => this.providers;
+        public IEnumerable<FieldProvider> Providers => this.providers;
 
         /// <summary>
         /// Adds a provider to the provider list
@@ -111,6 +111,28 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public void AddProviders(IEnumerable<FieldProvider> newProviders)
         {
             this.providers.AddRange(newProviders);
+        }
+
+        /// <summary>
+        /// Makes a duplicate of the current object
+        /// </summary>
+        /// <returns>The object duplicate</returns>
+        public virtual MergedObjectType Clone()
+        {
+            var mergedObjectType = new MergedObjectType(this.OriginalTypeName);
+            this.FillWithMyFields(mergedObjectType);
+            return mergedObjectType;
+        }
+
+        /// <summary>
+        /// Fills the empty object with current objects fields
+        /// </summary>
+        /// <param name="shell">The empty object to fill</param>
+        protected virtual void FillWithMyFields(MergedObjectType shell)
+        {
+            shell.AddProviders(this.providers);
+            shell.Fields = this.Fields.ToDictionary(p => p.Key, p => p.Value.Clone());
+            shell.Category = this.Category;
         }
 
         /// <summary>
@@ -133,7 +155,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             var usedFields =
                 GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName)
                     .Join(
-                        this.Fields.Where(f => f.Value.Type.Providers.Any(fp => fp.Provider == provider)),
+                        this.Fields.Where(f => f.Value.Providers.Any(fp => fp == provider)),
                         s => s.Name,
                         fp => fp.Key,
                         (s, fp) => new { Ast = s, Field = fp.Value })

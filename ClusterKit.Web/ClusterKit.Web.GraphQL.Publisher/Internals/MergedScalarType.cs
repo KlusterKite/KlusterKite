@@ -10,8 +10,7 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System;
-    using System.Collections.Generic;
-
+    
     using ClusterKit.API.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -25,29 +24,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     internal class MergedScalarType : MergedType
     {
         /// <inheritdoc />
-        public MergedScalarType(EnScalarType type, FieldProvider provider)
+        public MergedScalarType(EnScalarType type)
             : base(type.ToString())
         {
-            this.Provider = provider;
             this.ScalarType = type;
         }
 
         /// <inheritdoc />
         public override string ComplexTypeName => $"Scalar-{this.ScalarType}";
-
-        /// <summary>
-        /// Gets the field provider
-        /// </summary>
-        public FieldProvider Provider { get; }
-
-        /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers
-        {
-            get
-            {
-                yield return this.Provider;
-            }
-        }
 
         /// <summary>
         /// Gets the scalar type
@@ -88,12 +72,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             return (resolve as JValue)?.Value; 
-        }
-
-        /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
         }
     }
 }

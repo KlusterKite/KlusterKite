@@ -42,7 +42,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedUntypedMutationResult(
             MergedObjectType originalReturnType,
             MergedApiRoot root,
-            FieldProvider provider)
+            ApiProvider provider)
             : base(originalReturnType.OriginalTypeName)
         {
             this.OriginalReturnType = originalReturnType;
@@ -53,16 +53,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets the provider
         /// </summary>
-        public FieldProvider Provider { get; }
-
-        /// <inheritdoc />
-        public override IEnumerable<FieldProvider> Providers
-        {
-            get
-            {
-                yield return this.Provider;
-            }
-        }
+        public ApiProvider Provider { get; }
 
         /// <inheritdoc />
         public override string Description => this.OriginalReturnType.Description;
@@ -85,16 +76,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return graphType;
         }
 
-        /// <inheritdoc />
-        public override IEnumerable<MergedType> GetAllTypes()
-        {
-            yield return this;
-            foreach (var mergedType in this.OriginalReturnType.GetAllTypes())
-            {
-                yield return mergedType;
-            }
-        }
-
         /// <summary>
         /// Creates virtual field
         /// </summary>
@@ -115,7 +96,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </returns>
         private FieldType CreateField(string name, MergedType type, IFieldResolver resolver = null, EnFieldFlags flags = EnFieldFlags.None)
         {
-            var mergedField = new MergedField(name, type, flags);
+            var mergedField = new MergedField(name, type, this.Provider, flags);
             return this.ConvertApiField(new KeyValuePair<string, MergedField>(name, mergedField), resolver);
         }
 
