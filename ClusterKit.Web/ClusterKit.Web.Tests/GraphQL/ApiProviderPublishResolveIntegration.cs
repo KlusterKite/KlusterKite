@@ -1732,6 +1732,58 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// If API defines method that has no published parameters, the mutations declared in method result should be accessable
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task ObjectMethodAsFieldSubMutationTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"                          
+            mutation M {
+                    call: TestApi_asyncObjectMethodAsField_setName(name: ""hello world"", clientMutationId: ""test client id"") {
+                        result {
+                            name
+                        },
+                        clientMutationId,
+                        api {
+                            syncScalarField
+                        }
+                    }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""call"": {
+                                ""result"": {
+                                    ""name"": ""hello world""
+                                },
+                                ""clientMutationId"": ""test client id"",
+                                ""api"": {
+                                    ""syncScalarField"": ""SyncScalarField""
+                                }
+                            }
+                          }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing simple fields requests from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>

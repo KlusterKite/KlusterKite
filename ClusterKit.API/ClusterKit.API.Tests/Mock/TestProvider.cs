@@ -305,6 +305,19 @@ namespace ClusterKit.API.Tests.Mock
         }
 
         /// <summary>
+        /// Async method that should be treated as read-only field
+        /// </summary>
+        /// <param name="requestContext">The request context</param>
+        /// <param name="apiRequest">The request data</param>
+        /// <returns>The nested provider</returns>
+        [DeclareField]
+        [UsedImplicitly]
+        public Task<NestedProvider> AsyncObjectMethodAsField(RequestContext requestContext, ApiRequest apiRequest)
+        {
+            return Task.FromResult(new NestedProvider { SyncScalarField = "returned type" });
+        }
+
+        /// <summary>
         /// Faulted async method
         /// </summary>
         /// <returns>Faulted task</returns>
