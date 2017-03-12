@@ -1699,6 +1699,83 @@ namespace ClusterKit.Web.Tests.GraphQL
                         ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
+        
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task ErrorHandlingTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var faultingProvider = new FaultingProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var successProvider = new DirectProvider(new AdditionalProvider(), this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { faultingProvider, successProvider });
+
+            var faultingQuery = @"
+            {                
+                api {
+                    syncScalarField,
+                    helloWorld
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = faultingQuery;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": null,
+                          ""errors"": [
+                            {
+                              ""message"": ""Error trying to resolve api."",
+                              ""locations"": [
+                                {
+                                  ""line"": 3,
+                                  ""column"": 17
+                                }
+                              ]
+                            }
+                          ]
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+            
+            var successQuery = @"
+            {                
+                api {                    
+                    helloWorld
+                }
+            }
+            ";
+
+            result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = successQuery;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            expectedResult = @"
+                        {
+                          ""data"": {
+                                ""api"": {
+                                ""helloWorld"": ""Hello world""
+                                }
+                            }
+                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
 
         /// <summary>
         /// Checking the work of <see cref="DeclareFieldAttribute.Access"/>
@@ -2153,6 +2230,45 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(
                 CleanResponse(expectedResult), 
                 CleanResponse(response));
+        }
+
+        /// <summary>
+        /// An additional provider
+        /// </summary>
+        [ApiDescription(Name = "AdditionalApi")]
+        public class AdditionalProvider : API.Provider.ApiProvider
+        {
+            /// <summary>
+            /// Published string
+            /// </summary>
+            [DeclareField]
+            public string HelloWorld => "Hello world";
+        }
+
+        /// <summary>
+        /// The provider that throws an exception during resolve
+        /// </summary>
+        private class FaultingProvider : DirectProvider
+        {
+            /// <inheritdoc />
+            public FaultingProvider(API.Provider.ApiProvider provider, Action<string> errorOutput)
+                : base(provider, errorOutput)
+            {
+            }
+
+            /// <inheritdoc />
+            public override async Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
+            {
+                await base.GetData(requests, context);
+                throw new Exception("Test exception");
+            }
+
+            /// <inheritdoc />
+            public override async Task<JObject> SearchNode(string id, List<RequestPathElement> path, ApiRequest nodeRequest, RequestContext context)
+            {
+                await base.SearchNode(id, path, nodeRequest, context);
+                throw new Exception("Test exception");
+            }
         }
     }
 }

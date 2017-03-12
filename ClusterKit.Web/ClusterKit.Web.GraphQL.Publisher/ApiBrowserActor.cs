@@ -307,7 +307,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     needsSchemaRebuild = true;
                     endpoints = new ApiEndpoints(
                         description.Description,
-                        ConfigurationUtils.GetRestTimeout(Context.System));
+                        Context.System);
                     this.apiEndpoints.Add(description.Description.ApiName, endpoints);
                     Context.GetLogger()
                         .Info(
@@ -351,13 +351,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
             /// <param name="description">
             /// The description.
             /// </param>
-            /// <param name="requestTimeout">
-            /// The request timeout.
+            /// <param name="system">
+            /// The actor system
             /// </param>
-            public ApiEndpoints(ApiDescription description, TimeSpan? requestTimeout)
+            public ApiEndpoints(ApiDescription description, ActorSystem system)
             {
                 this.Descriptions.Add(description.Version, description);
-                this.Provider = new ActorSystemApiProvider(description, requestTimeout);
+                this.Provider = new ActorSystemApiProvider(description, system);
             }
 
             /// <summary>

@@ -19,6 +19,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
     
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Messages;
+    using ClusterKit.Core;
     using ClusterKit.Security.Client;
 
     using Newtonsoft.Json.Linq;
@@ -44,12 +45,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="description">
         /// The API description.
         /// </param>
-        /// <param name="timeout">
-        /// The request timeout.
+        /// <param name="system">
+        /// The actor system.
         /// </param>
-        public ActorSystemApiProvider(ApiDescription description, TimeSpan? timeout)
+        public ActorSystemApiProvider(ApiDescription description, ActorSystem system)
         {
-            this.timeout = timeout;
+            this.timeout = ConfigurationUtils.GetRestTimeout(system);
             this.Description = description;
         }
 
@@ -75,7 +76,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 {
                     mutation.Context = context;
                     
-                    // todo: repeat ask in case of exception
                     var midResult = await endpoint.Ask<SurrogatableJObject>(mutation, this.timeout);
                     result.Merge((JObject)midResult);
                 }
@@ -83,7 +83,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 return result;
             }
 
-            // todo: repeat ask in case of exception
             var query = new QueriApiRequest { Context = context, Fields = requests };
             return await endpoint.Ask<SurrogatableJObject>(query, this.timeout);
         }

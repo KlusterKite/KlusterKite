@@ -375,7 +375,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type.ComplexTypeName).ToList();
                 var requestedFields = new List<ApiRequest>();
                 
-                // todo: resolve alias collisions
                 foreach (var topField in topFields.Where(f => f.Name == "result"))
                 {
                     requestedFields.AddRange(responseType.OriginalReturnType.GatherSingleApiRequest(topField, context));
