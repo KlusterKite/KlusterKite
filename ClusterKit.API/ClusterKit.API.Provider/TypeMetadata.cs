@@ -212,6 +212,7 @@ namespace ClusterKit.API.Provider
                     break;
             }
 
+            flags |= EnFieldFlags.Queryable;
             return flags;
         }
 

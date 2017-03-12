@@ -15,6 +15,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher;
@@ -1697,6 +1698,37 @@ namespace ClusterKit.Web.Tests.GraphQL
                         }
                         ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Checking the work of <see cref="DeclareFieldAttribute.Access"/>
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task FieldAccessTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = Queries.IntrospectionQuery;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = JObject.Parse(new DocumentWriter(true).Write(result));
+            Assert.NotNull(response);
+
+            var queryType = response.SelectToken("$.data.__schema.types[?(@.name == 'TestApi_NestedProvider')]");
+            Assert.NotNull(queryType);
+            Assert.Null(queryType.SelectToken("fields[?(@.name == 'argumentField')]"));
+            Assert.NotNull(queryType.SelectToken("fields[?(@.name == 'readOnlyField')]"));
+
+            var inputType = response.SelectToken("$.data.__schema.types[?(@.name == 'TestApi_NestedProvider_Input')]");
+            Assert.NotNull(inputType);
+            Assert.NotNull(inputType.SelectToken("inputFields[?(@.name == 'argumentField')]"));
+            Assert.Null(inputType.SelectToken("inputFields[?(@.name == 'readOnlyField')]"));
         }
 
         /// <summary>

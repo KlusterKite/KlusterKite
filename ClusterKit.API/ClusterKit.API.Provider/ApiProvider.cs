@@ -539,10 +539,20 @@ namespace ClusterKit.API.Provider
                 flags |= EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable;
             }
 
-            if (!metadata.IsAsync && !metadata.IsForwarding && metadata.ConverterType == null && property.CanWrite
-                && metadata.MetaType != TypeMetadata.EnMetaType.Connection)
+            if (!metadata.IsAsync 
+                && !metadata.IsForwarding 
+                && metadata.ConverterType == null 
+                && property.CanWrite
+                && metadata.MetaType != TypeMetadata.EnMetaType.Connection
+                && (!(attribute is DeclareFieldAttribute) || ((DeclareFieldAttribute)attribute).Access.HasFlag(EnAccessFlag.Writable)))
             {
                 flags |= EnFieldFlags.CanBeUsedInInput;
+            }
+
+            if (attribute is DeclareFieldAttribute
+                && !((DeclareFieldAttribute)attribute).Access.HasFlag(EnAccessFlag.Queryable))
+            {
+                flags &= ~EnFieldFlags.Queryable;
             }
 
             if (metadata.ScalarType != EnScalarType.None)

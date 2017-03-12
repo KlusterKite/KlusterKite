@@ -50,6 +50,11 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// In input types, this field can be set
         /// </summary>
-        CanBeUsedInInput = 32
+        CanBeUsedInInput = 32,
+
+        /// <summary>
+        /// This field can be queried
+        /// </summary>
+        Queryable = 64,
     }
 }

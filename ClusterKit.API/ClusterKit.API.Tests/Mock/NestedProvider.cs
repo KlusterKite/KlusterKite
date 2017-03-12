@@ -38,6 +38,20 @@ namespace ClusterKit.API.Tests.Mock
         public string SyncScalarField { get; set; } = "SyncScalarField";
 
         /// <summary>
+        /// Gets or sets the field that is visible only in "input" objects
+        /// </summary>
+        [DeclareField(Access = EnAccessFlag.Writable)]
+        [UsedImplicitly]
+        public string ArgumentField { get; set; }
+
+        /// <summary>
+        /// Gets or sets the field that is not visible "input" objects, but can be queried
+        /// </summary>
+        [DeclareField(Access = EnAccessFlag.Queryable)]
+        [UsedImplicitly]
+        public string ReadOnlyField { get; set; }
+
+        /// <summary>
         /// Test nested mutation
         /// </summary>
         /// <param name="name">The new name of current test object</param>

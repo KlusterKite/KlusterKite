@@ -15,6 +15,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Xml.Serialization;
 
+    using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.Data.CRUD;
 
@@ -98,7 +99,8 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of users assigned to this role
         /// </summary>
-        [DeclareField(Description = "The list of users assigned to this role")]
+        [UsedImplicitly]
+        [DeclareField(Description = "The list of users assigned to this role", Access = EnAccessFlag.Queryable)]
         public List<User> Users { get; set; }
 
         /// <inheritdoc />

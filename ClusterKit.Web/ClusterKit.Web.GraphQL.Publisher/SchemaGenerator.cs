@@ -614,7 +614,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             bool createAsInput,
             Dictionary<string, MergedType> typesCreated)
         {
-            foreach (var apiField in apiFields)
+            foreach (var apiField in apiFields.Where(f => (createAsInput && f.Flags.HasFlag(EnFieldFlags.CanBeUsedInInput)) || (!createAsInput && f.Flags.HasFlag(EnFieldFlags.Queryable))))
             {
                 MergedField complexField;
                 if (parentType.Fields.TryGetValue(apiField.Name, out complexField))

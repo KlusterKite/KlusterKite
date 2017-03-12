@@ -15,6 +15,7 @@ namespace ClusterKit.NodeManager.Client.ORM
 
     using BCrypt.Net;
 
+    using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.Data.CRUD;
 
@@ -35,7 +36,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of roles assigned to this user
         /// </summary>
-        [DeclareField(Description = "The list of roles assigned to this user")]
+        [DeclareField(Description = "The list of roles assigned to this user", Access = EnAccessFlag.Queryable)]
         public List<Role> Roles { get; set; } = new List<Role>();
 
         /// <summary>
