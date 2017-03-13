@@ -16,5 +16,11 @@ namespace ClusterKit.Data.Tests.Mock
     /// </summary>
     public class TestDataContextMigrationConfiguration : DbMigrationsConfiguration<TestDataContext>
     {
+        /// <inheritdoc />
+        public TestDataContextMigrationConfiguration()
+        {
+            this.AutomaticMigrationsEnabled = true;
+            this.AutomaticMigrationDataLossAllowed = true;
+        }
     }
 }

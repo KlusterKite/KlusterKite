@@ -221,7 +221,7 @@ namespace ClusterKit.API.Provider
             {
                 var parameterDescription =
                     parameter.GetCustomAttribute(typeof(ApiDescriptionAttribute)) as ApiDescriptionAttribute;
-                var parameterName = parameterDescription?.Name ?? ToCamelCase(parameter.Name);
+                var parameterName = parameterDescription?.Name ?? ApiDescriptionAttribute.ToCamelCase(parameter.Name);
 
                 string command;
                 if (parameter.ParameterType == typeof(RequestContext))

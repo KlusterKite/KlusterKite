@@ -170,7 +170,8 @@ namespace ClusterKit.Data.CRUD
                 ActionType = EnActionType.Update,
                 Id = id,
                 Data = newNode,
-                RequestContext = this.context
+                RequestContext = this.context,
+                ApiRequest = apiRequest
             };
 
             var result =

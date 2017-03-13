@@ -13,6 +13,7 @@ namespace ClusterKit.Data.Tests.Mock
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
+    using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
 
     /// <summary>
@@ -30,16 +31,19 @@ namespace ClusterKit.Data.Tests.Mock
         /// <summary>
         /// Gets or sets the user login
         /// </summary>
+        [DeclareField]
         public string Login { get; set; }
 
         /// <summary>
         /// Gets or sets the user password
         /// </summary>
+        [DeclareField]
         public string Password { get; set; }
 
         /// <summary>
         /// Gets or sets the user roles
         /// </summary>
+        [DeclareField(Access = EnAccessFlag.Queryable)]
         public List<Role> Roles { get; set; }
     }
 }

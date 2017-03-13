@@ -423,7 +423,7 @@ namespace ClusterKit.API.Provider
                 return null;
             }
 
-            var name = attribute.Name ?? ResolverGenerator.ToCamelCase(method.Name);
+            var name = attribute.Name ?? ApiDescriptionAttribute.ToCamelCase(method.Name);
             data.FieldNames[method] = name;
             data.Members[apiType.TypeName][name] = method;
 
@@ -464,7 +464,7 @@ namespace ClusterKit.API.Provider
                 var description =
                     parameterInfo.GetCustomAttribute(typeof(ApiDescriptionAttribute)) as ApiDescriptionAttribute;
 
-                var parameterName = description?.Name ?? ResolverGenerator.ToCamelCase(parameterInfo.Name);
+                var parameterName = description?.Name ?? ApiDescriptionAttribute.ToCamelCase(parameterInfo.Name);
                 if (parameterMetadata.ScalarType != EnScalarType.None)
                 {
                     field.Arguments.Add(
@@ -525,7 +525,7 @@ namespace ClusterKit.API.Provider
                 return null;
             }
 
-            var name = attribute.Name ?? ResolverGenerator.ToCamelCase(property.Name);
+            var name = attribute.Name ?? ApiDescriptionAttribute.ToCamelCase(property.Name);
             data.FieldNames[property] = name;
             data.Members[apiType.TypeName][name] = property;
 
@@ -708,7 +708,7 @@ namespace ClusterKit.API.Provider
                     {
                         var description =
                             (DeclareConnectionAttribute)m.GetCustomAttribute(typeof(DeclareConnectionAttribute));
-                        var name = description?.Name ?? ResolverGenerator.ToCamelCase(m.Name);
+                        var name = description?.Name ?? ApiDescriptionAttribute.ToCamelCase(m.Name);
                         return
                             new
                                 {

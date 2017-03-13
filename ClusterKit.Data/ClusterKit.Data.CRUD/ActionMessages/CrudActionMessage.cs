@@ -11,6 +11,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
 {
     using Akka.Routing;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
@@ -43,6 +44,11 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// </summary>
         [UsedImplicitly]
         public TData Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets the original <see cref="ApiRequest"/>. Optional.
+        /// </summary>
+        public ApiRequest ApiRequest { get; set; }
 
         /// <summary>
         /// Gets or sets the original requester description

@@ -65,26 +65,6 @@ namespace ClusterKit.API.Provider
         public abstract string Generate();
 
         /// <summary>
-        /// Converts string to camel case
-        /// </summary>
-        /// <param name="name">The property / method name</param>
-        /// <returns>The name in camel case</returns>
-        internal static string ToCamelCase(string name)
-        {
-            name = name?.Trim();
-
-            if (string.IsNullOrEmpty(name))
-            {
-                return name;
-            }
-
-            var array = name.ToCharArray();
-            array[0] = array[0].ToString().ToLowerInvariant().ToCharArray().First();
-
-            return new string(array);
-        }
-
-        /// <summary>
         /// Creates valid type name representation
         /// </summary>
         /// <remarks>

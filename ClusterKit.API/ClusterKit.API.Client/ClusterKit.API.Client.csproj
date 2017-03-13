@@ -83,6 +83,7 @@
     <Compile Include="Attributes\PublishToApiAttribute.cs" />
     <Compile Include="Converters\ArrayConverter.cs" />
     <Compile Include="Converters\StringConverter.cs" />
+    <Compile Include="DataUpdater.cs" />
     <Compile Include="EnAccessFlag.cs" />
     <Compile Include="EnFieldFlags.cs" />
     <Compile Include="EnScalarType.cs" />

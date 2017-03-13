@@ -15,6 +15,7 @@ namespace ClusterKit.Data
     using Akka.Actor;
     using Akka.Event;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
@@ -385,6 +386,20 @@ namespace ClusterKit.Data
                                 return CrudActionResponse<TObject>.Error(
                                     new EntityNotFoundException(),
                                     request.ExtraData);
+                            }
+
+                            if (request.ApiRequest != null)
+                            {
+                                var updatedObject = await factory.Get(request.Id);
+                                if (updatedObject == null)
+                                {
+                                    return CrudActionResponse<TObject>.Error(
+                                        new EntityNotFoundException(),
+                                        request.ExtraData);
+                                }
+
+                                DataUpdater<TObject>.Update(updatedObject, entity, request.ApiRequest);
+                                entity = updatedObject;
                             }
 
                             entity = this.BeforeUpdate<TObject>(entity, oldObject);

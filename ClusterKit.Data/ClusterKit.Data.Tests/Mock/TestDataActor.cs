@@ -25,12 +25,12 @@ namespace ClusterKit.Data.Tests.Mock
         /// <summary>
         /// The mocked data context
         /// </summary>
-        private readonly TestDataContext dataContext;
+        private readonly IContextFactory<TestDataContext> contextFactory;
 
         /// <inheritdoc />
-        public TestDataActor(TestDataContext dataContext)
+        public TestDataActor(IContextFactory<TestDataContext> contextFactory)
         {
-            this.dataContext = dataContext;
+            this.contextFactory = contextFactory;
 
             this.ReceiveAsync<CrudActionMessage<User, Guid>>(this.OnRequest);
             this.ReceiveAsync<CrudActionMessage<Role, Guid>>(this.OnRequest);
@@ -41,7 +41,7 @@ namespace ClusterKit.Data.Tests.Mock
         /// <inheritdoc />
         protected override Task<TestDataContext> GetContext()
         {
-            return Task.FromResult(this.dataContext);
+            return this.contextFactory.CreateContext(null, "test");
         }
     }
 }
