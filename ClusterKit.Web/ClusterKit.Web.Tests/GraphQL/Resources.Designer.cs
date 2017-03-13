@@ -61,38 +61,6 @@ namespace ClusterKit.Web.Tests.GraphQL {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {
-        ///  &quot;data&quot;: {
-        ///    &quot;__schema&quot;: {
-        ///      &quot;queryType&quot;: {
-        ///        &quot;name&quot;: &quot;Query&quot;
-        ///      },
-        ///      &quot;mutationType&quot;: {
-        ///        &quot;name&quot;: &quot;Mutations&quot;
-        ///      },
-        ///      &quot;subscriptionType&quot;: null,
-        ///      &quot;types&quot;: [
-        ///        {
-        ///          &quot;kind&quot;: &quot;SCALAR&quot;,
-        ///          &quot;name&quot;: &quot;String&quot;,
-        ///          &quot;description&quot;: null,
-        ///          &quot;fields&quot;: null,
-        ///          &quot;inputFields&quot;: null,
-        ///          &quot;interfaces&quot;: null,
-        ///          &quot;enumValues&quot;: null,
-        ///          &quot;possibleTypes&quot;: null
-        ///        },
-        ///        {
-        ///          &quot;kind&quot;: &quot;SCALAR&quot;,
-        ///          &quot;name&quot;: &quot;Bo [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string ApiProviderResolveTestProviderSchemaSnapshot {
-            get {
-                return ResourceManager.GetString("ApiProviderResolveTestProviderSchemaSnapshot", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to query IntrospectionQuery {
         ///    __schema {
         ///      queryType { name }
@@ -137,9 +105,7 @@ namespace ClusterKit.Web.Tests.GraphQL {
         ///      &quot;queryType&quot;: {
         ///        &quot;name&quot;: &quot;Query&quot;
         ///      },
-        ///      &quot;mutationType&quot;: {
-        ///        &quot;name&quot;: &quot;Mutations&quot;
-        ///      },
+        ///      &quot;mutationType&quot;: null,
         ///      &quot;subscriptionType&quot;: null,
         ///      &quot;types&quot;: [
         ///        {
@@ -154,7 +120,8 @@ namespace ClusterKit.Web.Tests.GraphQL {
         ///        },
         ///        {
         ///          &quot;kind&quot;: &quot;SCALAR&quot;,
-        ///          &quot;name&quot;: &quot;Bo [rest of string was truncated]&quot;;.
+        ///          &quot;name&quot;: &quot;Boolean&quot;,
+        ///          &quot;description&quot;:  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SchemaDescriptionTestSnapshot {
             get {

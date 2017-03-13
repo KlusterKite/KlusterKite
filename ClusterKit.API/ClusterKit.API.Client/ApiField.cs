@@ -104,7 +104,7 @@ namespace ClusterKit.API.Client
         public static ApiField Object(
             [NotNull] string name,
             [NotNull] string typeName,
-            EnFieldFlags flags = EnFieldFlags.None,
+            EnFieldFlags flags = EnFieldFlags.Queryable,
             IEnumerable<ApiField> arguments = null,
             string description = null)
         {
@@ -141,7 +141,7 @@ namespace ClusterKit.API.Client
         public static ApiField Scalar(
             [NotNull] string name,
             EnScalarType type,
-            EnFieldFlags flags = EnFieldFlags.None,
+            EnFieldFlags flags = EnFieldFlags.Queryable,
             IEnumerable<ApiField> arguments = null,
             string description = null)
         {

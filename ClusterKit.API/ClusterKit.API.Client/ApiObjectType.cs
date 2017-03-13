@@ -64,7 +64,7 @@ namespace ClusterKit.API.Client
         /// <param name="flags">The list of field flags</param>
         /// <param name="description">The field description</param>
         /// <returns>The api filed</returns>
-        public ApiField CreateField(string name, EnFieldFlags flags = EnFieldFlags.None, string description = null)
+        public ApiField CreateField(string name, EnFieldFlags flags = EnFieldFlags.Queryable, string description = null)
         {
             return ApiField.Object(name, this.TypeName, flags, description: description);
         }

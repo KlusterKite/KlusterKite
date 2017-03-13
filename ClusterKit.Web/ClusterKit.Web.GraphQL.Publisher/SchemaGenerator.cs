@@ -108,7 +108,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var schema = new Schema
                              {
                                  Query = (VirtualGraphType)graphTypes[root.ComplexTypeName],
-                                 Mutation = mutationType
+                                 Mutation = mutationType.Fields.Any() ? mutationType : null
                              };
 
             schema.Initialize();

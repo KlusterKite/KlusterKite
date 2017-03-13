@@ -60,14 +60,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                                    {
                                        ApiField.Scalar("id", EnScalarType.Guid),
                                        ApiField.Scalar("name", EnScalarType.String),
-                                       ApiField.Scalar("numbers", EnScalarType.Integer, EnFieldFlags.IsArray),
-                                       ApiField.Object("objects", "object", EnFieldFlags.IsArray)
+                                       ApiField.Scalar("numbers", EnScalarType.Integer, EnFieldFlags.IsArray | EnFieldFlags.Queryable),
+                                       ApiField.Object("objects", "object", EnFieldFlags.IsArray | EnFieldFlags.Queryable)
                                    };
             var viewerType = new ApiObjectType("viewer", viewerFields);
 
             var objectFields = new[]
                                    {
-                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
+                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey | EnFieldFlags.Queryable),
                                        ApiField.Scalar("name", EnScalarType.String)
                                    };
 
@@ -77,7 +77,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection | EnFieldFlags.Queryable) });
 
             var provider = new MoqProvider
             {
@@ -199,7 +199,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var objectFields = new[]
                                    {
-                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
+                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey | EnFieldFlags.Queryable),
                                        ApiField.Scalar("name", EnScalarType.String)
                                    };
 
@@ -209,7 +209,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection | EnFieldFlags.Queryable) });
 
             var provider = new MoqProvider
                                {
@@ -424,20 +424,20 @@ namespace ClusterKit.Web.Tests.GraphQL
                                        ApiField.Object(
                                            "getObjects",
                                            "object",
-                                           EnFieldFlags.IsArray,
+                                           EnFieldFlags.IsArray | EnFieldFlags.Queryable,
                                            getObjectsArguments),
                                        ApiField.Object(
                                            "getObjectConnections",
                                            "object",
-                                           EnFieldFlags.IsConnection,
+                                           EnFieldFlags.IsConnection | EnFieldFlags.Queryable,
                                            getObjectsArguments),
                                    };
             var viewerType = new ApiObjectType("viewer", viewerFields);
 
             var objectFields = new[]
                                    {
-                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey),
-                                       ApiField.Scalar("name", EnScalarType.String)
+                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey | EnFieldFlags.Queryable | EnFieldFlags.CanBeUsedInInput),
+                                       ApiField.Scalar("name", EnScalarType.String, EnFieldFlags.Queryable | EnFieldFlags.CanBeUsedInInput)
                                    };
 
             var objectType = new ApiObjectType("object", objectFields);
@@ -446,7 +446,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 "TestApi1",
                 "0.0.0.1",
                 new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection) });
+                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection | EnFieldFlags.Queryable) });
 
             var provider = new MoqProvider
                                {

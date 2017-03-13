@@ -15,8 +15,6 @@ namespace ClusterKit.Data.Tests.Mock
 
     using ClusterKit.API.Client.Attributes;
 
-    using JetBrains.Annotations;
-
     /// <summary>
     /// The user for test data context
     /// </summary>
