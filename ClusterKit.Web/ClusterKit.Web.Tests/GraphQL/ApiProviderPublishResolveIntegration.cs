@@ -407,7 +407,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_create(newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId"") {
+                    call: TestApi_connection_create(input: {newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId""}) {
                     clientMutationId,
                     node {
                         id,
@@ -554,7 +554,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_create(newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId"") {
+                    call: TestApi_connection_create(input: {newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId""}) {
                     mutationId: clientMutationId,
                     nodeElement: node {
                         globalId: id,
@@ -735,7 +735,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_delete(id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"") {
+                    call: TestApi_connection_delete(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110""}) {
                     node {
                         id,
                         __id,
@@ -906,7 +906,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_update(id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}) {
+                    call: TestApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}}) {
                     node {
                         id,
                         __id,
@@ -1051,7 +1051,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_update(id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", newNode: { name: ""hello world"", value: 13}) {
+                    call: TestApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", newNode: { name: ""hello world"", value: 13}}) {
                     errors {
                         field,
                         message
@@ -1475,7 +1475,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_nestedAsync_setName(name: ""hello world"", clientMutationId: ""test client id"") {
+                    call: TestApi_nestedAsync_setName(input: {name: ""hello world"", clientMutationId: ""test client id""}) {
                         result {
                             name
                         },
@@ -1511,6 +1511,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                             }
                           }
                         }";
+
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -1821,7 +1822,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_asyncObjectMethodAsField_setName(name: ""hello world"", clientMutationId: ""test client id"") {
+                    call: TestApi_asyncObjectMethodAsField_setName(input: {name: ""hello world"", clientMutationId: ""test client id""}) {
                         result {
                             name
                         },

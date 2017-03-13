@@ -305,9 +305,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     }
                 }
 
+                var arguments = context.FieldAst.Arguments.ToJson(context).Property("input")?.Value as JObject;
                 var request = new MutationApiRequest
                 {
-                    Arguments = context.FieldAst.Arguments.ToJson(context),
+                    Arguments = arguments,
                     FieldName = this.mergedField.FieldName,
                     Fields = requestedFields
                 };
@@ -348,7 +349,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     }
                 }
 
-                data?.Add("clientMutationId", context.GetArgument<string>("clientMutationId"));
+                data?.Add("clientMutationId", arguments?.Property("clientMutationId")?.ToObject<string>());
                 return data;
             }
 
@@ -380,15 +381,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     requestedFields.AddRange(responseType.OriginalReturnType.GatherSingleApiRequest(topField, context));
                 }
 
+                var arguments = context.FieldAst.Arguments.ToJson(context).Property("input")?.Value as JObject;
                 var request = new MutationApiRequest
                 {
-                    Arguments = context.FieldAst.Arguments.ToJson(context),
+                    Arguments = arguments,
                     FieldName = this.mergedField.FieldName,
                     Fields = requestedFields
                 };
 
                 var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
-                data?.Add("clientMutationId", context.GetArgument<string>("clientMutationId"));
+                data?.Add("clientMutationId", arguments?.Property("clientMutationId")?.ToObject<string>());
                 return data;
             }
 

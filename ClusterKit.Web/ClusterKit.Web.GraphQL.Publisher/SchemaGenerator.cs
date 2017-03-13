@@ -476,25 +476,48 @@ namespace ClusterKit.Web.GraphQL.Publisher
             MergedApiRoot apiRoot,
             Dictionary<string, MergedType> typesCreated)
         {
-            var returnType = (MergedObjectType)CreateMergedType(provider, apiMutation, null, new List<string>(), false, typesCreated);
-            var arguments = apiMutation.Arguments.ToDictionary(
-                a => a.Name,
-                a =>
-                    new MergedField( 
-                        a.Name,
-                        CreateMergedType(provider, a, null, new List<string>(), true, typesCreated),
+            var returnType =
+                (MergedObjectType)CreateMergedType(provider, apiMutation, null, new List<string>(), false, typesCreated);
+
+            var inputType = new MergedInputType(apiMutation.Name);
+            inputType.AddProvider(new FieldProvider { Provider = provider, FieldType = new ApiObjectType(apiMutation.Name) });
+            typesCreated[inputType.ComplexTypeName] = inputType;
+
+            foreach (var apiField in apiMutation.Arguments)
+            {
+                inputType.Fields.Add(
+                    apiField.Name,
+                    new MergedField(
+                        apiField.Name,
+                        CreateMergedType(provider, apiField, null, new List<string>(), true, typesCreated),
                         provider,
                         apiMutation.Flags,
-                        description: a.Description));
-            arguments["clientMutationId"] = new MergedField(
+                        description: apiField.Description));
+            }
+
+            inputType.Fields["clientMutationId"] = new MergedField(
                 "clientMutationId",
                 CreateScalarType(EnScalarType.String, typesCreated),
                 provider);
 
+            var arguments = new Dictionary<string, MergedField>
+                                {
+                                    {
+                                        "input",
+                                        new MergedField("input", inputType, provider)
+                                    }
+                                };
+
             var payload = new MergedUntypedMutationResult(returnType, apiRoot, provider);
             typesCreated[payload.ComplexTypeName] = payload;
 
-            var untypedMutation = new MergedField(apiMutation.Name, payload, provider, apiMutation.Flags, arguments, apiMutation.Description);
+            var untypedMutation = new MergedField(
+                apiMutation.Name,
+                payload,
+                provider,
+                apiMutation.Flags,
+                arguments,
+                apiMutation.Description);
 
             return untypedMutation;
         }
@@ -539,20 +562,35 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 errorDescriptionType,
                 provider);
             typesCreated[returnType.ComplexTypeName] = returnType;
-            var arguments = apiMutation.Arguments.ToDictionary(
-                a => a.Name,
-                a =>
+
+            var inputType = new MergedInputType(apiMutation.Name);
+            inputType.AddProvider(new FieldProvider { Provider = provider, FieldType = new ApiObjectType(apiMutation.Name) });
+            typesCreated[inputType.ComplexTypeName] = inputType;
+
+            foreach (var apiField in apiMutation.Arguments)
+            {
+                inputType.Fields.Add(
+                    apiField.Name,
                     new MergedField(
-                        a.Name,
-                        CreateMergedType(provider, a, null, new List<string>(), true, typesCreated),
+                        apiField.Name,
+                        CreateMergedType(provider, apiField, null, new List<string>(), true, typesCreated),
                         provider,
                         apiMutation.Flags,
-                        description: a.Description));
+                        description: apiField.Description));
+            }
 
-            arguments["clientMutationId"] = new MergedField(
+            inputType.Fields["clientMutationId"] = new MergedField(
                 "clientMutationId",
                 CreateScalarType(EnScalarType.String, typesCreated),
                 provider);
+
+            var arguments = new Dictionary<string, MergedField>
+                                {
+                                    {
+                                        "input",
+                                        new MergedField("input", inputType, provider)
+                                    }
+                                };
 
             return new MergedField(apiMutation.Name, returnType, provider, apiMutation.Flags, arguments, apiMutation.Description);
         }

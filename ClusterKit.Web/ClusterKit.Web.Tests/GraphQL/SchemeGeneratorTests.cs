@@ -832,6 +832,26 @@ namespace ClusterKit.Web.Tests.GraphQL
             var provider = new MoqProvider { Description = api };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
+            var errors = SchemaGenerator.CheckSchema(schema).Select(e => $"Schema type error: {e}")
+                            .Union(SchemaGenerator.CheckSchemaIntrospection(schema)).Select(e => $"Schema introspection error: {e}");
+
+            var hasErrors = false;
+            foreach (var error in errors)
+            {
+                hasErrors = true;
+                this.output.WriteLine(error);
+            }
+
+            using (var printer = new SchemaPrinter(schema))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
+            }
+
+            Assert.False(hasErrors);
+
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
