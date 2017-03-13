@@ -63,12 +63,12 @@ namespace ClusterKit.API.Client
         }
 
         /// <summary>
-        /// Performs data copy from <see cref="newData"/> to <see cref="objectToUpdate"/> fields
+        /// Performs data copy from source to destination fields
         /// </summary>
-        /// <param name="objectToUpdate">The object to update</param>
-        /// <param name="newData">The object containing new data</param>
+        /// <param name="destination">The object to update</param>
+        /// <param name="source">The object containing new data</param>
         /// <param name="request">The original api request used to update an object</param>
-        public static void Update(TObject objectToUpdate, TObject newData, ApiRequest request)
+        public static void Update(TObject destination, TObject source, ApiRequest request)
         {
             var fieldsModified =
                 (((JObject)request.Arguments).Property("newNode")?.Value as JObject)?.Properties().Select(p => p.Name);
@@ -83,7 +83,7 @@ namespace ClusterKit.API.Client
                 Action<TObject, TObject> copier;
                 if (propertyCopiers.TryGetValue(fieldName, out copier))
                 {
-                    copier(objectToUpdate, newData);
+                    copier(destination, source);
                 }
             }
         }

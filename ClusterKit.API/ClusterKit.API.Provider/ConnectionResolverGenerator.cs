@@ -75,6 +75,8 @@ namespace ClusterKit.API.Provider
                         using System.Linq;
                         using System.Linq.Expressions;
 
+                        using System.Reflection;
+
                         using Newtonsoft.Json;
                         using Newtonsoft.Json.Linq;
                     
@@ -144,6 +146,12 @@ namespace ClusterKit.API.Provider
                 private static Expression<Func<string, string, bool>> filterStringCheckIn = (left, right) => left.Contains(right);
                 private static Expression<Func<string, string, bool>> filterStringStartsWith = (left, right) => left.StartsWith(right);
                 private static Expression<Func<string, string, bool>> filterStringEndsWith = (left, right) => left.EndsWith(right);
+
+                private static MethodInfo stringContains = typeof(string).GetMethod(""Contains"");
+                private static MethodInfo stringStartsWith = typeof(string).GetMethod(""StartsWith"", new[] {{ typeof(string) }});
+                private static MethodInfo stringEndsWith = typeof(string).GetMethod(""EndsWith"", new[] {{ typeof(string) }});
+                private static MethodInfo stringToLower = typeof(string).GetMethod(""ToLower"", new Type[0]);
+
                 private static readonly ParameterExpression filterableEntity = Expression.Parameter(typeof({className}));
                 {string.Join(
                         "\n",
@@ -241,6 +249,7 @@ namespace ClusterKit.API.Provider
                 case EnScalarType.Float:
                 case EnScalarType.Decimal:
                 case EnScalarType.Integer:
+                case EnScalarType.DateTime:
                     yield return $"{{ \"{apiName}_lt\", prop => Expression.LessThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
                     yield return $"{{ \"{apiName}_lte\", prop => Expression.LessThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
                     yield return $"{{ \"{apiName}_gt\", prop => Expression.GreaterThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
@@ -248,21 +257,40 @@ namespace ClusterKit.API.Provider
                     break;
                 case EnScalarType.String:
                     yield return
-                        $"{{ \"{apiName}_in\", prop => Expression.Invoke(filterStringCheckIn, Expression.Constant(prop.Value.ToObject<string>()), {expressionParameter}) }}";
+                        $"{{ \"{apiName}_in\", prop => Expression.Call(Expression.Constant(prop.Value.ToObject<string>()), stringContains, {expressionParameter}) }}";
                     yield return
-                        $"{{ \"{apiName}_not_in\", prop => Expression.Not(Expression.Invoke(filterStringCheckIn, Expression.Constant(prop.Value.ToObject<string>()), {expressionParameter})) }}";
+                        $"{{ \"{apiName}_not_in\", prop => Expression.Not(Expression.Call(Expression.Constant(prop.Value.ToObject<string>()), stringContains, {expressionParameter})) }}";
                     yield return
-                        $"{{ \"{apiName}_contains\", prop => Expression.Invoke(filterStringCheckIn, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                        $"{{ \"{apiName}_contains\", prop => Expression.Call({expressionParameter}, stringContains, Expression.Constant(prop.Value.ToObject<string>())) }}";
                     yield return
-                        $"{{ \"{apiName}_not_contains\", prop => Expression.Not(Expression.Invoke(filterStringCheckIn, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+                        $"{{ \"{apiName}_not_contains\", prop => Expression.Not(Expression.Call({expressionParameter}, stringContains, Expression.Constant(prop.Value.ToObject<string>()))) }}";
                     yield return
-                        $"{{ \"{apiName}_starts_with\", prop => Expression.Invoke(filterStringStartsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                        $"{{ \"{apiName}_starts_with\", prop => Expression.Call({expressionParameter}, stringStartsWith, Expression.Constant(prop.Value.ToObject<string>())) }}";
                     yield return
-                        $"{{ \"{apiName}_not_starts_with\", prop => Expression.Not(Expression.Invoke(filterStringStartsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+                        $"{{ \"{apiName}_not_starts_with\", prop => Expression.Not(Expression.Call({expressionParameter}, stringStartsWith, Expression.Constant(prop.Value.ToObject<string>()))) }}";
                     yield return
-                        $"{{ \"{apiName}_ends_with\", prop => Expression.Invoke(filterStringEndsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                        $"{{ \"{apiName}_ends_with\", prop => Expression.Call({expressionParameter}, stringEndsWith, Expression.Constant(prop.Value.ToObject<string>()))  }}";
                     yield return
-                        $"{{ \"{apiName}_not_ends_with\", prop => Expression.Not(Expression.Invoke(filterStringEndsWith, {expressionParameter}, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+                        $"{{ \"{apiName}_not_ends_with\", prop => Expression.Not(Expression.Call({expressionParameter}, stringEndsWith, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+
+                    yield return $"{{ \"{apiName}_l\", prop => Expression.Equal(Expression.Call({expressionParameter}, stringToLower), Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return $"{{ \"{apiName}_l_not\", prop => Expression.NotEqual(Expression.Call({expressionParameter}, stringToLower), Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return
+                        $"{{ \"{apiName}_l_in\", prop => Expression.Call(Expression.Constant(prop.Value.ToObject<string>()), stringContains, Expression.Call({expressionParameter}, stringToLower)) }}";
+                    yield return
+                        $"{{ \"{apiName}_l_not_in\", prop => Expression.Not(Expression.Call(Expression.Constant(prop.Value.ToObject<string>()), stringContains, Expression.Call({expressionParameter}, stringToLower))) }}";
+                    yield return
+                        $"{{ \"{apiName}_l_contains\", prop => Expression.Call(Expression.Call({expressionParameter}, stringToLower), stringContains, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                    yield return
+                        $"{{ \"{apiName}_l_not_contains\", prop => Expression.Not(Expression.Call(Expression.Call({expressionParameter}, stringToLower), stringContains, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+                    yield return
+                        $"{{ \"{apiName}_l_starts_with\", prop => Expression.Call(Expression.Call({expressionParameter}, stringToLower), stringStartsWith, Expression.Constant(prop.Value.ToObject<string>())) }}";
+                    yield return
+                        $"{{ \"{apiName}_l_not_starts_with\", prop => Expression.Not(Expression.Call(Expression.Call({expressionParameter}, stringToLower), stringStartsWith, Expression.Constant(prop.Value.ToObject<string>()))) }}";
+                    yield return
+                        $"{{ \"{apiName}_l_ends_with\", prop => Expression.Call(Expression.Call({expressionParameter}, stringToLower), stringEndsWith, Expression.Constant(prop.Value.ToObject<string>()))  }}";
+                    yield return
+                        $"{{ \"{apiName}_l_not_ends_with\", prop => Expression.Not(Expression.Call(Expression.Call({expressionParameter}, stringToLower), stringEndsWith, Expression.Constant(prop.Value.ToObject<string>()))) }}";
                     break;
             }
         }

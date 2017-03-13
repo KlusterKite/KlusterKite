@@ -92,7 +92,7 @@ namespace ClusterKit.API.Tests
         [InlineData("{\"name_not_contains\": \"tes\"}", null, 10, 0, 0, new string[0])]
         [InlineData("{\"name_not_contains\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 
-        [InlineData("{\"name_starts_with\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
+        [InlineData("{\"name_l_starts_with\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
         [InlineData("{\"name_starts_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
         [InlineData("{\"name_not_starts_with\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 

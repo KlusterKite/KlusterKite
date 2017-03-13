@@ -508,6 +508,78 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         ResolvedType = new StringGraphType(),
                         Description = $"The {fieldName} not ends with the value\n{fieldDescription}"
                     };
+            yield return
+                            new FieldType
+                            {
+                                Name = $"{fieldName}_l",
+                                ResolvedType = new StringGraphType(),
+                                Description = $"The {fieldName} exactly equals the value\n{fieldDescription}"
+                            };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_not",
+                    ResolvedType = new StringGraphType(),
+                    Description = $"The {fieldName} not equals the value\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_in",
+                    ResolvedType = new StringGraphType(),
+                    Description = $"The value contains the {fieldName} as substring\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_not_in",
+                    ResolvedType = new StringGraphType(),
+                    Description =
+                            $"The value not contains the {fieldName} as substring\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_contains",
+                    ResolvedType = new StringGraphType(),
+                    Description = $"The {fieldName} contains the value as substring\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_not_contains",
+                    ResolvedType = new StringGraphType(),
+                    Description =
+                            $"The {fieldName} not contains the value as substring\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_starts_with",
+                    ResolvedType = new StringGraphType(),
+                    Description = $"The {fieldName} starts with the value\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_not_starts_with",
+                    ResolvedType = new StringGraphType(),
+                    Description = $"The {fieldName} not starts with the value\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_ends_with",
+                    ResolvedType = new StringGraphType(),
+                    Description = $"The {fieldName} ends with the value\n{fieldDescription}"
+                };
+            yield return
+                new FieldType
+                {
+                    Name = $"{fieldName}_l_not_ends_with",
+                    ResolvedType = new StringGraphType(),
+                    Description = $"The {fieldName} not ends with the value\n{fieldDescription}"
+                };
         }
 
         /// <summary>

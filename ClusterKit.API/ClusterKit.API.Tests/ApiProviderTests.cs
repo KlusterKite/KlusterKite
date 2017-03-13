@@ -86,11 +86,11 @@ namespace ClusterKit.API.Tests
 
             Assert.True(description.Fields.Any(f => f.Name == "arrayedObjects"));
             Assert.Equal(nodeType.TypeName, description.Fields.First(f => f.Name == "arrayedObjects").TypeName);
-            Assert.Equal(EnFieldFlags.IsArray, description.Fields.First(f => f.Name == "arrayedObjects").Flags);
+            Assert.Equal(EnFieldFlags.IsArray | EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "arrayedObjects").Flags);
 
             Assert.True(description.Fields.Any(f => f.Name == "connectedObjects"));
             Assert.Equal(nodeType.TypeName, description.Fields.First(f => f.Name == "connectedObjects").TypeName);
-            Assert.Equal(EnFieldFlags.IsConnection, description.Fields.First(f => f.Name == "connectedObjects").Flags);
+            Assert.Equal(EnFieldFlags.IsConnection | EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "connectedObjects").Flags);
             Assert.True(description.Mutations.Any(m => m.Name == "connectedObjects.create"));
             //// Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.create").TypeName);
             Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "connectedObjects.create").Arguments.First().TypeName);
@@ -104,22 +104,22 @@ namespace ClusterKit.API.Tests
 
             Assert.True(description.Fields.Any(f => f.Name == "publishedStringProperty"));
             Assert.Equal(EnScalarType.String, description.Fields.First(f => f.Name == "publishedStringProperty").ScalarType);
-            Assert.Equal(EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable, description.Fields.First(f => f.Name == "publishedStringProperty").Flags);
+            Assert.Equal(EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable | EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "publishedStringProperty").Flags);
 
             Assert.True(description.Fields.Any(f => f.Name == "stringArray"));
             Assert.Equal(EnScalarType.String, description.Fields.First(f => f.Name == "stringArray").ScalarType);
-            Assert.Equal(EnFieldFlags.IsArray, description.Fields.First(f => f.Name == "stringArray").Flags);
+            Assert.Equal(EnFieldFlags.IsArray | EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "stringArray").Flags);
 
             Assert.False(description.Fields.Any(f => f.Name == "unPublishedStringProperty"));
 
             Assert.True(description.Fields.Any(f => f.Name == "publishedStringMethod"));
             Assert.Equal(EnScalarType.String, description.Fields.First(f => f.Name == "publishedStringMethod").ScalarType);
-            Assert.Equal(EnFieldFlags.None, description.Fields.First(f => f.Name == "publishedStringMethod").Flags);
+            Assert.Equal(EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "publishedStringMethod").Flags);
             Assert.Equal(2, description.Fields.First(f => f.Name == "publishedStringMethod").Arguments.Count);
 
             Assert.True(description.Fields.Any(f => f.Name == "validateNode"));
             Assert.Equal(EnScalarType.Boolean, description.Fields.First(f => f.Name == "validateNode").ScalarType);
-            Assert.Equal(EnFieldFlags.None, description.Fields.First(f => f.Name == "validateNode").Flags);
+            Assert.Equal(EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "validateNode").Flags);
             Assert.Equal(2, description.Fields.First(f => f.Name == "validateNode").Arguments.Count);
 
             Assert.True(description.Mutations.Any(m => m.Name == "mutateNode"));
