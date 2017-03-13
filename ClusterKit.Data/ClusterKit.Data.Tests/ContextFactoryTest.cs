@@ -9,14 +9,12 @@
 
 namespace ClusterKit.Data.Tests
 {
-    using System.Data.Common;
     using System.Data.Entity;
-    using System.Data.Entity.Migrations;
 
     using ClusterKit.Data.EF;
+    using ClusterKit.Data.Tests.Mock;
 
-    using JetBrains.Annotations;
-
+    using Moq;
     using Xunit;
 
     /// <summary>
@@ -30,7 +28,7 @@ namespace ClusterKit.Data.Tests
         [Fact]
         public void CreatorTest()
         {
-            var creator = BaseContextFactory<TestContext, TestContextMigrationConfiguration>.Creator;
+            var creator = BaseContextFactory<TestDataContext, TestDataContextMigrationConfiguration>.Creator;
             Assert.NotNull(creator);
 
             var context = creator(null, true);
@@ -38,30 +36,16 @@ namespace ClusterKit.Data.Tests
         }
 
         /// <summary>
-        /// Test valid context
+        /// Tests mocking work
         /// </summary>
-        [UsedImplicitly]
-        private class TestContext : DbContext
+        [Fact]
+        public void MockTest()
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TestContext"/> class.
-            /// </summary>
-            /// <param name="existingConnection">
-            /// The existing connection.
-            /// </param>
-            /// <param name="contextOwnsConnection">
-            /// The context owns connection.
-            /// </param>
-            public TestContext(DbConnection existingConnection, bool contextOwnsConnection = true)
-            {
-            }
-        }
-
-        /// <summary>
-        /// Test context migration
-        /// </summary>
-        private class TestContextMigrationConfiguration : DbMigrationsConfiguration<TestContext>
-        {
+            var usersMock = new Mock<DbSet<User>>();
+            var rolesMock = new Mock<DbSet<Role>>();
+            var context = new Mock<TestDataContext>();
+            context.Setup(m => m.Roles).Returns(rolesMock.Object);
+            context.Setup(m => m.Users).Returns(usersMock.Object);
         }
     }
 }
