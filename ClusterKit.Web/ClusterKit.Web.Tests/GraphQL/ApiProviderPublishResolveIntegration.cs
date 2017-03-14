@@ -23,6 +23,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using global::GraphQL;
     using global::GraphQL.Http;
     using global::GraphQL.Utilities;
+    using global::GraphQL.Validation.Complexity;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -141,6 +142,12 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      r.Schema = schema;
                                      r.Query = query;
                                      r.UserContext = new RequestContext();
+                                     r.ComplexityConfiguration = new ComplexityConfiguration
+                                                                     {
+                                                                         FieldImpact = 2.0,
+                                                                         MaxDepth = 15,
+                                                                         MaxComplexity = 200
+                                                                     };
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);

@@ -12,6 +12,12 @@
 	}
 
 	ClusterKit.Web {
+
+		GraphQL {
+			MaxDepth = 15,
+			MaxComplexity = 200
+		}
+
 		Services {
 			GraphQL { 
 				Port = 8080 

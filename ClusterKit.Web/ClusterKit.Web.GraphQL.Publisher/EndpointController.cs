@@ -17,11 +17,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using System.Threading.Tasks;
     using System.Web.Http;
 
+    using Akka.Configuration;
+
     using ClusterKit.Web.Authorization;
 
     using global::GraphQL;
     using global::GraphQL.Http;
     using global::GraphQL.Instrumentation;
+    using global::GraphQL.Validation.Complexity;
 
     using JetBrains.Annotations;
 
@@ -49,6 +52,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
         private readonly IDocumentWriter writer;
 
         /// <summary>
+        /// The graphQL complexity configuration
+        /// </summary>
+        private ComplexityConfiguration complexityConfiguration;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EndpointController"/> class.
         /// </summary>
         /// <param name="schemaProvider">
@@ -60,11 +68,28 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="writer">
         /// The writer.
         /// </param>
-        public EndpointController(SchemaProvider schemaProvider, IDocumentExecuter executer, IDocumentWriter writer)
+        /// <param name="config">
+        /// The system config.
+        /// </param>
+        public EndpointController(
+            SchemaProvider schemaProvider,
+            IDocumentExecuter executer,
+            IDocumentWriter writer,
+            Config config)
         {
             this.schemaProvider = schemaProvider;
             this.executer = executer;
             this.writer = writer;
+            this.complexityConfiguration = new ComplexityConfiguration
+                                               {
+                                                   MaxDepth =
+                                                       config.GetInt(
+                                                           "ClusterKit.Web.GraphQL.MaxDepth"),
+                                                   FieldImpact = 2.0,
+                                                   MaxComplexity =
+                                                       config.GetInt(
+                                                           "ClusterKit.Web.GraphQL.MaxComplexity")
+                                               };
         }
 
         /// <summary>
@@ -125,7 +150,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                      options.Inputs = inputs;
                                      options.UserContext = requestContext;
 
-                                     // _.ComplexityConfiguration = new ComplexityConfiguration { MaxDepth = 15 };
+                                     options.ComplexityConfiguration = this.complexityConfiguration;
                                      options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                                  }).ConfigureAwait(false);
 
