@@ -83,9 +83,11 @@ namespace ClusterKit.Data.TestKit
             Expression<Func<TObject, bool>> filter,
             List<SortingCondition> sort,
             int? skip,
-            int? count)
+            int? count,
+            ApiRequest apiRequest)
         {
             var query = this.Storage.Values.AsQueryable();
+            
             if (filter != null)
             {
                 query = query.Where(filter);

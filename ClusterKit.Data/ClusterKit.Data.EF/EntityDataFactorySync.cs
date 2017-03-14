@@ -91,9 +91,16 @@ namespace ClusterKit.Data.EF
             Expression<Func<TObject, bool>> filter,
             List<SortingCondition> sort,
             int? skip,
-            int? count)
+            int? count,
+            ApiRequest apiRequest)
         {
             var query = this.GetDbQuery() as IQueryable<TObject>;
+
+            if (apiRequest != null)
+            {
+                query = query.SetIncludes(apiRequest);
+            }
+
             if (filter != null)
             {
                 query = query.Where(filter);

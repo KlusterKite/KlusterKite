@@ -134,7 +134,8 @@ namespace ClusterKit.Data.CRUD
             Expression<Func<TObject, bool>> filter,
             IEnumerable<SortingCondition> sort,
             int? limit,
-            int? offset)
+            int? offset,
+            ApiRequest apiRequest)
         {
             this.actorSystem.Log.Info("{Type}: Query launched", this.GetType().Name);
             var sortingConditions = sort?.ToList() ?? new List<SortingCondition>();
@@ -144,14 +145,28 @@ namespace ClusterKit.Data.CRUD
                 offset = null;
             }
 
+
+            ApiRequest combinedRequest = null;
+            if (apiRequest != null)
+            {
+                combinedRequest = new ApiRequest
+                                      {
+                                          Fields =
+                                              apiRequest.Fields.Where(f => f.FieldName == "items")
+                                                  .SelectMany(f => f.Fields)
+                                                  .ToList()
+                                      };
+            }
+
             var request = new CollectionRequest<TObject>
                               {
                                   Count = limit,
                                   Skip = offset,
                                   Filter = filter,
                                   Sort = sortingConditions,
-                                  AcceptAsParcel = true
-                              };
+                                  AcceptAsParcel = true,
+                                  ApiRequest = combinedRequest
+            };
 
             var parcel = await this.actorSystem.ActorSelection(this.dataActorPath).Ask<ParcelNotification>(request, this.timeout);
             var result = (CollectionResponse<TObject>)await parcel.Receive(this.actorSystem);

@@ -28,7 +28,8 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// The list of discovered property copiers
         /// </summary>
-        private static Dictionary<string, Action<TObject, TObject>> propertyCopiers = new Dictionary<string, Action<TObject, TObject>>();
+        private static readonly Dictionary<string, Action<TObject, TObject>> PropertyCopiers
+            = new Dictionary<string, Action<TObject, TObject>>();
 
         /// <summary>
         /// Initializes static members of the <see cref="DataUpdater{TObject}"/> class.
@@ -58,7 +59,7 @@ namespace ClusterKit.API.Client
                     copy, 
                     destination, 
                     source);
-                propertyCopiers[propertyName] = lambda.Compile();
+                PropertyCopiers[propertyName] = lambda.Compile();
             }
         }
 
@@ -81,7 +82,7 @@ namespace ClusterKit.API.Client
             foreach (var fieldName in fieldsModified)
             {
                 Action<TObject, TObject> copier;
-                if (propertyCopiers.TryGetValue(fieldName, out copier))
+                if (PropertyCopiers.TryGetValue(fieldName, out copier))
                 {
                     copier(destination, source);
                 }

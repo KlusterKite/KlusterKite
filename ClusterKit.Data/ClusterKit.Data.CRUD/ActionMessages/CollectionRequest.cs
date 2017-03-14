@@ -52,6 +52,11 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         public byte[] ExtraData { get; set; }
 
         /// <summary>
+        /// Gets or sets the original <see cref="ApiRequest"/>. Optional.
+        /// </summary>
+        public ApiRequest ApiRequest { get; set; }
+
+        /// <summary>
         /// Gets or sets the original requester description
         /// </summary>
         /// <remarks>

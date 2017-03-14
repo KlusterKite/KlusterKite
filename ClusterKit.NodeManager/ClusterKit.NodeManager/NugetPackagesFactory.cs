@@ -79,7 +79,8 @@ namespace ClusterKit.NodeManager
             Expression<Func<IPackage, bool>> filter,
             List<SortingCondition> sort,
             int? skip,
-            int? count)
+            int? count,
+            ApiRequest apiRequest)
         {
             var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(this.Context);
             var query = nugetRepository.Search(string.Empty, true).AsQueryable().Where(p => p.IsLatestVersion);

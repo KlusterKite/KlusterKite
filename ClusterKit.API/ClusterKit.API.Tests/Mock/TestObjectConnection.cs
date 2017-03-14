@@ -110,7 +110,8 @@ namespace ClusterKit.API.Tests.Mock
             Expression<Func<TestObject, bool>> filter,
             IEnumerable<SortingCondition> sort,
             int? limit,
-            int? offset)
+            int? offset,
+            ApiRequest apiRequest)
         {
             var query = this.objects.Values.AsQueryable();
 

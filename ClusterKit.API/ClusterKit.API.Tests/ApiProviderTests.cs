@@ -334,7 +334,12 @@ namespace ClusterKit.API.Tests
                 }
 
                 /// <inheritdoc />
-                public Task<QueryResult<NodeObject>> Query(Expression<Func<NodeObject, bool>> filter, IEnumerable<SortingCondition> sort, int? limit, int? offset)
+                public Task<QueryResult<NodeObject>> Query(
+                    Expression<Func<NodeObject, bool>> filter,
+                    IEnumerable<SortingCondition> sort,
+                    int? limit,
+                    int? offset,
+                    ApiRequest apiRequest)
                 {
                     var query = this.nodes.AsQueryable();
 

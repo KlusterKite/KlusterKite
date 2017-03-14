@@ -10,6 +10,7 @@ namespace ClusterKit.Data
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -163,11 +164,19 @@ namespace ClusterKit.Data
                 using (var ds = await this.GetContext())
                 {
                     var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+
+                    Context.GetLogger()
+                        .Info(
+                            "{Type}: query has api request: {Condition}",
+                            this.GetType().Name,
+                            string.Join(", ", collectionRequest.ApiRequest?.Fields?.Select(f => f.FieldName) ?? new string[0]));
+
                     var response = await factory.GetList(
                                        collectionRequest.Filter,
                                        collectionRequest.Sort,
                                        collectionRequest.Skip,
-                                       collectionRequest.Count);
+                                       collectionRequest.Count,
+                                       collectionRequest.ApiRequest);
 
                     if (collectionRequest.AcceptAsParcel)
                     {

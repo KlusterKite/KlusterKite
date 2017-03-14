@@ -96,6 +96,9 @@ namespace ClusterKit.Data
         /// <param name="count">
         /// The maximum number of objects to return. Returns all on null.
         /// </param>
+        /// <param name="apiRequest">
+        /// The original <see cref="ApiRequest"/>. Optional.
+        /// </param>
         /// <returns>
         /// The list of objects from datasource
         /// </returns>
@@ -103,7 +106,8 @@ namespace ClusterKit.Data
             Expression<Func<TObject, bool>> filter,
             List<SortingCondition> sort,
             int? skip, 
-            int? count);
+            int? count,
+            ApiRequest apiRequest);
 
         /// <summary>
         /// Adds an object to datasource

@@ -65,7 +65,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
             var filter = filterArgument != null ? this.CreateFilter(filterArgument) : null;
             var sort = sortArgument != null ? this.CreateSort(sortArgument) : null;
-            var items = await connection.Query(filter, sort, limit, offset);
+            var items = await connection.Query(filter, sort, limit, offset, request);
 
             if (items == null)
             {

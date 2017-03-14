@@ -54,11 +54,19 @@ namespace ClusterKit.API.Client
         /// <param name="offset">
         /// The number of objects to skip
         /// </param>
+        /// <param name="apiRequest">
+        /// The original api request
+        /// </param>
         /// <returns>
         /// The nodes list
         /// </returns>
         [UsedImplicitly]
-        Task<QueryResult<T>> Query(Expression<Func<T, bool>> filter, IEnumerable<SortingCondition> sort,  int? limit, int? offset);
+        Task<QueryResult<T>> Query(
+            Expression<Func<T, bool>> filter,
+            IEnumerable<SortingCondition> sort,
+            int? limit,
+            int? offset,
+            ApiRequest apiRequest);
 
         /// <summary>
         /// Creates a new node
