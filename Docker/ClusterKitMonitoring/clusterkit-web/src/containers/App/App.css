@@ -1,0 +1,5 @@
+.app {
+    margin-top: 70px;
+    height: calc(100vh - 50px);
+    /*width: 100vw;*/
+}

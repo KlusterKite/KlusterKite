@@ -1,0 +1,1648 @@
+schema {
+  query: Query
+  mutation: Mutations
+}
+
+# Akka system address
+type ClusterKitNodeApi_AkkaAddress {
+  # the address string representation
+  asString: String
+
+  # the address host
+  host: String
+
+  # the address port
+  port: Int
+
+  # the address protocol
+  protocol: String
+
+  # the address system name
+  system: String
+}
+
+type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ {
+  # The mutated object result
+  result: Boolean
+
+  # The list of mutation errors
+  errors: [ClusterKitNodeApi_ErrorDescription]
+}
+
+type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
+  result: ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+enum ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType {
+  Public
+  Private
+}
+
+type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi {
+  # Authenticated user
+  clusterKitUser: ClusterKitNodeApi_ClusterKitUserDescription
+
+  # The current user privileges
+  clusterKitUserPrivileges: [String]
+
+  # The current application privileges
+  clusterKitClientPrivileges: [String]
+}
+
+# The root provider
+type ClusterKitNodeApi_ClusterKitNodeApi {
+  # The ClusterKit node managing API
+  nodeManagerData: ClusterKitNodeApi_ClusterKitNodeManagement
+
+  # The current user
+  me: ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
+
+  # The node global searcher according to Relay specification
+  __node(
+    # The node global id
+    id: ID
+  ): Node
+}
+
+# Description of node configuration
+type ClusterKitNodeApi_ClusterKitNodeDescription {
+  # symbolic container type code
+  containerType: String
+
+  # a value indicating whether the current node is cluster leader
+  isClusterLeader: Boolean
+
+  # a value indicating whether software and or configuration is obsolete and needed to be upgraded
+  isObsolete: Boolean
+
+  # a value indicating whether this is complete description
+  isInitialized: Boolean
+
+  # the list of roles, where current node is leader
+  leaderInRoles: [String]
+
+  # The list of descriptions of installed modules
+  modules: [ClusterKitNodeApi_ClusterKitPackageDescription]
+
+  # The node's address
+  nodeAddress: ClusterKitNodeApi_AkkaAddress
+
+  # request id to indicate node instance startup
+  nodeId: Uid
+
+  # node template code
+  nodeTemplate: String
+
+  # current node template version
+  nodeTemplateVersion: Int
+
+  # the list of cluster roles
+  roles: [String]
+
+  # node start time
+  startTimeStamp: Int
+}
+
+# The main ClusterKit node managing methods
+type ClusterKitNodeApi_ClusterKitNodeManagement {
+  # The list of available packages from local cluster repository
+  getPackages: [ClusterKitNodeApi_ClusterKitNugetPackage]
+
+  # Current cluster node template usage for debug purposes
+  getTemplateStatistics: ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics
+
+  # The list of known active nodes
+  getActiveNodeDescriptions: [ClusterKitNodeApi_ClusterKitNodeDescription]
+
+  # Node templates
+  nodeTemplates(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitNodeTemplate_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitNodeTemplate_Connection
+
+  # Node templates
+  nugetFeeds(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitNugetFeed_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitNugetFeed_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitNugetFeed_Connection
+
+  # Node templates
+  seedAddresses(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitSeedAddress_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitSeedAddress_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitSeedAddress_Connection
+
+  # ClusterKit managing system users
+  users(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitUser_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitUser_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitUser_Connection
+
+  # ClusterKit managing system security roles
+  roles(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitRole_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitRole_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitRole_Connection
+}
+
+# The list of connected ClusterKitNodeApi_ClusterKitNodeTemplate_Node
+#  
+type ClusterKitNodeApi_ClusterKitNodeTemplate_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_ClusterKitNodeTemplate_Edge]
+}
+
+# The ClusterKitNodeApi_ClusterKitNodeTemplate_Node in a connected list
+#  
+type ClusterKitNodeApi_ClusterKitNodeTemplate_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: ClusterKitNodeApi_ClusterKitNodeTemplate_Node
+}
+
+# The filter conditions for a ClusterKitNodeApi_ClusterKitNodeTemplate_Node connected objects
+input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitNodeTemplate_Filter]
+
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitNodeTemplate_Filter]
+
+  # The code exactly equals the value
+  # The program readable node template name
+  code: String
+
+  # The code not equals the value
+  # The program readable node template name
+  code_not: String
+
+  # The value contains the code as substring
+  # The program readable node template name
+  code_in: String
+
+  # The value not contains the code as substring
+  # The program readable node template name
+  code_not_in: String
+
+  # The code contains the value as substring
+  # The program readable node template name
+  code_contains: String
+
+  # The code not contains the value as substring
+  # The program readable node template name
+  code_not_contains: String
+
+  # The code starts with the value
+  # The program readable node template name
+  code_starts_with: String
+
+  # The code not starts with the value
+  # The program readable node template name
+  code_not_starts_with: String
+
+  # The code ends with the value
+  # The program readable node template name
+  code_ends_with: String
+
+  # The code not ends with the value
+  # The program readable node template name
+  code_not_ends_with: String
+
+  # The configuration exactly equals the value
+  # The akka configuration template for node
+  configuration: String
+
+  # The configuration not equals the value
+  # The akka configuration template for node
+  configuration_not: String
+
+  # The value contains the configuration as substring
+  # The akka configuration template for node
+  configuration_in: String
+
+  # The value not contains the configuration as substring
+  # The akka configuration template for node
+  configuration_not_in: String
+
+  # The configuration contains the value as substring
+  # The akka configuration template for node
+  configuration_contains: String
+
+  # The configuration not contains the value as substring
+  # The akka configuration template for node
+  configuration_not_contains: String
+
+  # The configuration starts with the value
+  # The akka configuration template for node
+  configuration_starts_with: String
+
+  # The configuration not starts with the value
+  # The akka configuration template for node
+  configuration_not_starts_with: String
+
+  # The configuration ends with the value
+  # The akka configuration template for node
+  configuration_ends_with: String
+
+  # The configuration not ends with the value
+  # The akka configuration template for node
+  configuration_not_ends_with: String
+
+  # The id exactly equals the value
+  # The unique template identification number
+  id: Int
+
+  # The id not equals the value
+  # The unique template identification number
+  id_not: Int
+
+  # The id is less then the value
+  # The unique template identification number
+  id_lt: Int
+
+  # The id is less or equal then the value
+  # The unique template identification number
+  id_lte: Int
+
+  # The id is greater then the value
+  # The unique template identification number
+  id_gt: Int
+
+  # The id is greater or equal then the value
+  # The unique template identification number
+  id_gte: Int
+
+  # The maximumNeededInstances exactly equals the value
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # The maximumNeededInstances not equals the value
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_not: Int
+
+  # The maximumNeededInstances is less then the value
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_lt: Int
+
+  # The maximumNeededInstances is less or equal then the value
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_lte: Int
+
+  # The maximumNeededInstances is greater then the value
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_gt: Int
+
+  # The maximumNeededInstances is greater or equal then the value
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_gte: Int
+
+  # The minimumRequiredInstances exactly equals the value
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
+
+  # The minimumRequiredInstances not equals the value
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_not: Int
+
+  # The minimumRequiredInstances is less then the value
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_lt: Int
+
+  # The minimumRequiredInstances is less or equal then the value
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_lte: Int
+
+  # The minimumRequiredInstances is greater then the value
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_gt: Int
+
+  # The minimumRequiredInstances is greater or equal then the value
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_gte: Int
+
+  # The name exactly equals the value
+  # The human readable node template name
+  name: String
+
+  # The name not equals the value
+  # The human readable node template name
+  name_not: String
+
+  # The value contains the name as substring
+  # The human readable node template name
+  name_in: String
+
+  # The value not contains the name as substring
+  # The human readable node template name
+  name_not_in: String
+
+  # The name contains the value as substring
+  # The human readable node template name
+  name_contains: String
+
+  # The name not contains the value as substring
+  # The human readable node template name
+  name_not_contains: String
+
+  # The name starts with the value
+  # The human readable node template name
+  name_starts_with: String
+
+  # The name not starts with the value
+  # The human readable node template name
+  name_not_starts_with: String
+
+  # The name ends with the value
+  # The human readable node template name
+  name_ends_with: String
+
+  # The name not ends with the value
+  # The human readable node template name
+  name_not_ends_with: String
+
+  # The priority exactly equals the value
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The priority not equals the value
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_not: Float
+
+  # The priority is less then the value
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_lt: Float
+
+  # The priority is less or equal then the value
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_lte: Float
+
+  # The priority is greater then the value
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_gt: Float
+
+  # The priority is greater or equal then the value
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_gte: Float
+
+  # The version exactly equals the value
+  # The template version
+  version: Int
+
+  # The version not equals the value
+  # The template version
+  version_not: Int
+
+  # The version is less then the value
+  # The template version
+  version_lt: Int
+
+  # The version is less or equal then the value
+  # The template version
+  version_lte: Int
+
+  # The version is greater then the value
+  # The template version
+  version_gt: Int
+
+  # The version is greater or equal then the value
+  # The template version
+  version_gte: Int
+}
+
+# Node template description
+input ClusterKitNodeApi_ClusterKitNodeTemplate_Input {
+  # The program readable node template name
+  code: String
+
+  # The akka configuration template for node
+  configuration: String
+
+  # The list of container types to install node templates
+  containerTypes: [String]
+
+  # The unique template identification number
+  id: Int
+
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
+
+  # The human readable node template name
+  name: String
+
+  # The list of nuget packages to install (along with there dependencies)
+  packages: [String]
+
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The template version
+  version: Int
+}
+
+type ClusterKitNodeApi_ClusterKitNodeTemplate_Node implements Node {
+  # The program readable node template name
+  code: String
+
+  # The akka configuration template for node
+  configuration: String
+
+  # The list of container types to install node templates
+  containerTypes: [String]
+
+  # The unique template identification number
+  __id: Int
+
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
+
+  # The human readable node template name
+  name: String
+
+  # The list of nuget packages to install (along with there dependencies)
+  packages: [String]
+
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The template version
+  version: Int
+
+  # The node global id
+  id: ID
+}
+
+type ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitNodeTemplate_Node
+  edge: ClusterKitNodeApi_ClusterKitNodeTemplate_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitNodeTemplate_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitNodeTemplate_OrderByEnum {
+  # code ascending
+  # The program readable node template name
+  code_asc
+
+  # code descending
+  # The program readable node template name
+  code_desc
+
+  # configuration ascending
+  # The akka configuration template for node
+  configuration_asc
+
+  # configuration descending
+  # The akka configuration template for node
+  configuration_desc
+
+  # id ascending
+  # The unique template identification number
+  id_asc
+
+  # id descending
+  # The unique template identification number
+  id_desc
+
+  # maximumNeededInstances ascending
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_asc
+
+  # maximumNeededInstances descending
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_desc
+
+  # minimumRequiredInstances ascending
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_asc
+
+  # minimumRequiredInstances descending
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_desc
+
+  # name ascending
+  # The human readable node template name
+  name_asc
+
+  # name descending
+  # The human readable node template name
+  name_desc
+
+  # priority ascending
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_asc
+
+  # priority descending
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_desc
+
+  # version ascending
+  # The template version
+  version_asc
+
+  # version descending
+  # The template version
+  version_desc
+}
+
+# The list of connected ClusterKitNodeApi_ClusterKitNugetFeed_Node
+#  
+type ClusterKitNodeApi_ClusterKitNugetFeed_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_ClusterKitNugetFeed_Edge]
+}
+
+# The ClusterKitNodeApi_ClusterKitNugetFeed_Node in a connected list
+#  
+type ClusterKitNodeApi_ClusterKitNugetFeed_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: ClusterKitNodeApi_ClusterKitNugetFeed_Node
+}
+
+# The filter conditions for a ClusterKitNodeApi_ClusterKitNugetFeed_Node connected objects
+input ClusterKitNodeApi_ClusterKitNugetFeed_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitNugetFeed_Filter]
+
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitNugetFeed_Filter]
+
+  # The type exactly equals the value
+  # The  type of feed
+  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+
+  # The type not equals the value
+  # The  type of feed
+  type_not: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+
+  # The address exactly equals the value
+  # The seed url address
+  address: String
+
+  # The address not equals the value
+  # The seed url address
+  address_not: String
+
+  # The value contains the address as substring
+  # The seed url address
+  address_in: String
+
+  # The value not contains the address as substring
+  # The seed url address
+  address_not_in: String
+
+  # The address contains the value as substring
+  # The seed url address
+  address_contains: String
+
+  # The address not contains the value as substring
+  # The seed url address
+  address_not_contains: String
+
+  # The address starts with the value
+  # The seed url address
+  address_starts_with: String
+
+  # The address not starts with the value
+  # The seed url address
+  address_not_starts_with: String
+
+  # The address ends with the value
+  # The seed url address
+  address_ends_with: String
+
+  # The address not ends with the value
+  # The seed url address
+  address_not_ends_with: String
+
+  # The id exactly equals the value
+  # The unique address identification number
+  id: Int
+
+  # The id not equals the value
+  # The unique address identification number
+  id_not: Int
+
+  # The id is less then the value
+  # The unique address identification number
+  id_lt: Int
+
+  # The id is less or equal then the value
+  # The unique address identification number
+  id_lte: Int
+
+  # The id is greater then the value
+  # The unique address identification number
+  id_gt: Int
+
+  # The id is greater or equal then the value
+  # The unique address identification number
+  id_gte: Int
+
+  # The password exactly equals the value
+  # The user password for basic authentication
+  password: String
+
+  # The password not equals the value
+  # The user password for basic authentication
+  password_not: String
+
+  # The value contains the password as substring
+  # The user password for basic authentication
+  password_in: String
+
+  # The value not contains the password as substring
+  # The user password for basic authentication
+  password_not_in: String
+
+  # The password contains the value as substring
+  # The user password for basic authentication
+  password_contains: String
+
+  # The password not contains the value as substring
+  # The user password for basic authentication
+  password_not_contains: String
+
+  # The password starts with the value
+  # The user password for basic authentication
+  password_starts_with: String
+
+  # The password not starts with the value
+  # The user password for basic authentication
+  password_not_starts_with: String
+
+  # The password ends with the value
+  # The user password for basic authentication
+  password_ends_with: String
+
+  # The password not ends with the value
+  # The user password for basic authentication
+  password_not_ends_with: String
+
+  # The userName exactly equals the value
+  # The username for basic authentication
+  userName: String
+
+  # The userName not equals the value
+  # The username for basic authentication
+  userName_not: String
+
+  # The value contains the userName as substring
+  # The username for basic authentication
+  userName_in: String
+
+  # The value not contains the userName as substring
+  # The username for basic authentication
+  userName_not_in: String
+
+  # The userName contains the value as substring
+  # The username for basic authentication
+  userName_contains: String
+
+  # The userName not contains the value as substring
+  # The username for basic authentication
+  userName_not_contains: String
+
+  # The userName starts with the value
+  # The username for basic authentication
+  userName_starts_with: String
+
+  # The userName not starts with the value
+  # The username for basic authentication
+  userName_not_starts_with: String
+
+  # The userName ends with the value
+  # The username for basic authentication
+  userName_ends_with: String
+
+  # The userName not ends with the value
+  # The username for basic authentication
+  userName_not_ends_with: String
+}
+
+# The link to the nuget feed to download updates
+input ClusterKitNodeApi_ClusterKitNugetFeed_Input {
+  # The seed url address
+  address: String
+
+  # The unique address identification number
+  id: Int
+
+  # The user password for basic authentication
+  password: String
+
+  # The  type of feed
+  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+
+  # The username for basic authentication
+  userName: String
+}
+
+type ClusterKitNodeApi_ClusterKitNugetFeed_Node implements Node {
+  # The seed url address
+  address: String
+
+  # The unique address identification number
+  __id: Int
+
+  # The user password for basic authentication
+  password: String
+
+  # The  type of feed
+  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+
+  # The username for basic authentication
+  userName: String
+
+  # The node global id
+  id: ID
+}
+
+type ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitNugetFeed_Node
+  edge: ClusterKitNodeApi_ClusterKitNugetFeed_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitNugetFeed_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitNugetFeed_OrderByEnum {
+  # address ascending
+  # The seed url address
+  address_asc
+
+  # address descending
+  # The seed url address
+  address_desc
+
+  # id ascending
+  # The unique address identification number
+  id_asc
+
+  # id descending
+  # The unique address identification number
+  id_desc
+
+  # password ascending
+  # The user password for basic authentication
+  password_asc
+
+  # password descending
+  # The user password for basic authentication
+  password_desc
+
+  # type ascending
+  # The  type of feed
+  type_asc
+
+  # type descending
+  # The  type of feed
+  type_desc
+
+  # userName ascending
+  # The username for basic authentication
+  userName_asc
+
+  # userName descending
+  # The username for basic authentication
+  userName_desc
+}
+
+# The nuget package
+type ClusterKitNodeApi_ClusterKitNugetPackage {
+  # The package name
+  id: String
+
+  # The package version
+  version: String
+}
+
+# Short description of NuGet package
+type ClusterKitNodeApi_ClusterKitPackageDescription {
+  # The package Id
+  id: String
+
+  # The package version
+  version: String
+}
+
+# Security role. The amount of privileges assigned to the user
+type ClusterKitNodeApi_ClusterKitRole {
+  # The role uid
+  uid: Uid
+
+  # The role name
+  name: String
+
+  # The list of granted privileges
+  allowedScope: [String]
+
+  # The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)
+  deniedScope: [String]
+
+  # The list of users assigned to this role
+  users: [ClusterKitNodeApi_ClusterKitUser]
+}
+
+# The list of connected ClusterKitNodeApi_ClusterKitRole_Node
+#  
+type ClusterKitNodeApi_ClusterKitRole_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_ClusterKitRole_Edge]
+}
+
+# The ClusterKitNodeApi_ClusterKitRole_Node in a connected list
+#  
+type ClusterKitNodeApi_ClusterKitRole_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: ClusterKitNodeApi_ClusterKitRole_Node
+}
+
+# The filter conditions for a ClusterKitNodeApi_ClusterKitRole_Node connected objects
+input ClusterKitNodeApi_ClusterKitRole_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitRole_Filter]
+
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitRole_Filter]
+
+  # The uid exactly equals the value
+  # The role uid
+  uid: Uid
+
+  # The uid not equals the value
+  # The role uid
+  uid_not: Uid
+
+  # The name exactly equals the value
+  # The role name
+  name: String
+
+  # The name not equals the value
+  # The role name
+  name_not: String
+
+  # The value contains the name as substring
+  # The role name
+  name_in: String
+
+  # The value not contains the name as substring
+  # The role name
+  name_not_in: String
+
+  # The name contains the value as substring
+  # The role name
+  name_contains: String
+
+  # The name not contains the value as substring
+  # The role name
+  name_not_contains: String
+
+  # The name starts with the value
+  # The role name
+  name_starts_with: String
+
+  # The name not starts with the value
+  # The role name
+  name_not_starts_with: String
+
+  # The name ends with the value
+  # The role name
+  name_ends_with: String
+
+  # The name not ends with the value
+  # The role name
+  name_not_ends_with: String
+}
+
+# Security role. The amount of privileges assigned to the user
+input ClusterKitNodeApi_ClusterKitRole_Input {
+  # The role uid
+  uid: Uid
+
+  # The role name
+  name: String
+
+  # The list of granted privileges
+  allowedScope: [String]
+
+  # The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)
+  deniedScope: [String]
+}
+
+type ClusterKitNodeApi_ClusterKitRole_Node implements Node {
+  # The role uid
+  uid: Uid
+
+  # The role name
+  name: String
+
+  # The list of granted privileges
+  allowedScope: [String]
+
+  # The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)
+  deniedScope: [String]
+
+  # The list of users assigned to this role
+  users: [ClusterKitNodeApi_ClusterKitUser]
+
+  # The node global id
+  id: ID
+}
+
+type ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitRole_Node
+  edge: ClusterKitNodeApi_ClusterKitRole_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitRole_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitRole_OrderByEnum {
+  # uid ascending
+  # The role uid
+  uid_asc
+
+  # uid descending
+  # The role uid
+  uid_desc
+
+  # name ascending
+  # The role name
+  name_asc
+
+  # name descending
+  # The role name
+  name_desc
+}
+
+# The list of connected ClusterKitNodeApi_ClusterKitSeedAddress_Node
+#  
+type ClusterKitNodeApi_ClusterKitSeedAddress_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_ClusterKitSeedAddress_Edge]
+}
+
+# The ClusterKitNodeApi_ClusterKitSeedAddress_Node in a connected list
+#  
+type ClusterKitNodeApi_ClusterKitSeedAddress_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: ClusterKitNodeApi_ClusterKitSeedAddress_Node
+}
+
+# The filter conditions for a ClusterKitNodeApi_ClusterKitSeedAddress_Node connected objects
+input ClusterKitNodeApi_ClusterKitSeedAddress_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitSeedAddress_Filter]
+
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitSeedAddress_Filter]
+
+  # The address exactly equals the value
+  # The seed address in format of akka url
+  address: String
+
+  # The address not equals the value
+  # The seed address in format of akka url
+  address_not: String
+
+  # The value contains the address as substring
+  # The seed address in format of akka url
+  address_in: String
+
+  # The value not contains the address as substring
+  # The seed address in format of akka url
+  address_not_in: String
+
+  # The address contains the value as substring
+  # The seed address in format of akka url
+  address_contains: String
+
+  # The address not contains the value as substring
+  # The seed address in format of akka url
+  address_not_contains: String
+
+  # The address starts with the value
+  # The seed address in format of akka url
+  address_starts_with: String
+
+  # The address not starts with the value
+  # The seed address in format of akka url
+  address_not_starts_with: String
+
+  # The address ends with the value
+  # The seed address in format of akka url
+  address_ends_with: String
+
+  # The address not ends with the value
+  # The seed address in format of akka url
+  address_not_ends_with: String
+
+  # The id exactly equals the value
+  # The unique address identification number
+  id: Int
+
+  # The id not equals the value
+  # The unique address identification number
+  id_not: Int
+
+  # The id is less then the value
+  # The unique address identification number
+  id_lt: Int
+
+  # The id is less or equal then the value
+  # The unique address identification number
+  id_lte: Int
+
+  # The id is greater then the value
+  # The unique address identification number
+  id_gt: Int
+
+  # The id is greater or equal then the value
+  # The unique address identification number
+  id_gte: Int
+}
+
+# The address of fixed cluster seed for new node configuration
+input ClusterKitNodeApi_ClusterKitSeedAddress_Input {
+  # The seed address in format of akka url
+  address: String
+
+  # The unique address identification number
+  id: Int
+}
+
+type ClusterKitNodeApi_ClusterKitSeedAddress_Node implements Node {
+  # The seed address in format of akka url
+  address: String
+
+  # The unique address identification number
+  __id: Int
+
+  # The node global id
+  id: ID
+}
+
+type ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitSeedAddress_Node
+  edge: ClusterKitNodeApi_ClusterKitSeedAddress_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitSeedAddress_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitSeedAddress_OrderByEnum {
+  # address ascending
+  # The seed address in format of akka url
+  address_asc
+
+  # address descending
+  # The seed address in format of akka url
+  address_desc
+
+  # id ascending
+  # The unique address identification number
+  id_asc
+
+  # id descending
+  # The unique address identification number
+  id_desc
+}
+
+# Overall debug data of current cluster node template use
+type ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics {
+  # node templates statistics data
+  templates: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData]
+}
+
+# Statistics data for template
+type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData {
+  #  current active node count
+  activeNodes: Int
+
+  # currently configured maximum required active nodes count
+  maximumRequiredNodes: Int
+
+  # currently configured minimum required active nodes count
+  minimumRequiredNodes: Int
+
+  # name of the node template
+  name: String
+
+  # the number of currently active nodes, that need to be upgraded
+  obsoleteNodes: Int
+
+  # the number of nodes that are in upgrade process now
+  startingNodes: Int
+
+  # the number of nodes that are in upgrade process now
+  upgradingNodes: Int
+}
+
+# The web ui user
+type ClusterKitNodeApi_ClusterKitUser {
+  # The list of roles assigned to this user
+  roles: [ClusterKitNodeApi_ClusterKitRole]
+
+  # The user uid
+  uid: Uid
+
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill: Date
+
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill: Date
+
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The user login
+  login: String
+}
+
+# The list of connected ClusterKitNodeApi_ClusterKitUser_Node
+#  
+type ClusterKitNodeApi_ClusterKitUser_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_ClusterKitUser_Edge]
+}
+
+# The ClusterKitNodeApi_ClusterKitUser_Node in a connected list
+#  
+type ClusterKitNodeApi_ClusterKitUser_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: ClusterKitNodeApi_ClusterKitUser_Node
+}
+
+# The filter conditions for a ClusterKitNodeApi_ClusterKitUser_Node connected objects
+input ClusterKitNodeApi_ClusterKitUser_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitUser_Filter]
+
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitUser_Filter]
+
+  # The uid exactly equals the value
+  # The user uid
+  uid: Uid
+
+  # The uid not equals the value
+  # The user uid
+  uid_not: Uid
+
+  # The isBlocked exactly equals the value
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # The isBlocked not equals the value
+  # A value indicating whether current user is currently manually blocked
+  isBlocked_not: Boolean
+
+  # The isDeleted exactly equals the value
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The isDeleted not equals the value
+  # A value indicating whether current user is currently manually blocked
+  isDeleted_not: Boolean
+
+  # The login exactly equals the value
+  # The user login
+  login: String
+
+  # The login not equals the value
+  # The user login
+  login_not: String
+
+  # The value contains the login as substring
+  # The user login
+  login_in: String
+
+  # The value not contains the login as substring
+  # The user login
+  login_not_in: String
+
+  # The login contains the value as substring
+  # The user login
+  login_contains: String
+
+  # The login not contains the value as substring
+  # The user login
+  login_not_contains: String
+
+  # The login starts with the value
+  # The user login
+  login_starts_with: String
+
+  # The login not starts with the value
+  # The user login
+  login_not_starts_with: String
+
+  # The login ends with the value
+  # The user login
+  login_ends_with: String
+
+  # The login not ends with the value
+  # The user login
+  login_not_ends_with: String
+}
+
+# The web ui user
+input ClusterKitNodeApi_ClusterKitUser_Input {
+  # The user uid
+  uid: Uid
+
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill: Date
+
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill: Date
+
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The user login
+  login: String
+}
+
+type ClusterKitNodeApi_ClusterKitUser_Node implements Node {
+  # The list of roles assigned to this user
+  roles: [ClusterKitNodeApi_ClusterKitRole]
+
+  # The user uid
+  uid: Uid
+
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill: Date
+
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill: Date
+
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The user login
+  login: String
+
+  # The node global id
+  id: ID
+}
+
+type ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitUser_Node
+  edge: ClusterKitNodeApi_ClusterKitUser_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitUser_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitUser_OrderByEnum {
+  # uid ascending
+  # The user uid
+  uid_asc
+
+  # uid descending
+  # The user uid
+  uid_desc
+
+  # activeTill ascending
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill_asc
+
+  # activeTill descending
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill_desc
+
+  # blockedTill ascending
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill_asc
+
+  # blockedTill descending
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill_desc
+
+  # isBlocked ascending
+  # A value indicating whether current user is currently manually blocked
+  isBlocked_asc
+
+  # isBlocked descending
+  # A value indicating whether current user is currently manually blocked
+  isBlocked_desc
+
+  # isDeleted ascending
+  # A value indicating whether current user is currently manually blocked
+  isDeleted_asc
+
+  # isDeleted descending
+  # A value indicating whether current user is currently manually blocked
+  isDeleted_desc
+
+  # login ascending
+  # The user login
+  login_asc
+
+  # login descending
+  # The user login
+  login_desc
+}
+
+# Short user description
+type ClusterKitNodeApi_ClusterKitUserDescription {
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill: Date
+
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill: Date
+
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The user login
+  login: String
+}
+
+# The mutation error description
+type ClusterKitNodeApi_ErrorDescription {
+  # The related field name
+  field: String
+
+  # The error message
+  message: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_nodeTemplates_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitNodeTemplate_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_nodeTemplates_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_nodeTemplates_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitNodeTemplate_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_nugetFeeds_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitNugetFeed_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_nugetFeeds_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_nugetFeeds_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitNugetFeed_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_reloadPackages_Input {
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_roles_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitRole_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_roles_update_Input {
+  # The object's id
+  id: Uid
+
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitRole_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_seedAddresses_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitSeedAddress_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_seedAddresses_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_seedAddresses_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitSeedAddress_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_upgradeNode_Input {
+  address: String
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_users_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitUser_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_nodeManagerData_users_update_Input {
+  # The object's id
+  id: Uid
+
+  # The object's data
+  newNode: ClusterKitNodeApi_ClusterKitUser_Input
+  clientMutationId: String
+}
+
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
+
+# The list of all detected mutations
+type Mutations {
+  # Request to server to reload package list
+  ClusterKitNodeApi_nodeManagerData_reloadPackages(input: ClusterKitNodeApi_nodeManagerData_reloadPackages_Input): ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload
+
+  # Manual node upgrade request
+  ClusterKitNodeApi_nodeManagerData_upgradeNode(input: ClusterKitNodeApi_nodeManagerData_upgradeNode_Input): ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload
+
+  # Creates the new node template
+  ClusterKitNodeApi_nodeManagerData_nodeTemplates_create(input: ClusterKitNodeApi_nodeManagerData_nodeTemplates_create_Input): ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload
+
+  # Creates the new node template
+  ClusterKitNodeApi_nodeManagerData_nodeTemplates_update(input: ClusterKitNodeApi_nodeManagerData_nodeTemplates_update_Input): ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload
+
+  # Creates the new node template
+  ClusterKitNodeApi_nodeManagerData_nodeTemplates_delete(input: ClusterKitNodeApi_nodeManagerData_nodeTemplates_delete_Input): ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload
+
+  # Creates the new nuget feed link
+  ClusterKitNodeApi_nodeManagerData_nugetFeeds_create(input: ClusterKitNodeApi_nodeManagerData_nugetFeeds_create_Input): ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload
+
+  # Creates the new nuget feed link
+  ClusterKitNodeApi_nodeManagerData_nugetFeeds_update(input: ClusterKitNodeApi_nodeManagerData_nugetFeeds_update_Input): ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload
+
+  # Creates the new nuget feed link
+  ClusterKitNodeApi_nodeManagerData_nugetFeeds_delete(input: ClusterKitNodeApi_nodeManagerData_nugetFeeds_delete_Input): ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload
+
+  # Creates the new seed address
+  ClusterKitNodeApi_nodeManagerData_seedAddresses_create(input: ClusterKitNodeApi_nodeManagerData_seedAddresses_create_Input): ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload
+
+  # Creates the new seed address
+  ClusterKitNodeApi_nodeManagerData_seedAddresses_update(input: ClusterKitNodeApi_nodeManagerData_seedAddresses_update_Input): ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload
+
+  # Creates the new seed address
+  ClusterKitNodeApi_nodeManagerData_seedAddresses_delete(input: ClusterKitNodeApi_nodeManagerData_seedAddresses_delete_Input): ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload
+
+  # Creates the new user
+  ClusterKitNodeApi_nodeManagerData_users_create(input: ClusterKitNodeApi_nodeManagerData_users_create_Input): ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload
+
+  # Creates the new user
+  ClusterKitNodeApi_nodeManagerData_users_update(input: ClusterKitNodeApi_nodeManagerData_users_update_Input): ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload
+
+  # Creates the new managing system role
+  ClusterKitNodeApi_nodeManagerData_roles_create(input: ClusterKitNodeApi_nodeManagerData_roles_create_Input): ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload
+
+  # Creates the new managing system role
+  ClusterKitNodeApi_nodeManagerData_roles_update(input: ClusterKitNodeApi_nodeManagerData_roles_update_Input): ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload
+}
+
+# The Node interface as described in Relay documentation
+interface Node {
+  # The node id
+  id: ID
+}
+
+# The root query type
+type Query {
+  # The united api access
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+
+  # The node global searcher according to Relay specification
+  node(
+    # The node global id
+    id: ID
+  ): Node
+}
+
+# The Uid / Guid representation
+scalar Uid
