@@ -1546,7 +1546,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -2025,6 +2025,54 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 2,
                                 3
                               ]
+                            }
+                          }
+                        }
+                        ";
+
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+        
+        /// <summary>
+        /// Testing querying the objects virtual id
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task VirtualIdTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            {                
+                api {
+                    id
+                    nestedAsync {
+                        id
+                    }           
+                }                
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""id"": ""TestApi_TestApi"",                              
+                              ""nestedAsync"": {
+                                ""id"": ""TestApi_NestedProvider"",
+                              }
                             }
                           }
                         }

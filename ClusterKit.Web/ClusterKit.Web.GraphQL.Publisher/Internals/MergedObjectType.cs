@@ -13,8 +13,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Linq;
 
     using ClusterKit.API.Client;
+    using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Language.AST;
+    using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
     /// <summary>
@@ -124,6 +126,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return mergedObjectType;
         }
 
+        /// <inheritdoc />
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        {
+            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
+            if (graphType.Fields.All(f => f.Name != "id"))
+            {
+                graphType.AddField(new FieldType
+                                       {
+                                           Name = "id",
+                                           ResolvedType = new IdGraphType(),
+                                           Resolver = new VirtualIdResolver(this)
+                                       });
+            }
+
+            return graphType;
+        }
+
         /// <summary>
         /// Fills the empty object with current objects fields
         /// </summary>
@@ -176,6 +195,34 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      : usedField.Field.Type.GatherSingleApiRequest(usedField.Ast, context).ToList();
 
                 yield return request;
+            }
+        }
+
+        /// <summary>
+        /// Resolves value for virtual id of static classes
+        /// </summary>
+        private class VirtualIdResolver : IFieldResolver
+        {
+            /// <summary>
+            /// The parent type
+            /// </summary>
+            private readonly MergedObjectType parentType;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="VirtualIdResolver"/> class.
+            /// </summary>
+            /// <param name="parentType">
+            /// The parent type.
+            /// </param>
+            public VirtualIdResolver(MergedObjectType parentType)
+            {
+                this.parentType = parentType;
+            }
+
+            /// <inheritdoc />
+            public object Resolve(ResolveFieldContext context)
+            {
+                return this.parentType.ComplexTypeName;
             }
         }
     }

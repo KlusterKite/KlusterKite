@@ -513,21 +513,21 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                             {
                                 Name = $"{fieldName}_l",
                                 ResolvedType = new StringGraphType(),
-                                Description = $"The {fieldName} exactly equals the value\n{fieldDescription}"
+                                Description = $"The {fieldName} lowercased exactly equals the value\n{fieldDescription}"
                             };
             yield return
                 new FieldType
                 {
                     Name = $"{fieldName}_l_not",
                     ResolvedType = new StringGraphType(),
-                    Description = $"The {fieldName} not equals the value\n{fieldDescription}"
+                    Description = $"The {fieldName} lowercased not equals the value\n{fieldDescription}"
                 };
             yield return
                 new FieldType
                 {
                     Name = $"{fieldName}_l_in",
                     ResolvedType = new StringGraphType(),
-                    Description = $"The value contains the {fieldName} as substring\n{fieldDescription}"
+                    Description = $"The value contains the {fieldName} lowercased as substring\n{fieldDescription}"
                 };
             yield return
                 new FieldType
@@ -535,14 +535,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     Name = $"{fieldName}_l_not_in",
                     ResolvedType = new StringGraphType(),
                     Description =
-                            $"The value not contains the {fieldName} as substring\n{fieldDescription}"
+                            $"The value not contains the {fieldName} lowercased as substring\n{fieldDescription}"
                 };
             yield return
                 new FieldType
                 {
                     Name = $"{fieldName}_l_contains",
                     ResolvedType = new StringGraphType(),
-                    Description = $"The {fieldName} contains the value as substring\n{fieldDescription}"
+                    Description = $"The {fieldName} lowercased contains the value as substring\n{fieldDescription}"
                 };
             yield return
                 new FieldType
@@ -550,35 +550,35 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     Name = $"{fieldName}_l_not_contains",
                     ResolvedType = new StringGraphType(),
                     Description =
-                            $"The {fieldName} not contains the value as substring\n{fieldDescription}"
+                            $"The {fieldName} lowercased not contains the value as substring\n{fieldDescription}"
                 };
             yield return
                 new FieldType
                 {
                     Name = $"{fieldName}_l_starts_with",
                     ResolvedType = new StringGraphType(),
-                    Description = $"The {fieldName} starts with the value\n{fieldDescription}"
+                    Description = $"The {fieldName} lowercased starts with the value\n{fieldDescription}"
                 };
             yield return
                 new FieldType
                 {
                     Name = $"{fieldName}_l_not_starts_with",
                     ResolvedType = new StringGraphType(),
-                    Description = $"The {fieldName} not starts with the value\n{fieldDescription}"
+                    Description = $"The {fieldName} lowercased not starts with the value\n{fieldDescription}"
                 };
             yield return
                 new FieldType
                 {
                     Name = $"{fieldName}_l_ends_with",
                     ResolvedType = new StringGraphType(),
-                    Description = $"The {fieldName} ends with the value\n{fieldDescription}"
+                    Description = $"The {fieldName} lowercased ends with the value\n{fieldDescription}"
                 };
             yield return
                 new FieldType
                 {
                     Name = $"{fieldName}_l_not_ends_with",
                     ResolvedType = new StringGraphType(),
-                    Description = $"The {fieldName} not ends with the value\n{fieldDescription}"
+                    Description = $"The {fieldName} lowercased not ends with the value\n{fieldDescription}"
                 };
         }
 

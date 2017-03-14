@@ -145,7 +145,6 @@ namespace ClusterKit.Data.CRUD
                 offset = null;
             }
 
-
             ApiRequest combinedRequest = null;
             if (apiRequest != null)
             {
