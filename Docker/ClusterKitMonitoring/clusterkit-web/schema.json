@@ -935,6 +935,18 @@
               "deprecationReason": null
             },
             {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "node",
               "description": "The node global searcher according to Relay specification",
               "args": [
@@ -987,6 +999,18 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1354,6 +1378,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -1413,6 +1449,18 @@
                   "name": "ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -1507,6 +1555,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1678,6 +1738,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -1780,6 +1852,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -2167,6 +2251,106 @@
               "defaultValue": null
             },
             {
+              "name": "code_l",
+              "description": "The code lowercased exactly equals the value\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not",
+              "description": "The code lowercased not equals the value\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_in",
+              "description": "The value contains the code lowercased as substring\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_in",
+              "description": "The value not contains the code lowercased as substring\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_contains",
+              "description": "The code lowercased contains the value as substring\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_contains",
+              "description": "The code lowercased not contains the value as substring\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_starts_with",
+              "description": "The code lowercased starts with the value\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_starts_with",
+              "description": "The code lowercased not starts with the value\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_ends_with",
+              "description": "The code lowercased ends with the value\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_ends_with",
+              "description": "The code lowercased not ends with the value\nThe program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "configuration",
               "description": "The configuration exactly equals the value\nThe akka configuration template for node",
               "type": {
@@ -2259,6 +2443,106 @@
             {
               "name": "configuration_not_ends_with",
               "description": "The configuration not ends with the value\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l",
+              "description": "The configuration lowercased exactly equals the value\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not",
+              "description": "The configuration lowercased not equals the value\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_in",
+              "description": "The value contains the configuration lowercased as substring\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_in",
+              "description": "The value not contains the configuration lowercased as substring\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_contains",
+              "description": "The configuration lowercased contains the value as substring\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_contains",
+              "description": "The configuration lowercased not contains the value as substring\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_starts_with",
+              "description": "The configuration lowercased starts with the value\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_starts_with",
+              "description": "The configuration lowercased not starts with the value\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_ends_with",
+              "description": "The configuration lowercased ends with the value\nThe akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_ends_with",
+              "description": "The configuration lowercased not ends with the value\nThe akka configuration template for node",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -2539,6 +2823,106 @@
             {
               "name": "name_not_ends_with",
               "description": "The name not ends with the value\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l",
+              "description": "The name lowercased exactly equals the value\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not",
+              "description": "The name lowercased not equals the value\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_in",
+              "description": "The value contains the name lowercased as substring\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_in",
+              "description": "The value not contains the name lowercased as substring\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_contains",
+              "description": "The name lowercased contains the value as substring\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_contains",
+              "description": "The name lowercased not contains the value as substring\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_starts_with",
+              "description": "The name lowercased starts with the value\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_starts_with",
+              "description": "The name lowercased not starts with the value\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_ends_with",
+              "description": "The name lowercased ends with the value\nThe human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_ends_with",
+              "description": "The name lowercased not ends with the value\nThe human readable node template name",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -3119,6 +3503,106 @@
               "defaultValue": null
             },
             {
+              "name": "address_l",
+              "description": "The address lowercased exactly equals the value\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not",
+              "description": "The address lowercased not equals the value\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_in",
+              "description": "The value contains the address lowercased as substring\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_in",
+              "description": "The value not contains the address lowercased as substring\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_contains",
+              "description": "The address lowercased contains the value as substring\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_contains",
+              "description": "The address lowercased not contains the value as substring\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_starts_with",
+              "description": "The address lowercased starts with the value\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_starts_with",
+              "description": "The address lowercased not starts with the value\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_ends_with",
+              "description": "The address lowercased ends with the value\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_ends_with",
+              "description": "The address lowercased not ends with the value\nThe seed url address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "id",
               "description": "The id exactly equals the value\nThe unique address identification number",
               "type": {
@@ -3279,6 +3763,106 @@
               "defaultValue": null
             },
             {
+              "name": "password_l",
+              "description": "The password lowercased exactly equals the value\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_not",
+              "description": "The password lowercased not equals the value\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_in",
+              "description": "The value contains the password lowercased as substring\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_not_in",
+              "description": "The value not contains the password lowercased as substring\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_contains",
+              "description": "The password lowercased contains the value as substring\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_not_contains",
+              "description": "The password lowercased not contains the value as substring\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_starts_with",
+              "description": "The password lowercased starts with the value\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_not_starts_with",
+              "description": "The password lowercased not starts with the value\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_ends_with",
+              "description": "The password lowercased ends with the value\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password_l_not_ends_with",
+              "description": "The password lowercased not ends with the value\nThe user password for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "userName",
               "description": "The userName exactly equals the value\nThe username for basic authentication",
               "type": {
@@ -3371,6 +3955,106 @@
             {
               "name": "userName_not_ends_with",
               "description": "The userName not ends with the value\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l",
+              "description": "The userName lowercased exactly equals the value\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_not",
+              "description": "The userName lowercased not equals the value\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_in",
+              "description": "The value contains the userName lowercased as substring\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_not_in",
+              "description": "The value not contains the userName lowercased as substring\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_contains",
+              "description": "The userName lowercased contains the value as substring\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_not_contains",
+              "description": "The userName lowercased not contains the value as substring\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_starts_with",
+              "description": "The userName lowercased starts with the value\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_not_starts_with",
+              "description": "The userName lowercased not starts with the value\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_ends_with",
+              "description": "The userName lowercased ends with the value\nThe username for basic authentication",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "userName_l_not_ends_with",
+              "description": "The userName lowercased not ends with the value\nThe username for basic authentication",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -3708,6 +4392,106 @@
             {
               "name": "address_not_ends_with",
               "description": "The address not ends with the value\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l",
+              "description": "The address lowercased exactly equals the value\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not",
+              "description": "The address lowercased not equals the value\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_in",
+              "description": "The value contains the address lowercased as substring\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_in",
+              "description": "The value not contains the address lowercased as substring\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_contains",
+              "description": "The address lowercased contains the value as substring\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_contains",
+              "description": "The address lowercased not contains the value as substring\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_starts_with",
+              "description": "The address lowercased starts with the value\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_starts_with",
+              "description": "The address lowercased not starts with the value\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_ends_with",
+              "description": "The address lowercased ends with the value\nThe seed address in format of akka url",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_ends_with",
+              "description": "The address lowercased not ends with the value\nThe seed address in format of akka url",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -4082,6 +4866,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -4177,6 +4973,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4375,6 +5183,106 @@
             {
               "name": "login_not_ends_with",
               "description": "The login not ends with the value\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l",
+              "description": "The login lowercased exactly equals the value\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_not",
+              "description": "The login lowercased not equals the value\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_in",
+              "description": "The value contains the login lowercased as substring\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_not_in",
+              "description": "The value not contains the login lowercased as substring\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_contains",
+              "description": "The login lowercased contains the value as substring\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_not_contains",
+              "description": "The login lowercased not contains the value as substring\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_starts_with",
+              "description": "The login lowercased starts with the value\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_not_starts_with",
+              "description": "The login lowercased not starts with the value\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_ends_with",
+              "description": "The login lowercased ends with the value\nThe user login",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "login_l_not_ends_with",
+              "description": "The login lowercased not ends with the value\nThe user login",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -4798,6 +5706,106 @@
                 "ofType": null
               },
               "defaultValue": null
+            },
+            {
+              "name": "name_l",
+              "description": "The name lowercased exactly equals the value\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not",
+              "description": "The name lowercased not equals the value\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_in",
+              "description": "The value contains the name lowercased as substring\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_in",
+              "description": "The value not contains the name lowercased as substring\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_contains",
+              "description": "The name lowercased contains the value as substring\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_contains",
+              "description": "The name lowercased not contains the value as substring\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_starts_with",
+              "description": "The name lowercased starts with the value\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_starts_with",
+              "description": "The name lowercased not starts with the value\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_ends_with",
+              "description": "The name lowercased ends with the value\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_ends_with",
+              "description": "The name lowercased not ends with the value\nThe role name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
             }
           ],
           "interfaces": null,
@@ -4887,6 +5895,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -4954,6 +5974,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -5449,6 +6481,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -5480,6 +6524,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -6789,62 +7845,4 @@
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            }
-          ]
-        },
-        {
-          "name": "skip",
-          "description": "Directs the executor to skip this field or fragment when the 'if' argument is true.",
-          "locations": [
-            "FIELD",
-            "FRAGMENT_SPREAD",
-            "INLINE_FRAGMENT"
-          ],
-          "args": [
-            {
-              "name": "if",
-              "description": "Skipped when true.",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            }
-          ]
-        },
-        {
-          "name": "deprecated",
-          "description": "Marks an element of a GraphQL schema as no longer supported.",
-          "locations": [
-            "FIELD_DEFINITION",
-            "ENUM_VALUE"
-          ],
-          "args": [
-            {
-              "name": "reason",
-              "description": "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted in [Markdown](https://daringfireball.net/projects/markdown/).",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": "\"No longer supported\""
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
+         

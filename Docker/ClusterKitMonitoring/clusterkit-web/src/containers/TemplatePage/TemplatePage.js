@@ -44,11 +44,15 @@ class TemplatePage extends React.Component {
     Relay.Store.commitUpdate(
       new CreateTemplateMutation(
         {
-          userName: model.userName,
-          password: model.password,
-          address: model.address,
-          type: model.type,
-          api: this.props.api,
+          code: model.code,
+          configuration: model.configuration,
+          containerTypes: model.containerTypes,
+          maximumNeededInstances: model.maximumNeededInstances,
+          minimumRequiredInstances: model.minimumRequiredInstances,
+          name: model.name,
+          packages: model.packages,
+          priority: model.priority,
+          version: model.version
         }),
       {
         onSuccess: () => browserHistory.push('/Templates'),
@@ -63,7 +67,6 @@ class TemplatePage extends React.Component {
         {
           nodeId: this.props.params.id,
           __id: model.__id,
-          api: this.props.api,
           code: model.code,
           configuration: model.configuration,
           containerTypes: model.containerTypes,
@@ -116,6 +119,7 @@ export default Relay.createContainer(
     fragments: {
       api: () => Relay.QL`
         fragment on ClusterKitNodeApi_ClusterKitNodeApi {
+          id
           __node(id: $id) @include( if: $nodeExists ) {
             ...on ClusterKitNodeApi_ClusterKitNodeTemplate_Node {
               __id
@@ -128,11 +132,6 @@ export default Relay.createContainer(
               packages
               priority
               version
-            }
-          }
-          me @skip( if: $nodeExists ) {
-            clusterKitUser {
-              login
             }
           }
         }

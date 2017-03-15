@@ -1,6 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 
+import ReloadPackages from '../../components/ReloadPackages/index';
 import NodesList from '../../components/NodesList/index';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 
@@ -14,11 +15,19 @@ class HomePage extends React.Component {
     return false;
   };
 
-  // <NodesList hasError={false} upgradeNodePrivilege={true} onManualUpgrade={this.onNodeUpgrade} nodeDescriptions={this.props.api.nodeManagerData} />
-  // <NodesWithTemplates data={this.props.api.nodeManagerData} />
+  refetchData = () => {
+    console.log('refetch');
+    // this.props.relay.forceFetch();
+  };
+
   render () {
     return (
       <div>
+        <h1>Monitoring</h1>
+        <button type="button" className="btn btn-primary btn-lg" onClick={this.refetchData}>
+          <i className="fa fa-refresh"/> {' '} Refetch
+        </button>
+        <ReloadPackages />
         <NodesWithTemplates data={this.props.api.nodeManagerData} />
         <NodesList hasError={false} upgradeNodePrivilege={true} onManualUpgrade={this.onNodeUpgrade} nodeDescriptions={this.props.api.nodeManagerData} />
       </div>
@@ -29,8 +38,6 @@ class HomePage extends React.Component {
 export default Relay.createContainer(
   HomePage,
   {
-    // ${NodesList.getFragment('nodeDescriptions')},
-    // ${NodesWithTemplates.getFragment('data')},
     fragments: {
       api: () => Relay.QL`fragment on ClusterKitNodeApi_ClusterKitNodeApi {
         nodeManagerData {

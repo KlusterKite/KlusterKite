@@ -48,7 +48,6 @@ class FeedPage extends React.Component {
           password: model.password,
           address: model.address,
           type: model.type,
-          api: this.props.api,
         }),
       {
         onSuccess: () => browserHistory.push('/NugetFeeds'),
@@ -67,7 +66,6 @@ class FeedPage extends React.Component {
           password: model.password,
           address: model.address,
           type: model.type,
-          api: this.props.api,
         }),
       {
         onSuccess: () => browserHistory.push('/NugetFeeds'),
@@ -111,6 +109,7 @@ export default Relay.createContainer(
     fragments: {
       api: () => Relay.QL`
         fragment on ClusterKitNodeApi_ClusterKitNodeApi {
+          id
           __node(id: $id) @include( if: $nodeExists ) {
             ...on ClusterKitNodeApi_ClusterKitNugetFeed_Node {
               __id
@@ -118,11 +117,6 @@ export default Relay.createContainer(
               type
               userName
               password
-            }
-          }
-          me @skip( if: $nodeExists ) {
-            clusterKitUser {
-              login
             }
           }
         }

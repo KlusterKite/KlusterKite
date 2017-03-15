@@ -5,7 +5,7 @@ const doRedirect = true;
 
 /**
  * Redirects to the authorization page (in case everything else fails)
- * @param reject Callback function
+ * @param reject {Function} Callback function for failure
  */
 const redirectToAuth = (reject) => {
   const currentLocation = browserHistory.getCurrentLocation().pathname;
@@ -55,21 +55,27 @@ const authenticate = (data) => {
 };
 
 /**
- * Process new token from the server and resolve new adios connection
+ * Process new token from the server and resolves new access token
  * @param response {Object} Authorization data from the server
  * @param resolve {Function} Resolve function
+ * @param reject {Function} Callback function for failure
  */
-const processResponse = (response, resolve) => {
+const processResponse = (response, resolve, reject) => {
   if (response.status === 200) {
     response.json().then(function(data) {
       authenticate(data);
       resolve(data.access_token);
     });
   } else {
-    redirectToAuth();
+    redirectToAuth(reject);
   }
 };
 
+/**
+ * Process new token from the server and resolves new access token
+ * @param resolve {Function} Resolve function
+ * @param reject {Function} Callback function for failure
+ */
 const promise = new Promise((resolve, reject) => {
   const accessToken = Storage.get('accessToken');
   const refreshToken = Storage.get('refreshToken');
@@ -81,9 +87,9 @@ const promise = new Promise((resolve, reject) => {
   if (!accessToken && refreshToken) {
     if (refreshToken) {
       requestNewToken(refreshToken).then(data => {
-        processResponse(data, resolve);
+        processResponse(data, resolve, reject);
       }).catch(error => {
-        redirectToAuth();
+        redirectToAuth(reject);
       });
     } else {
       redirectToAuth(reject);
