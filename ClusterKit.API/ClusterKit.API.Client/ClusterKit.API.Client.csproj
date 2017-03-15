@@ -77,6 +77,13 @@
     <Compile Include="ApiObjectType.cs" />
     <Compile Include="ApiType.cs" />
     <Compile Include="Attributes\ApiDescriptionAttribute.cs" />
+    <Compile Include="Attributes\Authorization\LogAccessAttribute.cs" />
+    <Compile Include="AuthorizationRule.cs" />
+    <Compile Include="Attributes\Authorization\EnConnectionAction.cs" />
+    <Compile Include="Attributes\Authorization\EnPrivilegeScope.cs" />
+    <Compile Include="Attributes\Authorization\RequirePrivilegeAttribute.cs" />
+    <Compile Include="Attributes\Authorization\RequireSessionAttribute.cs" />
+    <Compile Include="Attributes\Authorization\RequireUserAttribute.cs" />
     <Compile Include="Attributes\DeclareConnectionAttribute.cs" />
     <Compile Include="Attributes\DeclareFieldAttribute.cs" />
     <Compile Include="Attributes\DeclareMutationAttribute.cs" />

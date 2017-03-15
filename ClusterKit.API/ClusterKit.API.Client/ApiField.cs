@@ -81,6 +81,21 @@ namespace ClusterKit.API.Client
         public string TypeName { get; set; }
 
         /// <summary>
+        /// Gets or sets the list of authorization requirements
+        /// </summary>
+        public List<AuthorizationRule> AuthorizationRules { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a valid authenticated session is required for access this field
+        /// </summary>
+        public bool RequireAuthenticatedSession { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a valid authenticated user session is required for access this field
+        /// </summary>
+        public bool RequireAuthenticatedUserSession { get; set; }
+
+        /// <summary>
         /// Creates an object containing field
         /// </summary>
         /// <param name="name">
@@ -183,7 +198,10 @@ namespace ClusterKit.API.Client
                            Arguments = new List<ApiField>(this.Arguments),
                            Description = this.Description,
                            ScalarType = this.ScalarType,
-                           TypeName = this.TypeName
+                           TypeName = this.TypeName,
+                           AuthorizationRules = new List<AuthorizationRule>(this.AuthorizationRules),
+                           RequireAuthenticatedSession = this.RequireAuthenticatedSession,
+                           RequireAuthenticatedUserSession = this.RequireAuthenticatedUserSession 
                        };
         }
     }
