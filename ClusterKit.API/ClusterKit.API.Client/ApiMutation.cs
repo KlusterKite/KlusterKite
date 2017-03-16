@@ -87,7 +87,11 @@ namespace ClusterKit.API.Client
                 Description = field.Description,
                 ScalarType = field.ScalarType,
                 TypeName = field.TypeName,
-                Type = type
+                Type = type,
+                AuthorizationRules = field.AuthorizationRules,
+                LogAccessRules = field.LogAccessRules,
+                RequireAuthenticatedSession = field.RequireAuthenticatedSession,
+                RequireAuthenticatedUserSession = field.RequireAuthenticatedUserSession
             };
         }
     }

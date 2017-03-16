@@ -17,6 +17,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Tests.Mock;
+    using ClusterKit.Core.Log;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher;
 
@@ -25,11 +26,19 @@ namespace ClusterKit.Web.Tests.GraphQL
     using global::GraphQL.Utilities;
     using global::GraphQL.Validation.Complexity;
 
+    using JetBrains.Annotations;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    using Serilog;
+    using Serilog.Core;
+    using Serilog.Events;
+
     using Xunit;
     using Xunit.Abstractions;
+
+    using Constants = ClusterKit.Core.Log.Constants;
 
     /// <summary>
     /// Testing publishing and resolving integration
@@ -1664,6 +1673,398 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// <summary>
         /// Testing simple fields requests from <see cref="ApiDescription"/>
         /// </summary>
+        /// <param name="fieldName">The requested api field name</param>
+        /// <param name="expectingResult">A value indicating whether to expect data result</param>
+        /// <param name="setSession">A value indicating whether to set authentication session</param>
+        /// <param name="setUser">A value indicating whether to set authenticated user</param>
+        /// <param name="setClientPrivilege">A value indicating whether to set "access" to client privileges scope</param>
+        /// <param name="setUserPrivilege">A value indicating whether to set "access" to user privileges scope</param>
+        /// <returns>Async task</returns>
+        [Theory]
+        [InlineData("requireSessionField", false, false, false, false, false)]
+        [InlineData("requireSessionField", true, true, false, false, false)]
+        [InlineData("requireUserField", true, false, false, false, false)]
+        [InlineData("requireUserField", false, true, false, false, false)]
+        [InlineData("requireUserField", true, true, true, false, false)]
+
+        [InlineData("requirePrivilegeAnyField", true, false, false, false, false)]
+        [InlineData("requirePrivilegeAnyField", false, true, false, false, false)]
+        [InlineData("requirePrivilegeAnyField", true, true, false, true, false)]
+        [InlineData("requirePrivilegeAnyField", false, true, true, false, false)]
+        [InlineData("requirePrivilegeAnyField", true, true, true, false, true)]
+
+        [InlineData("requirePrivilegeBothField", true, false, false, false, false)]
+        [InlineData("requirePrivilegeBothField", false, true, false, false, false)]
+        [InlineData("requirePrivilegeBothField", false, true, false, true, false)]
+        [InlineData("requirePrivilegeBothField", false, true, true, false, false)]
+        [InlineData("requirePrivilegeBothField", false, true, true, false, true)]
+        [InlineData("requirePrivilegeBothField", true, true, true, true, true)]
+
+        [InlineData("requirePrivilegeUserField", true, false, false, false, false)]
+        [InlineData("requirePrivilegeUserField", false, true, false, false, false)]
+        [InlineData("requirePrivilegeUserField", false, true, false, true, false)]
+        [InlineData("requirePrivilegeUserField", false, true, true, false, false)]
+        [InlineData("requirePrivilegeUserField", true, true, true, false, true)]
+
+        [InlineData("requirePrivilegeClientField", true, false, false, false, false)]
+        [InlineData("requirePrivilegeClientField", false, true, false, false, false)]
+        [InlineData("requirePrivilegeClientField", true, true, false, true, false)]
+        [InlineData("requirePrivilegeClientField", false, true, true, false, false)]
+        [InlineData("requirePrivilegeClientField", false, true, true, false, true)]
+
+        [InlineData("requirePrivilegeIgnoreOnUserPresentField", true, false, false, false, false)]
+        [InlineData("requirePrivilegeIgnoreOnUserPresentField", false, true, false, false, false)]
+        [InlineData("requirePrivilegeIgnoreOnUserPresentField", true, true, false, true, false)]
+        [InlineData("requirePrivilegeIgnoreOnUserPresentField", true, true, true, false, false)]
+
+        [InlineData("requirePrivilegeIgnoreOnUserNotPresentField", true, false, false, false, false)]
+        [InlineData("requirePrivilegeIgnoreOnUserNotPresentField", true, true, false, false, false)]
+        [InlineData("requirePrivilegeIgnoreOnUserNotPresentField", true, true, true, false, true)]
+        [InlineData("requirePrivilegeIgnoreOnUserNotPresentField", false, true, true, false, false)]
+        public async Task AuthorizationFieldTest(
+            string fieldName,
+            bool expectingResult,
+            bool setSession,
+            bool setUser,
+            bool setClientPrivilege,
+            bool setUserPrivilege)
+        {
+            var sink = CreateSecurityLogger();
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
+
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+            var query = $@"
+            {{                
+                api {{
+                    {fieldName}
+                }}
+            }}
+            ";
+
+            var context = new RequestContext();
+            if (setSession)
+            {
+                TestUser user = null;
+                if (setUser)
+                {
+                    user = new TestUser { UserId = Guid.Empty.ToString("N") };
+                }
+
+                context.Authentication = new AccessTicket(
+                    user,
+                    setUserPrivilege ? new[] { "allow" } : new string[0],
+                    "test",
+                    "test",
+                    setClientPrivilege ? new[] { "allow" } : new string[0],
+                    DateTimeOffset.Now,
+                    null,
+                    null);
+            }
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                r => 
+                {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = context;
+                }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = $@"
+                        {{
+                          ""data"": {{
+                            ""api"": {{ 
+                                ""{fieldName}"": {(expectingResult ? "\"success\"" : "null")}
+                            }}
+                          }}
+                        }}
+                        ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+            Assert.Equal(expectingResult ? 0 : 1, sink.LogEvents.Count);
+        }
+
+        /// <summary>
+        /// Testing the authorization to untyped mutation
+        /// </summary>
+        /// <param name="expectingResult">A value indicating whether to expect data result</param>
+        /// <param name="setSession">A value indicating whether to set authentication session</param>
+        /// <returns>The async task</returns>
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(true, true)]
+        public async Task AuthorizationMutationTest(bool expectingResult, bool setSession)
+        {
+            var sink = CreateSecurityLogger();
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
+
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+            var query = @"
+            mutation M {                
+                TestApi_authorizedMutation(input: {clientMutationId: ""test""}) {
+                    result,
+                    clientMutationId,
+                    api {
+                        syncScalarField
+                    }
+                }
+            }
+            ";
+
+            var context = new RequestContext();
+            if (setSession)
+            {
+                context.Authentication = new AccessTicket(
+                    null,
+                    new string[0],
+                    "test",
+                    "test",
+                    new[] { "allow" },
+                    DateTimeOffset.Now,
+                    null,
+                    null);
+            }
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = context;
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = expectingResult 
+                      ? @"
+                        {
+                            ""data"": {
+                                ""testApi_authorizedMutation"": {
+                                    ""result"": ""ok"",
+                                    ""clientMutationId"": ""test"",
+                                    ""api"": { 
+                                        ""syncScalarField"": ""SyncScalarField""
+                                    } 
+                                }
+                            }
+                        }
+                        "
+                      : @"
+                        {
+                            ""data"": {
+                                ""testApi_authorizedMutation"": {
+                                    ""result"": null,
+                                    ""clientMutationId"": ""test"",
+                                    ""api"": { 
+                                        ""syncScalarField"": ""SyncScalarField""
+                                    } 
+                                }
+                            }
+                        }
+                        ";
+
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+            Assert.Equal(expectingResult ? 0 : 1, sink.LogEvents.Count);
+        }
+
+        /// <summary>
+        /// Testing authorized connection query request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <param name="expectingResult">A value indicating whether to expect data result</param>
+        /// <param name="setSession">A value indicating whether to set authentication session</param>
+        /// /// <param name="privilege">The privilege to set</param>
+        /// <returns>Async task</returns>
+        [Theory]
+        [InlineData(false, false, null)]
+        [InlineData(false, true, "create")]
+        [InlineData(true, true, "read")]
+        public async Task AuthorizationConnectionQueryTest(bool expectingResult, bool setSession, string privilege)
+        {
+            var sink = CreateSecurityLogger();
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var context = new RequestContext();
+            if (setSession)
+            {
+                context.Authentication = new AccessTicket(
+                    null,
+                    new string[0],
+                    "test",
+                    "test",
+                    privilege != null ? new[] { privilege } : new string[0],
+                    DateTimeOffset.Now,
+                    null,
+                    null);
+            }
+
+            var query = @"
+            {                
+                api {
+                        authorizedConnection {
+                            count,
+                            edges {
+                                node {
+                                    name,
+                                    value
+                                }                    
+                            }
+                        }
+                }                
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = context;
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = expectingResult
+                            ? @"
+                            {
+                              ""data"": {
+                                ""api"": {
+                                  ""authorizedConnection"": {
+                                    ""count"": 1,
+                                    ""edges"": [
+                                      {
+                                        ""node"": {
+                                          ""name"": ""1-test"",
+                                          ""value"": 100.0
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                            "
+                            : @"
+                            {
+                              ""data"": {
+                                ""api"": {
+                                  ""authorizedConnection"": null
+                                }
+                              }
+                            }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+            Assert.Equal(expectingResult ? 0 : 1, sink.LogEvents.Count);
+        }
+
+        /// <summary>
+        /// Testing authorized connection mutation request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <param name="setSession">A value indicating whether to set authentication session</param>
+        /// /// <param name="privilege">The privilege to set</param>
+        /// <param name="mutationName">The mutation name</param>
+        /// <param name="arguments">The mutation arguments</param>
+        /// <param name="expectedResult">The expected result</param>
+        /// <param name="expectingResult">A value indicating whether to expect data result</param>
+        /// <returns>Async task</returns>
+        [Theory]
+        [InlineData(false, false, "create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": null}}}", false)]
+        [InlineData(true, "query", "create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(true, "create", "create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": {\"name\": \"new node\"}}}}", true)]
+
+        [InlineData(false, false, "update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(true, "query", "update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(true, "update", "update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": {\"name\": \"new node\"}}}}", true)]
+
+        [InlineData(false, false, "delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(true, "query", "delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(true, "delete", "delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\": {\"node\": {\"name\": \"1-test\"}}}}", true)]
+        public async Task AuthorizationConnectionMutationTest(
+            bool setSession, 
+            string privilege,
+            string mutationName,
+            string arguments,
+            string expectedResult,
+            bool expectingResult)
+        {
+            var sink = CreateSecurityLogger();
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var context = new RequestContext();
+            if (setSession)
+            {
+                context.Authentication = new AccessTicket(
+                    null,
+                    new string[0],
+                    "test",
+                    "test",
+                    privilege != null ? new[] { privilege } : new string[0],
+                    DateTimeOffset.Now,
+                    null,
+                    null);
+            }
+
+            var query = $@"
+            mutation M {{        
+                m: TestApi_authorizedConnection_{mutationName}({arguments}) {{
+                    node {{
+                        name
+                    }}
+                }}
+            }}
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = context;
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+            Assert.Equal(expectingResult ? 0 : 1, sink.LogEvents.Count);
+        }
+
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
         /// <returns>Async task</returns>
         [Fact]
         public async Task DateTimeTest()
@@ -2289,6 +2690,28 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Creates a virtual logger for security events
+        /// </summary>
+        /// <returns>The test sink</returns>
+        private static ArraySink CreateSecurityLogger()
+        {
+            var loggerConfig = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Verbose);
+            var sink = new ArraySink();
+            Func<LogEvent, bool> logFilter = log =>
+            {
+                LogEventPropertyValue value;
+                return log.Properties.TryGetValue(Constants.LogRecordTypeKey, out value)
+                       && (value as ScalarValue)?.Value is EnLogRecordType
+                       && (EnLogRecordType)((ScalarValue)value).Value == EnLogRecordType.Security;
+            };
+
+            loggerConfig =
+                loggerConfig.WriteTo.Logger(c => c.Filter.ByIncludingOnly(logFilter).WriteTo.Sink(sink, LogEventLevel.Verbose));
+            Log.Logger = loggerConfig.CreateLogger();
+            return sink;
+        }
+
+        /// <summary>
         /// An additional provider
         /// </summary>
         [ApiDescription(Name = "AdditionalApi")]
@@ -2298,6 +2721,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// Published string
             /// </summary>
             [DeclareField]
+            [UsedImplicitly]
             public string HelloWorld => "Hello world";
         }
 
@@ -2324,6 +2748,32 @@ namespace ClusterKit.Web.Tests.GraphQL
             {
                 await base.SearchNode(id, path, nodeRequest, context);
                 throw new Exception("Test exception");
+            }
+        }
+
+        /// <summary>
+        /// The test user implementation for tests
+        /// </summary>
+        private class TestUser : IUser
+        {
+            /// <inheritdoc />
+            public string UserId { get; set; }
+        }
+
+        /// <summary>
+        /// The security log sink for tests
+        /// </summary>
+        private class ArraySink : ILogEventSink
+        {
+            /// <summary>
+            /// Gets the list of logged events
+            /// </summary>
+            public List<LogEvent> LogEvents { get; } = new List<LogEvent>();
+
+            /// <inheritdoc />
+            public void Emit(LogEvent logEvent)
+            {
+                this.LogEvents.Add(logEvent);
             }
         }
     }

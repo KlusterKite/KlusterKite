@@ -47,8 +47,18 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             this.searcher = root.NodeSearher;
-            var apiField = new MergedField("api", root, providers.First(), description: "The united api access");
-            apiField.AddProviders(providers.Skip(1));
+            var apiField = new MergedField(
+                "api",
+                root,
+                providers.First(),
+                null,
+                description: "The united api access");
+
+            foreach (var apiProvider in providers.Skip(1))
+            {
+                apiField.AddProvider(apiProvider, null);
+            }
+
             this.Fields["api"] = apiField;
         }
 

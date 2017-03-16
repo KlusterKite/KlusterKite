@@ -67,7 +67,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Name = "cursor",
                                          ResolvedType = new StringGraphType(),
                                          Resolver = new CursorResolver(),
-                                         Description = "A value to use with paging positioning"
+                                         Description =
+                                             "A value to use with paging positioning"
                                      },
                                  new FieldType
                                      {
@@ -76,7 +77,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                          Metadata =
                                              new Dictionary<string, object>
                                                  {
-                                                     { MetaDataTypeKey, new MergedField("node", this.ObjectType, this.Provider, description: this.ObjectType.Description) }
+                                                     {
+                                                         MetaDataTypeKey,
+                                                         new MergedField(
+                                                             "node",
+                                                             this.ObjectType,
+                                                             this.Provider,
+                                                             null,
+                                                             description: this.ObjectType.Description)
+                                                     }
                                                  }
                                      }
                              };

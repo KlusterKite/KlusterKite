@@ -181,6 +181,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                              "edges",
                                                              this.EdgeType,
                                                              this.Provider,
+                                                             null,
                                                              EnFieldFlags.IsArray,
                                                              description: "The list of edges according to filtering and paging conditions")
                                                      }

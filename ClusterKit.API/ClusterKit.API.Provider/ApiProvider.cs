@@ -136,7 +136,14 @@ namespace ClusterKit.API.Provider
                     return null;
                 }
 
-                var resolveResult = await this.GetPropertyRecursive(mutation.Path, context, onErrorCallback);
+                var resolveResult = mutation.Path.Count == 0 
+                    ? new ObjectResolver.ResolvePropertyResult
+                          {
+                              Resolver = this.resolver,
+                              Value = this
+                          }
+
+                    : await this.GetPropertyRecursive(mutation.Path, context, onErrorCallback); 
                 if (resolveResult == null)
                 {
                     return null;
@@ -154,7 +161,8 @@ namespace ClusterKit.API.Provider
                                context,
                                this.argumentsSerializer,
                                onErrorCallback);
-                    return result?.Property(request.FieldName)?.Value as JObject;
+
+                    return new JObject { { "result", result?.Property(request.FieldName)?.Value } };
                 }
 
                 var connectionResolver = resolveResult.Resolver as IConnectionResolver;
@@ -486,6 +494,7 @@ namespace ClusterKit.API.Provider
                 }
             }
 
+            field.FillAuthorizationProperties(method);
             return field;
         }
 
@@ -562,16 +571,22 @@ namespace ClusterKit.API.Provider
                     flags |= EnFieldFlags.IsKey;
                 }
 
-                return ApiField.Scalar(name, metadata.ScalarType, flags, description: attribute.Description);
+                var scalar = ApiField.Scalar(name, metadata.ScalarType, flags, description: attribute.Description);
+                scalar.FillAuthorizationProperties(property);
+                return scalar;
             }
 
             var returnApiType = this.GenerateTypeDescription(metadata, data);
 
-            return ApiField.Object(
+            var field = ApiField.Object(
                 name,
                 returnApiType.TypeName,
                 flags,
                 description: attribute.Description);
+
+            field.FillAuthorizationProperties(property);
+
+            return field;
         }
 
         /// <summary>
@@ -676,6 +691,7 @@ namespace ClusterKit.API.Provider
 
             foreach (var description in fields)
             {
+                description.ApiField.FillAuthorizationProperties(description.Method);
                 apiType.DirectMutations.Add(description.ApiField);
                 yield return
                     new MutationDescription
@@ -777,7 +793,7 @@ namespace ClusterKit.API.Provider
                     var field = ApiField.Object(
                         "create",
                         mutationResult.TypeName,
-                        arguments:
+                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
                         new List<ApiField>
                             {
                                 ApiField.Object(
@@ -786,7 +802,7 @@ namespace ClusterKit.API.Provider
                                     description: "The object's data")
                             },
                         description: attribute.CreateDescription);
-
+                    field.FillAuthorizationProperties(description.Member);
                     yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionCreate };
                 }
 
@@ -795,7 +811,7 @@ namespace ClusterKit.API.Provider
                     var field = ApiField.Object(
                         "update",
                         mutationResult.TypeName,
-                        arguments:
+                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
                         new List<ApiField>
                             {
                                 ApiField.Scalar("id", idScalarType, description: "The object's id"),
@@ -805,6 +821,7 @@ namespace ClusterKit.API.Provider
                                     description: "The object's data")
                             },
                         description: attribute.CreateDescription);
+                    field.FillAuthorizationProperties(description.Member);
                     yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionUpdate };
                 }
 
@@ -813,9 +830,10 @@ namespace ClusterKit.API.Provider
                     var field = ApiField.Object(
                         "delete",
                         mutationResult.TypeName,
-                        arguments:
+                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
                         new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
                         description: attribute.CreateDescription);
+                    field.FillAuthorizationProperties(description.Member);
                     yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionDelete };
                 }
             }

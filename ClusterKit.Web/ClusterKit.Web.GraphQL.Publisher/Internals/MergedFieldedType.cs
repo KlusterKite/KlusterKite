@@ -13,6 +13,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Linq;
 
     using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Attributes.Authorization;
+    using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Language.AST;
@@ -50,6 +52,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 if (!this.Fields.TryGetValue(field.Name, out localField))
                 {
+                    continue;
+                }
+
+                var apiField = localField.OriginalFields.Values.First();
+                if (apiField != null
+                    && !apiField.CheckAuthorization(context.UserContext as RequestContext, EnConnectionAction.Query))
+                {
+                    var severity = apiField.LogAccessRules.Any()
+                                       ? apiField.LogAccessRules.Max(l => l.Severity)
+                                       : EnSeverity.Trivial;
+
+                    SecurityLog.CreateRecord(
+                        SecurityLog.EnType.OperationDenied,
+                        severity,
+                        context.UserContext as RequestContext,
+                        "Unauthorized call to {ApiPath}",
+                        $"{contextFieldAst.Name}.{apiField.Name}");
                     continue;
                 }
 

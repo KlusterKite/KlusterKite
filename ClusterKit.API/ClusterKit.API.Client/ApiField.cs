@@ -11,6 +11,11 @@ namespace ClusterKit.API.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
+    using ClusterKit.API.Client.Attributes.Authorization;
+    using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
 
@@ -84,6 +89,11 @@ namespace ClusterKit.API.Client
         /// Gets or sets the list of authorization requirements
         /// </summary>
         public List<AuthorizationRule> AuthorizationRules { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of log access rules
+        /// </summary>
+        public List<LogAccessRule> LogAccessRules { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether a valid authenticated session is required for access this field
@@ -181,6 +191,94 @@ namespace ClusterKit.API.Client
                        };
         }
 
+        /// <summary>
+        /// Fills the <see cref="AuthorizationRules"/>, <see cref="LogAccessRules"/>, 
+        /// <see cref="RequireAuthenticatedSession"/> and <see cref="RequireAuthenticatedUserSession"/> 
+        /// from attributes of related API member
+        /// </summary>
+        /// <param name="memberInfo">The related API member</param>
+        public void FillAuthorizationProperties(MemberInfo memberInfo)
+        {
+            this.RequireAuthenticatedSession = memberInfo.GetCustomAttribute<RequireSessionAttribute>() != null;
+            this.RequireAuthenticatedUserSession = memberInfo.GetCustomAttribute<RequireUserAttribute>() != null;
+            this.AuthorizationRules =
+                memberInfo.GetCustomAttributes<RequirePrivilegeAttribute>().Select(a => a.CreateRule()).ToList();
+            this.LogAccessRules =
+                memberInfo.GetCustomAttributes<LogAccessAttribute>().Select(a => a.CreateRule()).ToList();
+        }
+
+        /// <summary>
+        /// Checks if provided context is authorized to access this field
+        /// </summary>
+        /// <param name="context">
+        /// The request context
+        /// </param>
+        /// <param name="action">
+        /// The performed action.
+        /// </param>
+        /// <returns>
+        /// Whether context is authorized to access this field
+        /// </returns>
+        public bool CheckAuthorization(RequestContext context, EnConnectionAction action)
+        {
+            var accessTicket = context?.Authentication;
+            if (accessTicket == null)
+            {
+                return !this.RequireAuthenticatedSession;
+            }
+
+            if (accessTicket.User == null && this.RequireAuthenticatedUserSession)
+            {
+                return false;
+            }
+
+            if (this.AuthorizationRules == null)
+            {
+                return true;
+            }
+
+            foreach (var rule in this.AuthorizationRules)
+            {
+                if ((accessTicket.User != null && rule.IgnoreOnUserPresent)
+                    || (accessTicket.User == null && rule.IgnoreOnUserNotPresent))
+                {
+                    continue;
+                }
+
+                if (this.Flags.HasFlag(EnFieldFlags.IsConnection))
+                {
+                    if (!rule.ConnectionActions.HasFlag(action))
+                    {
+                        continue;
+                    }
+                }
+
+                if (rule.Scope != EnPrivilegeScope.User)
+                {
+                    var clientHasPrivilege = accessTicket.ClientScope.Contains(rule.Privilege);
+                    if (!clientHasPrivilege
+                        && (rule.Scope == EnPrivilegeScope.Both || rule.Scope == EnPrivilegeScope.Client))
+                    {
+                        return false;
+                    }
+
+                    if (clientHasPrivilege
+                        && (rule.Scope == EnPrivilegeScope.Any || rule.Scope == EnPrivilegeScope.Client))
+                    {
+                        continue;
+                    }
+                }
+
+                var userHasPrivilege = accessTicket.UserScope.Contains(rule.Privilege);
+                if (!userHasPrivilege)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         /// <inheritdoc />
         public override string ToString()
         {
@@ -199,9 +297,14 @@ namespace ClusterKit.API.Client
                            Description = this.Description,
                            ScalarType = this.ScalarType,
                            TypeName = this.TypeName,
-                           AuthorizationRules = new List<AuthorizationRule>(this.AuthorizationRules),
-                           RequireAuthenticatedSession = this.RequireAuthenticatedSession,
-                           RequireAuthenticatedUserSession = this.RequireAuthenticatedUserSession 
+                           AuthorizationRules =
+                               this.AuthorizationRules != null
+                                   ? new List<AuthorizationRule>(this.AuthorizationRules)
+                                   : null,
+                           RequireAuthenticatedSession =
+                               this.RequireAuthenticatedSession,
+                           RequireAuthenticatedUserSession =
+                               this.RequireAuthenticatedUserSession
                        };
         }
     }

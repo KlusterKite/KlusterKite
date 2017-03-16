@@ -477,7 +477,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             Dictionary<string, MergedType> typesCreated)
         {
             var returnType =
-                (MergedObjectType)CreateMergedType(provider, apiMutation, null, new List<string>(), false, typesCreated);
+                CreateMergedType(provider, apiMutation, null, new List<string>(), false, typesCreated);
 
             var inputType = new MergedInputType(apiMutation.Name);
             inputType.AddProvider(new FieldProvider { Provider = provider, FieldType = new ApiObjectType(apiMutation.Name) });
@@ -491,6 +491,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                         apiField.Name,
                         CreateMergedType(provider, apiField, null, new List<string>(), true, typesCreated),
                         provider,
+                        apiMutation.Clone(),
                         apiMutation.Flags,
                         description: apiField.Description));
             }
@@ -498,23 +499,25 @@ namespace ClusterKit.Web.GraphQL.Publisher
             inputType.Fields["clientMutationId"] = new MergedField(
                 "clientMutationId",
                 CreateScalarType(EnScalarType.String, typesCreated),
-                provider);
+                provider,
+                apiMutation);
 
             var arguments = new Dictionary<string, MergedField>
                                 {
                                     {
                                         "input",
-                                        new MergedField("input", inputType, provider)
+                                        new MergedField("input", inputType, provider, apiMutation)
                                     }
                                 };
 
-            var payload = new MergedUntypedMutationResult(returnType, apiRoot, provider);
+            var payload = new MergedUntypedMutationResult(returnType, apiRoot, provider, apiMutation);
             typesCreated[payload.ComplexTypeName] = payload;
 
             var untypedMutation = new MergedField(
                 apiMutation.Name,
                 payload,
                 provider,
+                apiMutation,
                 apiMutation.Flags,
                 arguments,
                 apiMutation.Description);
@@ -543,7 +546,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 return null;
             }
 
-            var errorDescriptionApiType = provider.Description.Types.FirstOrDefault(t => t.TypeName == "ErrorDescription") as ApiObjectType;
+            var errorDescriptionApiType =
+                provider.Description.Types.FirstOrDefault(t => t.TypeName == "ErrorDescription") as ApiObjectType;
             MergedType errorDescriptionType = null;
             if (errorDescriptionApiType != null)
             {
@@ -564,7 +568,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
             typesCreated[returnType.ComplexTypeName] = returnType;
 
             var inputType = new MergedInputType(apiMutation.Name);
-            inputType.AddProvider(new FieldProvider { Provider = provider, FieldType = new ApiObjectType(apiMutation.Name) });
+            inputType.AddProvider(
+                new FieldProvider { Provider = provider, FieldType = new ApiObjectType(apiMutation.Name) });
             typesCreated[inputType.ComplexTypeName] = inputType;
 
             foreach (var apiField in apiMutation.Arguments)
@@ -575,6 +580,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                         apiField.Name,
                         CreateMergedType(provider, apiField, null, new List<string>(), true, typesCreated),
                         provider,
+                        apiMutation,
                         apiMutation.Flags,
                         description: apiField.Description));
             }
@@ -582,17 +588,29 @@ namespace ClusterKit.Web.GraphQL.Publisher
             inputType.Fields["clientMutationId"] = new MergedField(
                 "clientMutationId",
                 CreateScalarType(EnScalarType.String, typesCreated),
-                provider);
+                provider,
+                apiMutation);
 
             var arguments = new Dictionary<string, MergedField>
                                 {
                                     {
                                         "input",
-                                        new MergedField("input", inputType, provider)
+                                        new MergedField(
+                                            "input",
+                                            inputType,
+                                            provider,
+                                            apiMutation)
                                     }
                                 };
 
-            return new MergedField(apiMutation.Name, returnType, provider, apiMutation.Flags, arguments, apiMutation.Description);
+            return new MergedField(
+                apiMutation.Name,
+                returnType,
+                provider,
+                apiMutation,
+                apiMutation.Flags,
+                arguments,
+                apiMutation.Description);
         }
 
         /// <summary>
@@ -685,6 +703,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                             argument.Name,
                             fieldArgumentType,
                             provider,
+                            apiField,
                             argument.Flags,
                             description: argument.Description);
                     }
@@ -697,12 +716,18 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     apiField.Name,
                     fieldType,
                     provider,
+                    apiField,
                     apiField.Flags,
                     fieldArguments,
                     string.IsNullOrWhiteSpace(description) ? null : description);
                 if (complexField != null)
                 {
-                    field.AddProviders(complexField.Providers);
+                    foreach (var complexFieldProvider in complexField.Providers)
+                    {
+                        field.AddProvider(
+                            complexFieldProvider,
+                            complexField.OriginalFields[provider.Description.ApiName]);
+                    }
                 }
 
                 parentType.Fields[apiField.Name] = field;

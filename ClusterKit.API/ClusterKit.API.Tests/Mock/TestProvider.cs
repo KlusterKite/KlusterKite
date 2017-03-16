@@ -16,6 +16,7 @@ namespace ClusterKit.API.Tests.Mock
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Client.Attributes.Authorization;
     using ClusterKit.API.Client.Converters;
     using ClusterKit.API.Provider;
     using ClusterKit.Security.Client;
@@ -34,11 +35,6 @@ namespace ClusterKit.API.Tests.Mock
     public class TestProvider : ApiProvider
     {
         /// <summary>
-        /// The test objects connection
-        /// </summary>
-        private readonly TestObjectConnection connection;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TestProvider"/> class.
         /// </summary>
         /// <param name="objects">
@@ -51,7 +47,7 @@ namespace ClusterKit.API.Tests.Mock
                 objects = new List<TestObject>();
             }
 
-            this.connection = new TestObjectConnection(objects.ToDictionary(o => o.Id));
+            this.Connection = new TestObjectConnection(objects.ToDictionary(o => o.Id));
         }
 
         /// <summary>
@@ -118,11 +114,11 @@ namespace ClusterKit.API.Tests.Mock
         public Task<string> AsyncScalarField => Task.FromResult("AsyncScalarField");
 
         /// <summary>
-        /// Test objects connection
+        /// Gets the test objects connection
         /// </summary>
         [DeclareConnection(CanCreate = true, CanDelete = true, CanUpdate = true)]
         [UsedImplicitly]
-        public TestObjectConnection Connection => this.connection;
+        public TestObjectConnection Connection { get; }
 
         /// <summary>
         /// Gets a value indicating whether something is faulting
@@ -227,6 +223,92 @@ namespace ClusterKit.API.Tests.Mock
         [DeclareField(Converter = typeof(StringConverter))]
         [UsedImplicitly]
         public ThirdPartyObject ThirdParty { get; set; } = new ThirdPartyObject { Contents = "Third party" };
+        
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequireSession]
+        public string RequireSessionField => "success";
+
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequireUser]
+        public string RequireUserField => "success";
+
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequirePrivilege("allow")]
+        public string RequirePrivilegeAnyField => "success";
+
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequirePrivilege("allow", Scope = EnPrivilegeScope.Both)]
+        public string RequirePrivilegeBothField => "success";
+
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequirePrivilege("allow", Scope = EnPrivilegeScope.User)]
+        public string RequirePrivilegeUserField => "success";
+
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequirePrivilege("allow", Scope = EnPrivilegeScope.Client)]
+        public string RequirePrivilegeClientField => "success";
+
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequirePrivilege("allow", IgnoreOnUserPresent = true)]
+        public string RequirePrivilegeIgnoreOnUserPresentField => "success";
+
+        /// <summary>
+        /// Gets the field that requires a valid authentication session
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [RequirePrivilege("allow", IgnoreOnUserNotPresent = true)]
+        public string RequirePrivilegeIgnoreOnUserNotPresentField => "success";
+
+        /// <summary>
+        /// Gets the connection with required authorization
+        /// </summary>
+        [UsedImplicitly]
+        [RequireSession]
+        [RequirePrivilege("read", ConnectionActions = EnConnectionAction.Query)]
+        [RequirePrivilege("create", ConnectionActions = EnConnectionAction.Create)]
+        [RequirePrivilege("update", ConnectionActions = EnConnectionAction.Update)]
+        [RequirePrivilege("delete", ConnectionActions = EnConnectionAction.Delete)]
+        [DeclareConnection(CanCreate = true, CanUpdate = true, CanDelete = true)]
+        public TestObjectConnection AuthorizedConnection => this.Connection;
+
+        /// <summary>
+        /// The mutation that requires authorization
+        /// </summary>
+        /// <returns>Always true</returns>
+        [DeclareMutation]
+        [UsedImplicitly]
+        [RequireSession]
+        [RequirePrivilege("allow")]
+        public string AuthorizedMutation() => "ok";
 
         /// <summary>
         /// The method with <seealso cref="DateTime"/> argument

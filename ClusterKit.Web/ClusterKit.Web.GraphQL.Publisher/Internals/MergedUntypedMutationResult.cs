@@ -17,6 +17,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// The type representing the mutation payload for the untyped mutation
     /// </summary>
@@ -26,6 +28,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// The edge type
         /// </summary>
         private readonly MergedApiRoot root;
+
+        /// <summary>
+        /// The original field description
+        /// </summary>
+        private readonly ApiField field;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MergedUntypedMutationResult"/> class.
@@ -39,14 +46,19 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="provider">
         /// The provider.
         /// </param>
+        /// <param name="field">
+        /// The original field description
+        /// </param>
         public MergedUntypedMutationResult(
-            MergedObjectType originalReturnType,
+            MergedType originalReturnType,
             MergedApiRoot root,
-            ApiProvider provider)
+            ApiProvider provider,
+            ApiField field)
             : base(originalReturnType.OriginalTypeName)
         {
             this.OriginalReturnType = originalReturnType;
             this.root = root;
+            this.field = field;
             this.Provider = provider;
         }
 
@@ -64,7 +76,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets the original return type
         /// </summary>
-        public MergedObjectType OriginalReturnType { get; }
+        public MergedType OriginalReturnType { get; }
 
         /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
@@ -96,7 +108,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </returns>
         private FieldType CreateField(string name, MergedType type, IFieldResolver resolver = null, EnFieldFlags flags = EnFieldFlags.None)
         {
-            var mergedField = new MergedField(name, type, this.Provider, flags);
+            var mergedField = new MergedField(name, type, this.Provider, this.field, flags);
             return this.ConvertApiField(new KeyValuePair<string, MergedField>(name, mergedField), resolver);
         }
 
@@ -108,7 +120,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                return context.Source;
+                return (context.Source as JObject)?.Property("result")?.Value;
             }
         }
     }

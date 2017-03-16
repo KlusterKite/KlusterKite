@@ -98,6 +98,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="INodeConnection.cs" />
     <Compile Include="IValueConverter.cs" />
+    <Compile Include="LogAccessRule.cs" />
     <Compile Include="Messages\ApiDiscoverRequest.cs" />
     <Compile Include="Messages\ApiDiscoverResponse.cs" />
     <Compile Include="Messages\SurrogatableJObject.cs" />

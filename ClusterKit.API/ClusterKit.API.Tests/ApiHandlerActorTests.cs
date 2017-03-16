@@ -97,8 +97,9 @@ namespace ClusterKit.API.Tests
             var result = (JObject)await actor.Ask<SurrogatableJObject>(request, TimeSpan.FromSeconds(1));
             Assert.NotNull(result);
             this.Sys.Log.Info(result.ToString(Formatting.Indented));
-            Assert.NotNull(result.Property("name"));
-            Assert.Equal("new name", result.Property("name").ToObject<string>());
+            var token = result.SelectToken("result.name");
+            Assert.NotNull(token);
+            Assert.Equal("new name", token.ToObject<string>());
         }
 
         /// <summary>

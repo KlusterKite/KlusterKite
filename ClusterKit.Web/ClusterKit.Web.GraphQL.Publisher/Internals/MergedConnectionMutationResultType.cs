@@ -118,7 +118,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </returns>
         private FieldType CreateField(string name, MergedType type, IFieldResolver resolver = null, EnFieldFlags flags = EnFieldFlags.None)
         {
-            var mergedField = new MergedField(name, type, this.Provider, flags);
+            var mergedField = new MergedField(name, type, this.Provider, null, flags);
             return this.ConvertApiField(new KeyValuePair<string, MergedField>(name, mergedField), resolver);
         }
 

@@ -9,11 +9,13 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Attributes.Authorization;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -162,7 +164,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <summary>
             /// Mutation API provider
             /// </summary>
-            private ApiProvider provider;
+            private readonly ApiProvider provider;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="MutationResolver"/> class.
@@ -226,9 +228,39 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 RequestContext requestContext,
                 MergedConnectionMutationResultType responseType)
             {
+                var arguments = context.FieldAst.Arguments.ToJson(context).Property("input")?.Value as JObject;
+
+                var actionName = this.mergedField.FieldName?.Split('.').LastOrDefault();
+                EnConnectionAction action;
+                var originalApiField = this.mergedField.OriginalFields.Values.FirstOrDefault();
+
+                if (Enum.TryParse(actionName, true, out action) && originalApiField != null
+                    && !originalApiField.CheckAuthorization(requestContext, action))
+                {
+                    var severity = originalApiField.LogAccessRules.Any()
+                                       ? originalApiField.LogAccessRules.Max(l => l.Severity)
+                                       : EnSeverity.Trivial;
+
+                    SecurityLog.CreateRecord(
+                        SecurityLog.EnType.OperationDenied,
+                        severity,
+                        context.UserContext as RequestContext,
+                        "Unauthorized call to {ApiPath}",
+                        context.FieldAst.Name);
+
+                    var emptyResponse = new JObject
+                                            {
+                                                {
+                                                    "clientMutationId",
+                                                    arguments?.Property("clientMutationId")?.ToObject<string>()
+                                                }
+                                            };
+                    return emptyResponse;
+                }
+
                 var edgeType = responseType.EdgeType;
                 var nodeType = responseType.EdgeType.ObjectType;
-                List<ApiRequest> requestedFields = new List<ApiRequest>();
+                var requestedFields = new List<ApiRequest>();
                 var idSubRequestRequest = new List<ApiRequest>
                                               {
                                                   new ApiRequest { FieldName = nodeType.KeyName, Alias = "__id" }
@@ -305,7 +337,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     }
                 }
 
-                var arguments = context.FieldAst.Arguments.ToJson(context).Property("input")?.Value as JObject;
                 var request = new MutationApiRequest
                 {
                     Arguments = arguments,
@@ -382,6 +413,31 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 }
 
                 var arguments = context.FieldAst.Arguments.ToJson(context).Property("input")?.Value as JObject;
+
+                var originalApiField = this.mergedField.OriginalFields.Values.FirstOrDefault();
+                if (originalApiField != null && !originalApiField.CheckAuthorization(requestContext, EnConnectionAction.Query))
+                {
+                    var severity = originalApiField.LogAccessRules.Any()
+                                       ? originalApiField.LogAccessRules.Max(l => l.Severity)
+                                       : EnSeverity.Trivial;
+
+                    SecurityLog.CreateRecord(
+                        SecurityLog.EnType.OperationDenied,
+                        severity,
+                        context.UserContext as RequestContext,
+                        "Unauthorized call to {ApiPath}",
+                        context.FieldAst.Name);
+
+                    var emptyResponse = new JObject
+                                            {
+                                                {
+                                                    "clientMutationId",
+                                                    arguments?.Property("clientMutationId")?.ToObject<string>()
+                                                }
+                                            };
+                    return emptyResponse;
+                }
+
                 var request = new MutationApiRequest
                 {
                     Arguments = arguments,

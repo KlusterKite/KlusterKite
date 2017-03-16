@@ -1,26 +1,21 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LogAccessAttribute.cs" company="ClusterKit">
+// <copyright file="LogAccessRule.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Defines the LogAccessAttribute type.
+//   The action description to log a field / method access
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client.Attributes.Authorization
+namespace ClusterKit.API.Client
 {
-    using System;
-
+    using ClusterKit.API.Client.Attributes.Authorization;
     using ClusterKit.Security.Client;
 
     /// <summary>
-    /// The access to the marked field will be logged to security log with specified severity
+    /// The action description to log a field / method access
     /// </summary>
-    /// <remarks>
-    /// In case of multiple attributes applied to the same case the one with the highest severity will be used
-    /// </remarks>
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-    public class LogAccessAttribute : Attribute
+    public class LogAccessRule
     {
         /// <summary>
         /// Gets or sets the severity
@@ -50,20 +45,5 @@ namespace ClusterKit.API.Client.Attributes.Authorization
         /// Usually data modification operation a logged by themselves at operation place
         /// </returns>
         public EnConnectionAction ConnectionActions { get; set; } = EnConnectionAction.All;
-
-        /// <summary>
-        /// Creates <see cref="LogAccessRule"/> from this attribute
-        /// </summary>
-        /// <returns>The <see cref="LogAccessRule"/></returns>
-        public LogAccessRule CreateRule()
-        {
-            return new LogAccessRule
-                       {
-                           Type = this.Type,
-                           ConnectionActions = this.ConnectionActions,
-                           Severity = this.Severity,
-                           LogMessage = this.LogMessage
-                       };
-        }
     }
 }

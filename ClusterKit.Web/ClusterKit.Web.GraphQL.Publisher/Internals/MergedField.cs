@@ -39,6 +39,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="provider">
         /// The api provider for the field
         /// </param>
+        /// <param name="field">The original field description</param>
         /// <param name="flags">
         /// The flags.
         /// </param>
@@ -52,6 +53,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             string name,
             MergedType type,
             ApiProvider provider,
+            ApiField field,
             EnFieldFlags flags = EnFieldFlags.None,
             IReadOnlyDictionary<string, MergedField> arguments = null,
             string description = null)
@@ -61,7 +63,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             this.Flags = flags;
             this.Arguments = (arguments ?? new Dictionary<string, MergedField>()).ToImmutableDictionary();
             this.Description = description;
-            this.providers.Add(provider);
+            this.AddProvider(provider, field);
         }
 
         /// <summary>
@@ -96,21 +98,19 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public IEnumerable<ApiProvider> Providers => this.providers;
 
         /// <summary>
+        /// Gets the list of original field description by api name
+        /// </summary>
+        public Dictionary<string, ApiField> OriginalFields { get; } = new Dictionary<string, ApiField>();
+
+        /// <summary>
         /// Adds a provider to the provider list
         /// </summary>
         /// <param name="provider">The provider</param>
-        public void AddProvider(ApiProvider provider)
+        /// <param name="field">The original field description</param>
+        public void AddProvider(ApiProvider provider, ApiField field)
         {
             this.providers.Add(provider);
-        }
-
-        /// <summary>
-        /// Adds the list of providers to the provider list
-        /// </summary>
-        /// <param name="newProviders">The list of providers</param>
-        public void AddProviders(IEnumerable<ApiProvider> newProviders)
-        {
-            this.providers.AddRange(newProviders);
+            this.OriginalFields[provider.Description.ApiName] = field;
         }
 
         /// <summary>
@@ -119,14 +119,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>The field clone</returns>
         public MergedField Clone()
         {
+            var apiProvider = this.providers.First();
+            var field = this.OriginalFields[apiProvider.Description.ApiName];
+
             var mergedField = new MergedField(
                 this.FieldName,
                 this.Type,
-                this.providers.First(),
+                apiProvider,
+                field,
                 this.Flags,
                 this.Arguments,
                 this.Description);
-            mergedField.providers.AddRange(this.providers.Skip(1));
+
+            foreach (var provider in this.providers.Skip(1))
+            {
+                mergedField.AddProvider(provider, this.OriginalFields[provider.Description.ApiName]);
+            }
+
             return mergedField;
         }
     }

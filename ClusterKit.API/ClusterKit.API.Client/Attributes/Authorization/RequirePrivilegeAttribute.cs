@@ -39,7 +39,7 @@ namespace ClusterKit.API.Client.Attributes.Authorization
         public EnPrivilegeScope Scope { get; set; } = EnPrivilegeScope.Any;
 
         /// <summary>
-        /// Gets or sets the scope to look for privilege
+        /// Gets or sets the list of connection actions to apply attribute to
         /// </summary>
         public EnConnectionAction ConnectionActions { get; set; } = EnConnectionAction.All;
 
@@ -53,5 +53,21 @@ namespace ClusterKit.API.Client.Attributes.Authorization
         /// Client application makes calls on it's on behalf
         /// </summary>
         public bool IgnoreOnUserNotPresent { get; set; }
+
+        /// <summary>
+        /// Creates a rule from attribute
+        /// </summary>
+        /// <returns>The authorization rule</returns>
+        public AuthorizationRule CreateRule()
+        {
+            return new AuthorizationRule
+                       {
+                           ConnectionActions = this.ConnectionActions,
+                           IgnoreOnUserNotPresent = this.IgnoreOnUserNotPresent,
+                           IgnoreOnUserPresent = this.IgnoreOnUserPresent,
+                           Privilege = this.Privilege,
+                           Scope = this.Scope
+                       };
+        }
     }
 }

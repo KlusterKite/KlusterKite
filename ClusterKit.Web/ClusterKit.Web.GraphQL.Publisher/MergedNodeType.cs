@@ -41,7 +41,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="objectType">
         /// The object Type.
         /// </param>
-        public MergedNodeType(ApiProvider provider, MergedObjectType objectType)
+        public MergedNodeType(
+            ApiProvider provider, 
+            MergedObjectType objectType)
             : base(objectType.OriginalTypeName)
         {
             this.Provider = provider;
@@ -55,6 +57,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     "__id",
                     conflictingField.Type,
                     this.Provider,
+                    null,
                     conflictingField.Flags,
                     conflictingField.Arguments.ToDictionary(p => p.Key, p => p.Value),
                     conflictingField.Description);
