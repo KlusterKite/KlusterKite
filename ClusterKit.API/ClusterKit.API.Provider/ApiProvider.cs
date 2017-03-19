@@ -16,6 +16,8 @@ namespace ClusterKit.API.Provider
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using Castle.Core.Internal;
+
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Provider.Resolvers;
@@ -44,7 +46,7 @@ namespace ClusterKit.API.Provider
         /// <summary>
         /// The current api resolver
         /// </summary>
-        private ObjectResolver resolver;
+        private IResolver resolver;
 
         /// <summary>
         /// Prepares serializer to deserialize arguments
@@ -94,7 +96,7 @@ namespace ClusterKit.API.Provider
         /// <returns>
         /// Resolved query
         /// </returns>
-        public virtual Task<JObject> ResolveQuery(
+        public virtual Task<JToken> ResolveQuery(
             List<ApiRequest> requests,
             RequestContext context,
             Action<Exception> onErrorCallback)
@@ -320,6 +322,31 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.Types.Clear();
             this.ApiDescription.Mutations.Clear();
 
+            var rootResolver = typeof(GenericObjectResolver<>)
+                .MakeGenericType(this.GetType()).CreateInstance<GenericObjectResolver>();
+            this.resolver = rootResolver;
+            var root = (ApiObjectType)rootResolver.GetApiType();
+            this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
+            this.ApiDescription.Description = root.Description;
+            this.ApiDescription.Fields = new List<ApiField>(root.Fields.Select(f => f.Clone()));
+
+            List<ApiType> allTypes;
+            List<ApiMutation> mutationList;
+            rootResolver.CreateApiRoot(out allTypes, out this.argumentsSerializer, out mutationList);
+            this.ApiDescription.Mutations = mutationList;
+
+            /*
+            this.ApiDescription.Mutations = this.mutations.Values.Select(d => d.CreateMutationField()).ToList();
+            this.ApiDescription.Types =
+                assembleData.DiscoveredApiTypes.Values.ToList();
+            this.argumentsSerializer = new JsonSerializer
+                                           {
+                                               ContractResolver =
+                                                   new InputContractResolver(assembleData.FieldNames)
+                                           };
+            */
+
+            /*
             var assembleData = new AssembleTempData();
             var root = (ApiObjectType)this.GenerateTypeDescription(
                 new TypeMetadata
@@ -348,6 +375,7 @@ namespace ClusterKit.API.Provider
                                            };
 
             this.CompileResolvers(root, assembleData);
+            */
         }
 
         /// <summary>
@@ -909,7 +937,7 @@ namespace ClusterKit.API.Provider
         {
             var type = typeMetaData.Type;
             var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
-            var typeName = descriptionAttribute?.Name ?? ResolverGenerator.ToCSharpRepresentation(type);
+            var typeName = descriptionAttribute?.Name ?? NamingUtilities.ToCSharpRepresentation(type);
 
             if (typeMetaData.MetaType == TypeMetadata.EnMetaType.Connection)
             {

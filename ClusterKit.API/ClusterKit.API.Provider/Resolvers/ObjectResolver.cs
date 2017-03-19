@@ -159,6 +159,12 @@ namespace ClusterKit.API.Provider.Resolvers
             return await this.ResolveQuery(source, request, context, argumentsSerializer, onErrorCallback);
         }
 
+        /// <inheritdoc />
+        public ApiType GetElementType()
+        {
+            return null;
+        }
+
         /// <summary>
         /// The result of resolve property operation
         /// </summary>

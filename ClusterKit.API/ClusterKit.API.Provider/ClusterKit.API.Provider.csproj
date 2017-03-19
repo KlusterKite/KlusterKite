@@ -181,6 +181,8 @@
     <Compile Include="Resolvers\CollectionResolver.cs" />
     <Compile Include="Resolvers\ConnectionResolver.cs" />
     <Compile Include="Resolvers\ForwarderResolver.cs" />
+    <Compile Include="Resolvers\GenericConnectionResolver.cs" />
+    <Compile Include="Resolvers\GenericObjectResolver.cs" />
     <Compile Include="Resolvers\IConnectionResolver.cs" />
     <Compile Include="Resolvers\ObjectResolver.cs" />
     <Compile Include="Resolvers\IResolver.cs" />

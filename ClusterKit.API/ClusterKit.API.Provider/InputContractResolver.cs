@@ -12,12 +12,15 @@ namespace ClusterKit.API.Provider
     using System.Collections.Generic;
     using System.Reflection;
 
+    using JetBrains.Annotations;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
 
     /// <summary>
     /// Json contract resolver
     /// </summary>
+    [UsedImplicitly]
     internal class InputContractResolver : DefaultContractResolver
     {
         /// <summary>

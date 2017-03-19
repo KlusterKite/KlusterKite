@@ -204,7 +204,7 @@ namespace ClusterKit.API.Client
             this.AuthorizationRules =
                 memberInfo.GetCustomAttributes<RequirePrivilegeAttribute>().Select(a => a.CreateRule()).ToList();
             this.LogAccessRules =
-                memberInfo.GetCustomAttributes<LogAccessAttribute>().Select(a => a.CreateRule()).ToList();
+                memberInfo.GetCustomAttributes<LogAccessAttribute>().Select(a => a.CreateRule(memberInfo)).ToList();
         }
 
         /// <summary>

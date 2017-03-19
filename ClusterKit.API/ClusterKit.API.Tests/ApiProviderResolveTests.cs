@@ -17,6 +17,7 @@ namespace ClusterKit.API.Tests
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Provider;
+    using ClusterKit.API.Provider.Resolvers;
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Security.Client;
 
@@ -610,6 +611,29 @@ namespace ClusterKit.API.Tests
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
+        public async Task GenericSyncScalarFieldTest()
+        {
+            var resolver = new GenericObjectResolver<TestProvider>();
+            var context = new RequestContext();
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "syncScalarField" } };
+
+            var result = await resolver.ResolveQuery(
+                             new TestProvider(),
+                             new ApiRequest { Fields = query },
+                             context,
+                             JsonSerializer.Create(),
+                             e => this.output.WriteLine($"Error: {e.Message}\n{e.StackTrace}")) as JObject;
+
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("syncScalarField"));
+            Assert.Equal("SyncScalarField", result.Property("syncScalarField").ToObject<string>());
+        }
+
+        /// <summary>
+        /// Testing sync scalar field
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
         public async Task ConverterTest()
         {
             var provider = this.GetProvider();
@@ -779,7 +803,7 @@ namespace ClusterKit.API.Tests
             stopwatch.Stop();
             this.output.WriteLine($"Resolved in {(double)stopwatch.ElapsedTicks * 1000 / Stopwatch.Frequency}ms");
             this.output.WriteLine(result.ToString(Formatting.Indented));
-            return result;
+            return result as JObject;
         }
     }
 }

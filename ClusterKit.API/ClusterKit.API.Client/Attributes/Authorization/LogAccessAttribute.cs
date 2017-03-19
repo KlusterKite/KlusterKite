@@ -10,6 +10,7 @@
 namespace ClusterKit.API.Client.Attributes.Authorization
 {
     using System;
+    using System.Reflection;
 
     using ClusterKit.Security.Client;
 
@@ -54,16 +55,27 @@ namespace ClusterKit.API.Client.Attributes.Authorization
         /// <summary>
         /// Creates <see cref="LogAccessRule"/> from this attribute
         /// </summary>
-        /// <returns>The <see cref="LogAccessRule"/></returns>
-        public LogAccessRule CreateRule()
+        /// <param name="memberInfo">
+        /// The member Info.
+        /// </param>
+        /// <returns>
+        /// The <see cref="LogAccessRule"/>
+        /// </returns>
+        public LogAccessRule CreateRule(MemberInfo memberInfo)
         {
+            var logMessage = this.LogMessage;
+            if (this.LogMessage == null)
+            {
+                logMessage = $"The property {memberInfo.Name} of {NamingUtilities.ToCSharpRepresentation(memberInfo.ReflectedType)} was accessed";
+            }
+
             return new LogAccessRule
                        {
                            Type = this.Type,
                            ConnectionActions = this.ConnectionActions,
                            Severity = this.Severity,
-                           LogMessage = this.LogMessage
-                       };
+                           LogMessage = logMessage
+            };
         }
     }
 }

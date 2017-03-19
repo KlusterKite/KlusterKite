@@ -45,5 +45,11 @@ namespace ClusterKit.API.Provider.Resolvers
         /// The <see cref="Task"/>.
         /// </returns>
         Task<JToken> ResolveQuery(object source, ApiRequest request, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback);
+
+        /// <summary>
+        /// Gets the resolved api type of resolved element
+        /// </summary>
+        /// <returns>The api type</returns>
+        ApiType GetElementType();
     }
 }

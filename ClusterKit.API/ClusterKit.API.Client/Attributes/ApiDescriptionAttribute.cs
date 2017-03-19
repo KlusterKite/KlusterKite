@@ -11,6 +11,7 @@ namespace ClusterKit.API.Client.Attributes
 {
     using System;
     using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// Describes type (class) to published api
@@ -46,6 +47,48 @@ namespace ClusterKit.API.Client.Attributes
             array[0] = array[0].ToString().ToLowerInvariant().ToCharArray().First();
 
             return new string(array);
+        }
+
+        /// <summary>
+        /// Creates name for the type 
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>The type name</returns>
+        public static string GetTypeName(Type type)
+        {
+            var attr = type.GetCustomAttribute<ApiDescriptionAttribute>();
+            return attr?.GetName(type) ?? NamingUtilities.ToCSharpRepresentation(type);
+        }
+
+        /// <summary>
+        /// Creates name for the method parameter 
+        /// </summary>
+        /// <param name="parameter">The type</param>
+        /// <returns>The type name</returns>
+        public static string GetParameterName(ParameterInfo parameter)
+        {
+            var attr = parameter.GetCustomAttribute<ApiDescriptionAttribute>();
+            return attr?.Name ?? ToCamelCase(parameter.Name);
+        }
+
+        /// <summary>
+        /// Creates name for the type field
+        /// </summary>
+        /// <param name="member">The type member</param>
+        /// <returns>The member name</returns>
+        public string GetName(MemberInfo member)
+        {
+            return this.Name ?? ToCamelCase(member.Name);
+        }
+
+        /// <summary>
+        /// Creates name for the type 
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>The type name</returns>
+        public string GetName(Type type)
+        {
+            return this.Name ?? NamingUtilities.ToCSharpRepresentation(type);
         }
     }
 }

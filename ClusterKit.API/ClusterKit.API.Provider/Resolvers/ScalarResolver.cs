@@ -37,5 +37,11 @@ namespace ClusterKit.API.Provider.Resolvers
         {
             return Task.FromResult<JToken>(new JValue((TScalar)source));
         }
+
+        /// <inheritdoc />
+        public ApiType GetElementType()
+        {
+            return null;
+        }
     }
 }

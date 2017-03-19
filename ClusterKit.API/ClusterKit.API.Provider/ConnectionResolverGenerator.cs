@@ -45,7 +45,7 @@ namespace ClusterKit.API.Provider
 
         /// <inheritdoc />
         protected override string ClassName => "ConnectionResolver"
-                                               + $"_{Regex.Replace(ToCSharpRepresentation(this.ObjectType), "[^a-zA-Z0-9]", string.Empty)}"
+                                               + $"_{Regex.Replace(NamingUtilities.ToCSharpRepresentation(this.ObjectType), "[^a-zA-Z0-9]", string.Empty)}"
                                                + $"_{this.Uid:N}";
 
         /// <inheritdoc />
@@ -84,8 +84,8 @@ namespace ClusterKit.API.Provider
                         using ClusterKit.API.Client;
                         using ClusterKit.API.Provider.Resolvers;
 
-                        // Connection resolver for {ToCSharpRepresentation(this.ObjectType)}
-                        public class {this.ClassName} : ConnectionResolver<{ToCSharpRepresentation(this.ObjectType)},{ToCSharpRepresentation(this.typeMetadata.TypeOfId)}>
+                        // Connection resolver for {NamingUtilities.ToCSharpRepresentation(this.ObjectType)}
+                        public class {this.ClassName} : ConnectionResolver<{NamingUtilities.ToCSharpRepresentation(this.ObjectType)},{NamingUtilities.ToCSharpRepresentation(this.typeMetadata.TypeOfId)}>
                         {{  
                             private IResolver nodeResolver = new {this.Data.ObjectResolverNames[nodeApiType.TypeName]}();
                             public override IResolver NodeResolver {{ get {{ return this.nodeResolver; }} }}
@@ -93,7 +93,7 @@ namespace ClusterKit.API.Provider
                             private IResolver mutationResultResolver = {mutationResultResolverDeclaration};
                             public override IResolver MutationResultResolver {{ get {{ return this.mutationResultResolver; }} }}
           
-                            protected override Expression<Func<{ToCSharpRepresentation(this.ObjectType)}, bool>> CreateFilter(JObject filter) 
+                            protected override Expression<Func<{NamingUtilities.ToCSharpRepresentation(this.ObjectType)}, bool>> CreateFilter(JObject filter) 
                             {{
                                 return GenerateFilterExpression(filter);
                             }}
@@ -128,7 +128,7 @@ namespace ClusterKit.API.Provider
                 throw new InvalidOperationException($"The returned type of connection {this.typeMetadata.Type.FullName} is not an object type");
             }
 
-            var className = ToCSharpRepresentation(this.typeMetadata.Type);
+            var className = NamingUtilities.ToCSharpRepresentation(this.typeMetadata.Type);
             var filterable = sortedApiObjectType.Fields
                 .Where(f => f.Flags.HasFlag(EnFieldFlags.IsFilterable))
                 .Select(f => new { f.Name, Property = this.Data.Members[sortedApiType.TypeName][f.Name] as PropertyInfo, f.ScalarType })
@@ -241,8 +241,8 @@ namespace ClusterKit.API.Provider
             PropertyInfo property,
             EnScalarType scalarType)
         {
-            yield return $"{{ \"{apiName}\", prop => Expression.Equal({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
-            yield return $"{{ \"{apiName}_not\", prop => Expression.NotEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
+            yield return $"{{ \"{apiName}\", prop => Expression.Equal({expressionParameter}, Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
+            yield return $"{{ \"{apiName}_not\", prop => Expression.NotEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
 
             switch (scalarType)
             {
@@ -250,10 +250,10 @@ namespace ClusterKit.API.Provider
                 case EnScalarType.Decimal:
                 case EnScalarType.Integer:
                 case EnScalarType.DateTime:
-                    yield return $"{{ \"{apiName}_lt\", prop => Expression.LessThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
-                    yield return $"{{ \"{apiName}_lte\", prop => Expression.LessThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
-                    yield return $"{{ \"{apiName}_gt\", prop => Expression.GreaterThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
-                    yield return $"{{ \"{apiName}_gte\", prop => Expression.GreaterThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return $"{{ \"{apiName}_lt\", prop => Expression.LessThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return $"{{ \"{apiName}_lte\", prop => Expression.LessThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return $"{{ \"{apiName}_gt\", prop => Expression.GreaterThan({expressionParameter}, Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return $"{{ \"{apiName}_gte\", prop => Expression.GreaterThanOrEqual({expressionParameter}, Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
                     break;
                 case EnScalarType.String:
                     yield return
@@ -273,8 +273,8 @@ namespace ClusterKit.API.Provider
                     yield return
                         $"{{ \"{apiName}_not_ends_with\", prop => Expression.Not(Expression.Call({expressionParameter}, stringEndsWith, Expression.Constant(prop.Value.ToObject<string>()))) }}";
 
-                    yield return $"{{ \"{apiName}_l\", prop => Expression.Equal(Expression.Call({expressionParameter}, stringToLower), Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
-                    yield return $"{{ \"{apiName}_l_not\", prop => Expression.NotEqual(Expression.Call({expressionParameter}, stringToLower), Expression.Constant(prop.Value.ToObject<{ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return $"{{ \"{apiName}_l\", prop => Expression.Equal(Expression.Call({expressionParameter}, stringToLower), Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
+                    yield return $"{{ \"{apiName}_l_not\", prop => Expression.NotEqual(Expression.Call({expressionParameter}, stringToLower), Expression.Constant(prop.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(property.PropertyType)}>())) }}";
                     yield return
                         $"{{ \"{apiName}_l_in\", prop => Expression.Call(Expression.Constant(prop.Value.ToObject<string>()), stringContains, Expression.Call({expressionParameter}, stringToLower)) }}";
                     yield return

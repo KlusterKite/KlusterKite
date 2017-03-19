@@ -63,5 +63,8 @@ namespace ClusterKit.API.Provider.Resolvers
 
             return result;
         }
+
+        /// <inheritdoc />
+        public ApiType GetElementType() => this.elementResolver.GetElementType();
     }
 }

@@ -301,6 +301,33 @@ namespace ClusterKit.API.Tests.Mock
         public TestObjectConnection AuthorizedConnection => this.Connection;
 
         /// <summary>
+        /// Gets the field that logs its access
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [LogAccess(Severity = EnSeverity.Crucial)]
+        public string LoggedNoMessageField => "success";
+
+        /// <summary>
+        /// Gets the field that logs its access
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField]
+        [LogAccess(Severity = EnSeverity.Crucial, LogMessage = "LoggedWithMessageField accessed")]
+        public string LoggedWithMessageField => "success";
+
+        /// <summary>
+        /// Gets the connection with required authorization
+        /// </summary>
+        [UsedImplicitly]
+        [LogAccess(LogMessage = "Connection queryed", ConnectionActions = EnConnectionAction.Query)]
+        [LogAccess(LogMessage = "Connection created", ConnectionActions = EnConnectionAction.Create)]
+        [LogAccess(LogMessage = "Connection updated", ConnectionActions = EnConnectionAction.Update)]
+        [LogAccess(LogMessage = "Connection deleted", ConnectionActions = EnConnectionAction.Delete)]
+        [DeclareConnection(CanCreate = true, CanUpdate = true, CanDelete = true)]
+        public TestObjectConnection LoggedConnection => this.Connection;
+
+        /// <summary>
         /// The mutation that requires authorization
         /// </summary>
         /// <returns>Always true</returns>

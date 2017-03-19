@@ -59,12 +59,6 @@ namespace ClusterKit.API.Provider
         public Dictionary<string, string> ConnectionResolverNames { get; } = new Dictionary<string, string>();
 
         /// <summary>
-        /// Gets the list of resolver class names for mutations
-        /// </summary>
-        [NotNull]
-        public Dictionary<string, string> MutationResolverNames { get; } = new Dictionary<string, string>();
-
-        /// <summary>
         /// Gets the list of properties described in API
         /// </summary>
         [NotNull]

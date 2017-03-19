@@ -41,7 +41,7 @@ namespace ClusterKit.API.Provider
 
         /// <inheritdoc />
         protected override string ClassName => "ObjectResolver"
-                                               + $"_{Regex.Replace(ToCSharpRepresentation(this.ObjectType), "[^a-zA-Z0-9]", string.Empty)}"
+                                               + $"_{Regex.Replace(NamingUtilities.ToCSharpRepresentation(this.ObjectType), "[^a-zA-Z0-9]", string.Empty)}"
                                                + $"_{this.Uid:N}";
 
         /// <summary>
@@ -67,11 +67,11 @@ namespace ClusterKit.API.Provider
                         using ClusterKit.API.Client;
                         using ClusterKit.API.Provider.Resolvers;
 
-                        // Object resolver for {ToCSharpRepresentation(this.ObjectType)}
+                        // Object resolver for {NamingUtilities.ToCSharpRepresentation(this.ObjectType)}
                         public class {this.ClassName} : ObjectResolver
                         {{
-                                private static Dictionary<string, Func<{ToCSharpRepresentation(this.ObjectType)},ApiRequest,RequestContext,JsonSerializer,Task<ResolvePropertyResult>>>
-                                    PropertyResolvers = new Dictionary<string, Func<{ToCSharpRepresentation(
+                                private static Dictionary<string, Func<{NamingUtilities.ToCSharpRepresentation(this.ObjectType)},ApiRequest,RequestContext,JsonSerializer,Task<ResolvePropertyResult>>>
+                                    PropertyResolvers = new Dictionary<string, Func<{NamingUtilities.ToCSharpRepresentation(
                 this.ObjectType)},ApiRequest,RequestContext,JsonSerializer,Task<ResolvePropertyResult>>>
                                     {{
                                     {string.Join(",", this.GeneratePropertyResolvers())}
@@ -84,14 +84,14 @@ namespace ClusterKit.API.Provider
                                     JsonSerializer argumentsSerializer,
                                     Action<Exception> onErrorCallback)
                                 {{
-                                        var typedSource = ({ToCSharpRepresentation(this.ObjectType)})source;
+                                        var typedSource = ({NamingUtilities.ToCSharpRepresentation(this.ObjectType)})source;
                                         if (typedSource == null)
                                         {{
                                             if (onErrorCallback != null) onErrorCallback(new Exception(""source is null or of wrong type""));
                                             return null;
                                         }}
 
-                                        Func<{ToCSharpRepresentation(this.ObjectType)},ApiRequest,RequestContext,JsonSerializer,Task<ResolvePropertyResult>> resolver;
+                                        Func<{NamingUtilities.ToCSharpRepresentation(this.ObjectType)},ApiRequest,RequestContext,JsonSerializer,Task<ResolvePropertyResult>> resolver;
                                         if (!PropertyResolvers.TryGetValue(request.FieldName, out resolver))
                                         {{
                                             if (onErrorCallback != null) onErrorCallback(new Exception(""There is no resolver for field "" + request.FieldName));
@@ -116,13 +116,13 @@ namespace ClusterKit.API.Provider
             if (!this.Data.ApiTypeByOriginalTypeNames.TryGetValue(this.ObjectType.FullName, out apiType)
                 || !this.Data.Members.TryGetValue(apiType.TypeName, out members))
             {
-                throw new Exception($"{ToCSharpRepresentation(this.ObjectType)} has no ApiType");
+                throw new Exception($"{NamingUtilities.ToCSharpRepresentation(this.ObjectType)} has no ApiType");
             }
 
             var apiObjectType = apiType as ApiObjectType;
             if (apiObjectType == null)
             {
-                throw new Exception($"{ToCSharpRepresentation(this.ObjectType)} is not an object type");
+                throw new Exception($"{NamingUtilities.ToCSharpRepresentation(this.ObjectType)} is not an object type");
             }
 
             foreach (var field in apiObjectType.Fields.Union(apiObjectType.DirectMutations ?? new List<ApiField>()))
@@ -184,10 +184,10 @@ namespace ClusterKit.API.Provider
             }
 
             var endTypeResolver = metaData.ScalarType != EnScalarType.None
-                                      ? $"new ScalarResolver<{ToCSharpRepresentation(metaData.Type)}>()"
+                                      ? $"new ScalarResolver<{NamingUtilities.ToCSharpRepresentation(metaData.Type)}>()"
                                       : metaData.Type.IsSubclassOf(typeof(Enum))
                                           ? metaData.Type.GetCustomAttribute<FlagsAttribute>() != null
-                                                ? $"new ScalarResolver<{ToCSharpRepresentation(Enum.GetUnderlyingType(metaData.Type))}>()"
+                                                ? $"new ScalarResolver<{NamingUtilities.ToCSharpRepresentation(Enum.GetUnderlyingType(metaData.Type))}>()"
                                                 : "new StringResolver()"
                                           : $"new {this.Data.ObjectResolverNames[field.TypeName]}()";
 
@@ -237,8 +237,8 @@ namespace ClusterKit.API.Provider
                     command = $@"                    
                     var prop{parameterIndex} = arguments != null ? arguments.Property(""{parameterName}"") : null;
                     var arg{parameterIndex} = prop{parameterIndex} != null && prop{parameterIndex}.Value != null
-                            ? prop{parameterIndex}.Value.ToObject<{ToCSharpRepresentation(parameter.ParameterType)}>(serializer)
-                            : default({ToCSharpRepresentation(parameter.ParameterType)});
+                            ? prop{parameterIndex}.Value.ToObject<{NamingUtilities.ToCSharpRepresentation(parameter.ParameterType)}>(serializer)
+                            : default({NamingUtilities.ToCSharpRepresentation(parameter.ParameterType)});
                     ";
                 }
 
@@ -250,7 +250,7 @@ namespace ClusterKit.API.Provider
                 Enumerable.Range(0, method.GetParameters().Length).Select(n => $"arg{n}"))})";
             var acquirement = metadata.ConverterType == null
                 ? $"var fieldValue = {execution};"
-                : $"var fieldValue = new {ToCSharpRepresentation(metadata.ConverterType)}().Convert({execution});";
+                : $"var fieldValue = new {NamingUtilities.ToCSharpRepresentation(metadata.ConverterType)}().Convert({execution});";
             return $@"
                 JObject arguments = request.Arguments;
                 {string.Join("\r\n", codeCommands)}
@@ -269,7 +269,7 @@ namespace ClusterKit.API.Provider
             var await = metadata.IsAsync ? "await" : string.Empty;
             var acquirement = metadata.ConverterType == null
                                   ? $"var fieldValue = {@await} source.{property.Name};"
-                                  : $"var fieldValue = new {ToCSharpRepresentation(metadata.ConverterType)}().Convert({@await} source.{property.Name});";
+                                  : $"var fieldValue = new {NamingUtilities.ToCSharpRepresentation(metadata.ConverterType)}().Convert({@await} source.{property.Name});";
             return acquirement;
         }
     }

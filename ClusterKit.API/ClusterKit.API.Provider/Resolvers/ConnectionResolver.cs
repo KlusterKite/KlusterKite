@@ -29,18 +29,70 @@ namespace ClusterKit.API.Provider.Resolvers
     /// <typeparam name="T">The type of node</typeparam>
     /// <typeparam name="TId">The type of node id</typeparam>
     [UsedImplicitly]
-    public abstract class ConnectionResolver<T, TId> : IResolver, IConnectionResolver 
-        where T : class, new() 
+    public abstract class ConnectionResolver<T, TId> : IResolver, IConnectionResolver
+        where T : class, new()
     {
+        /// <summary>
+        /// Gets the mutation result resolver
+        /// </summary>
+        public abstract IResolver MutationResultResolver { get; }
+
         /// <summary>
         /// Gets the node object resolver
         /// </summary>
         public abstract IResolver NodeResolver { get; }
 
-        /// <summary>
-        /// Gets the mutation result resolver
-        /// </summary>
-        public abstract IResolver MutationResultResolver { get; }
+        /// <inheritdoc />
+        public ApiType GetElementType() => this.NodeResolver.GetElementType();
+
+        /// <inheritdoc />
+        public async Task<object> GetNodeById(object nodeConnection, string id)
+        {
+            var connection = nodeConnection as INodeConnection<T, TId>;
+            if (connection == null)
+            {
+                return null;
+            }
+
+            TId realId;
+            try
+            {
+                realId = JsonConvert.DeserializeObject<TId>(id);
+            }
+            catch
+            {
+                return null;
+            }
+
+            return await connection.GetById(realId);
+        }
+
+        /// <inheritdoc />
+        public Task<JObject> ResolveMutation(
+            object nodeConnection,
+            ApiRequest request,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            var connection = nodeConnection as INodeConnection<T, TId>;
+            if (connection == null)
+            {
+                return Task.FromResult<JObject>(null);
+            }
+
+            switch (request.FieldName)
+            {
+                case "create":
+                    return this.MutationCreate(connection, request, context, argumentsSerializer, onErrorCallback);
+                case "update":
+                    return this.MutationUpdate(connection, request, context, argumentsSerializer, onErrorCallback);
+                case "delete":
+                    return this.MutationDelete(connection, request, context, argumentsSerializer, onErrorCallback);
+                default:
+                    return Task.FromResult<JObject>(null);
+            }
+        }
 
         /// <inheritdoc />
         public virtual async Task<JToken> ResolveQuery(
@@ -117,55 +169,6 @@ namespace ClusterKit.API.Provider.Resolvers
             return result;
         }
 
-        /// <inheritdoc />
-        public async Task<object> GetNodeById(object nodeConnection, string id)
-        {
-            var connection = nodeConnection as INodeConnection<T, TId>;
-            if (connection == null)
-            {
-                return null;
-            }
-
-            TId realId;
-            try
-            {
-                realId = JsonConvert.DeserializeObject<TId>(id);
-            }
-            catch
-            {
-                return null;
-            }
-
-            return await connection.GetById(realId);
-        }
-
-        /// <inheritdoc />
-        public Task<JObject> ResolveMutation(
-            object nodeConnection, 
-            ApiRequest request,
-            RequestContext context,
-            JsonSerializer argumentsSerializer,
-            Action<Exception> onErrorCallback)
-        {
-            var connection = nodeConnection as INodeConnection<T, TId>;
-            if (connection == null)
-            {
-                return Task.FromResult<JObject>(null);
-            }
-
-            switch (request.FieldName)
-            {
-                case "create":
-                    return this.MutationCreate(connection, request, context, argumentsSerializer, onErrorCallback);
-                case "update":
-                    return this.MutationUpdate(connection, request, context, argumentsSerializer, onErrorCallback);
-                case "delete":
-                    return this.MutationDelete(connection, request, context, argumentsSerializer, onErrorCallback);
-                default:
-                    return Task.FromResult<JObject>(null);
-            }
-        }
-
         /// <summary>
         /// Creates filter expression by filter request
         /// </summary>
@@ -205,8 +208,56 @@ namespace ClusterKit.API.Provider.Resolvers
             var serializedData = ((JObject)request.Arguments)?.Property("newNode")?.Value as JObject;
             var newNode = serializedData?.ToObject<T>();
             var result = await connection.Create(newNode);
-            var mutationCreate = (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            var mutationCreate =
+                (JObject)
+                await this.MutationResultResolver.ResolveQuery(
+                    result,
+                    request,
+                    context,
+                    argumentsSerializer,
+                    onErrorCallback);
             return mutationCreate;
+        }
+
+        /// <summary>
+        /// Runs the creation mutation
+        /// </summary>
+        /// <param name="connection">The connection</param>
+        /// <param name="request">The request</param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The arguments serializer.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <returns>The resolved data</returns>
+        private async Task<JObject> MutationDelete(
+            INodeConnection<T, TId> connection,
+            ApiRequest request,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            var serializedId = ((JObject)request.Arguments)?.Property("id")?.Value;
+            var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
+            var result = await connection.Delete(id);
+            var mutationDelete =
+                (JObject)
+                await this.MutationResultResolver.ResolveQuery(
+                    result,
+                    request,
+                    context,
+                    argumentsSerializer,
+                    onErrorCallback);
+            if (result.Result != null)
+            {
+                mutationDelete.Add("__deletedId", JsonConvert.SerializeObject(id));
+            }
+
+            return mutationDelete;
         }
 
         /// <summary>
@@ -236,7 +287,14 @@ namespace ClusterKit.API.Provider.Resolvers
             var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
             var newNode = serializedData?.ToObject<T>();
             var result = await connection.Update(id, newNode, request);
-            var mutationUpdate = (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
+            var mutationUpdate =
+                (JObject)
+                await this.MutationResultResolver.ResolveQuery(
+                    result,
+                    request,
+                    context,
+                    argumentsSerializer,
+                    onErrorCallback);
             if (result.Result != null)
             {
                 if (id != null && !id.Equals(connection.GetId(result.Result)))
@@ -246,40 +304,6 @@ namespace ClusterKit.API.Provider.Resolvers
             }
 
             return mutationUpdate;
-        }
-
-        /// <summary>
-        /// Runs the creation mutation
-        /// </summary>
-        /// <param name="connection">The connection</param>
-        /// <param name="request">The request</param>
-        /// <param name="context">
-        /// The context.
-        /// </param>
-        /// <param name="argumentsSerializer">
-        /// The arguments serializer.
-        /// </param>
-        /// <param name="onErrorCallback">
-        /// The on error callback.
-        /// </param>
-        /// <returns>The resolved data</returns>
-        private async Task<JObject> MutationDelete(
-            INodeConnection<T, TId> connection,
-            ApiRequest request,
-            RequestContext context,
-            JsonSerializer argumentsSerializer,
-            Action<Exception> onErrorCallback)
-        {
-            var serializedId = ((JObject)request.Arguments)?.Property("id")?.Value;
-            var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
-            var result = await connection.Delete(id);
-            var mutationDelete = (JObject)await this.MutationResultResolver.ResolveQuery(result, request, context, argumentsSerializer, onErrorCallback);
-            if (result.Result != null)
-            {
-                mutationDelete.Add("__deletedId", JsonConvert.SerializeObject(id));
-            }
-
-            return mutationDelete;
         }
     }
 }

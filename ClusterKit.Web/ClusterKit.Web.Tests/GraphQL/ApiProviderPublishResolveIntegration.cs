@@ -1876,6 +1876,62 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
             Assert.Equal(expectingResult ? 0 : 1, sink.LogEvents.Count);
         }
+        
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task FieldAccessLogTest()
+        {
+            var sink = CreateSecurityLogger();
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            {                
+                api {
+                    loggedNoMessageField,
+                    loggedWithMessageField,
+                    loggedConnection {
+                        count
+                    }
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                               ""loggedNoMessageField"": ""success"",
+                                ""loggedWithMessageField"": ""success"",
+                                ""loggedConnection"": {
+                                    ""count"": 0
+                                }
+                          }
+                        }
+                        ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+
+            Assert.Equal(3, sink.LogEvents.Count);
+            var events = sink.LogEvents.OrderBy(e => e.MessageTemplate);
+            foreach (var logEvent in events)
+            {
+                this.output.WriteLine(logEvent.RenderMessage());
+            }
+        }
 
         /// <summary>
         /// Testing authorized connection query request from <see cref="ApiDescription"/>

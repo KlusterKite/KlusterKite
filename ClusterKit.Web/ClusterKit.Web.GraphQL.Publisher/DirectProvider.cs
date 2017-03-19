@@ -84,7 +84,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                        requests,
                        context,
                        exception =>
-                           this.errorOutput?.Invoke($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
+                           this.errorOutput?.Invoke($"Resolve error: {exception.Message}\n{exception.StackTrace}")) as JObject;
             return this.UseJsonRepack ? Repack(result) : result;
         }
 
