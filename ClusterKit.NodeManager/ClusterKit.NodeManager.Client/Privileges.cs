@@ -9,7 +9,6 @@
 
 namespace ClusterKit.NodeManager.Client
 {
-    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Security.Client;
     using ClusterKit.Security.Client.Attributes;
 
@@ -22,31 +21,31 @@ namespace ClusterKit.NodeManager.Client
         /// <summary>
         /// The privilege to manage <see cref="User"/>
         /// </summary>
-        [PrivilegeDescription("User management", "Get", "GetList", "Create", "Delete", "Update", Target = EnPrivilegeTarget.User)]
+        [PrivilegeDescription("User management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
         public const string User = "ClusterKit.NodeManager.User";
 
         /// <summary>
-        /// The privilege to manage <see cref="Role"/>
+        /// The privilege to manage <see cref="ORM.Role"/>
         /// </summary>
-        [PrivilegeDescription("Role management", "Get", "GetList", "Create", "Delete", "Update", Target = EnPrivilegeTarget.User)]
-        public const string RoleRead = "ClusterKit.NodeManager.Role";
+        [PrivilegeDescription("Role management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
+        public const string Role = "ClusterKit.NodeManager.Role";
 
         /// <summary>
         /// The privilege to manage <see cref="NodeTemplate"/>
         /// </summary>
-        [PrivilegeDescription("Node template management", "Get", "GetList", "Create", "Delete", "Update", Target = EnPrivilegeTarget.User)]
+        [PrivilegeDescription("Node template management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
         public const string NodeTemplate = "ClusterKit.NodeManager.NodeTemplate";
 
         /// <summary>
         /// The privilege to manage <see cref="NugetFeed"/>
         /// </summary>
-        [PrivilegeDescription("Nuget feed management", "Get", "GetList", "Create", "Delete", "Update", Target = EnPrivilegeTarget.User)]
+        [PrivilegeDescription("Nuget feed management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
         public const string NugetFeed = "ClusterKit.NodeManager.NugetFeed";
 
         /// <summary>
         /// The privilege to manage <see cref="SeedAddress"/>
         /// </summary>
-        [PrivilegeDescription("Seed addresses management", "Get", "GetList", "Create", "Delete", "Update", Target = EnPrivilegeTarget.User)]
+        [PrivilegeDescription("Seed addresses management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
         public const string SeedAddress = "ClusterKit.NodeManager.SeedAddress";
 
         /// <summary>

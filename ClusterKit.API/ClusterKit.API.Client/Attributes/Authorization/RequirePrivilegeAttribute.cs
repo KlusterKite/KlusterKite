@@ -44,6 +44,11 @@ namespace ClusterKit.API.Client.Attributes.Authorization
         public EnConnectionAction ConnectionActions { get; set; } = EnConnectionAction.All;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the connection action type name should be added to required privilege on authorization check
+        /// </summary>
+        public bool AddActionNameToRequiredPrivilege { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether that this rule will be ignored in case of valid user authentication session
         /// </summary>
         public bool IgnoreOnUserPresent { get; set; }
@@ -66,7 +71,8 @@ namespace ClusterKit.API.Client.Attributes.Authorization
                            IgnoreOnUserNotPresent = this.IgnoreOnUserNotPresent,
                            IgnoreOnUserPresent = this.IgnoreOnUserPresent,
                            Privilege = this.Privilege,
-                           Scope = this.Scope
+                           Scope = this.Scope,
+                           AddActionNameToRequiredPrivilege = this.AddActionNameToRequiredPrivilege
                        };
         }
     }

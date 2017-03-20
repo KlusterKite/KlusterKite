@@ -17,6 +17,11 @@ namespace ClusterKit.API.Client
     public class AuthorizationRule
     {
         /// <summary>
+        /// Gets or sets a value indicating whether the connection action type name should be added to required privilege on authorization check
+        /// </summary>
+        public bool AddActionNameToRequiredPrivilege { get; set; }
+
+        /// <summary>
         /// Gets or sets the required privilege
         /// </summary>
         public string Privilege { get; set; }

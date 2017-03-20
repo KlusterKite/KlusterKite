@@ -18,8 +18,10 @@ namespace ClusterKit.NodeManager
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Client.Attributes.Authorization;
     using ClusterKit.Core;
     using ClusterKit.Data.CRUD;
+    using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -62,6 +64,9 @@ namespace ClusterKit.NodeManager
         /// <returns>The list of available packages</returns>
         [UsedImplicitly]
         [DeclareField(Description = "The list of available packages from local cluster repository")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
         public async Task<List<PackageDescriptionForApi>> GetPackages()
         {
             return
@@ -76,6 +81,9 @@ namespace ClusterKit.NodeManager
         /// <returns>Current cluster statistics</returns>
         [UsedImplicitly]
         [DeclareField(Description = "Current cluster node template usage for debug purposes")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetTemplateStatistics, Scope = EnPrivilegeScope.User)]
         public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
         {
             return
@@ -89,6 +97,10 @@ namespace ClusterKit.NodeManager
         /// <returns>Success of the operation</returns>
         [UsedImplicitly]
         [DeclareMutation(Description = "Request to server to reload package list")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.ReloadPackages, Scope = EnPrivilegeScope.User)]
+        [LogAccess]
         public async Task<MutationResult<bool>> ReloadPackages()
         {
             var result =
@@ -104,6 +116,10 @@ namespace ClusterKit.NodeManager
         /// <returns>Execution task</returns>
         [UsedImplicitly]
         [DeclareMutation(Description = "Manual node upgrade request")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.UpgradeNode, Scope = EnPrivilegeScope.User)]
+        [LogAccess]
         public async Task<MutationResult<bool>> UpgradeNode(string address)
         {
             var result =
@@ -118,6 +134,9 @@ namespace ClusterKit.NodeManager
         /// <returns>The list of descriptions</returns>
         [UsedImplicitly]
         [DeclareField(Description = "The list of known active nodes")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetActiveNodeDescriptions, Scope = EnPrivilegeScope.User)]
         public async Task<List<NodeDescription>> GetActiveNodeDescriptions()
         {
             var activeNodeDescriptions =
@@ -140,6 +159,9 @@ namespace ClusterKit.NodeManager
         [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new node template", CanDelete = true,
             DeleteDescription = "Deletes the node template", CanUpdate = true,
             UpdateDescription = "Updates the node template", Description = "Node templates")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.NodeTemplate, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public Connection<NodeTemplate, int> NodeTemplates(RequestContext context)
         {
             return new Connection<NodeTemplate, int>(
@@ -158,6 +180,7 @@ namespace ClusterKit.NodeManager
         [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new nuget feed link", CanDelete = true,
             DeleteDescription = "Deletes the nuget feed link", CanUpdate = true,
             UpdateDescription = "Updates the nuget feed link", Description = "Node templates")]
+        [RequirePrivilege(Privileges.NugetFeed, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public Connection<NugetFeed, int> NugetFeeds(RequestContext context)
         {
             return new Connection<NugetFeed, int>(
@@ -176,6 +199,7 @@ namespace ClusterKit.NodeManager
         [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new seed address", CanDelete = true,
             DeleteDescription = "Deletes the seed address", CanUpdate = true,
             UpdateDescription = "Updates the seed address", Description = "Node templates")]
+        [RequirePrivilege(Privileges.SeedAddress, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public Connection<SeedAddress, int> SeedAddresses(RequestContext context)
         {
             return new Connection<SeedAddress, int>(
@@ -193,6 +217,7 @@ namespace ClusterKit.NodeManager
         [UsedImplicitly]
         [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new user", CanUpdate = true,
             UpdateDescription = "Updates the user", Description = "ClusterKit managing system users")]
+        [RequirePrivilege(Privileges.User, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public Connection<User, Guid> Users(RequestContext context)
         {
             return new Connection<User, Guid>(
@@ -211,6 +236,7 @@ namespace ClusterKit.NodeManager
         [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new managing system role",
             CanUpdate = true, UpdateDescription = "Updates the managing system role",
             Description = "ClusterKit managing system security roles")]
+        [RequirePrivilege(Privileges.Role, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public Connection<Role, Guid> Roles(RequestContext context)
         {
             return new Connection<Role, Guid>(

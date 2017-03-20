@@ -253,9 +253,15 @@ namespace ClusterKit.API.Client
                     }
                 }
 
+                var rulePrivilege = rule.Privilege;
+                if (rule.AddActionNameToRequiredPrivilege)
+                {
+                    rulePrivilege = $"{rulePrivilege}.{action}";
+                }
+
                 if (rule.Scope != EnPrivilegeScope.User)
                 {
-                    var clientHasPrivilege = accessTicket.ClientScope.Contains(rule.Privilege);
+                    var clientHasPrivilege = accessTicket.ClientScope.Contains(rulePrivilege);
                     if (!clientHasPrivilege
                         && (rule.Scope == EnPrivilegeScope.Both || rule.Scope == EnPrivilegeScope.Client))
                     {
@@ -269,7 +275,7 @@ namespace ClusterKit.API.Client
                     }
                 }
 
-                var userHasPrivilege = accessTicket.UserScope.Contains(rule.Privilege);
+                var userHasPrivilege = accessTicket.UserScope.Contains(rulePrivilege);
                 if (!userHasPrivilege)
                 {
                     return false;
