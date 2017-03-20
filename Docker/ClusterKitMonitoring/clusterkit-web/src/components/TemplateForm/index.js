@@ -19,15 +19,11 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
       if (isNaN(Number(otherField))) return true;
       return Number(value) >= Number(values[otherField]);
     });
-
-    String.prototype.replaceAll = function(search, replacement) {
-      const target = this;
-      return target.replace(new RegExp(search, 'g'), replacement);
-    };
   }
 
   static propTypes = {
     onSubmit: React.PropTypes.func.isRequired,
+    onDelete: React.PropTypes.func,
     initialValues: React.PropTypes.object,
     saving: React.PropTypes.bool,
     saved: React.PropTypes.bool,
@@ -35,19 +31,24 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
   };
 
   arrayToString(data) {
-    return data.join().replaceAll(',', '\n');
+    return this.replaceAll(data.join(), ',', '\n');
   }
 
   stringToArray(data) {
     return data && data.length > 0 ? data.split('\n') : [];
   }
 
+  replaceAll(value, search, replacement) {
+    return value.replace(new RegExp(search, 'g'), replacement);
+  }
+
   submit(model) {
     model.packages = this.stringToArray(model.packages);
     model.containerTypes = this.stringToArray(model.containerTypes);
-    model.maximumNeededInstances = Number.parseInt(model.maximumNeededInstances);
-    model.minimumRequiredInstances = Number.parseInt(model.minimumRequiredInstances);
-    model.version = Number.parseInt(model.version);
+    model.maximumNeededInstances = Number.parseInt(model.maximumNeededInstances, 10);
+    model.minimumRequiredInstances = model.minimumRequiredInstances ? Number.parseInt(model.minimumRequiredInstances, 10) : 0;
+    model.version = model.version ? Number.parseInt(model.version, 10) : 0;
+    model.priority = model.priority ? Number.parseInt(model.priority, 10) : 0;
     this.props.onSubmit(model);
   }
 
@@ -61,8 +62,7 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
         {!initialValues &&
           <h2>Create a new Template</h2>
         }
-        <Form onSubmit={this.submit} className="form-horizontal form-margin" saving={this.props.saving} saved={this.props.saved} saveError={this.props.saveError}>
-          <p>Version: {initialValues.version}</p>
+        <Form onSubmit={this.submit} onDelete={this.props.onDelete ? this.props.onDelete : null} className="form-horizontal form-margin" saving={this.props.saving} saved={this.props.saved} saveError={this.props.saveError}>
           <fieldset>
             <Input name="__id" value={initialValues && initialValues.__id} type="hidden" />
             <Input name="version" value={(initialValues && initialValues.version) || ""} type="hidden" />
@@ -75,7 +75,6 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
               value={(initialValues && initialValues.minimumRequiredInstances) || ""}
               validations={{isNumeric:true,isLessOrEqualThan:'maximumNeededInstances'}}
               validationErrors={{isNumeric: 'You have to type a number', isLessOrEqualThan: 'Cannot exceed Maximum Needed Instances'}}
-              required
               elementWrapperClassName="col-sm-2"
             />
             <Input
@@ -89,7 +88,7 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
             <Input name="priority" label="Priority" value={(initialValues && initialValues.priority) || ""} validations="isNumeric" validationError="Must be numeric" elementWrapperClassName="col-sm-2" />
             <Textarea name="packages" label="Packages" value={(initialValues && this.arrayToString(initialValues.packages)) || ""} rows={6} />
             <Textarea name="containerTypes" label="Container Types" value={(initialValues && this.arrayToString(initialValues.containerTypes)) || ""} rows={3} />
-            <Textarea name="bonfiguration" label="Configuration" value={(initialValues && initialValues.configuration) || ""} rows={10} />
+            <Textarea name="configuration" label="Configuration" value={(initialValues && initialValues.configuration) || ""} rows={10} />
           </fieldset>
         </Form>
       </div>

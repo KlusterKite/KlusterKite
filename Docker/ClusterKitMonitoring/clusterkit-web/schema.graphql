@@ -19,6 +19,7 @@ type ClusterKitNodeApi_AkkaAddress {
 
   # the address system name
   system: String
+  id: ID
 }
 
 type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ {
@@ -27,6 +28,7 @@ type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ {
 
   # The list of mutation errors
   errors: [ClusterKitNodeApi_ErrorDescription]
+  id: ID
 }
 
 type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
@@ -49,6 +51,7 @@ type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi {
 
   # The current application privileges
   clusterKitClientPrivileges: [String]
+  id: ID
 }
 
 # The root provider
@@ -58,6 +61,7 @@ type ClusterKitNodeApi_ClusterKitNodeApi {
 
   # The current user
   me: ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
+  id: ID
 
   # The node global searcher according to Relay specification
   __node(
@@ -103,6 +107,7 @@ type ClusterKitNodeApi_ClusterKitNodeDescription {
 
   # node start time
   startTimeStamp: Int
+  id: ID
 }
 
 # The main ClusterKit node managing methods
@@ -195,6 +200,7 @@ type ClusterKitNodeApi_ClusterKitNodeManagement {
     # The number of objects to skip from the start of list
     offset: Int
   ): ClusterKitNodeApi_ClusterKitRole_Connection
+  id: ID
 }
 
 # The list of connected ClusterKitNodeApi_ClusterKitNodeTemplate_Node
@@ -263,6 +269,46 @@ input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter {
   # The program readable node template name
   code_not_ends_with: String
 
+  # The code lowercased exactly equals the value
+  # The program readable node template name
+  code_l: String
+
+  # The code lowercased not equals the value
+  # The program readable node template name
+  code_l_not: String
+
+  # The value contains the code lowercased as substring
+  # The program readable node template name
+  code_l_in: String
+
+  # The value not contains the code lowercased as substring
+  # The program readable node template name
+  code_l_not_in: String
+
+  # The code lowercased contains the value as substring
+  # The program readable node template name
+  code_l_contains: String
+
+  # The code lowercased not contains the value as substring
+  # The program readable node template name
+  code_l_not_contains: String
+
+  # The code lowercased starts with the value
+  # The program readable node template name
+  code_l_starts_with: String
+
+  # The code lowercased not starts with the value
+  # The program readable node template name
+  code_l_not_starts_with: String
+
+  # The code lowercased ends with the value
+  # The program readable node template name
+  code_l_ends_with: String
+
+  # The code lowercased not ends with the value
+  # The program readable node template name
+  code_l_not_ends_with: String
+
   # The configuration exactly equals the value
   # The akka configuration template for node
   configuration: String
@@ -302,6 +348,46 @@ input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter {
   # The configuration not ends with the value
   # The akka configuration template for node
   configuration_not_ends_with: String
+
+  # The configuration lowercased exactly equals the value
+  # The akka configuration template for node
+  configuration_l: String
+
+  # The configuration lowercased not equals the value
+  # The akka configuration template for node
+  configuration_l_not: String
+
+  # The value contains the configuration lowercased as substring
+  # The akka configuration template for node
+  configuration_l_in: String
+
+  # The value not contains the configuration lowercased as substring
+  # The akka configuration template for node
+  configuration_l_not_in: String
+
+  # The configuration lowercased contains the value as substring
+  # The akka configuration template for node
+  configuration_l_contains: String
+
+  # The configuration lowercased not contains the value as substring
+  # The akka configuration template for node
+  configuration_l_not_contains: String
+
+  # The configuration lowercased starts with the value
+  # The akka configuration template for node
+  configuration_l_starts_with: String
+
+  # The configuration lowercased not starts with the value
+  # The akka configuration template for node
+  configuration_l_not_starts_with: String
+
+  # The configuration lowercased ends with the value
+  # The akka configuration template for node
+  configuration_l_ends_with: String
+
+  # The configuration lowercased not ends with the value
+  # The akka configuration template for node
+  configuration_l_not_ends_with: String
 
   # The id exactly equals the value
   # The unique template identification number
@@ -414,6 +500,46 @@ input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter {
   # The name not ends with the value
   # The human readable node template name
   name_not_ends_with: String
+
+  # The name lowercased exactly equals the value
+  # The human readable node template name
+  name_l: String
+
+  # The name lowercased not equals the value
+  # The human readable node template name
+  name_l_not: String
+
+  # The value contains the name lowercased as substring
+  # The human readable node template name
+  name_l_in: String
+
+  # The value not contains the name lowercased as substring
+  # The human readable node template name
+  name_l_not_in: String
+
+  # The name lowercased contains the value as substring
+  # The human readable node template name
+  name_l_contains: String
+
+  # The name lowercased not contains the value as substring
+  # The human readable node template name
+  name_l_not_contains: String
+
+  # The name lowercased starts with the value
+  # The human readable node template name
+  name_l_starts_with: String
+
+  # The name lowercased not starts with the value
+  # The human readable node template name
+  name_l_not_starts_with: String
+
+  # The name lowercased ends with the value
+  # The human readable node template name
+  name_l_ends_with: String
+
+  # The name lowercased not ends with the value
+  # The human readable node template name
+  name_l_not_ends_with: String
 
   # The priority exactly equals the value
   # The priority weight for service, when deciding witch template should be brought up
@@ -682,6 +808,46 @@ input ClusterKitNodeApi_ClusterKitNugetFeed_Filter {
   # The seed url address
   address_not_ends_with: String
 
+  # The address lowercased exactly equals the value
+  # The seed url address
+  address_l: String
+
+  # The address lowercased not equals the value
+  # The seed url address
+  address_l_not: String
+
+  # The value contains the address lowercased as substring
+  # The seed url address
+  address_l_in: String
+
+  # The value not contains the address lowercased as substring
+  # The seed url address
+  address_l_not_in: String
+
+  # The address lowercased contains the value as substring
+  # The seed url address
+  address_l_contains: String
+
+  # The address lowercased not contains the value as substring
+  # The seed url address
+  address_l_not_contains: String
+
+  # The address lowercased starts with the value
+  # The seed url address
+  address_l_starts_with: String
+
+  # The address lowercased not starts with the value
+  # The seed url address
+  address_l_not_starts_with: String
+
+  # The address lowercased ends with the value
+  # The seed url address
+  address_l_ends_with: String
+
+  # The address lowercased not ends with the value
+  # The seed url address
+  address_l_not_ends_with: String
+
   # The id exactly equals the value
   # The unique address identification number
   id: Int
@@ -746,6 +912,46 @@ input ClusterKitNodeApi_ClusterKitNugetFeed_Filter {
   # The user password for basic authentication
   password_not_ends_with: String
 
+  # The password lowercased exactly equals the value
+  # The user password for basic authentication
+  password_l: String
+
+  # The password lowercased not equals the value
+  # The user password for basic authentication
+  password_l_not: String
+
+  # The value contains the password lowercased as substring
+  # The user password for basic authentication
+  password_l_in: String
+
+  # The value not contains the password lowercased as substring
+  # The user password for basic authentication
+  password_l_not_in: String
+
+  # The password lowercased contains the value as substring
+  # The user password for basic authentication
+  password_l_contains: String
+
+  # The password lowercased not contains the value as substring
+  # The user password for basic authentication
+  password_l_not_contains: String
+
+  # The password lowercased starts with the value
+  # The user password for basic authentication
+  password_l_starts_with: String
+
+  # The password lowercased not starts with the value
+  # The user password for basic authentication
+  password_l_not_starts_with: String
+
+  # The password lowercased ends with the value
+  # The user password for basic authentication
+  password_l_ends_with: String
+
+  # The password lowercased not ends with the value
+  # The user password for basic authentication
+  password_l_not_ends_with: String
+
   # The userName exactly equals the value
   # The username for basic authentication
   userName: String
@@ -785,6 +991,46 @@ input ClusterKitNodeApi_ClusterKitNugetFeed_Filter {
   # The userName not ends with the value
   # The username for basic authentication
   userName_not_ends_with: String
+
+  # The userName lowercased exactly equals the value
+  # The username for basic authentication
+  userName_l: String
+
+  # The userName lowercased not equals the value
+  # The username for basic authentication
+  userName_l_not: String
+
+  # The value contains the userName lowercased as substring
+  # The username for basic authentication
+  userName_l_in: String
+
+  # The value not contains the userName lowercased as substring
+  # The username for basic authentication
+  userName_l_not_in: String
+
+  # The userName lowercased contains the value as substring
+  # The username for basic authentication
+  userName_l_contains: String
+
+  # The userName lowercased not contains the value as substring
+  # The username for basic authentication
+  userName_l_not_contains: String
+
+  # The userName lowercased starts with the value
+  # The username for basic authentication
+  userName_l_starts_with: String
+
+  # The userName lowercased not starts with the value
+  # The username for basic authentication
+  userName_l_not_starts_with: String
+
+  # The userName lowercased ends with the value
+  # The username for basic authentication
+  userName_l_ends_with: String
+
+  # The userName lowercased not ends with the value
+  # The username for basic authentication
+  userName_l_not_ends_with: String
 }
 
 # The link to the nuget feed to download updates
@@ -911,6 +1157,7 @@ type ClusterKitNodeApi_ClusterKitRole {
 
   # The list of users assigned to this role
   users: [ClusterKitNodeApi_ClusterKitUser]
+  id: ID
 }
 
 # The list of connected ClusterKitNodeApi_ClusterKitRole_Node
@@ -986,6 +1233,46 @@ input ClusterKitNodeApi_ClusterKitRole_Filter {
   # The name not ends with the value
   # The role name
   name_not_ends_with: String
+
+  # The name lowercased exactly equals the value
+  # The role name
+  name_l: String
+
+  # The name lowercased not equals the value
+  # The role name
+  name_l_not: String
+
+  # The value contains the name lowercased as substring
+  # The role name
+  name_l_in: String
+
+  # The value not contains the name lowercased as substring
+  # The role name
+  name_l_not_in: String
+
+  # The name lowercased contains the value as substring
+  # The role name
+  name_l_contains: String
+
+  # The name lowercased not contains the value as substring
+  # The role name
+  name_l_not_contains: String
+
+  # The name lowercased starts with the value
+  # The role name
+  name_l_starts_with: String
+
+  # The name lowercased not starts with the value
+  # The role name
+  name_l_not_starts_with: String
+
+  # The name lowercased ends with the value
+  # The role name
+  name_l_ends_with: String
+
+  # The name lowercased not ends with the value
+  # The role name
+  name_l_not_ends_with: String
 }
 
 # Security role. The amount of privileges assigned to the user
@@ -1117,6 +1404,46 @@ input ClusterKitNodeApi_ClusterKitSeedAddress_Filter {
   # The seed address in format of akka url
   address_not_ends_with: String
 
+  # The address lowercased exactly equals the value
+  # The seed address in format of akka url
+  address_l: String
+
+  # The address lowercased not equals the value
+  # The seed address in format of akka url
+  address_l_not: String
+
+  # The value contains the address lowercased as substring
+  # The seed address in format of akka url
+  address_l_in: String
+
+  # The value not contains the address lowercased as substring
+  # The seed address in format of akka url
+  address_l_not_in: String
+
+  # The address lowercased contains the value as substring
+  # The seed address in format of akka url
+  address_l_contains: String
+
+  # The address lowercased not contains the value as substring
+  # The seed address in format of akka url
+  address_l_not_contains: String
+
+  # The address lowercased starts with the value
+  # The seed address in format of akka url
+  address_l_starts_with: String
+
+  # The address lowercased not starts with the value
+  # The seed address in format of akka url
+  address_l_not_starts_with: String
+
+  # The address lowercased ends with the value
+  # The seed address in format of akka url
+  address_l_ends_with: String
+
+  # The address lowercased not ends with the value
+  # The seed address in format of akka url
+  address_l_not_ends_with: String
+
   # The id exactly equals the value
   # The unique address identification number
   id: Int
@@ -1194,6 +1521,7 @@ enum ClusterKitNodeApi_ClusterKitSeedAddress_OrderByEnum {
 type ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics {
   # node templates statistics data
   templates: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData]
+  id: ID
 }
 
 # Statistics data for template
@@ -1218,6 +1546,7 @@ type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData {
 
   # the number of nodes that are in upgrade process now
   upgradingNodes: Int
+  id: ID
 }
 
 # The web ui user
@@ -1242,6 +1571,7 @@ type ClusterKitNodeApi_ClusterKitUser {
 
   # The user login
   login: String
+  id: ID
 }
 
 # The list of connected ClusterKitNodeApi_ClusterKitUser_Node
@@ -1333,6 +1663,46 @@ input ClusterKitNodeApi_ClusterKitUser_Filter {
   # The login not ends with the value
   # The user login
   login_not_ends_with: String
+
+  # The login lowercased exactly equals the value
+  # The user login
+  login_l: String
+
+  # The login lowercased not equals the value
+  # The user login
+  login_l_not: String
+
+  # The value contains the login lowercased as substring
+  # The user login
+  login_l_in: String
+
+  # The value not contains the login lowercased as substring
+  # The user login
+  login_l_not_in: String
+
+  # The login lowercased contains the value as substring
+  # The user login
+  login_l_contains: String
+
+  # The login lowercased not contains the value as substring
+  # The user login
+  login_l_not_contains: String
+
+  # The login lowercased starts with the value
+  # The user login
+  login_l_starts_with: String
+
+  # The login lowercased not starts with the value
+  # The user login
+  login_l_not_starts_with: String
+
+  # The login lowercased ends with the value
+  # The user login
+  login_l_ends_with: String
+
+  # The login lowercased not ends with the value
+  # The user login
+  login_l_not_ends_with: String
 }
 
 # The web ui user
@@ -1458,6 +1828,7 @@ type ClusterKitNodeApi_ClusterKitUserDescription {
 
   # The user login
   login: String
+  id: ID
 }
 
 # The mutation error description
@@ -1467,6 +1838,7 @@ type ClusterKitNodeApi_ErrorDescription {
 
   # The error message
   message: String
+  id: ID
 }
 
 input ClusterKitNodeApi_nodeManagerData_nodeTemplates_create_Input {
@@ -1636,6 +2008,7 @@ interface Node {
 type Query {
   # The united api access
   api: ClusterKitNodeApi_ClusterKitNodeApi
+  id: ID
 
   # The node global searcher according to Relay specification
   node(

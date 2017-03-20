@@ -47,10 +47,15 @@ export default class CreateTemplateMutation extends Relay.Mutation {
       id: this.props.__id,
       newNode: {
         id: this.props.__id,
-        address: this.props.address,
-        userName: this.props.userName,
-        password: this.props.password,
-        type: this.props.type,
+        code: this.props.code,
+        configuration: this.props.configuration,
+        containerTypes: this.props.containerTypes,
+        maximumNeededInstances: this.props.maximumNeededInstances,
+        minimumRequiredInstances: this.props.minimumRequiredInstances,
+        name: this.props.name,
+        packages: this.props.packages,
+        priority: this.props.priority,
+        version: this.props.version,
       }
     }
   }
@@ -59,10 +64,15 @@ export default class CreateTemplateMutation extends Relay.Mutation {
     return {
       edge: {
         node: {
-          address: this.props.address,
-          userName: this.props.userName,
-          password: this.props.password,
-          type: this.props.type,
+          code: this.props.code,
+          configuration: this.props.configuration,
+          containerTypes: this.props.containerTypes,
+          maximumNeededInstances: this.props.maximumNeededInstances,
+          minimumRequiredInstances: this.props.minimumRequiredInstances,
+          name: this.props.name,
+          packages: this.props.packages,
+          priority: this.props.priority,
+          version: this.props.version,
         },
       },
     }
