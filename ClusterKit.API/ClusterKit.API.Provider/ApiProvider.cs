@@ -33,12 +33,13 @@ namespace ClusterKit.API.Provider
         /// <summary>
         /// The list of warnings gathered on generation stage
         /// </summary>
+        /// todo: collect errors from all resolvers
         private readonly List<string> generationErrors = new List<string>();
 
         /// <summary>
         /// The current api resolver
         /// </summary>
-        private GenericObjectResolver resolver;
+        private ObjectResolver resolver;
 
         /// <summary>
         /// Prepares serializer to deserialize arguments
@@ -48,7 +49,7 @@ namespace ClusterKit.API.Provider
         /// <summary>
         /// The list of generated mutations
         /// </summary>
-        private Dictionary<string, GenericObjectResolver.MutationDescription> mutations;
+        private Dictionary<string, ObjectResolver.MutationDescription> mutations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiProvider"/> class.
@@ -90,7 +91,8 @@ namespace ClusterKit.API.Provider
         {
             return this.resolver.ResolveQuery(
                 this,
-                new ApiRequest { Fields = requests },
+                new ApiRequest { Fields = requests }, 
+                ApiField.Object("root", this.ApiDescription.ApiName), 
                 context,
                 this.argumentsSerializer,
                 onErrorCallback);
@@ -118,7 +120,7 @@ namespace ClusterKit.API.Provider
         {
             try
             {
-                GenericObjectResolver.MutationDescription mutation;
+                ObjectResolver.MutationDescription mutation;
 
                 if (!this.mutations.TryGetValue(request.FieldName, out mutation))
                 {
@@ -134,12 +136,13 @@ namespace ClusterKit.API.Provider
                 request.FieldName = mutation.Field.Name;
                 var rootRequest = new ApiRequest { Fields = new List<ApiRequest> { request } };
 
-                var objectResolver = mutation.Resolver as GenericObjectResolver;
+                var objectResolver = mutation.Resolver as ObjectResolver;
                 if (objectResolver != null)
                 {
                     var result = await objectResolver.ResolveQuery(
                                resolveResult,
-                               rootRequest,
+                               rootRequest, 
+                               mutation.Field,
                                context,
                                this.argumentsSerializer,
                                onErrorCallback) as JObject;
@@ -153,6 +156,7 @@ namespace ClusterKit.API.Provider
                     var resolvedMutation = await connectionResolver.ResolveMutation(
                                               resolveResult,
                                               request,
+                                              mutation.Field,
                                               context,
                                               this.argumentsSerializer,
                                               onErrorCallback);
@@ -217,7 +221,8 @@ namespace ClusterKit.API.Provider
                     (JObject)
                     await connectionResolver.NodeResolver.ResolveQuery(
                         node,
-                        nodeRequest,
+                        nodeRequest, 
+                        resolveResult.Item3,
                         context,
                         this.argumentsSerializer,
                         onErrorCallback);
@@ -315,8 +320,8 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.Types.Clear();
             this.ApiDescription.Mutations.Clear();
 
-            var rootResolver = typeof(GenericObjectResolver<>)
-                .MakeGenericType(this.GetType()).CreateInstance<GenericObjectResolver>();
+            var rootResolver = typeof(ObjectResolver<>)
+                .MakeGenericType(this.GetType()).CreateInstance<ObjectResolver>();
             this.resolver = rootResolver;
             var root = (ApiObjectType)rootResolver.GetApiType();
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
@@ -324,7 +329,7 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.Fields = new List<ApiField>(root.Fields.Select(f => f.Clone()));
 
             List<ApiType> allTypes;
-            List<GenericObjectResolver.MutationDescription> mutationList;
+            List<ObjectResolver.MutationDescription> mutationList;
             rootResolver.CreateApiRoot(out allTypes, out this.argumentsSerializer, out mutationList);
             this.mutations = mutationList.ToDictionary(m => m.MutationName);
             this.ApiDescription.Types = allTypes;

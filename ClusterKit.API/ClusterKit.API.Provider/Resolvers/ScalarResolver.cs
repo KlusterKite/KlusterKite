@@ -28,12 +28,7 @@ namespace ClusterKit.API.Provider.Resolvers
     public class ScalarResolver<TScalar> : IResolver
     {
         /// <inheritdoc />
-        public Task<JToken> ResolveQuery(
-            object source,
-            ApiRequest request,
-            RequestContext context,
-            JsonSerializer argumentsSerializer,
-            Action<Exception> onErrorCallback)
+        public Task<JToken> ResolveQuery(object source, ApiRequest request, ApiField apiField, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback)
         {
             return Task.FromResult<JToken>(new JValue((TScalar)source));
         }

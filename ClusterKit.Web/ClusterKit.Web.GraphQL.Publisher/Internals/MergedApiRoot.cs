@@ -189,13 +189,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// </returns>
             public object Resolve(ResolveFieldContext context)
             {
+                // todo: check and fix correct behavior 
                 var connectionMutationResultType = this.mergedField.Type as MergedConnectionMutationResultType;
                 if (connectionMutationResultType != null)
                 {
                     return this.DoConnectionMutationApiRequests(
                         context,
                         context.UserContext as RequestContext,
-                        connectionMutationResultType);
+                        connectionMutationResultType).Result;
                 }
 
                 var untypedMutationResultType = this.mergedField.Type as MergedUntypedMutationResult;
@@ -204,7 +205,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     return this.DoUntypedMutationApiRequests(
                         context,
                         context.UserContext as RequestContext,
-                        untypedMutationResultType);
+                        untypedMutationResultType).Result;
                 }
 
                 return this.DoApiRequests(context, context.UserContext as RequestContext);

@@ -1875,7 +1875,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
             Assert.Equal(expectingResult ? 0 : 1, sink.LogEvents.Count);
         }
-        
+
         /// <summary>
         /// Testing simple fields requests from <see cref="ApiDescription"/>
         /// </summary>
@@ -1885,7 +1885,11 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var sink = CreateSecurityLogger();
             var internalApiProvider = new TestProvider();
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var query = @"
@@ -1902,11 +1906,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
-                             {
-                                 r.Schema = schema;
-                                 r.Query = query;
-                                 r.UserContext = new RequestContext();
-                             }).ConfigureAwait(true);
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
@@ -1924,12 +1928,116 @@ namespace ClusterKit.Web.Tests.GraphQL
                         ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
 
-            Assert.Equal(3, sink.LogEvents.Count);
-            var events = sink.LogEvents.OrderBy(e => e.MessageTemplate);
+            var events = sink.LogEvents.OrderBy(e => e.MessageTemplate.Text);
             foreach (var logEvent in events)
             {
                 this.output.WriteLine(logEvent.RenderMessage());
             }
+
+            Assert.Equal(3, sink.LogEvents.Count);
+            Assert.True(events.Any(e => e.RenderMessage() == "Connection queried"));
+            Assert.True(events.Any(e => e.RenderMessage() == "LoggedWithMessageField accessed"));
+            Assert.True(
+                events.Any(
+                    e =>
+                        e.RenderMessage()
+                        == "The property LoggedNoMessageField of ClusterKit.API.Tests.Mock.TestProvider with id null was accessed"));
+        }
+
+        /// <summary>
+        /// Testing simple fields requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task MutationLogTest()
+        {
+            var sink = CreateSecurityLogger();
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            mutation {                
+                untyped: TestApi_loggedMutation {
+                    result
+                },
+                create: TestApi_loggedConnection_create(input: { newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world""} }) {
+                    node {
+                        name
+                    }
+                },
+                update: TestApi_loggedConnection_update(input: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", newNode: { name: ""updated world""} }) {
+                    node {
+                        name
+                    }
+                },
+                delete: TestApi_loggedConnection_delete(input: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"" }) {
+                    node {
+                        name
+                    }
+                },
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""untyped"": {
+                                ""result"": ""ok""
+                            },
+                            ""create"": {
+                                ""node"": {
+                                    ""name"": ""hello world""
+                                }
+                            },
+                            ""update"": {
+                                ""node"": {
+                                    ""name"": ""updated world""
+                                }
+                            },
+                            ""delete"": {
+                                ""node"": {
+                                    ""name"": ""updated world""
+                                }
+                            },
+                          }
+                        }
+                        ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+
+            var events = sink.LogEvents;
+            foreach (var logEvent in events)
+            {
+                this.output.WriteLine(logEvent.RenderMessage());
+            }
+
+            Assert.Equal(4, sink.LogEvents.Count);
+            Assert.Equal(
+                "The property LoggedMutation of ClusterKit.API.Tests.Mock.TestProvider with id null was accessed",
+                sink.LogEvents[0].RenderMessage());
+            Assert.Equal(
+                "Connection created",
+                sink.LogEvents[1].RenderMessage());
+            Assert.Equal(
+                "Connection updated",
+                sink.LogEvents[2].RenderMessage());
+            Assert.Equal(
+                "Connection deleted",
+                sink.LogEvents[3].RenderMessage());
         }
 
         /// <summary>

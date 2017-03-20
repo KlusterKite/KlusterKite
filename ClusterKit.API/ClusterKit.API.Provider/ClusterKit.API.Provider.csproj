@@ -172,23 +172,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiProvider.cs" />
-    <Compile Include="AssembleTempData.cs" />
-    <Compile Include="ConnectionResolverGenerator.cs" />
     <Compile Include="InputContractResolver.cs" />
-    <Compile Include="ObjectResolverGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResolverGenerator.cs" />
     <Compile Include="Resolvers\CollectionResolver.cs" />
-    <Compile Include="Resolvers\ConnectionResolver.cs" />
     <Compile Include="Resolvers\EnumResolver.cs" />
     <Compile Include="Resolvers\ForwarderResolver.cs" />
-    <Compile Include="Resolvers\GenericConnectionResolver.cs" />
-    <Compile Include="Resolvers\GenericObjectResolver.cs" />
-    <Compile Include="Resolvers\IConnectionResolver.cs" />
+    <Compile Include="Resolvers\ConnectionResolver.cs" />
     <Compile Include="Resolvers\ObjectResolver.cs" />
+    <Compile Include="Resolvers\IConnectionResolver.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="Resolvers\ScalarResolver.cs" />
-    <Compile Include="Resolvers\StringResolver.cs" />
     <Compile Include="Resolvers\SwapVisitor.cs" />
     <Compile Include="TypeMetadata.cs" />
   </ItemGroup>

@@ -36,12 +36,7 @@ namespace ClusterKit.API.Provider.Resolvers
         }
 
         /// <inheritdoc />
-        public async Task<JToken> ResolveQuery(
-            object source,
-            ApiRequest request,
-            RequestContext context,
-            JsonSerializer argumentsSerializer,
-            Action<Exception> onErrorCallback)
+        public async Task<JToken> ResolveQuery(object source, ApiRequest request, ApiField apiField, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback)
         {
             if (source == null)
             {
@@ -58,7 +53,7 @@ namespace ClusterKit.API.Provider.Resolvers
             var result = new JArray();
             foreach (var value in collection)
             {
-                result.Add(await this.elementResolver.ResolveQuery(value, request, context, argumentsSerializer, onErrorCallback));
+                result.Add(await this.elementResolver.ResolveQuery(value, request, apiField, context, argumentsSerializer, onErrorCallback));
             }
 
             return result;

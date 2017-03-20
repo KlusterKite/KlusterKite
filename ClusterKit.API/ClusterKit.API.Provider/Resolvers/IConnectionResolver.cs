@@ -41,6 +41,9 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </summary>
         /// <param name="nodeConnection">The node connection</param>
         /// <param name="request">The mutation request</param>
+        /// <param name="field">
+        /// The mutating field
+        /// </param>
         /// <param name="context">
         /// The context.
         /// </param>
@@ -54,6 +57,7 @@ namespace ClusterKit.API.Provider.Resolvers
         Task<JObject> ResolveMutation(
             object nodeConnection,
             ApiRequest request,
+            ApiField field,
             RequestContext context,
             JsonSerializer argumentsSerializer,
             Action<Exception> onErrorCallback);

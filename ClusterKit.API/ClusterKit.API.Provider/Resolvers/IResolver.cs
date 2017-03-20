@@ -27,24 +27,33 @@ namespace ClusterKit.API.Provider.Resolvers
         /// Resolves API request to object
         /// </summary>
         /// <param name="source">
-        /// The source.
+        ///     The source.
         /// </param>
         /// <param name="request">
-        /// The request to this object as a field of parent object.
+        ///     The request to this object as a field of parent object.
+        /// </param>
+        /// <param name="apiField">
+        /// The container field description
         /// </param>
         /// <param name="context">
-        /// The context.
+        ///     The context.
         /// </param>
         /// <param name="argumentsSerializer">
-        /// The arguments serializer.
+        ///     The arguments serializer.
         /// </param>
         /// <param name="onErrorCallback">
-        /// The on error callback.
+        ///     The on error callback.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task<JToken> ResolveQuery(object source, ApiRequest request, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback);
+        Task<JToken> ResolveQuery(
+            object source,
+            ApiRequest request,
+            ApiField apiField,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback);
 
         /// <summary>
         /// Gets the resolved api type of resolved element

@@ -11,7 +11,6 @@ namespace ClusterKit.API.Provider.Resolvers
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading.Tasks;
 
@@ -56,12 +55,7 @@ namespace ClusterKit.API.Provider.Resolvers
         public static ApiType GeneratedType { get; }
 
         /// <inheritdoc />
-        public Task<JToken> ResolveQuery(
-            object source,
-            ApiRequest request,
-            RequestContext context,
-            JsonSerializer argumentsSerializer,
-            Action<Exception> onErrorCallback)
+        public Task<JToken> ResolveQuery(object source, ApiRequest request, ApiField apiField, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback)
         {
             var value = hasFlags ? new JValue((long)source) : new JValue(source.ToString());
             return Task.FromResult<JToken>(value);

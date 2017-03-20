@@ -35,12 +35,7 @@ namespace ClusterKit.API.Provider.Resolvers
         }
 
         /// <inheritdoc />
-        public Task<JToken> ResolveQuery(
-            object source,
-            ApiRequest request,
-            RequestContext context,
-            JsonSerializer argumentsSerializer,
-            Action<Exception> onErrorCallback)
+        public Task<JToken> ResolveQuery(object source, ApiRequest request, ApiField apiField, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback)
         {
             var result = source as JToken;
             return Task.FromResult(result ?? JValue.CreateNull());
