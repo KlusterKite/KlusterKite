@@ -304,7 +304,8 @@ namespace ClusterKit.API.Client
                            RequireAuthenticatedSession =
                                this.RequireAuthenticatedSession,
                            RequireAuthenticatedUserSession =
-                               this.RequireAuthenticatedUserSession
+                               this.RequireAuthenticatedUserSession,
+                           LogAccessRules = this.LogAccessRules
                        };
         }
     }

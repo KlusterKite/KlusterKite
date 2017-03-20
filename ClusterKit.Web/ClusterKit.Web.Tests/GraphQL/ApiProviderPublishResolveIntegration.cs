@@ -1733,8 +1733,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var internalApiProvider = new TestProvider();
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
                                          {
-                                             UseJsonRepack =
-                                                 true
+                                             UseJsonRepack = true
                                          };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
