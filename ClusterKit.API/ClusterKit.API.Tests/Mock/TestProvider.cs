@@ -301,6 +301,15 @@ namespace ClusterKit.API.Tests.Mock
         public TestObjectConnection AuthorizedConnection => this.Connection;
 
         /// <summary>
+        /// Gets the connection with required authorization
+        /// </summary>
+        [UsedImplicitly]
+        [RequireSession]
+        [RequirePrivilege("allow", AddActionNameToRequiredPrivilege = true)]
+        [DeclareConnection(CanCreate = true, CanUpdate = true, CanDelete = true)]
+        public TestObjectConnection AuthorizedNamedConnection => this.Connection;
+
+        /// <summary>
         /// Gets the field that logs its access
         /// </summary>
         [UsedImplicitly]
