@@ -33,7 +33,6 @@ namespace ClusterKit.API.Provider
         /// <summary>
         /// The list of warnings gathered on generation stage
         /// </summary>
-        /// todo: collect errors from all resolvers
         private readonly List<string> generationErrors = new List<string>();
 
         /// <summary>
@@ -330,7 +329,10 @@ namespace ClusterKit.API.Provider
 
             List<ApiType> allTypes;
             List<ObjectResolver.MutationDescription> mutationList;
-            rootResolver.CreateApiRoot(out allTypes, out this.argumentsSerializer, out mutationList);
+            List<string> errors;
+            rootResolver.CreateApiRoot(out allTypes, out this.argumentsSerializer, out mutationList, out errors);
+            this.generationErrors.Clear();
+            this.generationErrors.AddRange(errors);
             this.mutations = mutationList.ToDictionary(m => m.MutationName);
             this.ApiDescription.Types = allTypes;
             this.ApiDescription.Mutations = this.mutations.Values.Select(d => d.CreateMutationField()).ToList();

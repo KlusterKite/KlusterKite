@@ -11,6 +11,7 @@ namespace ClusterKit.API.Provider.Resolvers
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -54,6 +55,11 @@ namespace ClusterKit.API.Provider.Resolvers
             Action<Exception> onErrorCallback);
 
         /// <summary>
+        /// Gets the list of errors occurred during initialization
+        /// </summary>
+        public abstract IEnumerable<string> Errors { get; }
+
+        /// <summary>
         /// Gets the defined <see cref="ApiType"/>
         /// </summary>
         /// <returns>The api type</returns>
@@ -71,10 +77,12 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <param name="types">The list of all types used in api</param>
         /// <param name="argumentsSerializer">The configured JSON serializer to deserialize method arguments</param>
         /// <param name="mutationList">The list of all defined mutations</param>
+        /// <param name="errors">The list of generated errors</param>
         internal abstract void CreateApiRoot(
             out List<ApiType> types,
             out JsonSerializer argumentsSerializer,
-            out List<MutationDescription> mutationList);
+            out List<MutationDescription> mutationList,
+            out List<string> errors);
 
         /// <summary>
         /// Generates mutations
@@ -298,6 +306,11 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </summary>
         public static List<string> GetGenerationErrors => new List<string>(GenerationErrors);
 
+        /// <summary>
+        /// Gets the list of errors occurred during initialization
+        /// </summary>
+        public override IEnumerable<string> Errors => GenerationErrors.ToImmutableList();
+
         /// <inheritdoc />
         public override ApiType GetApiType() => GeneratedType;
 
@@ -423,9 +436,10 @@ namespace ClusterKit.API.Provider.Resolvers
         internal override void CreateApiRoot(
             out List<ApiType> types,
             out JsonSerializer argumentsSerializer,
-            out List<MutationDescription> mutationList)
+            out List<MutationDescription> mutationList,
+            out List<string> errors)
         {
-            this.CreateAllRelatedTypeListForApiRoot(out types, out argumentsSerializer);
+            this.CreateAllRelatedTypeListForApiRoot(out types, out argumentsSerializer, out errors);
 
             mutationList =
                 this.GenerateMutations(
@@ -1007,9 +1021,16 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <summary>
         /// Creates an api root data from current type
         /// </summary>
-        /// <param name="types">The list of all types used in api</param>
-        /// <param name="argumentsSerializer">The configured JSON serializer to deserialize method arguments</param>
-        private void CreateAllRelatedTypeListForApiRoot(out List<ApiType> types, out JsonSerializer argumentsSerializer)
+        /// <param name="types">
+        /// The list of all types used in api
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The configured JSON serializer to deserialize method arguments
+        /// </param>
+        /// <param name="errors">
+        /// The list of generation errors.
+        /// </param>
+        private void CreateAllRelatedTypeListForApiRoot(out List<ApiType> types, out JsonSerializer argumentsSerializer, out List<string> errors)
         {
             var directTypes = this.GetDirectRelatedObjectResolvers().ToList();
             directTypes.Add(this);
@@ -1018,6 +1039,8 @@ namespace ClusterKit.API.Provider.Resolvers
             var resolveQueue = new Queue<IResolver>(directTypes);
             var resolvedTypes = new Dictionary<string, IResolver>();
             var memberNames = new Dictionary<MemberInfo, string>();
+
+            errors = new List<string>();
 
             while (resolveQueue.Count > 0)
             {
@@ -1035,6 +1058,8 @@ namespace ClusterKit.API.Provider.Resolvers
                 {
                     continue;
                 }
+
+                errors.AddRange(genericResolver.Errors.Select(e => $"{apiType}: {e}"));
 
                 foreach (var pair in genericResolver.GetFieldsNames())
                 {
