@@ -137,7 +137,6 @@ namespace ClusterKit.Data.CRUD
             int? offset,
             ApiRequest apiRequest)
         {
-            this.actorSystem.Log.Info("{Type}: Query launched", this.GetType().Name);
             var sortingConditions = sort?.ToList() ?? new List<SortingCondition>();
 
             if (sortingConditions.Count == 0)

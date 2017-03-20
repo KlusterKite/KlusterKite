@@ -10,6 +10,7 @@ namespace ClusterKit.Data
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -34,10 +35,33 @@ namespace ClusterKit.Data
     public abstract class BaseCrudActor<TContext> : ReceiveActor
         where TContext : IDisposable
     {
+        /// <summary>
+        /// The default query limit
+        /// </summary>
+        private readonly int defaultQueryLimit;
+
+        /// <summary>
+        /// The list of individual class limits
+        /// </summary>
+        private readonly IReadOnlyDictionary<string, int> classQueryLimits;
+
         /// <inheritdoc />
         protected BaseCrudActor()
         {
             this.Receive<ParcelException>(m => this.OnParcelException(m));
+
+            var configSection = Context.System.Settings.Config.GetConfig("ClusterKit.Data.Crud.Query.Limits");
+            this.defaultQueryLimit = configSection?.GetInt("Default", 100) ?? 100;
+            var classLimits = new Dictionary<string, int>();
+            if (configSection != null)
+            {
+                foreach (var valuePair in configSection.AsEnumerable())
+                {
+                    classLimits[valuePair.Key] = valuePair.Value.GetInt();
+                }
+            }
+
+            this.classQueryLimits = classLimits.ToImmutableDictionary();
         }
 
         /// <summary>
@@ -162,13 +186,26 @@ namespace ClusterKit.Data
             {
                 using (var ds = await this.GetContext())
                 {
+                    int maxLimit;
+                    if (!this.classQueryLimits.TryGetValue(
+                            NamingUtilities.ToCSharpRepresentation(typeof(TObject)),
+                            out maxLimit))
+                    {
+                        maxLimit = this.defaultQueryLimit;
+                    }
+
+                    var limit = maxLimit != 0
+                                && (!collectionRequest.Count.HasValue || collectionRequest.Count.Value > maxLimit)
+                                    ? maxLimit
+                                    : collectionRequest.Count;
+
                     var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
 
                     var response = await factory.GetList(
                                        collectionRequest.Filter,
                                        collectionRequest.Sort,
                                        collectionRequest.Skip,
-                                       collectionRequest.Count,
+                                       limit,
                                        collectionRequest.ApiRequest);
 
                     if (collectionRequest.AcceptAsParcel)
