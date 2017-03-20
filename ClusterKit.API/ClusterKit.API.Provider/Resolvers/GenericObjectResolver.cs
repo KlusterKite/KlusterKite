@@ -32,21 +32,32 @@ namespace ClusterKit.API.Provider.Resolvers
     public abstract class GenericObjectResolver : IResolver
     {
         /// <summary>
+        /// Gets a value of specified field without arguments
+        /// </summary>
+        /// <param name="source">
+        /// The source object
+        /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The arguments serializer.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <returns>The value</returns>
+        internal delegate Task<object> GetMutationContainerDelegate(
+            object source,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback);
+
+        /// <summary>
         /// Gets the defined <see cref="ApiType"/>
         /// </summary>
         /// <returns>The api type</returns>
         public abstract ApiType GetApiType();
-
-        /// <summary>
-        /// Creates an api root data from current type
-        /// </summary>
-        /// <param name="types">The list of all types used in api</param>
-        /// <param name="argumentsSerializer">The configured JSON serializer to deserialize method arguments</param>
-        /// <param name="mutationList">The list of all defined mutations</param>
-        public abstract void CreateApiRoot(
-            out List<ApiType> types,
-            out JsonSerializer argumentsSerializer,
-            out List<ApiMutation> mutationList);
 
         /// <inheritdoc />
         public abstract Task<JToken> ResolveQuery(
@@ -60,10 +71,41 @@ namespace ClusterKit.API.Provider.Resolvers
         ApiType IResolver.GetElementType() => this.GetApiType();
 
         /// <summary>
+        /// Creates an api root data from current type
+        /// </summary>
+        /// <param name="types">The list of all types used in api</param>
+        /// <param name="argumentsSerializer">The configured JSON serializer to deserialize method arguments</param>
+        /// <param name="mutationList">The list of all defined mutations</param>
+        internal abstract void CreateApiRoot(
+            out List<ApiType> types,
+            out JsonSerializer argumentsSerializer,
+            out List<MutationDescription> mutationList);
+
+        /// <summary>
+        /// Generates mutations
+        /// </summary>
+        /// <param name="path">
+        /// The path to current field
+        /// </param>
+        /// <param name="typesUsed">
+        /// The types already used to avoid circular references
+        /// </param>
+        /// <param name="getContainerDelegate">
+        /// The get source container.
+        /// </param>
+        /// <returns>
+        /// The list of mutations
+        /// </returns>
+        internal abstract IEnumerable<MutationDescription> GenerateMutations(
+            List<string> path,
+            List<string> typesUsed,
+            GetMutationContainerDelegate getContainerDelegate);
+
+        /// <summary>
         /// Gets the list <see cref="GenericObjectResolver{T}"/> that a used to resolve the fields of current object
         /// </summary>
         /// <returns>The list of resolvers</returns>
-        internal abstract IEnumerable<GenericObjectResolver> GetDirectRelatedObjectResolvers();
+        internal abstract IEnumerable<IResolver> GetDirectRelatedObjectResolvers();
 
         /// <summary>
         /// Gets the names of type fields
@@ -72,19 +114,93 @@ namespace ClusterKit.API.Provider.Resolvers
         internal abstract Dictionary<MemberInfo, string> GetFieldsNames();
 
         /// <summary>
+        /// Gets a value of specified nested field
+        /// </summary>
+        /// <param name="source">
+        /// The source object
+        /// </param>
+        /// <param name="fieldNames">
+        /// The nested field names
+        /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The arguments serializer.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <returns>The value</returns>
+        internal abstract Task<Tuple<object, IResolver>> GetNestedFieldValue(
+            object source,
+            Queue<string> fieldNames,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback);
+
+        /// <summary>
+        /// The internal description of published mutation
+        /// </summary>
+        internal class MutationDescription
+        {
+            /// <summary>
+            /// Gets or sets the mutation field
+            /// </summary>
+            public ApiField Field { get; set; }
+
+            /// <summary>
+            /// Gets the mutation virtual field name
+            /// </summary>
+            public string MutationName
+                => string.Join(".", new List<string>(this.Path.Select(p => p?.FieldName)) { this.Field.Name });
+
+            /// <summary>
+            /// Gets or sets the path to mutation container
+            /// </summary>
+            public List<ApiRequest> Path { get; set; }
+
+            /// <summary>
+            /// Gets or sets the method to resolve property container
+            /// </summary>
+            public GetMutationContainerDelegate ResolveContainer { get; set; }
+
+            /// <summary>
+            /// Gets or sets the container resolver
+            /// </summary>
+            public IResolver Resolver { get; set; }
+
+            /// <summary>
+            /// Gets or sets the mutation type
+            /// </summary>
+            public ApiMutation.EnType Type { get; set; }
+
+            /// <summary>
+            /// Creates virtual mutation field to describe mutation
+            /// </summary>
+            /// <returns>The mutation field</returns>
+            public ApiMutation CreateMutationField()
+            {
+                var field = ApiMutation.CreateFromField(this.Field, this.Type);
+                field.Name = this.MutationName;
+                return field;
+            }
+        }
+
+        /// <summary>
         /// The related type description
         /// </summary>
         protected class RelatedType
         {
             /// <summary>
-            /// Gets or sets the type
-            /// </summary>
-            public Type Type { get; set; }
-            
-            /// <summary>
             /// Gets or sets the type resolver
             /// </summary>
             public IResolver Resolver { get; set; }
+
+            /// <summary>
+            /// Gets or sets the type
+            /// </summary>
+            public Type Type { get; set; }
         }
     }
 
@@ -96,6 +212,7 @@ namespace ClusterKit.API.Provider.Resolvers
     /// </typeparam>
     [SuppressMessage("ReSharper", "StaticMemberInGenericType",
         Justification = "Making use of static properties in generic classes")]
+
     // ReSharper disable once StyleCop.SA1402
     public class GenericObjectResolver<T> : GenericObjectResolver
     {
@@ -133,15 +250,12 @@ namespace ClusterKit.API.Provider.Resolvers
 
             var typeName = ApiDescriptionAttribute.GetTypeName(type);
 
-            if (type.IsSubclassOf(typeof(Enum)))
-            {
-                GeneratedType = new ApiEnumType(typeName, Enum.GetNames(type));
-                return;
-            }
+            GenerateTypeProperties().ForEach(f => Fields[f.Field.Name] = f);
+            GenerateTypeMethods().ForEach(f => Fields[f.Field.Name] = f);
 
             var apiObjectType = new ApiObjectType(typeName);
-            apiObjectType.Fields.AddRange(GenerateTypeProperties());
-            apiObjectType.Fields.AddRange(GenerateTypeMethods());
+            apiObjectType.Fields.AddRange(Fields.Values.Where(f => !f.IsMutation).Select(f => f.Field));
+            apiObjectType.Description = type.GetCustomAttribute<ApiDescriptionAttribute>()?.Description;
             GeneratedType = apiObjectType;
         }
 
@@ -188,47 +302,6 @@ namespace ClusterKit.API.Provider.Resolvers
         /// Gets the list of errors occurred on generation stage
         /// </summary>
         public static List<string> GetGenerationErrors => new List<string>(GenerationErrors);
-
-        /// <inheritdoc />
-        public override void CreateApiRoot(
-            out List<ApiType> types,
-            out JsonSerializer argumentsSerializer,
-            out List<ApiMutation> mutationList)
-        {
-            var directTypes = this.GetDirectRelatedObjectResolvers().ToList();
-            directTypes.Add(this);
-            
-            types = new List<ApiType>();
-            var resolveQueue = new Queue<GenericObjectResolver>(directTypes);
-            var resolvedTypes = new Dictionary<string, GenericObjectResolver>();
-            var memberNames = new Dictionary<MemberInfo, string>();
-
-            while (resolveQueue.Count > 0)
-            {
-                var resolver = resolveQueue.Dequeue();
-                var apiType = resolver.GetApiType();
-                if (resolvedTypes.ContainsKey(apiType.TypeName))
-                {
-                    continue;
-                }
-
-                resolvedTypes[apiType.TypeName] = resolver;
-                types.Add(apiType);
-                foreach (var pair in resolver.GetFieldsNames())
-                {
-                    memberNames[pair.Key] = pair.Value;
-                }
-
-                foreach (var objectResolver in resolver.GetDirectRelatedObjectResolvers())
-                {
-                    resolveQueue.Enqueue(objectResolver);
-                }
-            }
-
-            var jsonContractResolver = new InputContractResolver(memberNames);
-            argumentsSerializer = new JsonSerializer { ContractResolver = jsonContractResolver };
-            mutationList = new List<ApiMutation>();
-        }
 
         /// <inheritdoc />
         public override ApiType GetApiType() => GeneratedType;
@@ -336,13 +409,50 @@ namespace ClusterKit.API.Provider.Resolvers
             return result;
         }
 
+        /// <inheritdoc />
+        internal override void CreateApiRoot(
+            out List<ApiType> types,
+            out JsonSerializer argumentsSerializer,
+            out List<MutationDescription> mutationList)
+        {
+            this.CreateAllRelatedTypeListForApiRoot(out types, out argumentsSerializer);
+
+            mutationList =
+                this.GenerateMutations(
+                    new List<string>(),
+                    new List<string> { GeneratedType.TypeName },
+                    (source, context, serializer, callback) => Task.FromResult(source)).ToList();
+        }
+
+        /// <inheritdoc />
+        internal override IEnumerable<MutationDescription> GenerateMutations(
+            List<string> path,
+            List<string> typesUsed,
+            GetMutationContainerDelegate getContainer)
+        {
+            foreach (var mutation in this.GenerateMutationsUntyped(path, getContainer))
+            {
+                yield return mutation;
+            }
+
+            foreach (var apiField in this.GenerateMutationsFromConnections(path, getContainer))
+            {
+                yield return apiField;
+            }
+
+            foreach (var mutation in this.GenerateMutationsFromFields(path, typesUsed, getContainer))
+            {
+                yield return mutation;
+            }
+        }
+
         /// <summary>
         /// Gets the list <see cref="GenericObjectResolver{T}"/> that a used to resolve the fields of current object
         /// </summary>
         /// <returns>The list of resolvers</returns>
-        internal override IEnumerable<GenericObjectResolver> GetDirectRelatedObjectResolvers()
+        internal override IEnumerable<IResolver> GetDirectRelatedObjectResolvers()
         {
-            return RelatedTypes.Select(t => t.Resolver).OfType<GenericObjectResolver>();
+            return RelatedTypes.Select(t => t.Resolver);
         }
 
         /// <summary>
@@ -354,6 +464,56 @@ namespace ClusterKit.API.Provider.Resolvers
             return Fields.ToDictionary(f => f.Value.TypeMember, f => f.Key);
         }
 
+        /// <inheritdoc />
+        internal override Task<Tuple<object, IResolver>> GetNestedFieldValue(
+            object source,
+            Queue<string> fieldNames,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            if (fieldNames.Count == 0)
+            {
+                return Task.FromResult<Tuple<object, IResolver>>(null);
+            }
+
+            FieldDescription field;
+
+            var fieldName = fieldNames.Dequeue();
+            if (fieldName == null || !Fields.TryGetValue(fieldName, out field))
+            {
+                return Task.FromResult<Tuple<object, IResolver>>(null);
+            }
+
+            var value = field.GetValue(
+                (T)source,
+                new ApiRequest { FieldName = fieldName },
+                context,
+                argumentsSerializer,
+                onErrorCallback);
+
+            if (fieldNames.Count == 0)
+            {
+                return value.ContinueWith(v => new Tuple<object, IResolver>(v.Result, field.Resolver));
+            }
+
+            var nestedResolver = field.Resolver as GenericObjectResolver;
+            if (nestedResolver == null)
+            {
+                return Task.FromResult<Tuple<object, IResolver>>(null);
+            }
+
+            return
+                value.ContinueWith(
+                    task =>
+                        nestedResolver.GetNestedFieldValue(
+                            task.Result,
+                            fieldNames,
+                            context,
+                            argumentsSerializer,
+                            onErrorCallback)).Unwrap();
+        }
+
         /// <summary>
         /// Creates a resolver for the specified type
         /// </summary>
@@ -361,11 +521,14 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <returns>The resolver</returns>
         private static IResolver CreateResolver(TypeMetadata metadata)
         {
-            var elementResolver = metadata.ScalarType == EnScalarType.None
-                                      ? typeof(GenericObjectResolver<>).MakeGenericType(metadata.Type)
+            var elementResolver = metadata.ScalarType != EnScalarType.None
+                                      ? typeof(ScalarResolver<>).MakeGenericType(metadata.Type)
                                           .CreateInstance<IResolver>()
-                                      : typeof(ScalarResolver<>).MakeGenericType(metadata.Type)
-                                          .CreateInstance<IResolver>();
+                                      : metadata.Type.IsSubclassOf(typeof(Enum))
+                                          ? typeof(EnumResolver<>).MakeGenericType(metadata.Type)
+                                              .CreateInstance<IResolver>()
+                                          : typeof(GenericObjectResolver<>).MakeGenericType(metadata.Type)
+                                              .CreateInstance<IResolver>();
 
             if (metadata.IsForwarding)
             {
@@ -397,7 +560,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <returns>
         /// The field description
         /// </returns>
-        private static ApiField GenerateFieldFromMethod(MethodInfo method, PublishToApiAttribute attribute)
+        private static FieldDescription GenerateFieldFromMethod(MethodInfo method, PublishToApiAttribute attribute)
         {
             var type = method.ReflectedType;
             TypeMetadata metadata;
@@ -478,12 +641,20 @@ namespace ClusterKit.API.Provider.Resolvers
                     {
                         RelatedTypes.Add(new RelatedType { Type = parameterMetadata.Type });
                     }
+
+                    if (metadata.GetFlags().HasFlag(EnFieldFlags.IsConnection))
+                    {
+                        var mutationResult = typeof(MutationResult<>).MakeGenericType(metadata.Type);
+                        if (RelatedTypes.All(rt => rt.Type != mutationResult))
+                        {
+                            RelatedTypes.Add(new RelatedType { Type = mutationResult });
+                        }
+                    }
                 }
             }
 
             field.FillAuthorizationProperties(method);
-            Fields[field.Name] = new FieldDescription(field, metadata, method);
-            return field;
+            return new FieldDescription(field, metadata, method, attribute is DeclareMutationAttribute);
         }
 
         /// <summary>
@@ -498,7 +669,9 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <returns>
         /// The field description
         /// </returns>
-        private static ApiField GenerateFieldFromProperty(PropertyInfo property, PublishToApiAttribute attribute)
+        private static FieldDescription GenerateFieldFromProperty(
+            PropertyInfo property,
+            PublishToApiAttribute attribute)
         {
             var declaringType = property.ReflectedType;
 
@@ -549,8 +722,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
                 var scalar = ApiField.Scalar(name, metadata.ScalarType, flags, description: attribute.Description);
                 scalar.FillAuthorizationProperties(property);
-                Fields[scalar.Name] = new FieldDescription(scalar, metadata, property);
-                return scalar;
+                return new FieldDescription(scalar, metadata, property, attribute is DeclareMutationAttribute);
             }
 
             var field = ApiField.Object(
@@ -564,28 +736,29 @@ namespace ClusterKit.API.Provider.Resolvers
                 RelatedTypes.Add(new RelatedType { Type = metadata.Type });
             }
 
+            if (metadata.GetFlags().HasFlag(EnFieldFlags.IsConnection))
+            {
+                var mutationResult = typeof(MutationResult<>).MakeGenericType(metadata.Type);
+                if (RelatedTypes.All(rt => rt.Type != mutationResult))
+                {
+                    RelatedTypes.Add(new RelatedType { Type = mutationResult });
+                }
+            }
+
             field.FillAuthorizationProperties(property);
-            Fields[field.Name] = new FieldDescription(field, metadata, property);
-            return field;
+            return new FieldDescription(field, metadata, property, attribute is DeclareMutationAttribute);
         }
 
         /// <summary>
         /// Generate fields from type methods
         /// </summary>
         /// <returns>The field api description</returns>
-        private static IEnumerable<ApiField> GenerateTypeMethods()
+        private static IEnumerable<FieldDescription> GenerateTypeMethods()
         {
             var type = typeof(T);
             return
                 type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Select(
-                        p =>
-                            new
-                                {
-                                    Method = p,
-                                    Attribute =
-                                    (DeclareFieldAttribute)p.GetCustomAttribute(typeof(DeclareFieldAttribute))
-                                })
+                    .Select(p => new { Method = p, Attribute = p.GetCustomAttribute<PublishToApiAttribute>() })
                     .Where(p => p.Attribute != null && !p.Method.IsGenericMethod && !p.Method.IsGenericMethodDefinition)
                     .Select(m => GenerateFieldFromMethod(m.Method, m.Attribute))
                     .Where(f => f != null);
@@ -595,19 +768,12 @@ namespace ClusterKit.API.Provider.Resolvers
         /// Generate fields from type properties
         /// </summary>
         /// <returns>The field api description</returns>
-        private static IEnumerable<ApiField> GenerateTypeProperties()
+        private static IEnumerable<FieldDescription> GenerateTypeProperties()
         {
             var type = typeof(T);
             return
                 type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Select(
-                        p =>
-                            new
-                                {
-                                    Property = p,
-                                    Attribute =
-                                    (DeclareFieldAttribute)p.GetCustomAttribute(typeof(DeclareFieldAttribute))
-                                })
+                    .Select(p => new { Property = p, Attribute = p.GetCustomAttribute<PublishToApiAttribute>() })
                     .Where(p => p.Attribute != null && p.Property.CanRead)
                     .Select(o => GenerateFieldFromProperty(o.Property, o.Attribute))
                     .Where(f => f != null);
@@ -646,9 +812,10 @@ namespace ClusterKit.API.Provider.Resolvers
                 var jsonPropertyValue = typeof(JProperty).GetProperty("Value");
                 var jsonTokenToObject = typeof(JToken).GetMethod("ToObject", new[] { typeof(JsonSerializer) });
 
-                var arguments = Expression.Convert(
-                    Expression.Property(requestParam, typeof(ApiRequest).GetProperty("Arguments")),
-                    typeof(JObject));
+                var arguments =
+                    Expression.Convert(
+                        Expression.Property(requestParam, typeof(ApiRequest).GetProperty("Arguments")),
+                        typeof(JObject));
 
                 foreach (var parameterInfo in methodInfo.GetParameters())
                 {
@@ -697,13 +864,38 @@ namespace ClusterKit.API.Provider.Resolvers
                 valueGetter = Expression.Property(sourceParam, propertyInfo);
             }
 
-            if (!fieldDescription.Metadata.IsAsync)
+            Func<Expression, Expression> converterExpression = null;
+            if (fieldDescription.Metadata.ConverterType != null)
             {
-                var taskCreator = typeof(Task).GetMethod("FromResult").MakeGenericMethod(valueType);
-                valueGetter = Expression.Call(taskCreator, valueGetter);
+                var constructor = fieldDescription.Metadata.ConverterType.GetConstructor(new Type[0]);
+                if (constructor != null)
+                {
+                    var converterInstance = Expression.New(constructor);
+                    var converterMethod = fieldDescription.Metadata.ConverterType.GetMethod(
+                        "Convert",
+                        new[] { typeof(object) });
+
+                    if (converterMethod != null)
+                    {
+                        converterExpression = param => Expression.Call(converterInstance, converterMethod, param);
+                    }
+                }
             }
 
-            valueGetter = GenerateValueGetterConvertResultToObject(valueType, valueGetter);
+            if (!fieldDescription.Metadata.IsAsync)
+            {
+                var taskCreator = typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(object));
+                if (converterExpression != null)
+                {
+                    valueGetter = converterExpression(valueGetter);
+                }
+
+                valueGetter = Expression.Call(taskCreator, Expression.Convert(valueGetter, typeof(object)));
+            }
+            else
+            {
+                valueGetter = GenerateValueGetterConvertResultToObject(valueType, valueGetter, converterExpression);
+            }
 
             var function = Expression.Lambda<PropertyValueGetter>(
                 valueGetter,
@@ -719,10 +911,19 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <summary>
         /// Creates an expression that will convert result value to object
         /// </summary>
-        /// <param name="returnType">The return object type</param>
-        /// <param name="getValue">The value getter expression</param>
-        /// <returns>The conversed type expression</returns>
-        private static Expression GenerateValueGetterConvertResultToObject(Type returnType, Expression getValue)
+        /// <param name="returnType">
+        /// The return object type
+        /// </param>
+        /// <param name="getValue">
+        /// The value getter expression
+        /// </param>
+        /// <param name="converterExpression">
+        /// Function to convert actual value with use of converter
+        /// </param>
+        /// <returns>
+        /// The conversed type expression
+        /// </returns>
+        private static Expression GenerateValueGetterConvertResultToObject(Type returnType, Expression getValue, Func<Expression, Expression> converterExpression)
         {
             var asyncType = TypeMetadata.CheckType(returnType, typeof(Task<>));
             if (asyncType != null)
@@ -745,9 +946,15 @@ namespace ClusterKit.API.Provider.Resolvers
 
             var resultParameter = Expression.Parameter(taskType, "task");
 
+            Expression result = Expression.Property(resultParameter, taskResult);
+            if (converterExpression != null)
+            {
+                result = converterExpression(result);
+            }
+
             var conversion =
                 Expression.Lambda(
-                    Expression.Convert(Expression.Property(resultParameter, taskResult), typeof(object)),
+                    Expression.Convert(result, typeof(object)),
                     resultParameter);
             getValue = Expression.Call(getValue, continueMethod, conversion);
 
@@ -780,10 +987,305 @@ namespace ClusterKit.API.Provider.Resolvers
 
                 foreach (var relatedType in RelatedTypes)
                 {
-                    relatedType.Resolver =
-                        typeof(GenericObjectResolver<>).MakeGenericType(relatedType.Type).CreateInstance<IResolver>();
+                    relatedType.Resolver = relatedType.Type.IsSubclassOf(typeof(Enum))
+                        ? typeof(EnumResolver<>).MakeGenericType(relatedType.Type).CreateInstance<IResolver>()
+                        : typeof(GenericObjectResolver<>).MakeGenericType(relatedType.Type).CreateInstance<IResolver>();
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates an api root data from current type
+        /// </summary>
+        /// <param name="types">The list of all types used in api</param>
+        /// <param name="argumentsSerializer">The configured JSON serializer to deserialize method arguments</param>
+        private void CreateAllRelatedTypeListForApiRoot(out List<ApiType> types, out JsonSerializer argumentsSerializer)
+        {
+            var directTypes = this.GetDirectRelatedObjectResolvers().ToList();
+            directTypes.Add(this);
+
+            types = new List<ApiType>();
+            var resolveQueue = new Queue<IResolver>(directTypes);
+            var resolvedTypes = new Dictionary<string, IResolver>();
+            var memberNames = new Dictionary<MemberInfo, string>();
+
+            while (resolveQueue.Count > 0)
+            {
+                var resolver = resolveQueue.Dequeue();
+                var apiType = resolver.GetElementType();
+                if (resolvedTypes.ContainsKey(apiType.TypeName))
+                {
+                    continue;
+                }
+
+                resolvedTypes[apiType.TypeName] = resolver;
+                types.Add(apiType);
+                var genericResolver = resolver as GenericObjectResolver;
+                if (genericResolver == null)
+                {
+                    continue;
+                }
+
+                foreach (var pair in genericResolver.GetFieldsNames())
+                {
+                    memberNames[pair.Key] = pair.Value;
+                }
+
+                foreach (var objectResolver in genericResolver.GetDirectRelatedObjectResolvers())
+                {
+                    resolveQueue.Enqueue(objectResolver);
+                }
+            }
+
+            var jsonContractResolver = new InputContractResolver(memberNames);
+            argumentsSerializer = new JsonSerializer { ContractResolver = jsonContractResolver };
+        }
+
+        /// <summary>
+        /// Generate mutations directly declared in the type
+        /// </summary>
+        /// <param name="path">
+        /// The fields path
+        /// </param>
+        /// <param name="getContainer">
+        /// The container resolver method
+        /// </param>
+        /// <returns>
+        /// The list of mutations
+        /// </returns>
+        private IEnumerable<MutationDescription> GenerateMutationsFromConnections(
+            List<string> path,
+            GetMutationContainerDelegate getContainer)
+        {
+            var connections =
+                Fields.Values.Where(
+                    f =>
+                        f.Field.Flags.HasFlag(EnFieldFlags.IsConnection) && f.Field.ScalarType == EnScalarType.None
+                        && f.Field.Arguments.Count == 0);
+
+            foreach (var connection in connections)
+            {
+                var attribute = connection.TypeMember.GetCustomAttribute<DeclareConnectionAttribute>();
+                if (attribute == null)
+                {
+                    continue;
+                }
+
+                var idScalarType = TypeMetadata.CheckScalarType(connection.Metadata.TypeOfId);
+                if (idScalarType == EnScalarType.None)
+                {
+                    GenerationErrors.Add(
+                        $"Defined type of id should be scalar type on connection {connection.Field.Name} of type {NamingUtilities.ToCSharpRepresentation(typeof(T))}");
+                    continue;
+                }
+
+                var mutationResultType = typeof(MutationResult<>).MakeGenericType(connection.Metadata.Type);
+
+                // todo: add to related types
+                var mutationResult =
+                    typeof(GenericObjectResolver<>).MakeGenericType(mutationResultType)
+                        .CreateInstance<GenericObjectResolver>()
+                        .GetApiType();
+
+                var requestPath =
+                    new List<string>(path) { connection.Field.Name }.Select(p => new ApiRequest { FieldName = p })
+                        .ToList();
+
+                GetMutationContainerDelegate nextResolver =
+                    (source, context, serializer, callback) =>
+                        getContainer(source, context, serializer, callback)
+                            .ContinueWith(
+                                result =>
+                                    this.GetFieldValue(source, connection.Field.Name, context, serializer, callback))
+                            .Unwrap();
+
+                if (attribute.CanCreate)
+                {
+                    var field = ApiField.Object(
+                        "create",
+                        mutationResult.TypeName,
+                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
+                        new List<ApiField>
+                            {
+                                ApiField.Object(
+                                    "newNode",
+                                    connection.Field.TypeName,
+                                    description: "The object's data")
+                            },
+                        attribute.CreateDescription);
+                    field.FillAuthorizationProperties(connection.TypeMember);
+                    yield return
+                        new MutationDescription
+                            {
+                                Field = field,
+                                Path = requestPath,
+                                Type = ApiMutation.EnType.ConnectionCreate,
+                                Resolver = connection.Resolver,
+                                ResolveContainer = nextResolver
+                            };
+                }
+
+                if (attribute.CanUpdate)
+                {
+                    var field = ApiField.Object(
+                        "update",
+                        mutationResult.TypeName,
+                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
+                        new List<ApiField>
+                            {
+                                ApiField.Scalar("id", idScalarType, description: "The object's id"),
+                                ApiField.Object(
+                                    "newNode",
+                                    connection.Field.TypeName,
+                                    description: "The object's data")
+                            },
+                        attribute.CreateDescription);
+                    field.FillAuthorizationProperties(connection.TypeMember);
+                    yield return
+                        new MutationDescription
+                            {
+                                Field = field,
+                                Path = requestPath,
+                                Type = ApiMutation.EnType.ConnectionUpdate,
+                                Resolver = connection.Resolver,
+                                ResolveContainer = nextResolver
+                            };
+                }
+
+                if (attribute.CanDelete)
+                {
+                    var field = ApiField.Object(
+                        "delete",
+                        mutationResult.TypeName,
+                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
+                        new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
+                        attribute.CreateDescription);
+                    field.FillAuthorizationProperties(connection.TypeMember);
+                    yield return
+                        new MutationDescription
+                            {
+                                Field = field,
+                                Path = requestPath,
+                                Type = ApiMutation.EnType.ConnectionDelete,
+                                Resolver = connection.Resolver,
+                                ResolveContainer = nextResolver
+                            };
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generate mutation from type fields
+        /// </summary>
+        /// <param name="path">The type field path</param>
+        /// <param name="typesUsed">Already used types to avoid circular references</param>
+        /// <param name="getContainer">The container getter</param>
+        /// <returns>The list of mutations</returns>
+        private IEnumerable<MutationDescription> GenerateMutationsFromFields(
+            List<string> path,
+            List<string> typesUsed,
+            GetMutationContainerDelegate getContainer)
+        {
+            var possibleMutationSubcontainers =
+                Fields.Values.Where(
+                    f =>
+                        !f.Field.Arguments.Any() && f.Field.ScalarType == EnScalarType.None
+                        && !f.Field.Flags.HasFlag(EnFieldFlags.IsArray)
+                        && !f.Field.Flags.HasFlag(EnFieldFlags.IsConnection));
+
+            foreach (var subContainer in possibleMutationSubcontainers)
+            {
+                if (typesUsed.Contains(subContainer.Field.TypeName))
+                {
+                    // circular type use
+                    continue;
+                }
+
+                var subTypeResolver = subContainer.Resolver as GenericObjectResolver;
+                if (subTypeResolver == null)
+                {
+                    continue;
+                }
+
+                var newPath = new List<string>(path) { subContainer.Field.Name };
+                var newTypesUsed = new List<string>(typesUsed) { subContainer.Field.TypeName };
+                GetMutationContainerDelegate nextResolver =
+                    (source, context, serializer, callback) =>
+                        getContainer(source, context, serializer, callback)
+                            .ContinueWith(
+                                result =>
+                                    this.GetFieldValue(source, subContainer.Field.Name, context, serializer, callback))
+                            .Unwrap();
+
+                foreach (var generateMutation in subTypeResolver.GenerateMutations(newPath, newTypesUsed, nextResolver))
+                {
+                    yield return generateMutation;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the untyped mutation declared in type
+        /// </summary>
+        /// <param name="path">The path to get to this type</param>
+        /// <param name="getContainer">The container getter</param>
+        /// <returns>The list of untyped mutations</returns>
+        private IEnumerable<MutationDescription> GenerateMutationsUntyped(
+            List<string> path,
+            GetMutationContainerDelegate getContainer)
+        {
+            foreach (var field in Fields.Values.Where(f => f.IsMutation))
+            {
+                yield return
+                    new MutationDescription
+                        {
+                            Field = field.Field,
+                            Path = path.Select(p => new ApiRequest { FieldName = p }).ToList(),
+                            Type = ApiMutation.EnType.Untyped,
+                            ResolveContainer = getContainer,
+                            Resolver = this
+                        };
+            }
+        }
+
+        /// <summary>
+        /// Gets a value of specified field without arguments
+        /// </summary>
+        /// <param name="source">
+        /// The source object
+        /// </param>
+        /// <param name="fieldName">
+        /// The field n
+        /// </param>
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        /// <param name="argumentsSerializer">
+        /// The arguments serializer.
+        /// </param>
+        /// <param name="onErrorCallback">
+        /// The on error callback.
+        /// </param>
+        /// <returns>The value</returns>
+        private Task<object> GetFieldValue(
+            object source,
+            string fieldName,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
+        {
+            FieldDescription field;
+            if (!Fields.TryGetValue(fieldName, out field))
+            {
+                return Task.FromResult<object>(null);
+            }
+
+            return field.GetValue(
+                (T)source,
+                new ApiRequest { FieldName = fieldName },
+                context,
+                argumentsSerializer,
+                onErrorCallback);
         }
 
         /// <summary>
@@ -803,11 +1305,15 @@ namespace ClusterKit.API.Provider.Resolvers
             /// <param name="typeMember">
             /// The type member.
             /// </param>
-            public FieldDescription(ApiField field, TypeMetadata metadata, MemberInfo typeMember)
+            /// <param name="isMutation">
+            /// A value indicating whether this field is mutation
+            /// </param>
+            public FieldDescription(ApiField field, TypeMetadata metadata, MemberInfo typeMember, bool isMutation)
             {
                 this.Field = field;
                 this.Metadata = metadata;
                 this.TypeMember = typeMember;
+                this.IsMutation = isMutation;
             }
 
             /// <summary>
@@ -819,6 +1325,11 @@ namespace ClusterKit.API.Provider.Resolvers
             /// Gets or sets a field value resolver method
             /// </summary>
             public PropertyValueGetter GetValue { get; set; }
+
+            /// <summary>
+            /// Gets a value indicating whether this field is mutation
+            /// </summary>
+            public bool IsMutation { get; }
 
             /// <summary>
             /// Gets the field metadata

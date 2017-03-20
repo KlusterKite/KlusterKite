@@ -10,7 +10,6 @@
 namespace ClusterKit.API.Provider
 {
     using System;
-    using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
@@ -22,8 +21,6 @@ namespace ClusterKit.API.Provider
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Provider.Resolvers;
     using ClusterKit.Security.Client;
-
-    using JetBrains.Annotations;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -39,14 +36,9 @@ namespace ClusterKit.API.Provider
         private readonly List<string> generationErrors = new List<string>();
 
         /// <summary>
-        /// The list of errors gathered on generation stage
-        /// </summary>
-        private readonly List<string> generationWarnings = new List<string>();
-
-        /// <summary>
         /// The current api resolver
         /// </summary>
-        private IResolver resolver;
+        private GenericObjectResolver resolver;
 
         /// <summary>
         /// Prepares serializer to deserialize arguments
@@ -56,7 +48,7 @@ namespace ClusterKit.API.Provider
         /// <summary>
         /// The list of generated mutations
         /// </summary>
-        private Dictionary<string, MutationDescription> mutations;
+        private Dictionary<string, GenericObjectResolver.MutationDescription> mutations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiProvider"/> class.
@@ -75,11 +67,6 @@ namespace ClusterKit.API.Provider
         /// Gets the list of warnings gathered on generation stage
         /// </summary>
         public IReadOnlyList<string> GenerationErrors => this.generationErrors.AsReadOnly();
-
-        /// <summary>
-        /// Gets the list of errors gathered on generation stage
-        /// </summary>
-        public IReadOnlyList<string> GenerationWarnings => this.generationWarnings.AsReadOnly();
 
         /// <summary>
         /// Resolves query
@@ -131,21 +118,14 @@ namespace ClusterKit.API.Provider
         {
             try
             {
-                MutationDescription mutation;
+                GenericObjectResolver.MutationDescription mutation;
 
                 if (!this.mutations.TryGetValue(request.FieldName, out mutation))
                 {
                     return null;
                 }
 
-                var resolveResult = mutation.Path.Count == 0 
-                    ? new ObjectResolver.ResolvePropertyResult
-                          {
-                              Resolver = this.resolver,
-                              Value = this
-                          }
-
-                    : await this.GetPropertyRecursive(mutation.Path, context, onErrorCallback); 
+                var resolveResult = await mutation.ResolveContainer(this, context, this.argumentsSerializer, onErrorCallback);
                 if (resolveResult == null)
                 {
                     return null;
@@ -154,24 +134,24 @@ namespace ClusterKit.API.Provider
                 request.FieldName = mutation.Field.Name;
                 var rootRequest = new ApiRequest { Fields = new List<ApiRequest> { request } };
 
-                var objectResolver = resolveResult.Resolver as ObjectResolver;
+                var objectResolver = mutation.Resolver as GenericObjectResolver;
                 if (objectResolver != null)
                 {
                     var result = await objectResolver.ResolveQuery(
-                               resolveResult.Value,
+                               resolveResult,
                                rootRequest,
                                context,
                                this.argumentsSerializer,
-                               onErrorCallback);
+                               onErrorCallback) as JObject;
 
                     return new JObject { { "result", result?.Property(request.FieldName)?.Value } };
                 }
 
-                var connectionResolver = resolveResult.Resolver as IConnectionResolver;
+                var connectionResolver = mutation.Resolver as IConnectionResolver;
                 if (connectionResolver != null)
                 {
                     var resolvedMutation = await connectionResolver.ResolveMutation(
-                                              resolveResult.Value,
+                                              resolveResult,
                                               request,
                                               context,
                                               this.argumentsSerializer,
@@ -219,15 +199,28 @@ namespace ClusterKit.API.Provider
         {
             try
             {
-                var resolveResult = await this.GetPropertyRecursive(path, context, onErrorCallback);
-                var connectionResolver = resolveResult?.Resolver as IConnectionResolver;
+                var resolveResult = await this.resolver.GetNestedFieldValue(
+                                        this,
+                                        new Queue<string>(path.Select(p => p.FieldName)),
+                                        context,
+                                        this.argumentsSerializer,
+                                        onErrorCallback);
+
+                var connectionResolver = resolveResult?.Item2 as IConnectionResolver;
                 if (connectionResolver == null)
                 {
                     return null;
                 }
 
-                var node = await connectionResolver.GetNodeById(resolveResult.Value, id);
-                return (JObject)await connectionResolver.NodeResolver.ResolveQuery(node, nodeRequest, context, this.argumentsSerializer, onErrorCallback);
+                var node = await connectionResolver.GetNodeById(resolveResult.Item1, id);
+                return
+                    (JObject)
+                    await connectionResolver.NodeResolver.ResolveQuery(
+                        node,
+                        nodeRequest,
+                        context,
+                        this.argumentsSerializer,
+                        onErrorCallback);
             }
             catch (Exception e)
             {
@@ -331,785 +324,11 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.Fields = new List<ApiField>(root.Fields.Select(f => f.Clone()));
 
             List<ApiType> allTypes;
-            List<ApiMutation> mutationList;
+            List<GenericObjectResolver.MutationDescription> mutationList;
             rootResolver.CreateApiRoot(out allTypes, out this.argumentsSerializer, out mutationList);
-            this.ApiDescription.Mutations = mutationList;
-
-            /*
+            this.mutations = mutationList.ToDictionary(m => m.MutationName);
+            this.ApiDescription.Types = allTypes;
             this.ApiDescription.Mutations = this.mutations.Values.Select(d => d.CreateMutationField()).ToList();
-            this.ApiDescription.Types =
-                assembleData.DiscoveredApiTypes.Values.ToList();
-            this.argumentsSerializer = new JsonSerializer
-                                           {
-                                               ContractResolver =
-                                                   new InputContractResolver(assembleData.FieldNames)
-                                           };
-            */
-
-            /*
-            var assembleData = new AssembleTempData();
-            var root = (ApiObjectType)this.GenerateTypeDescription(
-                new TypeMetadata
-                    {
-                        Type = this.GetType(),
-                        MetaType = TypeMetadata.EnMetaType.Object,
-                        ScalarType = EnScalarType.None
-                    }, 
-                assembleData);
-
-            this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
-            this.ApiDescription.Description = root.Description;
-
-            this.mutations = this.GenerateMutations(root, new List<string>(), new List<string>(), assembleData)
-                .ToDictionary(m => m.MutationName);
-
-            this.ApiDescription.Mutations = this.mutations.Values.Select(d => d.CreateMutationField()).ToList();
-            this.ApiDescription.Types =
-                assembleData.DiscoveredApiTypes.Values.ToList();
-            this.ApiDescription.Fields = root.Fields;
-
-            this.argumentsSerializer = new JsonSerializer
-                                           {
-                                               ContractResolver =
-                                                   new InputContractResolver(assembleData.FieldNames)
-                                           };
-
-            this.CompileResolvers(root, assembleData);
-            */
-        }
-
-        /// <summary>
-        /// Perform resolvers compilation
-        /// </summary>
-        /// <param name="root">
-        /// The root api description.
-        /// </param>
-        /// <param name="data">
-        /// The temporary data used during assemble process
-        /// </param>
-        private void CompileResolvers(ApiObjectType root, AssembleTempData data)
-        {
-            var code = data.ResolverGenerators.Select(g => g.Generate()).ToList();
-            var comDomProvider = CodeDomProvider.CreateProvider("C#");
-#if DEBUG
-            var compilerParameters = new CompilerParameters { GenerateInMemory = false, IncludeDebugInformation = true };
-#else
-            var compilerParameters = new CompilerParameters { GenerateInMemory = true, IncludeDebugInformation = false };
-#endif
-
-            compilerParameters.ReferencedAssemblies.AddRange(
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(a => !a.IsDynamic)
-                    .Select(a => a.CodeBase.Replace("file:\\", string.Empty).Replace(
-                        Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX ? "file://" : "file:///", string.Empty))
-                    .ToArray());
-
-            var compiledResult = comDomProvider.CompileAssemblyFromSource(compilerParameters, code.ToArray());
-            foreach (CompilerError error in compiledResult.Errors)
-            {
-                if (error.IsWarning)
-                {
-                    this.generationWarnings.Add(error.ToString());
-                }
-                else
-                {
-                    this.generationErrors.Add(error.ToString());
-                }
-            }
-
-            if (!compiledResult.Errors.HasErrors)
-            {
-                this.resolver = (ObjectResolver)compiledResult.CompiledAssembly.CreateInstance(
-                            data.ObjectResolverNames[root.TypeName]);
-            }
-        }
-
-        /// <summary>
-        /// Generates api field from type method
-        /// </summary>
-        /// <param name="method">
-        /// The method to process
-        /// </param>
-        /// <param name="apiType">The api type description</param>
-        /// <param name="attribute">
-        /// The method description attribute
-        /// </param>
-        /// <param name="data">
-        /// The temporary data used during assemble process
-        /// </param>
-        /// <returns>
-        /// The field description
-        /// </returns>
-        private ApiField GenerateFieldFromMethod(
-            MethodInfo method,
-            ApiObjectType apiType,
-            PublishToApiAttribute attribute,
-            AssembleTempData data)
-        {
-            var type = method.ReflectedType;
-            TypeMetadata metadata;
-            try
-            {
-                metadata = GenerateTypeMetadata(method.ReturnType, attribute);
-            }
-            catch (Exception exception)
-            {
-                this.generationErrors.Add(
-                    $"Error while parsing return type of method {method.Name} of type {type?.FullName}: {exception.Message}");
-                return null;
-            }
-
-            var name = attribute.Name ?? ApiDescriptionAttribute.ToCamelCase(method.Name);
-            data.FieldNames[method] = name;
-            data.Members[apiType.TypeName][name] = method;
-
-            ApiField field;
-            if (metadata.ScalarType != EnScalarType.None)
-            {
-                field = ApiField.Scalar(
-                    name,
-                    metadata.ScalarType,
-                    metadata.GetFlags(),
-                    description: attribute.Description);
-            }
-            else
-            {
-                var returnApiType = this.GenerateTypeDescription(metadata, data);
-                field = ApiField.Object(
-                    name,
-                    returnApiType.TypeName,
-                    metadata.GetFlags(),
-                    description: attribute.Description);
-            }
-
-            foreach (var parameterInfo in method.GetParameters())
-            {
-                if (parameterInfo.ParameterType == typeof(RequestContext))
-                {
-                    continue;
-                }
-
-                if (parameterInfo.ParameterType == typeof(ApiRequest))
-                {
-                    continue;
-                }
-
-                var parameterMetadata = GenerateTypeMetadata(
-                    parameterInfo.ParameterType,
-                    new DeclareFieldAttribute());
-                var description =
-                    parameterInfo.GetCustomAttribute(typeof(ApiDescriptionAttribute)) as ApiDescriptionAttribute;
-
-                var parameterName = description?.Name ?? ApiDescriptionAttribute.ToCamelCase(parameterInfo.Name);
-                if (parameterMetadata.ScalarType != EnScalarType.None)
-                {
-                    field.Arguments.Add(
-                        ApiField.Scalar(
-                            parameterName,
-                            parameterMetadata.ScalarType,
-                            parameterMetadata.GetFlags(),
-                            description: description?.Description));
-                }
-                else
-                {
-                    var parameterApiType = this.GenerateTypeDescription(parameterMetadata, data);
-                    field.Arguments.Add(
-                        ApiField.Object(
-                            parameterName,
-                            parameterApiType.TypeName,
-                            parameterMetadata.GetFlags(),
-                            description: description?.Description));
-                }
-            }
-
-            field.FillAuthorizationProperties(method);
-            return field;
-        }
-
-        /// <summary>
-        /// Generates api field from type method
-        /// </summary>
-        /// <param name="apiType">The type api description</param>
-        /// <param name="property">
-        /// The property to process
-        /// </param>
-        /// <param name="attribute">
-        /// The method description attribute
-        /// </param>
-        /// <param name="data">
-        /// The temporary data used during assemble process
-        /// </param>
-        /// <returns>
-        /// The field description
-        /// </returns>
-        private ApiField GenerateFieldFromProperty(
-            ApiObjectType apiType,
-            PropertyInfo property,
-            PublishToApiAttribute attribute,
-            AssembleTempData data)
-        {
-            var declaringType = property.ReflectedType;
-
-            TypeMetadata metadata;
-            try
-            {
-                metadata = GenerateTypeMetadata(property.PropertyType, attribute);
-            }
-            catch (Exception exception)
-            {
-                this.generationErrors.Add(
-                    $"Error while parsing return type of property {property.Name} of type {declaringType?.FullName}: {exception.Message}");
-                return null;
-            }
-
-            var name = attribute.Name ?? ApiDescriptionAttribute.ToCamelCase(property.Name);
-            data.FieldNames[property] = name;
-            data.Members[apiType.TypeName][name] = property;
-
-            var flags = metadata.GetFlags();
-
-            if ((metadata.Type.IsSubclassOf(typeof(Enum)) || metadata.ScalarType != EnScalarType.None)
-                && !metadata.IsAsync && !metadata.IsForwarding
-                && (metadata.MetaType == TypeMetadata.EnMetaType.Object
-                    || metadata.MetaType == TypeMetadata.EnMetaType.Scalar))
-            {
-                flags |= EnFieldFlags.IsFilterable | EnFieldFlags.IsSortable;
-            }
-
-            if (!metadata.IsAsync 
-                && !metadata.IsForwarding 
-                && metadata.ConverterType == null 
-                && property.CanWrite
-                && metadata.MetaType != TypeMetadata.EnMetaType.Connection
-                && (!(attribute is DeclareFieldAttribute) || ((DeclareFieldAttribute)attribute).Access.HasFlag(EnAccessFlag.Writable)))
-            {
-                flags |= EnFieldFlags.CanBeUsedInInput;
-            }
-
-            if (attribute is DeclareFieldAttribute
-                && !((DeclareFieldAttribute)attribute).Access.HasFlag(EnAccessFlag.Queryable))
-            {
-                flags &= ~EnFieldFlags.Queryable;
-            }
-
-            if (metadata.ScalarType != EnScalarType.None)
-            {
-                if ((attribute as DeclareFieldAttribute)?.IsKey == true)
-                {
-                    flags |= EnFieldFlags.IsKey;
-                }
-
-                var scalar = ApiField.Scalar(name, metadata.ScalarType, flags, description: attribute.Description);
-                scalar.FillAuthorizationProperties(property);
-                return scalar;
-            }
-
-            var returnApiType = this.GenerateTypeDescription(metadata, data);
-
-            var field = ApiField.Object(
-                name,
-                returnApiType.TypeName,
-                flags,
-                description: attribute.Description);
-
-            field.FillAuthorizationProperties(property);
-
-            return field;
-        }
-
-        /// <summary>
-        /// Generates mutations
-        /// </summary>
-        /// <param name="apiType">
-        /// The current api type
-        /// </param>
-        /// <param name="path">
-        /// The path to current field
-        /// </param>
-        /// <param name="typesUsed">
-        /// The types already used to avoid circular references
-        /// </param>
-        /// <param name="data">
-        /// The temporary data used during assemble process
-        /// </param>
-        /// <returns>
-        /// The list of mutations
-        /// </returns>
-        private IEnumerable<MutationDescription> GenerateMutations(
-            ApiObjectType apiType,
-            List<string> path,
-            List<string> typesUsed,
-            AssembleTempData data)
-        {
-            Type type;
-            if (!data.DiscoveredTypes.TryGetValue(apiType.TypeName, out type))
-            {
-                yield break;
-            }
-
-            foreach (var mutation in this.GenerateMutationsDirect(apiType, type, path, data))
-            {
-                yield return mutation;
-            }
-
-            foreach (var mutation in this.GenerateMutationsFromFields(apiType, path, typesUsed, data))
-            {
-                yield return mutation;
-            }
-
-            foreach (var apiField in this.GenerateMutationsFromConnections(type, apiType, path, data))
-            {
-                yield return apiField;
-            }
-        }
-
-        /// <summary>
-        /// Generate mutations directly declared in the type
-        /// </summary>
-        /// <param name="apiType">The api type description</param>
-        /// <param name="type">The type</param>
-        /// <param name="path">The fields path</param>
-        /// <param name="data">
-        /// The temporary data used during assemble process
-        /// </param>
-        /// <returns>The list of mutations</returns>
-        private IEnumerable<MutationDescription> GenerateMutationsDirect(
-            ApiObjectType apiType,
-            Type type,
-            List<string> path,
-            AssembleTempData data)
-        {
-            if (apiType.DirectMutations != null)
-            {
-                foreach (var field in apiType.DirectMutations)
-                {
-                    yield return
-                        new MutationDescription
-                            {
-                                Field = field,
-                                Path = path.Select(p => new ApiRequest { FieldName = p }).ToList(),
-                                Type = ApiMutation.EnType.Untyped
-                            };
-                }
-
-                yield break;
-            }
-
-            apiType.DirectMutations = new List<ApiField>();
-            var fields =
-                type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Select(
-                        p =>
-                            new
-                                {
-                                    Method = p,
-                                    Attribute =
-                                    (DeclareMutationAttribute)p.GetCustomAttribute(typeof(DeclareMutationAttribute))
-                                })
-                    .Where(p => p.Attribute != null && !p.Method.IsGenericMethod && !p.Method.IsGenericMethodDefinition)
-                    .Select(
-                        m =>
-                            new
-                                {
-                                    ApiField = this.GenerateFieldFromMethod(m.Method, apiType, m.Attribute, data),
-                                    m.Method,
-                                    MetaData = GenerateTypeMetadata(m.Method.ReturnType, m.Attribute)
-                                })
-                    .Where(f => f.ApiField != null);
-
-            foreach (var description in fields)
-            {
-                description.ApiField.FillAuthorizationProperties(description.Method);
-                apiType.DirectMutations.Add(description.ApiField);
-                yield return
-                    new MutationDescription
-                    {
-                        Field = description.ApiField,
-                        Path = path.Select(p => new ApiRequest { FieldName = p }).ToList(),
-                        Type = ApiMutation.EnType.Untyped
-                    };
-            }
-        }
-
-        /// <summary>
-        /// Generate mutations directly declared in the type
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <param name="apiType">The api description of the type</param>
-        /// <param name="path">The fields path</param>
-        /// <param name="data">
-        /// The temporary data used during assemble process
-        /// </param>
-        /// <returns>The list of mutations</returns>
-        private IEnumerable<MutationDescription> GenerateMutationsFromConnections(
-            Type type,
-            ApiObjectType apiType,
-            List<string> path,
-            AssembleTempData data)
-        {
-            var members = type.GetMembers().Where(m => m is PropertyInfo || m is MethodInfo).Select(
-                m =>
-                    {
-                        var description =
-                            (DeclareConnectionAttribute)m.GetCustomAttribute(typeof(DeclareConnectionAttribute));
-                        var name = description?.Name ?? ApiDescriptionAttribute.ToCamelCase(m.Name);
-                        return
-                            new
-                                {
-                                    Name = name,
-                                    Member = m,
-                                    Description = description,
-                                    Type = (m as PropertyInfo)?.PropertyType ?? (m as MethodInfo)?.ReturnType
-                                };
-                    }).Where(m => m.Description != null).ToList();
-
-            var connections =
-                apiType.Fields.Where(
-                    f =>
-                        !f.Arguments.Any() && f.ScalarType == EnScalarType.None
-                        && f.Flags.HasFlag(EnFieldFlags.IsConnection));
-
-            foreach (var connection in connections)
-            {
-                var description = members.FirstOrDefault(m => m.Name == connection.Name);
-                if (description == null)
-                {
-                    continue;
-                }
-
-                var attribute = description.Description;
-                var connectionType = attribute.ReturnType ?? description.Type;
-                if (connectionType == null)
-                {
-                    this.generationErrors.Add(
-                        $"Type discover error on connection {connection.Name} of type {type.FullName}");
-                    continue;
-                }
-
-                var checkType = TypeMetadata.CheckType(connectionType, typeof(INodeConnection<,>));
-                var idType = checkType?.GenericTypeArguments[1];
-                var connectedObjectType = checkType?.GenericTypeArguments[0];
-                if (idType == null || connectedObjectType == null)
-                {
-                    this.generationErrors.Add($"Wrong type on connection {connection.Name} of type {type.FullName}");
-                    continue;
-                }
-
-                var idScalarType = TypeMetadata.CheckScalarType(idType);
-                if (idScalarType == EnScalarType.None)
-                {
-                    this.generationErrors.Add(
-                        $"Defined type of id should be scalar type on connection {connection.Name} of type {type.FullName}");
-                    continue;
-                }
-
-                ApiType connectionApiType;
-                if (!data.DiscoveredApiTypes.TryGetValue(connection.TypeName, out connectionApiType))
-                {
-                    this.generationErrors.Add(
-                        $"Defined type of connection {connection.Name} of type {type.FullName} was not processed on previous steps");
-                    continue;
-                }
-
-                var mutationResultType = typeof(MutationResult<>).MakeGenericType(connectedObjectType);
-                var mutationResultMetadata = GenerateTypeMetadata(mutationResultType, new DeclareFieldAttribute { Description = "The mutation result" });
-                var mutationResult = this.GenerateTypeDescription(mutationResultMetadata, data);
-                var requestPath = new List<string>(path) { connection.Name }.Select(p => new ApiRequest { FieldName = p }).ToList();
-
-                if (attribute.CanCreate)
-                {
-                    var field = ApiField.Object(
-                        "create",
-                        mutationResult.TypeName,
-                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
-                        new List<ApiField>
-                            {
-                                ApiField.Object(
-                                    "newNode",
-                                    connection.TypeName,
-                                    description: "The object's data")
-                            },
-                        description: attribute.CreateDescription);
-                    field.FillAuthorizationProperties(description.Member);
-                    yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionCreate };
-                }
-
-                if (attribute.CanUpdate)
-                {
-                    var field = ApiField.Object(
-                        "update",
-                        mutationResult.TypeName,
-                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
-                        new List<ApiField>
-                            {
-                                ApiField.Scalar("id", idScalarType, description: "The object's id"),
-                                ApiField.Object(
-                                    "newNode",
-                                    connection.TypeName,
-                                    description: "The object's data")
-                            },
-                        description: attribute.CreateDescription);
-                    field.FillAuthorizationProperties(description.Member);
-                    yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionUpdate };
-                }
-
-                if (attribute.CanDelete)
-                {
-                    var field = ApiField.Object(
-                        "delete",
-                        mutationResult.TypeName,
-                        EnFieldFlags.Queryable | EnFieldFlags.IsConnection,
-                        new List<ApiField> { ApiField.Scalar("id", idScalarType, description: "The object's id") },
-                        description: attribute.CreateDescription);
-                    field.FillAuthorizationProperties(description.Member);
-                    yield return new MutationDescription { Field = field, Path = requestPath, Type = ApiMutation.EnType.ConnectionDelete };
-                }
-            }
-        }
-
-        /// <summary>
-        /// Generate mutation from type fields
-        /// </summary>
-        /// <param name="apiType">The api description of the type</param>
-        /// <param name="path">The type field path</param>
-        /// <param name="typesUsed">Already used types to avoid circular references</param>
-        /// <param name="data">
-        /// The temporary data used during assemble process
-        /// </param>
-        /// <returns>The list of mutations</returns>
-        private IEnumerable<MutationDescription> GenerateMutationsFromFields(
-            ApiObjectType apiType,
-            List<string> path,
-            List<string> typesUsed,
-            AssembleTempData data)
-        {
-            var possibleMutationSubcontainers =
-                apiType.Fields.Where(
-                    f =>
-                        !f.Arguments.Any() && f.ScalarType == EnScalarType.None
-                        && !f.Flags.HasFlag(EnFieldFlags.IsArray) && !f.Flags.HasFlag(EnFieldFlags.IsConnection));
-
-            foreach (var subContainer in possibleMutationSubcontainers)
-            {
-                if (typesUsed.Contains(subContainer.TypeName))
-                {
-                    // circular type use
-                    continue;
-                }
-
-                ApiType subType;
-                if (!data.DiscoveredApiTypes.TryGetValue(subContainer.TypeName, out subType))
-                {
-                    this.generationErrors.Add($"Could not find declared api type {subContainer.TypeName}");
-                    continue;
-                }
-
-                var subObjectType = subType as ApiObjectType;
-
-                if (subObjectType == null)
-                {
-                    continue;
-                }
-
-                var newPath = new List<string>(path) { subContainer.Name };
-                var newTypesUsed = new List<string>(typesUsed) { apiType.TypeName };
-
-                foreach (var generateMutation in this.GenerateMutations(subObjectType, newPath, newTypesUsed, data))
-                {
-                    yield return generateMutation;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Generates type description
-        /// </summary>
-        /// <param name="typeMetaData">
-        /// The type to describe
-        /// </param>
-        /// <param name="data">
-        /// The temporary data used during assemble process.
-        /// </param>
-        /// <returns>
-        /// The api type description
-        /// </returns>
-        private ApiType GenerateTypeDescription([NotNull] TypeMetadata typeMetaData, [NotNull] AssembleTempData data)
-        {
-            var type = typeMetaData.Type;
-            var descriptionAttribute = (ApiDescriptionAttribute)type.GetCustomAttribute(typeof(ApiDescriptionAttribute));
-            var typeName = descriptionAttribute?.Name ?? NamingUtilities.ToCSharpRepresentation(type);
-
-            if (typeMetaData.MetaType == TypeMetadata.EnMetaType.Connection)
-            {
-                if (!data.ConnectionResolverNames.ContainsKey(typeMetaData.TypeName))
-                {
-                    var connectionResolverGenerator = new ConnectionResolverGenerator(typeMetaData, data);
-                    data.ConnectionResolverNames[typeMetaData.TypeName] = connectionResolverGenerator.FullClassName;
-                    data.ResolverGenerators.Add(connectionResolverGenerator);
-                }
-            }
-
-            ApiType apiType;
-            if (data.ApiTypeByOriginalTypeNames.TryGetValue(type.FullName, out apiType))
-            {
-                return apiType;
-            }
-
-            if (type.IsSubclassOf(typeof(Enum)))
-            {
-                var apiEnumType =
-                    new ApiEnumType(
-                        typeName,
-                        Enum.GetNames(type)) { Description = descriptionAttribute?.Description };
-                data.DiscoveredTypes[apiEnumType.TypeName] = type;
-                data.DiscoveredApiTypes[apiEnumType.TypeName] = apiEnumType;
-                data.ApiTypeByOriginalTypeNames[type.FullName] = apiEnumType;
-                return apiEnumType;
-            }
-
-            var apiObjectType = new ApiObjectType(typeName)
-                          {
-                              Description =
-                                  descriptionAttribute?.Description
-                          };
-
-            data.DiscoveredTypes[apiObjectType.TypeName] = type;
-            data.DiscoveredApiTypes[apiObjectType.TypeName] = apiObjectType;
-            data.ApiTypeByOriginalTypeNames[type.FullName] = apiObjectType;
-            data.Members[apiObjectType.TypeName] = new Dictionary<string, MemberInfo>();
-
-            var resolverGenerator = new ObjectResolverGenerator(type, data);
-            data.ObjectResolverNames[apiObjectType.TypeName] = resolverGenerator.FullClassName;
-            data.ResolverGenerators.Add(resolverGenerator);
-
-            apiObjectType.Fields.AddRange(this.GenerateTypeProperties(type, apiObjectType, data));
-            apiObjectType.Fields.AddRange(this.GenerateTypeMethods(type, apiObjectType, data));
-            return apiObjectType;
-        }
-
-        /// <summary>
-        /// Generate fields from type methods
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <param name="apiType">The type api description</param>
-        /// <param name="data">The temporary data used during assemble process</param>
-        /// <returns>The field api description</returns>
-        private IEnumerable<ApiField> GenerateTypeMethods(Type type, ApiObjectType apiType, [NotNull] AssembleTempData data)
-        {
-            return
-                type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Select(
-                        p =>
-                            new
-                                {
-                                    Method = p,
-                                    Attribute =
-                                    (DeclareFieldAttribute)p.GetCustomAttribute(typeof(DeclareFieldAttribute))
-                                })
-                    .Where(p => p.Attribute != null && !p.Method.IsGenericMethod && !p.Method.IsGenericMethodDefinition)
-                    .Select(m => this.GenerateFieldFromMethod(m.Method, apiType, m.Attribute, data))
-                    .Where(f => f != null);
-        }
-
-        /// <summary>
-        /// Generate fields from type properties
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <param name="apiType">The type api description</param>
-        /// <param name="data">The temporary data used during assemble process</param>
-        /// <returns>The field api description</returns>
-        private IEnumerable<ApiField> GenerateTypeProperties(
-            Type type,
-            ApiObjectType apiType,
-            [NotNull] AssembleTempData data)
-        {
-            return
-                type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Select(
-                        p =>
-                            new
-                                {
-                                    Property = p,
-                                    Attribute =
-                                    (DeclareFieldAttribute)p.GetCustomAttribute(typeof(DeclareFieldAttribute))
-                                })
-                    .Where(p => p.Attribute != null && p.Property.CanRead)
-                    .Select(o => this.GenerateFieldFromProperty(apiType, o.Property, o.Attribute, data))
-                    .Where(f => f != null);
-        }
-
-        /// <summary>
-        /// Resolves api property by it's request path (suitable for parameterless fields)
-        /// </summary>
-        /// <param name="path">The request path</param>
-        /// <param name="context">The request context</param>
-        /// <param name="onErrorCallback">
-        /// The method that will be called in case of errors
-        /// </param>
-        /// <returns>The data / resolver pair of requested property or null</returns>
-        private async Task<ObjectResolver.ResolvePropertyResult> GetPropertyRecursive(List<ApiRequest> path, RequestContext context, Action<Exception> onErrorCallback)
-        {
-            if (path.Count == 0)
-            {
-                return null;
-            }
-
-            var result = new ObjectResolver.ResolvePropertyResult { Resolver = this.resolver, Value = this };
-            var queue = new Queue<ApiRequest>(path);
-            while (queue.Count > 0)
-            {
-                var objectResolver = result.Resolver as ObjectResolver;
-                if (objectResolver == null)
-                {
-                    return null;
-                }
-
-                var field = queue.Dequeue();
-                result = await objectResolver.ResolvePropertyValue(result.Value, field, context, this.argumentsSerializer, onErrorCallback);
-                if (result == null)
-                {
-                    return null;
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// The internal description of published mutation
-        /// </summary>
-        private class MutationDescription
-        {
-            /// <summary>
-            /// Gets or sets the mutation field
-            /// </summary>
-            public ApiField Field { get; set; }
-
-            /// <summary>
-            /// Gets or sets the path to mutation container
-            /// </summary>
-            public List<ApiRequest> Path { get; set; }
-
-            /// <summary>
-            /// Gets the mutation virtual field name
-            /// </summary>
-            public string MutationName => string.Join(".", new List<string>(this.Path.Select(p => p?.FieldName)) { this.Field.Name });
-
-            /// <summary>
-            /// Gets or sets the mutation type
-            /// </summary>
-            public ApiMutation.EnType Type { get; set; }
-
-            /// <summary>
-            /// Creates virtual mutation field to describe mutation
-            /// </summary>
-            /// <returns>The mutation field</returns>
-            public ApiMutation CreateMutationField()
-            {
-                var field = ApiMutation.CreateFromField(this.Field, this.Type);
-                field.Name = this.MutationName;
-                return field;
-            }
         }
     }
 }

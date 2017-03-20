@@ -418,7 +418,6 @@ namespace ClusterKit.API.Tests
         {
             var provider = this.GetProvider();
             Assert.Equal(0, provider.GenerationErrors.Count);
-            Assert.Equal(0, provider.GenerationWarnings.Count);
 
             var context = new RequestContext();
             var query = new List<ApiRequest> { new ApiRequest { FieldName = "asyncScalarField" } };
@@ -781,7 +780,6 @@ namespace ClusterKit.API.Tests
             }
 
             Assert.Equal(0, provider.GenerationErrors.Count);
-            Assert.Equal(0, provider.GenerationWarnings.Count);
             return provider;
         }
 

@@ -180,6 +180,7 @@
     <Compile Include="ResolverGenerator.cs" />
     <Compile Include="Resolvers\CollectionResolver.cs" />
     <Compile Include="Resolvers\ConnectionResolver.cs" />
+    <Compile Include="Resolvers\EnumResolver.cs" />
     <Compile Include="Resolvers\ForwarderResolver.cs" />
     <Compile Include="Resolvers\GenericConnectionResolver.cs" />
     <Compile Include="Resolvers\GenericObjectResolver.cs" />

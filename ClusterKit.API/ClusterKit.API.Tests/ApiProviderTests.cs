@@ -60,10 +60,8 @@ namespace ClusterKit.API.Tests
             var provider = new TestApi();
 
             provider.GenerationErrors.ForEach(e => this.output.WriteLine($"Generation error: {e}"));
-            provider.GenerationWarnings.ForEach(w => this.output.WriteLine($"Generation warning: {w}"));
 
             Assert.Equal(0, provider.GenerationErrors.Count);
-            Assert.Equal(0, provider.GenerationWarnings.Count);
 
             var description = provider.ApiDescription;
             Assert.NotNull(description);

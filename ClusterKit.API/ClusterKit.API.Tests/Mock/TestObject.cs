@@ -13,6 +13,8 @@ namespace ClusterKit.API.Tests.Mock
 
     using ClusterKit.API.Client.Attributes;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Test object
     /// </summary>
@@ -40,11 +42,13 @@ namespace ClusterKit.API.Tests.Mock
         /// Gets or sets the name of the object
         /// </summary>
         [DeclareField]
+        [UsedImplicitly]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the object uid
         /// </summary>
+        [UsedImplicitly]
         [DeclareField(IsKey = true)]
         public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -52,12 +56,14 @@ namespace ClusterKit.API.Tests.Mock
         /// Gets or sets some value
         /// </summary>
         [DeclareField]
+        [UsedImplicitly]
         public decimal Value { get; set; }
 
         /// <summary>
         /// Gets or sets some value
         /// </summary>
         [DeclareField]
+        [UsedImplicitly]
         public EnObjectType Type { get; set; } = EnObjectType.Good;
     }
 }

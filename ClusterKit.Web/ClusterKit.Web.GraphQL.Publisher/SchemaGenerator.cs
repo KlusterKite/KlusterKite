@@ -726,7 +726,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     {
                         field.AddProvider(
                             complexFieldProvider,
-                            complexField.OriginalFields[provider.Description.ApiName]);
+                            complexField.OriginalFields[complexFieldProvider.Description.ApiName]);
                     }
                 }
 

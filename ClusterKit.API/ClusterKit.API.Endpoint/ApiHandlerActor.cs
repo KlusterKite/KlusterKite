@@ -50,14 +50,6 @@ namespace ClusterKit.API.Endpoint
                     apiProvider.GetType().Name,
                     generationError);
             }
-
-            foreach (var generationWarning in apiProvider.GenerationWarnings)
-            {
-                Context.GetLogger().Warning(
-                    "{Type}  generationError warning: {GenerationError}",
-                    apiProvider.GetType().Name,
-                    generationWarning);
-            }
         }
 
         /// <summary>

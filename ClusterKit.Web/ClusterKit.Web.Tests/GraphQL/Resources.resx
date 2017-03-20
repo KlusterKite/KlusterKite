@@ -1146,6 +1146,18 @@
               "deprecationReason": null
             },
             {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "node",
               "description": "The node global searcher according to Relay specification",
               "args": [
@@ -1179,6 +1191,18 @@
           "name": "TestApi_TestApi",
           "description": "The test api",
           "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "__node",
               "description": "The node global searcher according to Relay specification",

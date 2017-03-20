@@ -55,13 +55,7 @@ namespace ClusterKit.NodeManager.Tests
                 this.output.WriteLine($"Error: {error}");
             }
 
-            foreach (var warning in api.GenerationWarnings)
-            {
-                this.output.WriteLine($"Warning: {warning}");
-            }
-
             Assert.Equal(0, api.GenerationErrors.Count);
-            Assert.Equal(0, api.GenerationWarnings.Count);
 
             var webApiProvider = new DirectProvider(api, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { webApiProvider });

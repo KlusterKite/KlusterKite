@@ -116,7 +116,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -236,7 +236,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -329,7 +329,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -379,7 +379,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -492,7 +492,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -656,7 +656,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -739,7 +739,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
             var result = await new DocumentExecuter().ExecuteAsync(
@@ -887,7 +887,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.NotNull(schema.Query);
-            Assert.Equal(2, schema.Query.Fields.Count());
+            Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
         }
 
