@@ -135,14 +135,12 @@ namespace ClusterKit.Web.Tests.Auth
                 Guid.NewGuid().ToString("N"),
                 "Bearer");
 
-
             var request = new RestRequest { Method = Method.GET, Resource = "test" };
             request.AddHeader("Accept", "application/json, text/json");
             var result = await client.ExecuteTaskAsync(request);
 
             Assert.Equal(HttpStatusCode.Unauthorized, result.StatusCode);
         }
-
 
         /// <summary>
         /// In case of invalid token, controller should return 401
@@ -154,7 +152,6 @@ namespace ClusterKit.Web.Tests.Auth
             this.ExpectNoMsg();
             var client = new RestClient($"http://localhost:{this.OwinPort}/public") { Timeout = 5000 };
            
-
             var request = new RestRequest { Method = Method.GET, Resource = "test" };
             request.AddHeader("Accept", "application/json, text/json");
             var result = await client.ExecuteTaskAsync(request);

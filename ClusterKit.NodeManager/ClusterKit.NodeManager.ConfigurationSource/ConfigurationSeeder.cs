@@ -156,7 +156,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                             {
                                                 Privileges.GetActiveNodeDescriptions,
                                                 Privileges.GetTemplateStatistics,
-                                                $"{Privileges.NodeTemplate}.GetList"
+                                                $"{Privileges.NodeTemplate}.GetList",
+                                                $"{Privileges.NodeTemplate}.Query"
                                             }
                                 };
             context.Roles.Add(adminRole);
