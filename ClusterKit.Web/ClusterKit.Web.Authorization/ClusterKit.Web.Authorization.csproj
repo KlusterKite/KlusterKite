@@ -231,6 +231,7 @@
     <Compile Include="Attributes\RequireUserPrivilegeAttribute.cs" />
     <Compile Include="AuthorizedController.cs" />
     <Compile Include="Authorizer.cs" />
+    <Compile Include="CheckTokenMiddleware.cs" />
     <Compile Include="Configuration.Designer.cs">
       <DependentUpon>Configuration.resx</DependentUpon>
       <AutoGen>True</AutoGen>
