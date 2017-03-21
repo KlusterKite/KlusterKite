@@ -30,10 +30,13 @@ class ReloadPackages extends React.Component {
         new ReloadPackagesMutation({}),
         {
           onSuccess: (response) => {
-            const result = response.clusterKitNodeApi_nodeManagerData_reloadPackages.result.result;
+            const result = response.clusterKitNodeApi_nodeManagerData_reloadPackages.result && response.clusterKitNodeApi_nodeManagerData_reloadPackages.result.result;
             if (result) {
               this.showReloadingMessage();
               this.hideReloadingMessageAfterDelay();
+            } else {
+              this.showErrorMessage();
+              this.hideErrorMessageAfterDelay();
             }
           },
           onFailure: (transaction) => console.log(transaction),
@@ -52,10 +55,26 @@ class ReloadPackages extends React.Component {
   };
 
   /**
+   * Shows reloading packages message
+   */
+  showErrorMessage = () => {
+    this.setState({
+      isError: true
+    });
+  };
+
+  /**
    * Hides reloading packages message after delay
    */
   hideReloadingMessageAfterDelay = () => {
-    delay(() => this.hideReloadingMessage(), 2000);
+    delay(() => this.hideReloadingMessage(), 5000);
+  };
+
+  /**
+   * Hides reloading packages message after delay
+   */
+  hideErrorMessageAfterDelay = () => {
+    delay(() => this.hideErrorMessage(), 5000);
   };
 
   /**
@@ -67,6 +86,15 @@ class ReloadPackages extends React.Component {
     });
   };
 
+  /**
+   * Hides reloading packages message
+   */
+  hideErrorMessage = () => {
+    this.setState({
+      isError: false
+    });
+  };
+
   render() {
     return (
       <div>
@@ -75,6 +103,13 @@ class ReloadPackages extends React.Component {
           <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
           {' '}
           Reloading Packages
+        </div>
+        }
+        {this.state.isError &&
+        <div className="alert alert-danger" role="alert">
+          <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          {' '}
+          Error Reloading Packages
         </div>
         }
         <button type="button" className="btn btn-primary btn-lg" onClick={this.handleReload}>
