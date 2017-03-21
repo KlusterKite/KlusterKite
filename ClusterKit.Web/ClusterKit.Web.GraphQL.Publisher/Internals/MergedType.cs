@@ -116,7 +116,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 return name;
             }
 
-            return Regex.Replace(name, "[.<>+\\- \t]", "_", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            return Regex.Replace(name, "[^a-zA-Z0-9]", "_", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         }
 
         /// <summary>

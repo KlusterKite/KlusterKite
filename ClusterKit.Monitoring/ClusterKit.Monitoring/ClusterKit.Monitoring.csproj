@@ -33,6 +33,14 @@
     <DocumentationFile>bin\Release\ClusterKit.Monitoring.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
+      <Project>{2a6edcc4-c729-4bee-9bb5-ac6f76b3bac8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj">
+      <Project>{ddc4b9d1-49ac-4cd6-9fc5-fe4a02c54871}</Project>
+      <Name>ClusterKit.API.Provider</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Monitoring.Client\ClusterKit.Monitoring.Client.csproj">
       <Project>{f3216b61-26c8-4ad6-84df-4531d4c568a2}</Project>
       <Name>ClusterKit.Monitoring.Client</Name>
@@ -247,31 +255,31 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj">
       <Project>{8E543EA4-65DE-475F-8045-C094CDE58E29}</Project>
       <Name>ClusterKit.Web.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj">
       <Project>{477B201A-A30C-4360-B56A-6F61C049BB04}</Project>
       <Name>ClusterKit.Web</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj">
       <Project>{7DE19EFC-58C5-4DBF-8A2A-E81E54AF5623}</Project>
       <Name>ClusterKit.LargeObjects.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
       <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
       <Name>ClusterKit.LargeObjects</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Authorization/ClusterKit.Web.Authorization.csproj">
       <Project>{6ADFBDDF-E452-46FC-A037-6D57300BE561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>
-    </ProjectReference>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actors\ClusterScanActor.cs" />
@@ -284,6 +292,8 @@
     <Compile Include="Messages\ClusterScanRequest.cs" />
     <Compile Include="Messages\ClusterScanResultRequest.cs" />
     <Compile Include="Messages\ClusterTree.cs" />
+    <Compile Include="MonitoringApi.cs" />
+    <Compile Include="MonitoringApiProvider.cs" />
     <Compile Include="OwinConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebApi\MonitoringController.cs" />
