@@ -6,6 +6,7 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Nav from 'react-bootstrap/lib/Nav';
 import NavItem from 'react-bootstrap/lib/NavItem';
 
+import { hasPrivilege } from '../../utils/privileges';
 import Storage from '../../utils/ttl-storage';
 
 import './App.css';
@@ -20,6 +21,7 @@ export default class App extends React.Component {
           <Navbar.Header>
             <Navbar.Brand>
               <IndexLink to="/" activeStyle={{ color: '#333' }}>
+                <div className="topLogo" />
                 <span>ClusterKit</span>
               </IndexLink>
             </Navbar.Brand>
@@ -31,14 +33,18 @@ export default class App extends React.Component {
               </LinkContainer>
             </Nav>
             <Nav navbar>
-              <LinkContainer to="/Templates">
-                <NavItem>Templates</NavItem>
-              </LinkContainer>
+              {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.GetList') &&
+                <LinkContainer to="/Templates">
+                  <NavItem>Templates</NavItem>
+                </LinkContainer>
+              }
             </Nav>
             <Nav navbar>
-              <LinkContainer to="/NugetFeeds">
-                <NavItem>Nuget Feeds</NavItem>
-              </LinkContainer>
+              {hasPrivilege('ClusterKit.NodeManager.NugetFeed.GetList') &&
+                <LinkContainer to="/NugetFeeds">
+                  <NavItem>Nuget Feeds</NavItem>
+                </LinkContainer>
+              }
             </Nav>
             {username &&
             <Nav pullRight>

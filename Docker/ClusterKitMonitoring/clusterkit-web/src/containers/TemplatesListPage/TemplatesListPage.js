@@ -1,6 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 
+import { hasPrivilege } from '../../utils/privileges';
 import TemplatesList from '../../components/TemplatesList/index';
 
 class TemplatesListPage extends React.Component {
@@ -11,7 +12,10 @@ class TemplatesListPage extends React.Component {
   render () {
     return (
       <div>
-        <TemplatesList templates={this.props.api.nodeManagerData} createNodeTemplatePrivilege={true} getNodeTemplatePrivilege={true} />
+        <TemplatesList
+          templates={this.props.api.nodeManagerData}
+          createNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Create')}
+          getNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Get')} />
       </div>
     )
   }

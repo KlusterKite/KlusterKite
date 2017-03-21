@@ -33,14 +33,14 @@ export class NodesWithTemplates extends React.Component {
 
   render() {
     const activeNodes = this.props.data.getActiveNodeDescriptions;
-    const templates = this.props.data.nodeTemplates.edges;
+    const templates = this.props.data.nodeTemplates && this.props.data.nodeTemplates.edges;
 
     return (
       <div className="templates">
         <div>
-          <span className="label label-default">Total nodes: {activeNodes.length}</span>
+          <span className="label label-default">Total nodes: {(activeNodes && activeNodes.length) || 'unknown'}</span>
         </div>
-        {templates.map((template) =>
+        {templates && templates.map((template) =>
           <div key={template.node.code}>
             {this.drawTemplate(template.node)}
           </div>

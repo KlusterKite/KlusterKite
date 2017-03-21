@@ -12,7 +12,7 @@ class TemplatesList extends React.Component { // eslint-disable-line react/prefe
   };
 
   render() {
-    const templates = this.props.templates.nodeTemplates.edges;
+    const templates = this.props.templates.nodeTemplates && this.props.templates.nodeTemplates.edges;
     return (
       <div>
         <h2>Templates list</h2>

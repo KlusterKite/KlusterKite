@@ -5,6 +5,8 @@ import ReloadPackages from '../../components/ReloadPackages/index';
 import NodesList from '../../components/NodesList/index';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 
+import { hasPrivilege } from '../../utils/privileges';
+
 class HomePage extends React.Component {
   static propTypes = {
     api: React.PropTypes.object,
@@ -17,19 +19,26 @@ class HomePage extends React.Component {
 
   refetchData = () => {
     console.log('refetch');
-    // this.props.relay.forceFetch();
+    this.props.relay.forceFetch();
   };
 
   render () {
     return (
       <div>
         <h1>Monitoring</h1>
-        <button type="button" className="btn btn-primary btn-lg" onClick={this.refetchData}>
+        {false && <button type="button" className="btn btn-primary btn-lg" onClick={this.refetchData}>
           <i className="fa fa-refresh"/> {' '} Refetch
-        </button>
-        <ReloadPackages />
-        <NodesWithTemplates data={this.props.api.nodeManagerData} />
-        <NodesList hasError={false} upgradeNodePrivilege={true} onManualUpgrade={this.onNodeUpgrade} nodeDescriptions={this.props.api.nodeManagerData} />
+        </button>}
+        {hasPrivilege('ClusterKit.NodeManager.ReloadPackages') &&
+          <ReloadPackages />
+        }
+        {hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics') && this.props.api.nodeManagerData &&
+          <NodesWithTemplates data={this.props.api.nodeManagerData}/>
+        }
+        {hasPrivilege('ClusterKit.NodeManager.GetActiveNodeDescriptions') && this.props.api.nodeManagerData &&
+          <NodesList hasError={false} upgradeNodePrivilege={hasPrivilege('ClusterKit.NodeManager.UpgradeNode')} onManualUpgrade={this.onNodeUpgrade}
+                     nodeDescriptions={this.props.api.nodeManagerData}/>
+        }
       </div>
     )
   }
