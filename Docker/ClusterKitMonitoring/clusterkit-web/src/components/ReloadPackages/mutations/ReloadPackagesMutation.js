@@ -9,19 +9,26 @@ export default class ReloadPackagesMutation extends Relay.Mutation {
   getFatQuery () {
     return Relay.QL`
       fragment on ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
-        result
-        api
+        result {
+          result
+        }
       }
     `
   }
 
-  getConfigs () {
+  getConfigs() {
     return [{
-      type: 'FIELDS_CHANGE',
-      fieldIDs: {
-        result: this.props.result,
-      },
-    }]
+      type: 'REQUIRED_CHILDREN',
+      children: [
+          Relay.QL`
+          fragment on ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
+            result {
+              result
+            }
+          }
+        `,
+      ],
+    }];
   }
 
   getVariables () {
@@ -31,7 +38,9 @@ export default class ReloadPackagesMutation extends Relay.Mutation {
 
   getOptimisticResponse () {
     return {
-      result : true
+      result: {
+        result: true
+      }
     }
   }
 }

@@ -20,6 +20,7 @@ export default class App extends React.Component {
           <Navbar.Header>
             <Navbar.Brand>
               <IndexLink to="/" activeStyle={{ color: '#333' }}>
+                <div className="topLogo" />
                 <span>ClusterKit</span>
               </IndexLink>
             </Navbar.Brand>

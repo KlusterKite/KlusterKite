@@ -18,47 +18,6 @@ storiesOf('Homepage')
   })
 ;
 
-// const getActiveNodeDescriptions = function () {
-//   return [
-//     {
-//       "NodeTemplate": null,
-//     },
-//     {
-//       "NodeTemplate": "clusterManager",
-//     },
-//     {
-//       "NodeTemplate": "clusterManager",
-//     },
-//     {
-//       "NodeTemplate": "publisher",
-//     },
-//     {
-//       "NodeTemplate": "publisher",
-//     }
-//   ];
-// };
-//
-// const getNodeTemplatesList = function () {
-//   return [
-//     {
-//       "Code": "clusterManager",
-//       "MinimumRequiredInstances": 1,
-//       "Name": "Cluster manager (cluster monitoring and managing)"
-//     },
-//     {
-//       "Code": "empty",
-//       "MinimumRequiredInstances": 0,
-//       "Name": "Cluster empty instance, just for demo"
-//     },
-//     {
-//       "Code": "publisher",
-//       "MinimumRequiredInstances": 1,
-//       "Name": "Cluster Nginx configurator"
-//     }
-//   ];
-// };
-
-
 const getData = () => {
   return {
     "data": {

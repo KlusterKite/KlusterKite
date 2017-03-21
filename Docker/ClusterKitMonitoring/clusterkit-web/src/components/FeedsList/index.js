@@ -10,7 +10,7 @@ class FeedList extends React.Component {
   };
 
   render() {
-    const feeds = this.props.feeds.nugetFeeds.edges;
+    const feeds = this.props.feeds.nugetFeeds && this.props.feeds.nugetFeeds.edges;
 
     return (
       <div>

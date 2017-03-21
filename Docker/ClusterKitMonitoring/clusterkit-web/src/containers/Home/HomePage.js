@@ -17,19 +17,24 @@ class HomePage extends React.Component {
 
   refetchData = () => {
     console.log('refetch');
-    // this.props.relay.forceFetch();
+    this.props.relay.forceFetch();
   };
 
   render () {
     return (
       <div>
         <h1>Monitoring</h1>
-        <button type="button" className="btn btn-primary btn-lg" onClick={this.refetchData}>
+        {false && <button type="button" className="btn btn-primary btn-lg" onClick={this.refetchData}>
           <i className="fa fa-refresh"/> {' '} Refetch
-        </button>
+        </button>}
         <ReloadPackages />
-        <NodesWithTemplates data={this.props.api.nodeManagerData} />
-        <NodesList hasError={false} upgradeNodePrivilege={true} onManualUpgrade={this.onNodeUpgrade} nodeDescriptions={this.props.api.nodeManagerData} />
+        {this.props.api.nodeManagerData &&
+          <NodesWithTemplates data={this.props.api.nodeManagerData}/>
+        }
+        {this.props.api.nodeManagerData &&
+          <NodesList hasError={false} upgradeNodePrivilege={true} onManualUpgrade={this.onNodeUpgrade}
+                     nodeDescriptions={this.props.api.nodeManagerData}/>
+        }
       </div>
     )
   }
