@@ -73,10 +73,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 if (this.Providers.Any())
                 {
-                    var providersNames = this.Providers.Select(p => $"{EscapeName(p.Provider.Description.ApiName)}_{EscapeName(p.FieldType.TypeName)}")
-                        .Distinct()
-                        .OrderBy(s => s)
-                        .ToArray();
+                    var providersNames =
+                        this.Providers.Select(
+                                p => $"{EscapeName(p.Provider.Description.ApiName)}_{EscapeName(p.FieldType.TypeName)}")
+                            .Distinct()
+                            .OrderBy(s => s)
+                            .ToArray();
 
                     return string.Join("_", providersNames);
                 }
@@ -132,14 +134,18 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
-            if (graphType.Fields.All(f => f.Name != "id"))
+            if (this.CreateVirtualId)
             {
-                graphType.AddField(new FieldType
-                                       {
-                                           Name = "id",
-                                           ResolvedType = new IdGraphType(),
-                                           Resolver = new VirtualIdResolver(this)
-                                       });
+                graphType.AddField(
+                    new FieldType
+                        {
+                            Name = "id",
+                            ResolvedType = new IdGraphType(),
+                            Resolver =
+                                this.KeyField == null
+                                    ? new VirtualIdResolver(this)
+                                    : (IFieldResolver)this.KeyField.Type
+                        });
             }
 
             return graphType;
@@ -171,10 +177,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>
         /// The list of api requests
         /// </returns>
-        protected IEnumerable<ApiRequest> GatherMultipleApiRequest(ApiProvider provider, Field contextFieldAst, ResolveFieldContext context)
+        protected IEnumerable<ApiRequest> GatherMultipleApiRequest(
+            ApiProvider provider,
+            Field contextFieldAst,
+            ResolveFieldContext context)
         {
+            var requestedFields 
+                = GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName).ToList();
             var usedFields =
-                GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName)
+                requestedFields
                     .Join(
                         this.Fields.Where(f => f.Value.Providers.Any(fp => fp == provider)),
                         s => s.Name,
@@ -182,10 +193,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         (s, fp) => new { Ast = s, Field = fp.Value })
                     .ToList();
 
+            if (this.KeyField != null && this.CreateVirtualId && this.KeyField.Providers.Any(fp => fp == provider))
+            {
+                usedFields.AddRange(
+                    requestedFields.Where(f => f.Name == "id").Select(f => new { Ast = f, Field = this.KeyField }));
+            }
+
             foreach (var usedField in usedFields)
             {
                 var apiField = usedField.Field.OriginalFields[provider.Description.ApiName];
-                if (apiField != null && !apiField.CheckAuthorization(context.UserContext as RequestContext, EnConnectionAction.Query))
+                if (apiField != null
+                    && !apiField.CheckAuthorization(context.UserContext as RequestContext, EnConnectionAction.Query))
                 {
                     var severity = apiField.LogAccessRules.Any()
                                        ? apiField.LogAccessRules.Max(l => l.Severity)
@@ -202,10 +220,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 }
 
                 var request = new ApiRequest
-                {
-                    Arguments = usedField.Ast.Arguments.ToJson(context),
-                    Alias = usedField.Ast.Alias,
-                    FieldName = usedField.Ast.Name
+                                  {
+                                      Arguments = usedField.Ast.Arguments.ToJson(context),
+                                      Alias = usedField.Ast.Alias ?? usedField.Ast.Name,
+                                      FieldName = usedField.Field.FieldName
                 };
                 var endType = usedField.Field.Type as MergedObjectType;
 

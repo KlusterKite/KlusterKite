@@ -127,7 +127,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     filteredSource.Add(property.Name.Substring(prefix.Length), property.Value);
                 }
 
-                filteredSource.Add("__id", source.Property("__id")?.Value);
+                //// filteredSource.Add("__id", source.Property("__id")?.Value);
 
                 var globalId = source.Property("__globalId")?.Value.ToObject<string>();
                 if (globalId == null)

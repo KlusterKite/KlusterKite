@@ -2633,7 +2633,11 @@ namespace ClusterKit.Web.Tests.GraphQL
                     id
                     nestedAsync {
                         id
-                    }           
+                    },
+                    arrayOfObjectNoIds {
+                        id,
+                        code
+                    }
                 }                
             }
             ";
@@ -2649,16 +2653,20 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.output.WriteLine(response);
 
             var expectedResult = @"
-                        {
-                          ""data"": {
-                            ""api"": {
-                              ""id"": ""TestApi_TestApi"",                              
-                              ""nestedAsync"": {
-                                ""id"": ""TestApi_NestedProvider"",
-                              }
-                            }
-                          }
-                        }
+                                {
+                                    ""data"": {
+                                        ""api"": {
+                                            ""id"": ""TestApi_TestApi"",                              
+                                            ""nestedAsync"": {
+                                                ""id"": ""TestApi_NestedProvider"",
+                                            },
+                                            ""arrayOfObjectNoIds"": [
+                                                {""id"": ""code1"", ""code"": ""code1""},
+                                                {""id"": ""code2"", ""code"": ""code2""}
+                                            ]
+                                        }
+                                    }
+                                }
                         ";
 
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));

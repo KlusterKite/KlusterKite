@@ -40,8 +40,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
         {
             var createdTypes = new Dictionary<string, MergedType>();
             var api = MergeApis(providers, createdTypes);
+            api.Initialize();
             var nodeInterface = new NodeInterface();
             var root = new MergedRoot("Query", providers, api);
+            root.Initialize();
             createdTypes[root.ComplexTypeName] = root;
             createdTypes[api.ComplexTypeName] = api;
 
@@ -806,6 +808,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 createAsInput,
                 typesCreated);
 
+            objectType.Initialize();
             return objectType;
         }
 

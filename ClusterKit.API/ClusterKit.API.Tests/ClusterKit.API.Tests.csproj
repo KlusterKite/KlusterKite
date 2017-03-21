@@ -221,6 +221,7 @@
     <Compile Include="Mock\NestedProvider.cs" />
     <Compile Include="Mock\TestObject.cs" />
     <Compile Include="Mock\TestObjectConnection.cs" />
+    <Compile Include="Mock\TestObjectNoId.cs" />
     <Compile Include="Mock\TestProvider.cs" />
     <Compile Include="Mock\ThirdPartyObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

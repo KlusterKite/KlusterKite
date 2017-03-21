@@ -114,6 +114,17 @@ namespace ClusterKit.API.Tests.Mock
         public Task<string> AsyncScalarField => Task.FromResult("AsyncScalarField");
 
         /// <summary>
+        /// Gets or sets the plain list of object without named id
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public List<TestObjectNoId> ArrayOfObjectNoIds { get; set; } = new List<TestObjectNoId>
+                                                                           {
+                                                                               new TestObjectNoId("code1"),
+                                                                               new TestObjectNoId("code2")
+                                                                           };
+
+        /// <summary>
         /// Gets the test objects connection
         /// </summary>
         [DeclareConnection(CanCreate = true, CanDelete = true, CanUpdate = true)]

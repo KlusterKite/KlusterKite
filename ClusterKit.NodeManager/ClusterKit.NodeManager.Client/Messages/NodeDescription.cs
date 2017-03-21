@@ -76,7 +76,7 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// <summary>
         /// Gets or sets request id to indicate node instance startup
         /// </summary>
-        [DeclareField(Description = "request id to indicate node instance startup")]
+        [DeclareField(Description = "request id to indicate node instance startup", IsKey = true)]
         public Guid NodeId { get; set; }
 
         /// <summary>

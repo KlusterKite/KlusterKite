@@ -43,6 +43,25 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         public Dictionary<string, MergedField> Fields { get; protected set; }
 
+        /// <summary>
+        /// Gets a value indicating whether virtual id should be set
+        /// </summary>
+        protected bool CreateVirtualId { get; private set; }
+
+        /// <summary>
+        /// Gets the object's key field
+        /// </summary>
+        protected MergedField KeyField { get; private set; }
+
+        /// <summary>
+        /// Initializes the internal state
+        /// </summary>
+        public void Initialize()
+        {
+            this.KeyField = this.Fields.Values.FirstOrDefault(f => f.Flags.HasFlag(EnFieldFlags.IsKey));
+            this.CreateVirtualId = !this.Fields.ContainsKey("id");
+        }
+
         /// <inheritdoc />
         public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
@@ -50,7 +69,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 MergedField localField;
 
-                if (!this.Fields.TryGetValue(field.Name, out localField))
+                if (this.KeyField != null && this.CreateVirtualId && field.Name == "id")
+                {
+                    localField = this.KeyField;
+                }
+                else if (!this.Fields.TryGetValue(field.Name, out localField))
                 {
                     continue;
                 }
@@ -75,8 +98,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var request = new ApiRequest
                                   {
                                       Arguments = field.Arguments.ToJson(context),
-                                      FieldName = field.Name,
-                                      Alias = field.Alias,
+                                      FieldName = localField.FieldName,
+                                      Alias = field.Alias ?? field.Name,
                                       Fields = localField.Type.GatherSingleApiRequest(field, context).ToList()
                                   };
                 if (request.Fields.Count == 0)

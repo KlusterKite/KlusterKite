@@ -754,6 +754,7 @@ namespace ClusterKit.NodeManager
             {
                 var nodeDescription = new NodeDescription
                                           {
+                                              NodeId = Guid.NewGuid(),
                                               IsInitialized = false,
                                               NodeAddress = address,
                                               Modules = new List<PackageDescription>(),
