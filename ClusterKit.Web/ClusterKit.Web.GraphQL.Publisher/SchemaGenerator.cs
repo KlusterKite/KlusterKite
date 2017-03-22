@@ -553,12 +553,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
             MergedType errorDescriptionType = null;
             if (errorDescriptionApiType != null)
             {
-                errorDescriptionType = CreateMergedType(
+                errorDescriptionType = CreateConnectionType(
+                    errorDescriptionApiType,
                     provider,
-                    errorDescriptionApiType.CreateField("error"),
-                    null,
-                    new List<string>(),
-                    false,
                     typesCreated);
             }
 

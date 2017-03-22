@@ -1069,8 +1069,14 @@ namespace ClusterKit.Web.Tests.GraphQL
             mutation M {
                     call: TestApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", newNode: { name: ""hello world"", value: 13}}) {
                     errors {                        
-                        field,
-                        message
+                        count,
+                        edges {
+                            cursor,
+                            node {
+                                field,
+                                message
+                            }
+                        }
                     },
                     node {
                         id,
@@ -1120,16 +1126,25 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     {
                                       ""data"": {
                                         ""call"": {
-                                          ""errors"": [
-                                            {
-                                              ""field"": null,
-                                              ""message"": ""Update failed""
-                                            },
-                                            {
-                                              ""field"": ""id"",
-                                              ""message"": ""Node not found""
-                                            }
-                                          ],
+                                         ""errors"": {
+                                            ""count"": 2,
+                                            ""edges"": [
+                                              {
+                                                ""cursor"": 1,
+                                                ""node"": {
+                                                  ""field"": null,
+                                                  ""message"": ""Update failed""
+                                                }
+                                              },
+                                              {
+                                                ""cursor"": 2,
+                                                ""node"": {
+                                                  ""field"": ""id"",
+                                                  ""message"": ""Node not found""
+                                                }
+                                              }
+                                            ]
+                                          },
                                           ""node"": null,
                                           ""edge"": null,
                                           ""deletedId"": null,
@@ -1143,7 +1158,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       }
                                     }
                                 ";
-            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
         /// <summary>
@@ -2635,8 +2650,12 @@ namespace ClusterKit.Web.Tests.GraphQL
                         id
                     },
                     arrayOfObjectNoIds {
-                        id,
-                        code
+                        edges {
+                            node {
+                                id,
+                                code
+                            }
+                        }
                     }
                 }                
             }
@@ -2660,10 +2679,22 @@ namespace ClusterKit.Web.Tests.GraphQL
                                             ""nestedAsync"": {
                                                 ""id"": ""TestApi_NestedProvider"",
                                             },
-                                            ""arrayOfObjectNoIds"": [
-                                                {""id"": ""code1"", ""code"": ""code1""},
-                                                {""id"": ""code2"", ""code"": ""code2""}
-                                            ]
+                                            ""arrayOfObjectNoIds"": {
+                                                ""edges"": [
+                                                    {
+                                                    ""node"": {
+                                                        ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkosKkqs9E/zT8pKTS7xy/dMKVaqjdVRSizIBEqGpBaXOAJZOkqZKUBucn5KqqFSLQAVsJ95PwAAAA=="",
+                                                        ""code"": ""code1""
+                                                    }
+                                                    },
+                                                    {
+                                                    ""node"": {
+                                                        ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkosKkqs9E/zT8pKTS7xy/dMKVaqjdVRSizIBEqGpBaXOAJZOkqZKUBucn5KqpFSLQBMDtl7PwAAAA=="",
+                                                        ""code"": ""code2""
+                                                    }
+                                                    }
+                                                ]
+                                            }
                                         }
                                     }
                                 }

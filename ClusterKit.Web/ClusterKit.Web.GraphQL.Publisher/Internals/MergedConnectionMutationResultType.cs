@@ -85,7 +85,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             graphType.AddField(new FieldType { Name = "deletedId", ResolvedType = new IdGraphType(), Resolver = new DeletedIdResolver() });
             graphType.AddField(this.CreateField("node", this.EdgeType.ObjectType, new ResultNodeResolver(this.EdgeType.ObjectType)));
             graphType.AddField(this.CreateField("edge", this.EdgeType, new ResultEdgeResolver()));
-            graphType.AddField(this.CreateField("errors", this.ErrorType, new ResultErrorsResolver(), EnFieldFlags.IsArray));
+            graphType.AddField(this.CreateField("errors", this.ErrorType, new ResultErrorsResolver()));
             graphType.AddField(new FieldType { Name = "clientMutationId", ResolvedType = new StringGraphType(), Resolver = new ClientMutationIdIdResolver() });
             graphType.AddField(this.CreateField("api", this.root, this.root));
             return graphType;
