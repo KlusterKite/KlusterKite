@@ -16,7 +16,7 @@ export class NodesWithTemplates extends React.Component {
   drawTemplate(template) {
     const data = this.props.data.getActiveNodeDescriptions;
 
-    const nodesCount = data.filter(n => n.nodeTemplate === template.Code).length;
+    const nodesCount = data.filter(n => n.nodeTemplate === template.code).length;
     let color;
     if (nodesCount < template.minimumRequiredInstances) {
       color = 'label-danger';

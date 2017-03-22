@@ -118,7 +118,8 @@ export default Relay.createContainer(
     }),
     fragments: {
       api: () => Relay.QL`
-        fragment on ClusterKitNodeApi_ClusterKitNodeApi {
+        fragment on ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi {
+          __typename
           id
           __node(id: $id) @include( if: $nodeExists ) {
             ...on ClusterKitNodeApi_ClusterKitNodeTemplate_Node {
