@@ -10,6 +10,7 @@
 namespace ClusterKit.API.Provider.Resolvers
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
@@ -37,6 +38,12 @@ namespace ClusterKit.API.Provider.Resolvers
         public ApiType GetElementType()
         {
             return null;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ApiField> GetTypeArguments()
+        {
+            yield break;
         }
     }
 }

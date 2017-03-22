@@ -63,10 +63,22 @@ namespace ClusterKit.API.Provider.Resolvers
         /// Gets the defined <see cref="ApiType"/>
         /// </summary>
         /// <returns>The api type</returns>
-        public abstract ApiType GetApiType();
+        public abstract ApiObjectType GetApiType();
 
         /// <inheritdoc />
-        public abstract Task<JToken> ResolveQuery(object source, ApiRequest request, ApiField apiField, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback);
+        public IEnumerable<ApiField> GetTypeArguments()
+        {
+            yield break;
+        }
+
+        /// <inheritdoc />
+        public abstract Task<JToken> ResolveQuery(
+            object source,
+            ApiRequest request,
+            ApiField apiField,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback);
 
         /// <inheritdoc />
         ApiType IResolver.GetElementType() => this.GetApiType();
@@ -109,6 +121,12 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </summary>
         /// <returns>The list of resolvers</returns>
         internal abstract IEnumerable<IResolver> GetDirectRelatedObjectResolvers();
+
+        /// <summary>
+        /// Gets the list <see cref="ApiType"/> that a used to resolve the fields of current object but are not correspond to real objects and does not have a resolver
+        /// </summary>
+        /// <returns>The list of resolvers</returns>
+        internal abstract IEnumerable<ApiType> GetDirectRelatedVirtualTypes();
 
         /// <summary>
         /// Gets the names of type fields
@@ -196,6 +214,11 @@ namespace ClusterKit.API.Provider.Resolvers
         protected class RelatedType
         {
             /// <summary>
+            /// Gets or sets the related api type
+            /// </summary>
+            public ApiType ApiType { get; set; }
+
+            /// <summary>
             /// Gets or sets the type resolver
             /// </summary>
             public IResolver Resolver { get; set; }
@@ -213,6 +236,10 @@ namespace ClusterKit.API.Provider.Resolvers
     /// <typeparam name="T">
     /// The type of object to resolve
     /// </typeparam>
+    /// <remarks>
+    /// <see cref="CollectionResolver{T}"/> uses <see cref="ObjectResolver{T}"/> in it's static initialization. 
+    /// So <see cref="ObjectResolver{T}"/> cannot use <see cref="CollectionResolver{T}"/> in it's static initialization to avoid deadlock
+    /// </remarks>
     [SuppressMessage("ReSharper", "StaticMemberInGenericType",
         Justification = "Making use of static properties in generic classes")]
 
@@ -259,6 +286,25 @@ namespace ClusterKit.API.Provider.Resolvers
             var apiObjectType = new ApiObjectType(typeName);
             apiObjectType.Fields.AddRange(Fields.Values.Where(f => !f.IsMutation).Select(f => f.Field));
             apiObjectType.Description = type.GetCustomAttribute<ApiDescriptionAttribute>()?.Description;
+
+            if (apiObjectType.Fields.Count == 0)
+            {
+                GenerationErrors.Add("Object has no fields");
+            }
+            else
+            {
+                var keysCount = apiObjectType.Fields.Count(f => f.Flags.HasFlag(EnFieldFlags.IsKey));
+
+                if (keysCount == 0)
+                {
+                    // GenerationErrors.Add("Object has no key");
+                }
+                else if (keysCount > 1)
+                {
+                    GenerationErrors.Add("Object has multiple keys");
+                }
+            }
+
             GeneratedType = apiObjectType;
         }
 
@@ -297,9 +343,15 @@ namespace ClusterKit.API.Provider.Resolvers
             Action<Exception> onErrorCallback);
 
         /// <summary>
+        /// Gets the declared fields
+        /// </summary>
+        public static IReadOnlyDictionary<string, MemberInfo> DeclaredFields
+            => Fields.ToImmutableDictionary(f => f.Key, f => f.Value.TypeMember);
+
+        /// <summary>
         /// Gets the generated api type for <see cref="T"/>
         /// </summary>
-        public static ApiType GeneratedType { get; }
+        public static ApiObjectType GeneratedType { get; }
 
         /// <summary>
         /// Gets the list of errors occurred on generation stage
@@ -312,7 +364,7 @@ namespace ClusterKit.API.Provider.Resolvers
         public override IEnumerable<string> Errors => GenerationErrors.ToImmutableList();
 
         /// <inheritdoc />
-        public override ApiType GetApiType() => GeneratedType;
+        public override ApiObjectType GetApiType() => GeneratedType;
 
         /// <inheritdoc />
         public override async Task<JToken> ResolveQuery(
@@ -476,7 +528,13 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <returns>The list of resolvers</returns>
         internal override IEnumerable<IResolver> GetDirectRelatedObjectResolvers()
         {
-            return RelatedTypes.Select(t => t.Resolver);
+            return RelatedTypes.Where(t => t.Resolver != null).Select(t => t.Resolver);
+        }
+
+        /// <inheritdoc />
+        internal override IEnumerable<ApiType> GetDirectRelatedVirtualTypes()
+        {
+            return RelatedTypes.Where(t => t.ApiType != null).Select(t => t.ApiType);
         }
 
         /// <summary>
@@ -518,7 +576,9 @@ namespace ClusterKit.API.Provider.Resolvers
 
             if (fieldNames.Count == 0)
             {
-                return value.ContinueWith(v => new Tuple<object, IResolver, ApiField>(v.Result, field.Resolver, field.Field));
+                return
+                    value.ContinueWith(
+                        v => new Tuple<object, IResolver, ApiField>(v.Result, field.Resolver, field.Field));
             }
 
             var nestedResolver = field.Resolver as ObjectResolver;
@@ -541,10 +601,18 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <summary>
         /// Creates a resolver for the specified type
         /// </summary>
-        /// <param name="metadata">The type metadata</param>
-        /// <returns>The resolver</returns>
-        private static IResolver CreateResolver(TypeMetadata metadata)
+        /// <param name="fieldName">
+        /// The field name.
+        /// </param>
+        /// <param name="field">
+        /// The type field
+        /// </param>
+        /// <returns>
+        /// The resolver
+        /// </returns>
+        private static IResolver CreateResolver(string fieldName, FieldDescription field)
         {
+            var metadata = field.Metadata;
             var elementResolver = metadata.ScalarType != EnScalarType.None
                                       ? typeof(ScalarResolver<>).MakeGenericType(metadata.Type)
                                           .CreateInstance<IResolver>()
@@ -554,22 +622,73 @@ namespace ClusterKit.API.Provider.Resolvers
                                           : typeof(ObjectResolver<>).MakeGenericType(metadata.Type)
                                               .CreateInstance<IResolver>();
 
+            var elementObjectResolver = elementResolver as ObjectResolver;
+
             if (metadata.IsForwarding)
             {
                 return new ForwarderResolver(elementResolver.GetElementType());
             }
 
-            if (metadata.GetFlags().HasFlag(EnFieldFlags.IsConnection))
+            if (!metadata.GetFlags().HasFlag(EnFieldFlags.IsArray)
+                && !metadata.GetFlags().HasFlag(EnFieldFlags.IsConnection))
             {
-                var connectionResolverType = typeof(ConnectionResolver<,>).MakeGenericType(
-                    metadata.Type,
-                    metadata.TypeOfId);
-                return connectionResolverType.CreateInstance<IResolver>();
+                return elementResolver;
             }
 
-            return metadata.GetFlags().HasFlag(EnFieldFlags.IsArray)
-                       ? new CollectionResolver(elementResolver)
-                       : elementResolver;
+            if (elementObjectResolver != null)
+            {
+                var objectKeys =
+                    elementObjectResolver.GetApiType().Fields.Count(f => f.Flags.HasFlag(EnFieldFlags.IsKey));
+                if (objectKeys == 0)
+                {
+                    GenerationErrors.Add($"Field {fieldName} is an array of {metadata.TypeName} that has no key fields");
+                }
+                else if (objectKeys > 1)
+                {
+                    GenerationErrors.Add(
+                        $"Field {fieldName} is an array of {metadata.TypeName} that has multiple key fields");
+                }
+                else
+                {
+                    var collectionType = typeof(CollectionResolver<>).MakeGenericType(metadata.Type);
+                    var filterType =
+                        (ApiObjectType)
+                        collectionType.GetProperty("FilterType", BindingFlags.Static | BindingFlags.Public)
+                            .GetValue(null);
+                    if (filterType.Fields.Count > 2 && RelatedTypes.All(rt => rt.ApiType != filterType))
+                    {
+                        RelatedTypes.Add(new RelatedType { ApiType = filterType });
+                    }
+
+                    var sortType =
+                        (ApiEnumType)
+                        collectionType.GetProperty("SortType", BindingFlags.Static | BindingFlags.Public).GetValue(null);
+
+                    if (sortType.Values.Any() && RelatedTypes.All(rt => rt.ApiType != sortType))
+                    {
+                        RelatedTypes.Add(new RelatedType { ApiType = sortType });
+                    }
+
+                    if (metadata.GetFlags().HasFlag(EnFieldFlags.IsConnection))
+                    {
+                        var connectionResolverType = typeof(ConnectionResolver<,>).MakeGenericType(
+                            metadata.Type,
+                            metadata.TypeOfId);
+
+                        return connectionResolverType.CreateInstance<IResolver>();
+                    }
+
+                    field.Field.Flags &= ~EnFieldFlags.IsArray;
+                    field.Field.Flags |= EnFieldFlags.IsConnection;
+                    return collectionType.CreateInstance<IResolver>();
+                }
+            }
+            else if (metadata.GetFlags().HasFlag(EnFieldFlags.IsArray))
+            {
+                return new SimpleCollectionResolver(elementResolver);
+            }
+
+            return new NullResolver();
         }
 
         /// <summary>
@@ -821,7 +940,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
             if (methodInfo == null && propertyInfo == null)
             {
-                GenerationErrors.Add($"Field {fieldDescription.Field.Name} is nighter property nor method");
+                GenerationErrors.Add($"Field {fieldDescription.Field.Name} is neither property nor method");
                 return (source, request, context, serializer, callback) => Task.FromResult<object>(null);
             }
 
@@ -947,7 +1066,10 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <returns>
         /// The conversed type expression
         /// </returns>
-        private static Expression GenerateValueGetterConvertResultToObject(Type returnType, Expression getValue, Func<Expression, Expression> converterExpression)
+        private static Expression GenerateValueGetterConvertResultToObject(
+            Type returnType,
+            Expression getValue,
+            Func<Expression, Expression> converterExpression)
         {
             var asyncType = TypeMetadata.CheckType(returnType, typeof(Task<>));
             if (asyncType != null)
@@ -976,10 +1098,7 @@ namespace ClusterKit.API.Provider.Resolvers
                 result = converterExpression(result);
             }
 
-            var conversion =
-                Expression.Lambda(
-                    Expression.Convert(result, typeof(object)),
-                    resultParameter);
+            var conversion = Expression.Lambda(Expression.Convert(result, typeof(object)), resultParameter);
             getValue = Expression.Call(getValue, continueMethod, conversion);
 
             return getValue;
@@ -1005,15 +1124,24 @@ namespace ClusterKit.API.Provider.Resolvers
                 isInitialized = true;
                 foreach (var field in Fields.Values)
                 {
-                    field.Resolver = CreateResolver(field.Metadata);
+                    field.Resolver = CreateResolver(field.Field.Name, field);
+                    foreach (var typeArgument in field.Resolver.GetTypeArguments())
+                    {
+                        var argument = typeArgument.Clone();
+                        argument.Flags |= EnFieldFlags.IsTypeArgument;
+                        field.Field.Arguments.Add(argument);
+                    }
+
                     field.GetValue = GenerateValueGetter(field);
                 }
 
-                foreach (var relatedType in RelatedTypes)
+                foreach (var relatedType in RelatedTypes.Where(r => r.Type != null))
                 {
                     relatedType.Resolver = relatedType.Type.IsSubclassOf(typeof(Enum))
-                        ? typeof(EnumResolver<>).MakeGenericType(relatedType.Type).CreateInstance<IResolver>()
-                        : typeof(ObjectResolver<>).MakeGenericType(relatedType.Type).CreateInstance<IResolver>();
+                                               ? typeof(EnumResolver<>).MakeGenericType(relatedType.Type)
+                                                   .CreateInstance<IResolver>()
+                                               : typeof(ObjectResolver<>).MakeGenericType(relatedType.Type)
+                                                   .CreateInstance<IResolver>();
                 }
             }
         }
@@ -1030,7 +1158,10 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <param name="errors">
         /// The list of generation errors.
         /// </param>
-        private void CreateAllRelatedTypeListForApiRoot(out List<ApiType> types, out JsonSerializer argumentsSerializer, out List<string> errors)
+        private void CreateAllRelatedTypeListForApiRoot(
+            out List<ApiType> types,
+            out JsonSerializer argumentsSerializer,
+            out List<string> errors)
         {
             var directTypes = this.GetDirectRelatedObjectResolvers().ToList();
             directTypes.Add(this);
@@ -1060,6 +1191,14 @@ namespace ClusterKit.API.Provider.Resolvers
                 }
 
                 errors.AddRange(genericResolver.Errors.Select(e => $"{apiType}: {e}"));
+
+                foreach (var type in genericResolver.GetDirectRelatedVirtualTypes())
+                {
+                    if (!types.Contains(type))
+                    {
+                        types.Add(type);
+                    }
+                }
 
                 foreach (var pair in genericResolver.GetFieldsNames())
                 {
@@ -1096,7 +1235,7 @@ namespace ClusterKit.API.Provider.Resolvers
                 Fields.Values.Where(
                     f =>
                         f.Field.Flags.HasFlag(EnFieldFlags.IsConnection) && f.Field.ScalarType == EnScalarType.None
-                        && f.Field.Arguments.Count == 0);
+                        && f.Field.Arguments.All(a => a.Flags.HasFlag(EnFieldFlags.IsTypeArgument)));
 
             foreach (var connection in connections)
             {

@@ -322,7 +322,7 @@ namespace ClusterKit.API.Provider
             var rootResolver = typeof(ObjectResolver<>)
                 .MakeGenericType(this.GetType()).CreateInstance<ObjectResolver>();
             this.resolver = rootResolver;
-            var root = (ApiObjectType)rootResolver.GetApiType();
+            var root = rootResolver.GetApiType();
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;
             this.ApiDescription.Description = root.Description;
             this.ApiDescription.Fields = new List<ApiField>(root.Fields.Select(f => f.Clone()));

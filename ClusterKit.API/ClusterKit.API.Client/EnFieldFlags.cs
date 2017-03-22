@@ -56,5 +56,10 @@ namespace ClusterKit.API.Client
         /// This field can be queried
         /// </summary>
         Queryable = 64,
+
+        /// <summary>
+        /// This is argument and argument from type resolver (not original property / method itself)
+        /// </summary>
+        IsTypeArgument = 128
     }
 }

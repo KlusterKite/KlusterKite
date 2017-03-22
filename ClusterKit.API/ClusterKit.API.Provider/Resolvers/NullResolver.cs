@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ForwarderResolver.cs" company="ClusterKit">
+// <copyright file="NullResolver.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Resolves value for forwarded fields
+//   Empty resolver that always return null
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -20,30 +20,27 @@ namespace ClusterKit.API.Provider.Resolvers
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Resolves value for forwarded fields
+    /// Empty resolver that always return null
     /// </summary>
-    public class ForwarderResolver : IResolver
+    public class NullResolver : IResolver
     {
-        /// <summary>
-        /// The resolved property type
-        /// </summary>
-        private readonly ApiType resolvedType;
-
         /// <inheritdoc />
-        public ForwarderResolver(ApiType resolvedType)
+        public Task<JToken> ResolveQuery(
+            object source,
+            ApiRequest request,
+            ApiField apiField,
+            RequestContext context,
+            JsonSerializer argumentsSerializer,
+            Action<Exception> onErrorCallback)
         {
-            this.resolvedType = resolvedType;
+            return Task.FromResult<JToken>(null);
         }
 
         /// <inheritdoc />
-        public Task<JToken> ResolveQuery(object source, ApiRequest request, ApiField apiField, RequestContext context, JsonSerializer argumentsSerializer, Action<Exception> onErrorCallback)
+        public ApiType GetElementType()
         {
-            var result = source as JToken;
-            return Task.FromResult(result ?? JValue.CreateNull());
+            return null;
         }
-
-        /// <inheritdoc />
-        public ApiType GetElementType() => this.resolvedType;
 
         /// <inheritdoc />
         public IEnumerable<ApiField> GetTypeArguments()

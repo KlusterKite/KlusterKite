@@ -10,6 +10,7 @@
 namespace ClusterKit.API.Provider.Resolvers
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
@@ -60,5 +61,11 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </summary>
         /// <returns>The api type</returns>
         ApiType GetElementType();
+
+        /// <summary>
+        /// Gets the list of arguments that are supported by resolver itself (not the original object method arguments)
+        /// </summary>
+        /// <returns>The list of additional arguments</returns>
+        IEnumerable<ApiField> GetTypeArguments();
     }
 }

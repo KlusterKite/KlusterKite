@@ -1068,7 +1068,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var query = @"                          
             mutation M {
                     call: TestApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", newNode: { name: ""hello world"", value: 13}}) {
-                    errors {
+                    errors {                        
                         field,
                         message
                     },

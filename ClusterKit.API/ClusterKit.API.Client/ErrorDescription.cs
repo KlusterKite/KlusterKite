@@ -43,6 +43,13 @@ namespace ClusterKit.API.Client
         }
 
         /// <summary>
+        /// Gets or sets the error number
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField(Description = "The error number", IsKey = true)]
+        public int Number { get; set; }
+
+        /// <summary>
         /// Gets or sets the related field name
         /// </summary>
         [UsedImplicitly]

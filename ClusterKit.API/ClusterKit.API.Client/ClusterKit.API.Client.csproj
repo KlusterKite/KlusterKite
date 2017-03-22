@@ -62,11 +62,11 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-</ProjectReference>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiDescription.cs" />
@@ -90,6 +90,7 @@
     <Compile Include="Attributes\PublishToApiAttribute.cs" />
     <Compile Include="Converters\ArrayConverter.cs" />
     <Compile Include="Converters\DictionaryConverter.cs" />
+    <Compile Include="Converters\Pair.cs" />
     <Compile Include="Converters\StringConverter.cs" />
     <Compile Include="DataUpdater.cs" />
     <Compile Include="EnAccessFlag.cs" />

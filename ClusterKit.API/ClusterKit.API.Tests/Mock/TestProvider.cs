@@ -11,6 +11,7 @@ namespace ClusterKit.API.Tests.Mock
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -35,6 +36,11 @@ namespace ClusterKit.API.Tests.Mock
     public class TestProvider : ApiProvider
     {
         /// <summary>
+        /// The list of objects
+        /// </summary>
+        private readonly List<TestObject> objects;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TestProvider"/> class.
         /// </summary>
         /// <param name="objects">
@@ -42,12 +48,8 @@ namespace ClusterKit.API.Tests.Mock
         /// </param>
         public TestProvider(List<TestObject> objects = null)
         {
-            if (objects == null)
-            {
-                objects = new List<TestObject>();
-            }
-
-            this.Connection = new TestObjectConnection(objects.ToDictionary(o => o.Id));
+            this.objects = objects ?? new List<TestObject>();
+            this.Connection = new TestObjectConnection(this.objects.ToDictionary(o => o.Id));
         }
 
         /// <summary>
@@ -123,6 +125,13 @@ namespace ClusterKit.API.Tests.Mock
                                                                                new TestObjectNoId("code1"),
                                                                                new TestObjectNoId("code2")
                                                                            };
+
+        /// <summary>
+        /// Gets the test object array
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public IEnumerable<TestObject> Collection => this.objects.ToImmutableList();
 
         /// <summary>
         /// Gets the test objects connection
