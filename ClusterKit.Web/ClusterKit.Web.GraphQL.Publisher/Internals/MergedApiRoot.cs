@@ -171,7 +171,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         return seed;
                     });
 
-
             var data = this.ResolveData(context, response);
             data.Add("__newGlobalId", new JArray());
             return data;

@@ -431,7 +431,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
         {
             var apiRoot = new MergedApiRoot("api");
             apiRoot.AddProviders(providers.Select(p => new FieldProvider { Provider = p, FieldType = p.Description }));
-            
+            apiRoot.Category = providers.Count > 1
+                                   ? MergedObjectType.EnCategory.MultipleApiType
+                                   : MergedObjectType.EnCategory.SingleApiType;
+
             foreach (var provider in providers)
             {
                 MergeFields(apiRoot, provider.Description.Fields, provider, new List<string>(), false, createdTypes);
@@ -459,7 +462,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 }
             }
 
-            var nodeSearcher = new NodeSearcher(providers, apiRoot);
+            var nodeSearcher = new NodeSearcher(apiRoot);
             apiRoot.NodeSearher = nodeSearcher;
             return apiRoot;
         }

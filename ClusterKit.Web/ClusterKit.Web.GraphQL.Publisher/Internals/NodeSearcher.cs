@@ -30,11 +30,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     internal class NodeSearcher : IFieldResolver
     {
         /// <summary>
-        /// The list of api providers
-        /// </summary>
-        private readonly List<ApiProvider> providers;
-
-        /// <summary>
         /// The api root.
         /// </summary>
         private readonly MergedApiRoot apiRoot;
@@ -42,15 +37,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeSearcher"/> class.
         /// </summary>
-        /// <param name="providers">
-        /// The providers.
-        /// </param>
         /// <param name="apiRoot">
         /// The api Root.
         /// </param>
-        public NodeSearcher(List<ApiProvider> providers, MergedApiRoot apiRoot)
+        public NodeSearcher(MergedApiRoot apiRoot)
         {
-            this.providers = providers;
             this.apiRoot = apiRoot;
         }
 
@@ -58,6 +49,62 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public object Resolve(ResolveFieldContext context)
         {
             return this.SearchNode(context);
+        }
+
+        /// <summary>
+        /// Creates the nested request to get data
+        /// </summary>
+        /// <param name="globalId">The path to container</param>
+        /// <param name="typesList">The list of nested types that corresponds the path</param>
+        /// <param name="path">The generated path to the end element</param>
+        /// <param name="tailRequests">The tail request for the found object data</param>
+        /// <returns>The list of requests</returns>
+        private static List<ApiRequest> CreateRequest(
+            List<GlobalId> globalId,
+            List<MergedType> typesList,
+            List<string> path,
+            List<ApiRequest> tailRequests)
+        {
+            for (var index = globalId.Count - 1; index >= 0; index--)
+            {
+                var element = globalId[index];
+                var type = typesList[index];
+
+                var args = element.Arguments ?? new JObject();
+                if (element.Id != null && element.Id.HasValues)
+                {
+                    args.Add("id", element.Id);
+                }
+
+                ApiRequest request;
+                if (type is MergedConnectionType)
+                {
+                    path.Add($"{element.FieldName}.items[0]");
+                    request = new ApiRequest { FieldName = "items", Fields = tailRequests };
+
+                    request = new ApiRequest
+                                  {
+                                      FieldName = element.FieldName,
+                                      Arguments = element.Arguments,
+                                      Fields = new List<ApiRequest> { request }
+                                  };
+                }
+                else
+                {
+                    path.Add(element.FieldName);
+                    request = new ApiRequest
+                                  {
+                                      FieldName = element.FieldName,
+                                      Arguments = element.Arguments,
+                                      Fields = tailRequests
+                                  };
+                }
+
+                tailRequests = new List<ApiRequest> { request };
+            }
+
+            path.Reverse();
+            return tailRequests;
         }
 
         /// <summary>
@@ -75,62 +122,101 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 return null;
             }
 
-            var globalId = JsonConvert.DeserializeObject<GlobalId>(serializedId);
-            if (globalId?.ApiName == null || globalId.Id == null || globalId.Path == null || globalId.Path.Count == 0)
+            List<GlobalId> globalId;
+            try
+            {
+                globalId = JsonConvert.DeserializeObject<List<GlobalId>>(serializedId);
+            }
+            catch
             {
                 return null;
             }
 
-            var api = this.providers.FirstOrDefault(p => p.Description.ApiName == globalId.ApiName);
-            if (api == null)
-            {
-                return null;
-            }
-
-            var queue = new Queue<RequestPathElement>(globalId.Path);
+            var queue = new Queue<GlobalId>(globalId);
             MergedType mergedType = this.apiRoot;
+            var typesList = new List<MergedType>();
             while (queue.Count > 0)
             {
-                var objectType = mergedType as MergedObjectType;
-                if (objectType == null)
-                {
-                    return null;
-                }
-
                 var field = queue.Dequeue();
-                MergedField mergedField;
-                if (!objectType.Fields.TryGetValue(field.FieldName, out mergedField))
+                var objectType = mergedType as MergedObjectType;
+                var connectionType = mergedType as MergedConnectionType;
+
+                if (objectType != null)
+                {
+                    MergedField mergedField;
+                    if (!objectType.Fields.TryGetValue(field.FieldName, out mergedField))
+                    {
+                        return null;
+                    }
+
+                    mergedType = mergedField.Type;
+                    typesList.Add(mergedType);
+                }
+                else if (connectionType != null)
+                {
+                    MergedField mergedField;
+                    if (!connectionType.ElementType.Fields.TryGetValue(field.FieldName, out mergedField))
+                    {
+                        return null;
+                    }
+
+                    mergedType = mergedField.Type;
+                    typesList.Add(mergedType);
+                }
+                else
                 {
                     return null;
                 }
-
-                mergedType = mergedField.Type;
             }
 
-            var connectionType = mergedType as MergedConnectionType;
-            if (connectionType == null)
+            var finalType = (mergedType as MergedConnectionType)?.ElementType ?? mergedType as MergedObjectType;
+            if (finalType == null)
             {
                 return null;
             }
 
-            var nodeRequest = connectionType.ElementType.GatherSingleApiRequest(context.FieldAst, context).ToList();
-            nodeRequest.Add(new ApiRequest { Alias = "__id", FieldName = connectionType.ElementType.KeyField.FieldName });
+            List<string> path = new List<string>();
 
-            var searchNode = await 
-                api.SearchNode(
-                    globalId.Id.ToString(Formatting.None),
-                    globalId.Path,
-                    new ApiRequest { Fields = nodeRequest.ToList() },
-                    context.UserContext as RequestContext);
-
-            if (searchNode != null)
+            var result = new JObject();
+            if (finalType.Category == MergedObjectType.EnCategory.MultipleApiType)
             {
-                searchNode.Add("__resolvedType", connectionType.ElementType.ComplexTypeName);
-                searchNode.Add("__globalId", packedId);
-                searchNode = connectionType.ElementType.ResolveData(context, searchNode);
+                if (typesList.Any(t => !(t is MergedObjectType)))
+                {
+                    return null;
+                }
+                
+                foreach (var provider in this.apiRoot.Providers)
+                {
+                    var tailRequests =
+                        finalType.GatherMultipleApiRequest(provider.Provider, context.FieldAst, context).ToList();
+                    if (tailRequests.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    path = new List<string>();
+                    var requests = CreateRequest(globalId, typesList, path, tailRequests);
+                    result.Merge(await provider.Provider.GetData(requests, context.UserContext as RequestContext));
+                }
+            }
+            else
+            {
+                var tailRequests = finalType.GatherSingleApiRequest(context.FieldAst, context).ToList();
+                var provider = finalType.Providers.First().Provider;
+                
+                tailRequests = CreateRequest(globalId, typesList, path, tailRequests);
+                result = await provider.GetData(tailRequests, context.UserContext as RequestContext);
             }
 
-            return searchNode;
+            var item = result.SelectToken(string.Join(".", path)) as JObject;
+            if (item == null)
+            {
+                return null;
+            }
+
+            item.Add("__resolvedType", finalType.ComplexTypeName);
+            item.Add(MergedObjectType.GlobalIdPropertyName, JArray.Parse(serializedId));
+            return item;
         }
 
         /// <summary>
@@ -139,11 +225,18 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         private class GlobalId
         {
             /// <summary>
-            /// Gets or sets the api name
+            /// Gets or sets the field arguments
             /// </summary>
-            [JsonProperty("api")]
+            [JsonProperty("a")]
             [UsedImplicitly]
-            public string ApiName { get; set; }
+            public JObject Arguments { get; set; }
+
+            /// <summary>
+            /// Gets or sets the path to the connection
+            /// </summary>
+            [JsonProperty("f")]
+            [UsedImplicitly]
+            public string FieldName { get; set; }
 
             /// <summary>
             /// Gets or sets the id value
@@ -151,13 +244,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             [JsonProperty("id")]
             [UsedImplicitly]
             public JValue Id { get; set; }
-
-            /// <summary>
-            /// Gets or sets the path to the connection
-            /// </summary>
-            [JsonProperty("p")]
-            [UsedImplicitly]
-            public List<RequestPathElement> Path { get; set; }
         }
     }
 }

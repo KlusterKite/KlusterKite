@@ -29,6 +29,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     internal class MergedObjectType : MergedFieldedType
     {
         /// <summary>
+        /// Gets the name of the internal pre-calculated field to store globalId
+        /// </summary>
+        internal const string GlobalIdPropertyName = "__newGlobalId";
+        
+        /// <summary>
+        /// Gets the name of the internal pre-calculated field to store request data for the current object
+        /// </summary>
+        internal const string RequestPropertyName = "_localRequest";
+
+        /// <summary>
         /// the list of providers
         /// </summary>
         private readonly List<FieldProvider> providers = new List<FieldProvider>();
@@ -132,6 +142,77 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return mergedObjectType;
         }
 
+        /// <summary>
+        /// Gather request parameters for the specified api provider
+        /// </summary>
+        /// <param name="provider">
+        /// The api provider
+        /// </param>
+        /// <param name="contextFieldAst">
+        /// The request context
+        /// </param>
+        /// <param name="context">
+        /// The resolve context.
+        /// </param>
+        /// <returns>
+        /// The list of api requests
+        /// </returns>
+        public IEnumerable<ApiRequest> GatherMultipleApiRequest(
+            ApiProvider provider,
+            Field contextFieldAst,
+            ResolveFieldContext context)
+        {
+            if (this.KeyField != null && this.KeyField.Providers.Contains(provider))
+            {
+                yield return new ApiRequest { Alias = "__id", FieldName = this.KeyField.FieldName };
+            }
+
+            // todo: process the __id request
+            var requestedFields =
+                GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName).ToList();
+            var usedFields =
+                requestedFields.Join(
+                    this.Fields.Where(f => f.Value.Providers.Any(fp => fp == provider)),
+                    s => s.Name,
+                    fp => fp.Key,
+                    (s, fp) => new { Ast = s, Field = fp.Value }).ToList();
+
+            foreach (var usedField in usedFields)
+            {
+                var apiField = usedField.Field.OriginalFields[provider.Description.ApiName];
+                if (apiField != null
+                    && !apiField.CheckAuthorization(context.UserContext as RequestContext, EnConnectionAction.Query))
+                {
+                    var severity = apiField.LogAccessRules.Any()
+                                       ? apiField.LogAccessRules.Max(l => l.Severity)
+                                       : EnSeverity.Trivial;
+
+                    SecurityLog.CreateRecord(
+                        SecurityLog.EnType.OperationDenied,
+                        severity,
+                        context.UserContext as RequestContext,
+                        "Unauthorized call to {ApiPath}",
+                        $"{contextFieldAst.Name}.{apiField.Name}");
+
+                    continue;
+                }
+
+                var request = new ApiRequest
+                                  {
+                                      Arguments = usedField.Ast.Arguments.ToJson(context),
+                                      Alias = usedField.Ast.Alias ?? usedField.Ast.Name,
+                                      FieldName = usedField.Field.FieldName
+                                  };
+                var endType = usedField.Field.Type as MergedObjectType;
+
+                request.Fields = endType?.Category == EnCategory.MultipleApiType
+                                     ? endType.GatherMultipleApiRequest(provider, usedField.Ast, context).ToList()
+                                     : usedField.Field.Type.GatherSingleApiRequest(usedField.Ast, context).ToList();
+
+                yield return request;
+            }
+        }
+
         /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
@@ -143,12 +224,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             graphType.AddField(
-                new FieldType
-                {
-                    Name = "id",
-                    ResolvedType = new IdGraphType(),
-                    Resolver = new VirtualIdResolver()
-                });
+                new FieldType { Name = "id", ResolvedType = new IdGraphType(), Resolver = new VirtualIdResolver() });
 
             graphType.AddResolvedInterface(nodeInterface);
             nodeInterface.AddImplementedType(this.ComplexTypeName, graphType);
@@ -186,7 +262,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 }
 
                 var property = source.Property(field.Alias ?? field.Name)?.Value as JObject;
-                if (property == null || property.Property("__localRequest") != null)
+                if (property == null || property.Property(RequestPropertyName) != null)
                 {
                     continue;
                 }
@@ -207,19 +283,19 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     }
                 }
 
-                property.Add("__localRequest", localRequest);
+                property.Add(RequestPropertyName, localRequest);
             }
 
             // generating self globalId data
             JContainer parent = source.Parent;
             JArray parentGlobalId = null;
-            var selfRequest = source.Property("__localRequest")?.Value as JObject;
+            var selfRequest = source.Property(RequestPropertyName)?.Value as JObject;
             while (parent != null)
             {
-                parentGlobalId = (parent as JObject)?.Property("__newGlobalId")?.Value as JArray;
+                parentGlobalId = (parent as JObject)?.Property(GlobalIdPropertyName)?.Value as JArray;
                 if (selfRequest == null)
                 {
-                    selfRequest = (parent as JObject)?.Property("__localRequest")?.Value as JObject;
+                    selfRequest = (parent as JObject)?.Property(RequestPropertyName)?.Value as JObject;
                 }
 
                 if (parentGlobalId != null)
@@ -230,7 +306,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 parent = parent.Parent;
             }
 
-            if (selfRequest != null)
+            if (source.Property(GlobalIdPropertyName) == null && selfRequest != null)
             {
                 var globalId = parentGlobalId != null ? new JArray(parentGlobalId) : new JArray();
                 var selfPart = (JObject)selfRequest.DeepClone();
@@ -240,7 +316,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 }
 
                 globalId.Add(selfPart);
-                source.Add("__newGlobalId", globalId);
+                source.Add(GlobalIdPropertyName, globalId);
             }
 
             return source;
@@ -255,83 +331,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             shell.AddProviders(this.providers);
             shell.Fields = this.Fields.ToDictionary(p => p.Key, p => p.Value.Clone());
             shell.Category = this.Category;
-        }
-
-        /// <summary>
-        /// Gather request parameters for the specified api provider
-        /// </summary>
-        /// <param name="provider">
-        /// The api provider
-        /// </param>
-        /// <param name="contextFieldAst">
-        /// The request context
-        /// </param>
-        /// <param name="context">
-        /// The resolve context.
-        /// </param>
-        /// <returns>
-        /// The list of api requests
-        /// </returns>
-        protected IEnumerable<ApiRequest> GatherMultipleApiRequest(
-            ApiProvider provider,
-            Field contextFieldAst,
-            ResolveFieldContext context)
-        {
-            if (this.KeyField != null && this.KeyField.Providers.Contains(provider))
-            {
-                yield return new ApiRequest
-                {
-                    Alias = "__id",
-                    FieldName = this.KeyField.FieldName
-                };
-            }
-
-            // todo: process the __id request
-            var requestedFields 
-                = GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName).ToList();
-            var usedFields =
-                requestedFields
-                    .Join(
-                        this.Fields.Where(f => f.Value.Providers.Any(fp => fp == provider)),
-                        s => s.Name,
-                        fp => fp.Key,
-                        (s, fp) => new { Ast = s, Field = fp.Value })
-                    .ToList();
-
-            foreach (var usedField in usedFields)
-            {
-                var apiField = usedField.Field.OriginalFields[provider.Description.ApiName];
-                if (apiField != null
-                    && !apiField.CheckAuthorization(context.UserContext as RequestContext, EnConnectionAction.Query))
-                {
-                    var severity = apiField.LogAccessRules.Any()
-                                       ? apiField.LogAccessRules.Max(l => l.Severity)
-                                       : EnSeverity.Trivial;
-
-                    SecurityLog.CreateRecord(
-                        SecurityLog.EnType.OperationDenied,
-                        severity,
-                        context.UserContext as RequestContext,
-                        "Unauthorized call to {ApiPath}",
-                        $"{contextFieldAst.Name}.{apiField.Name}");
-
-                    continue;
-                }
-
-                var request = new ApiRequest
-                                  {
-                                      Arguments = usedField.Ast.Arguments.ToJson(context),
-                                      Alias = usedField.Ast.Alias ?? usedField.Ast.Name,
-                                      FieldName = usedField.Field.FieldName
-                };
-                var endType = usedField.Field.Type as MergedObjectType;
-
-                request.Fields = endType?.Category == EnCategory.MultipleApiType
-                                     ? endType.GatherMultipleApiRequest(provider, usedField.Ast, context).ToList()
-                                     : usedField.Field.Type.GatherSingleApiRequest(usedField.Ast, context).ToList();
-
-                yield return request;
-            }
         }
 
         /// <summary>

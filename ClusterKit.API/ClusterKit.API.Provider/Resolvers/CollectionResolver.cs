@@ -215,25 +215,6 @@ namespace ClusterKit.API.Provider.Resolvers
                 }
             }
 
-            if (request.FieldName != null)
-            {
-                var requestDescription = new JObject { { "f", request.FieldName } };
-                if (request.Arguments != null)
-                {
-                    var reservedNames = new[] { "filter", "sort", "limit", "offset" };
-                    var requestArguments =
-                        ((JObject)request.Arguments).Properties().Where(p => !reservedNames.Contains(p.Name)).ToList();
-                    if (requestArguments.Count > 0)
-                    {
-                        var requestArgumentsObject = new JObject();
-                        requestArguments.ForEach(ra => requestArgumentsObject.Add(ra.Name, ra.Value));
-                        requestDescription.Add("a", requestArgumentsObject);
-                    }
-                }
-
-                result.Add("__request", requestDescription);
-            }
-
             return result;
         }
 

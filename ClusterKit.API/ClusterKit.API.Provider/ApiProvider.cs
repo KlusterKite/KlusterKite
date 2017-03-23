@@ -160,8 +160,6 @@ namespace ClusterKit.API.Provider
                                               this.argumentsSerializer,
                                               onErrorCallback);
 
-                    var path = new JArray(mutation.Path.Select(p => new JObject { { "f", p.FieldName } }));
-                    resolvedMutation.Add("__requestPath", path);
                     return resolvedMutation;
                 }
 

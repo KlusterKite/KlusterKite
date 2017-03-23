@@ -1175,10 +1175,8 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
-            var globalId = ((JObject)JsonConvert
-                                   .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
-                                                      + ",\"api\":\"TestApi\""
-                                                      + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
+            var globalId = JArray.Parse("[{\"f\":\"connection\","
+                + "\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}]")
                 .PackGlobalId();
 
             var query = $@"
@@ -1189,7 +1187,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                     }}
                 }}
 
-                fragment F0 on TestApi_TestObject_Node 
+                fragment F0 on TestApi_TestObject 
                 {{
                     __id,
                     id,
@@ -1197,8 +1195,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                     value
                 }}            
             ";
-
-            this.output.WriteLine(query);
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
@@ -1209,17 +1205,80 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-            var expectedResult = @"
-                            {
-                              ""data"": {
-                                ""node"": {
+            var expectedResult = $@"
+                            {{
+                              ""data"": {{
+                                ""node"": {{
                                   ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                  ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
+                                  ""id"": ""{globalId.Replace("\"", "\\\"")}"",
                                   ""name"": ""1-test"",
                                   ""value"": 100.0
-                                }
-                              }
-                            }";
+                                }}
+                              }}
+                            }}";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing node requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task NodeQuerySimpleObjectTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d1"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+            var globalId = JArray.Parse("[{\"f\":\"nestedSync\"}, {\"f\":\"this\"}]").PackGlobalId();
+            Assert.NotNull(globalId);
+            this.output.WriteLine(globalId);
+            this.output.WriteLine("--------------");
+            var query = $@"
+                            {{
+                                node(id: ""{globalId.Replace("\"", "\\\"")}"") 
+                                {{
+                                    __typename,
+                                    ...F0
+                                }}
+                            }}
+                            fragment F0 on TestApi_NestedProvider 
+                            {{
+                                syncScalarField
+                            }}";
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = @"
+                                        {
+                                          ""data"": {
+                                            ""node"": {
+                                              ""__typename"": ""TestApi_NestedProvider"",
+                                              ""syncScalarField"": ""SyncScalarField""                    
+                                            }
+                                          }
+                                        }";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -1243,30 +1302,15 @@ namespace ClusterKit.Web.Tests.GraphQL
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
-
-            var idSearchQuery = @"
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
             {
-                api {
-                    nestedSync {
-                        this {
-                            id
-                        }
-                    }
-                }
-            }
-            ";
+                UseJsonRepack = true
+            };
 
-            var result = await new DocumentExecuter().ExecuteAsync(
-                                         r =>
-                                         {
-                                             r.Schema = schema;
-                                             r.Query = idSearchQuery;
-                                             r.UserContext = new RequestContext();
-                                         }).ConfigureAwait(true);
-            var response = new DocumentWriter(true).Write(result);
-            var globalId = JObject.Parse(response).SelectToken("data.api.nestedSync.this.id").Value<string>();
+            var secondProvider = new DirectProvider(new TestSecondProvider(), this.output.WriteLine) { UseJsonRepack = true };
+
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider, secondProvider });
+            var globalId = JArray.Parse("[]").PackGlobalId();
             Assert.NotNull(globalId);
             this.output.WriteLine(globalId);
             this.output.WriteLine("--------------");
@@ -1278,25 +1322,27 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     ...F0
                                 }}
                             }}
-                            fragment F0 on TestApi_NestedProvider 
+                            fragment F0 on TestApi_TestSecondApi
                             {{
-                                syncScalarField
+                                syncScalarField,
+                                secondApiName
                             }}";
-            result = await new DocumentExecuter().ExecuteAsync(
-                                         r =>
-                                         {
-                                             r.Schema = schema;
-                                             r.Query = query;
-                                             r.UserContext = new RequestContext();
-                                         }).ConfigureAwait(true);
-            response = new DocumentWriter(true).Write(result);
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             var expectedResult = @"
                                         {
                                           ""data"": {
                                             ""node"": {
-                                              ""__typeName"": ""TestApi_NestedProvider"",
-                                              ""syncScalarField"": ""SyncScalarField""                    
+                                              ""__typename"": ""TestApi_TestSecondApi"",
+                                              ""syncScalarField"": ""SyncScalarField"",
+                                              ""secondApiName"" : ""SecondApiName""
                                             }
                                           }
                                         }";
@@ -1330,11 +1376,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                                          };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
-            var globalId =
-                ((JObject)
-                    JsonConvert.DeserializeObject(
-                        "{\"p\":[{\"f\":\"connection\"}]" + ",\"api\":\"TestApi\""
-                        + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}")).PackGlobalId();
+            var globalId = JArray.Parse("[{\"f\":\"connection\","
+                + "\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}]").PackGlobalId();
 
             var query = $@"
                 {{
@@ -1347,7 +1390,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                     }}
                 }}
 
-                fragment F0 on TestApi_TestObject_Node 
+                fragment F0 on TestApi_TestObject 
                 {{
                     __id,
                     id,
@@ -1365,19 +1408,19 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-            var expectedResult = @"
-                            {
-                              ""data"": {
-                                ""api"": {
-                                    ""__node"": {
+            var expectedResult = $@"
+                            {{
+                              ""data"": {{
+                                ""api"": {{
+                                    ""__node"": {{
                                       ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                      ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
+                                      ""id"": ""{globalId.Replace("\"", "\\\"")}"",
                                       ""name"": ""1-test"",
                                       ""value"": 100.0
-                                    }
-                                }
-                              }
-                            }";
+                                    }}
+                                }}
+                              }}
+                            }}";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -1411,7 +1454,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }            
             }
 
-            fragment F0 on TestApi_TestObject_Node {
+            fragment F0 on TestApi_TestObject {
                 __id,
                 id,
                 name,
@@ -1419,15 +1462,13 @@ namespace ClusterKit.Web.Tests.GraphQL
             }            
             ";
 
-            var globalId = ((JObject)JsonConvert
-                                   .DeserializeObject("{\"p\":[{\"f\":\"connection\"}]"
-                                                      + ",\"api\":\"TestApi\""
-                                                      + ",\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}"))
+            var globalId = JArray.Parse("[{\"f\":\"connection\","
+                + "\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}]")
                 .PackGlobalId();
 
             var variables = $@"
             {{
-                ""id"": ""{globalId}""
+                ""id"": ""{globalId.Replace("\"", "\\\"")}""
             }}
             ";
 
@@ -1441,17 +1482,17 @@ namespace ClusterKit.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-            var expectedResult = @"
-                            {
-                              ""data"": {
-                                ""node"": {
+            var expectedResult = $@"
+                            {{
+                              ""data"": {{
+                                ""node"": {{
                                   ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                  ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
+                                  ""id"": ""{globalId.Replace("\"", "\\\"")}"",
                                   ""name"": ""1-test"",
                                   ""value"": 100.0
-                                }
-                              }
-                            }";
+                                }}
+                              }}
+                            }}";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -2635,7 +2676,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var internalApiProvider = new TestProvider();
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+            var secondProvider = new DirectProvider(new TestSecondProvider(), this.output.WriteLine) { UseJsonRepack = true };
+
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider, secondProvider });
 
             var query = @"
             {                
@@ -2651,7 +2694,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                     asyncScalarField,
                     faultedSyncField,
                     forwardedArray,
-                    syncArrayOfScalarField                    
+                    syncArrayOfScalarField,
+                    secondApiName                  
                 }                
             }
             ";
@@ -2690,7 +2734,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 1,
                                 2,
                                 3
-                              ]
+                              ],
+                              ""secondApiName"": ""SecondApiName"",
                             }
                           }
                         }

@@ -9,9 +9,9 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
-    using System.IO;
+/*    using System.IO;
     using System.IO.Compression;
-    using System.Text;
+    using System.Text;*/
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -32,7 +32,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             return @string;
             ////return System.Convert.ToBase64String(Encoding.UTF8.GetBytes(@string));
 
-            using (var mem = new MemoryStream())
+/*            using (var mem = new MemoryStream())
             {
                 using (var zip = new GZipStream(mem, CompressionLevel.Optimal, true))
                 {
@@ -43,7 +43,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     var zipped = mem.ToArray();
                     return System.Convert.ToBase64String(zipped); 
                 }
-            }
+            }*/
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             return packed;
             ////return Encoding.UTF8.GetString(System.Convert.FromBase64String(packed));
 
-            try
+/*            try
             {
                 var zipped = System.Convert.FromBase64String(packed);
                 using (var memIn = new MemoryStream())
@@ -86,7 +86,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             catch
             {
                 return null;
-            }
+            }*/
         }
     }
 }

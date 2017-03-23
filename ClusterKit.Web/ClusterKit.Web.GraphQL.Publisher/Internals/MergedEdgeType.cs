@@ -156,7 +156,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 source.Add(fieldName, filteredSource);
 
-
                 return this.originalType.ResolveData(context, filteredSource);
             }
         }

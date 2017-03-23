@@ -268,7 +268,6 @@
     <Compile Include="Internals\MergedFieldedType.cs" />
     <Compile Include="Internals\MergedUntypedMutationResult.cs" />
     <Compile Include="Internals\NodeSearcher.cs" />
-    <Compile Include="MergedNodeType.cs" />
     <Compile Include="OwinConfigurator.cs" />
     <Compile Include="Queries.Designer.cs">
       <AutoGen>True</AutoGen>
