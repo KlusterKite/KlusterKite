@@ -36,7 +36,7 @@ namespace ClusterKit.API.Provider.Resolvers
     [SuppressMessage("ReSharper", "StaticMemberInGenericType",
         Justification = "Making use of static properties in generic classes")]
     public class CollectionResolver<T> : IResolver
-        where T : class, new()
+        where T : class
     {
         /// <summary>
         /// The initialization lock to make it thread-safe

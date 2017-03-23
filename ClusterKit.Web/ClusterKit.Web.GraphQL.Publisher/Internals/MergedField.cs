@@ -15,6 +15,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
     using ClusterKit.API.Client;
 
+    using global::GraphQL.Resolvers;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -103,6 +105,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public Dictionary<string, ApiField> OriginalFields { get; } = new Dictionary<string, ApiField>();
 
         /// <summary>
+        /// Gets or sets the resolver to use instead of specified <see cref="MergedType"/>
+        /// </summary>
+        public IFieldResolver Resolver { get; set; }
+
+        /// <summary>
         /// Adds a provider to the provider list
         /// </summary>
         /// <param name="provider">The provider</param>
@@ -130,6 +137,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 this.Flags,
                 this.Arguments,
                 this.Description);
+
+            mergedField.Resolver = this.Resolver;
 
             foreach (var provider in this.providers.Skip(1))
             {

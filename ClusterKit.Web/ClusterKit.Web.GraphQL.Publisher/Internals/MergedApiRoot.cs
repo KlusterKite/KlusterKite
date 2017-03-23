@@ -50,6 +50,29 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         public NodeSearcher NodeSearher { get; internal set; }
 
+        /// <summary>
+        /// Gets combined name from all provider
+        /// </summary>
+        public override string ComplexTypeName
+        {
+            get
+            {
+                if (this.Providers.Any())
+                {
+                    var providersNames =
+                        this.Providers.Select(
+                                p => EscapeName(p.Provider.Description.ApiName))
+                            .Distinct()
+                            .OrderBy(s => s)
+                            .ToArray();
+
+                    return string.Join("_", providersNames);
+                }
+
+                return EscapeName(this.OriginalTypeName);
+            }
+        }
+
         /// <inheritdoc />
         public override MergedObjectType Clone()
         {
@@ -148,7 +171,10 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         return seed;
                     });
 
-            return response;
+
+            var data = this.ResolveData(context, response);
+            data.Add("__newGlobalId", new JArray());
+            return data;
         }
 
         /// <summary>
@@ -264,7 +290,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var requestedFields = new List<ApiRequest>();
                 var idSubRequestRequest = new List<ApiRequest>
                                               {
-                                                  new ApiRequest { FieldName = nodeType.KeyName, Alias = "__id" }
+                                                  new ApiRequest { FieldName = nodeType.KeyField.FieldName, Alias = "__id" }
                                               };
                 var idRequestRequest = new ApiRequest
                 {
@@ -287,7 +313,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     {
                         case "node":
                             var nodeFields = nodeType.GatherSingleApiRequest(nodeRequest, context).ToList();
-                            nodeFields.Add(new ApiRequest { Alias = "__id", FieldName = nodeType.KeyName });
+                            nodeFields.Add(new ApiRequest { Alias = "__id", FieldName = nodeType.KeyField.FieldName });
                             requestedFields.Add(
                                 new ApiRequest
                                     {
@@ -313,7 +339,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                             }));
                             }
 
-                            edgeFields.Add(new ApiRequest { Alias = "__id", FieldName = nodeType.KeyName });
+                            edgeFields.Add(new ApiRequest { Alias = "__id", FieldName = nodeType.KeyField.FieldName });
                             requestedFields.Add(
                                 new ApiRequest { Alias = nodeAlias, FieldName = "result", Fields = edgeFields });
 

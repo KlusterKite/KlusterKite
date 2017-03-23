@@ -41,7 +41,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedConnectionType(string originalTypeName, ApiProvider provider, MergedObjectType elementType)
             : base(originalTypeName)
         {
-            this.ElementType = new MergedNodeType(provider, elementType);
+            this.ElementType = elementType;
             this.Provider = provider;
             this.EdgeType = new MergedEdgeType(this.OriginalTypeName, provider, this.ElementType);
         }
@@ -56,7 +56,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets the object end type
         /// </summary>
-        public MergedNodeType ElementType { get; }
+        public MergedObjectType ElementType { get; }
 
         /// <summary>
         /// Gets the type of the edge
@@ -84,7 +84,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         {
                             var fields = new List<ApiRequest>
                                              {
-                                                 new ApiRequest { FieldName = this.ElementType.KeyName, Alias = "__id" }
+                                                 new ApiRequest { FieldName = this.ElementType.KeyField.FieldName, Alias = "__id" }
                                              };
                             foreach (var nodeRequest in
                                 GetRequestedFields(field.SelectionSet, context, this.ElementType.ComplexTypeName)

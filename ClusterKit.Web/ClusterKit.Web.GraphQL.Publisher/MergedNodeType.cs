@@ -157,6 +157,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             return source;
         }
 
+        /*
         /// <inheritdoc />
         public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
@@ -174,6 +175,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
             return requests;
         }
+        */
         
         /// <summary>
         /// The resolver for the global id

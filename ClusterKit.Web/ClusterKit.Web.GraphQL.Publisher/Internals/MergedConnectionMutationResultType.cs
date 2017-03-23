@@ -47,7 +47,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// The provider.
         /// </param>
         public MergedConnectionMutationResultType(
-            MergedNodeType nodeType, 
+            MergedObjectType nodeType, 
             MergedApiRoot root,
             MergedType errorType,
             ApiProvider provider)
@@ -142,7 +142,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <summary>
             /// The node type
             /// </summary>
-            private readonly MergedNodeType nodeType;
+            private readonly MergedObjectType nodeType;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ResultNodeResolver"/> class.
@@ -150,7 +150,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <param name="nodeType">
             /// The node type.
             /// </param>
-            public ResultNodeResolver(MergedNodeType nodeType)
+            public ResultNodeResolver(MergedObjectType nodeType)
             {
                 this.nodeType = nodeType;
             }
@@ -159,7 +159,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             public object Resolve(ResolveFieldContext context)
             {
                 var source = ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value as JObject;
-                return source == null ? null : this.nodeType.ResolveData((JObject)source.DeepClone());
+                return source == null ? null : this.nodeType.ResolveData(context, (JObject)source.DeepClone());
             }
         }
 

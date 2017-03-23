@@ -55,7 +55,7 @@ namespace ClusterKit.NodeManager.Messages
             /// <summary>
             /// Gets or sets name of the node template
             /// </summary>
-            [DeclareField(Description = "name of the node template")]
+            [DeclareField(Description = "name of the node template", IsKey = true)]
             public string Name { get; set; }
 
             /// <summary>

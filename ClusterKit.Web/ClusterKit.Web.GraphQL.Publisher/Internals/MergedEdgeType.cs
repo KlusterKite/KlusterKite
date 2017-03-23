@@ -10,7 +10,8 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
-    
+    using System.Linq;
+
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Resolvers;
@@ -35,7 +36,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="objectType">
         /// The end Type.
         /// </param>
-        public MergedEdgeType(string originalTypeName, ApiProvider provider, MergedNodeType objectType) : base(originalTypeName)
+        public MergedEdgeType(string originalTypeName, ApiProvider provider, MergedObjectType objectType) : base(originalTypeName)
         {
             this.ObjectType = objectType;
             this.Provider = provider;
@@ -50,7 +51,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Gets the end type
         /// </summary>
-        public MergedNodeType ObjectType { get; }
+        public MergedObjectType ObjectType { get; }
 
         /// <summary>
         /// Gets the field provider
@@ -85,6 +86,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                              this.Provider,
                                                              null,
                                                              description: this.ObjectType.Description)
+                                                             {
+                                                                 Resolver = new NodeResolver(this.ObjectType)
+                                                             }
                                                      }
                                                  }
                                      }
@@ -109,6 +113,51 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             public object Resolve(ResolveFieldContext context)
             {
                 return (context.Source as JObject)?.GetValue("__id");
+            }
+        }
+
+        /// <summary>
+        /// The node resolver
+        /// </summary>
+        private class NodeResolver : IFieldResolver
+        {
+            /// <summary>
+            /// The original node type
+            /// </summary>
+            private MergedObjectType originalType;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="NodeResolver"/> class.
+            /// </summary>
+            /// <param name="originalType">
+            /// The original type.
+            /// </param>
+            public NodeResolver(MergedObjectType originalType)
+            {
+                this.originalType = originalType;
+            }
+
+            /// <inheritdoc />
+            public object Resolve(ResolveFieldContext context)
+            {
+                var source = context.Source as JObject;
+                if (source == null)
+                {
+                    return null;
+                }
+
+                var fieldName = context.FieldAst.Alias ?? context.FieldAst.Name;
+                var filteredSource = new JObject();
+                var prefix = $"{fieldName}_";
+                foreach (var property in source.Properties().Where(p => p.Name.StartsWith(prefix)))
+                {
+                    filteredSource.Add(property.Name.Substring(prefix.Length), property.Value);
+                }
+
+                source.Add(fieldName, filteredSource);
+
+
+                return this.originalType.ResolveData(context, filteredSource);
             }
         }
     }

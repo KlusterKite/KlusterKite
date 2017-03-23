@@ -59,7 +59,7 @@ namespace ClusterKit.Monitoring.Client.Messages
         /// Gets or sets the actor's name
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "the actor's name")]
+        [DeclareField(Description = "the actor's name", IsKey = true)]
         public string Name { get; set; }
 
         /// <summary>

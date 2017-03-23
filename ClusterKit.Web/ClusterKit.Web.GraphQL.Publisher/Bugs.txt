@@ -1,0 +1,26 @@
+﻿Сергей Пуриков, [22.03.17 18:14]
+Почему-то clusterKitMonitoring_clusterKitMonitoringApi_initiateScan всегда возвращает result: false, хотя процесс сканирования явно начинается. Но это не страшно.
+
+Сергей Пуриков, [22.03.17 18:16]
+Ну вот запрос на всякий случай:
+
+mutation InitiateScanMutation($input_0:ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input!) {
+  ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan(input:$input_0) {
+    clientMutationId,
+    ...F0
+  }
+}
+fragment F0 on Boolean_MutationPayload {
+  result
+}
+
+
+variables:
+
+{
+  "input_0": {
+    "clientMutationId": "0"
+  }
+}
+
+--------------------------------------------------------

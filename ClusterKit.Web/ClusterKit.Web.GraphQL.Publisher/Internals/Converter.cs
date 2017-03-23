@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using Akka;
@@ -35,7 +36,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>
         /// The corresponding JSON
         /// </returns>
-        public static JObject ToJson(this Arguments arguments, ResolveFieldContext context)
+        public static JObject ToJson(this IEnumerable<Argument> arguments, ResolveFieldContext context)
         {
             var result = new JObject();
             foreach (var argument in arguments)

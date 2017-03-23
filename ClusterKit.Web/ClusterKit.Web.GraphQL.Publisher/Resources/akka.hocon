@@ -15,7 +15,7 @@
 
 		GraphQL {
 			MaxDepth = 15,
-			MaxComplexity = 400
+			MaxComplexity = 2000
 		}
 
 		Services {

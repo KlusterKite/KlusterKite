@@ -19,9 +19,11 @@ namespace ClusterKit.NodeManager
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Client.Attributes.Authorization;
+    using ClusterKit.API.Client.Converters;
     using ClusterKit.Core;
     using ClusterKit.Data.CRUD;
     using ClusterKit.NodeManager.Client;
+    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -63,16 +65,16 @@ namespace ClusterKit.NodeManager
         /// </summary>
         /// <returns>The list of available packages</returns>
         [UsedImplicitly]
-        [DeclareField(Description = "The list of available packages from local cluster repository")]
+        [DeclareField(
+            Description = "The list of available packages from local cluster repository",
+            Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
-        public async Task<List<PackageDescriptionForApi>> GetPackages()
+        public Task<List<PackageDescription>> GetPackages()
         {
-            return
-                (await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
-                     .Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout))
-                     .Select(d => new PackageDescriptionForApi(d)).ToList();
+            return this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                     .Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
         }
 
         /// <summary>
@@ -251,38 +253,5 @@ namespace ClusterKit.NodeManager
         /// </summary>
         /// <returns>Akka actor path</returns>
         private string GetManagerActorProxyPath() => "/user/NodeManager/NodeManagerProxy";
-
-        /// <summary>
-        /// Description of the Nuget package for API output
-        /// </summary>
-        [ApiDescription(Description = "The nuget package", Name = "ClusterKitNugetPackage")]
-        public class PackageDescriptionForApi
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="PackageDescriptionForApi"/> class.
-            /// </summary>
-            /// <param name="description">
-            /// The original description.
-            /// </param>
-            public PackageDescriptionForApi(PackageDescription description)
-            {
-                this.Id = description.Id;
-                this.Version = description.Version;
-            }
-
-            /// <summary>
-            /// Gets the package Id
-            /// </summary>
-            [UsedImplicitly]
-            [DeclareField(Description = "The package name")]
-            public string Id { get; }
-
-            /// <summary>
-            /// Gets the package latest version
-            /// </summary>
-            [DeclareField(Description = "The package version")]
-            [UsedImplicitly]
-            public string Version { get; }
-        }
     }
 }

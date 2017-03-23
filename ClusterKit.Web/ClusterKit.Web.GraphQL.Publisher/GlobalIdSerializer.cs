@@ -26,9 +26,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// </summary>
         /// <param name="globalId">The global id</param>
         /// <returns>Packed global id</returns>
-        public static string PackGlobalId(this JObject globalId)
+        public static string PackGlobalId(this JToken globalId)
         {
             var @string = globalId.ToString(Formatting.None);
+            return @string;
+            ////return System.Convert.ToBase64String(Encoding.UTF8.GetBytes(@string));
+
             using (var mem = new MemoryStream())
             {
                 using (var zip = new GZipStream(mem, CompressionLevel.Optimal, true))
@@ -50,6 +53,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <returns>Unpacked global id as string</returns>
         public static string UnpackGlobalId(this string packed)
         {
+            return packed;
+            ////return Encoding.UTF8.GetString(System.Convert.FromBase64String(packed));
+
             try
             {
                 var zipped = System.Convert.FromBase64String(packed);

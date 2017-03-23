@@ -21,6 +21,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// The merged api type description
     /// </summary>
@@ -134,21 +136,114 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
-            if (this.CreateVirtualId)
+            var idField = graphType.Fields.FirstOrDefault(f => f.Name == "id");
+            if (idField != null)
             {
-                graphType.AddField(
-                    new FieldType
-                        {
-                            Name = "id",
-                            ResolvedType = new IdGraphType(),
-                            Resolver =
-                                this.KeyField == null
-                                    ? new VirtualIdResolver(this)
-                                    : (IFieldResolver)this.KeyField.Type
-                        });
+                idField.Name = "__id";
             }
 
+            graphType.AddField(
+                new FieldType
+                {
+                    Name = "id",
+                    ResolvedType = new IdGraphType(),
+                    Resolver = new VirtualIdResolver()
+                });
+
+            graphType.AddResolvedInterface(nodeInterface);
+            nodeInterface.AddImplementedType(this.ComplexTypeName, graphType);
+
             return graphType;
+        }
+
+        /// <inheritdoc />
+        public override object Resolve(ResolveFieldContext context)
+        {
+            var resolve = base.Resolve(context) as JObject;
+            if (resolve == null)
+            {
+                return null;
+            }
+
+            return this.ResolveData(context, resolve);
+        }
+
+        /// <summary>
+        /// Resolves parent data
+        /// </summary>
+        /// <param name="context">The request context</param>
+        /// <param name="source">The parent data</param>
+        /// <returns>The resolved data</returns>
+        public virtual JObject ResolveData(ResolveFieldContext context, JObject source)
+        {
+            // setting request data for child elements
+            foreach (var field in GetRequestedFields(context.FieldAst.SelectionSet, context, this.ComplexTypeName))
+            {
+                MergedField localField;
+                if (!this.Fields.TryGetValue(field.Name, out localField))
+                {
+                    continue;
+                }
+
+                var property = source.Property(field.Alias ?? field.Name)?.Value as JObject;
+                if (property == null || property.Property("__localRequest") != null)
+                {
+                    continue;
+                }
+
+                var localRequest = new JObject { { "f", localField.FieldName } };
+                if (field.Arguments != null && field.Arguments.Any())
+                {
+                    var args =
+                        field.Arguments.Where(
+                                a =>
+                                    localField.Arguments.ContainsKey(a.Name)
+                                    && !localField.Arguments[a.Name].Flags.HasFlag(EnFieldFlags.IsTypeArgument))
+                            .OrderBy(a => a.Name)
+                            .ToList();
+                    if (args.Count > 0)
+                    {
+                        localRequest.Add("a", args.ToJson(context));
+                    }
+                }
+
+                property.Add("__localRequest", localRequest);
+            }
+
+            // generating self globalId data
+            JContainer parent = source.Parent;
+            JArray parentGlobalId = null;
+            var selfRequest = source.Property("__localRequest")?.Value as JObject;
+            while (parent != null)
+            {
+                parentGlobalId = (parent as JObject)?.Property("__newGlobalId")?.Value as JArray;
+                if (selfRequest == null)
+                {
+                    selfRequest = (parent as JObject)?.Property("__localRequest")?.Value as JObject;
+                }
+
+                if (parentGlobalId != null)
+                {
+                    break;
+                }
+
+                parent = parent.Parent;
+            }
+
+            if (selfRequest != null)
+            {
+                var globalId = parentGlobalId != null ? new JArray(parentGlobalId) : new JArray();
+                var selfPart = (JObject)selfRequest.DeepClone();
+                if (this.KeyField != null)
+                {
+                    selfPart.Add("id", source.Property("__id")?.Value);
+                }
+
+                globalId.Add(selfPart);
+                source.Add("__newGlobalId", globalId);
+            }
+
+            return source;
         }
 
         /// <summary>
@@ -182,6 +277,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             Field contextFieldAst,
             ResolveFieldContext context)
         {
+            if (this.KeyField != null && this.KeyField.Providers.Contains(provider))
+            {
+                yield return new ApiRequest
+                {
+                    Alias = "__id",
+                    FieldName = this.KeyField.FieldName
+                };
+            }
+
+            // todo: process the __id request
             var requestedFields 
                 = GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName).ToList();
             var usedFields =
@@ -192,12 +297,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         fp => fp.Key,
                         (s, fp) => new { Ast = s, Field = fp.Value })
                     .ToList();
-
-            if (this.KeyField != null && this.CreateVirtualId && this.KeyField.Providers.Any(fp => fp == provider))
-            {
-                usedFields.AddRange(
-                    requestedFields.Where(f => f.Name == "id").Select(f => new { Ast = f, Field = this.KeyField }));
-            }
 
             foreach (var usedField in usedFields)
             {
@@ -240,26 +339,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         private class VirtualIdResolver : IFieldResolver
         {
-            /// <summary>
-            /// The parent type
-            /// </summary>
-            private readonly MergedObjectType parentType;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="VirtualIdResolver"/> class.
-            /// </summary>
-            /// <param name="parentType">
-            /// The parent type.
-            /// </param>
-            public VirtualIdResolver(MergedObjectType parentType)
-            {
-                this.parentType = parentType;
-            }
-
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                return this.parentType.ComplexTypeName;
+                var id = (context.Source as JObject)?.Property("__newGlobalId")?.Value;
+                return id?.PackGlobalId();
             }
         }
     }

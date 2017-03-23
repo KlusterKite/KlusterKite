@@ -96,7 +96,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
                         if (f.Resolver == null)
                         {
-                            f.Resolver = fieldDescription.Type;
+                            f.Resolver = fieldDescription.Resolver ?? fieldDescription.Type;
                         }
 
                         if (!string.IsNullOrWhiteSpace(fieldDescription.Description))

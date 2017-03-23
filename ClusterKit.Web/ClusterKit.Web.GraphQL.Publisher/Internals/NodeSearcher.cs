@@ -114,7 +114,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             var nodeRequest = connectionType.ElementType.GatherSingleApiRequest(context.FieldAst, context).ToList();
-            nodeRequest.Add(new ApiRequest { Alias = "__id", FieldName = connectionType.ElementType.KeyName });
+            nodeRequest.Add(new ApiRequest { Alias = "__id", FieldName = connectionType.ElementType.KeyField.FieldName });
 
             var searchNode = await 
                 api.SearchNode(
@@ -127,7 +127,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             {
                 searchNode.Add("__resolvedType", connectionType.ElementType.ComplexTypeName);
                 searchNode.Add("__globalId", packedId);
-                searchNode = connectionType.ElementType.ResolveData(searchNode);
+                searchNode = connectionType.ElementType.ResolveData(context, searchNode);
             }
 
             return searchNode;

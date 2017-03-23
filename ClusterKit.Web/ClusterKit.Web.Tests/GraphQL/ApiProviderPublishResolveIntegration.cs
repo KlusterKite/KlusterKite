@@ -133,8 +133,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                             count,
                             edges {
                                 cursor,
-                                node {
-                                    id,
+                                node {                                    
                                     __id,
                                     name,
                                     value
@@ -170,7 +169,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       {
                                         ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                         ""node"": {
-                                          ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                           ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                           ""name"": ""3-test"",
                                           ""value"": 50.0
@@ -178,8 +176,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       },
                                       {
                                         ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                        ""node"": {
-                                          ""id"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
+                                        ""node"": {                                          
                                           ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                           ""name"": ""4-test"",
                                           ""value"": 70.0
@@ -258,8 +255,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                             items: edges {
                                 location: cursor,
                                 location2: cursor,
-                                item: node {
-                                    globalId: id,
+                                item: node {                                    
                                     naming: name,
                                 },
                                 item2: node {
@@ -274,7 +270,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                     type
                                 },
                                 item2: node {
-                                    globalId2: id,
                                     id2: __id,
                                     naming2: name,
                                     v2: value,
@@ -307,7 +302,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 ""location"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                                 ""location2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                                 ""item"": {
-                                                  ""globalId"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                                   ""naming"": ""3-test""
                                                 },
                                                 ""item2"": {
@@ -319,7 +313,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 ""location"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                                 ""location2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                                 ""item"": {
-                                                  ""globalId"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
                                                   ""naming"": ""4-test""
                                                 },
                                                 ""item2"": {
@@ -336,7 +329,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                   ""type"": ""Good""
                                                 },
                                                 ""item2"": {
-                                                  ""globalId2"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
                                                   ""id2"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                                   ""naming2"": ""3-test"",
                                                   ""v2"": 50.0,
@@ -350,7 +342,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                   ""type"": ""Good""
                                                 },
                                                 ""item2"": {
-                                                  ""globalId2"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
                                                   ""id2"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                                   ""naming2"": ""4-test"",
                                                   ""v2"": 70.0,
@@ -1233,6 +1224,86 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing node requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task NodeQueryRootTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d1"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var idSearchQuery = @"
+            {
+                api {
+                    nestedSync {
+                        this {
+                            id
+                        }
+                    }
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                                         r =>
+                                         {
+                                             r.Schema = schema;
+                                             r.Query = idSearchQuery;
+                                             r.UserContext = new RequestContext();
+                                         }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            var globalId = JObject.Parse(response).SelectToken("data.api.nestedSync.this.id").Value<string>();
+            Assert.NotNull(globalId);
+            this.output.WriteLine(globalId);
+            this.output.WriteLine("--------------");
+            var query = $@"
+                            {{
+                                node(id: ""{globalId.Replace("\"", "\\\"")}"") 
+                                {{
+                                    __typename,
+                                    ...F0
+                                }}
+                            }}
+                            fragment F0 on TestApi_NestedProvider 
+                            {{
+                                syncScalarField
+                            }}";
+            result = await new DocumentExecuter().ExecuteAsync(
+                                         r =>
+                                         {
+                                             r.Schema = schema;
+                                             r.Query = query;
+                                             r.UserContext = new RequestContext();
+                                         }).ConfigureAwait(true);
+            response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = @"
+                                        {
+                                          ""data"": {
+                                            ""node"": {
+                                              ""__typeName"": ""TestApi_NestedProvider"",
+                                              ""syncScalarField"": ""SyncScalarField""                    
+                                            }
+                                          }
+                                        }";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing nested node requests from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
@@ -1672,10 +1743,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 ""syncScalarField"": ""SyncScalarField""
                               },
                               ""syncScalarField"": ""SyncScalarField"",
-                              ""faultedASyncMethod"": {
-                                ""asyncScalarField"": null,
-                                ""syncScalarField"": null
-                              },
+                              ""faultedASyncMethod"": null,
                               ""syncEnumField"": ""EnumItem1"",
                               ""syncFlagsField"": 1,
                             }
@@ -2642,14 +2710,25 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
+            var apiId = JArray.Parse("[]").PackGlobalId().Replace("\"", "\\\"");
+            var nestedId = JArray.Parse("[{\"f\":\"nestedAsync\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var nestedNestedId = JArray.Parse("[{\"f\":\"nestedAsync\"},{\"f\":\"this\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var nodeId = JArray.Parse("[{\"f\":\"arrayOfObjectNoIds\",\"id\":\"code1\"}]").PackGlobalId().Replace("\"", "\\\"");
+
             var query = @"
             {                
                 api {
-                    id
+                    id,
+                    syncScalarField,
                     nestedAsync {
-                        id
+                        id,
+                        syncScalarField,
+                        this {
+                            id,
+                            syncScalarField
+                        }
                     },
-                    arrayOfObjectNoIds {
+                    arrayOfObjectNoIds(limit: 1) {
                         edges {
                             node {
                                 id,
@@ -2671,33 +2750,33 @@ namespace ClusterKit.Web.Tests.GraphQL
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
-            var expectedResult = @"
-                                {
-                                    ""data"": {
-                                        ""api"": {
-                                            ""id"": ""TestApi_TestApi"",                              
-                                            ""nestedAsync"": {
-                                                ""id"": ""TestApi_NestedProvider"",
-                                            },
-                                            ""arrayOfObjectNoIds"": {
+            var expectedResult = $@"
+                                {{
+                                    ""data"": {{
+                                        ""api"": {{
+                                            ""id"": ""{apiId}"", 
+                                            ""syncScalarField"": ""SyncScalarField"",                             
+                                            ""nestedAsync"": {{
+                                                ""id"": ""{nestedId}"",
+                                                ""syncScalarField"": ""SyncScalarField"",
+                                                ""this"": {{
+                                                    ""id"": ""{nestedNestedId}"",
+                                                    ""syncScalarField"": ""SyncScalarField""
+                                                }}
+                                            }},
+                                            ""arrayOfObjectNoIds"": {{
                                                 ""edges"": [
-                                                    {
-                                                    ""node"": {
-                                                        ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkosKkqs9E/zT8pKTS7xy/dMKVaqjdVRSizIBEqGpBaXOAJZOkqZKUBucn5KqqFSLQAVsJ95PwAAAA=="",
-                                                        ""code"": ""code1""
-                                                    }
-                                                    },
-                                                    {
-                                                    ""node"": {
-                                                        ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkosKkqs9E/zT8pKTS7xy/dMKVaqjdVRSizIBEqGpBaXOAJZOkqZKUBucn5KqpFSLQBMDtl7PwAAAA=="",
-                                                        ""code"": ""code2""
-                                                    }
-                                                    }
+                                                    {{
+                                                        ""node"": {{
+                                                            ""id"": ""{nodeId}"",
+                                                            ""code"": ""code1""
+                                                        }}
+                                                    }}
                                                 ]
-                                            }
-                                        }
-                                    }
-                                }
+                                            }}
+                                        }}
+                                    }}
+                                }}
                         ";
 
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
@@ -2721,7 +2800,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
             }
 
-            fragment F on TestApi_TestApi {
+            fragment F on TestApi {
                     syncScalarField
             }
             ";
@@ -2762,7 +2841,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var query = @"
             query FragmentsRequest {                
                 api {
-                   ...on TestApi_TestApi {
+                   ...on TestApi {
                     syncScalarField
                     }
                 }

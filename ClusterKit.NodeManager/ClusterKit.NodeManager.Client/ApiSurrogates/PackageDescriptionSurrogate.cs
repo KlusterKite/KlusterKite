@@ -22,11 +22,18 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
     public class PackageDescriptionSurrogate
     {
         /// <summary>
-        /// Gets or sets the package Id
+        /// Gets the package id (name and version)
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "The package Id")]
-        public string Id { get; set; }
+        [DeclareField(Description = "The package id (name and version)", IsKey = true)]
+        public string Id => $"{this.Name} {this.Version}";
+
+        /// <summary>
+        /// Gets or sets the package name
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField(Description = "The package name")]
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the package latest version
@@ -51,7 +58,7 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
 
                 return new PackageDescriptionSurrogate
                 {
-                    Id = packageDescription.Id,
+                    Name = packageDescription.Id,
                     Version = packageDescription.Version
                 };
             }

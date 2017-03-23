@@ -44,14 +44,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public Dictionary<string, MergedField> Fields { get; protected set; }
 
         /// <summary>
-        /// Gets a value indicating whether virtual id should be set
-        /// </summary>
-        protected bool CreateVirtualId { get; private set; }
-
-        /// <summary>
         /// Gets the object's key field
         /// </summary>
-        protected MergedField KeyField { get; private set; }
+        public MergedField KeyField { get; private set; }
 
         /// <summary>
         /// Initializes the internal state
@@ -59,17 +54,34 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public void Initialize()
         {
             this.KeyField = this.Fields.Values.FirstOrDefault(f => f.Flags.HasFlag(EnFieldFlags.IsKey));
-            this.CreateVirtualId = !this.Fields.ContainsKey("id");
         }
 
         /// <inheritdoc />
         public override IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
         {
+            if (this.KeyField != null)
+            {
+                yield return new ApiRequest
+                                 {
+                                     Alias = "__id",
+                                     FieldName = this.KeyField.FieldName
+                                 };
+            }
+
             foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName))
             {
-                MergedField localField;
+                if (field.Alias == "__id")
+                {
+                    continue;
+                }
 
-                if (this.KeyField != null && this.CreateVirtualId && field.Name == "id")
+                MergedField localField;
+                if (field.Name == "id")
+                {
+                    continue;
+                }
+
+                if (field.Name == "__id" && this.KeyField != null)
                 {
                     localField = this.KeyField;
                 }

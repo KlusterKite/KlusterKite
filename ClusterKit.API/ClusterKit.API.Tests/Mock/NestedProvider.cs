@@ -52,6 +52,12 @@ namespace ClusterKit.API.Tests.Mock
         public string ReadOnlyField { get; set; }
 
         /// <summary>
+        /// Gets this for infinite recursive requests
+        /// </summary>
+        [DeclareField]
+        public NestedProvider This => this;
+
+        /// <summary>
         /// Test nested mutation
         /// </summary>
         /// <param name="name">The new name of current test object</param>
