@@ -2775,13 +2775,14 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var apiId = JArray.Parse("[]").PackGlobalId().Replace("\"", "\\\"");
             var nestedId = JArray.Parse("[{\"f\":\"nestedAsync\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var nested2Id = JArray.Parse("[{\"f\":\"nestedSync\"}]").PackGlobalId().Replace("\"", "\\\"");
             var nestedNestedId = JArray.Parse("[{\"f\":\"nestedAsync\"},{\"f\":\"this\"}]").PackGlobalId().Replace("\"", "\\\"");
             var nodeId = JArray.Parse("[{\"f\":\"arrayOfObjectNoIds\",\"id\":\"code1\"}]").PackGlobalId().Replace("\"", "\\\"");
 
             var query = @"
             {                
                 api {
-                    id,
+                    id
                     syncScalarField,
                     nestedAsync {
                         id,
@@ -2791,6 +2792,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                             syncScalarField
                         }
                     },
+                    nestedSync {
+                        id
+                    }
                     arrayOfObjectNoIds(limit: 1) {
                         edges {
                             node {
@@ -2826,6 +2830,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                     ""id"": ""{nestedNestedId}"",
                                                     ""syncScalarField"": ""SyncScalarField""
                                                 }}
+                                            }},
+                                            ""nestedSync"": {{
+                                                ""id"": ""{nested2Id}""
                                             }},
                                             ""arrayOfObjectNoIds"": {{
                                                 ""edges"": [

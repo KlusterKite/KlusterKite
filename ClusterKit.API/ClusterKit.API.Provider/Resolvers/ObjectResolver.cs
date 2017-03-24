@@ -378,7 +378,7 @@ namespace ClusterKit.API.Provider.Resolvers
             var source = (T)sourceUntyped;
             if (request?.Fields == null || request.Fields.Count == 0)
             {
-                return null;
+                return new JObject();
             }
 
             var result = new JObject();

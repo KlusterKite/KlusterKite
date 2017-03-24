@@ -151,27 +151,30 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 }
             }
 
+            JObject data;
             if (taskList.Count == 0)
             {
-                return new JObject();
+                data = new JObject();
+            }
+            else
+            {
+                var responses = await Task.WhenAll(taskList);
+                var options = new JsonMergeSettings
+                                  {
+                                      MergeArrayHandling = MergeArrayHandling.Merge,
+                                      MergeNullValueHandling = MergeNullValueHandling.Ignore
+                                  };
+
+                var response = responses.Aggregate(
+                    new JObject(),
+                    (seed, next) =>
+                        {
+                            seed.Merge(next, options);
+                            return seed;
+                        });
+                data = this.ResolveData(context, response);
             }
 
-            var responses = await Task.WhenAll(taskList);
-            var options = new JsonMergeSettings
-                              {
-                                  MergeArrayHandling = MergeArrayHandling.Merge,
-                                  MergeNullValueHandling = MergeNullValueHandling.Ignore
-                              };
-
-            var response = responses.Aggregate(
-                new JObject(),
-                (seed, next) =>
-                    {
-                        seed.Merge(next, options);
-                        return seed;
-                    });
-
-            var data = this.ResolveData(context, response);
             data.Add("__newGlobalId", new JArray());
             return data;
         }

@@ -267,7 +267,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             graphType.AddField(
-                new FieldType { Name = "id", ResolvedType = new IdGraphType(), Resolver = new VirtualIdResolver() });
+                new FieldType { Name = "id", ResolvedType = new IdGraphType(), Resolver = new GlobalIdResolver() });
 
             graphType.AddResolvedInterface(nodeInterface);
             nodeInterface.AddImplementedType(this.ComplexTypeName, graphType);
@@ -304,8 +304,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     continue;
                 }
 
-                var property = source.Property(field.Alias ?? field.Name)?.Value as JObject;
-                if (property == null || property.Property(RequestPropertyName) != null)
+                var propertyName = field.Alias ?? field.Name;
+                var property = source.Property(propertyName)?.Value as JObject;
+                if (property == null)
+                {
+                    if ((localField.Type as MergedObjectType)?.Category == EnCategory.MultipleApiType)
+                    {
+                        source.Add(propertyName, new JObject());
+                        property = (JObject)source.Property(propertyName).Value;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                
+                if (property.Property(RequestPropertyName) != null)
                 {
                     continue;
                 }
@@ -351,9 +365,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Resolves value for virtual id of static classes
+        /// Resolves value for global id
         /// </summary>
-        private class VirtualIdResolver : IFieldResolver
+        private class GlobalIdResolver : IFieldResolver
         {
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
