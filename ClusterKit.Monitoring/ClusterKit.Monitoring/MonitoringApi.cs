@@ -25,7 +25,7 @@ namespace ClusterKit.Monitoring
     /// <summary>
     /// Monitoring api
     /// </summary>
-    [ApiDescription(Description = "ClusterKit monitoring api")]
+    [ApiDescription(Description = "ClusterKit monitoring api", Name = "Root")]
     public class MonitoringApi
     {
         /// <summary>

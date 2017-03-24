@@ -504,5 +504,13 @@ namespace ClusterKit.API.Tests.Mock
 
             return "ok";
         }
+
+        /// <summary>
+        /// Example of simple trigger mutation
+        /// </summary>
+        /// <returns>The success of the operation</returns>
+        [UsedImplicitly]
+        [DeclareMutation]
+        public bool BoolMutation() => true;
     }
 }

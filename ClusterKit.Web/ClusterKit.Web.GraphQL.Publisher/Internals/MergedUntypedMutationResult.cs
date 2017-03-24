@@ -82,7 +82,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
         {
             var graphType = new VirtualGraphType(this.ComplexTypeName);
-            graphType.AddField(this.CreateField("result", this.OriginalReturnType, new ResultResolver()));
+            graphType.AddField(this.CreateField("result", this.OriginalReturnType, new ResultResolver(this.OriginalReturnType)));
             graphType.AddField(new FieldType { Name = "clientMutationId", ResolvedType = new StringGraphType(), Resolver = new MergedConnectionMutationResultType.ClientMutationIdIdResolver() });
             graphType.AddField(this.CreateField("api", this.root, this.root));
             return graphType;
@@ -117,10 +117,27 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// </summary>
         private class ResultResolver : IFieldResolver
         {
+            /// <summary>
+            /// The mutation result type
+            /// </summary>
+            private readonly MergedType resultType;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ResultResolver"/> class.
+            /// </summary>
+            /// <param name="resultType">
+            /// The result type.
+            /// </param>
+            public ResultResolver(MergedType resultType)
+            {
+                this.resultType = resultType;
+            }
+
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                return (context.Source as JObject)?.Property("result")?.Value;
+                var token = (context.Source as JObject)?.Property("result")?.Value;
+                return this.resultType is MergedScalarType ? (token as JValue)?.Value : token;
             }
         }
     }
