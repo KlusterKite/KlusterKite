@@ -303,11 +303,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 var nodeRequests = topFields.Where(f => f.Name == "node" || f.Name == "edge").ToList();
 
-                var nodeAliases = new List<string>();
                 foreach (var nodeRequest in nodeRequests)
                 {
                     var nodeAlias = nodeRequest.Alias ?? nodeRequest.Name;
-                    nodeAliases.Add(nodeAlias);
                     switch (nodeRequest.Name)
                     {
                         case "node":
@@ -318,8 +316,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                     {
                                         Alias = nodeAlias,
                                         FieldName = "result",
-                                        Fields =
-                                            nodeFields
+                                        Fields = nodeFields
                                     });
                             break;
                         case "edge":
@@ -371,38 +368,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 };
 
                 var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
-                var path = data?.Property("__requestPath")?.Value as JArray;
-                var result = data?.Property("__idRequest")?.Value as JObject;
-                
-                if (path != null && result != null)
+                if (data != null)
                 {
-                    var id = result.Property("__id")?.Value;
-                    var globalId = new JObject
-                                       {
-                                           { "p", path },
-                                           { "api", this.provider.Description.ApiName },
-                                           { "id", id }
-                                       };
-
-                    var globalIdString = globalId.PackGlobalId();
-                    foreach (var nodeAlias in nodeAliases)
+                    var mutation = (ApiMutation)this.mergedField.OriginalFields[this.provider.Description.ApiName];
+                    var treePath = mutation.Path.Take(mutation.Path.Count - 1).ToList();
+                    if (treePath.Count > 0)
                     {
-                        (data.Property(nodeAlias)?.Value as JObject)?.Add("__globalId", globalIdString);
+                        var parentGlobalId =
+                            new JArray(treePath.Select(r => new JObject { { "f", r.FieldName } }));
+                        data.Add(GlobalIdPropertyName, parentGlobalId);
                     }
 
-                    var deletedId = data.Property("__deletedId")?.Value;
-                    if (deletedId != null)
+                    var elementRequest = mutation.Path.LastOrDefault();
+                    if (elementRequest != null)
                     {
-                        var deletedGlobalId = new JObject
-                                       {
-                                           { "p", path },
-                                           { "api", this.provider.Description.ApiName },
-                                           { "id", deletedId }
-                                       };
-                        foreach (var field in topFields.Where(f => f.Name == "deletedId"))
-                        {
-                            data.Add(field.Alias ?? field.Name, deletedGlobalId.PackGlobalId());
-                        }
+                        var localRequest = new JObject { { "f", elementRequest.FieldName } };
+                        data.Add(RequestPropertyName, localRequest);
                     }
                 }
 

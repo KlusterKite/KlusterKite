@@ -288,47 +288,6 @@ namespace ClusterKit.API.Tests
         }
 
         /// <summary>
-        /// Testing <see cref="ApiProvider.SearchNode"/>
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task NodeSearchTest()
-        {
-            var initialObjects = new List<TestObject>
-                                     {
-                                         new TestObject { Name = "1-test", Value = 100m, Type = TestObject.EnObjectType.Good },
-                                         new TestObject { Name = "2-test", Value = 50m, Type = TestObject.EnObjectType.Bad },
-                                         new TestObject { Name = "3-test", Value = 50m, Type = TestObject.EnObjectType.Good },
-                                         new TestObject { Name = "4-test", Value = 70m, Type = TestObject.EnObjectType.Bad },
-                                         new TestObject { Name = "5-test", Value = 6m, Type = TestObject.EnObjectType.Good },
-                                     };
-
-            var provider = this.GetProvider(initialObjects);
-            var context = new RequestContext();
-
-            var objFields = new List<ApiRequest>
-                                {
-                                    new ApiRequest { FieldName = "id" },
-                                    new ApiRequest { FieldName = "name" },
-                                    new ApiRequest { FieldName = "value" }
-                                };
-
-            var objRequest = new ApiRequest { Fields = objFields };
-
-            var searchResult = await provider.SearchNode(
-                JsonConvert.SerializeObject(initialObjects[1].Id),
-                new List<ApiRequest> { new ApiRequest { FieldName = "connection" } },
-                objRequest,
-                context,
-                e => this.output.WriteLine($"Search exception: {e.Message}"));
-
-            Assert.NotNull(searchResult);
-            this.output.WriteLine(searchResult.ToString());
-            Assert.Equal("2-test", searchResult.Property("name")?.Value);
-            Assert.Equal(50.0, searchResult.Property("value")?.Value);
-        }
-
-        /// <summary>
         /// Testing connection mutation resolve
         /// </summary>
         /// <param name="mutationName">

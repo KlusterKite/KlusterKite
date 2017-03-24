@@ -202,7 +202,7 @@ namespace ClusterKit.API.Provider.Resolvers
             /// <returns>The mutation field</returns>
             public ApiMutation CreateMutationField()
             {
-                var field = ApiMutation.CreateFromField(this.Field, this.Type);
+                var field = ApiMutation.CreateFromField(this.Field, this.Type, this.Path);
                 field.Name = this.MutationName;
                 return field;
             }
@@ -1244,7 +1244,6 @@ namespace ClusterKit.API.Provider.Resolvers
 
                 var mutationResultType = typeof(MutationResult<>).MakeGenericType(connection.Metadata.Type);
 
-                // todo: add to related types
                 var mutationResult =
                     typeof(ObjectResolver<>).MakeGenericType(mutationResultType)
                         .CreateInstance<ObjectResolver>()

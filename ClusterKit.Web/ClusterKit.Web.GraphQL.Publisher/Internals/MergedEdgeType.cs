@@ -101,7 +101,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override object Resolve(ResolveFieldContext context)
         {
             var parentData = context.Source as JObject;
-            return parentData?.GetValue(context.FieldAst.Alias ?? context.FieldAst.Name);
+            var token = parentData?.GetValue(context.FieldAst.Alias ?? context.FieldAst.Name);
+            if (token == null || (!(token is JArray) && !token.HasValues))
+            {
+                return null;
+            }
+
+            return token;
         }
 
         /// <summary>

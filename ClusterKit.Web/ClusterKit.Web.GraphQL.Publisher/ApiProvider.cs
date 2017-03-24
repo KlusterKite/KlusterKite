@@ -40,29 +40,5 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// The resolved data
         /// </returns>
         public abstract Task<JObject> GetData(List<ApiRequest> requests, RequestContext context);
-
-        /// <summary>
-        /// Searches for the connection node
-        /// </summary>
-        /// <param name="id">
-        /// The node id
-        /// </param>
-        /// <param name="path">
-        /// The node connection path in API
-        /// </param>
-        /// <param name="nodeRequest">
-        /// The request to the node value
-        /// </param>
-        /// <param name="context">
-        /// The request context.
-        /// </param>
-        /// <returns>
-        /// The serialized node value
-        /// </returns>
-        public abstract Task<JObject> SearchNode(
-            string id, 
-            List<RequestPathElement> path, 
-            ApiRequest nodeRequest,
-            RequestContext context);
     }
 }

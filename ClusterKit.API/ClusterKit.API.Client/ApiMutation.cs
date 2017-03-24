@@ -69,6 +69,11 @@ namespace ClusterKit.API.Client
         }
 
         /// <summary>
+        /// Gets or sets the path to the mutation container
+        /// </summary>
+        public List<ApiRequest> Path { get; set; }
+
+        /// <summary>
         /// Gets or sets the type of a mutation
         /// </summary>
         public EnType Type { get; set; }
@@ -76,10 +81,19 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// Creates the mutation from field
         /// </summary>
-        /// <param name="field">The field description</param>
-        /// <param name="type">The mutation type</param>
-        /// <returns>The new mutation description</returns>
-        public static ApiMutation CreateFromField(ApiField field, EnType type)
+        /// <param name="field">
+        /// The field description
+        /// </param>
+        /// <param name="type">
+        /// The mutation type
+        /// </param>
+        /// <param name="path">
+        /// The path to the mutation container.
+        /// </param>
+        /// <returns>
+        /// The new mutation description
+        /// </returns>
+        public static ApiMutation CreateFromField(ApiField field, EnType type, List<ApiRequest> path)
         {
             return new ApiMutation(field.Name, field.Flags)
             {
@@ -91,7 +105,8 @@ namespace ClusterKit.API.Client
                 AuthorizationRules = field.AuthorizationRules,
                 LogAccessRules = field.LogAccessRules,
                 RequireAuthenticatedSession = field.RequireAuthenticatedSession,
-                RequireAuthenticatedUserSession = field.RequireAuthenticatedUserSession
+                RequireAuthenticatedUserSession = field.RequireAuthenticatedUserSession,
+                Path = path
             };
         }
     }

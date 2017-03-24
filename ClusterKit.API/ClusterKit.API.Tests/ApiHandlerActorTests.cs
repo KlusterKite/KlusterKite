@@ -58,7 +58,7 @@ namespace ClusterKit.API.Tests
 
             var context = new RequestContext();
             var queryFields = new List<ApiRequest> { new ApiRequest { FieldName = "asyncScalarField" } };
-            var query = new QueriApiRequest { Context = context, Fields = queryFields };
+            var query = new QueryApiRequest { Context = context, Fields = queryFields };
 
             var result = (JObject)await actor.Ask<SurrogatableJObject>(query, TimeSpan.FromSeconds(1));
             Assert.NotNull(result);

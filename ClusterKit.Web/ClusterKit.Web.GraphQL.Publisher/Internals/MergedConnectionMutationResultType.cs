@@ -83,8 +83,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         {
             var graphType = new VirtualGraphType(this.ComplexTypeName);
             graphType.AddField(new FieldType { Name = "deletedId", ResolvedType = new IdGraphType(), Resolver = new DeletedIdResolver() });
-            graphType.AddField(this.CreateField("node", this.EdgeType.ObjectType, new ResultNodeResolver(this.EdgeType.ObjectType)));
-            graphType.AddField(this.CreateField("edge", this.EdgeType, new ResultEdgeResolver()));
+            graphType.AddField(this.CreateField("node", this.EdgeType.ObjectType));
+            graphType.AddField(this.CreateField("edge", this.EdgeType));
             graphType.AddField(this.CreateField("errors", this.ErrorType, new ResultErrorsResolver()));
             graphType.AddField(new FieldType { Name = "clientMutationId", ResolvedType = new StringGraphType(), Resolver = new ClientMutationIdIdResolver() });
             graphType.AddField(this.CreateField("api", this.root, this.root));
@@ -135,47 +135,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Resolves data for node value
-        /// </summary>
-        private class ResultNodeResolver : IFieldResolver
-        {
-            /// <summary>
-            /// The node type
-            /// </summary>
-            private readonly MergedObjectType nodeType;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ResultNodeResolver"/> class.
-            /// </summary>
-            /// <param name="nodeType">
-            /// The node type.
-            /// </param>
-            public ResultNodeResolver(MergedObjectType nodeType)
-            {
-                this.nodeType = nodeType;
-            }
-
-            /// <inheritdoc />
-            public object Resolve(ResolveFieldContext context)
-            {
-                var source = ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value as JObject;
-                return source == null ? null : this.nodeType.ResolveData(context, (JObject)source.DeepClone());
-            }
-        }
-
-        /// <summary>
-        /// Resolves data for edge value
-        /// </summary>
-        private class ResultEdgeResolver : IFieldResolver
-        {
-            /// <inheritdoc />
-            public object Resolve(ResolveFieldContext context)
-            {
-                return ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value as JObject; 
-            }
-        }
-
-        /// <summary>
         /// Resolves data for edge value
         /// </summary>
         private class ResultErrorsResolver : IFieldResolver
@@ -195,7 +154,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                return ((JObject)context.Source)?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value;
+                var value = ((JObject)context.Source).Property("__deletedId")?.Value;
+                if (value == null)
+                {
+                    return null;
+                }
+
+                var globalId = GetGlobalId(
+                    (JObject)context.Source,
+                    value);
+                return globalId.PackGlobalId();
             }
         }
     }

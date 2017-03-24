@@ -412,6 +412,10 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
+            var newItemGlobalId =
+                JArray.Parse("[{\"f\": \"connection\", \"id\":\"251feea8-d3ac-461d-a385-0cf2ba7a74e8\"}]")
+                    .PackGlobalId().Replace("\"", "\\\"");
+
             var query = @"                          
             mutation M {
                     call: TestApi_connection_create(input: {newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId""}) {
@@ -460,46 +464,46 @@ namespace ClusterKit.Web.Tests.GraphQL
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             
-            var expectedResult = @"
-                                    {
-                                      ""data"": {
-                                        ""call"": {
+            var expectedResult = $@"
+                                    {{
+                                      ""data"": {{
+                                        ""call"": {{
                                           ""clientMutationId"": ""testClientMutationId"",
-                                          ""node"": {
-                                            ""id"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                          ""node"": {{
+                                            ""id"": ""{newItemGlobalId}"",
                                             ""__id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                             ""name"": ""hello world"",
                                             ""value"": 13.0
-                                          },
-                                          ""edge"": {
+                                          }},
+                                          ""edge"": {{
                                             ""cursor"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                            ""node"": {
-                                              ""id"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                            ""node"": {{
+                                              ""id"": ""{newItemGlobalId}"",
                                               ""__id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                               ""name"": ""hello world"",
                                               ""value"": 13.0
-                                            }
-                                          },
+                                            }}
+                                          }},
                                           ""deletedId"": null,
-                                          ""api"": {
-                                            ""connection"": {
+                                          ""api"": {{
+                                            ""connection"": {{
                                               ""count"": 1,
                                               ""edges"": [
-                                                {
+                                                {{
                                                   ""cursor"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                                  ""node"": {
-                                                    ""id"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                                  ""node"": {{
+                                                    ""id"": ""{newItemGlobalId}"",
                                                     ""__id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                                     ""name"": ""hello world"",
                                                     ""value"": 13.0
-                                                  }
-                                                }
+                                                  }}
+                                                }}
                                               ]
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
+                                            }}
+                                          }}
+                                        }}
+                                      }}
+                                    }}
                                     ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
@@ -558,6 +562,8 @@ namespace ClusterKit.Web.Tests.GraphQL
             var internalApiProvider = new TestProvider(initialObjects);
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var nodeId = JArray.Parse("[{\"f\": \"connection\", \"id\":\"251feea8-d3ac-461d-a385-0cf2ba7a74e8\"}]").PackGlobalId().Replace("\"", "\\\"");
 
             var query = @"                          
             mutation M {
@@ -624,63 +630,63 @@ namespace ClusterKit.Web.Tests.GraphQL
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
 
-            var expectedResult = @"
-                                    {
-                                      ""data"": {
-                                        ""call"": {
+            var expectedResult = $@"
+                                    {{
+                                      ""data"": {{
+                                        ""call"": {{
                                           ""mutationId"": ""testClientMutationId"",
-                                          ""nodeElement"": {
-                                            ""globalId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                          ""nodeElement"": {{
+                                            ""globalId"": ""{nodeId}"",
                                             ""realId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                             ""elementName"": ""hello world"",
                                             ""value"": 13.0
-                                          },
-                                          ""nodeElement2"": {
-                                            ""globalId2"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                          }},
+                                          ""nodeElement2"": {{
+                                            ""globalId2"": ""{nodeId}"",
                                             ""realId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                             ""elementName2"": ""hello world"",
                                             ""value"": 13.0
-                                          },
-                                          ""edgeObject"": {
+                                          }},
+                                          ""edgeObject"": {{
                                             ""id"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                            ""object"": {
-                                              ""longId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                            ""object"": {{
+                                              ""longId"": ""{nodeId}"",
                                               ""edgeName"": ""hello world""
-                                            },
-                                            ""object2"": {
+                                            }},
+                                            ""object2"": {{
                                               ""shortId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                               ""value"": 13.0
-                                            }
-                                          },
-                                          ""edgeObject2"": {
+                                            }}
+                                          }},
+                                          ""edgeObject2"": {{
                                             ""id2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                            ""object2"": {
-                                              ""longId2"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                            ""object2"": {{
+                                              ""longId2"": ""{nodeId}"",
                                               ""shortId2"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                               ""edgeName2"": ""hello world"",
                                               ""value"": 13.0
-                                            }
-                                          },
+                                            }}
+                                          }},
                                           ""removedId"": null,
-                                          ""root"": {
-                                            ""apiObjects"": {
+                                          ""root"": {{
+                                            ""apiObjects"": {{
                                               ""total"": 1,
                                               ""list"": [
-                                                {
+                                                {{
                                                   ""itemId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
-                                                  ""element"": {
-                                                    ""elementGlobalId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8GhJBEELnHeyMxQpLQgMk0hnvLt28edERzhcZAbHVynGUVvFdAtTLnAc/Y58lUNKktiozk5dppSjNppKk1Vu5xKxvcuQMe3w/aQb7IlYAAAA="",
+                                                  ""element"": {{
+                                                    ""elementGlobalId"": ""{nodeId}"",
                                                     ""elementId"": ""251feea8-d3ac-461d-a385-0cf2ba7a74e8"",
                                                     ""elementName"": ""hello world"",
                                                     ""elementValue"": 13.0
-                                                  }
-                                                }
+                                                  }}
+                                                }}
                                               ]
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
+                                            }}
+                                          }}
+                                        }}
+                                      }}
+                                    }}
                                     ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
@@ -740,6 +746,12 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
+            var node1Id = JArray.Parse("[{\"f\": \"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87110\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var node2Id = JArray.Parse("[{\"f\": \"connection\", \"id\":\"b500ca20-f649-4dcd-bda8-1fa5031ecdd3\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var node3Id = JArray.Parse("[{\"f\": \"connection\", \"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var node4Id = JArray.Parse("[{\"f\": \"connection\", \"id\":\"3af2c973-d985-4f95-a0c7-aa928d276881\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var node5Id = JArray.Parse("[{\"f\": \"connection\", \"id\":\"f0607502-5b77-4a3c-9142-e6197a7ee61e\"}]").PackGlobalId().Replace("\"", "\\\"");
+
             var query = @"                          
             mutation M {
                     call: TestApi_connection_delete(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110""}) {
@@ -787,72 +799,72 @@ namespace ClusterKit.Web.Tests.GraphQL
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             
-            var expectedResult = @"
-                                {
-                                  ""data"": {
-                                    ""call"": {
-                                      ""node"": {
-                                        ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhImKKKde7AzFnyGhAZItCPsXbp7bkfDcXckHAi1FA5frgXjEXAtz3nx+52zBHKc1J6ZtdklUUxycVpJn4gkRbuYNdiNSGH8PdZUnlYAAAA="",
+            var expectedResult = $@"
+                                {{
+                                  ""data"": {{
+                                    ""call"": {{
+                                      ""node"": {{
+                                        ""id"": ""{node1Id}"",
                                         ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
                                         ""name"": ""1-test"",
                                         ""value"": 100.0
-                                      },
-                                      ""edge"": {
+                                      }},
+                                      ""edge"": {{
                                         ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
-                                        ""node"": {
-                                          ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhImKKKde7AzFnyGhAZItCPsXbp7bkfDcXckHAi1FA5frgXjEXAtz3nx+52zBHKc1J6ZtdklUUxycVpJn4gkRbuYNdiNSGH8PdZUnlYAAAA="",
+                                        ""node"": {{
+                                          ""id"": ""{node1Id}"",
                                           ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
                                           ""name"": ""1-test"",
                                           ""value"": 100.0
-                                        }
-                                      },
-                                      ""deletedId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8WhI2KCqdd7ATC4QloUES6Qh3l27eNBSYqyHCwL85s6/pzej3BFfSmCd/9Rg1IYVBC/Uws9K7IApRzE5J8UQiQWGb9eK3lUhaoP+q2DHnWgAAAA=="",
-                                      ""api"": {
-                                        ""connection"": {
+                                        }}
+                                      }},
+                                      ""deletedId"": ""{node1Id}"",
+                                      ""api"": {{
+                                        ""connection"": {{
                                           ""count"": 4,
                                           ""edges"": [
-                                            {
+                                            {{
                                               ""cursor"": ""f0607502-5b77-4a3c-9142-e6197a7ee61e"",
-                                              ""node"": {
-                                                ""id"": ""H4sIAAAAAAAEAA2IOw6AIBAF7/JqNwEFNtp5BztjgbgkNEAiHfHuUs2no2I7OyI2hJKzhJZKxndN8DWNecjb9mET0jMyKqfYqpnszUzGL4FWbWYSp1f2LIOC7wdhM18gVgAAAA=="",
+                                              ""node"": {{
+                                                ""id"": ""{node5Id}"",
                                                 ""__id"": ""f0607502-5b77-4a3c-9142-e6197a7ee61e"",
                                                 ""name"": ""5-test"",
                                                 ""value"": 6.0
-                                              }
-                                            },
-                                            {
+                                              }}
+                                            }},
+                                            {{
                                               ""cursor"": ""b500ca20-f649-4dcd-bda8-1fa5031ecdd3"",
-                                              ""node"": {
-                                                ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlAbpKpgUFyopGBbpqZiaWuSUpyim5SSqKFrmFaoqmBsWFqckqKsVItAKGn6lFWAAAA"",
+                                              ""node"": {{
+                                                ""id"": ""{node2Id}"",
                                                 ""__id"": ""b500ca20-f649-4dcd-bda8-1fa5031ecdd3"",
                                                 ""name"": ""2-test"",
                                                 ""value"": 50.0
-                                              }
-                                            },
-                                            {
+                                              }}
+                                            }},
+                                            {{
                                               ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
-                                              ""node"": {
-                                                ""id"": ""H4sIAAAAAAAEAKtWKlCyiq5WSlOyUkrOz8tLTS7JzM9Tqo3VUUosyAQKhqQWlzgCWTpKmSlArpm5hYVpUqKBbpKRhYmuibFFmq6FsaWxbmqqZaJlapKRpWWKoVItAH1tZJZWAAAA"",
+                                              ""node"": {{
+                                                ""id"": ""{node3Id}"",
                                                 ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
                                                 ""name"": ""3-test"",
                                                 ""value"": 50.0
-                                              }
-                                            },
-                                            {
+                                              }}
+                                            }},
+                                            {{
                                               ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
-                                              ""node"": {
-                                                ""id"": ""H4sIAAAAAAAEAA3IOQ6AIBRF0b28GhIFkaFzD3bG4ochoQES6Qh7l+6eO9DgnoEEB19Lib7nWjBfBmp5zTt+/VrFkMOipCS81ZIHaxQ/klWcNq85kRUmCH0as2P+35sMPFYAAAA="",
+                                              ""node"": {{
+                                                ""id"": ""{node4Id}"",
                                                 ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
                                                 ""name"": ""4-test"",
                                                 ""value"": 70.0
-                                              }
-                                            }
+                                              }}
+                                            }}
                                           ]
-                                        }
-                                      }
-                                    }
-                                  }
-                                }";
+                                        }}
+                                      }}
+                                    }}
+                                  }}
+                                }}";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
 
@@ -911,6 +923,12 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
+            var oldId = JArray.Parse("[{\"f\": \"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87110\"}]")
+        .PackGlobalId().Replace("\"", "\\\"");
+
+            var newId = JArray.Parse("[{\"f\": \"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87111\"}]")
+.PackGlobalId().Replace("\"", "\\\"");
+
             var query = @"                          
             mutation M {
                     call: TestApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}}) {
@@ -958,45 +976,45 @@ namespace ClusterKit.Web.Tests.GraphQL
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             
-            var expectedResult = @"
-                                    {
-                                      ""data"": {
-                                        ""call"": {
-                                          ""node"": {
-                                            ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhInKCKde7AzFnyGhAZIpCPuXbp77kCDvQcSLEIthUPPteB7BFzLc1789nOWQI6TyjOz0ockikmuTi3SJyJJ0ax6C2YnInw/CryWn1YAAAA="",
+            var expectedResult = $@"
+                                    {{
+                                      ""data"": {{
+                                        ""call"": {{
+                                          ""node"": {{
+                                            ""id"": ""{newId}"",
                                             ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
                                             ""name"": ""hello world"",
                                             ""value"": 13.0
-                                          },
-                                          ""edge"": {
+                                          }},
+                                          ""edge"": {{
                                             ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
-                                            ""node"": {
-                                              ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhInKCKde7AzFnyGhAZIpCPuXbp77kCDvQcSLEIthUPPteB7BFzLc1789nOWQI6TyjOz0ockikmuTi3SJyJJ0ax6C2YnInw/CryWn1YAAAA="",
+                                            ""node"": {{
+                                              ""id"": ""{newId}"",
                                               ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
                                               ""name"": ""hello world"",
                                               ""value"": 13.0
-                                            }
-                                          },
-                                          ""deletedId"": ""H4sIAAAAAAAEAA3IMQ6AIBAF0bv8WhI2KCqdd7ATC4QloUES6Qh3l27eNBSYqyHCwL85s6/pzej3BFfSmCd/9Rg1IYVBC/Uws9K7IApRzE5J8UQiQWGb9eK3lUhaoP+q2DHnWgAAAA=="",
-                                          ""api"": {
-                                            ""connection"": {
+                                            }}
+                                          }},
+                                          ""deletedId"": ""{oldId}"",
+                                          ""api"": {{
+                                            ""connection"": {{
                                               ""count"": 1,
                                               ""edges"": [
-                                                {
+                                                {{
                                                   ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
-                                                  ""node"": {
-                                                    ""id"": ""H4sIAAAAAAAEAA3IOw6AIBBF0b28GhInKCKde7AzFnyGhAZIpCPuXbp77kCDvQcSLEIthUPPteB7BFzLc1789nOWQI6TyjOz0ockikmuTi3SJyJJ0ax6C2YnInw/CryWn1YAAAA="",
+                                                  ""node"": {{
+                                                    ""id"": ""{newId}"",
                                                     ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
                                                     ""name"": ""hello world"",
                                                     ""value"": 13.0
-                                                  }
-                                                }
+                                                  }}
+                                                }}
                                               ]
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
+                                            }}
+                                          }}
+                                        }}
+                                      }}
+                                    }}
                                 ";
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
         }
@@ -3078,13 +3096,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             public override async Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
             {
                 await base.GetData(requests, context);
-                throw new Exception("Test exception");
-            }
-
-            /// <inheritdoc />
-            public override async Task<JObject> SearchNode(string id, List<RequestPathElement> path, ApiRequest nodeRequest, RequestContext context)
-            {
-                await base.SearchNode(id, path, nodeRequest, context);
                 throw new Exception("Test exception");
             }
         }

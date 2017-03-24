@@ -173,65 +173,6 @@ namespace ClusterKit.API.Provider
         }
 
         /// <summary>
-        /// Searches for the connection node
-        /// </summary>
-        /// <param name="id">
-        /// The node id
-        /// </param>
-        /// <param name="path">
-        /// The node connection path in API
-        /// </param>
-        /// <param name="nodeRequest">The request to the node value</param>
-        /// <param name="context">
-        /// The request context.
-        /// </param>
-        /// <param name="onErrorCallback">
-        /// The method that will be called in case of errors
-        /// </param>
-        /// <returns>
-        /// The serialized node value
-        /// </returns>
-        public async Task<JObject> SearchNode(
-            string id,
-            List<ApiRequest> path,
-            ApiRequest nodeRequest,
-            RequestContext context,
-            Action<Exception> onErrorCallback)
-        {
-            try
-            {
-                var resolveResult = await this.resolver.GetNestedFieldValue(
-                                        this,
-                                        new Queue<string>(path.Select(p => p.FieldName)),
-                                        context,
-                                        this.argumentsSerializer,
-                                        onErrorCallback);
-
-                var connectionResolver = resolveResult?.Item2 as IConnectionResolver;
-                if (connectionResolver == null)
-                {
-                    return null;
-                }
-
-                var node = await connectionResolver.GetNodeById(resolveResult.Item1, id);
-                return
-                    (JObject)
-                    await connectionResolver.NodeResolver.ResolveQuery(
-                        node,
-                        nodeRequest, 
-                        resolveResult.Item3,
-                        context,
-                        this.argumentsSerializer,
-                        onErrorCallback);
-            }
-            catch (Exception e)
-            {
-                onErrorCallback?.Invoke(e);
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Parses the metadata of returning type for the field
         /// </summary>
         /// <param name="type">The original field return type</param>

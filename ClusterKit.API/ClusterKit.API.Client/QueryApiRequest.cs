@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="QueriApiRequest.cs" company="ClusterKit">
+// <copyright file="QueryApiRequest.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -16,7 +16,7 @@ namespace ClusterKit.API.Client
     /// <summary>
     /// The read-only query api request
     /// </summary>
-    public class QueriApiRequest 
+    public class QueryApiRequest 
     {
         /// <summary>
         /// Gets or sets the list of queried fields

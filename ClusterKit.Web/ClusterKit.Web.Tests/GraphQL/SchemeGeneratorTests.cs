@@ -817,7 +817,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                                         "object",
                                         arguments: new[] { objectType.CreateField("new", description: "The new object data") },
                                         description: "creates a new object"), 
-                                        ApiMutation.EnType.ConnectionCreate)
+                                        ApiMutation.EnType.ConnectionCreate,
+                                        new List<ApiRequest>())
                                 };
 
             var api = new ApiDescription(
@@ -929,12 +930,6 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             /// <inheritdoc />
             public override Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
-            {
-                return Task.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
-            }
-
-            /// <inheritdoc />
-            public override Task<JObject> SearchNode(string id, List<RequestPathElement> path, ApiRequest request, RequestContext context)
             {
                 return Task.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
             }

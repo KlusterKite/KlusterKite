@@ -40,8 +40,7 @@ namespace ClusterKit.API.Endpoint
         {
             this.apiProvider = apiProvider;
             this.Receive<MutationApiRequest>(m => this.HandleMutation(m));
-            this.Receive<QueriApiRequest>(m => this.HandleQuery(m));
-            this.Receive<NodeSearchApiRequest>(m => this.HandleNodeSearch(m));
+            this.Receive<QueryApiRequest>(m => this.HandleQuery(m));
 
             foreach (var generationError in apiProvider.GenerationErrors)
             {
@@ -74,38 +73,13 @@ namespace ClusterKit.API.Endpoint
         /// Handles query requests
         /// </summary>
         /// <param name="request">The query request</param>
-        private void HandleQuery(QueriApiRequest request)
+        private void HandleQuery(QueryApiRequest request)
         {
             var system = Context.System;
             this.apiProvider.ResolveQuery(
                     request.Fields,
                     request.Context,
                     exception => system.Log.Error(exception, "{Type}: query resolve exception", this.GetType().Name))
-                .PipeTo(
-                    this.Sender,
-                    this.Self,
-                    json => (SurrogatableJObject)json,
-                    e => this.HandleResolveException(e, system));
-        }
-
-        /// <summary>
-        /// Handles node search requests
-        /// </summary>
-        /// <param name="request">The query request</param>
-        private void HandleNodeSearch(NodeSearchApiRequest request)
-        {
-            var system = Context.System;
-            system.Log.Info(
-                "{Type}: Resolving query for API {ApiName}",
-                this.GetType().Name,
-                this.apiProvider.ApiDescription.ApiName);
-
-            this.apiProvider.SearchNode(
-                    request.Id,
-                    request.Path,
-                    request.Request,
-                    request.Context,
-                    exception => system.Log.Error(exception, "{Type}: node search exception", this.GetType().Name))
                 .PipeTo(
                     this.Sender,
                     this.Self,

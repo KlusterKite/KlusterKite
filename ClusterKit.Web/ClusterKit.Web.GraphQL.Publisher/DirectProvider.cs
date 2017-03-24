@@ -88,24 +88,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
             return this.UseJsonRepack ? Repack(result) : result;
         }
 
-        /// <inheritdoc />
-        public override async Task<JObject> SearchNode(
-            string id,
-            List<RequestPathElement> path,
-            ApiRequest request,
-            RequestContext context)
-        {
-            var result = await this.provider.SearchNode(
-                                 id,
-                                 path.Select(p => p.ToApiRequest()).ToList(),
-                                 request,
-                                 context,
-                                 exception =>
-                                     this.errorOutput?.Invoke($"Resolve error: {exception.Message}\n{exception.StackTrace}"));
-
-            return this.UseJsonRepack ? Repack(result) : result;
-        }
-
         /// <summary>
         /// Packs the <see cref="JObject"/> to the string and then restores it
         /// </summary>

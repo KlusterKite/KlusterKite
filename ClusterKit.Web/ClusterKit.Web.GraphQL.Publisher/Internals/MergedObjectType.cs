@@ -32,7 +32,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets the name of the internal pre-calculated field to store globalId
         /// </summary>
         internal const string GlobalIdPropertyName = "__newGlobalId";
-        
+
         /// <summary>
         /// Gets the name of the internal pre-calculated field to store request data for the current object
         /// </summary>
@@ -112,6 +112,49 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets or sets the list of providers
         /// </summary>
         public IEnumerable<FieldProvider> Providers => this.providers;
+
+        /// <summary>
+        /// Gets the globalId from source data and object id value
+        /// </summary>
+        /// <param name="source">The source data</param>
+        /// <param name="id">The id value</param>
+        /// <returns>The global id</returns>
+        public static JArray GetGlobalId(JObject source, JToken id)
+        {
+            var parent = source.Parent;
+            JArray parentGlobalId = null;
+            var selfRequest = source.Property(RequestPropertyName)?.Value as JObject;
+            while (parent != null)
+            {
+                parentGlobalId = (parent as JObject)?.Property(GlobalIdPropertyName)?.Value as JArray;
+                if (selfRequest == null)
+                {
+                    selfRequest = (parent as JObject)?.Property(RequestPropertyName)?.Value as JObject;
+                }
+
+                if (parentGlobalId != null)
+                {
+                    break;
+                }
+
+                parent = parent.Parent;
+            }
+
+            if (source.Property(GlobalIdPropertyName) == null && selfRequest != null)
+            {
+                var globalId = parentGlobalId != null ? new JArray(parentGlobalId) : new JArray();
+                var selfPart = (JObject)selfRequest.DeepClone();
+                if (id != null)
+                {
+                    selfPart.Add("id", id);
+                }
+
+                globalId.Add(selfPart);
+                return globalId;
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Adds a provider to the provider list
@@ -287,35 +330,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             // generating self globalId data
-            JContainer parent = source.Parent;
-            JArray parentGlobalId = null;
-            var selfRequest = source.Property(RequestPropertyName)?.Value as JObject;
-            while (parent != null)
+            var globalId = GetGlobalId(source, source.Property("__id")?.Value);
+            if (globalId != null)
             {
-                parentGlobalId = (parent as JObject)?.Property(GlobalIdPropertyName)?.Value as JArray;
-                if (selfRequest == null)
-                {
-                    selfRequest = (parent as JObject)?.Property(RequestPropertyName)?.Value as JObject;
-                }
-
-                if (parentGlobalId != null)
-                {
-                    break;
-                }
-
-                parent = parent.Parent;
-            }
-
-            if (source.Property(GlobalIdPropertyName) == null && selfRequest != null)
-            {
-                var globalId = parentGlobalId != null ? new JArray(parentGlobalId) : new JArray();
-                var selfPart = (JObject)selfRequest.DeepClone();
-                if (this.KeyField != null)
-                {
-                    selfPart.Add("id", source.Property("__id")?.Value);
-                }
-
-                globalId.Add(selfPart);
                 source.Add(GlobalIdPropertyName, globalId);
             }
 

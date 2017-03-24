@@ -83,30 +83,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 return result;
             }
 
-            var query = new QueriApiRequest { Context = context, Fields = requests };
-            return await endpoint.Ask<SurrogatableJObject>(query, this.timeout);
-        }
-
-        /// <inheritdoc />
-        public override async Task<JObject> SearchNode(
-            string id, 
-            List<RequestPathElement> path, 
-            ApiRequest request,
-            RequestContext context)
-        {
-            var endpoint = this.GetEndpoint();
-            if (endpoint == null)
-            {
-                return null;
-            }
-
-            var query = new NodeSearchApiRequest
-                            {
-                                Id = id,
-                                Context = context,
-                                Path = path.Select(p => p.ToApiRequest()).ToList(),
-                                Request = request
-                            };
+            var query = new QueryApiRequest { Context = context, Fields = requests };
             return await endpoint.Ask<SurrogatableJObject>(query, this.timeout);
         }
 

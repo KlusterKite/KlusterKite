@@ -244,7 +244,7 @@ namespace ClusterKit.API.Provider.Resolvers
                     onErrorCallback);
             if (result.Result != null)
             {
-                mutationDelete.Add("__deletedId", JsonConvert.SerializeObject(id));
+                mutationDelete.Add("__deletedId", JToken.FromObject(id));
             }
 
             SetLog(request, field, context, EnConnectionAction.Delete);
@@ -295,7 +295,7 @@ namespace ClusterKit.API.Provider.Resolvers
             {
                 if (id != null && !id.Equals(connection.GetId(result.Result)))
                 {
-                    mutationUpdate.Add("__deletedId", JsonConvert.SerializeObject(id));
+                    mutationUpdate.Add("__deletedId", JToken.FromObject(id));
                 }
             }
 
