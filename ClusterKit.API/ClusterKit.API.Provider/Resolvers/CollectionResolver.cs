@@ -35,7 +35,7 @@ namespace ClusterKit.API.Provider.Resolvers
     /// </remarks>
     [SuppressMessage("ReSharper", "StaticMemberInGenericType",
         Justification = "Making use of static properties in generic classes")]
-    public class CollectionResolver<T> : IResolver
+    internal class CollectionResolver<T> : IResolver
         where T : class
     {
         /// <summary>
@@ -55,13 +55,6 @@ namespace ClusterKit.API.Provider.Resolvers
         private static readonly ParameterExpression FilterSourceParameter = Expression.Parameter(typeof(T));
 
         /// <summary>
-        /// The node metadata
-        /// </summary>
-        private static readonly TypeMetadata NodeMetaData = TypeMetadata.GenerateTypeMetadata(
-            typeof(T),
-            new DeclareFieldAttribute());
-
-        /// <summary>
         /// The available sorting conditions
         /// </summary>
         private static readonly Dictionary<string, SortingCondition> SortingConditions =
@@ -79,6 +72,12 @@ namespace ClusterKit.API.Provider.Resolvers
         {
             FilterType = new ApiObjectType($"{ApiDescriptionAttribute.GetTypeName(typeof(T))}_Filter");
             SortType = new ApiEnumType($"{ApiDescriptionAttribute.GetTypeName(typeof(T))}_Sort");
+
+            var param = Expression.Parameter(typeof(T));
+            GetIdValue =
+                Expression.Lambda<Func<T, object>>(
+                    Expression.Convert(Expression.Property(param, NodeMetaData.KeyProperty), typeof(object)),
+                    param).Compile();
 
             InitializeType();
         }
@@ -104,12 +103,24 @@ namespace ClusterKit.API.Provider.Resolvers
         public static ApiObjectType FilterType { get; }
 
         /// <summary>
+        /// Gets a function to get id value from entity
+        /// </summary>
+        public static Func<T, object> GetIdValue { get; }
+
+        /// <summary>
         /// Gets the type to describe the collection sort argument element
         /// </summary>
         public static ApiEnumType SortType { get; }
 
         /// <inheritdoc />
         public IResolver NodeResolver { get; }
+
+        /// <summary>
+        /// Gets the node metadata
+        /// </summary>
+        protected static TypeMetadata NodeMetaData { get; } = TypeMetadata.GenerateTypeMetadata(
+            typeof(T),
+            new DeclareFieldAttribute());
 
         /// <summary>
         /// Gets the generated arguments
@@ -131,6 +142,21 @@ namespace ClusterKit.API.Provider.Resolvers
                     EnFieldFlags.CanBeUsedInInput | EnFieldFlags.Queryable | EnFieldFlags.IsTypeArgument
                     | EnFieldFlags.IsArray;
                 yield return ApiField.Object("sort", SortType.TypeName, SortFlags);
+            }
+
+            if (NodeMetaData.KeyProperty != null)
+            {
+                var keyMetadata = TypeMetadata.GenerateTypeMetadata(
+                    NodeMetaData.KeyProperty.PropertyType,
+                    NodeMetaData.KeyProperty.GetCustomAttribute<PublishToApiAttribute>());
+                if (keyMetadata.ScalarType != EnScalarType.None)
+                {
+                    yield return
+                        ApiField.Scalar(
+                            "id",
+                            keyMetadata.ScalarType,
+                            EnFieldFlags.CanBeUsedInInput | EnFieldFlags.Queryable | EnFieldFlags.IsTypeArgument);
+                }
             }
 
             yield return
@@ -173,12 +199,13 @@ namespace ClusterKit.API.Provider.Resolvers
             Action<Exception> onErrorCallback)
         {
             var arguments = (JObject)request.Arguments;
+            var id = arguments?.Property("id");
             var filterArgument = arguments?.Property("filter")?.Value as JObject;
             var sortArgument = arguments?.Property("sort")?.Value as JArray;
             var limit = (int?)(arguments?.Property("limit")?.Value as JValue);
             var offset = (int?)(arguments?.Property("offset")?.Value as JValue);
 
-            var filter = filterArgument != null ? CreateFilter(filterArgument) : null;
+            var filter = CreateFilter(filterArgument, id);
             var sort = sortArgument != null ? this.CreateSort(sortArgument) : null;
 
             var items = await this.GetQueryResult(source, request, filter, sort, limit, offset);
@@ -368,11 +395,20 @@ namespace ClusterKit.API.Provider.Resolvers
         /// Creates filter expression by filter request
         /// </summary>
         /// <param name="filter">The filter request</param>
+        /// <param name="id">The id argument</param>
         /// <returns>The filter expression</returns>
-        private static Expression<Func<T, bool>> CreateFilter(JObject filter)
+        private static Expression<Func<T, bool>> CreateFilter(JObject filter, JProperty id)
         {
-            var left = CreateFilterPart(filter);
-            return Expression.Lambda<Func<T, bool>>(left, FilterSourceParameter);
+            var filterCheck = filter != null ? CreateFilterPart(filter) : null;
+            var idCheck = id != null ? FilterChecks[NodeMetaData.KeyPropertyName](id) : null;
+
+            var check = filterCheck != null && idCheck != null
+                            ? Expression.And(filterCheck, idCheck)
+                            : filterCheck ?? idCheck;
+
+            return check == null 
+                ? null 
+                : Expression.Lambda<Func<T, bool>>(check, FilterSourceParameter);
         }
 
         /// <summary>

@@ -26,10 +26,9 @@ namespace ClusterKit.API.Provider.Resolvers
     /// Resolves requests to the connection
     /// </summary>
     /// <typeparam name="T">The type of node</typeparam>
-    /// <typeparam name="TId">The type of node id</typeparam>
     [SuppressMessage("ReSharper", "StaticMemberInGenericType",
         Justification = "Making use of static properties in generic classes")]
-    public class ConnectionResolver<T, TId> : CollectionResolver<T>, IConnectionResolver
+    internal class ConnectionResolver<T> : CollectionResolver<T>, IConnectionResolver
         where T : class, new()
     {
         /// <summary>
@@ -43,7 +42,7 @@ namespace ClusterKit.API.Provider.Resolvers
         private static ObjectResolver mutationResultResolver;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectionResolver{T,TId}"/> class.
+        /// Initializes a new instance of the <see cref="ConnectionResolver{T}"/> class.
         /// </summary>
         public ConnectionResolver()
         {
@@ -59,7 +58,7 @@ namespace ClusterKit.API.Provider.Resolvers
             JsonSerializer argumentsSerializer,
             Action<Exception> onErrorCallback)
         {
-            var connection = nodeConnection as INodeConnection<T, TId>;
+            var connection = nodeConnection as INodeConnection<T>;
             if (connection == null)
             {
                 return Task.FromResult<JObject>(null);
@@ -96,28 +95,6 @@ namespace ClusterKit.API.Provider.Resolvers
             }
         }
 
-        /// <inheritdoc />
-        public override async Task<object> GetNodeById(object nodeConnection, string id)
-        {
-            var connection = nodeConnection as INodeConnection<T, TId>;
-            if (connection == null)
-            {
-                return null;
-            }
-
-            TId realId;
-            try
-            {
-                realId = JsonConvert.DeserializeObject<TId>(id);
-            }
-            catch
-            {
-                return null;
-            }
-
-            return await connection.GetById(realId);
-        }
-
         /// <summary>
         /// Getting the query result
         /// </summary>
@@ -136,7 +113,7 @@ namespace ClusterKit.API.Provider.Resolvers
             int? limit,
             int? offset)
         {
-            var connection = source as INodeConnection<T, TId>;
+            var connection = source as INodeConnection<T>;
             return connection?.Query(filter, sort, limit, offset, request);
         }
 
@@ -181,7 +158,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </param>
         /// <returns>The resolved data</returns>
         private async Task<JObject> MutationCreate(
-            INodeConnection<T, TId> connection,
+            INodeConnection<T> connection,
             ApiRequest request,
             ApiField field,
             RequestContext context,
@@ -223,7 +200,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </param>
         /// <returns>The resolved data</returns>
         private async Task<JObject> MutationDelete(
-            INodeConnection<T, TId> connection,
+            INodeConnection<T> connection,
             ApiRequest request,
             ApiField field,
             RequestContext context,
@@ -231,7 +208,13 @@ namespace ClusterKit.API.Provider.Resolvers
             Action<Exception> onErrorCallback)
         {
             var serializedId = ((JObject)request.Arguments)?.Property("id")?.Value;
-            var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
+            var id = serializedId?.ToObject(NodeMetaData.KeyProperty.PropertyType);
+
+            if (id == null)
+            {
+                return null;
+            }
+
             var result = await connection.Delete(id);
             var mutationDelete =
                 (JObject)
@@ -270,7 +253,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </param>
         /// <returns>The resolved data</returns>
         private async Task<JObject> MutationUpdate(
-            INodeConnection<T, TId> connection,
+            INodeConnection<T> connection,
             ApiRequest request,
             ApiField field,
             RequestContext context,
@@ -279,7 +262,12 @@ namespace ClusterKit.API.Provider.Resolvers
         {
             var serializedData = ((JObject)request.Arguments)?.Property("newNode")?.Value as JObject;
             var serializedId = ((JObject)request.Arguments)?.Property("id")?.Value;
-            var id = serializedId != null ? serializedId.ToObject<TId>() : default(TId);
+            var id = serializedId?.ToObject(NodeMetaData.KeyProperty.PropertyType);
+            if (id == null)
+            {
+                return null;
+            }
+
             var newNode = serializedData?.ToObject<T>();
             var result = await connection.Update(id, newNode, request);
             var mutationUpdate =
@@ -293,7 +281,7 @@ namespace ClusterKit.API.Provider.Resolvers
                     onErrorCallback);
             if (result.Result != null)
             {
-                if (id != null && !id.Equals(connection.GetId(result.Result)))
+                if (!id.Equals(GetIdValue(result.Result)))
                 {
                     mutationUpdate.Add("__deletedId", JToken.FromObject(id));
                 }

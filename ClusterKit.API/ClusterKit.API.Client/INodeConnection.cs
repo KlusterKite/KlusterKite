@@ -20,25 +20,9 @@ namespace ClusterKit.API.Client
     /// Describes node connection
     /// </summary>
     /// <typeparam name="T">The type of node</typeparam>
-    /// <typeparam name="TId">The type of node id</typeparam>
-    public interface INodeConnection<T, TId>
+    public interface INodeConnection<T>
         where T : class, new()
     {
-        /// <summary>
-        /// Gets the node by id
-        /// </summary>
-        /// <param name="id">The node id</param>
-        /// <returns>The node or null if nothing found</returns>
-        [UsedImplicitly]
-        Task<T> GetById(TId id);
-
-        /// <summary>
-        /// Gets an id from node object
-        /// </summary>
-        /// <param name="node">The node object</param>
-        /// <returns>The id of node object</returns>
-        TId GetId(T node);
-
         /// <summary>
         /// Query the datasource for nodes
         /// </summary>
@@ -92,7 +76,7 @@ namespace ClusterKit.API.Client
         /// The new node after update
         /// </returns>
         [UsedImplicitly]
-        Task<MutationResult<T>> Update(TId id, T newNode, ApiRequest request);
+        Task<MutationResult<T>> Update(object id, T newNode, ApiRequest request);
 
         /// <summary>
         /// Removes a node from the data store
@@ -100,6 +84,6 @@ namespace ClusterKit.API.Client
         /// <param name="id">The node id</param>
         /// <returns>The old node data</returns>
         [UsedImplicitly]
-        Task<MutationResult<T>> Delete(TId id);
+        Task<MutationResult<T>> Delete(object id);
     }
 }

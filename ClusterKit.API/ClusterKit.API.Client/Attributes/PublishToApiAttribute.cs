@@ -10,6 +10,7 @@
 namespace ClusterKit.API.Client.Attributes
 {
     using System;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -33,5 +34,15 @@ namespace ClusterKit.API.Client.Attributes
         ///  It is expected for JObjects for connections, that they contains exactly two properties - "count" as <see cref="Newtonsoft.Json.Linq.JValue"/> and "items" as <see cref="Newtonsoft.Json.Linq.JArray"/>
         /// </remarks>
         public Type ReturnType { get; set; }
+
+        /// <summary>
+        /// Gets the declared member name
+        /// </summary>
+        /// <param name="memberInfo">The member</param>
+        /// <returns>The member name</returns>
+        public static string GetMemberName(MemberInfo memberInfo)
+        {
+            return memberInfo.GetCustomAttribute<PublishToApiAttribute>()?.Name ?? ToCamelCase(memberInfo.Name);
+        }
     }
 }

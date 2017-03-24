@@ -660,10 +660,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
                     if (metadata.GetFlags().HasFlag(EnFieldFlags.IsConnection))
                     {
-                        var connectionResolverType = typeof(ConnectionResolver<,>).MakeGenericType(
-                            metadata.Type,
-                            metadata.TypeOfId);
-
+                        var connectionResolverType = typeof(ConnectionResolver<>).MakeGenericType(metadata.Type);
                         return connectionResolverType.CreateInstance<IResolver>();
                     }
 
@@ -1234,7 +1231,14 @@ namespace ClusterKit.API.Provider.Resolvers
                     continue;
                 }
 
-                var idScalarType = TypeMetadata.CheckScalarType(connection.Metadata.TypeOfId);
+                if (connection.Metadata.KeyProperty == null)
+                {
+                    GenerationErrors.Add(
+                        $"Connection {connection.Field.Name} of type {NamingUtilities.ToCSharpRepresentation(typeof(T))} is defined for intities without key field");
+                    continue;
+                }
+
+                var idScalarType = TypeMetadata.CheckScalarType(connection.Metadata.KeyProperty.PropertyType);
                 if (idScalarType == EnScalarType.None)
                 {
                     GenerationErrors.Add(

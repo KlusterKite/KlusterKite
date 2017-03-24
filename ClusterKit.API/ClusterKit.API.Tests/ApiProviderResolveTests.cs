@@ -50,6 +50,9 @@ namespace ClusterKit.API.Tests
         /// <summary>
         /// Testing connection query resolve
         /// </summary>
+        /// <param name="id">
+        /// The id filter value
+        /// </param>
         /// <param name="filterJson">
         /// The filter Json.
         /// </param>
@@ -72,51 +75,62 @@ namespace ClusterKit.API.Tests
         /// The async task
         /// </returns>
         [Theory]
-        [InlineData(null, null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
-        [InlineData(null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
-        [InlineData(null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
+        [InlineData(null, null, null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
+        [InlineData(null, null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
 
-        [InlineData(null, "[\"type_asc\", \"name_asc\"]", 10, 0, 5, new[] { "1-test", "3-test", "5-test", "2-test", "4-test" })]
+        [InlineData(null, null, "[\"type_asc\", \"name_asc\"]", 10, 0, 5, new[] { "1-test", "3-test", "5-test", "2-test", "4-test" })]
 
-        [InlineData("{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
-        [InlineData("{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
-        [InlineData("{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
-        [InlineData("{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
-        [InlineData("{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
-        [InlineData("{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
+        [InlineData(null, "{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
+        [InlineData(null, "{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
+        [InlineData(null, "{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
+        [InlineData(null, "{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
+        [InlineData(null, "{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
 
-        [InlineData("{\"name_in\": \"1-test, 3-test\"}", null, 10, 0, 2, new[] { "1-test", "3-test" })]
-        [InlineData("{\"name_not_in\": \"1-test, 3-test\"}", null, 10, 0, 3, new[] { "2-test", "4-test", "5-test" })]
-        [InlineData("{\"name_contains\": \"tes\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
-        [InlineData("{\"name_contains\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
-        [InlineData("{\"name_not_contains\": \"tes\"}", null, 10, 0, 0, new string[0])]
-        [InlineData("{\"name_not_contains\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_in\": \"1-test, 3-test\"}", null, 10, 0, 2, new[] { "1-test", "3-test" })]
+        [InlineData(null, "{\"name_not_in\": \"1-test, 3-test\"}", null, 10, 0, 3, new[] { "2-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_contains\": \"tes\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_contains\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
+        [InlineData(null, "{\"name_not_contains\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_not_contains\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 
-        [InlineData("{\"name_l_starts_with\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
-        [InlineData("{\"name_starts_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
-        [InlineData("{\"name_not_starts_with\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_l_starts_with\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
+        [InlineData(null, "{\"name_starts_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_not_starts_with\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 
-        [InlineData("{\"name_ends_with\": \"test\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
-        [InlineData("{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
-        [InlineData("{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_ends_with\": \"test\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
 
-        [InlineData("{\"type\": \"Good\"}", null, 10, 0, 3, new[] { "1-test", "3-test", "5-test" })]
+        [InlineData(null, "{\"type\": \"Good\"}", null, 10, 0, 3, new[] { "1-test", "3-test", "5-test" })]
 
-        [InlineData(null, null, 3, null, 5, new[] { "1-test", "2-test", "3-test" })]
-        [InlineData(null, null, 3, 1, 5, new[] { "2-test", "3-test", "4-test" })]
-        [InlineData(null, null, 3, 2, 5, new[] { "3-test", "4-test", "5-test" })]
-        [InlineData(null, null, null, 2, 5, new[] { "3-test", "4-test", "5-test" })]
-        [InlineData(null, null, 3, 3, 5, new[] { "4-test", "5-test" })]
-        [InlineData(null, null, 3, 10, 5, new string[0])]
-        public async Task ConnectionQueryTests(string filterJson, string sortJson, int? limit, int? offset, int expectedCount, string[] expectedNames)
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a35", null, null, 10, 0, 1, new[] { "3-test" })]
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a35", "{\"value\": 50}", null, 10, 0, 1, new[] { "3-test" })]
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a36", null, null, 10, 0, 0, new string[0])]
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a35", "{\"value\": 100}", null, 10, 0, 0, new string[0])]
+
+        [InlineData(null, null, null, 3, null, 5, new[] { "1-test", "2-test", "3-test" })]
+        [InlineData(null, null, null, 3, 1, 5, new[] { "2-test", "3-test", "4-test" })]
+        [InlineData(null, null, null, 3, 2, 5, new[] { "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, null, null, 2, 5, new[] { "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, null, 3, 3, 5, new[] { "4-test", "5-test" })]
+        [InlineData(null, null, null, 3, 10, 5, new string[0])]
+        public async Task ConnectionQueryTests(string id, string filterJson, string sortJson, int? limit, int? offset, int expectedCount, string[] expectedNames)
         {
+            var uid1 = Guid.Parse("{4E4F28CD-EC25-48A1-9F87-F48700C7FABB}");
+            var uid2 = Guid.Parse("{A67DF061-9A15-4CFD-BC47-050922E37AF5}");
+            var uid3 = Guid.Parse("{24197905-2A1D-48BB-8781-5FC250CF8A35}");
+            var uid4 = Guid.Parse("{8A06971D-7706-4D19-B0E8-A172D352D53E}");
+            var uid5 = Guid.Parse("{1F2C2013-E636-4B7D-A018-1BD9AAA0D5A0}");
+
             var initialObjects = new List<TestObject>
                                      {
-                                         new TestObject { Name = "1-test", Value = 100m, Type = TestObject.EnObjectType.Good },
-                                         new TestObject { Name = "2-test", Value = 50m, Type = TestObject.EnObjectType.Bad },
-                                         new TestObject { Name = "3-test", Value = 50m, Type = TestObject.EnObjectType.Good },
-                                         new TestObject { Name = "4-test", Value = 70m, Type = TestObject.EnObjectType.Bad },
-                                         new TestObject { Name = "5-test", Value = 6m, Type = TestObject.EnObjectType.Good },
+                                         new TestObject { Name = "1-test", Value = 100m, Type = TestObject.EnObjectType.Good, Id = uid1 },
+                                         new TestObject { Name = "2-test", Value = 50m, Type = TestObject.EnObjectType.Bad, Id = uid2 },
+                                         new TestObject { Name = "3-test", Value = 50m, Type = TestObject.EnObjectType.Good, Id = uid3 },
+                                         new TestObject { Name = "4-test", Value = 70m, Type = TestObject.EnObjectType.Bad, Id = uid4 },
+                                         new TestObject { Name = "5-test", Value = 6m, Type = TestObject.EnObjectType.Good, Id = uid5 },
                                      };
 
             var provider = this.GetProvider(initialObjects);
@@ -136,6 +150,11 @@ namespace ClusterKit.API.Tests
             };
 
             var arguments = new JObject();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                arguments.Add("id", id);
+            }
+
             if (!string.IsNullOrWhiteSpace(filterJson))
             {
                 arguments.Add("filter", JsonConvert.DeserializeObject(filterJson) as JToken);
@@ -170,6 +189,9 @@ namespace ClusterKit.API.Tests
         /// <summary>
         /// Testing connection query resolve
         /// </summary>
+        /// <param name="id">
+        /// The id filter value
+        /// </param>
         /// <param name="filterJson">
         /// The filter Json.
         /// </param>
@@ -192,51 +214,62 @@ namespace ClusterKit.API.Tests
         /// The async task
         /// </returns>
         [Theory]
-        [InlineData(null, null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
-        [InlineData(null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
-        [InlineData(null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
+        [InlineData(null, null, null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, "[\"value_asc\", \"name_desc\"]", 10, 0, 5, new[] { "5-test", "3-test", "2-test", "4-test", "1-test" })]
+        [InlineData(null, null, "[\"value_desc\"]", 10, 0, 5, new[] { "1-test", "4-test", "2-test", "3-test", "5-test" })]
 
-        [InlineData(null, "[\"type_asc\", \"name_asc\"]", 10, 0, 5, new[] { "1-test", "3-test", "5-test", "2-test", "4-test" })]
+        [InlineData(null, null, "[\"type_asc\", \"name_asc\"]", 10, 0, 5, new[] { "1-test", "3-test", "5-test", "2-test", "4-test" })]
 
-        [InlineData("{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
-        [InlineData("{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
-        [InlineData("{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
-        [InlineData("{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
-        [InlineData("{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
-        [InlineData("{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
+        [InlineData(null, "{\"value_lt\": 50}", null, 10, 0, 1, new[] { "5-test" })]
+        [InlineData(null, "{\"value_lte\": 50}", null, 10, 0, 3, new[] { "2-test", "3-test", "5-test" })]
+        [InlineData(null, "{\"value_not\": 50}", null, 10, 0, 3, new[] { "1-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"value\": 50}", null, 10, 0, 2, new[] { "2-test", "3-test" })]
+        [InlineData(null, "{\"OR\": [{\"value\": 50}, {\"value\": 70}]}", null, 10, 0, 3, new[] { "2-test", "3-test", "4-test" })]
+        [InlineData(null, "{\"AND\": [{\"value\": 50}, {\"name\": \"2-test\"}]}", null, 10, 0, 1, new[] { "2-test" })]
 
-        [InlineData("{\"name_in\": \"1-test, 3-test\"}", null, 10, 0, 2, new[] { "1-test", "3-test" })]
-        [InlineData("{\"name_not_in\": \"1-test, 3-test\"}", null, 10, 0, 3, new[] { "2-test", "4-test", "5-test" })]
-        [InlineData("{\"name_contains\": \"tes\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
-        [InlineData("{\"name_contains\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
-        [InlineData("{\"name_not_contains\": \"tes\"}", null, 10, 0, 0, new string[0])]
-        [InlineData("{\"name_not_contains\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_in\": \"1-test, 3-test\"}", null, 10, 0, 2, new[] { "1-test", "3-test" })]
+        [InlineData(null, "{\"name_not_in\": \"1-test, 3-test\"}", null, 10, 0, 3, new[] { "2-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_contains\": \"tes\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_contains\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
+        [InlineData(null, "{\"name_not_contains\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_not_contains\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 
-        [InlineData("{\"name_l_starts_with\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
-        [InlineData("{\"name_starts_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
-        [InlineData("{\"name_not_starts_with\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_l_starts_with\": \"1-tes\"}", null, 10, 0, 1, new[] { "1-test" })]
+        [InlineData(null, "{\"name_starts_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_not_starts_with\": \"1-tes\"}", null, 10, 0, 4, new[] { "2-test", "3-test", "4-test", "5-test" })]
 
-        [InlineData("{\"name_ends_with\": \"test\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
-        [InlineData("{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
-        [InlineData("{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_ends_with\": \"test\"}", null, 10, 0, 5, new[] { "1-test", "2-test", "3-test", "4-test", "5-test" })]
+        [InlineData(null, "{\"name_ends_with\": \"tes\"}", null, 10, 0, 0, new string[0])]
+        [InlineData(null, "{\"name_not_ends_with\": \"test\"}", null, 10, 0, 0, new string[0])]
 
-        [InlineData("{\"type\": \"Good\"}", null, 10, 0, 3, new[] { "1-test", "3-test", "5-test" })]
+        [InlineData(null, "{\"type\": \"Good\"}", null, 10, 0, 3, new[] { "1-test", "3-test", "5-test" })]
 
-        [InlineData(null, null, 3, null, 5, new[] { "1-test", "2-test", "3-test" })]
-        [InlineData(null, null, 3, 1, 5, new[] { "2-test", "3-test", "4-test" })]
-        [InlineData(null, null, 3, 2, 5, new[] { "3-test", "4-test", "5-test" })]
-        [InlineData(null, null, null, 2, 5, new[] { "3-test", "4-test", "5-test" })]
-        [InlineData(null, null, 3, 3, 5, new[] { "4-test", "5-test" })]
-        [InlineData(null, null, 3, 10, 5, new string[0])]
-        public async Task CollectionQueryTests(string filterJson, string sortJson, int? limit, int? offset, int expectedCount, string[] expectedNames)
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a35", null, null, 10, 0, 1, new[] { "3-test" })]
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a35", "{\"value\": 50}", null, 10, 0, 1, new[] { "3-test" })]
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a36", null, null, 10, 0, 0, new string[0])]
+        [InlineData("24197905-2a1d-48bb-8781-5fc250cf8a35", "{\"value\": 100}", null, 10, 0, 0, new string[0])]
+
+        [InlineData(null, null, null, 3, null, 5, new[] { "1-test", "2-test", "3-test" })]
+        [InlineData(null, null, null, 3, 1, 5, new[] { "2-test", "3-test", "4-test" })]
+        [InlineData(null, null, null, 3, 2, 5, new[] { "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, null, null, 2, 5, new[] { "3-test", "4-test", "5-test" })]
+        [InlineData(null, null, null, 3, 3, 5, new[] { "4-test", "5-test" })]
+        [InlineData(null, null, null, 3, 10, 5, new string[0])]
+        public async Task CollectionQueryTests(string id, string filterJson, string sortJson, int? limit, int? offset, int expectedCount, string[] expectedNames)
         {
+            var uid1 = Guid.Parse("{4E4F28CD-EC25-48A1-9F87-F48700C7FABB}");
+            var uid2 = Guid.Parse("{A67DF061-9A15-4CFD-BC47-050922E37AF5}");
+            var uid3 = Guid.Parse("{24197905-2A1D-48BB-8781-5FC250CF8A35}");
+            var uid4 = Guid.Parse("{8A06971D-7706-4D19-B0E8-A172D352D53E}");
+            var uid5 = Guid.Parse("{1F2C2013-E636-4B7D-A018-1BD9AAA0D5A0}");
+
             var initialObjects = new List<TestObject>
                                      {
-                                         new TestObject { Name = "1-test", Value = 100m, Type = TestObject.EnObjectType.Good },
-                                         new TestObject { Name = "2-test", Value = 50m, Type = TestObject.EnObjectType.Bad },
-                                         new TestObject { Name = "3-test", Value = 50m, Type = TestObject.EnObjectType.Good },
-                                         new TestObject { Name = "4-test", Value = 70m, Type = TestObject.EnObjectType.Bad },
-                                         new TestObject { Name = "5-test", Value = 6m, Type = TestObject.EnObjectType.Good },
+                                         new TestObject { Name = "1-test", Value = 100m, Type = TestObject.EnObjectType.Good, Id = uid1 },
+                                         new TestObject { Name = "2-test", Value = 50m, Type = TestObject.EnObjectType.Bad, Id = uid2 },
+                                         new TestObject { Name = "3-test", Value = 50m, Type = TestObject.EnObjectType.Good, Id = uid3 },
+                                         new TestObject { Name = "4-test", Value = 70m, Type = TestObject.EnObjectType.Bad, Id = uid4 },
+                                         new TestObject { Name = "5-test", Value = 6m, Type = TestObject.EnObjectType.Good, Id = uid5 },
                                      };
 
             var provider = this.GetProvider(initialObjects);
@@ -256,6 +289,11 @@ namespace ClusterKit.API.Tests
             };
 
             var arguments = new JObject();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                arguments.Add("id", id);
+            }
+
             if (!string.IsNullOrWhiteSpace(filterJson))
             {
                 arguments.Add("filter", JsonConvert.DeserializeObject(filterJson) as JToken);
@@ -306,14 +344,14 @@ namespace ClusterKit.API.Tests
         /// The async task
         /// </returns>
         [Theory]
-        [InlineData("connection.create", "{\"newNode\": { \"name\":\"6-test\", \"value\": 1 }}", true, "{\"name\":\"6-test\",\"value\": 1.0, \"__request\":{\"f\":\"result\"} }")]
+        [InlineData("connection.create", "{\"newNode\": { \"name\":\"6-test\", \"value\": 1 }}", true, "{\"name\":\"6-test\",\"value\": 1.0 }")]
         [InlineData("connection.create", "{\"newNode\": { \"value\": 1 }}", false, "Create failed; name should be set")]
         [InlineData("connection.create", null, false, "Create failed; object data was not provided")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"value\": 1.0 }}", true, "{\"name\":\"2-test\",\"value\": 1.0, \"__request\":{\"f\":\"result\"} }")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{C12EE96B-2420-4F54-AAE5-788995B10679}\" }}", true, "{\"name\":\"2-test\",\"value\": 50.0, \"__request\":{\"f\":\"result\"} }")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"value\": 1.0 }}", true, "{\"name\":\"2-test\",\"value\": 1.0 }")]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{C12EE96B-2420-4F54-AAE5-788995B10679}\" }}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
         [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\", \"newNode\": { \"value\": 1.0 }}", false, "Update failed; Node not found")]
         [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{F0607502-5B77-4A3C-9142-E6197A7EE61E}\" }}", false, "Update failed; Duplicate key")]
-        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0, \"__request\":{\"f\":\"result\"} }")]
+        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
         [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\"}", false, "Delete failed; Node not found")]
         public async Task ConnectionMutationTests(
             string mutationName,

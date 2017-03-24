@@ -50,6 +50,11 @@ namespace ClusterKit.API.Provider
         }
 
         /// <summary>
+        /// Gets or sets the converter type
+        /// </summary>
+        public Type ConverterType { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether  this property / method has asynchronous access
         /// </summary>
         public bool IsAsync { get; set; }
@@ -58,6 +63,16 @@ namespace ClusterKit.API.Provider
         /// Gets or sets a value indicating whether this property / method forwards resolve to other API provider
         /// </summary>
         public bool IsForwarding { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type key property
+        /// </summary>
+        public PropertyInfo KeyProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type key property
+        /// </summary>
+        public string KeyPropertyName { get; set; }
 
         /// <summary>
         /// Gets or sets the meta type
@@ -73,16 +88,6 @@ namespace ClusterKit.API.Provider
         /// Gets or sets the true returning type
         /// </summary>
         public Type Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the converter type
-        /// </summary>
-        public Type ConverterType { get; set; }
-
-        /// <summary>
-        /// Gets or sets the type of node if for connections
-        /// </summary>
-        public Type TypeOfId { get; set; }
 
         /// <summary>
         /// Gets or sets the type name to look for resolver
@@ -214,12 +219,13 @@ namespace ClusterKit.API.Provider
             else if (converter != null)
             {
                 var valueConverter =
-                    converter
-                        .GetInterfaces()
-                        .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueConverter<>));
+                    converter.GetInterfaces()
+                        .FirstOrDefault(
+                            i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueConverter<>));
                 if (valueConverter == null)
                 {
-                    throw new InvalidOperationException($"Converter {converter.FullName} should implement the IValueConverter<>");
+                    throw new InvalidOperationException(
+                        $"Converter {converter.FullName} should implement the IValueConverter<>");
                 }
 
                 type = valueConverter.GenericTypeArguments[0];
@@ -231,12 +237,11 @@ namespace ClusterKit.API.Provider
             if (scalarType == EnScalarType.None)
             {
                 var enumerable = CheckType(type, typeof(IEnumerable<>));
-                var connection = CheckType(type, typeof(INodeConnection<,>));
+                var connection = CheckType(type, typeof(INodeConnection<>));
 
                 if (connection != null)
                 {
                     metadata.MetaType = EnMetaType.Connection;
-                    metadata.TypeOfId = connection.GenericTypeArguments[1];
                     type = connection.GenericTypeArguments[0];
                     scalarType = CheckScalarType(type);
                 }
@@ -261,8 +266,21 @@ namespace ClusterKit.API.Provider
             metadata.ScalarType = scalarType;
             metadata.Type = type;
 
-            var typeName = type.GetCustomAttribute<ApiDescriptionAttribute>()?.Name ?? type.FullName;
-            metadata.TypeName = metadata.TypeOfId != null ? $"{typeName}_{metadata.TypeOfId.FullName}" : typeName;
+            if (metadata.ScalarType == EnScalarType.None && !type.IsSubclassOf(typeof(Enum)))
+            {
+                var keyProperty =
+                    type.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance)
+                        .FirstOrDefault(p => p.GetCustomAttribute<DeclareFieldAttribute>()?.IsKey == true);
+                if (keyProperty != null)
+                {
+                    metadata.KeyProperty = keyProperty;
+                    metadata.KeyPropertyName = PublishToApiAttribute.GetMemberName(keyProperty);
+                }
+            }
+
+            var typeName = ApiDescriptionAttribute.GetTypeName(type);
+            metadata.TypeName = typeName;
+            ////metadata.TypeName = metadata.GetFlags().HasFlag(EnFieldFlags.IsConnection) ? $"{typeName}_Connection" : typeName;
             return metadata;
         }
 

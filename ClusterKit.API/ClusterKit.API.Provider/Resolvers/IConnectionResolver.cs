@@ -24,19 +24,6 @@ namespace ClusterKit.API.Provider.Resolvers
     public interface IConnectionResolver
     {
         /// <summary>
-        /// Gets the node object resolver
-        /// </summary>
-        IResolver NodeResolver { get; }
-
-        /// <summary>
-        /// Gets node object from node connection by it's id
-        /// </summary>
-        /// <param name="nodeConnection">The node connection object</param>
-        /// <param name="id">The object's serialized id</param>
-        /// <returns>The node</returns>
-        Task<object> GetNodeById(object nodeConnection, string id);
-
-        /// <summary>
         /// Resolves connection object mutation request
         /// </summary>
         /// <param name="nodeConnection">The node connection</param>

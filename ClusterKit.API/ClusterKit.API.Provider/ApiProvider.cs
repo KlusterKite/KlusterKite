@@ -12,13 +12,11 @@ namespace ClusterKit.API.Provider
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using System.Threading.Tasks;
 
     using Castle.Core.Internal;
 
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Provider.Resolvers;
     using ClusterKit.Security.Client;
 
@@ -170,83 +168,6 @@ namespace ClusterKit.API.Provider
                 onErrorCallback?.Invoke(e);
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Parses the metadata of returning type for the field
-        /// </summary>
-        /// <param name="type">The original field return type</param>
-        /// <param name="attribute">The description attribute</param>
-        /// <returns>The type metadata</returns>
-        internal static TypeMetadata GenerateTypeMetadata(Type type, PublishToApiAttribute attribute)
-        {
-            var metadata = new TypeMetadata();
-            var asyncType = TypeMetadata.CheckType(type, typeof(Task<>));
-            if (asyncType != null)
-            {
-                metadata.IsAsync = true;
-                type = asyncType.GenericTypeArguments[0];
-            }
-
-            var converter = (attribute as DeclareFieldAttribute)?.Converter;
-            if (attribute.ReturnType != null)
-            {
-                type = attribute.ReturnType;
-                metadata.IsForwarding = true;
-            }
-            else if (converter != null)
-            {
-                var valueConverter =
-                    converter
-                        .GetInterfaces()
-                        .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueConverter<>));
-                if (valueConverter == null)
-                {
-                    throw new InvalidOperationException($"Converter {converter.FullName} should implement the IValueConverter<>");
-                }
-
-                type = valueConverter.GenericTypeArguments[0];
-                metadata.ConverterType = converter;
-            }
-
-            var scalarType = TypeMetadata.CheckScalarType(type);
-            metadata.MetaType = TypeMetadata.EnMetaType.Scalar;
-            if (scalarType == EnScalarType.None)
-            {
-                var enumerable = TypeMetadata.CheckType(type, typeof(IEnumerable<>));
-                var connection = TypeMetadata.CheckType(type, typeof(INodeConnection<,>));
-
-                if (connection != null)
-                {
-                    metadata.MetaType = TypeMetadata.EnMetaType.Connection;
-                    metadata.TypeOfId = connection.GenericTypeArguments[1];
-                    type = connection.GenericTypeArguments[0];
-                    scalarType = TypeMetadata.CheckScalarType(type);
-                }
-                else if (enumerable != null)
-                {
-                    metadata.MetaType = TypeMetadata.EnMetaType.Array;
-                    type = enumerable.GenericTypeArguments[0];
-                    scalarType = TypeMetadata.CheckScalarType(type);
-                }
-                else
-                {
-                    metadata.MetaType = TypeMetadata.EnMetaType.Object;
-                }
-            }
-
-            if (scalarType != EnScalarType.None && type.IsSubclassOf(typeof(Enum)))
-            {
-                type = Enum.GetUnderlyingType(type);
-            }
-
-            // todo: check forwarding type
-            metadata.ScalarType = scalarType;
-            metadata.Type = type;
-
-            var typeName = type.GetCustomAttribute<ApiDescriptionAttribute>()?.Name ?? type.FullName;
-            metadata.TypeName = metadata.TypeOfId != null ? $"{typeName}_{metadata.TypeOfId.FullName}" : typeName;
-            return metadata;
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace ClusterKit.API.Client
     using System.Collections.Generic;
 
     /// <summary>
-    /// The result of <see cref="INodeConnection{T,TId}.Query"/> method
+    /// The result of <see cref="INodeConnection{T}.Query"/> method
     /// </summary>
     /// <typeparam name="T">The type of node</typeparam>
     public class QueryResult<T>
@@ -23,7 +23,7 @@ namespace ClusterKit.API.Client
         public int Count { get; set; }
 
         /// <summary>
-        /// Gets or sets the items limited by <see cref="INodeConnection{T,TId}.Query"/> limit and offset parameters
+        /// Gets or sets the items limited by <see cref="INodeConnection{T}.Query"/> limit and offset parameters
         /// </summary>
         public IEnumerable<T> Items { get; set; }
     }

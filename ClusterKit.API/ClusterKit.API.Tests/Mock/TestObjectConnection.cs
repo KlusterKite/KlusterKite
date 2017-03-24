@@ -22,7 +22,7 @@ namespace ClusterKit.API.Tests.Mock
     /// <summary>
     /// The <see cref="TestObject"/> connection provider
     /// </summary>
-    public class TestObjectConnection : INodeConnection<TestObject, Guid>
+    public class TestObjectConnection : INodeConnection<TestObject>
     {
         /// <summary>
         /// Gets the stored objects (virtual database)
@@ -75,10 +75,10 @@ namespace ClusterKit.API.Tests.Mock
         }
 
         /// <inheritdoc />
-        public Task<MutationResult<TestObject>> Delete(Guid id)
+        public Task<MutationResult<TestObject>> Delete(object id)
         {
             TestObject obj;
-            if (!this.objects.TryGetValue(id, out obj))
+            if (!this.objects.TryGetValue((Guid)id, out obj))
             {
                 var errors = new List<ErrorDescription>
                                  {
@@ -89,20 +89,8 @@ namespace ClusterKit.API.Tests.Mock
                 return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
             }
 
-            this.objects.Remove(id);
+            this.objects.Remove((Guid)id);
             return Task.FromResult(new MutationResult<TestObject> { Result = obj });
-        }
-
-        /// <inheritdoc />
-        public Task<TestObject> GetById(Guid id)
-        {
-            TestObject obj;
-            if (this.objects.TryGetValue(id, out obj))
-            {
-                return Task.FromResult(obj);
-            }
-
-            throw new Exception("not found");
         }
 
         /// <inheritdoc />
@@ -140,10 +128,11 @@ namespace ClusterKit.API.Tests.Mock
         }
 
         /// <inheritdoc />
-        public Task<MutationResult<TestObject>> Update(Guid id, TestObject newNode, ApiRequest request)
+        public Task<MutationResult<TestObject>> Update(object id, TestObject newNode, ApiRequest request)
         {
+            var uid = (Guid)id;
             TestObject obj;
-            if (!this.objects.TryGetValue(id, out obj))
+            if (!this.objects.TryGetValue(uid, out obj))
             {
                 var errors = new List<ErrorDescription>
                                  {
@@ -192,7 +181,7 @@ namespace ClusterKit.API.Tests.Mock
                 obj.Value = newNode.Value;
             }
 
-            this.objects.Remove(id);
+            this.objects.Remove(uid);
             this.objects[obj.Id] = obj;
 
             return Task.FromResult(new MutationResult<TestObject> { Result = obj });

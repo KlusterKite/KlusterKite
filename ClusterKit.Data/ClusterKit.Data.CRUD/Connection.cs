@@ -31,7 +31,8 @@ namespace ClusterKit.Data.CRUD
     /// <typeparam name="TId">
     /// The type of object id
     /// </typeparam>
-    public class Connection<TObject, TId> : INodeConnection<TObject, TId> where TObject : class, IObjectWithId<TId>, new()
+    /// TODO: remove TId type parameter and recover it from type data
+    public class Connection<TObject, TId> : INodeConnection<TObject> where TObject : class, IObjectWithId<TId>, new()
     {
         /// <summary>
         /// The actor system
@@ -113,23 +114,6 @@ namespace ClusterKit.Data.CRUD
         }
 
         /// <inheritdoc />
-        public async Task<TObject> GetById(TId id)
-        {
-            var request = new CrudActionMessage<TObject, TId>
-            {
-                ActionType = EnActionType.Get,
-                Id = id,
-                RequestContext = this.context
-            };
-
-            var result =
-                await this.actorSystem.ActorSelection(this.dataActorPath)
-                    .Ask<CrudActionResponse<TObject>>(request, this.timeout);
-
-            return result.Data;
-        }
-
-        /// <inheritdoc />
         public async Task<QueryResult<TObject>> Query(
             Expression<Func<TObject, bool>> filter,
             IEnumerable<SortingCondition> sort,
@@ -205,6 +189,18 @@ namespace ClusterKit.Data.CRUD
         public TId GetId(TObject node)
         {
             return node.GetId();
+        }
+
+        /// <inheritdoc />
+        Task<MutationResult<TObject>> INodeConnection<TObject>.Update(object id, TObject newNode, ApiRequest request)
+        {
+            return this.Update((TId)id, newNode, request);
+        }
+
+        /// <inheritdoc />
+        Task<MutationResult<TObject>> INodeConnection<TObject>.Delete(object id)
+        {
+            return this.Delete((TId)id);
         }
     }
 }

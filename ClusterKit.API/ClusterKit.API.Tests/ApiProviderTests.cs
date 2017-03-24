@@ -242,7 +242,7 @@ namespace ClusterKit.API.Tests
             /// </summary>
             [UsedImplicitly]
             [DeclareConnection(Description = "The connected objects", CanCreate = true, CanUpdate = true, CanDelete = true)]
-            public INodeConnection<NodeObject, Guid> ConnectedObjects => this.nodeObjectConnection;
+            public INodeConnection<NodeObject> ConnectedObjects => this.nodeObjectConnection;
 
             /// <summary>
             /// The published string property.
@@ -318,7 +318,7 @@ namespace ClusterKit.API.Tests
             /// <summary>
             /// The node object connection
             /// </summary>
-            private class NodeObjectConnection : INodeConnection<NodeObject, Guid>
+            private class NodeObjectConnection : INodeConnection<NodeObject>
             {
                 /// <summary>
                 /// The initial nodes list
@@ -374,27 +374,21 @@ namespace ClusterKit.API.Tests
                 }
 
                 /// <inheritdoc />
-                public Task<MutationResult<NodeObject>> Update(Guid id, NodeObject newNode, ApiRequest request)
+                public Task<MutationResult<NodeObject>> Update(object id, NodeObject newNode, ApiRequest request)
                 {
                     return Task.FromResult(new MutationResult<NodeObject> { Result = newNode });
                 }
 
                 /// <inheritdoc />
-                public async Task<MutationResult<NodeObject>> Delete(Guid id)
+                public async Task<MutationResult<NodeObject>> Delete(object id)
                 {
-                    var oldNode = await this.GetById(id);
+                    var oldNode = await this.GetById((Guid)id);
                     if (oldNode != null)
                     {
                         this.nodes.Remove(oldNode);
                     }
 
                     return new MutationResult<NodeObject> { Result = oldNode };
-                }
-
-                /// <inheritdoc />
-                public Guid GetId(NodeObject node)
-                {
-                    return node.Id;
                 }
             }
         }
