@@ -1460,19 +1460,39 @@ namespace ClusterKit.Web.Tests.GraphQL
                                              {
                                                  Id =
                                                      Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d0"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
                                                          "67885ba0-b284-438f-8393-ee9a9eb299d1"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d2"),
                                                  Name = "1-test",
                                                  Value = 100m
                                              }
                                      };
 
             var internalApiProvider = new TestProvider(initialObjects);
-            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
-            var globalId = JArray.Parse("[{\"f\":\"connection\","
-                + "\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}]")
-                .PackGlobalId();
+            var globalId =
+                JArray.Parse("[{\"f\":\"connection\"," + "\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}]")
+                    .PackGlobalId();
 
             var query = $@"
                 {{

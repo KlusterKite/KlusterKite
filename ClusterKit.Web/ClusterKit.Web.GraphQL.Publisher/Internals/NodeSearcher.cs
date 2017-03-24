@@ -71,7 +71,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var type = typesList[index];
 
                 var args = element.Arguments ?? new JObject();
-                if (element.Id != null && element.Id.HasValues)
+                if (element.Id != null)
                 {
                     args.Add("id", element.Id);
                 }
@@ -85,7 +85,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     request = new ApiRequest
                                   {
                                       FieldName = element.FieldName,
-                                      Arguments = element.Arguments,
+                                      Arguments = args,
                                       Fields = new List<ApiRequest> { request }
                                   };
                 }
@@ -95,7 +95,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                     request = new ApiRequest
                                   {
                                       FieldName = element.FieldName,
-                                      Arguments = element.Arguments,
+                                      Arguments = args,
                                       Fields = tailRequests
                                   };
                 }
