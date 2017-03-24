@@ -192,6 +192,130 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing connection query split request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task ConnectionQuerySplitRequestTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"),
+                                                 Name = "2-test",
+                                                 Value = 50m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{67885BA0-B284-438F-8393-EE9A9EB299D1}"),
+                                                 Name = "3-test",
+                                                 Value = 50m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3AF2C973-D985-4F95-A0C7-AA928D276881}"),
+                                                 Name = "4-test",
+                                                 Value = 70m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{F0607502-5B77-4A3C-9142-E6197A7EE61E}"),
+                                                 Name = "5-test",
+                                                 Value = 6m
+                                             },
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            {                
+                api {
+                        connection(sort: [value_asc, name_asc], filter: {value_gt: 10}, offset: 1, limit: 2) {
+                            count,
+                            edges {
+                                cursor,
+                                node {                                    
+                                    __id,
+                                    name
+                                }                    
+                            }
+                            edges {                                
+                                node {                                    
+                                    value
+                                }                    
+                            }
+                        }
+                }                
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                                 r.ComplexityConfiguration = new ComplexityConfiguration
+                                 {
+                                     FieldImpact = 2.0,
+                                     MaxDepth = 15,
+                                     MaxComplexity = 200
+                                 };
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = @"
+                            {
+                              ""data"": {
+                                ""api"": {
+                                  ""connection"": {
+                                    ""count"": 4,
+                                    ""edges"": [
+                                      {
+                                        ""cursor"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                        ""node"": {
+                                          ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                          ""name"": ""3-test"",
+                                          ""value"": 50.0
+                                        }
+                                      },
+                                      {
+                                        ""cursor"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                        ""node"": {                                          
+                                          ""__id"": ""3af2c973-d985-4f95-a0c7-aa928d276881"",
+                                          ""name"": ""4-test"",
+                                          ""value"": 70.0
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                            ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing connection query request from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>

@@ -218,7 +218,25 @@ namespace ClusterKit.API.Provider.Resolvers
             SetLog(request, apiField, context, EnConnectionAction.Query);
 
             var result = new JObject();
-            foreach (var requestField in request.Fields)
+            var fields = request.Fields.GroupBy(f => f.Alias ?? f.FieldName).Select(
+                g =>
+                {
+                    var f = g.First();
+                    if (f.Fields == null)
+                    {
+                        return f;
+                    }
+
+                    return new ApiRequest
+                    {
+                        Alias = f.Alias,
+                        Arguments = f.Arguments,
+                        FieldName = f.FieldName,
+                        Fields = g.SelectMany(sr => sr.Fields).ToList()
+                    };
+                });
+
+            foreach (var requestField in fields)
             {
                 switch (requestField.FieldName)
                 {

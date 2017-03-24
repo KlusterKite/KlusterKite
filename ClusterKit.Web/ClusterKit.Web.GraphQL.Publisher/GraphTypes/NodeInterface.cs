@@ -24,7 +24,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
         /// <summary>
         /// The list of implemented types
         /// </summary>
-        private readonly Dictionary<string, IObjectGraphType> implemntedTypes = new Dictionary<string, IObjectGraphType>();
+        private readonly Dictionary<string, IObjectGraphType> implementedTypes = new Dictionary<string, IObjectGraphType>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeInterface"/> class.
@@ -46,13 +46,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
         /// <param name="graphType">The implementing graph type</param>
         public void AddImplementedType(string typeName, IObjectGraphType graphType)
         {
-            if (this.implemntedTypes.ContainsKey(typeName))
+            if (this.implementedTypes.ContainsKey(typeName))
             {
                 throw new InvalidOperationException("The type is laready registered");
             }
 
             this.AddPossibleType(graphType);
-            this.implemntedTypes.Add(typeName, graphType);
+            this.implementedTypes.Add(typeName, graphType);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
             }
 
             IObjectGraphType type;
-            if (this.implemntedTypes.TryGetValue(typeName, out type))
+            if (this.implementedTypes.TryGetValue(typeName, out type))
             {
                 // todo: search and remove some strange function in GraphQL lib that removes installed field resolvers AND REMOVE THIS KLUDGE!!!!!
                 (type as VirtualGraphType)?.RestoreFieldResolvers();
