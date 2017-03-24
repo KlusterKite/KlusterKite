@@ -375,12 +375,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 {
                     var mutation = (ApiMutation)this.mergedField.OriginalFields[this.provider.Description.ApiName];
                     var treePath = mutation.Path.Take(mutation.Path.Count - 1).ToList();
-                    if (treePath.Count > 0)
-                    {
-                        var parentGlobalId =
-                            new JArray(treePath.Select(r => new JObject { { "f", r.FieldName } }));
-                        data.Add(GlobalIdPropertyName, parentGlobalId);
-                    }
+
+                    var parentGlobalId = new JArray(treePath.Select(r => new JObject { { "f", r.FieldName } }));
+                    data.Add(GlobalIdPropertyName, parentGlobalId);
 
                     var elementRequest = mutation.Path.LastOrDefault();
                     if (elementRequest != null)

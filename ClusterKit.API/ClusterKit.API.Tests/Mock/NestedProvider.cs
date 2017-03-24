@@ -9,6 +9,9 @@
 
 namespace ClusterKit.API.Tests.Mock
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
@@ -24,18 +27,23 @@ namespace ClusterKit.API.Tests.Mock
     public class NestedProvider
     {
         /// <summary>
-        /// Async scalar field
+        /// Initializes a new instance of the <see cref="NestedProvider"/> class.
         /// </summary>
-        [DeclareField]
-        [UsedImplicitly]
-        public Task<string> AsyncScalarField => Task.FromResult("AsyncScalarField");
+        public NestedProvider()
+        {
+        }
 
         /// <summary>
-        /// Gets or sets the sync scalar field
+        /// Initializes a new instance of the <see cref="NestedProvider"/> class.
         /// </summary>
-        [DeclareField]
-        [UsedImplicitly]
-        public string SyncScalarField { get; set; } = "SyncScalarField";
+        /// <param name="objects">
+        /// The list of pre-stored objects.
+        /// </param>
+        public NestedProvider(List<TestObject> objects)
+        {
+            this.Connection =
+                new TestObjectConnection(objects?.ToDictionary(o => o.Id) ?? new Dictionary<Guid, TestObject>());
+        }
 
         /// <summary>
         /// Gets or sets the field that is visible only in "input" objects
@@ -45,6 +53,20 @@ namespace ClusterKit.API.Tests.Mock
         public string ArgumentField { get; set; }
 
         /// <summary>
+        /// Async scalar field
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public Task<string> AsyncScalarField => Task.FromResult("AsyncScalarField");
+
+        /// <summary>
+        /// Gets the test objects connection
+        /// </summary>
+        [DeclareConnection(CanCreate = true, CanDelete = true, CanUpdate = true)]
+        [UsedImplicitly]
+        public TestObjectConnection Connection { get; }
+
+        /// <summary>
         /// Gets or sets the field that is not visible "input" objects, but can be queried
         /// </summary>
         [DeclareField(Access = EnAccessFlag.Queryable)]
@@ -52,22 +74,18 @@ namespace ClusterKit.API.Tests.Mock
         public string ReadOnlyField { get; set; }
 
         /// <summary>
+        /// Gets or sets the sync scalar field
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public string SyncScalarField { get; set; } = "SyncScalarField";
+
+        /// <summary>
         /// Gets this for infinite recursive requests
         /// </summary>
         [DeclareField]
-        public NestedProvider This => this;
-
-        /// <summary>
-        /// Test nested mutation
-        /// </summary>
-        /// <param name="name">The new name of current test object</param>
-        /// <returns>Test object after mutation</returns>
-        [DeclareMutation]
         [UsedImplicitly]
-        public TestObject SetName(string name)
-        {
-            return new TestObject { Name = name };
-        }
+        public NestedProvider This => this;
 
         /// <summary>
         /// Test nested mutation
@@ -79,6 +97,18 @@ namespace ClusterKit.API.Tests.Mock
         public MutationResult<bool> Check(string name)
         {
             return new MutationResult<bool> { Result = true };
+        }
+
+        /// <summary>
+        /// Test nested mutation
+        /// </summary>
+        /// <param name="name">The new name of current test object</param>
+        /// <returns>Test object after mutation</returns>
+        [DeclareMutation]
+        [UsedImplicitly]
+        public TestObject SetName(string name)
+        {
+            return new TestObject { Name = name };
         }
     }
 }

@@ -1262,7 +1262,7 @@ namespace ClusterKit.API.Provider.Resolvers
                         getContainer(source, context, serializer, callback)
                             .ContinueWith(
                                 result =>
-                                    this.GetFieldValue(source, connection.Field.Name, context, serializer, callback))
+                                    this.GetFieldValue(result.Result, connection.Field.Name, context, serializer, callback))
                             .Unwrap();
 
                 if (attribute.CanCreate)
@@ -1380,7 +1380,7 @@ namespace ClusterKit.API.Provider.Resolvers
                         getContainer(source, context, serializer, callback)
                             .ContinueWith(
                                 result =>
-                                    this.GetFieldValue(source, subContainer.Field.Name, context, serializer, callback))
+                                    this.GetFieldValue(result.Result, subContainer.Field.Name, context, serializer, callback))
                             .Unwrap();
 
                 foreach (var generateMutation in subTypeResolver.GenerateMutations(newPath, newTypesUsed, nextResolver))
@@ -1443,6 +1443,14 @@ namespace ClusterKit.API.Provider.Resolvers
             FieldDescription field;
             if (!Fields.TryGetValue(fieldName, out field))
             {
+                return Task.FromResult<object>(null);
+            }
+
+            if (source != null && !(source is T))
+            {
+                onErrorCallback(new Exception("ObjectResolver GetFieldValue error. "
+                                              + $"Expected source of type {NamingUtilities.ToCSharpRepresentation(typeof(T))} "
+                                              + $"but received {NamingUtilities.ToCSharpRepresentation(source.GetType())}"));
                 return Task.FromResult<object>(null);
             }
 

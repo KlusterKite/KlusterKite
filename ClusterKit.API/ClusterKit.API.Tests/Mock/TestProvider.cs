@@ -106,7 +106,7 @@ namespace ClusterKit.API.Tests.Mock
         /// </summary>
         [DeclareField(Name = "nestedAsync")]
         [UsedImplicitly]
-        public Task<NestedProvider> AsyncNestedProvider => Task.FromResult(new NestedProvider());
+        public Task<NestedProvider> AsyncNestedProvider => Task.FromResult(new NestedProvider(this.objects));
 
         /// <summary>
         /// Async scalar field
@@ -193,7 +193,7 @@ namespace ClusterKit.API.Tests.Mock
         /// </summary>
         [DeclareField(Name = "nestedSync")]
         [UsedImplicitly]
-        public NestedProvider SyncNestedProvider => new NestedProvider();
+        public NestedProvider SyncNestedProvider => new NestedProvider(this.objects);
 
         /// <summary>
         /// Sync scalar field

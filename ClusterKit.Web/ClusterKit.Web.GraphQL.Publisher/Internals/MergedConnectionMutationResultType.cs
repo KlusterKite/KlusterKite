@@ -154,15 +154,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                var value = ((JObject)context.Source).Property("__deletedId")?.Value;
+                var contextSource = (JObject)context.Source;
+
+                var value = contextSource.Property("__deletedId")?.Value;
                 if (value == null)
                 {
                     return null;
                 }
 
-                var globalId = GetGlobalId(
-                    (JObject)context.Source,
-                    value);
+                var globalId = contextSource.Property(GlobalIdPropertyName)?.Value?.DeepClone() as JArray;
+                var request = contextSource.Property(RequestPropertyName)?.Value?.DeepClone() as JObject;
+                if (globalId == null || request == null)
+                {
+                    return null;
+                }
+
+                request.Add("id", value);
+                globalId.Add(request);
                 return globalId.PackGlobalId();
             }
         }

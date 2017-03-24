@@ -1148,6 +1148,159 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// </summary>
         /// <returns>Async task</returns>
         [Fact]
+        public async Task ConnectionMutationNestedUpdateTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{B500CA20-F649-4DCD-BDA8-1FA5031ECDD3}"),
+                                                 Name = "2-test",
+                                                 Value = 50m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{67885BA0-B284-438F-8393-EE9A9EB299D1}"),
+                                                 Name = "3-test",
+                                                 Value = 50m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3AF2C973-D985-4F95-A0C7-AA928D276881}"),
+                                                 Name = "4-test",
+                                                 Value = 70m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{F0607502-5B77-4A3C-9142-E6197A7EE61E}"),
+                                                 Name = "5-test",
+                                                 Value = 6m
+                                             },
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var oldId = JArray.Parse("[{\"f\": \"nestedSync\"},{\"f\": \"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87110\"}]")
+        .PackGlobalId().Replace("\"", "\\\"");
+
+            var newId = JArray.Parse("[{\"f\": \"nestedSync\"},{\"f\": \"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87111\"}]")
+.PackGlobalId().Replace("\"", "\\\"");
+            var shortId = JArray.Parse("[{\"f\": \"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87111\"}]")
+.PackGlobalId().Replace("\"", "\\\"");
+
+            var query = @"                          
+            mutation M {
+                    call: TestApi_nestedSync_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}}) {
+                    node {
+                        id,
+                        __id,
+                        name,
+                        value
+                    },
+                    edge {
+                        cursor,
+                        node {
+                            id,
+                            __id,
+                            name,
+                            value
+                        }
+                    },
+                    deletedId,
+                    api {
+                        connection(sort: [value_asc, name_asc], filter: {value: 13}) {
+                            count,
+                            edges {
+                                cursor,
+                                node {
+                                    id,
+                                    __id,
+                                    name,
+                                    value
+                                }                    
+                            }
+                        }
+                    }
+                }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = $@"
+                                    {{
+                                      ""data"": {{
+                                        ""call"": {{
+                                          ""node"": {{
+                                            ""id"": ""{newId}"",
+                                            ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                            ""name"": ""hello world"",
+                                            ""value"": 13.0
+                                          }},
+                                          ""edge"": {{
+                                            ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                            ""node"": {{
+                                              ""id"": ""{newId}"",
+                                              ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                              ""name"": ""hello world"",
+                                              ""value"": 13.0
+                                            }}
+                                          }},
+                                          ""deletedId"": ""{oldId}"",
+                                          ""api"": {{
+                                            ""connection"": {{
+                                              ""count"": 1,
+                                              ""edges"": [
+                                                {{
+                                                  ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                                  ""node"": {{
+                                                    ""id"": ""{shortId}"",
+                                                    ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87111"",
+                                                    ""name"": ""hello world"",
+                                                    ""value"": 13.0
+                                                  }}
+                                                }}
+                                              ]
+                                            }}
+                                          }}
+                                        }}
+                                      }}
+                                    }}
+                                ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing connection update request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
         public async Task ConnectionMutationFaultedUpdateTest()
         {
             var initialObjects = new List<TestObject>
