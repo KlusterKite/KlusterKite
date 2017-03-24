@@ -33,14 +33,14 @@ export default class App extends React.Component {
               </LinkContainer>
             </Nav>
             <Nav navbar>
-              {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.GetList') &&
+              {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Query') &&
                 <LinkContainer to="/Templates">
                   <NavItem>Templates</NavItem>
                 </LinkContainer>
               }
             </Nav>
             <Nav navbar>
-              {hasPrivilege('ClusterKit.NodeManager.NugetFeed.GetList') &&
+              {hasPrivilege('ClusterKit.NodeManager.NugetFeed.Query') &&
                 <LinkContainer to="/NugetFeeds">
                   <NavItem>Nuget Feeds</NavItem>
                 </LinkContainer>

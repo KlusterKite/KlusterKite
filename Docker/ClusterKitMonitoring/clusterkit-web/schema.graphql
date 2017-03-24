@@ -3,6 +3,97 @@ schema {
   mutation: Mutations
 }
 
+type Boolean_MutationPayload {
+  result: Boolean
+  clientMutationId: String
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# Global cluster actors tree scan result
+type ClusterKitMonitoring__ClusterKitMonitoringClusterTree {
+  # Gets the list of nodes
+  nodes: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_DictionaryConverter_System_String__ClusterKit_Monitoring_Client_Messages_Node__ClusterKit_API_Client_Converters_DictionaryConverter]
+
+  # Gets the sum of queue size across tree
+  queueSizeSum: Int
+
+  # Gets the maximum queue size among tree nodes
+  maxQueueSize: Int
+  id: ID
+}
+
+# Represents a dictionary key-value pair
+type ClusterKitMonitoring_ClusterKit_API_Client_Converters_DictionaryConverter_System_String__ClusterKit_Monitoring_Client_Messages_Node__ClusterKit_API_Client_Converters_DictionaryConverter {
+  # Gets a dictionary key
+  key: String
+
+  # Gets a dictionary value
+  value: ClusterKitMonitoring_ClusterKitMonitoringNode
+  id: ID
+}
+
+# ClusterKit monitoring api
+type ClusterKitMonitoring_ClusterKit_Monitoring_MonitoringApi {
+  # Gets the last cluster scan result. Changes as system receives the scan results from nodes
+  getClusterTree: ClusterKitMonitoring__ClusterKitMonitoringClusterTree
+  id: ID
+}
+
+# ClusterKit node monitoring
+# The root provider
+type ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi {
+  # ClusterKit node monitoring
+  clusterKitMonitoringApi: ClusterKitMonitoring_ClusterKit_Monitoring_MonitoringApi
+
+  # The ClusterKit node managing API
+  nodeManagerData: ClusterKitNodeApi_ClusterKitNodeManagement
+
+  # The current user
+  me: ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
+  id: ID
+
+  # The node global searcher according to Relay specification
+  __node(
+    # The node global id
+    id: ID
+  ): Node
+}
+
+input ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input {
+  clientMutationId: String
+}
+
+# The actor's description
+type ClusterKitMonitoring_ClusterKitMonitoringNode {
+  # the actor's type
+  actorType: String
+
+  # the actor's last message
+  currentMessage: String
+
+  # the actor's dispatcher id
+  dispatcherId: String
+
+  # the actor's dispatcher type
+  dispatcherType: String
+
+  # the maximum queue size among it's children
+  maxQueueSize: Int
+
+  # the actor's name
+  name: String
+
+  # the actor's queue size
+  queueSize: Int
+
+  # the maximum queue size among it's children
+  queueSizeSum: Int
+
+  # the actor's children
+  children: [ClusterKitMonitoring_ClusterKitMonitoringNode]
+  id: ID
+}
+
 # Akka system address
 type ClusterKitNodeApi_AkkaAddress {
   # the address string representation
@@ -34,7 +125,7 @@ type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ {
 type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
   result: ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_
   clientMutationId: String
-  api: ClusterKitNodeApi_ClusterKitNodeApi
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
 }
 
 enum ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType {
@@ -52,22 +143,6 @@ type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi {
   # The current application privileges
   clusterKitClientPrivileges: [String]
   id: ID
-}
-
-# The root provider
-type ClusterKitNodeApi_ClusterKitNodeApi {
-  # The ClusterKit node managing API
-  nodeManagerData: ClusterKitNodeApi_ClusterKitNodeManagement
-
-  # The current user
-  me: ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
-  id: ID
-
-  # The node global searcher according to Relay specification
-  __node(
-    # The node global id
-    id: ID
-  ): Node
 }
 
 # Description of node configuration
@@ -664,7 +739,7 @@ type ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload {
   edge: ClusterKitNodeApi_ClusterKitNodeTemplate_Edge
   errors: [ClusterKitNodeApi_ErrorDescription]
   clientMutationId: String
-  api: ClusterKitNodeApi_ClusterKitNodeApi
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
 }
 
 # The list of ClusterKitNodeApi_ClusterKitNodeTemplate_Node fields that can be used as sorting functions
@@ -1077,7 +1152,7 @@ type ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload {
   edge: ClusterKitNodeApi_ClusterKitNugetFeed_Edge
   errors: [ClusterKitNodeApi_ErrorDescription]
   clientMutationId: String
-  api: ClusterKitNodeApi_ClusterKitNodeApi
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
 }
 
 # The list of ClusterKitNodeApi_ClusterKitNugetFeed_Node fields that can be used as sorting functions
@@ -1316,7 +1391,7 @@ type ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload {
   edge: ClusterKitNodeApi_ClusterKitRole_Edge
   errors: [ClusterKitNodeApi_ErrorDescription]
   clientMutationId: String
-  api: ClusterKitNodeApi_ClusterKitNodeApi
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
 }
 
 # The list of ClusterKitNodeApi_ClusterKitRole_Node fields that can be used as sorting functions
@@ -1495,7 +1570,7 @@ type ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload {
   edge: ClusterKitNodeApi_ClusterKitSeedAddress_Edge
   errors: [ClusterKitNodeApi_ErrorDescription]
   clientMutationId: String
-  api: ClusterKitNodeApi_ClusterKitNodeApi
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
 }
 
 # The list of ClusterKitNodeApi_ClusterKitSeedAddress_Node fields that can be used as sorting functions
@@ -1758,7 +1833,7 @@ type ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload {
   edge: ClusterKitNodeApi_ClusterKitUser_Edge
   errors: [ClusterKitNodeApi_ErrorDescription]
   clientMutationId: String
-  api: ClusterKitNodeApi_ClusterKitNodeApi
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
 }
 
 # The list of ClusterKitNodeApi_ClusterKitUser_Node fields that can be used as sorting functions
@@ -1952,6 +2027,9 @@ scalar Decimal
 
 # The list of all detected mutations
 type Mutations {
+  # Initiates the new actor system scan
+  ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan(input: ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input): Boolean_MutationPayload
+
   # Request to server to reload package list
   ClusterKitNodeApi_nodeManagerData_reloadPackages(input: ClusterKitNodeApi_nodeManagerData_reloadPackages_Input): ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload
 
@@ -2007,7 +2085,7 @@ interface Node {
 # The root query type
 type Query {
   # The united api access
-  api: ClusterKitNodeApi_ClusterKitNodeApi
+  api: ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi
   id: ID
 
   # The node global searcher according to Relay specification

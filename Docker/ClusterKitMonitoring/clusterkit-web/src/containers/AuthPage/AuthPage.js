@@ -1,5 +1,5 @@
 import React from 'react';
-import { browserHistory } from 'react-router'
+// import { browserHistory } from 'react-router'
 
 import Storage from '../../utils/ttl-storage';
 

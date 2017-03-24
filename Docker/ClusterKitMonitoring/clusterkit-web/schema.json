@@ -928,7 +928,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_ClusterKitNodeApi",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -977,9 +977,21 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKitNodeApi_ClusterKitNodeApi",
-          "description": "The root provider",
+          "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
+          "description": "ClusterKit node monitoring\nThe root provider",
           "fields": [
+            {
+              "name": "clusterKitMonitoringApi",
+              "description": "ClusterKit node monitoring",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitMonitoring_ClusterKit_Monitoring_MonitoringApi",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "nodeManagerData",
               "description": "The ClusterKit node managing API",
@@ -1034,6 +1046,286 @@
               "type": {
                 "kind": "INTERFACE",
                 "name": "Node",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitMonitoring_ClusterKit_Monitoring_MonitoringApi",
+          "description": "ClusterKit monitoring api",
+          "fields": [
+            {
+              "name": "getClusterTree",
+              "description": "Gets the last cluster scan result. Changes as system receives the scan results from nodes",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitMonitoring__ClusterKitMonitoringClusterTree",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitMonitoring__ClusterKitMonitoringClusterTree",
+          "description": "Global cluster actors tree scan result",
+          "fields": [
+            {
+              "name": "nodes",
+              "description": "Gets the list of nodes",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_DictionaryConverter_System_String__ClusterKit_Monitoring_Client_Messages_Node__ClusterKit_API_Client_Converters_DictionaryConverter",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "queueSizeSum",
+              "description": "Gets the sum of queue size across tree",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "maxQueueSize",
+              "description": "Gets the maximum queue size among tree nodes",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_DictionaryConverter_System_String__ClusterKit_Monitoring_Client_Messages_Node__ClusterKit_API_Client_Converters_DictionaryConverter",
+          "description": "Represents a dictionary key-value pair",
+          "fields": [
+            {
+              "name": "key",
+              "description": "Gets a dictionary key",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "value",
+              "description": "Gets a dictionary value",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoringNode",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitMonitoring_ClusterKitMonitoringNode",
+          "description": "The actor's description",
+          "fields": [
+            {
+              "name": "actorType",
+              "description": "the actor's type",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "currentMessage",
+              "description": "the actor's last message",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "dispatcherId",
+              "description": "the actor's dispatcher id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "dispatcherType",
+              "description": "the actor's dispatcher type",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "maxQueueSize",
+              "description": "the maximum queue size among it's children",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "the actor's name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "queueSize",
+              "description": "the actor's queue size",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "queueSizeSum",
+              "description": "the maximum queue size among it's children",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "children",
+              "description": "the actor's children",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ClusterKitMonitoring_ClusterKitMonitoringNode",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -6052,6 +6344,29 @@
           "description": "The list of all detected mutations",
           "fields": [
             {
+              "name": "ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan",
+              "description": "Initiates the new actor system scan",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Boolean_MutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "ClusterKitNodeApi_nodeManagerData_reloadPackages",
               "description": "Request to server to reload package list",
               "args": [
@@ -6404,6 +6719,74 @@
         },
         {
           "kind": "OBJECT",
+          "name": "Boolean_MutationPayload",
+          "description": null,
+          "fields": [
+            {
+              "name": "result",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "api",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload",
           "description": null,
           "fields": [
@@ -6437,7 +6820,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_ClusterKitNodeApi",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -6674,7 +7057,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_ClusterKitNodeApi",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -6983,7 +7366,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_ClusterKitNodeApi",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -7234,7 +7617,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_ClusterKitNodeApi",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -7455,7 +7838,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_ClusterKitNodeApi",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -7685,7 +8068,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_ClusterKitNodeApi",
+                "name": "ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi",
                 "ofType": null
               },
               "isDeprecated": false,
