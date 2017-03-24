@@ -32,19 +32,25 @@ export class NodesList extends React.Component {
   nodePopover(node) {
     return (
       <Popover title={`${node.nodeTemplate}`} id={`${node.nodeId}`}>
-        {node.modules.map((subModule) =>
-          <span key={`${node.nodeId}/${subModule.id}`}>
-            <span className="label label-default">{subModule.id}&nbsp;{subModule.version}</span>{' '}
-          </span>
-        )
+        {node.modules.edges.map((subModuleEdge) => {
+          const subModuleNode =  subModuleEdge.node;
+          return (
+            <span key={`${node.nodeId}/${subModuleNode.id}`}>
+              <span className="label label-default">{subModuleNode.id}&nbsp;{subModuleNode.version}</span>{' '}
+            </span>
+          );
+        })
         }
       </Popover>
     );
   }
 
   render() {
+    if (!this.props.nodeDescriptions.getActiveNodeDescriptions){
+      return (<div></div>);
+    }
     const { onManualUpgrade, hasError } = this.props;
-    const nodes = this.props.nodeDescriptions.getActiveNodeDescriptions;
+    const edges = this.props.nodeDescriptions.getActiveNodeDescriptions.edges;
 
     return (
       <div>
@@ -68,70 +74,73 @@ export class NodesList extends React.Component {
             </tr>
           </thead>
           <tbody>
-          {nodes && nodes.map((node) =>
-            <tr key={`${node.nodeId}`}>
-              <td>{node.isClusterLeader ? <i className="fa fa-check-circle" aria-hidden="true"></i> : ''}</td>
-              <td>{node.nodeAddress.host}:{node.nodeAddress.port}</td>
-              <td>
-                {node.nodeTemplate}
-              </td>
-              <td>
-                {node.containerType}
-              </td>
-              <td>
-                {node.isInitialized &&
+          {edges && edges.map((edge) => {
+            const node = edge.node;
+            return (
+              <tr key={`${node.nodeId}`}>
+                <td>{node.isClusterLeader ? <i className="fa fa-check-circle" aria-hidden="true"></i> : ''}</td>
+                <td>{node.nodeAddress.host}:{node.nodeAddress.port}</td>
+                <td>
+                  {node.nodeTemplate}
+                </td>
+                <td>
+                  {node.containerType}
+                </td>
+                <td>
+                  {node.isInitialized &&
                   <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={this.nodePopover(node)}>
                     <Button className="btn-info btn-xs">
-                      <Icon name="search" />
+                      <Icon name="search"/>
                     </Button>
                   </OverlayTrigger>
-                }
-              </td>
-              <td>
-                {node.roles.map((role) => this.drawRole(node, role))}
-              </td>
-              {node.isInitialized &&
+                  }
+                </td>
+                <td>
+                  {node.roles.map((role) => this.drawRole(node, role))}
+                </td>
+                {node.isInitialized &&
                 <td>
                   <span className="label">{node.isInitialized}</span>
                   {this.props.upgradeNodePrivilege &&
-                    <span>
-                      {!node.isObsolete &&
+                  <span>
+                        {!node.isObsolete &&
                         <button
-                        type="button" className="upgrade btn btn-xs btn-success"
-                        title="Upgrade Node"
-                        onClick={() => onManualUpgrade && onManualUpgrade(node)}>
-                          <Icon name="refresh" /> Actual
+                          type="button" className="upgrade btn btn-xs btn-success"
+                          title="Upgrade Node"
+                          onClick={() => onManualUpgrade && onManualUpgrade(node)}>
+                          <Icon name="refresh"/> Actual
                         </button>
-                      }
-                      {node.isObsolete &&
-                        <button
-                        type="button" className="upgrade btn btn-xs btn-warning"
-                        title="Upgrade Node"
-                        onClick={() => onManualUpgrade && onManualUpgrade(node)}>
-                          <Icon name="refresh" /> Obsolete
-                        </button>
-                      }
-                    </span>
+                        }
+                    {node.isObsolete &&
+                    <button
+                      type="button" className="upgrade btn btn-xs btn-warning"
+                      title="Upgrade Node"
+                      onClick={() => onManualUpgrade && onManualUpgrade(node)}>
+                      <Icon name="refresh"/> Obsolete
+                    </button>
+                    }
+                      </span>
                   }
                   {!this.props.upgradeNodePrivilege &&
-                    <span>
-                      {!node.isObsolete &&
+                  <span>
+                        {!node.isObsolete &&
                         <span className="label label-success">Actual</span>
-                      }
-                      {node.isObsolete &&
-                        <span className="label label-warning">Obsolete</span>
-                      }
-                    </span>
+                        }
+                    {node.isObsolete &&
+                    <span className="label label-warning">Obsolete</span>
+                    }
+                      </span>
                   }
                 </td>
-              }
-              {!node.isInitialized &&
+                }
+                {!node.isInitialized &&
                 <td>
                   <span className="label label-info">Uncontrolled</span>
                 </td>
-              }
-            </tr>
-          )
+                }
+              </tr>
+            )
+          })
           }
           </tbody>
         </table>
@@ -148,23 +157,31 @@ export default Relay.createContainer(
       nodeDescriptions: () => Relay.QL`fragment on ClusterKitNodeApi_ClusterKitNodeManagement {
         getActiveNodeDescriptions
         {
-          containerType,
-          isClusterLeader,
-          isObsolete,
-          isInitialized,
-          leaderInRoles,
-          nodeId,
-          nodeTemplate,
-          nodeTemplateVersion,
-          roles,
-          startTimeStamp,
-          nodeAddress {
-            host,
-            port,
-          },
-          modules {
-            id,
-            version,
+          edges {
+            node {
+              containerType,
+              isClusterLeader,
+              isObsolete,
+              isInitialized,
+              leaderInRoles,
+              nodeId,
+              nodeTemplate,
+              nodeTemplateVersion,
+              roles,
+              startTimeStamp,
+              nodeAddress {
+                host,
+                port,
+              },
+              modules {
+                edges {
+                  node {
+                    id,
+                    version,
+                  }
+                }
+              }
+            }
           }
         }
       }

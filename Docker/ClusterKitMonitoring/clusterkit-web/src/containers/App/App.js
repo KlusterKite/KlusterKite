@@ -46,6 +46,13 @@ export default class App extends React.Component {
                 </LinkContainer>
               }
             </Nav>
+            <Nav navbar>
+              {hasPrivilege('ClusterKit.Monitoring.GetClusterTree') &&
+              <LinkContainer to="/ActorsTree">
+                <NavItem>Actors Tree</NavItem>
+              </LinkContainer>
+              }
+            </Nav>
             {username &&
             <Nav pullRight>
               <LinkContainer to="/Logout">

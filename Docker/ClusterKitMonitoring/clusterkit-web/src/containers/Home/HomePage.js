@@ -48,7 +48,7 @@ export default Relay.createContainer(
   HomePage,
   {
     fragments: {
-      api: () => Relay.QL`fragment on ClusterKitMonitoring_ClusterKitMonitoring_ClusterKitNodeApi_ClusterKitNodeApi {
+      api: () => Relay.QL`fragment on ClusterKitMonitoring_ClusterKitNodeApi {
         __typename
         nodeManagerData {
           ${NodesWithTemplates.getFragment('data')},

@@ -120,7 +120,7 @@ const getToken = () => {
   }
   else if (!accessToken) {
     console.log('getting new accessToken');
-    tokenRefreshPromise().then(function() {
+    return tokenRefreshPromise().then(function() {
       console.log('got new token');
       return Storage.get('accessToken');
     });
