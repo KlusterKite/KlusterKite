@@ -5,6 +5,7 @@ import useRelay from 'react-router-relay'
 import { Router, IndexRoute, Route, browserHistory, applyRouterMiddleware } from 'react-router'
 
 import App from './containers/App/App';
+import ActorsTreePage from './containers/ActorsTreePage/ActorsTreePage';
 import AuthPage from './containers/AuthPage/AuthPage';
 import EditFormPage from './containers/EditForm/EditFormPage';
 import FeedsListPage from './containers/FeedsListPage/FeedsListPage';
@@ -28,6 +29,7 @@ export default class RoutesList extends React.Component {
           <IndexRoute component={HomePage} queries={ApiQueries} />
           <Route path='/Login' component={AuthPage} />
           <Route path='/Logout' component={LogoutPage} />
+          <Route path='/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
           <Route path='/Drivers' component={EditFormPage} queries={ApiQueries} />
           <Route path='/GraphQL' component={GraphQLPage} />
           <Route path='/NugetFeeds' component={FeedsListPage} queries={ApiQueries} />

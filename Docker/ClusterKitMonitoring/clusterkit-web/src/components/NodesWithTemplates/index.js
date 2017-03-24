@@ -14,9 +14,9 @@ export class NodesWithTemplates extends React.Component {
   };
 
   drawTemplate(template) {
-    const data = this.props.data.getActiveNodeDescriptions;
+    const data = this.props.data.getActiveNodeDescriptions.edges;
 
-    const nodesCount = data.filter(n => n.nodeTemplate === template.code).length;
+    const nodesCount = data.filter(n => n.node.nodeTemplate === template.code).length;
     let color;
     if (nodesCount < template.minimumRequiredInstances) {
       color = 'label-danger';
@@ -32,7 +32,10 @@ export class NodesWithTemplates extends React.Component {
   }
 
   render() {
-    const activeNodes = this.props.data.getActiveNodeDescriptions;
+    if (!this.props.data.getActiveNodeDescriptions){
+      return (<div></div>);
+    }
+    const activeNodes = this.props.data.getActiveNodeDescriptions.edges;
     const templates = this.props.data.nodeTemplates && this.props.data.nodeTemplates.edges;
 
     return (
@@ -56,7 +59,11 @@ export default Relay.createContainer(
     fragments: {
       data: () => Relay.QL`fragment on ClusterKitNodeApi_ClusterKitNodeManagement {
         getActiveNodeDescriptions {
-          nodeTemplate
+          edges {
+            node {
+              nodeTemplate
+            }
+          }
         }
         nodeTemplates {
           edges {

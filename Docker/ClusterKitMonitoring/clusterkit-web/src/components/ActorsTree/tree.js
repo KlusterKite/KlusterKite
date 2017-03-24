@@ -23,7 +23,7 @@ class ActorsTree extends React.Component {
   }
 
   static propTypes = {
-    tree: React.PropTypes.object.isRequired,
+    tree: React.PropTypes.arrayOf(React.PropTypes.object),
   };
 
   componentDidMount() {
@@ -32,6 +32,8 @@ class ActorsTree extends React.Component {
       .attr('class', 'tooltip')
       .style('opacity', 0);
 
+    console.log('tree', this.props.tree);
+
     if (this.props.tree) {
       this.renderTreeGraf(this.props.tree, ReactDom.findDOMNode(this));
     }
@@ -39,7 +41,7 @@ class ActorsTree extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.tree && !isEqual(nextProps.tree, this.props.tree)) {
-      this.renderTreeGraf(this.props.tree, ReactDom.findDOMNode(this));
+      this.renderTreeGraf(nextProps.tree, ReactDom.findDOMNode(this));
     }
   }
 
@@ -54,24 +56,29 @@ class ActorsTree extends React.Component {
   getActorToolTip(node) {
     const result = (
       <div className="wellTooltip well well-sm">
-        <p><strong>{decodeURIComponent(node.Name)}</strong></p>
-        {node.ActorType && (<small>Type: {node.ActorType}<br /></small>)}
-        {node.DispatcherType && (<small>DispatcherType: {node.DispatcherType}<br /></small>)}
-        {node.CurrentMessage && <small>CurrentMessage: {node.CurrentMessage}<br /></small>}
-        {node.QueueSize !== undefined && <small>QueueSize: {node.QueueSize}<br /></small>}
-        {node.QueueSizeSum !== undefined && <small>QueueSizeSum: {node.QueueSizeSum}<br /></small>}
-        {node.MaxQueueSize !== undefined && <small>MaxQueueSize: {node.MaxQueueSize}<br /></small>}
+        <p><strong>{decodeURIComponent(node.name)}</strong></p>
+        {node.actorType && (<small>Type: {node.actorType}<br /></small>)}
+        {node.dispatcherType && (<small>DispatcherType: {node.dispatcherType}<br /></small>)}
+        {node.currentMessage && <small>CurrentMessage: {node.currentMessage}<br /></small>}
+        {node.queueSize !== undefined && <small>QueueSize: {node.queueSize}<br /></small>}
+        {node.queueSizeSum !== undefined && <small>QueueSizeSum: {node.queueSizeSum}<br /></small>}
+        {node.maxQueueSize !== undefined && <small>MaxQueueSize: {node.maxQueueSize}<br /></small>}
       </div>);
 
     return result;
   }
 
   calculateLevels(tree) {
-    if (!tree.Children || tree.Children.length === 0) {
-      return [];
+    let children;
+    if (tree.children && tree.children.edges && tree.children.edges.length > 0) {
+      children = tree.children.edges.map(x => x.node);
+    } else if (tree.children && tree.children.length > 0) {
+      children = tree.children;
     }
+    else return [];
 
-    const arrays = tree.Children.map(c => this.calculateLevels(c));
+    const arrays = children.map(c => this.calculateLevels(c));
+
     const combinedArray = [];
     arrays.forEach(a => a.forEach((e, index) => {
       if (combinedArray[index] === undefined) {
@@ -81,7 +88,7 @@ class ActorsTree extends React.Component {
       }
     }));
 
-    combinedArray.unshift(tree.Children.length);
+    combinedArray.unshift(children.length);
     return combinedArray;
   }
 
@@ -91,19 +98,20 @@ class ActorsTree extends React.Component {
   }
 
   renderTreeGraf(tree, treeSvg) {
-    if (!tree || !tree.Nodes) {
+    if (!tree) {
       return;
     }
 
+    console.log('tree', tree);
+
     const updatedTree = {
-      Name: 'Cluster',
-      QueueSizeSum: tree.QueueSizeSum,
-      MaxQueueSize: tree.MaxQueueSize,
-      Children: Object.keys(tree.Nodes).map(key => ({
-        ...tree.Nodes[key],
-        Name: key,
-      })),
+      name: 'Cluster',
+      queueSizeSum: 0,
+      maxQueueSize: 0,
+      children: tree.map(c => c.node.value),
     };
+
+    console.log('updatedTree', updatedTree);
 
     const treeParams = this.calculateLevels(updatedTree);
     const maxDepth = treeParams.length;
@@ -122,7 +130,13 @@ class ActorsTree extends React.Component {
 
     const treeGraph = d3Tree().size([height, width - 160]);
 
-    const root = d3Hhierarchy(updatedTree, n => n.Children);
+    const root = d3Hhierarchy(updatedTree, n => {
+      if (n.children && n.children.edges) {
+        const nodes = n.children.edges.map(x => x.node);
+        return nodes;
+      }
+      return n.children;
+    });
     treeGraph(root);
 
     g.selectAll('.link')
@@ -154,9 +168,9 @@ class ActorsTree extends React.Component {
         const classes = [];
         classes.push("node");
         classes.push(d.children ? 'node--internal' : 'node--leaf');
-        if (d.data.QueueSize > 1) {
+        if (d.data.queueSize > 1) {
           classes.push('node--error');
-        } else if (d.data.MaxQueueSize > 1) {
+        } else if (d.data.maxQueueSize > 1) {
           classes.push('node--warning');
         } else {
           classes.push('node--ok');
@@ -222,7 +236,7 @@ class ActorsTree extends React.Component {
       .attr('dy', 3)
       .attr('x', () => 8)
       .style('text-anchor', 'start')
-      .text((d) => this.nameToTree(d.data.Name));
+      .text((d) => this.nameToTree(d.data.name));
   }
 
   render() {

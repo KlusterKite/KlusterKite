@@ -1,15 +1,23 @@
 import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
-// import StubContainer from 'react-storybooks-relay-container';
+import StubContainer from 'react-storybooks-relay-container';
 
-import ActorsTree from './index';
+import ActorsTree from './tree';
 import ActorsTreeButtons from './buttons';
 
 storiesOf('Actor tree')
   .add('graph', () => {
-    const scanResult = getScanResult();
-    return <ActorsTree tree={scanResult} />;
+    const data = getScanResult();
+    return <ActorsTree tree={data.data.api.clusterKitMonitoringApi.getClusterTree.nodes.edges} />;
   })
+  // .add('graph', () => {
+  //   const data = getScanResult();
+  //
+  //   const props = {
+  //     data: data.data.api.clusterKitMonitoringApi
+  //   };
+  //   return <StubContainer Component={ActorsTree} props={props} />;
+  // })
   .add('buttons', () => {
     return <ActorsTreeButtons isLoading={false} handleReload={action('handleReload')} handleScan={action('handleScan')} />;
   })
@@ -18,173 +26,1035 @@ storiesOf('Actor tree')
   })
 ;
 
-let getScanResult = function () {
-  const tree = {
-    "Nodes": {
-      "clusterManager-v0 172.18.0.10:36125": {
-        "ActorType": null,
-        "CurrentMessage": null,
-        "DispatcherId": null,
-        "DispatcherType": null,
-        "MaxQueueSize": 0,
-        "Name": "clusterManager-v0 172.18.0.10:36125",
-        "QueueSize": 0,
-        "QueueSizeSum": 0,
-        "Children": [
-          {
-            "ActorType": "Akka.Actor.SystemGuardianActor",
-            "CurrentMessage": null,
-            "DispatcherId": "akka.actor.default-dispatcher",
-            "DispatcherType": "Dispatcher",
-            "MaxQueueSize": 0,
-            "Name": "system",
-            "QueueSize": 0,
-            "QueueSizeSum": 0,
-            "Children": [
-              {
-                "ActorType": "Akka.Cluster.ClusterDaemon",
-                "CurrentMessage": null,
-                "DispatcherId": "akka.actor.default-dispatcher",
-                "DispatcherType": "Dispatcher",
-                "MaxQueueSize": 0,
-                "Name": "cluster",
-                "QueueSize": 0,
-                "QueueSizeSum": 0,
-                "Children": [
-                  {
-                    "ActorType": "Akka.Cluster.ClusterCoreSupervisor",
-                    "CurrentMessage": null,
-                    "DispatcherId": "akka.actor.default-dispatcher",
-                    "DispatcherType": "Dispatcher",
-                    "MaxQueueSize": 0,
-                    "Name": "core",
-                    "QueueSize": 0,
-                    "QueueSizeSum": 0,
-                    "Children": []
-                  },
-                  {
-                    "ActorType": "Akka.Cluster.ClusterHeartbeatReceiver",
-                    "CurrentMessage": null,
-                    "DispatcherId": "akka.actor.default-dispatcher",
-                    "DispatcherType": "Dispatcher",
-                    "MaxQueueSize": 0,
-                    "Name": "heartbeatReceiver",
-                    "QueueSize": 0,
-                    "QueueSizeSum": 0,
-                    "Children": []
-                  }
-                ]
-              },
-              {
-                "ActorType": "Akka.Cluster.ClusterReadView+EventBusListener",
-                "CurrentMessage": null,
-                "DispatcherId": "akka.actor.default-dispatcher",
-                "DispatcherType": "Dispatcher",
-                "MaxQueueSize": 0,
-                "Name": "clusterEventBusListener",
-                "QueueSize": 0,
-                "QueueSizeSum": 0,
-                "Children": []
-              },
-              {
-                "ActorType": "Akka.Event.DeadLetterListener",
-                "CurrentMessage": null,
-                "DispatcherId": "akka.actor.default-dispatcher",
-                "DispatcherType": "Dispatcher",
-                "MaxQueueSize": 0,
-                "Name": "deadLetterListener",
-                "QueueSize": 0,
-                "QueueSizeSum": 0,
-                "Children": []
-              },
-              {
-                "ActorType": "Akka.Remote.EndpointManager",
-                "CurrentMessage": null,
-                "DispatcherId": "akka.remote.default-remote-dispatcher",
-                "DispatcherType": "Dispatcher",
-                "MaxQueueSize": 0,
-                "Name": "endpointManager",
-                "QueueSize": 0,
-                "QueueSizeSum": 0,
-                "Children": [
-                  {
-                    "ActorType": "Akka.Remote.ReliableDeliverySupervisor",
-                    "CurrentMessage": null,
-                    "DispatcherId": "akka.remote.default-remote-dispatcher",
-                    "DispatcherType": "Dispatcher",
-                    "MaxQueueSize": 0,
-                    "Name": "reliableEndpointWriter-akka.tcp%3A%2F%2FClusterKit%40172.18.0.11%3A41011-4",
-                    "QueueSize": 0,
-                    "QueueSizeSum": 0,
-                    "Children": [
-                      {
-                        "ActorType": "Akka.Remote.EndpointWriter",
-                        "CurrentMessage": null,
-                        "DispatcherId": "akka.remote.default-remote-dispatcher",
-                        "DispatcherType": "Dispatcher",
-                        "MaxQueueSize": 0,
-                        "Name": "endpointWriter",
-                        "QueueSize": 0,
-                        "QueueSizeSum": 0,
-                        "Children": [
+const getScanResult = () => {
+  return {
+    "data": {
+      "api": {
+        "clusterKitMonitoringApi": {
+          "getClusterTree": {
+            "nodes": {
+              "edges": [
+                {
+                  "node": {
+                    "value": {
+                      "name": "clusterManager-v0 172.18.0.10:40679",
+                      "actorType": null,
+                      "dispatcherType": null,
+                      "currentMessage": null,
+                      "queueSize": 0,
+                      "queueSizeSum": 4,
+                      "maxQueueSize": 4,
+                      "children": {
+                        "edges": [
                           {
-                            "ActorType": "Akka.Remote.EndpointReader",
-                            "CurrentMessage": null,
-                            "DispatcherId": "akka.remote.default-remote-dispatcher",
-                            "DispatcherType": "Dispatcher",
-                            "MaxQueueSize": 0,
-                            "Name": "endpointReader-akka.tcp%3A%2F%2FClusterKit%40172.18.0.11%3A41011-1",
-                            "QueueSize": 0,
-                            "QueueSizeSum": 0,
-                            "Children": []
+                            "node": {
+                              "name": "system",
+                              "actorType": "Akka.Actor.SystemGuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 4,
+                              "maxQueueSize": 4,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "cluster",
+                                      "actorType": "Akka.Cluster.ClusterDaemon",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "clusterEventBusListener",
+                                      "actorType": "Akka.Cluster.ClusterReadView+EventBusListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "endpointManager",
+                                      "actorType": "Akka.Remote.EndpointManager",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 4,
+                                      "queueSizeSum": 4,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "EventStreamUnsubscriber-1",
+                                      "actorType": "Akka.Event.EventStreamUnsubscriber",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "log1-SerilogLogger",
+                                      "actorType": "Akka.Logger.Serilog.SerilogLogger",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-deployment-watcher",
+                                      "actorType": "Akka.Remote.RemoteDeploymentWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-watcher",
+                                      "actorType": "Akka.Cluster.ClusterRemoteWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remoting-terminator",
+                                      "actorType": "Akka.Remote.RemoteActorRefProvider+RemotingTerminator",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "transports",
+                                      "actorType": "Akka.Remote.TransportSupervisor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "node": {
+                              "name": "user",
+                              "actorType": "Akka.Actor.GuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "ClusterKit",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Core",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Monitoring",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "NodeManager",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Web",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
                           }
                         ]
                       }
-                    ]
+                    }
                   }
-                ]
-              },
-              {
-                "ActorType": "Akka.Event.EventStreamUnsubscriber",
-                "CurrentMessage": null,
-                "DispatcherId": "akka.actor.default-dispatcher",
-                "DispatcherType": "Dispatcher",
-                "MaxQueueSize": 0,
-                "Name": "EventStreamUnsubscriber-1",
-                "QueueSize": 0,
-                "QueueSizeSum": 0,
-                "Children": []
-              }
-            ]
+                },
+                {
+                  "node": {
+                    "value": {
+                      "name": "clusterManager-v0 172.18.0.11:39664",
+                      "actorType": null,
+                      "dispatcherType": null,
+                      "currentMessage": null,
+                      "queueSize": 0,
+                      "queueSizeSum": 0,
+                      "maxQueueSize": 0,
+                      "children": {
+                        "edges": [
+                          {
+                            "node": {
+                              "name": "system",
+                              "actorType": "Akka.Actor.SystemGuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "cluster",
+                                      "actorType": "Akka.Cluster.ClusterDaemon",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "clusterEventBusListener",
+                                      "actorType": "Akka.Cluster.ClusterReadView+EventBusListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "endpointManager",
+                                      "actorType": "Akka.Remote.EndpointManager",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "EventStreamUnsubscriber-1",
+                                      "actorType": "Akka.Event.EventStreamUnsubscriber",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "log1-SerilogLogger",
+                                      "actorType": "Akka.Logger.Serilog.SerilogLogger",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-deployment-watcher",
+                                      "actorType": "Akka.Remote.RemoteDeploymentWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-watcher",
+                                      "actorType": "Akka.Cluster.ClusterRemoteWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remoting-terminator",
+                                      "actorType": "Akka.Remote.RemoteActorRefProvider+RemotingTerminator",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "transports",
+                                      "actorType": "Akka.Remote.TransportSupervisor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "node": {
+                              "name": "user",
+                              "actorType": "Akka.Actor.GuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "ClusterKit",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Core",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Monitoring",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "NodeManager",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Web",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "node": {
+                    "value": {
+                      "name": "seed:3090",
+                      "actorType": null,
+                      "dispatcherType": null,
+                      "currentMessage": null,
+                      "queueSize": 0,
+                      "queueSizeSum": 0,
+                      "maxQueueSize": 0,
+                      "children": {
+                        "edges": [
+                          {
+                            "node": {
+                              "name": "system",
+                              "actorType": "Akka.Actor.SystemGuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "cluster",
+                                      "actorType": "Akka.Cluster.ClusterDaemon",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "clusterEventBusListener",
+                                      "actorType": "Akka.Cluster.ClusterReadView+EventBusListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "deadLetterListener",
+                                      "actorType": "Akka.Event.DeadLetterListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "endpointManager",
+                                      "actorType": "Akka.Remote.EndpointManager",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "EventStreamUnsubscriber-1",
+                                      "actorType": "Akka.Event.EventStreamUnsubscriber",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "log1-SerilogLogger",
+                                      "actorType": "Akka.Logger.Serilog.SerilogLogger",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-deployment-watcher",
+                                      "actorType": "Akka.Remote.RemoteDeploymentWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-watcher",
+                                      "actorType": "Akka.Cluster.ClusterRemoteWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remoting-terminator",
+                                      "actorType": "Akka.Remote.RemoteActorRefProvider+RemotingTerminator",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "transports",
+                                      "actorType": "Akka.Remote.TransportSupervisor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "node": {
+                              "name": "user",
+                              "actorType": "Akka.Actor.GuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "ClusterKit",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Core",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Monitoring",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "node": {
+                    "value": {
+                      "name": "publisher-v0 publisher1:40079",
+                      "actorType": null,
+                      "dispatcherType": null,
+                      "currentMessage": null,
+                      "queueSize": 0,
+                      "queueSizeSum": 0,
+                      "maxQueueSize": 0,
+                      "children": {
+                        "edges": [
+                          {
+                            "node": {
+                              "name": "system",
+                              "actorType": "Akka.Actor.SystemGuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "cluster",
+                                      "actorType": "Akka.Cluster.ClusterDaemon",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "clusterEventBusListener",
+                                      "actorType": "Akka.Cluster.ClusterReadView+EventBusListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "deadLetterListener",
+                                      "actorType": "Akka.Event.DeadLetterListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "endpointManager",
+                                      "actorType": "Akka.Remote.EndpointManager",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "EventStreamUnsubscriber-1",
+                                      "actorType": "Akka.Event.EventStreamUnsubscriber",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "log1-SerilogLogger",
+                                      "actorType": "Akka.Logger.Serilog.SerilogLogger",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-deployment-watcher",
+                                      "actorType": "Akka.Remote.RemoteDeploymentWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-watcher",
+                                      "actorType": "Akka.Cluster.ClusterRemoteWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remoting-terminator",
+                                      "actorType": "Akka.Remote.RemoteActorRefProvider+RemotingTerminator",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "transports",
+                                      "actorType": "Akka.Remote.TransportSupervisor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "node": {
+                              "name": "user",
+                              "actorType": "Akka.Actor.GuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "ClusterKit",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Core",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Monitoring",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "NodeManager",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Web",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "node": {
+                    "value": {
+                      "name": "publisher-v0 publisher2:33168",
+                      "actorType": null,
+                      "dispatcherType": null,
+                      "currentMessage": null,
+                      "queueSize": 0,
+                      "queueSizeSum": 0,
+                      "maxQueueSize": 0,
+                      "children": {
+                        "edges": [
+                          {
+                            "node": {
+                              "name": "system",
+                              "actorType": "Akka.Actor.SystemGuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "cluster",
+                                      "actorType": "Akka.Cluster.ClusterDaemon",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "clusterEventBusListener",
+                                      "actorType": "Akka.Cluster.ClusterReadView+EventBusListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "deadLetterListener",
+                                      "actorType": "Akka.Event.DeadLetterListener",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "endpointManager",
+                                      "actorType": "Akka.Remote.EndpointManager",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "EventStreamUnsubscriber-1",
+                                      "actorType": "Akka.Event.EventStreamUnsubscriber",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "log1-SerilogLogger",
+                                      "actorType": "Akka.Logger.Serilog.SerilogLogger",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-deployment-watcher",
+                                      "actorType": "Akka.Remote.RemoteDeploymentWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remote-watcher",
+                                      "actorType": "Akka.Cluster.ClusterRemoteWatcher",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "remoting-terminator",
+                                      "actorType": "Akka.Remote.RemoteActorRefProvider+RemotingTerminator",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "transports",
+                                      "actorType": "Akka.Remote.TransportSupervisor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "node": {
+                              "name": "user",
+                              "actorType": "Akka.Actor.GuardianActor",
+                              "dispatcherType": "Dispatcher",
+                              "currentMessage": null,
+                              "queueSize": 0,
+                              "queueSizeSum": 0,
+                              "maxQueueSize": 0,
+                              "children": {
+                                "edges": [
+                                  {
+                                    "node": {
+                                      "name": "ClusterKit",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Core",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Monitoring",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "NodeManager",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  },
+                                  {
+                                    "node": {
+                                      "name": "Web",
+                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "dispatcherType": "Dispatcher",
+                                      "currentMessage": null,
+                                      "queueSize": 0,
+                                      "queueSizeSum": 0,
+                                      "maxQueueSize": 0
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
           }
-        ]
-      },
-      "seed:3090": {
-        "ActorType": null,
-        "CurrentMessage": null,
-        "DispatcherId": null,
-        "DispatcherType": null,
-        "MaxQueueSize": 0,
-        "Name": "seed:3090",
-        "QueueSize": 0,
-        "QueueSizeSum": 0,
-        "Children": [
-          {
-            "ActorType": "Akka.Actor.SystemGuardianActor",
-            "CurrentMessage": null,
-            "DispatcherId": "akka.actor.default-dispatcher",
-            "DispatcherType": "Dispatcher",
-            "MaxQueueSize": 0,
-            "Name": "system",
-            "QueueSize": 0,
-            "QueueSizeSum": 0,
-            "Children": []
-          }
-        ]
+        }
       }
-    },
-    "QueueSizeSum": 0,
-    "MaxQueueSize": 0
-  };
-  return tree;
+    }
+  }
 };

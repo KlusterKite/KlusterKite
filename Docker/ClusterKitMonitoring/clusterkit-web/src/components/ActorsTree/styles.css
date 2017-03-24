@@ -55,3 +55,7 @@ div.tooltip {
 .wellTooltip {
   margin: 0;
 }
+
+.text-margined {
+  margin-top: 10px;
+}

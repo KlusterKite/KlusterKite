@@ -49,7 +49,7 @@ export default Relay.createContainer(
   {
     initialVariables: {
       filter: {
-        address_not: 'user@email'
+        address_not: "user@email"
       }
     },
     fragments: {
