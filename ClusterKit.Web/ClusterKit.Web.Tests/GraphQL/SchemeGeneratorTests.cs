@@ -58,10 +58,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         {
             var viewerFields = new[]
                                    {
-                                       ApiField.Scalar("id", EnScalarType.Guid),
+                                       ApiField.Scalar("id", EnScalarType.Guid, EnFieldFlags.Queryable | EnFieldFlags.IsKey),
                                        ApiField.Scalar("name", EnScalarType.String),
-                                       ApiField.Scalar("numbers", EnScalarType.Integer, EnFieldFlags.IsArray | EnFieldFlags.Queryable),
-                                       ApiField.Object("objects", "object", EnFieldFlags.IsArray | EnFieldFlags.Queryable)
+                                       ApiField.Scalar("numbers", EnScalarType.Integer, EnFieldFlags.IsArray | EnFieldFlags.Queryable)
                                    };
             var viewerType = new ApiObjectType("viewer", viewerFields);
 
@@ -84,23 +83,16 @@ namespace ClusterKit.Web.Tests.GraphQL
                 Description = api,
                 Data = @"{
 	                    ""viewer"": {
-		                    ""id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
+		                    ""__id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
 		                    ""name"": ""test name"",
-		                    ""numbers"": [1, 2, 3],
-                            ""objects"": [
-			                    {""id"": 30, ""name"": ""test name""}, 
-			                    {""id"": 40, ""name"": ""test name2""}
-		                    ]
+		                    ""numbers"": [1, 2, 3]
 	                    }, 
 	                    ""object"": {
 		                    ""count"": 2, 
 		                    ""edges"": [
-			                    {""__id"": 10}, 
-			                    {""__id"": 20}
-		                    ],
-                            ""__request"": {
-                                ""f"": ""object""
-                            }
+			                    {""__id"": 10, ""node___id"": 10}, 
+			                    {""__id"": 20, ""node___id"": 20}
+		                    ]
 	                    }
                     }"
             };
@@ -127,13 +119,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 query {
                                     api {
                                         viewer {
-                                            id,
+                                            __id,
                                             name,
-                                            numbers,
-                                            objects {
-                                                id,
-                                                name
-                                            }
+                                            numbers
                                         },
                                         object {
                                             count,
@@ -157,10 +145,9 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       ""data"": {
                                         ""api"": {
                                           ""viewer"": {
-                                            ""id"": ""fd73bafb-3698-4fa1-81f5-27c8c83bb4f0"",
+                                            ""__id"": ""fd73bafb-3698-4fa1-81f5-27c8c83bb4f0"",
                                             ""name"": ""test name"",
-		                                    ""numbers"": [1, 2, 3],
-                                            ""objects"": [ {""id"": 30, ""name"": ""test name""}, {""id"": 40, ""name"": ""test name2""}]
+		                                    ""numbers"": [1, 2, 3]
                                           },
                                           ""object"": {
                                             ""count"": 2,
@@ -175,122 +162,6 @@ namespace ClusterKit.Web.Tests.GraphQL
                                                 ""cursor"": 20,
                                                 ""node"": {
                                                   ""__id"": 20
-                                                }
-                                              }
-                                            ]
-                                          }
-                                        }
-                                      }
-                                    }";
-
-            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
-        }
-
-        /// <summary>
-        /// Testing generator for some api with arrays - filtering support
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task ConnectionsArgumentsApiTest()
-        {
-            var viewerType = new ApiObjectType(
-                "viewer",
-                new[] { ApiField.Scalar("id", EnScalarType.Integer), ApiField.Scalar("name", EnScalarType.String) });
-
-            var objectFields = new[]
-                                   {
-                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey | EnFieldFlags.Queryable),
-                                       ApiField.Scalar("name", EnScalarType.String)
-                                   };
-
-            var objectType = new ApiObjectType("object", objectFields);
-
-            var api = new ApiDescription(
-                "TestApi1",
-                "0.0.0.1",
-                new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection | EnFieldFlags.Queryable) });
-
-            var provider = new MoqProvider
-                               {
-                                   Description = api,
-                                   Data =
-                                       @"{
-                                            ""viewer"": {""id"": 1, ""name"": ""test name""}, 
-                                            ""object"": { 
-                                                ""count"": 2, 
-                                                ""edges"": [
-                                                    {""__id"": 10,  ""node_name"": ""test object1""}, 
-                                                    {""__id"": 20,  ""node_name"": ""test object2""}
-                                            ]}}"
-            };
-
-            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
-
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
-
-            Assert.NotNull(schema.Query);
-            Assert.Equal(3, schema.Query.Fields.Count());
-            Assert.True(schema.Query.HasField("api"));
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                             r =>
-                                 {
-                                     r.Schema = schema;
-                                     r.Query = @"
-                                query {
-                                    api {
-                                        viewer {
-                                            id,
-                                            name
-                                        },
-                                        object(filter: { id: 10, AND: [{name: ""test"", OR: [{id_lt: 20}]}] }, sort: [name_DESC, id_ASC], limit: 10, offset: 20) {
-                                            count,
-                                            edges {
-                                                cursor,                                                
-                                                node {
-                                                    __id,
-                                                    name
-                                                }
-                                            }
-                                        }
-                                    }
-                                }            
-                                ";
-                                 }).ConfigureAwait(true);
-
-            this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-
-            var expectedResponse = @"{
-                                      ""data"": {
-                                        ""api"": {
-                                          ""viewer"": {
-                                            ""id"": 1,
-                                            ""name"": ""test name""
-                                          },
-                                          ""object"": {
-                                            ""count"": 2,
-                                            ""edges"": [
-                                              {
-                                                ""cursor"": 10,
-                                                ""node"": {
-                                                  ""__id"": 10,
-                                                  ""name"": ""test object1""
-                                                }
-                                              },
-                                              {
-                                                ""cursor"": 20,
-                                                ""node"": {
-                                                  ""__id"": 20,
-                                                  ""name"": ""test object2""
                                                 }
                                               }
                                             ]
@@ -405,203 +276,6 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Testing generator for some api with arrays - filtering support
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task MethodsApiTest()
-        {
-            var getObjectsArguments = new[]
-                                          {
-                                              ApiField.Scalar("id", EnScalarType.Integer),
-                                              ApiField.Object("sub", "object")
-                                          };
-
-            var viewerFields = new[]
-                                   {
-                                       ApiField.Scalar("id", EnScalarType.Integer),
-                                       ApiField.Scalar("name", EnScalarType.String),
-                                       ApiField.Object(
-                                           "getObjects",
-                                           "object",
-                                           EnFieldFlags.IsArray | EnFieldFlags.Queryable,
-                                           getObjectsArguments),
-                                       ApiField.Object(
-                                           "getObjectConnections",
-                                           "object",
-                                           EnFieldFlags.IsConnection | EnFieldFlags.Queryable,
-                                           getObjectsArguments),
-                                   };
-            var viewerType = new ApiObjectType("viewer", viewerFields);
-
-            var objectFields = new[]
-                                   {
-                                       ApiField.Scalar("id", EnScalarType.Integer, EnFieldFlags.IsKey | EnFieldFlags.Queryable | EnFieldFlags.CanBeUsedInInput),
-                                       ApiField.Scalar("name", EnScalarType.String, EnFieldFlags.Queryable | EnFieldFlags.CanBeUsedInInput)
-                                   };
-
-            var objectType = new ApiObjectType("object", objectFields);
-
-            var api = new ApiDescription(
-                "TestApi1",
-                "0.0.0.1",
-                new[] { viewerType, objectType },
-                new[] { viewerType.CreateField("viewer"), objectType.CreateField("object", EnFieldFlags.IsConnection | EnFieldFlags.Queryable) });
-
-            var provider = new MoqProvider
-                               {
-                                   Description = api,
-                                   Data = @"
-                            {
-                                ""viewer"": 
-                                    {
-                                        ""id"": 1, 
-                                        ""name"": ""test name"", 
-                                        ""getObjects"": 
-                                        [
-                                            {""id"": 10,  ""name"": ""test object1""}, 
-                                            {""id"": 20,  ""name"": ""test object2""}
-                                        ], 
-                                        ""getObjectConnections"": 
-                                        {
-                                            ""count"": 2, 
-                                            ""edges"": 
-                                                [
-                                                    {""__id"": 10,  ""node_name"": ""test object1""}, 
-                                                    {""__id"": 20,  ""node_name"": ""test object2""}
-                                                ]
-                                        }
-                                    }, 
-                                    ""object"": { 
-                                        ""count"": 2, 
-                                        ""edges"": [
-                                            {""__id"": 10,  ""node_name"": ""test object1""}, 
-                                            {""__id"": 20,  ""node_name"": ""test object2""}
-                                        ]
-                                    }}"
-            };
-
-            var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
-
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
-
-            Assert.NotNull(schema.Query);
-            Assert.Equal(3, schema.Query.Fields.Count());
-            Assert.True(schema.Query.HasField("api"));
-
-            var result = await new DocumentExecuter().ExecuteAsync(
-                             r =>
-                                 {
-                                     r.Schema = schema;
-                                     r.Query = @"
-                                query TestQuery {
-                                    api {
-                                        viewer {
-                                            id,
-                                            name,
-                                            getObjects(id: 10, sub: { id: 20, name: ""test arg"" }) {
-                                                id,
-                                                name
-                                            },
-                                            getObjectConnections(id: 10, sub: { id: 20, name: ""test arg"" }) {
-                                                count,
-                                                edges {
-                                                    cursor,                                                
-                                                    node {
-                                                        __id,
-                                                        name
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        object(filter: { id: 10, AND: [{name: ""test"", OR: [{id_lt: 20}]}] }, sort: [name_DESC, id_ASC], limit: 10, offset: 20) {
-                                            count,
-                                            edges {
-                                                cursor,                                                
-                                                node {
-                                                    __id,
-                                                    name
-                                                }
-                                             }
-                                        }
-                                    }
-                                }            
-                                ";
-                                 }).ConfigureAwait(true);
-
-            this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
-            this.output.WriteLine(response);
-
-            var expectedResponse = @"{
-                                      ""data"": {
-                                        ""api"": {
-                                          ""viewer"": {
-                                            ""id"": 1,
-                                            ""name"": ""test name"",
-                                            ""getObjects"": [
-                                              {
-                                                ""id"": 10,
-                                                ""name"": ""test object1""
-                                              },
-                                              {
-                                                ""id"": 20,
-                                                ""name"": ""test object2""
-                                              }
-                                            ],
-                                            ""getObjectConnections"": {
-                                              ""count"": 2,
-                                              ""edges"": [
-                                                {
-                                                  ""cursor"": 10,
-                                                  ""node"": {
-                                                    ""__id"": 10,
-                                                    ""name"": ""test object1""
-                                                  }
-                                                },
-                                                {
-                                                  ""cursor"": 20,
-                                                  ""node"": {
-                                                    ""__id"": 20,
-                                                    ""name"": ""test object2""
-                                                  }
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          ""object"": {
-                                            ""count"": 2,
-                                            ""edges"": [
-                                              {
-                                                ""cursor"": 10,
-                                                ""node"": {
-                                                  ""__id"": 10,
-                                                  ""name"": ""test object1""
-                                                }
-                                              },
-                                              {
-                                                ""cursor"": 20,
-                                                ""node"": {
-                                                  ""__id"": 20,
-                                                  ""name"": ""test object2""
-                                                }
-                                              }
-                                            ]
-                                          }
-                                        }
-                                      }
-                                    }";
-
-            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
-        }
-
-        /// <summary>
         /// Testing generator for some simple single api
         /// </summary>
         /// <returns>The async task</returns>
@@ -635,14 +309,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 {
                                     Description = api1,
                                     Data =
-                                        "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}, \"object1\": {\"id\": 10}}"
+                                        "{\"viewer\": {\"__id\": 1, \"name\": \"test name\"}, \"object1\": {\"__id\": 10}}"
                                 };
 
             var provider2 = new MoqProvider
                                 {
                                     Description = api2,
                                     Data =
-                                        "{\"viewer\": {\"description\": \"test description\"}, \"object2\": {\"id\": 123}}"
+                                        "{\"viewer\": {\"description\": \"test description\"}, \"object2\": {\"__id\": 123}}"
                                 };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider1, provider2 });
@@ -667,15 +341,15 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 query {
                                     api {
                                         viewer {
-                                            id,
+                                            __id,
                                             name,
                                             description
                                         },
                                         object1 {
-                                            id
+                                            __id
                                         },
                                         object2 {
-                                            id
+                                            __id
                                         }
                                     }
                                 }            
@@ -689,15 +363,15 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       ""data"": {
                                         ""api"": {
                                           ""viewer"": {
-                                            ""id"": 1,
+                                            ""__id"": 1,
                                             ""name"": ""test name"",
                                             ""description"": ""test description""
                                           },
                                           ""object1"": {
-                                            ""id"": 10
+                                            ""__id"": 10
                                           },
                                           ""object2"": {
-                                            ""id"": 123
+                                            ""__id"": 123
                                           }
                                         }
                                       }
@@ -725,7 +399,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var provider = new MoqProvider
                                {
                                    Description = api,
-                                   Data = "{\"viewer\": {\"id\": 1, \"name\": \"test name\"}}"
+                                   Data = "{\"viewer\": {\"__id\": 1, \"name\": \"test name\"}}"
                                };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
@@ -750,7 +424,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 query {
                                     api {
                                         viewer {
-                                            id,
+                                            __id,
                                             name
                                         }
                                     }
@@ -765,7 +439,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                       ""data"": {
                                         ""api"": {
                                           ""viewer"": {
-                                            ""id"": 1,
+                                            ""__id"": 1,
                                             ""name"": ""test name""
                                           }
                                         }

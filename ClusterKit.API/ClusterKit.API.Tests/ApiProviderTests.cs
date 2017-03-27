@@ -74,7 +74,7 @@ namespace ClusterKit.API.Tests
 
             Assert.Equal("TestApi", description.ApiName);
             Assert.Equal(this.GetType().Assembly.GetName().Version, description.Version);
-            Assert.Equal(5, description.Types.Count);
+            Assert.Equal(9, description.Types.Count);
 
             Assert.NotNull(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnTest".ToLower())));
             Assert.Null(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnFlags".ToLower())));
@@ -84,7 +84,7 @@ namespace ClusterKit.API.Tests
 
             Assert.True(description.Fields.Any(f => f.Name == "arrayedObjects"));
             Assert.Equal(nodeType.TypeName, description.Fields.First(f => f.Name == "arrayedObjects").TypeName);
-            Assert.Equal(EnFieldFlags.IsArray | EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "arrayedObjects").Flags);
+            Assert.Equal(EnFieldFlags.IsConnection | EnFieldFlags.Queryable, description.Fields.First(f => f.Name == "arrayedObjects").Flags);
 
             Assert.True(description.Fields.Any(f => f.Name == "connectedObjects"));
             Assert.Equal(nodeType.TypeName, description.Fields.First(f => f.Name == "connectedObjects").TypeName);
@@ -134,7 +134,7 @@ namespace ClusterKit.API.Tests
             /// Gets or sets the node object id
             /// </summary>
             [UsedImplicitly]
-            [DeclareField(Description = "the object uid")]
+            [DeclareField(Description = "the object uid", IsKey = true)]
             public Guid Id { get; set; }
 
             /// <summary>

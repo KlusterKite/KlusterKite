@@ -366,10 +366,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 ""syncScalarField"": ""SyncScalarField""
                               },
                               ""syncScalarField"": ""SyncScalarField"",
-                              ""faultedASyncMethod"": {
-                                ""asyncScalarField"": null,
-                                ""syncScalarField"": null
-                              }
+                              ""faultedASyncMethod"": null
                             }
                           }
                         }

@@ -1129,6 +1129,35 @@
           "possibleTypes": null
         },
         {
+          "kind": "INTERFACE",
+          "name": "ITestApi",
+          "description": "The test api",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "TestApi",
+              "ofType": null
+            }
+          ]
+        },
+        {
           "kind": "OBJECT",
           "name": "Query",
           "description": "The root query type",
@@ -1139,7 +1168,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "TestApi_TestApi",
+                "name": "TestApi",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1182,13 +1211,19 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
         {
           "kind": "OBJECT",
-          "name": "TestApi_TestApi",
+          "name": "TestApi",
           "description": "The test api",
           "fields": [
             {
@@ -1228,7 +1263,18 @@
             }
           ],
           "inputFields": null,
-          "interfaces": [],
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "ITestApi",
+              "ofType": null
+            },
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -1253,7 +1299,18 @@
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": []
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "Query",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "TestApi",
+              "ofType": null
+            }
+          ]
         }
       ],
       "directives": [
