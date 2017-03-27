@@ -223,7 +223,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// </returns>
             public object Resolve(ResolveFieldContext context)
             {
-                // todo: check and fix correct behavior 
                 var connectionMutationResultType = this.mergedField.Type as MergedConnectionMutationResultType;
                 if (connectionMutationResultType != null)
                 {

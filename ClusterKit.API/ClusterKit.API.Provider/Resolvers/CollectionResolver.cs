@@ -178,12 +178,6 @@ namespace ClusterKit.API.Provider.Resolvers
         }
 
         /// <inheritdoc />
-        public virtual Task<object> GetNodeById(object nodeConnection, string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
         public IEnumerable<ApiField> GetTypeArguments()
         {
             return GetArguments();

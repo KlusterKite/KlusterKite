@@ -269,7 +269,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 yield return new ApiRequest { Alias = "__id", FieldName = this.KeyField.FieldName };
             }
 
-            // todo: process the __id request
             var requestedFields =
                 GetRequestedFields(contextFieldAst.SelectionSet, context, this).ToList();
             var usedFields =
