@@ -308,7 +308,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 };
                 requestedFields.Add(idRequestRequest);
 
-                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type.ComplexTypeName).ToList();
+                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type).ToList();
 
                 var nodeRequests = topFields.Where(f => f.Name == "node" || f.Name == "edge").ToList();
 
@@ -331,7 +331,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         case "edge":
                             var edgeFields = new List<ApiRequest>();
                             foreach (var edgeNodeRequests in
-                                GetRequestedFields(nodeRequest.SelectionSet, context, edgeType.ComplexTypeName)
+                                GetRequestedFields(nodeRequest.SelectionSet, context, edgeType)
                                     .Where(f => f.Name == "node"))
                             {
                                 edgeFields.AddRange(nodeType.GatherSingleApiRequest(edgeNodeRequests, context)
@@ -417,7 +417,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 RequestContext requestContext,
                 MergedUntypedMutationResult responseType)
             {
-                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type.ComplexTypeName).ToList();
+                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type).ToList();
                 var requestedFields = new List<ApiRequest>();
                 
                 foreach (var topField in topFields.Where(f => f.Name == "result"))

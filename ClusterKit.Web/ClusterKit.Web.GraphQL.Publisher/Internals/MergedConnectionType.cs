@@ -73,7 +73,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             Field contextFieldAst,
             ResolveFieldContext context)
         {
-            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName))
+            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context, this))
             {
                 switch (field.Name)
                 {
@@ -87,7 +87,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                                  new ApiRequest { FieldName = this.ElementType.KeyField.FieldName, Alias = "__id" }
                                              };
                             foreach (var nodeRequest in
-                                GetRequestedFields(field.SelectionSet, context, this.ElementType.ComplexTypeName)
+                                GetRequestedFields(field.SelectionSet, context, this.ElementType)
                                     .Where(f => f.Name == "node"))
                             {
                                 fields.AddRange(
@@ -190,6 +190,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             }
 
             return $"I{this.ComplexTypeName}";
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<string> GetPossibleFragmentTypeNames()
+        {
+            foreach (var typeName in base.GetPossibleFragmentTypeNames())
+            {
+                yield return typeName;
+            }
+
+            yield return this.GetInterfaceName(this.Provider);
         }
 
         /// <inheritdoc />

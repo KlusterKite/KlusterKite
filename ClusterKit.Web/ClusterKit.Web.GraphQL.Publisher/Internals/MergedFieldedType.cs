@@ -68,7 +68,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                  };
             }
 
-            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName))
+            foreach (var field in GetRequestedFields(contextFieldAst.SelectionSet, context, this))
             {
                 if (field.Alias == "__id")
                 {

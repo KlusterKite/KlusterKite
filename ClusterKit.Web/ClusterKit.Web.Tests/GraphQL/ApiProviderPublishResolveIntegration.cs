@@ -3281,6 +3281,49 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing requests with use of anonymous fragments from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task RequestWithFragmentAsInterfaceAnonymousTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            query FragmentsRequest {                
+                api {
+                   ...on ITestApi {
+                    syncScalarField
+                    }
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""api"": {
+                              ""syncScalarField"": ""SyncScalarField""
+                            }
+                          }
+                        }
+                        ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing requests with use of fragments from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>

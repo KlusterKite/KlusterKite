@@ -137,6 +137,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
+        public override IEnumerable<string> GetPossibleFragmentTypeNames()
+        {
+            foreach (var typeName in base.GetPossibleFragmentTypeNames())
+            {
+                yield return typeName;
+            }
+
+            yield return this.GetInterfaceName(this.Provider);
+        }
+
+        /// <inheritdoc />
         public override object Resolve(ResolveFieldContext context)
         {
             var parentData = context.Source as JObject;

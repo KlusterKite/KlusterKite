@@ -228,6 +228,22 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 $"I{EscapeName(provider.Description.ApiName)}_{EscapeName(fieldProvider.FieldType.TypeName)}";
         }
 
+        /// <inheritdoc />
+        public override IEnumerable<string> GetPossibleFragmentTypeNames()
+        {
+            foreach (var typeName in base.GetPossibleFragmentTypeNames())
+            {
+                yield return typeName;
+            }
+
+            foreach (var fieldProvider in this.Providers)
+            {
+                yield return this.GetInterfaceName(fieldProvider.Provider);
+            }
+
+            yield return "Node";
+        }
+
         /// <summary>
         /// Gather request parameters for the specified api provider
         /// </summary>
@@ -255,7 +271,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
             // todo: process the __id request
             var requestedFields =
-                GetRequestedFields(contextFieldAst.SelectionSet, context, this.ComplexTypeName).ToList();
+                GetRequestedFields(contextFieldAst.SelectionSet, context, this).ToList();
             var usedFields =
                 requestedFields.Join(
                     this.Fields.Where(f => f.Value.Providers.Any(fp => fp == provider)),
@@ -339,7 +355,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public virtual JObject ResolveData(ResolveFieldContext context, JObject source)
         {
             // setting request data for child elements
-            foreach (var field in GetRequestedFields(context.FieldAst.SelectionSet, context, this.ComplexTypeName))
+            foreach (var field in GetRequestedFields(context.FieldAst.SelectionSet, context, this))
             {
                 MergedField localField;
                 if (!this.Fields.TryGetValue(field.Name, out localField))

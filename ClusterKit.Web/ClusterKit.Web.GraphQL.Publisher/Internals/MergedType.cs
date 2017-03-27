@@ -59,52 +59,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public string OriginalTypeName { get; }
 
         /// <summary>
-        /// Gets the list of requested fields from parent 
-        /// <seealso cref="Field"/>
-        /// </summary>
-        /// <param name="selectionSet">
-        /// The parent field selection set
-        /// </param>
-        /// <param name="context">
-        /// The request context
-        /// </param>
-        /// <param name="currentTypeName">
-        /// The current type name.
-        /// </param>
-        /// <returns>
-        /// The list of fields
-        /// </returns>
-        public static IEnumerable<Field> GetRequestedFields(SelectionSet selectionSet, ResolveFieldContext context, string currentTypeName)
-        {
-            var directFields = selectionSet.Selections.OfType<Field>();
-            foreach (var field in directFields)
-            {
-                yield return field;
-            }
-
-            var inlineFragments = selectionSet.Selections.OfType<InlineFragment>().Where(f => f.Type.Name == currentTypeName);
-            foreach (var fragment in inlineFragments)
-            {
-                foreach (var field in GetRequestedFields(fragment.SelectionSet, context, currentTypeName))
-                {
-                    yield return field;
-                }
-            }
-
-            var fragmentsUsed =
-                selectionSet.Selections.OfType<FragmentSpread>()
-                    .Select(fs => context.Fragments.FindDefinition(fs.Name)).Where(f => f.Type.Name == currentTypeName);
-
-            foreach (var fragment in fragmentsUsed)
-            {
-                foreach (var field in GetRequestedFields(fragment.SelectionSet, context, currentTypeName))
-                {
-                    yield return field;
-                }
-            }
-        }
-
-        /// <summary>
         /// Removes special symbols from type and field names
         /// </summary>
         /// <param name="name">The original name</param>
@@ -120,6 +74,66 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
+        /// Gets the list of requested fields from parent 
+        /// <seealso cref="Field"/>
+        /// </summary>
+        /// <param name="selectionSet">
+        /// The parent field selection set
+        /// </param>
+        /// <param name="context">
+        /// The request context
+        /// </param>
+        /// <param name="type">
+        /// The type containing the fields
+        /// </param>
+        /// <returns>
+        /// The list of fields
+        /// </returns>
+        public static IEnumerable<Field> GetRequestedFields(
+            SelectionSet selectionSet,
+            ResolveFieldContext context,
+            MergedType type)
+        {
+            var directFields = selectionSet.Selections.OfType<Field>();
+            foreach (var field in directFields)
+            {
+                yield return field;
+            }
+
+            var typeNames = type.GetPossibleFragmentTypeNames().ToList();
+
+            var inlineFragments =
+                selectionSet.Selections.OfType<InlineFragment>().Where(f => typeNames.Contains(f.Type.Name));
+            foreach (var fragment in inlineFragments)
+            {
+                foreach (var field in GetRequestedFields(fragment.SelectionSet, context, type))
+                {
+                    yield return field;
+                }
+            }
+
+            var fragmentsUsed =
+                selectionSet.Selections.OfType<FragmentSpread>()
+                    .Select(fs => context.Fragments.FindDefinition(fs.Name))
+                    .Where(f => typeNames.Contains(f.Type.Name));
+
+            foreach (var fragment in fragmentsUsed)
+            {
+                foreach (var field in GetRequestedFields(fragment.SelectionSet, context, type))
+                {
+                    yield return field;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Extracts interface to represent type for specific API provider
+        /// </summary>
+        /// <param name="provider">The api provider</param>
+        /// <returns>The interface type or null if type is not defined for provider</returns>
+        public abstract IGraphType ExtractInterface(ApiProvider provider);
+
+        /// <summary>
         /// Gather request parameters
         /// </summary>
         /// <param name="contextFieldAst">
@@ -131,7 +145,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <returns>
         /// The list of api requests
         /// </returns>
-        public virtual IEnumerable<ApiRequest> GatherSingleApiRequest(Field contextFieldAst, ResolveFieldContext context)
+        public virtual IEnumerable<ApiRequest> GatherSingleApiRequest(
+            Field contextFieldAst,
+            ResolveFieldContext context)
         {
             yield break;
         }
@@ -165,18 +181,20 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public abstract IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces);
 
         /// <summary>
-        /// Extracts interface to represent type for specific API provider
-        /// </summary>
-        /// <param name="provider">The api provider</param>
-        /// <returns>The interface type or null if type is not defined for provider</returns>
-        public abstract IGraphType ExtractInterface(ApiProvider provider);
-
-        /// <summary>
         /// Gets the interface name to represent type for specific API provider
         /// </summary>
         /// <param name="provider">The api provider</param>
         /// <returns>The interface type or null if type is not defined for provider</returns>
         public abstract string GetInterfaceName(ApiProvider provider);
+
+        /// <summary>
+        /// Gets the list of possible type names used in fragments
+        /// </summary>
+        /// <returns>The list of type names</returns>
+        public virtual IEnumerable<string> GetPossibleFragmentTypeNames()
+        {
+            yield return this.ComplexTypeName;
+        }
 
         /// <summary>
         /// Resolves request value
