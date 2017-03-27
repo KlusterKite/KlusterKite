@@ -147,6 +147,43 @@ namespace ClusterKit.Web.GraphQL.Publisher
                         }
                     });
 
+            foreach (var @interface in allInterfaces.Values.OfType<TypeInterface>())
+            {
+                foreach (var field in @interface.Fields)
+                {
+                    var fieldDescription = field.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
+                    if (fieldDescription == null)
+                    {
+                        continue;
+                    }
+
+                    var typeArguments = fieldDescription.Type.GenerateArguments(graphTypes) ?? new QueryArguments();
+                    var fieldArguments =
+                        fieldDescription.Arguments.Select(
+                            p =>
+                                new QueryArgument(typeof(VirtualInputGraphType))
+                                {
+                                    Name = p.Key,
+                                    ResolvedType =
+                                            p.Value.Flags.HasFlag(
+                                                EnFieldFlags.IsArray)
+                                                ? new ListGraphType(
+                                                    graphTypes[p.Value.Type.ComplexTypeName])
+                                                : graphTypes[p.Value.Type.ComplexTypeName],
+                                    Description =
+                                            p.Value.Description
+                                });
+
+                    var resultingArguments = typeArguments.Union(fieldArguments).ToList();
+
+                    if (resultingArguments.Any())
+                    {
+                        field.Arguments = new QueryArguments(resultingArguments);
+                    }
+                }
+            }
+
+
             graphTypes.Values.OfType<VirtualGraphType>().ForEach(vgt => vgt.StoreFieldResolvers());
 
             var schema = new Schema
@@ -155,8 +192,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                  Mutation = mutationType.Fields.Any() ? mutationType : null
             };
 
-            var array = allInterfaces.Values.OfType<TypeInterface>().Cast<IGraphType>().ToArray();
-            schema.RegisterTypes(array);
+            var arrayOfInterfaces = allInterfaces.Values.OfType<TypeInterface>().Cast<IGraphType>().ToArray();
+            schema.RegisterTypes(arrayOfInterfaces);
             schema.Initialize();
             
             return schema;
