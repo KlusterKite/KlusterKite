@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequestDescription.cs" company="ClusterKit">
+// <copyright file="RequestContext.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -13,10 +13,12 @@ namespace ClusterKit.Security.Client
 
     using JetBrains.Annotations;
 
+    using Newtonsoft.Json.Linq;
+
     /// <summary>
     /// The full operation request description
     /// </summary>
-    public class RequestDescription
+    public class RequestContext
     {
         /// <summary>
         /// Gets or sets the authentication description
@@ -38,5 +40,11 @@ namespace ClusterKit.Security.Client
         ///  Gets or sets the local uri request
         /// </summary>
         public string RequestedLocalUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets additional data, that can be updated on previous steps
+        /// </summary>
+        [CanBeNull]
+        public JObject Data { get; set; } 
     }
 }

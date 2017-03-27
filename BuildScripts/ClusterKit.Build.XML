@@ -14,6 +14,11 @@
             The list of defined projects
             </summary>
         </member>
+        <member name="F:ClusterKit.Build.BuildUtils.definedSolutionName">
+            <summary>
+            The defined solution name
+            </summary>
+        </member>
         <member name="P:ClusterKit.Build.BuildUtils.BuildClean">
             <summary>
             Gets temporary directory to store clean builds of projects
@@ -55,6 +60,12 @@
             Defines the project list
             </summary>
             <param name="projects">The project list</param>
+        </member>
+        <member name="M:ClusterKit.Build.BuildUtils.DefineSolutionName(System.String)">
+            <summary>
+            Defines the solution name
+            </summary>
+            <param name="solutionName">The solution name</param>
         </member>
         <member name="M:ClusterKit.Build.BuildUtils.GetProjects">
             <summary>

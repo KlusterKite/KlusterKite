@@ -357,17 +357,17 @@ namespace ClusterKit.NodeManager
             {
                 DataFactory<ConfigurationContext, NodeTemplate, int>
                     .CreateFactory(context)
-                    .GetList(0, null).Result
+                    .GetList(null, null, null, null, null).Result.Items
                     .ForEach(t => this.nodeTemplates[t.Code] = t);
 
                 DataFactory<ConfigurationContext, SeedAddress, int>
                     .CreateFactory(context)
-                    .GetList(0, null).Result
+                    .GetList(null, null, null, null, null).Result.Items
                     .ForEach(s => this.seedAddresses[s.Id] = s);
 
                 DataFactory<ConfigurationContext, NugetFeed, int>
                     .CreateFactory(context)
-                    .GetList(0, null).Result
+                    .GetList(null, null, null, null, null).Result.Items
                     .ForEach(f => this.nugetFeeds[f.Id] = f);
             }
         }
@@ -452,7 +452,7 @@ namespace ClusterKit.NodeManager
             }
 
             NodeDescription leader;
-            if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+            if (message.Leader != null && this.nodeDescriptions.TryGetValue(message.Leader, out leader))
             {
                 leader.IsClusterLeader = true;
             }
@@ -754,6 +754,7 @@ namespace ClusterKit.NodeManager
             {
                 var nodeDescription = new NodeDescription
                                           {
+                                              NodeId = Guid.NewGuid(),
                                               IsInitialized = false,
                                               NodeAddress = address,
                                               Modules = new List<PackageDescription>(),
@@ -1022,7 +1023,7 @@ namespace ClusterKit.NodeManager
             var feedUrl = Context.System.Settings.Config.GetString(PackageRepositoryUrlPath);
             var factory = DataFactory<string, IPackage, string>.CreateFactory(feedUrl);
 
-            this.packages = factory.GetList(0, null).Result.ToDictionary(p => p.Id);
+            this.packages = factory.GetList(null, null, 0, null, null).Result.Items.ToDictionary(p => p.Id);
 
             foreach (var node in this.nodeDescriptions.Values)
             {
@@ -1235,8 +1236,8 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
                 this.ReceiveAsync<CollectionRequest<SeedAddress>>(this.OnCollectionRequest<SeedAddress, int>);
                 this.ReceiveAsync<CollectionRequest<NugetFeed>>(this.OnCollectionRequest<NugetFeed, int>);
-                this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, int>);
-                this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, int>);
+                this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, Guid>);
+                this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, Guid>);
 
                 this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
                 this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);

@@ -30,9 +30,9 @@ namespace ClusterKit.Web.Authorization
         /// <param name="context">The owin context</param>
         /// <returns>The security request description</returns>
         [UsedImplicitly]
-        public static RequestDescription GetRequestDescription(this IOwinContext context)
+        public static RequestContext GetRequestDescription(this IOwinContext context)
         {
-            return new RequestDescription
+            return new RequestContext
                        {
                            Authentication = context.GetSession(),
                            RemoteAddress = context.Request.RemoteIpAddress,
@@ -49,7 +49,7 @@ namespace ClusterKit.Web.Authorization
         /// <param name="controller">The api controller</param>
         /// <returns>The security request description</returns>
         [UsedImplicitly]
-        public static RequestDescription GetRequestDescription(this ApiController controller)
+        public static RequestContext GetRequestDescription(this ApiController controller)
         {
             var context = controller.Request.GetOwinContext();
             return context.GetRequestDescription();

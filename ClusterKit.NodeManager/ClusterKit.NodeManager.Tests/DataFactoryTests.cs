@@ -87,7 +87,7 @@ namespace ClusterKit.NodeManager.Tests
                     Assert.NotNull(guest.Roles);
                     Assert.Equal(1, guest.Roles.Count);
                     Assert.Equal("Guest", guest.Roles.First().Name);
-                    Assert.Equal(1, guest.GetScope().Count());
+                    Assert.Equal(3, guest.GetScope().Count());
                 }
             }
         }

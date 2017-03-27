@@ -9,11 +9,14 @@
 namespace ClusterKit.Data
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Event;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
@@ -32,10 +35,33 @@ namespace ClusterKit.Data
     public abstract class BaseCrudActor<TContext> : ReceiveActor
         where TContext : IDisposable
     {
+        /// <summary>
+        /// The default query limit
+        /// </summary>
+        private readonly int defaultQueryLimit;
+
+        /// <summary>
+        /// The list of individual class limits
+        /// </summary>
+        private readonly IReadOnlyDictionary<string, int> classQueryLimits;
+
         /// <inheritdoc />
         protected BaseCrudActor()
         {
             this.Receive<ParcelException>(m => this.OnParcelException(m));
+
+            var configSection = Context.System.Settings.Config.GetConfig("ClusterKit.Data.Crud.Query.Limits");
+            this.defaultQueryLimit = configSection?.GetInt("Default", 100) ?? 100;
+            var classLimits = new Dictionary<string, int>();
+            if (configSection != null)
+            {
+                foreach (var valuePair in configSection.AsEnumerable())
+                {
+                    classLimits[valuePair.Key] = valuePair.Value.GetInt();
+                }
+            }
+
+            this.classQueryLimits = classLimits.ToImmutableDictionary();
         }
 
         /// <summary>
@@ -156,19 +182,75 @@ namespace ClusterKit.Data
         protected virtual async Task OnCollectionRequest<TObject, TId>(CollectionRequest<TObject> collectionRequest)
             where TObject : class
         {
-            using (var ds = await this.GetContext())
+            try
             {
-                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
-                var objects = await factory.GetList(collectionRequest.Skip, collectionRequest.Count);
+                using (var ds = await this.GetContext())
+                {
+                    int maxLimit;
+                    if (!this.classQueryLimits.TryGetValue(
+                            NamingUtilities.ToCSharpRepresentation(typeof(TObject)),
+                            out maxLimit))
+                    {
+                        maxLimit = this.defaultQueryLimit;
+                    }
 
+                    var limit = maxLimit != 0
+                                && (!collectionRequest.Count.HasValue || collectionRequest.Count.Value > maxLimit)
+                                    ? maxLimit
+                                    : collectionRequest.Count;
+
+                    var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+
+                    var response = await factory.GetList(
+                                       collectionRequest.Filter,
+                                       collectionRequest.Sort,
+                                       collectionRequest.Skip,
+                                       limit,
+                                       collectionRequest.ApiRequest);
+
+                    if (collectionRequest.AcceptAsParcel)
+                    {
+                        Context.GetParcelManager()
+                            .Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
+                    }
+                    else
+                    {
+                        this.Sender.Tell(response);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                try
+                {
+                    Context.GetLogger()
+                        .Error(
+                            exception,
+                            "{Type}: Exception on processing CollectionRequest\n\t filter: {FilterExpression}\n\t sort: {SortExpression}\n\t limit: {Limit}\n\t offset: {Offset}",
+                            $"BaseCrudActor<{typeof(TObject).Name}>",
+                            collectionRequest.Filter?.ToString(),
+                            collectionRequest.Sort?.ToString(),
+                            collectionRequest.Count,
+                            collectionRequest.Skip);
+                }
+                catch
+                {
+                    Context.GetLogger()
+                        .Error(
+                            exception,
+                            "{Type}: Exception on processing CollectionRequest",
+                            $"BaseCrudActor<{typeof(TObject).Name}>");
+                }
+
+                var response = new CollectionResponse<TObject> { Items = new List<TObject>() };
                 if (collectionRequest.AcceptAsParcel)
                 {
                     Context.GetParcelManager()
-                        .Tell(new Parcel { Payload = objects, Recipient = this.Sender }, this.Self);
+                        .Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
                 }
                 else
                 {
-                    this.Sender.Tell(objects);
+                    this.Sender.Tell(response);
                 }
             }
         }
@@ -312,7 +394,7 @@ namespace ClusterKit.Data
                                 SecurityLog.CreateRecord(
                                     SecurityLog.EnType.DataCreateGranted,
                                     entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                    request.RequestDescription,
+                                    request.RequestContext,
                                     "{ObjectType} with {ObjectId} id was created",
                                     typeof(TObject).FullName,
                                     factory.GetId(entity));
@@ -345,6 +427,20 @@ namespace ClusterKit.Data
                                     request.ExtraData);
                             }
 
+                            if (request.ApiRequest != null)
+                            {
+                                var updatedObject = await factory.Get(request.Id);
+                                if (updatedObject == null)
+                                {
+                                    return CrudActionResponse<TObject>.Error(
+                                        new EntityNotFoundException(),
+                                        request.ExtraData);
+                                }
+
+                                DataUpdater<TObject>.Update(updatedObject, entity, request.ApiRequest);
+                                entity = updatedObject;
+                            }
+
                             entity = this.BeforeUpdate<TObject>(entity, oldObject);
                             if (entity == null)
                             {
@@ -361,7 +457,7 @@ namespace ClusterKit.Data
                                     SecurityLog.CreateRecord(
                                         SecurityLog.EnType.DataUpdateGranted,
                                         entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                        request.RequestDescription,
+                                        request.RequestContext,
                                         "{ObjectType} with id {ObjectId} was updated. New id is {NewObjectId}",
                                         typeof(TObject).FullName,
                                         factory.GetId(oldObject),
@@ -372,7 +468,7 @@ namespace ClusterKit.Data
                                     SecurityLog.CreateRecord(
                                         SecurityLog.EnType.DataUpdateGranted,
                                         entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                        request.RequestDescription,
+                                        request.RequestContext,
                                         "{ObjectType} with id {ObjectId} was updated.",
                                         typeof(TObject).FullName,
                                         factory.GetId(entity));
@@ -430,7 +526,7 @@ namespace ClusterKit.Data
                             SecurityLog.CreateRecord(
                                 SecurityLog.EnType.DataDeleteGranted,
                                 oldObject.Value is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                                request.RequestDescription,
+                                request.RequestContext,
                                 "{ObjectType} with id {ObjectId} was deleted.",
                                 typeof(TObject).FullName,
                                 factory.GetId(oldObject));

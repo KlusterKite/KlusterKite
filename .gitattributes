@@ -2,6 +2,8 @@
 # http://davidlaing.com/2012/09/19/customise-your-gitattributes-to-become-a-git-ninja/
 * text=auto
 
+*.sh text eol=lf merge=union
+
 # Custom for Visual Studio
 *.sln text eol=crlf merge=union 
 *.csproj merge=union

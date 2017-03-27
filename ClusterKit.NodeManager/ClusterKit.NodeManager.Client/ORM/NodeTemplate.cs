@@ -16,6 +16,9 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Linq;
     using System.Xml.Serialization;
 
+    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
+
     using JetBrains.Annotations;
 
     using Newtonsoft.Json;
@@ -24,23 +27,27 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// Node template description
     /// </summary>
     [UsedImplicitly]
-    public class NodeTemplate
+    [ApiDescription(Description = "Node template description", Name = "ClusterKitNodeTemplate")]
+    public class NodeTemplate : IObjectWithId<int>
     {
         /// <summary>
         /// Gets or sets the program readable node template name
         /// </summary>
         [Required]
+        [DeclareField(Description = "The program readable node template name")]
         public string Code { get; set; }
 
         /// <summary>
         /// Gets or sets akka configuration template for node
         /// </summary>
+        [DeclareField(Description = "The akka configuration template for node")]
         public string Configuration { get; set; }
 
         /// <summary>
         /// Gets or sets list of container types to install node templates
         /// </summary>
         [NotMapped]
+        [DeclareField(Description = "The list of container types to install node templates")]
         public List<string> ContainerTypes { get; set; } = new List<string>();
 
         /// <summary>
@@ -66,28 +73,33 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets unique template identification number
         /// </summary>
         [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
+        [DeclareField(Description = "The unique template identification number", IsKey = true)]
         public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets maximum number of working nodes that is reasonable for cluster
         /// </summary>
+        [DeclareField(Description = "The maximum number of working nodes that is reasonable for cluster")]
         public int? MaximumNeededInstances { get; set; }
 
         /// <summary>
         /// Gets or sets minimum number of working node type required for cluster to work
         /// </summary>
+        [DeclareField(Description = "The minimum number of working node type required for cluster to work")]
         public int MinimumRequiredInstances { get; set; }
 
         /// <summary>
         /// Gets or sets the human readable node template name
         /// </summary>
         [Required]
+        [DeclareField(Description = "The human readable node template name")]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets list of nuget packages to install (along with there dependencies)
         /// </summary>
         [NotMapped]
+        [DeclareField(Description = "The list of nuget packages to install (along with there dependencies)")]
         public List<string> Packages { get; set; } = new List<string>();
 
         /// <summary>
@@ -112,11 +124,19 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets priority weight for service, when deciding witch template should be brought up
         /// </summary>
+        [DeclareField(Description = "The priority weight for service, when deciding witch template should be brought up")]
         public double Priority { get; set; }
 
         /// <summary>
         /// Gets or sets the template version
         /// </summary>
+        [DeclareField(Description = "The template version")]
         public int Version { get; set; }
+
+        /// <inheritdoc />
+        int IObjectWithId<int>.GetId()
+        {
+            return this.Id;
+        }
     }
 }

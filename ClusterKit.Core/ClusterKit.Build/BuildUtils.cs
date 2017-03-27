@@ -10,6 +10,7 @@ namespace ClusterKit.Build
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -35,6 +36,11 @@ namespace ClusterKit.Build
         /// The list of defined projects
         /// </summary>
         private static List<ProjectDescription> definedProjectDescriptions = new List<ProjectDescription>();
+
+        /// <summary>
+        /// The defined solution name
+        /// </summary>
+        private static string definedSolutionName = "global";
 
         /// <summary>
         /// Gets temporary directory to store clean builds of projects
@@ -87,6 +93,21 @@ namespace ClusterKit.Build
         public static void DefineProjects(IEnumerable<ProjectDescription> projects)
         {
             definedProjectDescriptions = projects.ToList();
+        }
+
+        /// <summary>
+        /// Defines the solution name
+        /// </summary>
+        /// <param name="solutionName">The solution name</param>
+        [UsedImplicitly]
+        public static void DefineSolutionName([NotNull] string solutionName)
+        {
+            if (string.IsNullOrWhiteSpace(solutionName))
+            {
+                throw new ArgumentNullException(nameof(solutionName));
+            }
+
+            definedSolutionName = solutionName;
         }
 
         /// <summary>
@@ -603,7 +624,11 @@ namespace ClusterKit.Build
         /// <param name="projects">The list of projects</param>
         public static void CreateGlobalSolution(IEnumerable<ProjectDescription> projects)
         {
-            using (var writer = File.CreateText(Path.Combine(BuildDirectory, "global.sln")))
+            var fileName = definedSolutionName.IndexOf(".sln", StringComparison.InvariantCultureIgnoreCase) >= 0
+                               ? definedSolutionName
+                               : $"{definedSolutionName}.sln";
+
+            using (var writer = File.CreateText(Path.Combine(BuildDirectory, fileName)))
             {
                 writer.Write($@"
 Microsoft Visual Studio Solution File, Format Version 12.00
@@ -683,7 +708,7 @@ EndGlobal
 
             File.Copy(
                 Path.Combine(BuildDirectory, "..", "global.sln.DotSettings"),
-                Path.Combine(BuildDirectory, "global.sln.DotSettings"),
+                Path.Combine(BuildDirectory, $"{fileName}.DotSettings"),
                 true);
         }
 
@@ -693,6 +718,7 @@ EndGlobal
         /// <param name="project">
         /// The project to publish
         /// </param>
+        [UsedImplicitly]
         public static void CreateNuget(ProjectDescription project)
         {
             if (!project.ProjectType.HasFlag(ProjectDescription.EnProjectType.NugetPackage))
@@ -714,17 +740,16 @@ EndGlobal
                 Directory.CreateDirectory(PackageOutputDirectory);
             }
 
-            Func<NuGetHelper.NuGetParams, NuGetHelper.NuGetParams> provider = defaults =>
-            {
-                defaults.SetFieldValue("Version", Version);
-                defaults.SetFieldValue("WorkingDir", project.CleanBuildDirectory);
-                defaults.SetFieldValue("OutputPath", PackageOutputDirectory);
-                return defaults;
-            };
+            Func<ProcessStartInfo, Unit> execParameters = defaults =>
+                {
+                    defaults.FileName = "nuget.exe";
+                    defaults.Arguments = $"pack -Version {Version} "
+                                         + $"-OutputDirectory \"{PackageOutputDirectory}\""
+                                         + $" \"{generatedNuspecFile}\"";
+                    return null;
+                };
 
-            NuGetHelper.NuGetPackDirectly(provider.ToFSharpFunc(), generatedNuspecFile);
-
-            // ReSharper restore PossibleNullReferenceException
+            ProcessHelper.ExecProcess(execParameters.ToFSharpFunc(), TimeSpan.FromMinutes(1));
         }
 
         /// <summary>

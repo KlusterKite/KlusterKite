@@ -42,7 +42,7 @@ namespace ClusterKit.Log.Console
                 return configuration;
             }
 
-            return configuration.WriteTo.ColoredConsole(LogEventLevel.Debug);
+            return configuration.WriteTo.ColoredConsole(level);
         }
     }
 }

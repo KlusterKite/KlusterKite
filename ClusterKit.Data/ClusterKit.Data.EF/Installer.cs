@@ -55,7 +55,7 @@ namespace ClusterKit.Data.EF
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
         // ReSharper disable once ArrangeStaticMemberQualifier
-        protected override decimal AkkaConfigLoadPriority => BaseInstaller.PrioritySharedLib;
+        protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
 
         /// <summary>
         /// Should check the config and environment for possible errors.

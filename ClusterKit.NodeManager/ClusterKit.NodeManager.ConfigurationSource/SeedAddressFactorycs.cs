@@ -11,7 +11,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
     using System.Data.Entity;
-    using System.Linq;
     using System.Linq.Expressions;
 
     using ClusterKit.Data.EF;
@@ -23,7 +22,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     /// Data factory to work with <see cref="NodeTemplate"/>
     /// </summary>
     [UsedImplicitly]
-    public class SeedAddressFactorycs : EntityDataFactory<ConfigurationContext, SeedAddress, int>
+    public class SeedAddressFactorycs : EntityDataFactorySync<ConfigurationContext, SeedAddress, int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SeedAddressFactorycs"/> class.
@@ -51,14 +50,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <returns>The expression</returns>
         public override Expression<Func<SeedAddress, bool>> GetIdValidationExpression(int id)
             => t => t.Id == id;
-
-        /// <summary>
-        /// Gets sort function to get an ordered list from datasource
-        /// </summary>
-        /// <param name="set">The unordered set of objects</param>
-        /// <returns>The ordered set of objects</returns>
-        public override IOrderedQueryable<SeedAddress> GetSortFunction(IQueryable<SeedAddress> set)
-            => set.OrderBy(t => t.Id);
 
         /// <summary>
         /// Gets the dataset from current context

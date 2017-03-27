@@ -19,6 +19,7 @@ namespace ClusterKit.Monitoring
     using Castle.MicroKernel.SubSystems.Configuration;
     using Castle.Windsor;
 
+    using ClusterKit.API.Provider;
     using ClusterKit.Core;
 
     /// <summary>
@@ -57,7 +58,11 @@ namespace ClusterKit.Monitoring
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-            container.Register(Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ApiController))).LifestyleTransient());
+            container.Register(
+                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ApiController))).LifestyleTransient());
+
+            container.Register(
+                Component.For<ApiProvider>().ImplementedBy<MonitoringApiProvider>().LifestyleSingleton());
         }
     }
 }
