@@ -79,7 +79,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public MergedType OriginalReturnType { get; }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             var graphType = new VirtualGraphType(this.ComplexTypeName);
             graphType.AddField(this.CreateField("result", this.OriginalReturnType, new ResultResolver(this.OriginalReturnType)));

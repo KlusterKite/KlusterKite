@@ -59,7 +59,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public ApiProvider Provider { get; }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             var fields = new List<FieldType>
                              {
@@ -94,7 +94,46 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                      }
                              };
 
-            return new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
+            var generateGraphType = new VirtualGraphType(this.ComplexTypeName, fields) { Description = this.Description };
+            if (interfaces != null)
+            {
+                foreach (var typeInterface in interfaces)
+                {
+                    typeInterface.AddPossibleType(generateGraphType);
+                    generateGraphType.AddResolvedInterface(typeInterface);
+                }
+            }
+
+            return generateGraphType;
+        }
+
+        /// <inheritdoc />
+        public override IGraphType ExtractInterface(ApiProvider provider)
+        {
+            if (this.Provider != provider)
+            {
+                return null;
+            }
+
+            var nodeType = (ObjectGraphType)this.GenerateGraphType(null, null);
+            var apiInterface = new TypeInterface(this.GetInterfaceName(provider), this.Description);
+            foreach (var field in nodeType.Fields)
+            {
+                apiInterface.AddField(field);
+            }
+
+            return apiInterface;
+        }
+
+        /// <inheritdoc />
+        public override string GetInterfaceName(ApiProvider provider)
+        {
+            if (this.Provider != provider)
+            {
+                return null;
+            }
+
+            return $"I{this.ComplexTypeName}";
         }
 
         /// <inheritdoc />

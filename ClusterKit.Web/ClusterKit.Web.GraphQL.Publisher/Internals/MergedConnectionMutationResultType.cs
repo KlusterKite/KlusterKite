@@ -79,7 +79,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string ComplexTypeName => $"{this.OriginalTypeName}_NodeMutationPayload";
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             var graphType = new VirtualGraphType(this.ComplexTypeName);
             graphType.AddField(new FieldType { Name = "deletedId", ResolvedType = new IdGraphType(), Resolver = new DeletedIdResolver() });

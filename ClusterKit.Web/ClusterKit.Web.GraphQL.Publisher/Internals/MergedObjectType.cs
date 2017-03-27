@@ -185,6 +185,49 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return mergedObjectType;
         }
 
+        /// <inheritdoc />
+        public override IGraphType ExtractInterface(ApiProvider provider)
+        {
+            var fieldProvider = this.providers.FirstOrDefault(fp => fp.Provider == provider);
+            if (fieldProvider == null)
+            {
+                return null;
+            }
+
+            var fields =
+                this.Fields.Where(f => f.Value.Providers.Any(fp => fp == provider))
+                    .Select(this.ConvertApiField)
+                    .ToList();
+
+            var idField = fields.FirstOrDefault(f => f.Name == "id");
+            if (idField != null)
+            {
+                idField.Name = "__id";
+            }
+
+            fields.Insert(0, new FieldType { Name = "id", ResolvedType = new IdGraphType() });
+            var apiInterface =
+                new TypeInterface(
+                    this.GetInterfaceName(provider),
+                    fieldProvider.FieldType.Description);
+
+            foreach (var field in fields)
+            {
+                apiInterface.AddField(field);
+            }
+
+            return apiInterface;
+        }
+
+        /// <inheritdoc />
+        public override string GetInterfaceName(ApiProvider provider)
+        {
+            var fieldProvider = this.providers.FirstOrDefault(fp => fp.Provider == provider);
+            return fieldProvider == null 
+                ? null : 
+                $"I{EscapeName(provider.Description.ApiName)}_{EscapeName(fieldProvider.FieldType.TypeName)}";
+        }
+
         /// <summary>
         /// Gather request parameters for the specified api provider
         /// </summary>
@@ -257,9 +300,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
-            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
+            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface, interfaces);
             var idField = graphType.Fields.FirstOrDefault(f => f.Name == "id");
             if (idField != null)
             {
@@ -318,7 +361,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                         continue;
                     }
                 }
-                
+
                 if (property.Property(RequestPropertyName) != null)
                 {
                     continue;

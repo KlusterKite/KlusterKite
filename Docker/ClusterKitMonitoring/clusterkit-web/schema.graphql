@@ -3,593 +3,8 @@ schema {
   mutation: Mutations
 }
 
-type Boolean_MutationPayload {
-  result: Boolean
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
-}
-
-# Global cluster actors tree scan result
-type ClusterKitMonitoring__ClusterKitMonitoringClusterTree implements Node {
-  # Gets the list of nodes
-  nodes(filter: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input, sort: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Connection
-
-  # Gets the sum of queue size across tree
-  queueSizeSum: Int
-
-  # Gets the maximum queue size among tree nodes
-  maxQueueSize: Int
-  id: ID
-}
-
-# Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_ implements Node {
-  # Gets a dictionary key
-  key: String
-
-  # Gets a dictionary value
-  value: ClusterKitMonitoring_ClusterKitMonitoringNode
-  id: ID
-}
-
-# The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_
-#  Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Edge]
-}
-
-# The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_ in a connected list
-#  Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # Represents a dictionary key-value pair
-  node: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_
-}
-
-input ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input
-
-  # key exactly equals to the parameter, key: Gets a dictionary key
-  key: String
-
-  # key not equals to the parameter, key: Gets a dictionary key
-  key_not: String
-
-  # key is a substring of the parameter, key: Gets a dictionary key
-  key_in: String
-
-  # key is not a substring of the parameter, key: Gets a dictionary key
-  key_not_in: String
-
-  # key contains the parameter as substring, key: Gets a dictionary key
-  key_contains: String
-
-  # key doesn't contain the parameter as substring, key: Gets a dictionary key
-  key_not_contains: String
-
-  # key starts with the parameter value, key: Gets a dictionary key
-  key_starts_with: String
-
-  # key doesn't start with the parameter value, key: Gets a dictionary key
-  key_not_starts_with: String
-
-  # key ends with the parameter value, key: Gets a dictionary key
-  key_ends_with: String
-
-  # key doesn't end with the parameter value, key: Gets a dictionary key
-  key_not_ends_with: String
-
-  # key lowercased equals the parameter, key: Gets a dictionary key
-  key_l: String
-
-  # key lowercased doesn't equal the parameter, key: Gets a dictionary key
-  key_l_not: String
-
-  # key lowercased is a substring of the parameter, key: Gets a dictionary key
-  key_l_in: String
-
-  # key lowercased is not a substring of the parameter, key: Gets a dictionary key
-  key_l_not_in: String
-
-  # key lowercased contains the parameter as substring, key: Gets a dictionary key
-  key_l_contains: String
-
-  # key lowercased doesn't contain the parameter as substring, key: Gets a dictionary key
-  key_l_not_contains: String
-
-  # key lowercased starts with the parameter value, key: Gets a dictionary key
-  key_l_starts_with: String
-
-  # key lowercased doesn't start with the parameter value, key: Gets a dictionary key
-  key_l_not_starts_with: String
-
-  # key lowercased ends with the parameter value, key: Gets a dictionary key
-  key_l_ends_with: String
-
-  # key lowercased doesn't end with the parameter value, key: Gets a dictionary key
-  key_l_not_ends_with: String
-}
-
-enum ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Sort {
-  key_asc
-  key_desc
-}
-
-input ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input {
-  clientMutationId: String
-}
-
-# The actor's description
-type ClusterKitMonitoring_ClusterKitMonitoringNode implements Node {
-  # the actor's type
-  actorType: String
-
-  # the actor's last message
-  currentMessage: String
-
-  # the actor's dispatcher id
-  dispatcherId: String
-
-  # the actor's dispatcher type
-  dispatcherType: String
-
-  # the maximum queue size among it's children
-  maxQueueSize: Int
-
-  # the actor's name
-  name: String
-
-  # the actor's queue size
-  queueSize: Int
-
-  # the maximum queue size among it's children
-  queueSizeSum: Int
-
-  # the actor's children
-  children(filter: ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input, sort: [ClusterKitMonitoring_ClusterKitMonitoringNode_Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_ClusterKitMonitoringNode_Connection
-  id: ID
-}
-
-# The list of connected ClusterKitMonitoring_ClusterKitMonitoringNode
-#  The actor's description
-type ClusterKitMonitoring_ClusterKitMonitoringNode_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitMonitoring_ClusterKitMonitoringNode_Edge]
-}
-
-# The ClusterKitMonitoring_ClusterKitMonitoringNode in a connected list
-#  The actor's description
-type ClusterKitMonitoring_ClusterKitMonitoringNode_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # The actor's description
-  node: ClusterKitMonitoring_ClusterKitMonitoringNode
-}
-
-input ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input
-
-  # actorType exactly equals to the parameter, actorType: the actor's type
-  actorType: String
-
-  # actorType not equals to the parameter, actorType: the actor's type
-  actorType_not: String
-
-  # actorType is a substring of the parameter, actorType: the actor's type
-  actorType_in: String
-
-  # actorType is not a substring of the parameter, actorType: the actor's type
-  actorType_not_in: String
-
-  # actorType contains the parameter as substring, actorType: the actor's type
-  actorType_contains: String
-
-  # actorType doesn't contain the parameter as substring, actorType: the actor's type
-  actorType_not_contains: String
-
-  # actorType starts with the parameter value, actorType: the actor's type
-  actorType_starts_with: String
-
-  # actorType doesn't start with the parameter value, actorType: the actor's type
-  actorType_not_starts_with: String
-
-  # actorType ends with the parameter value, actorType: the actor's type
-  actorType_ends_with: String
-
-  # actorType doesn't end with the parameter value, actorType: the actor's type
-  actorType_not_ends_with: String
-
-  # actorType lowercased equals the parameter, actorType: the actor's type
-  actorType_l: String
-
-  # actorType lowercased doesn't equal the parameter, actorType: the actor's type
-  actorType_l_not: String
-
-  # actorType lowercased is a substring of the parameter, actorType: the actor's type
-  actorType_l_in: String
-
-  # actorType lowercased is not a substring of the parameter, actorType: the actor's type
-  actorType_l_not_in: String
-
-  # actorType lowercased contains the parameter as substring, actorType: the actor's type
-  actorType_l_contains: String
-
-  # actorType lowercased doesn't contain the parameter as substring, actorType: the actor's type
-  actorType_l_not_contains: String
-
-  # actorType lowercased starts with the parameter value, actorType: the actor's type
-  actorType_l_starts_with: String
-
-  # actorType lowercased doesn't start with the parameter value, actorType: the actor's type
-  actorType_l_not_starts_with: String
-
-  # actorType lowercased ends with the parameter value, actorType: the actor's type
-  actorType_l_ends_with: String
-
-  # actorType lowercased doesn't end with the parameter value, actorType: the actor's type
-  actorType_l_not_ends_with: String
-
-  # currentMessage exactly equals to the parameter, currentMessage: the actor's last message
-  currentMessage: String
-
-  # currentMessage not equals to the parameter, currentMessage: the actor's last message
-  currentMessage_not: String
-
-  # currentMessage is a substring of the parameter, currentMessage: the actor's last message
-  currentMessage_in: String
-
-  # currentMessage is not a substring of the parameter, currentMessage: the actor's last message
-  currentMessage_not_in: String
-
-  # currentMessage contains the parameter as substring, currentMessage: the actor's last message
-  currentMessage_contains: String
-
-  # currentMessage doesn't contain the parameter as substring, currentMessage: the actor's last message
-  currentMessage_not_contains: String
-
-  # currentMessage starts with the parameter value, currentMessage: the actor's last message
-  currentMessage_starts_with: String
-
-  # currentMessage doesn't start with the parameter value, currentMessage: the actor's last message
-  currentMessage_not_starts_with: String
-
-  # currentMessage ends with the parameter value, currentMessage: the actor's last message
-  currentMessage_ends_with: String
-
-  # currentMessage doesn't end with the parameter value, currentMessage: the actor's last message
-  currentMessage_not_ends_with: String
-
-  # currentMessage lowercased equals the parameter, currentMessage: the actor's last message
-  currentMessage_l: String
-
-  # currentMessage lowercased doesn't equal the parameter, currentMessage: the actor's last message
-  currentMessage_l_not: String
-
-  # currentMessage lowercased is a substring of the parameter, currentMessage: the actor's last message
-  currentMessage_l_in: String
-
-  # currentMessage lowercased is not a substring of the parameter, currentMessage: the actor's last message
-  currentMessage_l_not_in: String
-
-  # currentMessage lowercased contains the parameter as substring, currentMessage: the actor's last message
-  currentMessage_l_contains: String
-
-  # currentMessage lowercased doesn't contain the parameter as substring, currentMessage: the actor's last message
-  currentMessage_l_not_contains: String
-
-  # currentMessage lowercased starts with the parameter value, currentMessage: the actor's last message
-  currentMessage_l_starts_with: String
-
-  # currentMessage lowercased doesn't start with the parameter value, currentMessage: the actor's last message
-  currentMessage_l_not_starts_with: String
-
-  # currentMessage lowercased ends with the parameter value, currentMessage: the actor's last message
-  currentMessage_l_ends_with: String
-
-  # currentMessage lowercased doesn't end with the parameter value, currentMessage: the actor's last message
-  currentMessage_l_not_ends_with: String
-
-  # dispatcherId exactly equals to the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId: String
-
-  # dispatcherId not equals to the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId_not: String
-
-  # dispatcherId is a substring of the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId_in: String
-
-  # dispatcherId is not a substring of the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId_not_in: String
-
-  # dispatcherId contains the parameter as substring, dispatcherId: the actor's dispatcher id
-  dispatcherId_contains: String
-
-  # dispatcherId doesn't contain the parameter as substring, dispatcherId: the actor's dispatcher id
-  dispatcherId_not_contains: String
-
-  # dispatcherId starts with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_starts_with: String
-
-  # dispatcherId doesn't start with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_not_starts_with: String
-
-  # dispatcherId ends with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_ends_with: String
-
-  # dispatcherId doesn't end with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_not_ends_with: String
-
-  # dispatcherId lowercased equals the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId_l: String
-
-  # dispatcherId lowercased doesn't equal the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_not: String
-
-  # dispatcherId lowercased is a substring of the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_in: String
-
-  # dispatcherId lowercased is not a substring of the parameter, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_not_in: String
-
-  # dispatcherId lowercased contains the parameter as substring, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_contains: String
-
-  # dispatcherId lowercased doesn't contain the parameter as substring, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_not_contains: String
-
-  # dispatcherId lowercased starts with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_starts_with: String
-
-  # dispatcherId lowercased doesn't start with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_not_starts_with: String
-
-  # dispatcherId lowercased ends with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_ends_with: String
-
-  # dispatcherId lowercased doesn't end with the parameter value, dispatcherId: the actor's dispatcher id
-  dispatcherId_l_not_ends_with: String
-
-  # dispatcherType exactly equals to the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType: String
-
-  # dispatcherType not equals to the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType_not: String
-
-  # dispatcherType is a substring of the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType_in: String
-
-  # dispatcherType is not a substring of the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType_not_in: String
-
-  # dispatcherType contains the parameter as substring, dispatcherType: the actor's dispatcher type
-  dispatcherType_contains: String
-
-  # dispatcherType doesn't contain the parameter as substring, dispatcherType: the actor's dispatcher type
-  dispatcherType_not_contains: String
-
-  # dispatcherType starts with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_starts_with: String
-
-  # dispatcherType doesn't start with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_not_starts_with: String
-
-  # dispatcherType ends with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_ends_with: String
-
-  # dispatcherType doesn't end with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_not_ends_with: String
-
-  # dispatcherType lowercased equals the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType_l: String
-
-  # dispatcherType lowercased doesn't equal the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_not: String
-
-  # dispatcherType lowercased is a substring of the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_in: String
-
-  # dispatcherType lowercased is not a substring of the parameter, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_not_in: String
-
-  # dispatcherType lowercased contains the parameter as substring, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_contains: String
-
-  # dispatcherType lowercased doesn't contain the parameter as substring, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_not_contains: String
-
-  # dispatcherType lowercased starts with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_starts_with: String
-
-  # dispatcherType lowercased doesn't start with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_not_starts_with: String
-
-  # dispatcherType lowercased ends with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_ends_with: String
-
-  # dispatcherType lowercased doesn't end with the parameter value, dispatcherType: the actor's dispatcher type
-  dispatcherType_l_not_ends_with: String
-
-  # maxQueueSize exactly equals to the parameter, maxQueueSize: the maximum queue size among it's children
-  maxQueueSize: Int
-
-  # maxQueueSize not equals to the parameter, maxQueueSize: the maximum queue size among it's children
-  maxQueueSize_not: Int
-
-  # maxQueueSize is less then the parameter, maxQueueSize: the maximum queue size among it's children
-  maxQueueSize_lt: Int
-
-  # maxQueueSize is less then or equal to the parameter, maxQueueSize: the maximum queue size among it's children
-  maxQueueSize_lte: Int
-
-  # maxQueueSize is greater then the parameter, maxQueueSize: the maximum queue size among it's children
-  maxQueueSize_gt: Int
-
-  # maxQueueSize is greater then or equal to the parameter, maxQueueSize: the maximum queue size among it's children
-  maxQueueSize_gte: Int
-
-  # name exactly equals to the parameter, name: the actor's name
-  name: String
-
-  # name not equals to the parameter, name: the actor's name
-  name_not: String
-
-  # name is a substring of the parameter, name: the actor's name
-  name_in: String
-
-  # name is not a substring of the parameter, name: the actor's name
-  name_not_in: String
-
-  # name contains the parameter as substring, name: the actor's name
-  name_contains: String
-
-  # name doesn't contain the parameter as substring, name: the actor's name
-  name_not_contains: String
-
-  # name starts with the parameter value, name: the actor's name
-  name_starts_with: String
-
-  # name doesn't start with the parameter value, name: the actor's name
-  name_not_starts_with: String
-
-  # name ends with the parameter value, name: the actor's name
-  name_ends_with: String
-
-  # name doesn't end with the parameter value, name: the actor's name
-  name_not_ends_with: String
-
-  # name lowercased equals the parameter, name: the actor's name
-  name_l: String
-
-  # name lowercased doesn't equal the parameter, name: the actor's name
-  name_l_not: String
-
-  # name lowercased is a substring of the parameter, name: the actor's name
-  name_l_in: String
-
-  # name lowercased is not a substring of the parameter, name: the actor's name
-  name_l_not_in: String
-
-  # name lowercased contains the parameter as substring, name: the actor's name
-  name_l_contains: String
-
-  # name lowercased doesn't contain the parameter as substring, name: the actor's name
-  name_l_not_contains: String
-
-  # name lowercased starts with the parameter value, name: the actor's name
-  name_l_starts_with: String
-
-  # name lowercased doesn't start with the parameter value, name: the actor's name
-  name_l_not_starts_with: String
-
-  # name lowercased ends with the parameter value, name: the actor's name
-  name_l_ends_with: String
-
-  # name lowercased doesn't end with the parameter value, name: the actor's name
-  name_l_not_ends_with: String
-
-  # queueSize exactly equals to the parameter, queueSize: the actor's queue size
-  queueSize: Int
-
-  # queueSize not equals to the parameter, queueSize: the actor's queue size
-  queueSize_not: Int
-
-  # queueSize is less then the parameter, queueSize: the actor's queue size
-  queueSize_lt: Int
-
-  # queueSize is less then or equal to the parameter, queueSize: the actor's queue size
-  queueSize_lte: Int
-
-  # queueSize is greater then the parameter, queueSize: the actor's queue size
-  queueSize_gt: Int
-
-  # queueSize is greater then or equal to the parameter, queueSize: the actor's queue size
-  queueSize_gte: Int
-
-  # queueSizeSum exactly equals to the parameter, queueSizeSum: the maximum queue size among it's children
-  queueSizeSum: Int
-
-  # queueSizeSum not equals to the parameter, queueSizeSum: the maximum queue size among it's children
-  queueSizeSum_not: Int
-
-  # queueSizeSum is less then the parameter, queueSizeSum: the maximum queue size among it's children
-  queueSizeSum_lt: Int
-
-  # queueSizeSum is less then or equal to the parameter, queueSizeSum: the maximum queue size among it's children
-  queueSizeSum_lte: Int
-
-  # queueSizeSum is greater then the parameter, queueSizeSum: the maximum queue size among it's children
-  queueSizeSum_gt: Int
-
-  # queueSizeSum is greater then or equal to the parameter, queueSizeSum: the maximum queue size among it's children
-  queueSizeSum_gte: Int
-}
-
-enum ClusterKitMonitoring_ClusterKitMonitoringNode_Sort {
-  actorType_asc
-  actorType_desc
-  currentMessage_asc
-  currentMessage_desc
-  dispatcherId_asc
-  dispatcherId_desc
-  dispatcherType_asc
-  dispatcherType_desc
-  maxQueueSize_asc
-  maxQueueSize_desc
-  name_asc
-  name_desc
-  queueSize_asc
-  queueSize_desc
-  queueSizeSum_asc
-  queueSizeSum_desc
-}
-
-# ClusterKit node monitoring
-# The root provider
-type ClusterKitMonitoring_ClusterKitNodeApi implements Node {
-  # ClusterKit node monitoring
-  clusterKitMonitoringApi: ClusterKitMonitoring_Root
-
-  # The ClusterKit node managing API
-  nodeManagerData: ClusterKitNodeApi_ClusterKitNodeManagement
-
-  # The current user
-  me: ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
-  id: ID
-
-  # The node global searcher according to Relay specification
-  __node(
-    # The node global id
-    id: ID
-  ): Node
-}
-
-# ClusterKit monitoring api
-type ClusterKitMonitoring_Root implements Node {
-  # Gets the last cluster scan result. Changes as system receives the scan results from nodes
-  getClusterTree: ClusterKitMonitoring__ClusterKitMonitoringClusterTree
-  id: ID
-}
-
 # Akka system address
-type ClusterKitNodeApi_AkkaAddress implements Node {
+type ClusterKitNodeApi_AkkaAddress {
   # the address string representation
   asString: String
 
@@ -607,19 +22,19 @@ type ClusterKitNodeApi_AkkaAddress implements Node {
   id: ID
 }
 
-type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ implements Node {
+type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ {
   # The mutated object result
   result: Boolean
 
   # The list of mutation errors
-  errors(filter: ClusterKitNodeApi_ErrorDescription_Filter_Input, sort: [ClusterKitNodeApi_ErrorDescription_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ErrorDescription_Connection
+  errors: [ClusterKitNodeApi_ErrorDescription]
   id: ID
 }
 
 type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
   result: ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_
   clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
+  api: ClusterKitNodeApi_ClusterKitNodeApi
 }
 
 enum ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType {
@@ -627,7 +42,7 @@ enum ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType {
   Private
 }
 
-type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi implements Node {
+type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi {
   # Authenticated user
   clusterKitUser: ClusterKitNodeApi_ClusterKitUserDescription
 
@@ -639,8 +54,24 @@ type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi implements Node {
   id: ID
 }
 
+# The root provider
+type ClusterKitNodeApi_ClusterKitNodeApi {
+  # The ClusterKit node managing API
+  nodeManagerData: ClusterKitNodeApi_ClusterKitNodeManagement
+
+  # The current user
+  me: ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
+  id: ID
+
+  # The node global searcher according to Relay specification
+  __node(
+    # The node global id
+    id: ID
+  ): Node
+}
+
 # Description of node configuration
-type ClusterKitNodeApi_ClusterKitNodeDescription implements Node {
+type ClusterKitNodeApi_ClusterKitNodeDescription {
   # symbolic container type code
   containerType: String
 
@@ -657,7 +88,7 @@ type ClusterKitNodeApi_ClusterKitNodeDescription implements Node {
   leaderInRoles: [String]
 
   # The list of descriptions of installed modules
-  modules(filter: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitPackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitPackageDescription_Connection
+  modules: [ClusterKitNodeApi_ClusterKitPackageDescription]
 
   # The node's address
   nodeAddress: ClusterKitNodeApi_AkkaAddress
@@ -679,301 +110,101 @@ type ClusterKitNodeApi_ClusterKitNodeDescription implements Node {
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitNodeDescription
-#  Description of node configuration
-type ClusterKitNodeApi_ClusterKitNodeDescription_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitNodeDescription_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitNodeDescription in a connected list
-#  Description of node configuration
-type ClusterKitNodeApi_ClusterKitNodeDescription_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # Description of node configuration
-  node: ClusterKitNodeApi_ClusterKitNodeDescription
-}
-
-input ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input
-
-  # containerType exactly equals to the parameter, containerType: symbolic container type code
-  containerType: String
-
-  # containerType not equals to the parameter, containerType: symbolic container type code
-  containerType_not: String
-
-  # containerType is a substring of the parameter, containerType: symbolic container type code
-  containerType_in: String
-
-  # containerType is not a substring of the parameter, containerType: symbolic container type code
-  containerType_not_in: String
-
-  # containerType contains the parameter as substring, containerType: symbolic container type code
-  containerType_contains: String
-
-  # containerType doesn't contain the parameter as substring, containerType: symbolic container type code
-  containerType_not_contains: String
-
-  # containerType starts with the parameter value, containerType: symbolic container type code
-  containerType_starts_with: String
-
-  # containerType doesn't start with the parameter value, containerType: symbolic container type code
-  containerType_not_starts_with: String
-
-  # containerType ends with the parameter value, containerType: symbolic container type code
-  containerType_ends_with: String
-
-  # containerType doesn't end with the parameter value, containerType: symbolic container type code
-  containerType_not_ends_with: String
-
-  # containerType lowercased equals the parameter, containerType: symbolic container type code
-  containerType_l: String
-
-  # containerType lowercased doesn't equal the parameter, containerType: symbolic container type code
-  containerType_l_not: String
-
-  # containerType lowercased is a substring of the parameter, containerType: symbolic container type code
-  containerType_l_in: String
-
-  # containerType lowercased is not a substring of the parameter, containerType: symbolic container type code
-  containerType_l_not_in: String
-
-  # containerType lowercased contains the parameter as substring, containerType: symbolic container type code
-  containerType_l_contains: String
-
-  # containerType lowercased doesn't contain the parameter as substring, containerType: symbolic container type code
-  containerType_l_not_contains: String
-
-  # containerType lowercased starts with the parameter value, containerType: symbolic container type code
-  containerType_l_starts_with: String
-
-  # containerType lowercased doesn't start with the parameter value, containerType: symbolic container type code
-  containerType_l_not_starts_with: String
-
-  # containerType lowercased ends with the parameter value, containerType: symbolic container type code
-  containerType_l_ends_with: String
-
-  # containerType lowercased doesn't end with the parameter value, containerType: symbolic container type code
-  containerType_l_not_ends_with: String
-
-  # isClusterLeader exactly equals to the parameter, isClusterLeader: a value
-  # indicating whether the current node is cluster leader
-  isClusterLeader: Boolean
-
-  # isClusterLeader not equals to the parameter, isClusterLeader: a value
-  # indicating whether the current node is cluster leader
-  isClusterLeader_not: Boolean
-
-  # isObsolete exactly equals to the parameter, isObsolete: a value indicating
-  # whether software and or configuration is obsolete and needed to be upgraded
-  isObsolete: Boolean
-
-  # isObsolete not equals to the parameter, isObsolete: a value indicating whether
-  # software and or configuration is obsolete and needed to be upgraded
-  isObsolete_not: Boolean
-
-  # isInitialized exactly equals to the parameter, isInitialized: a value indicating whether this is complete description
-  isInitialized: Boolean
-
-  # isInitialized not equals to the parameter, isInitialized: a value indicating whether this is complete description
-  isInitialized_not: Boolean
-
-  # nodeId exactly equals to the parameter, nodeId: request id to indicate node instance startup
-  nodeId: Uid
-
-  # nodeId not equals to the parameter, nodeId: request id to indicate node instance startup
-  nodeId_not: Uid
-
-  # nodeTemplate exactly equals to the parameter, nodeTemplate: node template code
-  nodeTemplate: String
-
-  # nodeTemplate not equals to the parameter, nodeTemplate: node template code
-  nodeTemplate_not: String
-
-  # nodeTemplate is a substring of the parameter, nodeTemplate: node template code
-  nodeTemplate_in: String
-
-  # nodeTemplate is not a substring of the parameter, nodeTemplate: node template code
-  nodeTemplate_not_in: String
-
-  # nodeTemplate contains the parameter as substring, nodeTemplate: node template code
-  nodeTemplate_contains: String
-
-  # nodeTemplate doesn't contain the parameter as substring, nodeTemplate: node template code
-  nodeTemplate_not_contains: String
-
-  # nodeTemplate starts with the parameter value, nodeTemplate: node template code
-  nodeTemplate_starts_with: String
-
-  # nodeTemplate doesn't start with the parameter value, nodeTemplate: node template code
-  nodeTemplate_not_starts_with: String
-
-  # nodeTemplate ends with the parameter value, nodeTemplate: node template code
-  nodeTemplate_ends_with: String
-
-  # nodeTemplate doesn't end with the parameter value, nodeTemplate: node template code
-  nodeTemplate_not_ends_with: String
-
-  # nodeTemplate lowercased equals the parameter, nodeTemplate: node template code
-  nodeTemplate_l: String
-
-  # nodeTemplate lowercased doesn't equal the parameter, nodeTemplate: node template code
-  nodeTemplate_l_not: String
-
-  # nodeTemplate lowercased is a substring of the parameter, nodeTemplate: node template code
-  nodeTemplate_l_in: String
-
-  # nodeTemplate lowercased is not a substring of the parameter, nodeTemplate: node template code
-  nodeTemplate_l_not_in: String
-
-  # nodeTemplate lowercased contains the parameter as substring, nodeTemplate: node template code
-  nodeTemplate_l_contains: String
-
-  # nodeTemplate lowercased doesn't contain the parameter as substring, nodeTemplate: node template code
-  nodeTemplate_l_not_contains: String
-
-  # nodeTemplate lowercased starts with the parameter value, nodeTemplate: node template code
-  nodeTemplate_l_starts_with: String
-
-  # nodeTemplate lowercased doesn't start with the parameter value, nodeTemplate: node template code
-  nodeTemplate_l_not_starts_with: String
-
-  # nodeTemplate lowercased ends with the parameter value, nodeTemplate: node template code
-  nodeTemplate_l_ends_with: String
-
-  # nodeTemplate lowercased doesn't end with the parameter value, nodeTemplate: node template code
-  nodeTemplate_l_not_ends_with: String
-
-  # nodeTemplateVersion exactly equals to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion: Int
-
-  # nodeTemplateVersion not equals to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_not: Int
-
-  # nodeTemplateVersion is less then the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_lt: Int
-
-  # nodeTemplateVersion is less then or equal to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_lte: Int
-
-  # nodeTemplateVersion is greater then the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_gt: Int
-
-  # nodeTemplateVersion is greater then or equal to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_gte: Int
-
-  # startTimeStamp exactly equals to the parameter, startTimeStamp: node start time
-  startTimeStamp: Int
-
-  # startTimeStamp not equals to the parameter, startTimeStamp: node start time
-  startTimeStamp_not: Int
-
-  # startTimeStamp is less then the parameter, startTimeStamp: node start time
-  startTimeStamp_lt: Int
-
-  # startTimeStamp is less then or equal to the parameter, startTimeStamp: node start time
-  startTimeStamp_lte: Int
-
-  # startTimeStamp is greater then the parameter, startTimeStamp: node start time
-  startTimeStamp_gt: Int
-
-  # startTimeStamp is greater then or equal to the parameter, startTimeStamp: node start time
-  startTimeStamp_gte: Int
-}
-
-enum ClusterKitNodeApi_ClusterKitNodeDescription_Sort {
-  containerType_asc
-  containerType_desc
-  isClusterLeader_asc
-  isClusterLeader_desc
-  isObsolete_asc
-  isObsolete_desc
-  isInitialized_asc
-  isInitialized_desc
-  nodeId_asc
-  nodeId_desc
-  nodeTemplate_asc
-  nodeTemplate_desc
-  nodeTemplateVersion_asc
-  nodeTemplateVersion_desc
-  startTimeStamp_asc
-  startTimeStamp_desc
-}
-
 # The main ClusterKit node managing methods
-type ClusterKitNodeApi_ClusterKitNodeManagement implements Node {
+type ClusterKitNodeApi_ClusterKitNodeManagement {
   # The list of available packages from local cluster repository
-  getPackages(filter: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitPackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitPackageDescription_Connection
+  getPackages: [ClusterKitNodeApi_ClusterKitNugetPackage]
 
   # Current cluster node template usage for debug purposes
   getTemplateStatistics: ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics
 
   # The list of known active nodes
-  getActiveNodeDescriptions(filter: ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNodeDescription_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitNodeDescription_Connection
+  getActiveNodeDescriptions: [ClusterKitNodeApi_ClusterKitNodeDescription]
 
   # Node templates
-  nodeTemplates(filter: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNodeTemplate_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitNodeTemplate_Connection
+  nodeTemplates(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitNodeTemplate_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitNodeTemplate_Connection
 
   # Node templates
-  nugetFeeds(filter: ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNugetFeed_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitNugetFeed_Connection
+  nugetFeeds(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitNugetFeed_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitNugetFeed_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitNugetFeed_Connection
 
   # Node templates
-  seedAddresses(filter: ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitSeedAddress_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitSeedAddress_Connection
+  seedAddresses(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitSeedAddress_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitSeedAddress_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitSeedAddress_Connection
 
   # ClusterKit managing system users
-  users(filter: ClusterKitNodeApi_ClusterKitUser_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitUser_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitUser_Connection
+  users(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitUser_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitUser_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitUser_Connection
 
   # ClusterKit managing system security roles
-  roles(filter: ClusterKitNodeApi_ClusterKitRole_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitRole_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitRole_Connection
+  roles(
+    # The filtering conditions
+    filter: ClusterKitNodeApi_ClusterKitRole_Filter
+
+    # The sorting function (the sequence of functions to sort, the next function
+    # will be used if all previous will give equal values)
+    sort: [ClusterKitNodeApi_ClusterKitRole_OrderByEnum]
+
+    # The maximum number of objects to return
+    limit: Int
+
+    # The number of objects to skip from the start of list
+    offset: Int
+  ): ClusterKitNodeApi_ClusterKitRole_Connection
   id: ID
 }
 
-# Node template description
-type ClusterKitNodeApi_ClusterKitNodeTemplate implements Node {
-  # The program readable node template name
-  code: String
-
-  # The akka configuration template for node
-  configuration: String
-
-  # The list of container types to install node templates
-  containerTypes: [String]
-
-  # The unique template identification number
-  __id: Int
-
-  # The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances: Int
-
-  # The minimum number of working node type required for cluster to work
-  minimumRequiredInstances: Int
-
-  # The human readable node template name
-  name: String
-
-  # The list of nuget packages to install (along with there dependencies)
-  packages: [String]
-
-  # The priority weight for service, when deciding witch template should be brought up
-  priority: Float
-
-  # The template version
-  version: Int
-  id: ID
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitNodeTemplate
-#  Node template description
+# The list of connected ClusterKitNodeApi_ClusterKitNodeTemplate_Node
+#  
 type ClusterKitNodeApi_ClusterKitNodeTemplate_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
@@ -982,315 +213,380 @@ type ClusterKitNodeApi_ClusterKitNodeTemplate_Connection {
   edges: [ClusterKitNodeApi_ClusterKitNodeTemplate_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitNodeTemplate in a connected list
-#  Node template description
+# The ClusterKitNodeApi_ClusterKitNodeTemplate_Node in a connected list
+#  
 type ClusterKitNodeApi_ClusterKitNodeTemplate_Edge {
   # A value to use with paging positioning
   cursor: String
-
-  # Node template description
-  node: ClusterKitNodeApi_ClusterKitNodeTemplate
+  node: ClusterKitNodeApi_ClusterKitNodeTemplate_Node
 }
 
-input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input
+# The filter conditions for a ClusterKitNodeApi_ClusterKitNodeTemplate_Node connected objects
+input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitNodeTemplate_Filter]
 
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitNodeTemplate_Filter]
 
-  # code exactly equals to the parameter, code: The program readable node template name
+  # The code exactly equals the value
+  # The program readable node template name
   code: String
 
-  # code not equals to the parameter, code: The program readable node template name
+  # The code not equals the value
+  # The program readable node template name
   code_not: String
 
-  # code is a substring of the parameter, code: The program readable node template name
+  # The value contains the code as substring
+  # The program readable node template name
   code_in: String
 
-  # code is not a substring of the parameter, code: The program readable node template name
+  # The value not contains the code as substring
+  # The program readable node template name
   code_not_in: String
 
-  # code contains the parameter as substring, code: The program readable node template name
+  # The code contains the value as substring
+  # The program readable node template name
   code_contains: String
 
-  # code doesn't contain the parameter as substring, code: The program readable node template name
+  # The code not contains the value as substring
+  # The program readable node template name
   code_not_contains: String
 
-  # code starts with the parameter value, code: The program readable node template name
+  # The code starts with the value
+  # The program readable node template name
   code_starts_with: String
 
-  # code doesn't start with the parameter value, code: The program readable node template name
+  # The code not starts with the value
+  # The program readable node template name
   code_not_starts_with: String
 
-  # code ends with the parameter value, code: The program readable node template name
+  # The code ends with the value
+  # The program readable node template name
   code_ends_with: String
 
-  # code doesn't end with the parameter value, code: The program readable node template name
+  # The code not ends with the value
+  # The program readable node template name
   code_not_ends_with: String
 
-  # code lowercased equals the parameter, code: The program readable node template name
+  # The code lowercased exactly equals the value
+  # The program readable node template name
   code_l: String
 
-  # code lowercased doesn't equal the parameter, code: The program readable node template name
+  # The code lowercased not equals the value
+  # The program readable node template name
   code_l_not: String
 
-  # code lowercased is a substring of the parameter, code: The program readable node template name
+  # The value contains the code lowercased as substring
+  # The program readable node template name
   code_l_in: String
 
-  # code lowercased is not a substring of the parameter, code: The program readable node template name
+  # The value not contains the code lowercased as substring
+  # The program readable node template name
   code_l_not_in: String
 
-  # code lowercased contains the parameter as substring, code: The program readable node template name
+  # The code lowercased contains the value as substring
+  # The program readable node template name
   code_l_contains: String
 
-  # code lowercased doesn't contain the parameter as substring, code: The program readable node template name
+  # The code lowercased not contains the value as substring
+  # The program readable node template name
   code_l_not_contains: String
 
-  # code lowercased starts with the parameter value, code: The program readable node template name
+  # The code lowercased starts with the value
+  # The program readable node template name
   code_l_starts_with: String
 
-  # code lowercased doesn't start with the parameter value, code: The program readable node template name
+  # The code lowercased not starts with the value
+  # The program readable node template name
   code_l_not_starts_with: String
 
-  # code lowercased ends with the parameter value, code: The program readable node template name
+  # The code lowercased ends with the value
+  # The program readable node template name
   code_l_ends_with: String
 
-  # code lowercased doesn't end with the parameter value, code: The program readable node template name
+  # The code lowercased not ends with the value
+  # The program readable node template name
   code_l_not_ends_with: String
 
-  # configuration exactly equals to the parameter, configuration: The akka configuration template for node
+  # The configuration exactly equals the value
+  # The akka configuration template for node
   configuration: String
 
-  # configuration not equals to the parameter, configuration: The akka configuration template for node
+  # The configuration not equals the value
+  # The akka configuration template for node
   configuration_not: String
 
-  # configuration is a substring of the parameter, configuration: The akka configuration template for node
+  # The value contains the configuration as substring
+  # The akka configuration template for node
   configuration_in: String
 
-  # configuration is not a substring of the parameter, configuration: The akka configuration template for node
+  # The value not contains the configuration as substring
+  # The akka configuration template for node
   configuration_not_in: String
 
-  # configuration contains the parameter as substring, configuration: The akka configuration template for node
+  # The configuration contains the value as substring
+  # The akka configuration template for node
   configuration_contains: String
 
-  # configuration doesn't contain the parameter as substring, configuration: The akka configuration template for node
+  # The configuration not contains the value as substring
+  # The akka configuration template for node
   configuration_not_contains: String
 
-  # configuration starts with the parameter value, configuration: The akka configuration template for node
+  # The configuration starts with the value
+  # The akka configuration template for node
   configuration_starts_with: String
 
-  # configuration doesn't start with the parameter value, configuration: The akka configuration template for node
+  # The configuration not starts with the value
+  # The akka configuration template for node
   configuration_not_starts_with: String
 
-  # configuration ends with the parameter value, configuration: The akka configuration template for node
+  # The configuration ends with the value
+  # The akka configuration template for node
   configuration_ends_with: String
 
-  # configuration doesn't end with the parameter value, configuration: The akka configuration template for node
+  # The configuration not ends with the value
+  # The akka configuration template for node
   configuration_not_ends_with: String
 
-  # configuration lowercased equals the parameter, configuration: The akka configuration template for node
+  # The configuration lowercased exactly equals the value
+  # The akka configuration template for node
   configuration_l: String
 
-  # configuration lowercased doesn't equal the parameter, configuration: The akka configuration template for node
+  # The configuration lowercased not equals the value
+  # The akka configuration template for node
   configuration_l_not: String
 
-  # configuration lowercased is a substring of the parameter, configuration: The akka configuration template for node
+  # The value contains the configuration lowercased as substring
+  # The akka configuration template for node
   configuration_l_in: String
 
-  # configuration lowercased is not a substring of the parameter, configuration: The akka configuration template for node
+  # The value not contains the configuration lowercased as substring
+  # The akka configuration template for node
   configuration_l_not_in: String
 
-  # configuration lowercased contains the parameter as substring, configuration: The akka configuration template for node
+  # The configuration lowercased contains the value as substring
+  # The akka configuration template for node
   configuration_l_contains: String
 
-  # configuration lowercased doesn't contain the parameter as substring,
-  # configuration: The akka configuration template for node
+  # The configuration lowercased not contains the value as substring
+  # The akka configuration template for node
   configuration_l_not_contains: String
 
-  # configuration lowercased starts with the parameter value, configuration: The akka configuration template for node
+  # The configuration lowercased starts with the value
+  # The akka configuration template for node
   configuration_l_starts_with: String
 
-  # configuration lowercased doesn't start with the parameter value, configuration: The akka configuration template for node
+  # The configuration lowercased not starts with the value
+  # The akka configuration template for node
   configuration_l_not_starts_with: String
 
-  # configuration lowercased ends with the parameter value, configuration: The akka configuration template for node
+  # The configuration lowercased ends with the value
+  # The akka configuration template for node
   configuration_l_ends_with: String
 
-  # configuration lowercased doesn't end with the parameter value, configuration: The akka configuration template for node
+  # The configuration lowercased not ends with the value
+  # The akka configuration template for node
   configuration_l_not_ends_with: String
 
-  # id exactly equals to the parameter, id: The unique template identification number
+  # The id exactly equals the value
+  # The unique template identification number
   id: Int
 
-  # id not equals to the parameter, id: The unique template identification number
+  # The id not equals the value
+  # The unique template identification number
   id_not: Int
 
-  # id is less then the parameter, id: The unique template identification number
+  # The id is less then the value
+  # The unique template identification number
   id_lt: Int
 
-  # id is less then or equal to the parameter, id: The unique template identification number
+  # The id is less or equal then the value
+  # The unique template identification number
   id_lte: Int
 
-  # id is greater then the parameter, id: The unique template identification number
+  # The id is greater then the value
+  # The unique template identification number
   id_gt: Int
 
-  # id is greater then or equal to the parameter, id: The unique template identification number
+  # The id is greater or equal then the value
+  # The unique template identification number
   id_gte: Int
 
-  # maximumNeededInstances exactly equals to the parameter,
-  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
+  # The maximumNeededInstances exactly equals the value
+  # The maximum number of working nodes that is reasonable for cluster
   maximumNeededInstances: Int
 
-  # maximumNeededInstances not equals to the parameter, maximumNeededInstances:
+  # The maximumNeededInstances not equals the value
   # The maximum number of working nodes that is reasonable for cluster
   maximumNeededInstances_not: Int
 
-  # maximumNeededInstances is less then the parameter, maximumNeededInstances: The
-  # maximum number of working nodes that is reasonable for cluster
+  # The maximumNeededInstances is less then the value
+  # The maximum number of working nodes that is reasonable for cluster
   maximumNeededInstances_lt: Int
 
-  # maximumNeededInstances is less then or equal to the parameter,
-  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
+  # The maximumNeededInstances is less or equal then the value
+  # The maximum number of working nodes that is reasonable for cluster
   maximumNeededInstances_lte: Int
 
-  # maximumNeededInstances is greater then the parameter, maximumNeededInstances:
+  # The maximumNeededInstances is greater then the value
   # The maximum number of working nodes that is reasonable for cluster
   maximumNeededInstances_gt: Int
 
-  # maximumNeededInstances is greater then or equal to the parameter,
-  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
+  # The maximumNeededInstances is greater or equal then the value
+  # The maximum number of working nodes that is reasonable for cluster
   maximumNeededInstances_gte: Int
 
-  # minimumRequiredInstances exactly equals to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
+  # The minimumRequiredInstances exactly equals the value
+  # The minimum number of working node type required for cluster to work
   minimumRequiredInstances: Int
 
-  # minimumRequiredInstances not equals to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
+  # The minimumRequiredInstances not equals the value
+  # The minimum number of working node type required for cluster to work
   minimumRequiredInstances_not: Int
 
-  # minimumRequiredInstances is less then the parameter, minimumRequiredInstances:
+  # The minimumRequiredInstances is less then the value
   # The minimum number of working node type required for cluster to work
   minimumRequiredInstances_lt: Int
 
-  # minimumRequiredInstances is less then or equal to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
+  # The minimumRequiredInstances is less or equal then the value
+  # The minimum number of working node type required for cluster to work
   minimumRequiredInstances_lte: Int
 
-  # minimumRequiredInstances is greater then the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
+  # The minimumRequiredInstances is greater then the value
+  # The minimum number of working node type required for cluster to work
   minimumRequiredInstances_gt: Int
 
-  # minimumRequiredInstances is greater then or equal to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
+  # The minimumRequiredInstances is greater or equal then the value
+  # The minimum number of working node type required for cluster to work
   minimumRequiredInstances_gte: Int
 
-  # name exactly equals to the parameter, name: The human readable node template name
+  # The name exactly equals the value
+  # The human readable node template name
   name: String
 
-  # name not equals to the parameter, name: The human readable node template name
+  # The name not equals the value
+  # The human readable node template name
   name_not: String
 
-  # name is a substring of the parameter, name: The human readable node template name
+  # The value contains the name as substring
+  # The human readable node template name
   name_in: String
 
-  # name is not a substring of the parameter, name: The human readable node template name
+  # The value not contains the name as substring
+  # The human readable node template name
   name_not_in: String
 
-  # name contains the parameter as substring, name: The human readable node template name
+  # The name contains the value as substring
+  # The human readable node template name
   name_contains: String
 
-  # name doesn't contain the parameter as substring, name: The human readable node template name
+  # The name not contains the value as substring
+  # The human readable node template name
   name_not_contains: String
 
-  # name starts with the parameter value, name: The human readable node template name
+  # The name starts with the value
+  # The human readable node template name
   name_starts_with: String
 
-  # name doesn't start with the parameter value, name: The human readable node template name
+  # The name not starts with the value
+  # The human readable node template name
   name_not_starts_with: String
 
-  # name ends with the parameter value, name: The human readable node template name
+  # The name ends with the value
+  # The human readable node template name
   name_ends_with: String
 
-  # name doesn't end with the parameter value, name: The human readable node template name
+  # The name not ends with the value
+  # The human readable node template name
   name_not_ends_with: String
 
-  # name lowercased equals the parameter, name: The human readable node template name
+  # The name lowercased exactly equals the value
+  # The human readable node template name
   name_l: String
 
-  # name lowercased doesn't equal the parameter, name: The human readable node template name
+  # The name lowercased not equals the value
+  # The human readable node template name
   name_l_not: String
 
-  # name lowercased is a substring of the parameter, name: The human readable node template name
+  # The value contains the name lowercased as substring
+  # The human readable node template name
   name_l_in: String
 
-  # name lowercased is not a substring of the parameter, name: The human readable node template name
+  # The value not contains the name lowercased as substring
+  # The human readable node template name
   name_l_not_in: String
 
-  # name lowercased contains the parameter as substring, name: The human readable node template name
+  # The name lowercased contains the value as substring
+  # The human readable node template name
   name_l_contains: String
 
-  # name lowercased doesn't contain the parameter as substring, name: The human readable node template name
+  # The name lowercased not contains the value as substring
+  # The human readable node template name
   name_l_not_contains: String
 
-  # name lowercased starts with the parameter value, name: The human readable node template name
+  # The name lowercased starts with the value
+  # The human readable node template name
   name_l_starts_with: String
 
-  # name lowercased doesn't start with the parameter value, name: The human readable node template name
+  # The name lowercased not starts with the value
+  # The human readable node template name
   name_l_not_starts_with: String
 
-  # name lowercased ends with the parameter value, name: The human readable node template name
+  # The name lowercased ends with the value
+  # The human readable node template name
   name_l_ends_with: String
 
-  # name lowercased doesn't end with the parameter value, name: The human readable node template name
+  # The name lowercased not ends with the value
+  # The human readable node template name
   name_l_not_ends_with: String
 
-  # priority exactly equals to the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
+  # The priority exactly equals the value
+  # The priority weight for service, when deciding witch template should be brought up
   priority: Float
 
-  # priority not equals to the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
+  # The priority not equals the value
+  # The priority weight for service, when deciding witch template should be brought up
   priority_not: Float
 
-  # priority is less then the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
+  # The priority is less then the value
+  # The priority weight for service, when deciding witch template should be brought up
   priority_lt: Float
 
-  # priority is less then or equal to the parameter, priority: The priority weight
-  # for service, when deciding witch template should be brought up
+  # The priority is less or equal then the value
+  # The priority weight for service, when deciding witch template should be brought up
   priority_lte: Float
 
-  # priority is greater then the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
+  # The priority is greater then the value
+  # The priority weight for service, when deciding witch template should be brought up
   priority_gt: Float
 
-  # priority is greater then or equal to the parameter, priority: The priority
-  # weight for service, when deciding witch template should be brought up
+  # The priority is greater or equal then the value
+  # The priority weight for service, when deciding witch template should be brought up
   priority_gte: Float
 
-  # version exactly equals to the parameter, version: The template version
+  # The version exactly equals the value
+  # The template version
   version: Int
 
-  # version not equals to the parameter, version: The template version
+  # The version not equals the value
+  # The template version
   version_not: Int
 
-  # version is less then the parameter, version: The template version
+  # The version is less then the value
+  # The template version
   version_lt: Int
 
-  # version is less then or equal to the parameter, version: The template version
+  # The version is less or equal then the value
+  # The template version
   version_lte: Int
 
-  # version is greater then the parameter, version: The template version
+  # The version is greater then the value
+  # The template version
   version_gt: Int
 
-  # version is greater then or equal to the parameter, version: The template version
+  # The version is greater or equal then the value
+  # The template version
   version_gte: Int
 }
 
@@ -1327,55 +623,119 @@ input ClusterKitNodeApi_ClusterKitNodeTemplate_Input {
   version: Int
 }
 
-type ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitNodeTemplate
-  edge: ClusterKitNodeApi_ClusterKitNodeTemplate_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
-}
+type ClusterKitNodeApi_ClusterKitNodeTemplate_Node implements Node {
+  # The program readable node template name
+  code: String
 
-enum ClusterKitNodeApi_ClusterKitNodeTemplate_Sort {
-  code_asc
-  code_desc
-  configuration_asc
-  configuration_desc
-  id_asc
-  id_desc
-  maximumNeededInstances_asc
-  maximumNeededInstances_desc
-  minimumRequiredInstances_asc
-  minimumRequiredInstances_desc
-  name_asc
-  name_desc
-  priority_asc
-  priority_desc
-  version_asc
-  version_desc
-}
+  # The akka configuration template for node
+  configuration: String
 
-# The link to the nuget feed to download updates
-type ClusterKitNodeApi_ClusterKitNugetFeed implements Node {
-  # The seed url address
-  address: String
+  # The list of container types to install node templates
+  containerTypes: [String]
 
-  # The unique address identification number
+  # The unique template identification number
   __id: Int
 
-  # The user password for basic authentication
-  password: String
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
 
-  # The  type of feed
-  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
 
-  # The username for basic authentication
-  userName: String
+  # The human readable node template name
+  name: String
+
+  # The list of nuget packages to install (along with there dependencies)
+  packages: [String]
+
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The template version
+  version: Int
+
+  # The node global id
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitNugetFeed
-#  The link to the nuget feed to download updates
+type ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitNodeTemplate_Node
+  edge: ClusterKitNodeApi_ClusterKitNodeTemplate_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitNodeTemplate_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitNodeTemplate_OrderByEnum {
+  # code ascending
+  # The program readable node template name
+  code_asc
+
+  # code descending
+  # The program readable node template name
+  code_desc
+
+  # configuration ascending
+  # The akka configuration template for node
+  configuration_asc
+
+  # configuration descending
+  # The akka configuration template for node
+  configuration_desc
+
+  # id ascending
+  # The unique template identification number
+  id_asc
+
+  # id descending
+  # The unique template identification number
+  id_desc
+
+  # maximumNeededInstances ascending
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_asc
+
+  # maximumNeededInstances descending
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_desc
+
+  # minimumRequiredInstances ascending
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_asc
+
+  # minimumRequiredInstances descending
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_desc
+
+  # name ascending
+  # The human readable node template name
+  name_asc
+
+  # name descending
+  # The human readable node template name
+  name_desc
+
+  # priority ascending
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_asc
+
+  # priority descending
+  # The priority weight for service, when deciding witch template should be brought up
+  priority_desc
+
+  # version ascending
+  # The template version
+  version_asc
+
+  # version descending
+  # The template version
+  version_desc
+}
+
+# The list of connected ClusterKitNodeApi_ClusterKitNugetFeed_Node
+#  
 type ClusterKitNodeApi_ClusterKitNugetFeed_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
@@ -1384,225 +744,292 @@ type ClusterKitNodeApi_ClusterKitNugetFeed_Connection {
   edges: [ClusterKitNodeApi_ClusterKitNugetFeed_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitNugetFeed in a connected list
-#  The link to the nuget feed to download updates
+# The ClusterKitNodeApi_ClusterKitNugetFeed_Node in a connected list
+#  
 type ClusterKitNodeApi_ClusterKitNugetFeed_Edge {
   # A value to use with paging positioning
   cursor: String
-
-  # The link to the nuget feed to download updates
-  node: ClusterKitNodeApi_ClusterKitNugetFeed
+  node: ClusterKitNodeApi_ClusterKitNugetFeed_Node
 }
 
-input ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input
+# The filter conditions for a ClusterKitNodeApi_ClusterKitNugetFeed_Node connected objects
+input ClusterKitNodeApi_ClusterKitNugetFeed_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitNugetFeed_Filter]
 
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitNugetFeed_Filter]
 
-  # address exactly equals to the parameter, address: The seed url address
-  address: String
-
-  # address not equals to the parameter, address: The seed url address
-  address_not: String
-
-  # address is a substring of the parameter, address: The seed url address
-  address_in: String
-
-  # address is not a substring of the parameter, address: The seed url address
-  address_not_in: String
-
-  # address contains the parameter as substring, address: The seed url address
-  address_contains: String
-
-  # address doesn't contain the parameter as substring, address: The seed url address
-  address_not_contains: String
-
-  # address starts with the parameter value, address: The seed url address
-  address_starts_with: String
-
-  # address doesn't start with the parameter value, address: The seed url address
-  address_not_starts_with: String
-
-  # address ends with the parameter value, address: The seed url address
-  address_ends_with: String
-
-  # address doesn't end with the parameter value, address: The seed url address
-  address_not_ends_with: String
-
-  # address lowercased equals the parameter, address: The seed url address
-  address_l: String
-
-  # address lowercased doesn't equal the parameter, address: The seed url address
-  address_l_not: String
-
-  # address lowercased is a substring of the parameter, address: The seed url address
-  address_l_in: String
-
-  # address lowercased is not a substring of the parameter, address: The seed url address
-  address_l_not_in: String
-
-  # address lowercased contains the parameter as substring, address: The seed url address
-  address_l_contains: String
-
-  # address lowercased doesn't contain the parameter as substring, address: The seed url address
-  address_l_not_contains: String
-
-  # address lowercased starts with the parameter value, address: The seed url address
-  address_l_starts_with: String
-
-  # address lowercased doesn't start with the parameter value, address: The seed url address
-  address_l_not_starts_with: String
-
-  # address lowercased ends with the parameter value, address: The seed url address
-  address_l_ends_with: String
-
-  # address lowercased doesn't end with the parameter value, address: The seed url address
-  address_l_not_ends_with: String
-
-  # id exactly equals to the parameter, id: The unique address identification number
-  id: Int
-
-  # id not equals to the parameter, id: The unique address identification number
-  id_not: Int
-
-  # id is less then the parameter, id: The unique address identification number
-  id_lt: Int
-
-  # id is less then or equal to the parameter, id: The unique address identification number
-  id_lte: Int
-
-  # id is greater then the parameter, id: The unique address identification number
-  id_gt: Int
-
-  # id is greater then or equal to the parameter, id: The unique address identification number
-  id_gte: Int
-
-  # password exactly equals to the parameter, password: The user password for basic authentication
-  password: String
-
-  # password not equals to the parameter, password: The user password for basic authentication
-  password_not: String
-
-  # password is a substring of the parameter, password: The user password for basic authentication
-  password_in: String
-
-  # password is not a substring of the parameter, password: The user password for basic authentication
-  password_not_in: String
-
-  # password contains the parameter as substring, password: The user password for basic authentication
-  password_contains: String
-
-  # password doesn't contain the parameter as substring, password: The user password for basic authentication
-  password_not_contains: String
-
-  # password starts with the parameter value, password: The user password for basic authentication
-  password_starts_with: String
-
-  # password doesn't start with the parameter value, password: The user password for basic authentication
-  password_not_starts_with: String
-
-  # password ends with the parameter value, password: The user password for basic authentication
-  password_ends_with: String
-
-  # password doesn't end with the parameter value, password: The user password for basic authentication
-  password_not_ends_with: String
-
-  # password lowercased equals the parameter, password: The user password for basic authentication
-  password_l: String
-
-  # password lowercased doesn't equal the parameter, password: The user password for basic authentication
-  password_l_not: String
-
-  # password lowercased is a substring of the parameter, password: The user password for basic authentication
-  password_l_in: String
-
-  # password lowercased is not a substring of the parameter, password: The user password for basic authentication
-  password_l_not_in: String
-
-  # password lowercased contains the parameter as substring, password: The user password for basic authentication
-  password_l_contains: String
-
-  # password lowercased doesn't contain the parameter as substring, password: The user password for basic authentication
-  password_l_not_contains: String
-
-  # password lowercased starts with the parameter value, password: The user password for basic authentication
-  password_l_starts_with: String
-
-  # password lowercased doesn't start with the parameter value, password: The user password for basic authentication
-  password_l_not_starts_with: String
-
-  # password lowercased ends with the parameter value, password: The user password for basic authentication
-  password_l_ends_with: String
-
-  # password lowercased doesn't end with the parameter value, password: The user password for basic authentication
-  password_l_not_ends_with: String
-
-  # type exactly equals to the parameter, type: The  type of feed
+  # The type exactly equals the value
+  # The  type of feed
   type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
 
-  # type not equals to the parameter, type: The  type of feed
+  # The type not equals the value
+  # The  type of feed
   type_not: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
 
-  # userName exactly equals to the parameter, userName: The username for basic authentication
+  # The address exactly equals the value
+  # The seed url address
+  address: String
+
+  # The address not equals the value
+  # The seed url address
+  address_not: String
+
+  # The value contains the address as substring
+  # The seed url address
+  address_in: String
+
+  # The value not contains the address as substring
+  # The seed url address
+  address_not_in: String
+
+  # The address contains the value as substring
+  # The seed url address
+  address_contains: String
+
+  # The address not contains the value as substring
+  # The seed url address
+  address_not_contains: String
+
+  # The address starts with the value
+  # The seed url address
+  address_starts_with: String
+
+  # The address not starts with the value
+  # The seed url address
+  address_not_starts_with: String
+
+  # The address ends with the value
+  # The seed url address
+  address_ends_with: String
+
+  # The address not ends with the value
+  # The seed url address
+  address_not_ends_with: String
+
+  # The address lowercased exactly equals the value
+  # The seed url address
+  address_l: String
+
+  # The address lowercased not equals the value
+  # The seed url address
+  address_l_not: String
+
+  # The value contains the address lowercased as substring
+  # The seed url address
+  address_l_in: String
+
+  # The value not contains the address lowercased as substring
+  # The seed url address
+  address_l_not_in: String
+
+  # The address lowercased contains the value as substring
+  # The seed url address
+  address_l_contains: String
+
+  # The address lowercased not contains the value as substring
+  # The seed url address
+  address_l_not_contains: String
+
+  # The address lowercased starts with the value
+  # The seed url address
+  address_l_starts_with: String
+
+  # The address lowercased not starts with the value
+  # The seed url address
+  address_l_not_starts_with: String
+
+  # The address lowercased ends with the value
+  # The seed url address
+  address_l_ends_with: String
+
+  # The address lowercased not ends with the value
+  # The seed url address
+  address_l_not_ends_with: String
+
+  # The id exactly equals the value
+  # The unique address identification number
+  id: Int
+
+  # The id not equals the value
+  # The unique address identification number
+  id_not: Int
+
+  # The id is less then the value
+  # The unique address identification number
+  id_lt: Int
+
+  # The id is less or equal then the value
+  # The unique address identification number
+  id_lte: Int
+
+  # The id is greater then the value
+  # The unique address identification number
+  id_gt: Int
+
+  # The id is greater or equal then the value
+  # The unique address identification number
+  id_gte: Int
+
+  # The password exactly equals the value
+  # The user password for basic authentication
+  password: String
+
+  # The password not equals the value
+  # The user password for basic authentication
+  password_not: String
+
+  # The value contains the password as substring
+  # The user password for basic authentication
+  password_in: String
+
+  # The value not contains the password as substring
+  # The user password for basic authentication
+  password_not_in: String
+
+  # The password contains the value as substring
+  # The user password for basic authentication
+  password_contains: String
+
+  # The password not contains the value as substring
+  # The user password for basic authentication
+  password_not_contains: String
+
+  # The password starts with the value
+  # The user password for basic authentication
+  password_starts_with: String
+
+  # The password not starts with the value
+  # The user password for basic authentication
+  password_not_starts_with: String
+
+  # The password ends with the value
+  # The user password for basic authentication
+  password_ends_with: String
+
+  # The password not ends with the value
+  # The user password for basic authentication
+  password_not_ends_with: String
+
+  # The password lowercased exactly equals the value
+  # The user password for basic authentication
+  password_l: String
+
+  # The password lowercased not equals the value
+  # The user password for basic authentication
+  password_l_not: String
+
+  # The value contains the password lowercased as substring
+  # The user password for basic authentication
+  password_l_in: String
+
+  # The value not contains the password lowercased as substring
+  # The user password for basic authentication
+  password_l_not_in: String
+
+  # The password lowercased contains the value as substring
+  # The user password for basic authentication
+  password_l_contains: String
+
+  # The password lowercased not contains the value as substring
+  # The user password for basic authentication
+  password_l_not_contains: String
+
+  # The password lowercased starts with the value
+  # The user password for basic authentication
+  password_l_starts_with: String
+
+  # The password lowercased not starts with the value
+  # The user password for basic authentication
+  password_l_not_starts_with: String
+
+  # The password lowercased ends with the value
+  # The user password for basic authentication
+  password_l_ends_with: String
+
+  # The password lowercased not ends with the value
+  # The user password for basic authentication
+  password_l_not_ends_with: String
+
+  # The userName exactly equals the value
+  # The username for basic authentication
   userName: String
 
-  # userName not equals to the parameter, userName: The username for basic authentication
+  # The userName not equals the value
+  # The username for basic authentication
   userName_not: String
 
-  # userName is a substring of the parameter, userName: The username for basic authentication
+  # The value contains the userName as substring
+  # The username for basic authentication
   userName_in: String
 
-  # userName is not a substring of the parameter, userName: The username for basic authentication
+  # The value not contains the userName as substring
+  # The username for basic authentication
   userName_not_in: String
 
-  # userName contains the parameter as substring, userName: The username for basic authentication
+  # The userName contains the value as substring
+  # The username for basic authentication
   userName_contains: String
 
-  # userName doesn't contain the parameter as substring, userName: The username for basic authentication
+  # The userName not contains the value as substring
+  # The username for basic authentication
   userName_not_contains: String
 
-  # userName starts with the parameter value, userName: The username for basic authentication
+  # The userName starts with the value
+  # The username for basic authentication
   userName_starts_with: String
 
-  # userName doesn't start with the parameter value, userName: The username for basic authentication
+  # The userName not starts with the value
+  # The username for basic authentication
   userName_not_starts_with: String
 
-  # userName ends with the parameter value, userName: The username for basic authentication
+  # The userName ends with the value
+  # The username for basic authentication
   userName_ends_with: String
 
-  # userName doesn't end with the parameter value, userName: The username for basic authentication
+  # The userName not ends with the value
+  # The username for basic authentication
   userName_not_ends_with: String
 
-  # userName lowercased equals the parameter, userName: The username for basic authentication
+  # The userName lowercased exactly equals the value
+  # The username for basic authentication
   userName_l: String
 
-  # userName lowercased doesn't equal the parameter, userName: The username for basic authentication
+  # The userName lowercased not equals the value
+  # The username for basic authentication
   userName_l_not: String
 
-  # userName lowercased is a substring of the parameter, userName: The username for basic authentication
+  # The value contains the userName lowercased as substring
+  # The username for basic authentication
   userName_l_in: String
 
-  # userName lowercased is not a substring of the parameter, userName: The username for basic authentication
+  # The value not contains the userName lowercased as substring
+  # The username for basic authentication
   userName_l_not_in: String
 
-  # userName lowercased contains the parameter as substring, userName: The username for basic authentication
+  # The userName lowercased contains the value as substring
+  # The username for basic authentication
   userName_l_contains: String
 
-  # userName lowercased doesn't contain the parameter as substring, userName: The username for basic authentication
+  # The userName lowercased not contains the value as substring
+  # The username for basic authentication
   userName_l_not_contains: String
 
-  # userName lowercased starts with the parameter value, userName: The username for basic authentication
+  # The userName lowercased starts with the value
+  # The username for basic authentication
   userName_l_starts_with: String
 
-  # userName lowercased doesn't start with the parameter value, userName: The username for basic authentication
+  # The userName lowercased not starts with the value
+  # The username for basic authentication
   userName_l_not_starts_with: String
 
-  # userName lowercased ends with the parameter value, userName: The username for basic authentication
+  # The userName lowercased ends with the value
+  # The username for basic authentication
   userName_l_ends_with: String
 
-  # userName lowercased doesn't end with the parameter value, userName: The username for basic authentication
+  # The userName lowercased not ends with the value
+  # The username for basic authentication
   userName_l_not_ends_with: String
 }
 
@@ -1624,260 +1051,98 @@ input ClusterKitNodeApi_ClusterKitNugetFeed_Input {
   userName: String
 }
 
-type ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitNugetFeed
-  edge: ClusterKitNodeApi_ClusterKitNugetFeed_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
-}
+type ClusterKitNodeApi_ClusterKitNugetFeed_Node implements Node {
+  # The seed url address
+  address: String
 
-enum ClusterKitNodeApi_ClusterKitNugetFeed_Sort {
-  address_asc
-  address_desc
-  id_asc
-  id_desc
-  password_asc
-  password_desc
-  type_asc
-  type_desc
-  userName_asc
-  userName_desc
-}
+  # The unique address identification number
+  __id: Int
 
-# Short description of NuGet package
-type ClusterKitNodeApi_ClusterKitPackageDescription implements Node {
-  # The package id (name and version)
-  __id: String
+  # The user password for basic authentication
+  password: String
 
-  # The package name
-  name: String
+  # The  type of feed
+  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
 
-  # The package version
-  version: String
+  # The username for basic authentication
+  userName: String
+
+  # The node global id
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitPackageDescription
-#  Short description of NuGet package
-type ClusterKitNodeApi_ClusterKitPackageDescription_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitPackageDescription_Edge]
+type ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitNugetFeed_Node
+  edge: ClusterKitNodeApi_ClusterKitNugetFeed_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
 }
 
-# The ClusterKitNodeApi_ClusterKitPackageDescription in a connected list
-#  Short description of NuGet package
-type ClusterKitNodeApi_ClusterKitPackageDescription_Edge {
-  # A value to use with paging positioning
-  cursor: String
+# The list of ClusterKitNodeApi_ClusterKitNugetFeed_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitNugetFeed_OrderByEnum {
+  # address ascending
+  # The seed url address
+  address_asc
 
-  # Short description of NuGet package
-  node: ClusterKitNodeApi_ClusterKitPackageDescription
+  # address descending
+  # The seed url address
+  address_desc
+
+  # id ascending
+  # The unique address identification number
+  id_asc
+
+  # id descending
+  # The unique address identification number
+  id_desc
+
+  # password ascending
+  # The user password for basic authentication
+  password_asc
+
+  # password descending
+  # The user password for basic authentication
+  password_desc
+
+  # type ascending
+  # The  type of feed
+  type_asc
+
+  # type descending
+  # The  type of feed
+  type_desc
+
+  # userName ascending
+  # The username for basic authentication
+  userName_asc
+
+  # userName descending
+  # The username for basic authentication
+  userName_desc
 }
 
-input ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input
-
-  # id exactly equals to the parameter, id: The package id (name and version)
+# The nuget package
+type ClusterKitNodeApi_ClusterKitNugetPackage {
+  # The package name
   id: String
 
-  # id not equals to the parameter, id: The package id (name and version)
-  id_not: String
-
-  # id is a substring of the parameter, id: The package id (name and version)
-  id_in: String
-
-  # id is not a substring of the parameter, id: The package id (name and version)
-  id_not_in: String
-
-  # id contains the parameter as substring, id: The package id (name and version)
-  id_contains: String
-
-  # id doesn't contain the parameter as substring, id: The package id (name and version)
-  id_not_contains: String
-
-  # id starts with the parameter value, id: The package id (name and version)
-  id_starts_with: String
-
-  # id doesn't start with the parameter value, id: The package id (name and version)
-  id_not_starts_with: String
-
-  # id ends with the parameter value, id: The package id (name and version)
-  id_ends_with: String
-
-  # id doesn't end with the parameter value, id: The package id (name and version)
-  id_not_ends_with: String
-
-  # id lowercased equals the parameter, id: The package id (name and version)
-  id_l: String
-
-  # id lowercased doesn't equal the parameter, id: The package id (name and version)
-  id_l_not: String
-
-  # id lowercased is a substring of the parameter, id: The package id (name and version)
-  id_l_in: String
-
-  # id lowercased is not a substring of the parameter, id: The package id (name and version)
-  id_l_not_in: String
-
-  # id lowercased contains the parameter as substring, id: The package id (name and version)
-  id_l_contains: String
-
-  # id lowercased doesn't contain the parameter as substring, id: The package id (name and version)
-  id_l_not_contains: String
-
-  # id lowercased starts with the parameter value, id: The package id (name and version)
-  id_l_starts_with: String
-
-  # id lowercased doesn't start with the parameter value, id: The package id (name and version)
-  id_l_not_starts_with: String
-
-  # id lowercased ends with the parameter value, id: The package id (name and version)
-  id_l_ends_with: String
-
-  # id lowercased doesn't end with the parameter value, id: The package id (name and version)
-  id_l_not_ends_with: String
-
-  # name exactly equals to the parameter, name: The package name
-  name: String
-
-  # name not equals to the parameter, name: The package name
-  name_not: String
-
-  # name is a substring of the parameter, name: The package name
-  name_in: String
-
-  # name is not a substring of the parameter, name: The package name
-  name_not_in: String
-
-  # name contains the parameter as substring, name: The package name
-  name_contains: String
-
-  # name doesn't contain the parameter as substring, name: The package name
-  name_not_contains: String
-
-  # name starts with the parameter value, name: The package name
-  name_starts_with: String
-
-  # name doesn't start with the parameter value, name: The package name
-  name_not_starts_with: String
-
-  # name ends with the parameter value, name: The package name
-  name_ends_with: String
-
-  # name doesn't end with the parameter value, name: The package name
-  name_not_ends_with: String
-
-  # name lowercased equals the parameter, name: The package name
-  name_l: String
-
-  # name lowercased doesn't equal the parameter, name: The package name
-  name_l_not: String
-
-  # name lowercased is a substring of the parameter, name: The package name
-  name_l_in: String
-
-  # name lowercased is not a substring of the parameter, name: The package name
-  name_l_not_in: String
-
-  # name lowercased contains the parameter as substring, name: The package name
-  name_l_contains: String
-
-  # name lowercased doesn't contain the parameter as substring, name: The package name
-  name_l_not_contains: String
-
-  # name lowercased starts with the parameter value, name: The package name
-  name_l_starts_with: String
-
-  # name lowercased doesn't start with the parameter value, name: The package name
-  name_l_not_starts_with: String
-
-  # name lowercased ends with the parameter value, name: The package name
-  name_l_ends_with: String
-
-  # name lowercased doesn't end with the parameter value, name: The package name
-  name_l_not_ends_with: String
-
-  # version exactly equals to the parameter, version: The package version
+  # The package version
   version: String
-
-  # version not equals to the parameter, version: The package version
-  version_not: String
-
-  # version is a substring of the parameter, version: The package version
-  version_in: String
-
-  # version is not a substring of the parameter, version: The package version
-  version_not_in: String
-
-  # version contains the parameter as substring, version: The package version
-  version_contains: String
-
-  # version doesn't contain the parameter as substring, version: The package version
-  version_not_contains: String
-
-  # version starts with the parameter value, version: The package version
-  version_starts_with: String
-
-  # version doesn't start with the parameter value, version: The package version
-  version_not_starts_with: String
-
-  # version ends with the parameter value, version: The package version
-  version_ends_with: String
-
-  # version doesn't end with the parameter value, version: The package version
-  version_not_ends_with: String
-
-  # version lowercased equals the parameter, version: The package version
-  version_l: String
-
-  # version lowercased doesn't equal the parameter, version: The package version
-  version_l_not: String
-
-  # version lowercased is a substring of the parameter, version: The package version
-  version_l_in: String
-
-  # version lowercased is not a substring of the parameter, version: The package version
-  version_l_not_in: String
-
-  # version lowercased contains the parameter as substring, version: The package version
-  version_l_contains: String
-
-  # version lowercased doesn't contain the parameter as substring, version: The package version
-  version_l_not_contains: String
-
-  # version lowercased starts with the parameter value, version: The package version
-  version_l_starts_with: String
-
-  # version lowercased doesn't start with the parameter value, version: The package version
-  version_l_not_starts_with: String
-
-  # version lowercased ends with the parameter value, version: The package version
-  version_l_ends_with: String
-
-  # version lowercased doesn't end with the parameter value, version: The package version
-  version_l_not_ends_with: String
 }
 
-enum ClusterKitNodeApi_ClusterKitPackageDescription_Sort {
-  id_asc
-  id_desc
-  name_asc
-  name_desc
-  version_asc
-  version_desc
+# Short description of NuGet package
+type ClusterKitNodeApi_ClusterKitPackageDescription {
+  # The package Id
+  id: String
+
+  # The package version
+  version: String
 }
 
 # Security role. The amount of privileges assigned to the user
-type ClusterKitNodeApi_ClusterKitRole implements Node {
+type ClusterKitNodeApi_ClusterKitRole {
   # The role uid
   uid: Uid
 
@@ -1891,12 +1156,12 @@ type ClusterKitNodeApi_ClusterKitRole implements Node {
   deniedScope: [String]
 
   # The list of users assigned to this role
-  users(filter: ClusterKitNodeApi_ClusterKitUser_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitUser_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitUser_Connection
+  users: [ClusterKitNodeApi_ClusterKitUser]
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitRole
-#  Security role. The amount of privileges assigned to the user
+# The list of connected ClusterKitNodeApi_ClusterKitRole_Node
+#  
 type ClusterKitNodeApi_ClusterKitRole_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
@@ -1905,87 +1170,108 @@ type ClusterKitNodeApi_ClusterKitRole_Connection {
   edges: [ClusterKitNodeApi_ClusterKitRole_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitRole in a connected list
-#  Security role. The amount of privileges assigned to the user
+# The ClusterKitNodeApi_ClusterKitRole_Node in a connected list
+#  
 type ClusterKitNodeApi_ClusterKitRole_Edge {
   # A value to use with paging positioning
   cursor: String
-
-  # Security role. The amount of privileges assigned to the user
-  node: ClusterKitNodeApi_ClusterKitRole
+  node: ClusterKitNodeApi_ClusterKitRole_Node
 }
 
-input ClusterKitNodeApi_ClusterKitRole_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitRole_Filter_Input
+# The filter conditions for a ClusterKitNodeApi_ClusterKitRole_Node connected objects
+input ClusterKitNodeApi_ClusterKitRole_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitRole_Filter]
 
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitRole_Filter_Input
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitRole_Filter]
 
-  # uid exactly equals to the parameter, uid: The role uid
+  # The uid exactly equals the value
+  # The role uid
   uid: Uid
 
-  # uid not equals to the parameter, uid: The role uid
+  # The uid not equals the value
+  # The role uid
   uid_not: Uid
 
-  # name exactly equals to the parameter, name: The role name
+  # The name exactly equals the value
+  # The role name
   name: String
 
-  # name not equals to the parameter, name: The role name
+  # The name not equals the value
+  # The role name
   name_not: String
 
-  # name is a substring of the parameter, name: The role name
+  # The value contains the name as substring
+  # The role name
   name_in: String
 
-  # name is not a substring of the parameter, name: The role name
+  # The value not contains the name as substring
+  # The role name
   name_not_in: String
 
-  # name contains the parameter as substring, name: The role name
+  # The name contains the value as substring
+  # The role name
   name_contains: String
 
-  # name doesn't contain the parameter as substring, name: The role name
+  # The name not contains the value as substring
+  # The role name
   name_not_contains: String
 
-  # name starts with the parameter value, name: The role name
+  # The name starts with the value
+  # The role name
   name_starts_with: String
 
-  # name doesn't start with the parameter value, name: The role name
+  # The name not starts with the value
+  # The role name
   name_not_starts_with: String
 
-  # name ends with the parameter value, name: The role name
+  # The name ends with the value
+  # The role name
   name_ends_with: String
 
-  # name doesn't end with the parameter value, name: The role name
+  # The name not ends with the value
+  # The role name
   name_not_ends_with: String
 
-  # name lowercased equals the parameter, name: The role name
+  # The name lowercased exactly equals the value
+  # The role name
   name_l: String
 
-  # name lowercased doesn't equal the parameter, name: The role name
+  # The name lowercased not equals the value
+  # The role name
   name_l_not: String
 
-  # name lowercased is a substring of the parameter, name: The role name
+  # The value contains the name lowercased as substring
+  # The role name
   name_l_in: String
 
-  # name lowercased is not a substring of the parameter, name: The role name
+  # The value not contains the name lowercased as substring
+  # The role name
   name_l_not_in: String
 
-  # name lowercased contains the parameter as substring, name: The role name
+  # The name lowercased contains the value as substring
+  # The role name
   name_l_contains: String
 
-  # name lowercased doesn't contain the parameter as substring, name: The role name
+  # The name lowercased not contains the value as substring
+  # The role name
   name_l_not_contains: String
 
-  # name lowercased starts with the parameter value, name: The role name
+  # The name lowercased starts with the value
+  # The role name
   name_l_starts_with: String
 
-  # name lowercased doesn't start with the parameter value, name: The role name
+  # The name lowercased not starts with the value
+  # The role name
   name_l_not_starts_with: String
 
-  # name lowercased ends with the parameter value, name: The role name
+  # The name lowercased ends with the value
+  # The role name
   name_l_ends_with: String
 
-  # name lowercased doesn't end with the parameter value, name: The role name
+  # The name lowercased not ends with the value
+  # The role name
   name_l_not_ends_with: String
 }
 
@@ -2004,34 +1290,56 @@ input ClusterKitNodeApi_ClusterKitRole_Input {
   deniedScope: [String]
 }
 
-type ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitRole
-  edge: ClusterKitNodeApi_ClusterKitRole_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
-}
+type ClusterKitNodeApi_ClusterKitRole_Node implements Node {
+  # The role uid
+  uid: Uid
 
-enum ClusterKitNodeApi_ClusterKitRole_Sort {
-  uid_asc
-  uid_desc
-  name_asc
-  name_desc
-}
+  # The role name
+  name: String
 
-# The address of fixed cluster seed for new node configuration
-type ClusterKitNodeApi_ClusterKitSeedAddress implements Node {
-  # The seed address in format of akka url
-  address: String
+  # The list of granted privileges
+  allowedScope: [String]
 
-  # The unique address identification number
-  __id: Int
+  # The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)
+  deniedScope: [String]
+
+  # The list of users assigned to this role
+  users: [ClusterKitNodeApi_ClusterKitUser]
+
+  # The node global id
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitSeedAddress
-#  The address of fixed cluster seed for new node configuration
+type ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitRole_Node
+  edge: ClusterKitNodeApi_ClusterKitRole_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitRole_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitRole_OrderByEnum {
+  # uid ascending
+  # The role uid
+  uid_asc
+
+  # uid descending
+  # The role uid
+  uid_desc
+
+  # name ascending
+  # The role name
+  name_asc
+
+  # name descending
+  # The role name
+  name_desc
+}
+
+# The list of connected ClusterKitNodeApi_ClusterKitSeedAddress_Node
+#  
 type ClusterKitNodeApi_ClusterKitSeedAddress_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
@@ -2040,99 +1348,124 @@ type ClusterKitNodeApi_ClusterKitSeedAddress_Connection {
   edges: [ClusterKitNodeApi_ClusterKitSeedAddress_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitSeedAddress in a connected list
-#  The address of fixed cluster seed for new node configuration
+# The ClusterKitNodeApi_ClusterKitSeedAddress_Node in a connected list
+#  
 type ClusterKitNodeApi_ClusterKitSeedAddress_Edge {
   # A value to use with paging positioning
   cursor: String
-
-  # The address of fixed cluster seed for new node configuration
-  node: ClusterKitNodeApi_ClusterKitSeedAddress
+  node: ClusterKitNodeApi_ClusterKitSeedAddress_Node
 }
 
-input ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input
+# The filter conditions for a ClusterKitNodeApi_ClusterKitSeedAddress_Node connected objects
+input ClusterKitNodeApi_ClusterKitSeedAddress_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitSeedAddress_Filter]
 
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitSeedAddress_Filter]
 
-  # address exactly equals to the parameter, address: The seed address in format of akka url
+  # The address exactly equals the value
+  # The seed address in format of akka url
   address: String
 
-  # address not equals to the parameter, address: The seed address in format of akka url
+  # The address not equals the value
+  # The seed address in format of akka url
   address_not: String
 
-  # address is a substring of the parameter, address: The seed address in format of akka url
+  # The value contains the address as substring
+  # The seed address in format of akka url
   address_in: String
 
-  # address is not a substring of the parameter, address: The seed address in format of akka url
+  # The value not contains the address as substring
+  # The seed address in format of akka url
   address_not_in: String
 
-  # address contains the parameter as substring, address: The seed address in format of akka url
+  # The address contains the value as substring
+  # The seed address in format of akka url
   address_contains: String
 
-  # address doesn't contain the parameter as substring, address: The seed address in format of akka url
+  # The address not contains the value as substring
+  # The seed address in format of akka url
   address_not_contains: String
 
-  # address starts with the parameter value, address: The seed address in format of akka url
+  # The address starts with the value
+  # The seed address in format of akka url
   address_starts_with: String
 
-  # address doesn't start with the parameter value, address: The seed address in format of akka url
+  # The address not starts with the value
+  # The seed address in format of akka url
   address_not_starts_with: String
 
-  # address ends with the parameter value, address: The seed address in format of akka url
+  # The address ends with the value
+  # The seed address in format of akka url
   address_ends_with: String
 
-  # address doesn't end with the parameter value, address: The seed address in format of akka url
+  # The address not ends with the value
+  # The seed address in format of akka url
   address_not_ends_with: String
 
-  # address lowercased equals the parameter, address: The seed address in format of akka url
+  # The address lowercased exactly equals the value
+  # The seed address in format of akka url
   address_l: String
 
-  # address lowercased doesn't equal the parameter, address: The seed address in format of akka url
+  # The address lowercased not equals the value
+  # The seed address in format of akka url
   address_l_not: String
 
-  # address lowercased is a substring of the parameter, address: The seed address in format of akka url
+  # The value contains the address lowercased as substring
+  # The seed address in format of akka url
   address_l_in: String
 
-  # address lowercased is not a substring of the parameter, address: The seed address in format of akka url
+  # The value not contains the address lowercased as substring
+  # The seed address in format of akka url
   address_l_not_in: String
 
-  # address lowercased contains the parameter as substring, address: The seed address in format of akka url
+  # The address lowercased contains the value as substring
+  # The seed address in format of akka url
   address_l_contains: String
 
-  # address lowercased doesn't contain the parameter as substring, address: The seed address in format of akka url
+  # The address lowercased not contains the value as substring
+  # The seed address in format of akka url
   address_l_not_contains: String
 
-  # address lowercased starts with the parameter value, address: The seed address in format of akka url
+  # The address lowercased starts with the value
+  # The seed address in format of akka url
   address_l_starts_with: String
 
-  # address lowercased doesn't start with the parameter value, address: The seed address in format of akka url
+  # The address lowercased not starts with the value
+  # The seed address in format of akka url
   address_l_not_starts_with: String
 
-  # address lowercased ends with the parameter value, address: The seed address in format of akka url
+  # The address lowercased ends with the value
+  # The seed address in format of akka url
   address_l_ends_with: String
 
-  # address lowercased doesn't end with the parameter value, address: The seed address in format of akka url
+  # The address lowercased not ends with the value
+  # The seed address in format of akka url
   address_l_not_ends_with: String
 
-  # id exactly equals to the parameter, id: The unique address identification number
+  # The id exactly equals the value
+  # The unique address identification number
   id: Int
 
-  # id not equals to the parameter, id: The unique address identification number
+  # The id not equals the value
+  # The unique address identification number
   id_not: Int
 
-  # id is less then the parameter, id: The unique address identification number
+  # The id is less then the value
+  # The unique address identification number
   id_lt: Int
 
-  # id is less then or equal to the parameter, id: The unique address identification number
+  # The id is less or equal then the value
+  # The unique address identification number
   id_lte: Int
 
-  # id is greater then the parameter, id: The unique address identification number
+  # The id is greater then the value
+  # The unique address identification number
   id_gt: Int
 
-  # id is greater then or equal to the parameter, id: The unique address identification number
+  # The id is greater or equal then the value
+  # The unique address identification number
   id_gte: Int
 }
 
@@ -2145,31 +1478,54 @@ input ClusterKitNodeApi_ClusterKitSeedAddress_Input {
   id: Int
 }
 
-type ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitSeedAddress
-  edge: ClusterKitNodeApi_ClusterKitSeedAddress_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
+type ClusterKitNodeApi_ClusterKitSeedAddress_Node implements Node {
+  # The seed address in format of akka url
+  address: String
+
+  # The unique address identification number
+  __id: Int
+
+  # The node global id
+  id: ID
 }
 
-enum ClusterKitNodeApi_ClusterKitSeedAddress_Sort {
+type ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitSeedAddress_Node
+  edge: ClusterKitNodeApi_ClusterKitSeedAddress_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitSeedAddress_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitSeedAddress_OrderByEnum {
+  # address ascending
+  # The seed address in format of akka url
   address_asc
+
+  # address descending
+  # The seed address in format of akka url
   address_desc
+
+  # id ascending
+  # The unique address identification number
   id_asc
+
+  # id descending
+  # The unique address identification number
   id_desc
 }
 
 # Overall debug data of current cluster node template use
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics implements Node {
+type ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics {
   # node templates statistics data
-  templates(filter: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Connection
+  templates: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData]
   id: ID
 }
 
 # Statistics data for template
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData implements Node {
+type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData {
   #  current active node count
   activeNodes: Int
 
@@ -2193,240 +1549,10 @@ type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData implements Node {
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData
-#  Statistics data for template
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData in a connected list
-#  Statistics data for template
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # Statistics data for template
-  node: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData
-}
-
-input ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input
-
-  # activeNodes exactly equals to the parameter, activeNodes:  current active node count
-  activeNodes: Int
-
-  # activeNodes not equals to the parameter, activeNodes:  current active node count
-  activeNodes_not: Int
-
-  # activeNodes is less then the parameter, activeNodes:  current active node count
-  activeNodes_lt: Int
-
-  # activeNodes is less then or equal to the parameter, activeNodes:  current active node count
-  activeNodes_lte: Int
-
-  # activeNodes is greater then the parameter, activeNodes:  current active node count
-  activeNodes_gt: Int
-
-  # activeNodes is greater then or equal to the parameter, activeNodes:  current active node count
-  activeNodes_gte: Int
-
-  # maximumRequiredNodes exactly equals to the parameter, maximumRequiredNodes:
-  # currently configured maximum required active nodes count
-  maximumRequiredNodes: Int
-
-  # maximumRequiredNodes not equals to the parameter, maximumRequiredNodes:
-  # currently configured maximum required active nodes count
-  maximumRequiredNodes_not: Int
-
-  # maximumRequiredNodes is less then the parameter, maximumRequiredNodes:
-  # currently configured maximum required active nodes count
-  maximumRequiredNodes_lt: Int
-
-  # maximumRequiredNodes is less then or equal to the parameter,
-  # maximumRequiredNodes: currently configured maximum required active nodes count
-  maximumRequiredNodes_lte: Int
-
-  # maximumRequiredNodes is greater then the parameter, maximumRequiredNodes:
-  # currently configured maximum required active nodes count
-  maximumRequiredNodes_gt: Int
-
-  # maximumRequiredNodes is greater then or equal to the parameter,
-  # maximumRequiredNodes: currently configured maximum required active nodes count
-  maximumRequiredNodes_gte: Int
-
-  # minimumRequiredNodes exactly equals to the parameter, minimumRequiredNodes:
-  # currently configured minimum required active nodes count
-  minimumRequiredNodes: Int
-
-  # minimumRequiredNodes not equals to the parameter, minimumRequiredNodes:
-  # currently configured minimum required active nodes count
-  minimumRequiredNodes_not: Int
-
-  # minimumRequiredNodes is less then the parameter, minimumRequiredNodes:
-  # currently configured minimum required active nodes count
-  minimumRequiredNodes_lt: Int
-
-  # minimumRequiredNodes is less then or equal to the parameter,
-  # minimumRequiredNodes: currently configured minimum required active nodes count
-  minimumRequiredNodes_lte: Int
-
-  # minimumRequiredNodes is greater then the parameter, minimumRequiredNodes:
-  # currently configured minimum required active nodes count
-  minimumRequiredNodes_gt: Int
-
-  # minimumRequiredNodes is greater then or equal to the parameter,
-  # minimumRequiredNodes: currently configured minimum required active nodes count
-  minimumRequiredNodes_gte: Int
-
-  # name exactly equals to the parameter, name: name of the node template
-  name: String
-
-  # name not equals to the parameter, name: name of the node template
-  name_not: String
-
-  # name is a substring of the parameter, name: name of the node template
-  name_in: String
-
-  # name is not a substring of the parameter, name: name of the node template
-  name_not_in: String
-
-  # name contains the parameter as substring, name: name of the node template
-  name_contains: String
-
-  # name doesn't contain the parameter as substring, name: name of the node template
-  name_not_contains: String
-
-  # name starts with the parameter value, name: name of the node template
-  name_starts_with: String
-
-  # name doesn't start with the parameter value, name: name of the node template
-  name_not_starts_with: String
-
-  # name ends with the parameter value, name: name of the node template
-  name_ends_with: String
-
-  # name doesn't end with the parameter value, name: name of the node template
-  name_not_ends_with: String
-
-  # name lowercased equals the parameter, name: name of the node template
-  name_l: String
-
-  # name lowercased doesn't equal the parameter, name: name of the node template
-  name_l_not: String
-
-  # name lowercased is a substring of the parameter, name: name of the node template
-  name_l_in: String
-
-  # name lowercased is not a substring of the parameter, name: name of the node template
-  name_l_not_in: String
-
-  # name lowercased contains the parameter as substring, name: name of the node template
-  name_l_contains: String
-
-  # name lowercased doesn't contain the parameter as substring, name: name of the node template
-  name_l_not_contains: String
-
-  # name lowercased starts with the parameter value, name: name of the node template
-  name_l_starts_with: String
-
-  # name lowercased doesn't start with the parameter value, name: name of the node template
-  name_l_not_starts_with: String
-
-  # name lowercased ends with the parameter value, name: name of the node template
-  name_l_ends_with: String
-
-  # name lowercased doesn't end with the parameter value, name: name of the node template
-  name_l_not_ends_with: String
-
-  # obsoleteNodes exactly equals to the parameter, obsoleteNodes: the number of
-  # currently active nodes, that need to be upgraded
-  obsoleteNodes: Int
-
-  # obsoleteNodes not equals to the parameter, obsoleteNodes: the number of currently active nodes, that need to be upgraded
-  obsoleteNodes_not: Int
-
-  # obsoleteNodes is less then the parameter, obsoleteNodes: the number of currently active nodes, that need to be upgraded
-  obsoleteNodes_lt: Int
-
-  # obsoleteNodes is less then or equal to the parameter, obsoleteNodes: the
-  # number of currently active nodes, that need to be upgraded
-  obsoleteNodes_lte: Int
-
-  # obsoleteNodes is greater then the parameter, obsoleteNodes: the number of currently active nodes, that need to be upgraded
-  obsoleteNodes_gt: Int
-
-  # obsoleteNodes is greater then or equal to the parameter, obsoleteNodes: the
-  # number of currently active nodes, that need to be upgraded
-  obsoleteNodes_gte: Int
-
-  # startingNodes exactly equals to the parameter, startingNodes: the number of nodes that are in upgrade process now
-  startingNodes: Int
-
-  # startingNodes not equals to the parameter, startingNodes: the number of nodes that are in upgrade process now
-  startingNodes_not: Int
-
-  # startingNodes is less then the parameter, startingNodes: the number of nodes that are in upgrade process now
-  startingNodes_lt: Int
-
-  # startingNodes is less then or equal to the parameter, startingNodes: the number of nodes that are in upgrade process now
-  startingNodes_lte: Int
-
-  # startingNodes is greater then the parameter, startingNodes: the number of nodes that are in upgrade process now
-  startingNodes_gt: Int
-
-  # startingNodes is greater then or equal to the parameter, startingNodes: the
-  # number of nodes that are in upgrade process now
-  startingNodes_gte: Int
-
-  # upgradingNodes exactly equals to the parameter, upgradingNodes: the number of nodes that are in upgrade process now
-  upgradingNodes: Int
-
-  # upgradingNodes not equals to the parameter, upgradingNodes: the number of nodes that are in upgrade process now
-  upgradingNodes_not: Int
-
-  # upgradingNodes is less then the parameter, upgradingNodes: the number of nodes that are in upgrade process now
-  upgradingNodes_lt: Int
-
-  # upgradingNodes is less then or equal to the parameter, upgradingNodes: the number of nodes that are in upgrade process now
-  upgradingNodes_lte: Int
-
-  # upgradingNodes is greater then the parameter, upgradingNodes: the number of nodes that are in upgrade process now
-  upgradingNodes_gt: Int
-
-  # upgradingNodes is greater then or equal to the parameter, upgradingNodes: the
-  # number of nodes that are in upgrade process now
-  upgradingNodes_gte: Int
-}
-
-enum ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Sort {
-  activeNodes_asc
-  activeNodes_desc
-  maximumRequiredNodes_asc
-  maximumRequiredNodes_desc
-  minimumRequiredNodes_asc
-  minimumRequiredNodes_desc
-  name_asc
-  name_desc
-  obsoleteNodes_asc
-  obsoleteNodes_desc
-  startingNodes_asc
-  startingNodes_desc
-  upgradingNodes_asc
-  upgradingNodes_desc
-}
-
 # The web ui user
-type ClusterKitNodeApi_ClusterKitUser implements Node {
+type ClusterKitNodeApi_ClusterKitUser {
   # The list of roles assigned to this user
-  roles(filter: ClusterKitNodeApi_ClusterKitRole_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitRole_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitRole_Connection
+  roles: [ClusterKitNodeApi_ClusterKitRole]
 
   # The user uid
   uid: Uid
@@ -2448,8 +1574,8 @@ type ClusterKitNodeApi_ClusterKitUser implements Node {
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitUser
-#  The web ui user
+# The list of connected ClusterKitNodeApi_ClusterKitUser_Node
+#  
 type ClusterKitNodeApi_ClusterKitUser_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
@@ -2458,157 +1584,124 @@ type ClusterKitNodeApi_ClusterKitUser_Connection {
   edges: [ClusterKitNodeApi_ClusterKitUser_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitUser in a connected list
-#  The web ui user
+# The ClusterKitNodeApi_ClusterKitUser_Node in a connected list
+#  
 type ClusterKitNodeApi_ClusterKitUser_Edge {
   # A value to use with paging positioning
   cursor: String
-
-  # The web ui user
-  node: ClusterKitNodeApi_ClusterKitUser
+  node: ClusterKitNodeApi_ClusterKitUser_Node
 }
 
-input ClusterKitNodeApi_ClusterKitUser_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitUser_Filter_Input
+# The filter conditions for a ClusterKitNodeApi_ClusterKitUser_Node connected objects
+input ClusterKitNodeApi_ClusterKitUser_Filter {
+  # The filtering conditions that will pass if all internal conditions are passed
+  AND: [ClusterKitNodeApi_ClusterKitUser_Filter]
 
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitUser_Filter_Input
+  # The filtering conditions that will pass if any of internal conditions is passed
+  OR: [ClusterKitNodeApi_ClusterKitUser_Filter]
 
-  # uid exactly equals to the parameter, uid: The user uid
+  # The uid exactly equals the value
+  # The user uid
   uid: Uid
 
-  # uid not equals to the parameter, uid: The user uid
+  # The uid not equals the value
+  # The user uid
   uid_not: Uid
 
-  # activeTill exactly equals to the parameter, activeTill: A date, till which
-  # user is active. After this date the user will be blocked. Null for unlimited work.
-  activeTill: Date
-
-  # activeTill not equals to the parameter, activeTill: A date, till which user is
-  # active. After this date the user will be blocked. Null for unlimited work.
-  activeTill_not: Date
-
-  # activeTill is less then the parameter, activeTill: A date, till which user is
-  # active. After this date the user will be blocked. Null for unlimited work.
-  activeTill_lt: Date
-
-  # activeTill is less then or equal to the parameter, activeTill: A date, till
-  # which user is active. After this date the user will be blocked. Null for
-  # unlimited work.
-  activeTill_lte: Date
-
-  # activeTill is greater then the parameter, activeTill: A date, till which user
-  # is active. After this date the user will be blocked. Null for unlimited work.
-  activeTill_gt: Date
-
-  # activeTill is greater then or equal to the parameter, activeTill: A date, till
-  # which user is active. After this date the user will be blocked. Null for
-  # unlimited work.
-  activeTill_gte: Date
-
-  # blockedTill exactly equals to the parameter, blockedTill: A date, till which
-  # user is temporary blocked. After this date the user will be blocked. Null for
-  # unlimited work.
-  blockedTill: Date
-
-  # blockedTill not equals to the parameter, blockedTill: A date, till which user
-  # is temporary blocked. After this date the user will be blocked. Null for
-  # unlimited work.
-  blockedTill_not: Date
-
-  # blockedTill is less then the parameter, blockedTill: A date, till which user
-  # is temporary blocked. After this date the user will be blocked. Null for
-  # unlimited work.
-  blockedTill_lt: Date
-
-  # blockedTill is less then or equal to the parameter, blockedTill: A date, till
-  # which user is temporary blocked. After this date the user will be blocked.
-  # Null for unlimited work.
-  blockedTill_lte: Date
-
-  # blockedTill is greater then the parameter, blockedTill: A date, till which
-  # user is temporary blocked. After this date the user will be blocked. Null for
-  # unlimited work.
-  blockedTill_gt: Date
-
-  # blockedTill is greater then or equal to the parameter, blockedTill: A date,
-  # till which user is temporary blocked. After this date the user will be
-  # blocked. Null for unlimited work.
-  blockedTill_gte: Date
-
-  # isBlocked exactly equals to the parameter, isBlocked: A value indicating
-  # whether current user is currently manually blocked
+  # The isBlocked exactly equals the value
+  # A value indicating whether current user is currently manually blocked
   isBlocked: Boolean
 
-  # isBlocked not equals to the parameter, isBlocked: A value indicating whether current user is currently manually blocked
+  # The isBlocked not equals the value
+  # A value indicating whether current user is currently manually blocked
   isBlocked_not: Boolean
 
-  # isDeleted exactly equals to the parameter, isDeleted: A value indicating
-  # whether current user is currently manually blocked
+  # The isDeleted exactly equals the value
+  # A value indicating whether current user is currently manually blocked
   isDeleted: Boolean
 
-  # isDeleted not equals to the parameter, isDeleted: A value indicating whether current user is currently manually blocked
+  # The isDeleted not equals the value
+  # A value indicating whether current user is currently manually blocked
   isDeleted_not: Boolean
 
-  # login exactly equals to the parameter, login: The user login
+  # The login exactly equals the value
+  # The user login
   login: String
 
-  # login not equals to the parameter, login: The user login
+  # The login not equals the value
+  # The user login
   login_not: String
 
-  # login is a substring of the parameter, login: The user login
+  # The value contains the login as substring
+  # The user login
   login_in: String
 
-  # login is not a substring of the parameter, login: The user login
+  # The value not contains the login as substring
+  # The user login
   login_not_in: String
 
-  # login contains the parameter as substring, login: The user login
+  # The login contains the value as substring
+  # The user login
   login_contains: String
 
-  # login doesn't contain the parameter as substring, login: The user login
+  # The login not contains the value as substring
+  # The user login
   login_not_contains: String
 
-  # login starts with the parameter value, login: The user login
+  # The login starts with the value
+  # The user login
   login_starts_with: String
 
-  # login doesn't start with the parameter value, login: The user login
+  # The login not starts with the value
+  # The user login
   login_not_starts_with: String
 
-  # login ends with the parameter value, login: The user login
+  # The login ends with the value
+  # The user login
   login_ends_with: String
 
-  # login doesn't end with the parameter value, login: The user login
+  # The login not ends with the value
+  # The user login
   login_not_ends_with: String
 
-  # login lowercased equals the parameter, login: The user login
+  # The login lowercased exactly equals the value
+  # The user login
   login_l: String
 
-  # login lowercased doesn't equal the parameter, login: The user login
+  # The login lowercased not equals the value
+  # The user login
   login_l_not: String
 
-  # login lowercased is a substring of the parameter, login: The user login
+  # The value contains the login lowercased as substring
+  # The user login
   login_l_in: String
 
-  # login lowercased is not a substring of the parameter, login: The user login
+  # The value not contains the login lowercased as substring
+  # The user login
   login_l_not_in: String
 
-  # login lowercased contains the parameter as substring, login: The user login
+  # The login lowercased contains the value as substring
+  # The user login
   login_l_contains: String
 
-  # login lowercased doesn't contain the parameter as substring, login: The user login
+  # The login lowercased not contains the value as substring
+  # The user login
   login_l_not_contains: String
 
-  # login lowercased starts with the parameter value, login: The user login
+  # The login lowercased starts with the value
+  # The user login
   login_l_starts_with: String
 
-  # login lowercased doesn't start with the parameter value, login: The user login
+  # The login lowercased not starts with the value
+  # The user login
   login_l_not_starts_with: String
 
-  # login lowercased ends with the parameter value, login: The user login
+  # The login lowercased ends with the value
+  # The user login
   login_l_ends_with: String
 
-  # login lowercased doesn't end with the parameter value, login: The user login
+  # The login lowercased not ends with the value
+  # The user login
   login_l_not_ends_with: String
 }
 
@@ -2633,32 +1726,94 @@ input ClusterKitNodeApi_ClusterKitUser_Input {
   login: String
 }
 
-type ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitUser
-  edge: ClusterKitNodeApi_ClusterKitUser_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
+type ClusterKitNodeApi_ClusterKitUser_Node implements Node {
+  # The list of roles assigned to this user
+  roles: [ClusterKitNodeApi_ClusterKitRole]
+
+  # The user uid
+  uid: Uid
+
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill: Date
+
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill: Date
+
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The user login
+  login: String
+
+  # The node global id
+  id: ID
 }
 
-enum ClusterKitNodeApi_ClusterKitUser_Sort {
+type ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_ClusterKitUser_Node
+  edge: ClusterKitNodeApi_ClusterKitUser_Edge
+  errors: [ClusterKitNodeApi_ErrorDescription]
+  clientMutationId: String
+  api: ClusterKitNodeApi_ClusterKitNodeApi
+}
+
+# The list of ClusterKitNodeApi_ClusterKitUser_Node fields that can be used as sorting functions
+enum ClusterKitNodeApi_ClusterKitUser_OrderByEnum {
+  # uid ascending
+  # The user uid
   uid_asc
+
+  # uid descending
+  # The user uid
   uid_desc
+
+  # activeTill ascending
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
   activeTill_asc
+
+  # activeTill descending
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
   activeTill_desc
+
+  # blockedTill ascending
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
   blockedTill_asc
+
+  # blockedTill descending
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
   blockedTill_desc
+
+  # isBlocked ascending
+  # A value indicating whether current user is currently manually blocked
   isBlocked_asc
+
+  # isBlocked descending
+  # A value indicating whether current user is currently manually blocked
   isBlocked_desc
+
+  # isDeleted ascending
+  # A value indicating whether current user is currently manually blocked
   isDeleted_asc
+
+  # isDeleted descending
+  # A value indicating whether current user is currently manually blocked
   isDeleted_desc
+
+  # login ascending
+  # The user login
   login_asc
+
+  # login descending
+  # The user login
   login_desc
 }
 
 # Short user description
-type ClusterKitNodeApi_ClusterKitUserDescription implements Node {
+type ClusterKitNodeApi_ClusterKitUserDescription {
   # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
   activeTill: Date
 
@@ -2677,191 +1832,13 @@ type ClusterKitNodeApi_ClusterKitUserDescription implements Node {
 }
 
 # The mutation error description
-type ClusterKitNodeApi_ErrorDescription implements Node {
-  # The error number
-  number: Int
-
+type ClusterKitNodeApi_ErrorDescription {
   # The related field name
   field: String
 
   # The error message
   message: String
   id: ID
-}
-
-# The list of connected ClusterKitNodeApi_ErrorDescription
-#  The mutation error description
-type ClusterKitNodeApi_ErrorDescription_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ErrorDescription_Edge]
-}
-
-# The ClusterKitNodeApi_ErrorDescription in a connected list
-#  The mutation error description
-type ClusterKitNodeApi_ErrorDescription_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # The mutation error description
-  node: ClusterKitNodeApi_ErrorDescription
-}
-
-input ClusterKitNodeApi_ErrorDescription_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ErrorDescription_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ErrorDescription_Filter_Input
-
-  # number exactly equals to the parameter, number: The error number
-  number: Int
-
-  # number not equals to the parameter, number: The error number
-  number_not: Int
-
-  # number is less then the parameter, number: The error number
-  number_lt: Int
-
-  # number is less then or equal to the parameter, number: The error number
-  number_lte: Int
-
-  # number is greater then the parameter, number: The error number
-  number_gt: Int
-
-  # number is greater then or equal to the parameter, number: The error number
-  number_gte: Int
-
-  # field exactly equals to the parameter, field: The related field name
-  field: String
-
-  # field not equals to the parameter, field: The related field name
-  field_not: String
-
-  # field is a substring of the parameter, field: The related field name
-  field_in: String
-
-  # field is not a substring of the parameter, field: The related field name
-  field_not_in: String
-
-  # field contains the parameter as substring, field: The related field name
-  field_contains: String
-
-  # field doesn't contain the parameter as substring, field: The related field name
-  field_not_contains: String
-
-  # field starts with the parameter value, field: The related field name
-  field_starts_with: String
-
-  # field doesn't start with the parameter value, field: The related field name
-  field_not_starts_with: String
-
-  # field ends with the parameter value, field: The related field name
-  field_ends_with: String
-
-  # field doesn't end with the parameter value, field: The related field name
-  field_not_ends_with: String
-
-  # field lowercased equals the parameter, field: The related field name
-  field_l: String
-
-  # field lowercased doesn't equal the parameter, field: The related field name
-  field_l_not: String
-
-  # field lowercased is a substring of the parameter, field: The related field name
-  field_l_in: String
-
-  # field lowercased is not a substring of the parameter, field: The related field name
-  field_l_not_in: String
-
-  # field lowercased contains the parameter as substring, field: The related field name
-  field_l_contains: String
-
-  # field lowercased doesn't contain the parameter as substring, field: The related field name
-  field_l_not_contains: String
-
-  # field lowercased starts with the parameter value, field: The related field name
-  field_l_starts_with: String
-
-  # field lowercased doesn't start with the parameter value, field: The related field name
-  field_l_not_starts_with: String
-
-  # field lowercased ends with the parameter value, field: The related field name
-  field_l_ends_with: String
-
-  # field lowercased doesn't end with the parameter value, field: The related field name
-  field_l_not_ends_with: String
-
-  # message exactly equals to the parameter, message: The error message
-  message: String
-
-  # message not equals to the parameter, message: The error message
-  message_not: String
-
-  # message is a substring of the parameter, message: The error message
-  message_in: String
-
-  # message is not a substring of the parameter, message: The error message
-  message_not_in: String
-
-  # message contains the parameter as substring, message: The error message
-  message_contains: String
-
-  # message doesn't contain the parameter as substring, message: The error message
-  message_not_contains: String
-
-  # message starts with the parameter value, message: The error message
-  message_starts_with: String
-
-  # message doesn't start with the parameter value, message: The error message
-  message_not_starts_with: String
-
-  # message ends with the parameter value, message: The error message
-  message_ends_with: String
-
-  # message doesn't end with the parameter value, message: The error message
-  message_not_ends_with: String
-
-  # message lowercased equals the parameter, message: The error message
-  message_l: String
-
-  # message lowercased doesn't equal the parameter, message: The error message
-  message_l_not: String
-
-  # message lowercased is a substring of the parameter, message: The error message
-  message_l_in: String
-
-  # message lowercased is not a substring of the parameter, message: The error message
-  message_l_not_in: String
-
-  # message lowercased contains the parameter as substring, message: The error message
-  message_l_contains: String
-
-  # message lowercased doesn't contain the parameter as substring, message: The error message
-  message_l_not_contains: String
-
-  # message lowercased starts with the parameter value, message: The error message
-  message_l_starts_with: String
-
-  # message lowercased doesn't start with the parameter value, message: The error message
-  message_l_not_starts_with: String
-
-  # message lowercased ends with the parameter value, message: The error message
-  message_l_ends_with: String
-
-  # message lowercased doesn't end with the parameter value, message: The error message
-  message_l_not_ends_with: String
-}
-
-enum ClusterKitNodeApi_ErrorDescription_Sort {
-  number_asc
-  number_desc
-  field_asc
-  field_desc
-  message_asc
-  message_desc
 }
 
 input ClusterKitNodeApi_nodeManagerData_nodeTemplates_create_Input {
@@ -2975,9 +1952,6 @@ scalar Decimal
 
 # The list of all detected mutations
 type Mutations {
-  # Initiates the new actor system scan
-  ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan(input: ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input): Boolean_MutationPayload
-
   # Request to server to reload package list
   ClusterKitNodeApi_nodeManagerData_reloadPackages(input: ClusterKitNodeApi_nodeManagerData_reloadPackages_Input): ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload
 
@@ -3031,9 +2005,9 @@ interface Node {
 }
 
 # The root query type
-type Query implements Node {
+type Query {
   # The united api access
-  api: ClusterKitMonitoring_ClusterKitNodeApi
+  api: ClusterKitNodeApi_ClusterKitNodeApi
   id: ID
 
   # The node global searcher according to Relay specification

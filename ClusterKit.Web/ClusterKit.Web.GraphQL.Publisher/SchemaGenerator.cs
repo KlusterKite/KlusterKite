@@ -47,13 +47,55 @@ namespace ClusterKit.Web.GraphQL.Publisher
             createdTypes[root.ComplexTypeName] = root;
             createdTypes[api.ComplexTypeName] = api;
 
-            var types = createdTypes.Values.ToList();
+            var types = createdTypes.Values.GroupBy(t => t.ComplexTypeName).Select(g => g.First()).ToList();
 
-            var typeNames = types.Select(t => t.ComplexTypeName).Distinct().ToList();
+            var interfaces = providers.ToDictionary(
+                p => p,
+                p => types.Where(t => !(t is MergedInputType)).Select(t => t.ExtractInterface(p))
+                        .Where(i => i != null)
+                        .GroupBy(i => i.Name)
+                        .Select(g => g.First())
+                        .ToDictionary(i => i.Name));
 
-            var graphTypes = typeNames.ToDictionary(
-                typeName => typeName,
-                typeName => types.FirstOrDefault(t => t.ComplexTypeName == typeName)?.GenerateGraphType(nodeInterface));
+            foreach (var apiInterfaces in interfaces)
+            {
+                foreach (var apiInterface in apiInterfaces.Value.Values.OfType<TypeInterface>())
+                {
+                    foreach (var field in apiInterface.Fields)
+                    {
+                        var fieldDescription = field.GetMetadata<MergedField>(MergedType.MetaDataTypeKey);
+                        if (fieldDescription == null)
+                        {
+                            continue;
+                        }
+
+                        var fieldInterfaceName = fieldDescription.Type.GetInterfaceName(apiInterfaces.Key);
+
+                        IGraphType fieldValue;
+                        if (apiInterfaces.Value.TryGetValue(fieldInterfaceName, out fieldValue))
+                        {
+                            field.ResolvedType = fieldDescription.Flags.HasFlag(EnFieldFlags.IsArray)
+                                                     ? new ListGraphType(fieldValue)
+                                                     : fieldValue;
+                        }
+                    }
+                }
+            }
+
+            var allInterfaces = interfaces.Values.SelectMany(i => i)
+                .GroupBy(i => i.Key)
+                .ToDictionary(i => i.Key, i => i.First().Value);
+
+            var graphTypes = types.ToDictionary(
+                type => type.ComplexTypeName,
+                type => type.GenerateGraphType(
+                    nodeInterface,
+                    type is MergedInputType ? null :
+                    providers.Select(type.GetInterfaceName)
+                        .Where(name => name != null)
+                        .Select(n => allInterfaces[n])
+                        .OfType<TypeInterface>()
+                        .ToList()));
 
             var mutationType = api.GenerateMutationType();
             graphTypes[mutationType.Name] = mutationType;
@@ -111,9 +153,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
                              {
                                  Query = (VirtualGraphType)graphTypes[root.ComplexTypeName],
                                  Mutation = mutationType.Fields.Any() ? mutationType : null
-                             };
+            };
 
+            var array = allInterfaces.Values.OfType<TypeInterface>().Cast<IGraphType>().ToArray();
+            schema.RegisterTypes(array);
             schema.Initialize();
+            
             return schema;
         }
 

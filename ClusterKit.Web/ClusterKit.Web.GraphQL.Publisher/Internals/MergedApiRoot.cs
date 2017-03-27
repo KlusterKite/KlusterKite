@@ -111,9 +111,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
-            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
+            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface, interfaces);
             var nodeFieldType = new FieldType();
             nodeFieldType.Name = "__node";
             nodeFieldType.ResolvedType = nodeInterface;
@@ -125,6 +125,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             graphType.AddField(nodeFieldType);
 
             return graphType;
+        }
+
+        /// <inheritdoc />
+        public override string GetInterfaceName(ApiProvider provider)
+        {
+            return $"I{provider.Description.ApiName}";
         }
 
         /// <summary>

@@ -124,10 +124,20 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             var fields = this.Fields.Select(this.ConvertApiField);
-            return new VirtualGraphType(this.ComplexTypeName, fields.ToList()) { Description = this.Description };
+            var graphType = new VirtualGraphType(this.ComplexTypeName, fields.ToList()) { Description = this.Description };
+            if (interfaces != null)
+            {
+                foreach (var typeInterface in interfaces)
+                {
+                    typeInterface.AddImplementedType(this.ComplexTypeName, graphType);
+                    graphType.AddResolvedInterface(typeInterface);
+                }
+            }
+
+            return graphType;
         }
 
         /// <summary>

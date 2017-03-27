@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
@@ -35,7 +36,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string ComplexTypeName => $"{base.ComplexTypeName}_Input";
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             var fields = this.Fields.Select(this.ConvertApiField);
             var inputGraphType = new VirtualInputGraphType(this.ComplexTypeName) { Description = this.Description };

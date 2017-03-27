@@ -156,10 +156,27 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <param name="nodeInterface">
         /// The node Interface.
         /// </param>
+        /// <param name="interfaces">
+        /// The list of implemented interfaces.
+        /// </param>
         /// <returns>
         /// The representing <see cref="IGraphType"/>
         /// </returns>
-        public abstract IGraphType GenerateGraphType(NodeInterface nodeInterface);
+        public abstract IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces);
+
+        /// <summary>
+        /// Extracts interface to represent type for specific API provider
+        /// </summary>
+        /// <param name="provider">The api provider</param>
+        /// <returns>The interface type or null if type is not defined for provider</returns>
+        public abstract IGraphType ExtractInterface(ApiProvider provider);
+
+        /// <summary>
+        /// Gets the interface name to represent type for specific API provider
+        /// </summary>
+        /// <param name="provider">The api provider</param>
+        /// <returns>The interface type or null if type is not defined for provider</returns>
+        public abstract string GetInterfaceName(ApiProvider provider);
 
         /// <summary>
         /// Resolves request value

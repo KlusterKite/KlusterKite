@@ -10,7 +10,8 @@
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
     using System;
-    
+    using System.Collections.Generic;
+
     using ClusterKit.API.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -39,7 +40,19 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public EnScalarType ScalarType { get; }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType ExtractInterface(ApiProvider provider)
+        {
+            return this.GenerateGraphType(null, null);
+        }
+
+        /// <inheritdoc />
+        public override string GetInterfaceName(ApiProvider provider)
+        {
+            return this.GenerateGraphType(null, null).Name;
+        }
+
+        /// <inheritdoc />
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             switch (this.ScalarType)
             {
@@ -71,7 +84,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 return resolve;
             }
 
-            return (resolve as JValue)?.Value; 
+            return (resolve as JValue)?.Value;
         }
     }
 }

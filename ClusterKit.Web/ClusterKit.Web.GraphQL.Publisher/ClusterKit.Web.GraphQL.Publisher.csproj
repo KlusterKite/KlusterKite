@@ -261,7 +261,9 @@
     <Compile Include="ApiProvider.cs" />
     <Compile Include="DirectProvider.cs" />
     <Compile Include="GlobalIdSerializer.cs" />
+    <Compile Include="GraphTypes\BaseTypeInterface.cs" />
     <Compile Include="GraphTypes\NodeInterface.cs" />
+    <Compile Include="GraphTypes\TypeInterface.cs" />
     <Compile Include="Internals\Converter.cs" />
     <Compile Include="Internals\MergedConnectionMutationResultType.cs" />
     <Compile Include="Internals\MergedEnumType.cs" />

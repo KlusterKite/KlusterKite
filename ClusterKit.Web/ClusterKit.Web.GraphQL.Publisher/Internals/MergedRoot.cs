@@ -66,9 +66,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override string Description => "The root query type";
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
-            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface);
+            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface, interfaces);
             var nodeFieldType = new FieldType();
             nodeFieldType.Name = "node";
             nodeFieldType.ResolvedType = nodeInterface;

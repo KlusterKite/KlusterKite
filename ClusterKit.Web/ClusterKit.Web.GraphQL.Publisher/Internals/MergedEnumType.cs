@@ -9,6 +9,8 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
+    using System.Collections.Generic;
+
     using ClusterKit.API.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -50,7 +52,29 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public ApiProvider Provider { get; }
 
         /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface)
+        public override IGraphType ExtractInterface(ApiProvider provider)
+        {
+            if (this.Provider != provider)
+            {
+                return null;
+            }
+
+            return this.GenerateGraphType(null, null);
+        }
+
+        /// <inheritdoc />
+        public override string GetInterfaceName(ApiProvider provider)
+        {
+            if (this.Provider != provider)
+            {
+                return null;
+            }
+
+            return this.ComplexTypeName;
+        }
+
+        /// <inheritdoc />
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             var graphType = new EnumerationGraphType
                                 {
