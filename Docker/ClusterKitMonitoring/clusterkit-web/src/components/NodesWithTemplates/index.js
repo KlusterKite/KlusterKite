@@ -57,7 +57,7 @@ export default Relay.createContainer(
   NodesWithTemplates,
   {
     fragments: {
-      data: () => Relay.QL`fragment on ClusterKitNodeApi_ClusterKitNodeManagement {
+      data: () => Relay.QL`fragment on IClusterKitNodeApi_ClusterKitNodeManagement {
         getActiveNodeDescriptions {
           edges {
             node {

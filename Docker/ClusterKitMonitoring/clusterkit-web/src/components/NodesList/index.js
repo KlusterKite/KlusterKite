@@ -1,8 +1,12 @@
 import React from 'react';
 import Relay from 'react-relay'
 
+import delay from 'lodash/delay'
+
 import { Popover, OverlayTrigger, Button } from 'react-bootstrap';
 import Icon from 'react-fa';
+
+import UpgradeNodeMutation from './mutations/UpgradeNodeMutation';
 
 import './styles.css';
 
@@ -11,13 +15,17 @@ export class NodesList extends React.Component {
   constructor(props) {
     super(props);
     this.nodePopover = this.nodePopover.bind(this);
+
+    this.state = {
+      upgradingNodes: []
+    };
   }
 
   static propTypes = {
     nodeDescriptions: React.PropTypes.object,
-    onManualUpgrade: React.PropTypes.func.isRequired,
     hasError: React.PropTypes.bool.isRequired,
     upgradeNodePrivilege: React.PropTypes.bool.isRequired,
+    testMode: React.PropTypes.bool,
   };
 
   drawRole(node, role) {
@@ -35,8 +43,8 @@ export class NodesList extends React.Component {
         {node.modules.edges.map((subModuleEdge) => {
           const subModuleNode =  subModuleEdge.node;
           return (
-            <span key={`${node.nodeId}/${subModuleNode.id}`}>
-              <span className="label label-default">{subModuleNode.id}&nbsp;{subModuleNode.version}</span>{' '}
+            <span key={`${subModuleNode.id}`}>
+              <span className="label label-default">{subModuleNode.name}&nbsp;{subModuleNode.version}</span>{' '}
             </span>
           );
         })
@@ -45,11 +53,89 @@ export class NodesList extends React.Component {
     );
   }
 
+  onManualUpgrade(nodeAddress, nodeId) {
+    if (this.props.testMode) {
+      this.showUpgrading(nodeId);
+      this.hideUpgradingAfterDelay(nodeId);
+    } else {
+      Relay.Store.commitUpdate(
+        new UpgradeNodeMutation({address: nodeAddress}),
+        {
+          onSuccess: (response) => {
+            const result = response.clusterKitNodeApi_nodeManagerData_upgradeNode.result && response.clusterKitNodeApi_nodeManagerData_upgradeNode.result.result;
+            if (result) {
+              this.showUpgrading(nodeId);
+              this.hideUpgradingAfterDelay(nodeId);
+            } else {
+              this.showErrorMessage();
+              this.hideErrorMessageAfterDelay();
+            }
+          },
+          onFailure: (transaction) => console.log(transaction),
+        },
+      )
+    }
+  }
+
+  showUpgrading(nodeId) {
+    console.log('pushing ' + nodeId + ' to the ', this.state.upgradingNodes);
+
+    this.setState((prevState, props) => ({
+      upgradingNodes: [...prevState.upgradingNodes, nodeId]
+    }));
+  }
+
+  hideUpgrading(nodeId) {
+    this.setState(function(prevState, props) {
+      const index = prevState.upgradingNodes.indexOf(nodeId);
+      return {
+        upgradingNodes: [
+          ...prevState.upgradingNodes.slice(0, index),
+          ...prevState.upgradingNodes.slice(index + 1)
+        ]
+      };
+    });
+
+    console.log(this.state.upgradingNodes);
+  }
+
+  hideUpgradingAfterDelay(nodeId) {
+    delay(() => this.hideUpgrading(nodeId), 20000);
+  }
+
+  /**
+   * Shows reloading packages message
+   */
+  showErrorMessage = () => {
+    this.setState({
+      isError: true
+    });
+  };
+
+  /**
+   * Hides reloading packages message after delay
+   */
+  hideErrorMessageAfterDelay = () => {
+    delay(() => this.hideErrorMessage(), 5000);
+  };
+
+  /**
+   * Hides reloading packages message
+   */
+  hideErrorMessage = () => {
+    this.setState({
+      isError: false
+    });
+  };
+
   render() {
     if (!this.props.nodeDescriptions.getActiveNodeDescriptions){
       return (<div></div>);
     }
-    const { onManualUpgrade, hasError } = this.props;
+    let { hasError } = this.props;
+    if (this.state.isError) {
+      hasError = true;
+    }
     const edges = this.props.nodeDescriptions.getActiveNodeDescriptions.edges;
 
     return (
@@ -76,6 +162,8 @@ export class NodesList extends React.Component {
           <tbody>
           {edges && edges.map((edge) => {
             const node = edge.node;
+            const isUpdating = this.state.upgradingNodes.indexOf(node.nodeId) !== -1;
+            const reloadClassName = isUpdating ? 'fa fa-refresh fa-spin' : 'fa fa-refresh';
             return (
               <tr key={`${node.nodeId}`}>
                 <td>{node.isClusterLeader ? <i className="fa fa-check-circle" aria-hidden="true"></i> : ''}</td>
@@ -102,34 +190,36 @@ export class NodesList extends React.Component {
                 <td>
                   <span className="label">{node.isInitialized}</span>
                   {this.props.upgradeNodePrivilege &&
-                  <span>
-                        {!node.isObsolete &&
+                    <span>
+                      {!node.isObsolete &&
                         <button
+                          disabled={isUpdating}
                           type="button" className="upgrade btn btn-xs btn-success"
                           title="Upgrade Node"
-                          onClick={() => onManualUpgrade && onManualUpgrade(node)}>
-                          <Icon name="refresh"/> Actual
+                          onClick={() => this.onManualUpgrade(node.nodeAddress.asString, node.nodeId)}>
+                          <i className={reloadClassName} /> Actual
                         </button>
-                        }
-                    {node.isObsolete &&
-                    <button
-                      type="button" className="upgrade btn btn-xs btn-warning"
-                      title="Upgrade Node"
-                      onClick={() => onManualUpgrade && onManualUpgrade(node)}>
-                      <Icon name="refresh"/> Obsolete
-                    </button>
-                    }
-                      </span>
+                      }
+                      {node.isObsolete &&
+                        <button
+                          disabled={isUpdating}
+                          type="button" className="upgrade btn btn-xs btn-warning"
+                          title="Upgrade Node"
+                          onClick={() => this.onManualUpgrade(node.nodeAddress.asString, node.nodeId)}>
+                          <i className={reloadClassName} /> Obsolete
+                        </button>
+                      }
+                    </span>
                   }
                   {!this.props.upgradeNodePrivilege &&
                   <span>
-                        {!node.isObsolete &&
-                        <span className="label label-success">Actual</span>
-                        }
+                    {!node.isObsolete &&
+                    <span className="label label-success">Actual</span>
+                    }
                     {node.isObsolete &&
                     <span className="label label-warning">Obsolete</span>
                     }
-                      </span>
+                  </span>
                   }
                 </td>
                 }
@@ -154,7 +244,7 @@ export default Relay.createContainer(
   NodesList,
   {
     fragments: {
-      nodeDescriptions: () => Relay.QL`fragment on ClusterKitNodeApi_ClusterKitNodeManagement {
+      nodeDescriptions: () => Relay.QL`fragment on IClusterKitNodeApi_ClusterKitNodeManagement {
         getActiveNodeDescriptions
         {
           edges {
@@ -172,11 +262,13 @@ export default Relay.createContainer(
               nodeAddress {
                 host,
                 port,
+                asString,
               },
               modules {
                 edges {
                   node {
                     id,
+                    name,
                     version,
                   }
                 }

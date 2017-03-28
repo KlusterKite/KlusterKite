@@ -56,11 +56,17 @@ class ActorsTreePage extends React.Component {
    * Removes scanning flag after delay
    */
   stopScanningAfterDelay = () => {
-    delay(() => this.setScanning(false), 5000);
+    delay(() => this.stopScanning(), 5000);
+  };
+
+  stopScanning = () => {
+    this.setScanning(false);
+    this.props.relay.forceFetch();
   };
 
   onReload = () => {
     console.log('reloading');
+    this.props.relay.forceFetch();
   };
 
   render () {
@@ -80,7 +86,7 @@ export default Relay.createContainer(
   {
     fragments: {
       api: () => Relay.QL`
-        fragment on ClusterKitMonitoring_ClusterKitNodeApi {
+        fragment on IClusterKitMonitoring {
           __typename
           clusterKitMonitoringApi {
             getClusterTree {
