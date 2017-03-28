@@ -340,24 +340,30 @@ namespace ClusterKit.API.Tests
         /// <param name="expectedResult">
         /// The expected value (or errors if no result expected).
         /// </param>
+        /// <param name="expectConnectionFormnat">
+        /// A value indicating whether to expect response in connection mutation result format
+        /// </param>
         /// <returns>
         /// The async task
         /// </returns>
         [Theory]
-        [InlineData("connection.create", "{\"newNode\": { \"name\":\"6-test\", \"value\": 1 }}", true, "{\"name\":\"6-test\",\"value\": 1.0 }")]
-        [InlineData("connection.create", "{\"newNode\": { \"value\": 1 }}", false, "Create failed; name should be set")]
-        [InlineData("connection.create", null, false, "Create failed; object data was not provided")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"value\": 1.0 }}", true, "{\"name\":\"2-test\",\"value\": 1.0 }")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{C12EE96B-2420-4F54-AAE5-788995B10679}\" }}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\", \"newNode\": { \"value\": 1.0 }}", false, "Update failed; Node not found")]
-        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{F0607502-5B77-4A3C-9142-E6197A7EE61E}\" }}", false, "Update failed; Duplicate key")]
-        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0 }")]
-        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\"}", false, "Delete failed; Node not found")]
+        [InlineData("connection.create", "{\"newNode\": { \"name\":\"6-test\", \"value\": 1 }}", true, "{\"name\":\"6-test\",\"value\": 1.0 }", true)]
+        [InlineData("connection.create", "{\"newNode\": { \"value\": 1 }}", false, "Create failed; name should be set", true)]
+        [InlineData("connection.create", null, false, "Create failed; object data was not provided", true)]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"value\": 1.0 }}", true, "{\"name\":\"2-test\",\"value\": 1.0 }", true)]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{C12EE96B-2420-4F54-AAE5-788995B10679}\" }}", true, "{\"name\":\"2-test\",\"value\": 50.0 }", true)]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\", \"newNode\": { \"value\": 1.0 }}", false, "Update failed; Node not found", true)]
+        [InlineData("connection.update", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\", \"newNode\": { \"id\": \"{F0607502-5B77-4A3C-9142-E6197A7EE61E}\" }}", false, "Update failed; Duplicate key", true)]
+        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0 }", true)]
+        [InlineData("connection.delete", "{\"id\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD4\"}", false, "Delete failed; Node not found", true)]
+        [InlineData("connection.typedMutation", "{\"uid\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"name\":\"2-test\",\"value\": 50.0 }", true)]
+        [InlineData("connection.untypedMutation", "{\"uid\": \"B500CA20-F649-4DCD-BDA8-1FA5031ECDD3\"}", true, "{\"result\": true}", false)]
         public async Task ConnectionMutationTests(
             string mutationName,
             string mutationRequest,
             bool expectResult,
-            string expectedResult)
+            string expectedResult,
+            bool expectConnectionFormnat)
         {
             var initialObjects = new List<TestObject>
                                      {
@@ -458,28 +464,39 @@ namespace ClusterKit.API.Tests
             Assert.NotNull(result);
             this.output.WriteLine(result.ToString(Formatting.Indented));
 
-            var resultObject = result.Property("result");
-            var resultErrors = result.Property("errors");
-            Assert.NotNull(resultObject);
-            Assert.NotNull(resultErrors);
-            Assert.True(resultObject.HasValues);
-            Assert.True(resultErrors.HasValues);
-
-            if (expectResult)
+            if (expectConnectionFormnat)
             {
-                Assert.False(resultErrors.Value.HasValues);
-                Assert.True(resultObject.Value.HasValues);
-                Assert.Equal(
-                    ((JObject)JsonConvert.DeserializeObject(expectedResult)).ToString(Formatting.None),
-                    resultObject.Value.ToString(Formatting.None));
+                var resultObject = result.Property("result");
+                var resultErrors = result.Property("errors");
+                Assert.NotNull(resultObject);
+                Assert.True(resultObject.HasValues);
+
+                Assert.NotNull(resultErrors);
+                Assert.True(resultErrors.HasValues);
+
+                if (expectResult)
+                {
+                    Assert.False(resultErrors.Value.HasValues);
+                    Assert.True(resultObject.Value.HasValues);
+                    Assert.Equal(
+                        ((JObject)JsonConvert.DeserializeObject(expectedResult)).ToString(Formatting.None),
+                        resultObject.Value.ToString(Formatting.None));
+                }
+                else
+                {
+                    Assert.True(resultErrors.Value.HasValues);
+                    Assert.False(resultObject.Value.HasValues);
+                    var errors = string.Join(
+                        "; ",
+                        resultErrors.Value.SelectTokens("items[*].message").Select(t => t.Value<string>()).ToList());
+                    Assert.Equal(expectedResult, errors);
+                }
             }
             else
             {
-                Assert.True(resultErrors.Value.HasValues);
-                Assert.False(resultObject.Value.HasValues);
                 Assert.Equal(
-                    expectedResult,
-                    string.Join("; ", resultErrors.Value.SelectTokens("items[*].message").Select(t => t.Value<string>()).ToList()));
+                        ((JObject)JsonConvert.DeserializeObject(expectedResult)).ToString(Formatting.None),
+                        result.ToString(Formatting.None));
             }
         }
 

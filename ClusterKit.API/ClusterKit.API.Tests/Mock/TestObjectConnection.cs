@@ -16,6 +16,9 @@ namespace ClusterKit.API.Tests.Mock
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Attributes;
+
+    using JetBrains.Annotations;
 
     using Newtonsoft.Json.Linq;
 
@@ -186,5 +189,35 @@ namespace ClusterKit.API.Tests.Mock
 
             return Task.FromResult(new MutationResult<TestObject> { Result = obj });
         }
+        /// </summary>
+        /// <param name="uid">The node id</param>
+        /// <returns>The mutation result</returns>
+        [UsedImplicitly]
+        [DeclareMutation]
+        public Task<MutationResult<TestObject>> TypedMutation(Guid uid)
+            if (!this.objects.TryGetValue(uid, out obj))
+            {
+                var errors = new List<ErrorDescription>
+                                 {
+                                     new ErrorDescription(null, "Mutation failed"),
+                                     new ErrorDescription("id", "Node not found")
+                                 };
+
+                return Task.FromResult(new MutationResult<TestObject> { Errors = errors });
+            }
+
+            return Task.FromResult(new MutationResult<TestObject> { Result = obj });
+        }
+
+        /// <summary>
+        /// The example of additional connection typed mutation
+        /// </summary>
+        /// <param name="uid">The node id</param>
+        /// <returns>The mutation result</returns>
+        [UsedImplicitly]
+        [DeclareMutation]
+        public Task<bool> UntypedMutation(Guid uid)
+        {
+            return Task.FromResult(this.objects.ContainsKey(uid));
     }
 }

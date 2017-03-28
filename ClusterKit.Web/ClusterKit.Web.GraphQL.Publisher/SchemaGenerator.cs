@@ -744,6 +744,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                         case ApiMutation.EnType.ConnectionCreate:
                         case ApiMutation.EnType.ConnectionUpdate:
                         case ApiMutation.EnType.ConnectionDelete:
+                        case ApiMutation.EnType.Connection:
                             mutation = RegisterConnectionMutation(provider, apiMutation, apiRoot, createdTypes);
                             break;
                         case ApiMutation.EnType.Untyped:

@@ -90,6 +90,11 @@ namespace ClusterKit.API.Provider
         public Type Type { get; set; }
 
         /// <summary>
+        /// Gets or sets the real type that represents connection
+        /// </summary>
+        public Type RealConnectionType { get; set; }
+
+        /// <summary>
         /// Gets or sets the type name to look for resolver
         /// </summary>
         public string TypeName { get; set; }
@@ -242,6 +247,7 @@ namespace ClusterKit.API.Provider
                 if (connection != null)
                 {
                     metadata.MetaType = EnMetaType.Connection;
+                    metadata.RealConnectionType = type;
                     type = connection.GenericTypeArguments[0];
                     scalarType = CheckScalarType(type);
                 }
