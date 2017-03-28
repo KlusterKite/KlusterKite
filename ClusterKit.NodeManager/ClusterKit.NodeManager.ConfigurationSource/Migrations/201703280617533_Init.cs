@@ -1,9 +1,9 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="201702011416515_Init.cs" company="ClusterKit">
+// <copyright file="201703280617533_Init.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Initializes the database structure
+//   The initial database configuration
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
     using System.Data.Entity.Migrations;
 
     /// <summary>
-    /// Initializes the database structure
+    /// The initial database configuration
     /// </summary>
     public partial class Init : DbMigration
     {
@@ -29,6 +29,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
             this.DropTable("dbo.SeedAddresses");
             this.DropTable("dbo.Users");
             this.DropTable("dbo.Roles");
+            this.DropTable("dbo.Releases");
             this.DropTable("dbo.NugetFeeds");
         }
 
@@ -45,6 +46,24 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                             Password = c.String(),
                             Type = c.Int(nullable: false),
                             UserName = c.String(),
+                        }).PrimaryKey(t => t.Id);
+
+            this.CreateTable(
+                "dbo.Releases",
+                c =>
+                    new
+                        {
+                            Id = c.Int(nullable: false, identity: true),
+                            MajorVersion = c.Int(nullable: false),
+                            MinorVersion = c.Int(nullable: false),
+                            Name = c.String(),
+                            Notes = c.String(),
+                            Created = c.DateTimeOffset(nullable: false, precision: 7),
+                            Started = c.DateTimeOffset(precision: 7),
+                            Finished = c.DateTimeOffset(precision: 7),
+                            State = c.Int(nullable: false),
+                            IsStable = c.Boolean(nullable: false),
+                            ConfigurationJson = c.String(),
                         }).PrimaryKey(t => t.Id);
 
             this.CreateTable(

@@ -16,7 +16,7 @@ namespace ClusterKit.API.Client.Attributes
     /// <summary>
     /// Describes type (class) to published api
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter | AttributeTargets.Enum)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter | AttributeTargets.Enum | AttributeTargets.Field)]
     public class ApiDescriptionAttribute : Attribute
     {
         /// <summary>

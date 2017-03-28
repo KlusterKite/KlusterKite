@@ -25,7 +25,7 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
         /// Gets the package id (name and version)
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "The package id (name and version)", IsKey = true)]
+        [DeclareField(Description = "The package id (name and version)", IsKey = true, Access = EnAccessFlag.Queryable)]
         public string Id => $"{this.Name} {this.Version}";
 
         /// <summary>

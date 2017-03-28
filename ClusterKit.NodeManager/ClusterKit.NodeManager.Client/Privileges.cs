@@ -31,6 +31,12 @@ namespace ClusterKit.NodeManager.Client
         public const string Role = "ClusterKit.NodeManager.Role";
 
         /// <summary>
+        /// The privilege to manage <see cref="ORM.Role"/>
+        /// </summary>
+        [PrivilegeDescription("Release management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
+        public const string Release = "ClusterKit.NodeManager.Role";
+
+        /// <summary>
         /// The privilege to manage <see cref="NodeTemplate"/>
         /// </summary>
         [PrivilegeDescription("Node template management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]

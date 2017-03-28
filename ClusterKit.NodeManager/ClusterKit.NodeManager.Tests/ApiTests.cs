@@ -15,6 +15,8 @@ namespace ClusterKit.NodeManager.Tests
 
     using ClusterKit.Web.GraphQL.Publisher;
 
+    using GraphQL.Utilities;
+
     using Xunit;
     using Xunit.Abstractions;
 
@@ -59,11 +61,20 @@ namespace ClusterKit.NodeManager.Tests
 
             var webApiProvider = new DirectProvider(api, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<Web.GraphQL.Publisher.ApiProvider> { webApiProvider });
+
             var hasSchemaErrors = false;
             foreach (var error in SchemaGenerator.CheckSchema(schema))
             {
                 hasSchemaErrors = true;
                 this.output.WriteLine($"Schema error: {error}");
+            }
+            
+            using (var printer = new SchemaPrinter(schema))
+            {
+                var description = printer.Print();
+                this.output.WriteLine("-------- Schema -----------");
+                this.output.WriteLine(description);
+                Assert.False(string.IsNullOrWhiteSpace(description));
             }
 
             Assert.False(hasSchemaErrors);

@@ -1110,6 +1110,8 @@ namespace ClusterKit.NodeManager
             this.Receive<CrudActionMessage<User, Guid>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<Role>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<Role, Guid>>(m => this.workers.Forward(m));
+            this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<Release, int>>(m => this.workers.Forward(m));
         }
 
         /// <summary>
@@ -1232,12 +1234,14 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CrudActionMessage<NugetFeed, int>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<User, Guid>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<Role, Guid>>(this.OnRequest);
+                this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
 
                 this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
                 this.ReceiveAsync<CollectionRequest<SeedAddress>>(this.OnCollectionRequest<SeedAddress, int>);
                 this.ReceiveAsync<CollectionRequest<NugetFeed>>(this.OnCollectionRequest<NugetFeed, int>);
                 this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, Guid>);
                 this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, Guid>);
+                this.ReceiveAsync<CollectionRequest<Release>>(this.OnCollectionRequest<Release, int>);
 
                 this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
                 this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);

@@ -36,90 +36,99 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             }
 
             SetupUsers(context);
-            SetupTemplates(context);
+            context.Templates.AddRange(GetDefaultTemplates());
+
+            var configuration = new ReleaseConfiguration
+                                    {
+                                        NodeTemplates = new List<NodeTemplate>(GetDefaultTemplates())
+                                    };
+            var initialRelease = new Release
+                                     {
+                                         State = Release.EnState.Active,
+                                         Name = "Initial configuration",
+                                         Started = DateTimeOffset.Now,
+                                         Configuration = configuration
+                                     };
+            context.Releases.Add(initialRelease);
 
             context.SaveChanges();
         }
 
         /// <summary>
-        /// Installs default templates to the empty database
+        /// Gets the default templates
         /// </summary>
-        /// <param name="context">The data context</param>
-        private static void SetupTemplates(ConfigurationContext context)
+        /// <returns>The list of default templates</returns>
+        private static IEnumerable<NodeTemplate> GetDefaultTemplates()
         {
-            context.Templates.Add(
-                new NodeTemplate
-                    {
-                        Code = "publisher",
-                        Name = "Cluster Nginx configurator",
-                        MinimumRequiredInstances = 1,
-                        MaximumNeededInstances = null,
-                        ContainerTypes = new List<string> { "publisher" },
-                        Priority = 1000.0,
-                        Packages =
-                            new List<string>
+            yield return new NodeTemplate
                                 {
-                                    "ClusterKit.Core.Service",
-                                    "ClusterKit.Web.NginxConfigurator",
-                                    "ClusterKit.NodeManager.Client",
-                                    "ClusterKit.Log.Console",
-                                    "ClusterKit.Log.ElasticSearch",
-                                    "ClusterKit.Monitoring.Client",
-                                },
-                        Configuration = Configurations.Publisher,
-                        Version = 0
-                    });
+                                    Code = "publisher",
+                                    Name = "Cluster Nginx configurator",
+                                    MinimumRequiredInstances = 1,
+                                    MaximumNeededInstances = null,
+                                    ContainerTypes = new List<string> { "publisher" },
+                                    Priority = 1000.0,
+                                    Packages =
+                                        new List<string>
+                                            {
+                                                "ClusterKit.Core.Service",
+                                                "ClusterKit.Web.NginxConfigurator",
+                                                "ClusterKit.NodeManager.Client",
+                                                "ClusterKit.Log.Console",
+                                                "ClusterKit.Log.ElasticSearch",
+                                                "ClusterKit.Monitoring.Client",
+                                            },
+                                    Configuration = Configurations.Publisher,
+                                    Version = 0
+                                };
+            yield return new NodeTemplate
+                              {
+                                  Code = "clusterManager",
+                                  Name = "Cluster manager (cluster monitoring and managing)",
+                                  MinimumRequiredInstances = 1,
+                                  MaximumNeededInstances = 3,
+                                  ContainerTypes = new List<string> { "manager", "worker" },
+                                  Priority = 100.0,
+                                  Packages =
+                                      new List<string>
+                                          {
+                                              "ClusterKit.Core.Service",
+                                              "ClusterKit.NodeManager.Client",
+                                              "ClusterKit.Monitoring.Client",
+                                              "ClusterKit.Monitoring",
+                                              "ClusterKit.NodeManager",
+                                              "ClusterKit.Data.EF.Npgsql",
+                                              "ClusterKit.Web.Swagger.Monitor",
+                                              "ClusterKit.Web.Swagger",
+                                              "ClusterKit.Log.Console",
+                                              "ClusterKit.Log.ElasticSearch",
+                                              "ClusterKit.Web.Authentication",
+                                              "ClusterKit.Security.SessionRedis",
+                                              "ClusterKit.API.Endpoint",
+                                              "ClusterKit.Web.GraphQL.Publisher"
+                                          },
+                                  Configuration = Configurations.ClusterManager,
+                                  Version = 0
+                              };
 
-            context.Templates.Add(
-                new NodeTemplate
-                    {
-                        Code = "clusterManager",
-                        Name = "Cluster manager (cluster monitoring and managing)",
-                        MinimumRequiredInstances = 1,
-                        MaximumNeededInstances = 3,
-                        ContainerTypes = new List<string> { "manager", "worker" },
-                        Priority = 100.0,
-                        Packages =
-                            new List<string>
-                                {
-                                    "ClusterKit.Core.Service",
-                                    "ClusterKit.NodeManager.Client",
-                                    "ClusterKit.Monitoring.Client",
-                                    "ClusterKit.Monitoring",
-                                    "ClusterKit.NodeManager",
-                                    "ClusterKit.Data.EF.Npgsql",
-                                    "ClusterKit.Web.Swagger.Monitor",
-                                    "ClusterKit.Web.Swagger",
-                                    "ClusterKit.Log.Console",
-                                    "ClusterKit.Log.ElasticSearch",
-                                    "ClusterKit.Web.Authentication",
-                                    "ClusterKit.Security.SessionRedis",
-                                    "ClusterKit.API.Endpoint",
-                                    "ClusterKit.Web.GraphQL.Publisher"
-                                },
-                        Configuration = Configurations.ClusterManager,
-                        Version = 0
-                    });
-
-            context.Templates.Add(
-                new NodeTemplate
-                    {
-                        Code = "empty",
-                        Name = "Cluster empty instance, just for demo",
-                        MinimumRequiredInstances = 0,
-                        MaximumNeededInstances = null,
-                        ContainerTypes = new List<string> { "worker" },
-                        Priority = 1.0,
-                        Packages =
-                            new List<string>
-                                {
-                                    "ClusterKit.Core.Service",
-                                    "ClusterKit.NodeManager.Client",
-                                    "ClusterKit.Monitoring.Client"
-                                },
-                        Configuration = Configurations.Empty,
-                        Version = 0
-                    });
+            yield return new NodeTemplate
+                            {
+                                Code = "empty",
+                                Name = "Cluster empty instance, just for demo",
+                                MinimumRequiredInstances = 0,
+                                MaximumNeededInstances = null,
+                                ContainerTypes = new List<string> { "worker" },
+                                Priority = 1.0,
+                                Packages =
+                                    new List<string>
+                                        {
+                                            "ClusterKit.Core.Service",
+                                            "ClusterKit.NodeManager.Client",
+                                            "ClusterKit.Monitoring.Client"
+                                        },
+                                Configuration = Configurations.Empty,
+                                Version = 0
+                            };
         }
 
         /// <summary>

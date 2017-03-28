@@ -77,5 +77,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         [UsedImplicitly]
         public virtual DbSet<Role> Roles { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of releases
+        /// </summary>
+        [UsedImplicitly]
+        public virtual DbSet<Release> Releases { get; set; }
     }
 }

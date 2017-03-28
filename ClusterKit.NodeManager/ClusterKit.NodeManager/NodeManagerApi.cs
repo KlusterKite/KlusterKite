@@ -249,6 +249,26 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// The connection to the <see cref="Role"/>
+        /// </summary>
+        /// <param name="context">The request context</param>
+        /// <returns>The data connection</returns>
+        [UsedImplicitly]
+        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new draft release",
+            CanUpdate = true, UpdateDescription = "Updates the draft release",
+            CanDelete = true, DeleteDescription = "Removes the draft release",
+            Description = "ClusterKit managing system security roles")]
+        [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
+        public Connection<Release, int> Releases(RequestContext context)
+        {
+            return new Connection<Release, int>(
+                this.actorSystem,
+                this.GetManagerActorProxyPath(),
+                this.AkkaTimeout,
+                context);
+        }
+
+        /// <summary>
         /// Gets akka actor path for database worker
         /// </summary>
         /// <returns>Akka actor path</returns>
