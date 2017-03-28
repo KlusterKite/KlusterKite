@@ -186,7 +186,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <inheritdoc />
-        public override IGraphType ExtractInterface(ApiProvider provider)
+        public override IGraphType ExtractInterface(ApiProvider provider, NodeInterface nodeInterface)
         {
             var fieldProvider = this.providers.FirstOrDefault(fp => fp.Provider == provider);
             if (fieldProvider == null)

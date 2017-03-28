@@ -40,7 +40,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public EnScalarType ScalarType { get; }
 
         /// <inheritdoc />
-        public override IGraphType ExtractInterface(ApiProvider provider)
+        public override IGraphType ExtractInterface(ApiProvider provider, NodeInterface nodeInterface)
         {
             return this.GenerateGraphType(null, null);
         }
