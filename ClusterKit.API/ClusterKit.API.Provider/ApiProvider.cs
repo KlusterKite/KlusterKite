@@ -144,7 +144,9 @@ namespace ClusterKit.API.Provider
                                this.argumentsSerializer,
                                onErrorCallback) as JObject;
 
-                    return new JObject { { "result", result?.Property(request.FieldName)?.Value } };
+                    return mutation.Type == ApiMutation.EnType.Connection 
+                        ? result?.Property(request.FieldName)?.Value as JObject 
+                        : new JObject { { "result", result?.Property(request.FieldName)?.Value } };
                 }
 
                 var connectionResolver = mutation.Resolver as IConnectionResolver;

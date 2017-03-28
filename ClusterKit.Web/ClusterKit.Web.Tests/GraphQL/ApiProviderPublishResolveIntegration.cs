@@ -993,6 +993,120 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing connection delete request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task ConnectionMutationAdditionalTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var node1Id = JArray.Parse("[{\"f\": \"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87110\"}]").PackGlobalId().Replace("\"", "\\\"");
+
+            var query = @"                          
+            mutation M {
+                    call: TestApi_connection_typedMutation(input: {uid: ""3BEEE369-11DF-4A30-BF11-1D8465C87110""}) {
+                    node {
+                        id,
+                        __id,
+                        name,
+                        value
+                    },
+                    edge {
+                        cursor,
+                        node {
+                            id,
+                            __id,
+                            name,
+                            value
+                        }
+                    },
+                    deletedId,
+                    api {
+                        connection(sort: [value_asc, name_asc]) {
+                            count,
+                            edges {
+                                cursor,
+                                node {
+                                    id,
+                                    __id,
+                                    name,
+                                    value
+                                }                    
+                            }
+                        }
+                    }
+                }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = $@"
+                                {{
+                                  ""data"": {{
+                                    ""call"": {{
+                                      ""node"": {{
+                                        ""id"": ""{node1Id}"",
+                                        ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
+                                        ""name"": ""1-test"",
+                                        ""value"": 100.0
+                                      }},
+                                      ""edge"": {{
+                                        ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
+                                        ""node"": {{
+                                          ""id"": ""{node1Id}"",
+                                          ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
+                                          ""name"": ""1-test"",
+                                          ""value"": 100.0
+                                        }}
+                                      }},
+                                      ""deletedId"": null,
+                                      ""api"": {{
+                                        ""connection"": {{
+                                          ""count"": 1,
+                                          ""edges"": [
+                                            {{
+                                              ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
+                                              ""node"": {{
+                                                ""id"": ""{node1Id}"",
+                                                ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
+                                                ""name"": ""1-test"",
+                                                ""value"": 100.0
+                                              }}
+                                            }}
+                                          ]
+                                        }}
+                                      }}
+                                    }}
+                                  }}
+                                }}";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing connection update request from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
@@ -2007,6 +2121,53 @@ namespace ClusterKit.Web.Tests.GraphQL
                           ""data"": {
                             ""call"": {
                                 ""result"": true                               
+                            }
+                          }
+                        }";
+
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing call of simple mutation
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task MutationInConnectionRequestTest()
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"                          
+            mutation M {
+                    call: TestApi_connection_untypedMutation(input: {uid: ""2ECCD307-8BF5-464D-97B3-D56A9944C2E0""}) {
+                        result,
+                        api {
+                           syncScalarField
+                        }
+                    }
+            }            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+
+            var expectedResult = @"
+                        {
+                          ""data"": {
+                            ""call"": {
+                                ""result"": false,
+                                ""api"": {
+                                    ""syncScalarField"": ""SyncScalarField""
+                                }
                             }
                           }
                         }";

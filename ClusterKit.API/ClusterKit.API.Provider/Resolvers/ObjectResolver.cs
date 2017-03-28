@@ -227,6 +227,11 @@ namespace ClusterKit.API.Provider.Resolvers
             /// Gets or sets the type
             /// </summary>
             public Type Type { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether this type is connection type and should be hidden from API schema (but all related type will be used)
+            /// </summary>
+            public bool IsConnectionType { get; set; }
         }
     }
 
@@ -289,7 +294,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
             if (apiObjectType.Fields.Count == 0)
             {
-                GenerationErrors.Add("Object has no fields");
+                // GenerationErrors.Add("Object has no fields");
             }
             else
             {
@@ -500,7 +505,7 @@ namespace ClusterKit.API.Provider.Resolvers
                 yield return mutation;
             }
 
-            foreach (var apiField in this.GenerateMutationsFromConnections(path, getContainer))
+            foreach (var apiField in this.GenerateMutationsFromConnections(path, typesUsed, getContainer))
             {
                 yield return apiField;
             }
@@ -523,7 +528,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <inheritdoc />
         internal override IEnumerable<ApiType> GetDirectRelatedVirtualTypes()
         {
-            return RelatedTypes.Where(t => t.ApiType != null).Select(t => t.ApiType);
+            return RelatedTypes.Where(t => t.ApiType != null && !t.IsConnectionType).Select(t => t.ApiType);
         }
 
         /// <summary>
@@ -872,6 +877,12 @@ namespace ClusterKit.API.Provider.Resolvers
                 {
                     RelatedTypes.Add(new RelatedType { Type = mutationResult });
                 }
+
+                if (metadata.RealConnectionType != null
+                    && RelatedTypes.All(rt => rt.Type != metadata.RealConnectionType))
+                {
+                    RelatedTypes.Add(new RelatedType { Type = metadata.RealConnectionType, IsConnectionType = true });
+                }
             }
 
             field.FillAuthorizationProperties(property);
@@ -1128,6 +1139,7 @@ namespace ClusterKit.API.Provider.Resolvers
                                                    .CreateInstance<IResolver>()
                                                : typeof(ObjectResolver<>).MakeGenericType(relatedType.Type)
                                                    .CreateInstance<IResolver>();
+                    relatedType.ApiType = relatedType.Resolver.GetElementType();
                 }
             }
         }
@@ -1152,12 +1164,13 @@ namespace ClusterKit.API.Provider.Resolvers
             var directTypes = this.GetDirectRelatedObjectResolvers().ToList();
             directTypes.Add(this);
 
-            types = new List<ApiType>();
+            types = new List<ApiType> { GeneratedType };
             var resolveQueue = new Queue<IResolver>(directTypes);
             var resolvedTypes = new Dictionary<string, IResolver>();
             var memberNames = new Dictionary<MemberInfo, string>();
 
             errors = new List<string>();
+            errors.AddRange(this.Errors);
 
             while (resolveQueue.Count > 0)
             {
@@ -1169,7 +1182,7 @@ namespace ClusterKit.API.Provider.Resolvers
                 }
 
                 resolvedTypes[apiType.TypeName] = resolver;
-                types.Add(apiType);
+                
                 var genericResolver = resolver as ObjectResolver;
                 if (genericResolver == null)
                 {
@@ -1182,6 +1195,11 @@ namespace ClusterKit.API.Provider.Resolvers
                 {
                     if (!types.Contains(type))
                     {
+                        if ((type as ApiObjectType)?.Fields.Count == 0)
+                        {
+                            errors.Add($"{apiType}: Object has no fields");
+                        }
+
                         types.Add(type);
                     }
                 }
@@ -1207,6 +1225,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <param name="path">
         /// The fields path
         /// </param>
+        /// <param name="typesUsed">Already used types to avoid circular references</param>
         /// <param name="getContainer">
         /// The container resolver method
         /// </param>
@@ -1215,6 +1234,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </returns>
         private IEnumerable<MutationDescription> GenerateMutationsFromConnections(
             List<string> path,
+            List<string> typesUsed,
             GetMutationContainerDelegate getContainer)
         {
             var connections =
@@ -1253,8 +1273,9 @@ namespace ClusterKit.API.Provider.Resolvers
                         .CreateInstance<ObjectResolver>()
                         .GetApiType();
 
+                var nextPath = new List<string>(path) { connection.Field.Name };
                 var requestPath =
-                    new List<string>(path) { connection.Field.Name }.Select(p => new ApiRequest { FieldName = p })
+                    nextPath.Select(p => new ApiRequest { FieldName = p })
                         .ToList();
 
                 GetMutationContainerDelegate nextResolver =
@@ -1264,6 +1285,31 @@ namespace ClusterKit.API.Provider.Resolvers
                                 result =>
                                     this.GetFieldValue(result.Result, connection.Field.Name, context, serializer, callback))
                             .Unwrap();
+
+                var connectionType = (connection.TypeMember as MethodInfo)?.ReturnType
+                                     ?? (connection.TypeMember as PropertyInfo)?.PropertyType;
+                if (connectionType == null)
+                {
+                    continue;
+                }
+
+                if (connection.Metadata.RealConnectionType != null)
+                {
+                    var resolver =
+                        typeof(ObjectResolver<>).MakeGenericType(connection.Metadata.RealConnectionType)
+                            .CreateInstance<ObjectResolver>();
+
+                    var additionalMutations = resolver.GenerateMutations(nextPath, typesUsed, nextResolver);
+                    foreach (var mutation in additionalMutations)
+                    {
+                        if (mutation.Field.TypeName == mutationResult.TypeName)
+                        {
+                            mutation.Type = ApiMutation.EnType.Connection;
+                        }
+
+                        yield return mutation;
+                    }
+                }
 
                 if (attribute.CanCreate)
                 {
