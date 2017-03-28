@@ -58,6 +58,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactoryByLogin>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, Guid>>().ImplementedBy<UserFactoryByUid>().LifestyleTransient());
+            container.Register(Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>().LifestyleTransient());
 
             container.Register(
                 Component.For<IContextFactory<ConfigurationContext>>()

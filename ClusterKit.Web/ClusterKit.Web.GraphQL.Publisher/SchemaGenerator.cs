@@ -505,14 +505,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
             typesCreated[objectType.ComplexTypeName] = objectType;
 
-            var fieldsToMerge = createAsInput
-                                    ? apiObjectType.Fields.Where(
-                                        f => !f.Flags.HasFlag(EnFieldFlags.IsConnection) && !f.Arguments.Any())
-                                    : apiObjectType.Fields;
-
             MergeFields(
                 objectType,
-                fieldsToMerge,
+                apiObjectType.Fields,
                 provider,
                 path.Union(new[] { apiObjectType.TypeName }).ToList(),
                 createAsInput,
@@ -793,12 +788,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
             bool createAsInput,
             Dictionary<string, MergedType> typesCreated)
         {
-            foreach (
-                var apiField in
-                apiFields.Where(
-                    f =>
-                        (createAsInput && f.Flags.HasFlag(EnFieldFlags.CanBeUsedInInput))
-                        || (!createAsInput && f.Flags.HasFlag(EnFieldFlags.Queryable))))
+            var fields = createAsInput
+                             ? apiFields.Where(
+                                 f =>
+                                     f.Flags.HasFlag(EnFieldFlags.CanBeUsedInInput)
+                                     && f.Arguments.All(a => a.Flags.HasFlag(EnFieldFlags.IsTypeArgument)))
+                             : apiFields.Where(f => f.Flags.HasFlag(EnFieldFlags.Queryable));
+
+            foreach (var apiField in fields)
             {
                 MergedField complexField;
                 if (parentType.Fields.TryGetValue(apiField.Name, out complexField))
@@ -813,7 +810,18 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     }
                 }
 
-                var fieldType = CreateMergedType(provider, apiField, complexField, path, createAsInput, typesCreated);
+                var flags = apiField.Flags;
+
+                if (createAsInput && flags.HasFlag(EnFieldFlags.IsConnection))
+                {
+                    flags &= ~EnFieldFlags.IsConnection;
+                    flags |= EnFieldFlags.IsArray;
+                }
+
+                var cloneField = apiField.Clone();
+                cloneField.Flags = flags;
+
+                var fieldType = CreateMergedType(provider, cloneField, complexField, path, createAsInput, typesCreated);
 
                 if (fieldType == null)
                 {
@@ -840,12 +848,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 var description = string.Join(
                     "\n",
                     new[] { complexField?.Description, apiField.Description }.Where(s => !string.IsNullOrWhiteSpace(s)));
+
                 var field = new MergedField(
                     apiField.Name,
                     fieldType,
                     provider,
-                    apiField,
-                    apiField.Flags,
+                    cloneField,
+                    flags,
                     fieldArguments,
                     string.IsNullOrWhiteSpace(description) ? null : description);
                 if (complexField != null)

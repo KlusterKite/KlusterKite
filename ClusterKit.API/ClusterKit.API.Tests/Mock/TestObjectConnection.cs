@@ -186,11 +186,5 @@ namespace ClusterKit.API.Tests.Mock
 
             return Task.FromResult(new MutationResult<TestObject> { Result = obj });
         }
-
-        /// <inheritdoc />
-        public Guid GetId(TestObject node)
-        {
-            return node.Id;
-        }
     }
 }
