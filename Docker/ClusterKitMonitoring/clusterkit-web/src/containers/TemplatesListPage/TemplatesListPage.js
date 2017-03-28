@@ -25,7 +25,7 @@ export default Relay.createContainer(
   TemplatesListPage,
   {
     fragments: {
-      api: () => Relay.QL`fragment on ClusterKitMonitoring_ClusterKitNodeApi {
+      api: () => Relay.QL`fragment on IClusterKitNodeApi {
         __typename
         nodeManagerData {
           ${TemplatesList.getFragment('templates')},

@@ -7,9 +7,9 @@ let _privileges = null;
  * @return {string[]} List of privileges
  */
 const getPrivileges = () => {
-  if (_privileges) {
-    return _privileges;
-  }
+  // if (_privileges) {
+  //   return _privileges;
+  // }
 
   const privileges = Storage.get('privileges');
   if (!privileges) {

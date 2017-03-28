@@ -22,7 +22,7 @@ export default Relay.createContainer(
   FeedsListPage,
   {
     fragments: {
-      api: () => Relay.QL`fragment on ClusterKitMonitoring_ClusterKitNodeApi {
+      api: () => Relay.QL`fragment on IClusterKitNodeApi {
         __typename
         nodeManagerData {
           ${FeedsList.getFragment('feeds')},

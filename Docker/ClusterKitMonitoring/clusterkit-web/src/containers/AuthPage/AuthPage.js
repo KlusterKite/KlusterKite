@@ -1,5 +1,5 @@
 import React from 'react';
-// import { browserHistory } from 'react-router'
+import { browserHistory } from 'react-router'
 
 import Storage from '../../utils/ttl-storage';
 
@@ -140,11 +140,9 @@ export default class AuthPage extends React.Component {
     });
 
     if (this.props.location && this.props.location.query && this.props.location.query.from) {
-      // browserHistory.push(decodeURIComponent(this.props.location.query.from));
-      window.location = this.props.location.query.from;
+      browserHistory.push(decodeURIComponent(this.props.location.query.from));
     } else {
-      // browserHistory.push('/');
-      window.location = '/';
+      browserHistory.push('/');
     }
   }
 
