@@ -52,7 +52,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public ApiProvider Provider { get; }
 
         /// <inheritdoc />
-        public override IGraphType ExtractInterface(ApiProvider provider)
+        public override IGraphType ExtractInterface(ApiProvider provider, NodeInterface nodeInterface)
         {
             if (this.Provider != provider)
             {

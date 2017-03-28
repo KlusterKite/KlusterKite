@@ -207,7 +207,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
             var types = createdTypes.Values.GroupBy(t => t.ComplexTypeName).Select(g => g.First()).ToList();
 
-            var allInterfaces = GenerateApiTypeInterfaces(providers, types);
+            var allInterfaces = GenerateApiTypeInterfaces(providers, types, nodeInterface);
 
             IObjectGraphType mutationType;
             var graphTypes = GenerateApiTypes(providers, types, nodeInterface, allInterfaces, api, out mutationType);
@@ -579,16 +579,18 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// </summary>
         /// <param name="providers">The list of api providers</param>
         /// <param name="types">The list of merged api types</param>
+        /// <param name="nodeInterface">The node interface</param>
         /// <returns>The list of interfaces</returns>
         private static Dictionary<string, IGraphType> GenerateApiTypeInterfaces(
             List<ApiProvider> providers,
-            List<MergedType> types)
+            List<MergedType> types,
+            NodeInterface nodeInterface)
         {
             var interfaces = providers.ToDictionary(
                 p => p,
                 p =>
                     types.Where(t => !(t is MergedInputType))
-                        .Select(t => t.ExtractInterface(p))
+                        .Select(t => t.ExtractInterface(p, nodeInterface))
                         .Where(i => i != null)
                         .GroupBy(i => i.Name)
                         .Select(g => g.First())

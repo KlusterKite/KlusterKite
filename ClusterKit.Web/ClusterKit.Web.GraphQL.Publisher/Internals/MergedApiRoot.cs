@@ -41,16 +41,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Gets the list of declared mutations
-        /// </summary>
-        public Dictionary<string, MergedField> Mutations { get; } = new Dictionary<string, MergedField>();
-
-        /// <summary>
-        /// Gets or sets the node searcher
-        /// </summary>
-        public NodeSearcher NodeSearher { get; internal set; }
-
-        /// <summary>
         /// Gets combined name from all provider
         /// </summary>
         public override string ComplexTypeName
@@ -60,8 +50,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 if (this.Providers.Any())
                 {
                     var providersNames =
-                        this.Providers.Select(
-                                p => EscapeName(p.Provider.Description.ApiName))
+                        this.Providers.Select(p => EscapeName(p.Provider.Description.ApiName))
                             .Distinct()
                             .OrderBy(s => s)
                             .ToArray();
@@ -72,6 +61,16 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 return EscapeName(this.OriginalTypeName);
             }
         }
+
+        /// <summary>
+        /// Gets the list of declared mutations
+        /// </summary>
+        public Dictionary<string, MergedField> Mutations { get; } = new Dictionary<string, MergedField>();
+
+        /// <summary>
+        /// Gets or sets the node searcher
+        /// </summary>
+        public NodeSearcher NodeSearher { get; internal set; }
 
         /// <inheritdoc />
         public override MergedObjectType Clone()
@@ -86,6 +85,24 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return clone;
         }
 
+        /// <inheritdoc />
+        public override IGraphType ExtractInterface(ApiProvider provider, NodeInterface nodeInterface)
+        {
+            var extractInterface = (TypeInterface)base.ExtractInterface(provider, nodeInterface);
+            extractInterface.AddField(this.CreateNodeField(nodeInterface));
+            return extractInterface;
+        }
+
+        /// <inheritdoc />
+        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
+        {
+            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface, interfaces);
+            var nodeFieldType = this.CreateNodeField(nodeInterface);
+            graphType.AddField(nodeFieldType);
+
+            return graphType;
+        }
+
         /// <summary>
         /// Generate graph type for all registered mutations
         /// </summary>
@@ -93,7 +110,17 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public IObjectGraphType GenerateMutationType()
         {
             var fields = this.Mutations.Select(f => this.ConvertApiField(f, new MutationResolver(f.Value)));
-            return new VirtualGraphType("Mutations", fields.ToList()) { Description = "The list of all detected mutations" };
+            return new VirtualGraphType("Mutations", fields.ToList())
+                       {
+                           Description =
+                               "The list of all detected mutations"
+                       };
+        }
+
+        /// <inheritdoc />
+        public override string GetInterfaceName(ApiProvider provider)
+        {
+            return $"I{provider.Description.ApiName}";
         }
 
         /// <summary>
@@ -110,10 +137,13 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             return this.DoApiRequests(context, context.UserContext as RequestContext);
         }
 
-        /// <inheritdoc />
-        public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
+        /// <summary>
+        /// Creates the node searcher field for the graph type
+        /// </summary>
+        /// <param name="nodeInterface">The node interface</param>
+        /// <returns>The node field</returns>
+        private FieldType CreateNodeField(NodeInterface nodeInterface)
         {
-            var graphType = (VirtualGraphType)base.GenerateGraphType(nodeInterface, interfaces);
             var nodeFieldType = new FieldType();
             nodeFieldType.Name = "__node";
             nodeFieldType.ResolvedType = nodeInterface;
@@ -122,15 +152,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 new QueryArguments(
                     new QueryArgument(typeof(IdGraphType)) { Name = "id", Description = "The node global id" });
             nodeFieldType.Resolver = this.NodeSearher;
-            graphType.AddField(nodeFieldType);
-
-            return graphType;
-        }
-
-        /// <inheritdoc />
-        public override string GetInterfaceName(ApiProvider provider)
-        {
-            return $"I{provider.Description.ApiName}";
+            return nodeFieldType;
         }
 
         /// <summary>
@@ -226,22 +248,52 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var connectionMutationResultType = this.mergedField.Type as MergedConnectionMutationResultType;
                 if (connectionMutationResultType != null)
                 {
-                    return this.DoConnectionMutationApiRequests(
-                        context,
-                        context.UserContext as RequestContext,
-                        connectionMutationResultType).Result;
+                    return
+                        this.DoConnectionMutationApiRequests(
+                            context,
+                            context.UserContext as RequestContext,
+                            connectionMutationResultType).Result;
                 }
 
                 var untypedMutationResultType = this.mergedField.Type as MergedUntypedMutationResult;
                 if (untypedMutationResultType != null)
                 {
-                    return this.DoUntypedMutationApiRequests(
-                        context,
-                        context.UserContext as RequestContext,
-                        untypedMutationResultType).Result;
+                    return
+                        this.DoUntypedMutationApiRequests(
+                            context,
+                            context.UserContext as RequestContext,
+                            untypedMutationResultType).Result;
                 }
 
                 return this.DoApiRequests(context, context.UserContext as RequestContext);
+            }
+
+            /// <summary>
+            /// Creates an api requests to gather all data
+            /// </summary>
+            /// <param name="context">
+            /// The request contexts
+            /// </param>
+            /// <param name="requestContext">
+            /// The request Context.
+            /// </param>
+            /// <returns>
+            /// The request data
+            /// </returns>
+            private Task<JObject> DoApiRequests(ResolveFieldContext context, RequestContext requestContext)
+            {
+                var request = new MutationApiRequest
+                                  {
+                                      Arguments = context.FieldAst.Arguments.ToJson(context),
+                                      FieldName = this.mergedField.FieldName,
+                                      Fields =
+                                          this.mergedField.Type.GatherSingleApiRequest(
+                                              context.FieldAst,
+                                              context).ToList()
+                                  };
+
+                var apiRequests = this.provider.GetData(new List<ApiRequest> { request }, requestContext);
+                return apiRequests;
             }
 
             /// <summary>
@@ -297,17 +349,23 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var requestedFields = new List<ApiRequest>();
                 var idSubRequestRequest = new List<ApiRequest>
                                               {
-                                                  new ApiRequest { FieldName = nodeType.KeyField.FieldName, Alias = "__id" }
+                                                  new ApiRequest
+                                                      {
+                                                          FieldName =
+                                                              nodeType.KeyField.FieldName,
+                                                          Alias = "__id"
+                                                      }
                                               };
                 var idRequestRequest = new ApiRequest
-                {
-                    Alias = "__idRequest",
-                    FieldName = "result",
-                    Fields = idSubRequestRequest
-                };
+                                           {
+                                               Alias = "__idRequest",
+                                               FieldName = "result",
+                                               Fields = idSubRequestRequest
+                                           };
                 requestedFields.Add(idRequestRequest);
 
-                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type).ToList();
+                var topFields =
+                    GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type).ToList();
 
                 var nodeRequests = topFields.Where(f => f.Name == "node" || f.Name == "edge").ToList();
 
@@ -320,12 +378,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                             var nodeFields = nodeType.GatherSingleApiRequest(nodeRequest, context).ToList();
                             nodeFields.Add(new ApiRequest { Alias = "__id", FieldName = nodeType.KeyField.FieldName });
                             requestedFields.Add(
-                                new ApiRequest
-                                    {
-                                        Alias = nodeAlias,
-                                        FieldName = "result",
-                                        Fields = nodeFields
-                                    });
+                                new ApiRequest { Alias = nodeAlias, FieldName = "result", Fields = nodeFields });
                             break;
                         case "edge":
                             var edgeFields = new List<ApiRequest>();
@@ -333,8 +386,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                 GetRequestedFields(nodeRequest.SelectionSet, context, edgeType)
                                     .Where(f => f.Name == "node"))
                             {
-                                edgeFields.AddRange(nodeType.GatherSingleApiRequest(edgeNodeRequests, context)
-                                    .Select(
+                                edgeFields.AddRange(
+                                    nodeType.GatherSingleApiRequest(edgeNodeRequests, context).Select(
                                         f =>
                                             {
                                                 f.Alias =
@@ -369,11 +422,11 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 }
 
                 var request = new MutationApiRequest
-                {
-                    Arguments = arguments,
-                    FieldName = this.mergedField.FieldName,
-                    Fields = requestedFields
-                };
+                                  {
+                                      Arguments = arguments,
+                                      FieldName = this.mergedField.FieldName,
+                                      Fields = requestedFields
+                                  };
 
                 var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
                 if (data != null)
@@ -412,13 +465,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// The request data
             /// </returns>
             private async Task<JObject> DoUntypedMutationApiRequests(
-                ResolveFieldContext context, 
+                ResolveFieldContext context,
                 RequestContext requestContext,
                 MergedUntypedMutationResult responseType)
             {
-                var topFields = GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type).ToList();
+                var topFields =
+                    GetRequestedFields(context.FieldAst.SelectionSet, context, this.mergedField.Type).ToList();
                 var requestedFields = new List<ApiRequest>();
-                
+
                 foreach (var topField in topFields.Where(f => f.Name == "result"))
                 {
                     requestedFields.AddRange(responseType.OriginalReturnType.GatherSingleApiRequest(topField, context));
@@ -427,7 +481,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 var arguments = context.FieldAst.Arguments.ToJson(context).Property("input")?.Value as JObject;
 
                 var originalApiField = this.mergedField.OriginalFields.Values.FirstOrDefault();
-                if (originalApiField != null && !originalApiField.CheckAuthorization(requestContext, EnConnectionAction.Query))
+                if (originalApiField != null
+                    && !originalApiField.CheckAuthorization(requestContext, EnConnectionAction.Query))
                 {
                     var severity = originalApiField.LogAccessRules.Any()
                                        ? originalApiField.LogAccessRules.Max(l => l.Severity)
@@ -451,42 +506,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 }
 
                 var request = new MutationApiRequest
-                {
-                    Arguments = arguments,
-                    FieldName = this.mergedField.FieldName,
-                    Fields = requestedFields
-                };
+                                  {
+                                      Arguments = arguments,
+                                      FieldName = this.mergedField.FieldName,
+                                      Fields = requestedFields
+                                  };
 
                 var data = await this.provider.GetData(new List<ApiRequest> { request }, requestContext);
                 data?.Add("clientMutationId", arguments?.Property("clientMutationId")?.ToObject<string>());
                 return data;
-            }
-
-            /// <summary>
-            /// Creates an api requests to gather all data
-            /// </summary>
-            /// <param name="context">
-            /// The request contexts
-            /// </param>
-            /// <param name="requestContext">
-            /// The request Context.
-            /// </param>
-            /// <returns>
-            /// The request data
-            /// </returns>
-            private Task<JObject> DoApiRequests(ResolveFieldContext context, RequestContext requestContext)
-            {
-                var request = new MutationApiRequest
-                                  {
-                                      Arguments = context.FieldAst.Arguments.ToJson(context),
-                                      FieldName = this.mergedField.FieldName,
-                                      Fields =
-                                          this.mergedField.Type.GatherSingleApiRequest(
-                                              context.FieldAst, context).ToList()
-                                  };
-
-                var apiRequests = this.provider.GetData(new List<ApiRequest> { request }, requestContext);
-                return apiRequests;
             }
         }
     }
