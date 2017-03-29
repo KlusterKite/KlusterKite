@@ -2979,6 +2979,12 @@ interface IClusterKitMonitoring {
 
   # ClusterKit node monitoring
   clusterKitMonitoringApi: IClusterKitMonitoring_Root
+
+  # The node global searcher according to Relay specification
+  __node(
+    # The node global id
+    id: ID
+  ): Node
 }
 
 # Global cluster actors tree scan result
@@ -3091,6 +3097,12 @@ interface IClusterKitNodeApi {
 
   # The current user
   me: IClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
+
+  # The node global searcher according to Relay specification
+  __node(
+    # The node global id
+    id: ID
+  ): Node
 }
 
 # Akka system address

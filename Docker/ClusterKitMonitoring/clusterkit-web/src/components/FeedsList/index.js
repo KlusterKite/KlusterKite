@@ -15,7 +15,7 @@ class FeedList extends React.Component {
     return (
       <div>
         <h2>Nuget feeds list</h2>
-        <Link to="/NugetFeeds/create" className="btn btn-primary" role="button">Add a new feed</Link>
+        <Link to="/clusterkit/NugetFeeds/create" className="btn btn-primary" role="button">Add a new feed</Link>
         <table className="table table-hover">
           <thead>
             <tr>
@@ -27,7 +27,7 @@ class FeedList extends React.Component {
           {feeds && feeds.length > 0 && feeds.map((item) =>
             <tr key={item.node.id}>
               <td>
-                <Link to={`/NugetFeeds/${encodeURIComponent(item.node.id)}`}>
+                <Link to={`/clusterkit/NugetFeeds/${encodeURIComponent(item.node.id)}`}>
                 {item.node.address}
                 </Link>
               </td>

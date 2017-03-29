@@ -17,8 +17,8 @@ const redirectToAuth = (reject) => {
   Storage.remove('refreshToken');
   Storage.remove('username');
 
-  if (currentLocation.indexOf('/Login') === -1 && doRedirect) {
-    browserHistory.push(`/Login/?from=${encodeURIComponent(currentLocation + currentSearch)}`);
+  if (currentLocation.indexOf('/clusterkit/Login') === -1 && doRedirect) {
+    browserHistory.push(`/clusterkit/Login/?from=${encodeURIComponent(currentLocation + currentSearch)}`);
   }
   if (reject){
     reject();
@@ -82,11 +82,7 @@ const tokenRefreshPromise = () => {
     const accessToken = Storage.get('accessToken');
     const refreshToken = Storage.get('refreshToken');
 
-    if (accessToken){
-      resolve(accessToken);
-    }
-
-    if (!accessToken && refreshToken) {
+    if (refreshToken) {
       if (refreshToken) {
         requestNewToken(refreshToken).then(data => {
           processResponse(data, resolve, reject);
@@ -99,7 +95,7 @@ const tokenRefreshPromise = () => {
       }
     }
 
-    if (!accessToken && !refreshToken) {
+    if (!refreshToken) {
       redirectToAuth(reject);
     }
   });

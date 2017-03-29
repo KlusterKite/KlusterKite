@@ -1,9 +1,0 @@
-.templates {
-  margin-top: 10px;
-  display: flex;
-  flex-flow: wrap;
-}
-
-.templates > div {
-  margin-right: 5px;
-}

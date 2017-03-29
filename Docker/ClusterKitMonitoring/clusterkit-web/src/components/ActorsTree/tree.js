@@ -32,8 +32,6 @@ class ActorsTree extends React.Component {
       .attr('class', 'tooltip')
       .style('opacity', 0);
 
-    console.log('tree', this.props.tree);
-
     if (this.props.tree) {
       this.renderTreeGraf(this.props.tree, ReactDom.findDOMNode(this));
     }
@@ -102,16 +100,12 @@ class ActorsTree extends React.Component {
       return;
     }
 
-    console.log('tree', tree);
-
     const updatedTree = {
       name: 'Cluster',
       queueSizeSum: 0,
       maxQueueSize: 0,
       children: tree.map(c => c.node.value),
     };
-
-    console.log('updatedTree', updatedTree);
 
     const treeParams = this.calculateLevels(updatedTree);
     const maxDepth = treeParams.length;
