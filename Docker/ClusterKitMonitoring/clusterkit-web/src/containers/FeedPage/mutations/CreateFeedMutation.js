@@ -24,7 +24,7 @@ export default class CreateFeedMutation extends Relay.Mutation {
   //   return [{
   //     type: 'RANGE_ADD',
   //     parentName: 'nodeManagerData',
-  //     parentID: null,
+  //     parentID: this.props.nodeManagerDataId,
   //     connectionName: 'nugetFeeds',
   //     edgeName: 'edge',
   //     rangeBehaviors: {

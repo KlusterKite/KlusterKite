@@ -30,9 +30,6 @@ class FeedPage extends React.Component {
   }
 
   _onSubmit = (model) => {
-    console.log('onSubmit!', model);
-    console.log(this._isAddNew());
-
     if (this._isAddNew()){
       this._addNode(model);
     } else {
@@ -41,16 +38,18 @@ class FeedPage extends React.Component {
   }
 
   _addNode = (model) => {
+    console.log('id', this.props.api.nodeManagerData.id);
     Relay.Store.commitUpdate(
       new CreateFeedMutation(
         {
+          nodeManagerDataId: this.props.api.nodeManagerData.id,
           userName: model.userName,
           password: model.password,
           address: model.address,
           type: model.type,
         }),
       {
-        onSuccess: () => browserHistory.push('/NugetFeeds'),
+        onSuccess: () => browserHistory.push('/clusterkit/NugetFeeds'),
         onFailure: (transaction) => console.log(transaction),
       },
     )
@@ -68,19 +67,17 @@ class FeedPage extends React.Component {
           type: model.type,
         }),
       {
-        onSuccess: () => browserHistory.push('/NugetFeeds'),
+        onSuccess: () => browserHistory.push('/clusterkit/NugetFeeds'),
         onFailure: (transaction) => console.log(transaction),
       },
     )
   }
 
   _onDelete = () => {
-    console.log('deleting!', this.props.api.__node.__id);
-
     Relay.Store.commitUpdate(
       new DeleteFeedMutation({deletedId: this.props.api.__node.__id}),
       {
-        onSuccess: () => this.context.router.replace('/NugetFeeds'),
+        onSuccess: () => this.context.router.replace('/clusterkit/NugetFeeds'),
         onFailure: (transaction) => console.log(transaction),
       },
     )
@@ -108,9 +105,12 @@ export default Relay.createContainer(
     }),
     fragments: {
       api: () => Relay.QL`
-        fragment on ClusterKitMonitoring_ClusterKitNodeApi {
+        fragment on IClusterKitNodeApi {
           __typename
           id
+          nodeManagerData {
+            id
+          }
           __node(id: $id) @include( if: $nodeExists ) {
             ...on ClusterKitNodeApi_ClusterKitNugetFeed {
               __id

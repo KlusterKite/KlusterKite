@@ -20,7 +20,7 @@ export default class App extends React.Component {
         <Navbar fixedTop>
           <Navbar.Header>
             <Navbar.Brand>
-              <IndexLink to="/" activeStyle={{ color: '#333' }}>
+              <IndexLink to="/clusterkit/" activeStyle={{ color: '#333' }}>
                 <div className="topLogo" />
                 <span>ClusterKit</span>
               </IndexLink>
@@ -28,34 +28,34 @@ export default class App extends React.Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav navbar>
-              <LinkContainer to="/GraphQL">
+              <LinkContainer to="/clusterkit/GraphQL">
                 <NavItem>GraphQL</NavItem>
               </LinkContainer>
             </Nav>
             <Nav navbar>
               {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Query') &&
-                <LinkContainer to="/Templates">
+                <LinkContainer to="/clusterkit/Templates">
                   <NavItem>Templates</NavItem>
                 </LinkContainer>
               }
             </Nav>
             <Nav navbar>
               {hasPrivilege('ClusterKit.NodeManager.NugetFeed.Query') &&
-                <LinkContainer to="/NugetFeeds">
+                <LinkContainer to="/clusterkit/NugetFeeds">
                   <NavItem>Nuget Feeds</NavItem>
                 </LinkContainer>
               }
             </Nav>
             <Nav navbar>
               {hasPrivilege('ClusterKit.Monitoring.GetClusterTree') &&
-              <LinkContainer to="/ActorsTree">
+              <LinkContainer to="/clusterkit/ActorsTree">
                 <NavItem>Actors Tree</NavItem>
               </LinkContainer>
               }
             </Nav>
             {username &&
             <Nav pullRight>
-              <LinkContainer to="/Logout">
+              <LinkContainer to="/clusterkit/Logout">
                 <NavItem href="#">Logout ({username})</NavItem>
               </LinkContainer>
             </Nav>

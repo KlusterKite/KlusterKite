@@ -10,7 +10,7 @@ export default class LogoutPage extends React.Component {
     Storage.remove('username');
     Storage.remove('privileges');
 
-    browserHistory.push('/Login/');
+    browserHistory.push('/clusterkit/Login/');
   }
 
   render() {

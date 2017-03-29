@@ -17,7 +17,7 @@ class TemplatesList extends React.Component { // eslint-disable-line react/prefe
       <div>
         <h2>Templates list</h2>
         {this.props.createNodeTemplatePrivilege &&
-          <Link to="/Templates/create/" className="btn btn-primary" role="button">Add a new template</Link>
+          <Link to="/clusterkit/Templates/create/" className="btn btn-primary" role="button">Add a new template</Link>
         }
         <table className="table table-hover">
           <thead>
@@ -36,7 +36,7 @@ class TemplatesList extends React.Component { // eslint-disable-line react/prefe
             <tr key={item.node.id}>
               <td>
                 {this.props.getNodeTemplatePrivilege &&
-                  <Link to={`/Templates/${encodeURIComponent(item.node.id)}`}>
+                  <Link to={`/clusterkit/Templates/${encodeURIComponent(item.node.id)}`}>
                     {item.node.code}
                   </Link>
                 }

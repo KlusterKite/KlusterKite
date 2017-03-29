@@ -80,7 +80,7 @@ Target "DockerContainers" (fun _ ->
     NpmHelper.Npm(fun p ->
             { p with
                 Command = (NpmHelper.Run "build")
-                WorkingDirectory = "./Docker/ClusterKitMonitoring/web"
+                WorkingDirectory = "./Docker/ClusterKitMonitoring/clusterkit-web"
             })
 
     buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"

@@ -30,9 +30,6 @@ class TemplatePage extends React.Component {
   }
 
   _onSubmit = (model) => {
-    console.log('onSubmit!', model);
-    console.log('isNew?', this._isAddNew());
-
     if (this._isAddNew()){
       this._addNode(model);
     } else {
@@ -55,7 +52,7 @@ class TemplatePage extends React.Component {
           version: model.version
         }),
       {
-        onSuccess: () => browserHistory.push('/Templates'),
+        onSuccess: () => browserHistory.push('/clusterkit/Templates'),
         onFailure: (transaction) => console.log(transaction),
       },
     )
@@ -78,19 +75,17 @@ class TemplatePage extends React.Component {
           version: model.version
         }),
       {
-        onSuccess: () => browserHistory.push('/Templates'),
+        onSuccess: () => browserHistory.push('/clusterkit/Templates'),
         onFailure: (transaction) => console.log(transaction),
       },
     )
   }
 
   _onDelete = () => {
-    console.log('deleting!', this.props.api.__node.__id);
-
     Relay.Store.commitUpdate(
       new DeleteTemplateMutation({deletedId: this.props.api.__node.__id}),
       {
-        onSuccess: () => this.context.router.replace('/Templates'),
+        onSuccess: () => this.context.router.replace('/clusterkit/Templates'),
         onFailure: (transaction) => console.log(transaction),
       },
     )
@@ -119,8 +114,8 @@ export default Relay.createContainer(
     fragments: {
       api: () => Relay.QL`
         fragment on IClusterKitNodeApi {
-          __typename
           id
+          __typename
           __node(id: $id) @include( if: $nodeExists ) {
             ...on ClusterKitNodeApi_ClusterKitNodeTemplate {
               __id

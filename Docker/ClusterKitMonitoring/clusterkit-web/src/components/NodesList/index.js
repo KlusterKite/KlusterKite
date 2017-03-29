@@ -78,8 +78,6 @@ export class NodesList extends React.Component {
   }
 
   showUpgrading(nodeId) {
-    console.log('pushing ' + nodeId + ' to the ', this.state.upgradingNodes);
-
     this.setState((prevState, props) => ({
       upgradingNodes: [...prevState.upgradingNodes, nodeId]
     }));
@@ -95,8 +93,6 @@ export class NodesList extends React.Component {
         ]
       };
     });
-
-    console.log(this.state.upgradingNodes);
   }
 
   hideUpgradingAfterDelay(nodeId) {

@@ -142,7 +142,7 @@ export default class AuthPage extends React.Component {
     if (this.props.location && this.props.location.query && this.props.location.query.from) {
       browserHistory.push(decodeURIComponent(this.props.location.query.from));
     } else {
-      browserHistory.push('/');
+      browserHistory.push('/clusterkit/');
     }
   }
 
