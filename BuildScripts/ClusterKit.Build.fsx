@@ -191,6 +191,8 @@ Target "CleanPackageCache" (fun _ ->
 "PushThirdPartyPackages" <=? "CreateNuGet"
 "PushThirdPartyPackages" <=? "Clean"
 
+"PushThirdPartyPackages" ?=> "PushLocalPackages"
+
 // from now on this will be end-point targets with respect to build order
 
 //builds current project

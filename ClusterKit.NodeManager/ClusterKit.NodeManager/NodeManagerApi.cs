@@ -44,6 +44,11 @@ namespace ClusterKit.NodeManager
         private readonly ActorSystem actorSystem;
 
         /// <summary>
+        /// The address of the cluster nuget repository
+        /// </summary>
+        private readonly string feedUrl;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerApi"/> class.
         /// </summary>
         /// <param name="actorSystem">
@@ -52,83 +57,24 @@ namespace ClusterKit.NodeManager
         public NodeManagerApi(ActorSystem actorSystem)
         {
             this.actorSystem = actorSystem;
+            this.feedUrl = actorSystem.Settings.Config.GetString(NodeManagerActor.PackageRepositoryUrlPath);
             this.AkkaTimeout = ConfigurationUtils.GetRestTimeout(actorSystem);
         }
+
+        /// <summary>
+        /// Gets the list of packages in the nuget repository
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareConnection(Description = "The packages in the Nuget repository")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
+        public NugetPackagesConnection NugetPackages => new NugetPackagesConnection(this.feedUrl);
 
         /// <summary>
         /// Gets timeout for actor system requests
         /// </summary>
         private TimeSpan AkkaTimeout { get; }
-
-        /// <summary>
-        /// Gets the list of available packages from local cluster repository
-        /// </summary>
-        /// <returns>The list of available packages</returns>
-        [UsedImplicitly]
-        [DeclareField(
-            Description = "The list of available packages from local cluster repository",
-            Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
-        public Task<List<PackageDescription>> GetPackages()
-        {
-            return this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
-                     .Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
-        }
-
-        /// <summary>
-        /// Gets current cluster node template usage for debug purposes
-        /// </summary>
-        /// <returns>Current cluster statistics</returns>
-        [UsedImplicitly]
-        [DeclareField(Description = "Current cluster node template usage for debug purposes")]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.GetTemplateStatistics, Scope = EnPrivilegeScope.User)]
-        public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
-        {
-            return
-                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
-                    .Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
-        }
-
-        /// <summary>
-        /// Request to server to reload package list
-        /// </summary>
-        /// <returns>Success of the operation</returns>
-        [UsedImplicitly]
-        [DeclareMutation(Description = "Request to server to reload package list")]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.ReloadPackages, Scope = EnPrivilegeScope.User)]
-        [LogAccess]
-        public async Task<MutationResult<bool>> ReloadPackages()
-        {
-            var result =
-                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
-                    .Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);
-            return new MutationResult<bool> { Result = result };
-        }
-
-        /// <summary>
-        /// Manual node upgrade request
-        /// </summary>
-        /// <param name="address">Address of node to upgrade</param>
-        /// <returns>Execution task</returns>
-        [UsedImplicitly]
-        [DeclareMutation(Description = "Manual node upgrade request")]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.UpgradeNode, Scope = EnPrivilegeScope.User)]
-        [LogAccess]
-        public async Task<MutationResult<bool>> UpgradeNode(string address)
-        {
-            var result =
-                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
-                    .Ask<bool>(new NodeUpgradeRequest { Address = Address.Parse(address) }, this.AkkaTimeout);
-            return new MutationResult<bool> { Result = result };
-        }
 
         /// <summary>
         /// Gets current cluster active nodes descriptions
@@ -153,6 +99,39 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Gets the list of available packages from local cluster repository
+        /// </summary>
+        /// <returns>The list of available packages</returns>
+        [UsedImplicitly]
+        [DeclareField(Description = "The list of available packages from local cluster repository",
+            Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
+        public Task<List<PackageDescription>> GetPackages()
+        {
+            return
+                this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                    .Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
+        }
+
+        /// <summary>
+        /// Gets current cluster node template usage for debug purposes
+        /// </summary>
+        /// <returns>Current cluster statistics</returns>
+        [UsedImplicitly]
+        [DeclareField(Description = "Current cluster node template usage for debug purposes")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetTemplateStatistics, Scope = EnPrivilegeScope.User)]
+        public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
+        {
+            return
+                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                    .Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
+        }
+
+        /// <summary>
         /// The connection to the <see cref="NodeTemplate"/>
         /// </summary>
         /// <param name="context">The request context</param>
@@ -163,7 +142,8 @@ namespace ClusterKit.NodeManager
             UpdateDescription = "Updates the node template", Description = "Node templates")]
         [RequireSession]
         [RequireUser]
-        [RequirePrivilege(Privileges.NodeTemplate, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
+        [RequirePrivilege(Privileges.NodeTemplate, Scope = EnPrivilegeScope.User,
+            AddActionNameToRequiredPrivilege = true)]
         public Connection<NodeTemplate, int> NodeTemplates(RequestContext context)
         {
             return new Connection<NodeTemplate, int>(
@@ -193,18 +173,18 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// The connection to the <see cref="SeedAddress"/>
+        /// The connection to the <see cref="Role"/>
         /// </summary>
         /// <param name="context">The request context</param>
         /// <returns>The data connection</returns>
         [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new seed address", CanDelete = true,
-            DeleteDescription = "Deletes the seed address", CanUpdate = true,
-            UpdateDescription = "Updates the seed address", Description = "Node templates")]
-        [RequirePrivilege(Privileges.SeedAddress, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<SeedAddress, int> SeedAddresses(RequestContext context)
+        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new draft release", CanUpdate = true,
+            UpdateDescription = "Updates the draft release", CanDelete = true,
+            DeleteDescription = "Removes the draft release", Description = "ClusterKit managing system security roles")]
+        [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
+        public Connection<Release, int> Releases(RequestContext context)
         {
-            return new Connection<SeedAddress, int>(
+            return new Connection<Release, int>(
                 this.actorSystem,
                 this.GetManagerActorProxyPath(),
                 this.AkkaTimeout,
@@ -212,21 +192,21 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// The connection to the <see cref="User"/>
+        /// Request to server to reload package list
         /// </summary>
-        /// <param name="context">The request context</param>
-        /// <returns>The data connection</returns>
+        /// <returns>Success of the operation</returns>
         [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new user", CanUpdate = true,
-            UpdateDescription = "Updates the user", Description = "ClusterKit managing system users")]
-        [RequirePrivilege(Privileges.User, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<User, Guid> Users(RequestContext context)
+        [DeclareMutation(Description = "Request to server to reload package list")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.ReloadPackages, Scope = EnPrivilegeScope.User)]
+        [LogAccess]
+        public async Task<MutationResult<bool>> ReloadPackages()
         {
-            return new Connection<User, Guid>(
-                this.actorSystem,
-                this.GetManagerActorProxyPath(),
-                this.AkkaTimeout,
-                context);
+            var result =
+                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                    .Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);
+            return new MutationResult<bool> { Result = result };
         }
 
         /// <summary>
@@ -249,19 +229,55 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// The connection to the <see cref="Role"/>
+        /// The connection to the <see cref="SeedAddress"/>
         /// </summary>
         /// <param name="context">The request context</param>
         /// <returns>The data connection</returns>
         [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new draft release",
-            CanUpdate = true, UpdateDescription = "Updates the draft release",
-            CanDelete = true, DeleteDescription = "Removes the draft release",
-            Description = "ClusterKit managing system security roles")]
-        [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<Release, int> Releases(RequestContext context)
+        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new seed address", CanDelete = true,
+            DeleteDescription = "Deletes the seed address", CanUpdate = true,
+            UpdateDescription = "Updates the seed address", Description = "Node templates")]
+        [RequirePrivilege(Privileges.SeedAddress, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
+        public Connection<SeedAddress, int> SeedAddresses(RequestContext context)
         {
-            return new Connection<Release, int>(
+            return new Connection<SeedAddress, int>(
+                this.actorSystem,
+                this.GetManagerActorProxyPath(),
+                this.AkkaTimeout,
+                context);
+        }
+
+        /// <summary>
+        /// Manual node upgrade request
+        /// </summary>
+        /// <param name="address">Address of node to upgrade</param>
+        /// <returns>Execution task</returns>
+        [UsedImplicitly]
+        [DeclareMutation(Description = "Manual node upgrade request")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.UpgradeNode, Scope = EnPrivilegeScope.User)]
+        [LogAccess]
+        public async Task<MutationResult<bool>> UpgradeNode(string address)
+        {
+            var result =
+                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                    .Ask<bool>(new NodeUpgradeRequest { Address = Address.Parse(address) }, this.AkkaTimeout);
+            return new MutationResult<bool> { Result = result };
+        }
+
+        /// <summary>
+        /// The connection to the <see cref="User"/>
+        /// </summary>
+        /// <param name="context">The request context</param>
+        /// <returns>The data connection</returns>
+        [UsedImplicitly]
+        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new user", CanUpdate = true,
+            UpdateDescription = "Updates the user", Description = "ClusterKit managing system users")]
+        [RequirePrivilege(Privileges.User, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
+        public Connection<User, Guid> Users(RequestContext context)
+        {
+            return new Connection<User, Guid>(
                 this.actorSystem,
                 this.GetManagerActorProxyPath(),
                 this.AkkaTimeout,

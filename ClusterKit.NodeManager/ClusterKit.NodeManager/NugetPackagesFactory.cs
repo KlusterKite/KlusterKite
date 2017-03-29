@@ -83,7 +83,7 @@ namespace ClusterKit.NodeManager
             ApiRequest apiRequest)
         {
             var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(this.Context);
-            var query = nugetRepository.Search(string.Empty, true).AsQueryable().Where(p => p.IsLatestVersion);
+            var query = nugetRepository.Search(string.Empty, true).Where(p => p.IsLatestVersion);
 
             if (filter != null)
             {

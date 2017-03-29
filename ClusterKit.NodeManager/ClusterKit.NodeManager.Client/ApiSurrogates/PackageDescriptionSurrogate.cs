@@ -9,6 +9,8 @@
 
 namespace ClusterKit.NodeManager.Client.ApiSurrogates
 {
+    using System.Collections.Generic;
+
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -41,6 +43,13 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
         [UsedImplicitly]
         [DeclareField(Description = "The package version")]
         public string Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of available versions
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField(Description = "The list of available versions")]
+        public List<string> AvailableVersions { get; set; }
 
         /// <summary>
         /// Converts <see cref="PackageDescription"/> to <see cref="AkkaAddressSurrogate"/>

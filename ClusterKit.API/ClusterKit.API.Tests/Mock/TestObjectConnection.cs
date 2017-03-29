@@ -189,12 +189,21 @@ namespace ClusterKit.API.Tests.Mock
 
             return Task.FromResult(new MutationResult<TestObject> { Result = obj });
         }
+
+        /// <summary>
+        /// The typed mutation.
         /// </summary>
-        /// <param name="uid">The node id</param>
-        /// <returns>The mutation result</returns>
+        /// <param name="uid">
+        /// The uid.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         [UsedImplicitly]
         [DeclareMutation]
         public Task<MutationResult<TestObject>> TypedMutation(Guid uid)
+        {
+            TestObject obj;
             if (!this.objects.TryGetValue(uid, out obj))
             {
                 var errors = new List<ErrorDescription>
@@ -219,5 +228,6 @@ namespace ClusterKit.API.Tests.Mock
         public Task<bool> UntypedMutation(Guid uid)
         {
             return Task.FromResult(this.objects.ContainsKey(uid));
+        }
     }
 }

@@ -13,10 +13,17 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using System.Collections.Generic;
     using System.Linq;
 
+    using Akka.Configuration;
+
     using ClusterKit.Data;
+    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Security.Client;
-    
+
+    using Microsoft.Practices.ServiceLocation;
+
+    using NuGet;
+
     using Privileges = ClusterKit.NodeManager.Client.Privileges;
 
     /// <summary>
@@ -38,9 +45,20 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             SetupUsers(context);
             context.Templates.AddRange(GetDefaultTemplates());
 
+            var config = ServiceLocator.Current.GetInstance<Config>();
+            var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
+            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
+            var initialPackages =
+                nugetRepository.Search(string.Empty, true)
+                    .Where(p => p.IsLatestVersion)
+                    .ToList()
+                    .Select(p => new PackageDescriptionSurrogate { Name = p.Id, Version = p.Version.ToString() })
+                    .ToList();
+
             var configuration = new ReleaseConfiguration
                                     {
-                                        NodeTemplates = new List<NodeTemplate>(GetDefaultTemplates())
+                                        NodeTemplates = new List<NodeTemplate>(GetDefaultTemplates()),
+                                        Packages = initialPackages
                                     };
             var initialRelease = new Release
                                      {
