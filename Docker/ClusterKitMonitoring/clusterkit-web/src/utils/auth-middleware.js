@@ -82,11 +82,7 @@ const tokenRefreshPromise = () => {
     const accessToken = Storage.get('accessToken');
     const refreshToken = Storage.get('refreshToken');
 
-    if (accessToken){
-      resolve(accessToken);
-    }
-
-    if (!accessToken && refreshToken) {
+    if (refreshToken) {
       if (refreshToken) {
         requestNewToken(refreshToken).then(data => {
           processResponse(data, resolve, reject);
@@ -99,7 +95,7 @@ const tokenRefreshPromise = () => {
       }
     }
 
-    if (!accessToken && !refreshToken) {
+    if (!refreshToken) {
       redirectToAuth(reject);
     }
   });
