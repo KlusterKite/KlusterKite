@@ -31,9 +31,7 @@ export default class AuthPage extends React.Component {
       authorizing: true
     });
 
-    // const host = 'http://192.168.99.100/';
-    const host = 'http://entry/';
-    const url = `${host}api/1.x/security/token`;
+    const url = process.env.REACT_APP_AUTH_URL;
     const payload = `grant_type=password&client_id=ClusterKit.NodeManager.WebApplication&username=${data.Username}&password=${data.Password}`;
 
     fetch(url, {

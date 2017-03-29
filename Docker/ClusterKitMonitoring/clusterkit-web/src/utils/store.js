@@ -12,7 +12,7 @@ let instance = null;
 const refresh = () => {
   instance = new RelayNetworkLayer([
     urlMiddleware({
-      url: (req) => 'http://entry/api/1.x/graphQL',
+      url: (req) => process.env.REACT_APP_GRAPHQL_URL,
     }),
     authMiddleware({
       allowEmptyToken: true,
