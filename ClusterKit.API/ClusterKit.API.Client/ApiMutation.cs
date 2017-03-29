@@ -65,7 +65,12 @@ namespace ClusterKit.API.Client
             /// <summary>
             /// The node deletion in the connection
             /// </summary>
-            ConnectionDelete
+            ConnectionDelete,
+
+            /// <summary>
+            /// The additional connection mutation
+            /// </summary>
+            Connection
         }
 
         /// <summary>
