@@ -31,8 +31,7 @@ const redirectToAuth = (reject) => {
  * @param {string} refreshToken Refresh token
  */
 const requestNewToken = (refreshToken => {
-  const host = 'http://entry/';
-  const url = `${host}api/1.x/security/token`;
+  const url = process.env.REACT_APP_AUTH_URL;
   const payload = `grant_type=refresh_token&client_id=ClusterKit.NodeManager.WebApplication&refresh_token=${refreshToken}`;
 
   return fetch(url, {
@@ -115,9 +114,7 @@ const getToken = () => {
     redirectToAuth(null);
   }
   else if (!accessToken) {
-    console.log('getting new accessToken');
     return tokenRefreshPromise().then(function() {
-      console.log('got new token');
       return Storage.get('accessToken');
     });
   }
