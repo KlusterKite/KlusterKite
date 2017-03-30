@@ -24,7 +24,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// The web ui user
     /// </summary>
-    [ApiDescription(Description = "The web ui user", Name = "ClusterKitUser")]
+    [ApiDescription(Description = "The web ui user", Name = "User")]
     public class User : UserDescription, IObjectWithId<Guid>
     {
         /// <summary>

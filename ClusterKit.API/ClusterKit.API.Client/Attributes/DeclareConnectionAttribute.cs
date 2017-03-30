@@ -18,6 +18,24 @@ namespace ClusterKit.API.Client.Attributes
     public class DeclareConnectionAttribute : DeclareFieldAttribute
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="DeclareConnectionAttribute"/> class.
+        /// </summary>
+        public DeclareConnectionAttribute()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeclareConnectionAttribute"/> class.
+        /// </summary>
+        /// <param name="description">
+        /// The description.
+        /// </param>
+        public DeclareConnectionAttribute(string description)
+            : base(description)
+        {
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether new node creation is possible
         /// </summary>
         public bool CanCreate { get; set; }

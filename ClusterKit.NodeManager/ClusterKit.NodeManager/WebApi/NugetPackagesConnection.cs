@@ -1,4 +1,4 @@
-﻿ // --------------------------------------------------------------------------------------------------------------------
+ // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NugetPackagesConnection.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace ClusterKit.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;

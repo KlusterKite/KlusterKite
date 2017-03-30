@@ -1013,9 +1013,9 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void OnTemplatesStatisticsRequest()
         {
-            Func<NodeTemplate, TemplatesUsageStatistics.TemplateUsageStatistics> selector =
+            Func<NodeTemplate, TemplatesUsageStatistics.Data> selector =
                 t =>
-                    new TemplatesUsageStatistics.TemplateUsageStatistics
+                    new TemplatesUsageStatistics.Data
                         {
                             MaximumRequiredNodes = t.MaximumNeededInstances,
                             MinimumRequiredNodes = t.MinimumRequiredInstances,

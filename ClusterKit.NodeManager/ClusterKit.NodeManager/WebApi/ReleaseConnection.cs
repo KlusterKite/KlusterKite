@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReleaseConnection.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace ClusterKit.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
@@ -67,8 +67,7 @@ namespace ClusterKit.NodeManager
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ClusterUpdate)]
-        [DeclareMutation(
-            Description = "Initiates cluster upgrade procedure. The previous active release will be marked as failed")]
+        [DeclareMutation("Initiates cluster upgrade procedure. The previous active release will be marked as failed")]
         public async Task<MutationResult<Release>> RollbackCluster(
             [ApiDescription(Description = "The id of release that will be applied")] int id)
         {
@@ -93,7 +92,7 @@ namespace ClusterKit.NodeManager
         /// </summary>
         /// <param name="id">The id of release draft</param>
         /// <returns>The mutation result</returns>
-        [DeclareMutation(Description = "moves release state from \"draft\" to \"ready\"")]
+        [DeclareMutation("moves release state from \"draft\" to \"ready\"")]
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
@@ -126,7 +125,7 @@ namespace ClusterKit.NodeManager
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ClusterUpdate)]
-        [DeclareMutation(Description = "moves release state from \"draft\" to \"ready\"")]
+        [DeclareMutation("moves release state from \"draft\" to \"ready\"")]
         public async Task<MutationResult<Release>> SetStable(int id, bool isStable)
         {
             try
@@ -154,9 +153,9 @@ namespace ClusterKit.NodeManager
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ClusterUpdate)]
-        [DeclareMutation(Description = "Initiates cluster upgrade procedure. The previous active release will be marked as obsolete")]
+        [DeclareMutation("Initiates cluster upgrade procedure. The previous active release will be marked as obsolete")]
         public async Task<MutationResult<Release>> UpdateCluster(
-            [ApiDescription(Description = "The id of release that will be applied")] int id)
+            [ApiDescription("The id of release that will be applied")] int id)
         {
             try
             {

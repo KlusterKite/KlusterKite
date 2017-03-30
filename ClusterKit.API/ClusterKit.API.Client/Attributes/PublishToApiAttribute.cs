@@ -22,6 +22,24 @@ namespace ClusterKit.API.Client.Attributes
     public abstract class PublishToApiAttribute : ApiDescriptionAttribute
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="PublishToApiAttribute"/> class.
+        /// </summary>
+        protected PublishToApiAttribute()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishToApiAttribute"/> class.
+        /// </summary>
+        /// <param name="description">
+        /// The description.
+        /// </param>
+        protected PublishToApiAttribute(string description)
+            : base(description)
+        {
+        }
+
+        /// <summary>
         /// Gets or sets the return type to be described for an api 
         /// </summary>
         /// <remarks>

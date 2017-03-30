@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CurrentUserApi.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,11 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace ClusterKit.NodeManager.WebApi
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
+    using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Security.Client;
@@ -21,6 +24,7 @@ namespace ClusterKit.NodeManager
     /// <summary>
     /// Publishes access to the authenticated user information
     /// </summary>
+    [ApiDescription("Publishes access to the authenticated user information", Name = "CurrentUserApi")]
     public class CurrentUserApi
     {
         /// <summary>
@@ -43,21 +47,36 @@ namespace ClusterKit.NodeManager
         /// Gets the current user data
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "Authenticated user")]
+        [DeclareField("Authenticated user")]
         public UserDescription ClusterKitUser => this.context?.Authentication?.User as UserDescription;
 
         /// <summary>
         /// Gets the current user privileges
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "The current user privileges")]
+        [DeclareField("The current user privileges")]
         public List<string> ClusterKitUserPrivileges => this.context?.Authentication?.UserScope.ToList();
 
         /// <summary>
         /// Gets the current user privileges
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "The current application privileges")]
+        [DeclareField("The current application privileges")]
         public List<string> ClusterKitClientPrivileges => this.context?.Authentication?.ClientScope.ToList();
+
+        /// <summary>
+        /// Changes the current user password
+        /// </summary>
+        /// <param name="oldPassword">The user current password</param>
+        /// <param name="newPassword">The user new password</param>
+        /// <returns>The success of the operation</returns>
+        [UsedImplicitly]
+        [DeclareMutation("Changes the current user password")]
+        public Task<MutationResult<bool>> ChangePassword(
+            [ApiDescription("The user current password")] string oldPassword,
+            [ApiDescription("The user current password")] string newPassword)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

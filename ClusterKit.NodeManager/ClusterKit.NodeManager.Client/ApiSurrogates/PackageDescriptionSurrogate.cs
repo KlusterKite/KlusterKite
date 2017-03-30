@@ -20,7 +20,7 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
     /// <summary>
     /// Represents the <see cref="PackageDescription"/> for public API
     /// </summary>
-    [ApiDescription(Description = "Short description of NuGet package", Name = "ClusterKitPackageDescription")]
+    [ApiDescription(Description = "Short description of NuGet package", Name = "NugetPackage")]
     public class PackageDescriptionSurrogate
     {
         /// <summary>

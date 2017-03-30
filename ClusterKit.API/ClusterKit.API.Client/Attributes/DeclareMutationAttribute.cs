@@ -17,5 +17,22 @@ namespace ClusterKit.API.Client.Attributes
     [AttributeUsage(AttributeTargets.Method)]
     public class DeclareMutationAttribute : PublishToApiAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeclareMutationAttribute"/> class.
+        /// </summary>
+        public DeclareMutationAttribute()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeclareMutationAttribute"/> class.
+        /// </summary>
+        /// <param name="description">
+        /// The description.
+        /// </param>
+        public DeclareMutationAttribute(string description)
+            : base(description)
+        {
+        }
     }
 }

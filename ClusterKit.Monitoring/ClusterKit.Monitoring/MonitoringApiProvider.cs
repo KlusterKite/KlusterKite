@@ -20,7 +20,7 @@ namespace ClusterKit.Monitoring
     /// Provides API access to the monitoring functions
     /// </summary>
     [UsedImplicitly]
-    [ApiDescription(Description = "ClusterKit node monitoring", Name = "ClusterKitMonitoring")]
+    [ApiDescription("ClusterKit node monitoring", Name = "ClusterKitMonitoring")]
     public class MonitoringApiProvider : ApiProvider
     {
         /// <summary>
@@ -38,7 +38,7 @@ namespace ClusterKit.Monitoring
         /// Gets an access to the monitoring api
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "ClusterKit node monitoring")]
+        [DeclareField("ClusterKit node monitoring")]
         public MonitoringApi ClusterKitMonitoringApi { get; }
     }
 }

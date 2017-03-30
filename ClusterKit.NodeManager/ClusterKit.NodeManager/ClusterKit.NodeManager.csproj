@@ -286,7 +286,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
-    <Compile Include="CurrentUserApi.cs" />
     <Compile Include="Messages\ActiveNodeDescriptionsRequest.cs" />
     <Compile Include="Messages\AvailableTemplatesRequest.cs" />
     <Compile Include="Messages\NodeUpgradeRequest.cs" />
@@ -297,16 +296,19 @@
     <Compile Include="Messages\UpdateClusterRequest.cs" />
     <Compile Include="NodeManagerActor.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="NodeManagerApi.cs" />
-    <Compile Include="NugetPackagesConnection.cs" />
     <Compile Include="NugetPackagesFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReleaseConnection.cs" />
     <Compile Include="WebApi\AuthenticationController.cs" />
+    <Compile Include="WebApi\CurrentUserApi.cs" />
+    <Compile Include="WebApi\NodeManagerApi.cs" />
     <Compile Include="WebApi\NodeManagerController.cs" />
     <Compile Include="WebApi\NodeTemplatesRestController.cs" />
     <Compile Include="WebApi\NugetFeedsRestController.cs" />
+    <Compile Include="WebApi\NugetPackagesConnection.cs" />
+    <Compile Include="WebApi\ReleaseConnection.cs" />
+    <Compile Include="WebApi\RolesConnection.cs" />
     <Compile Include="WebApi\SeedAddressesRestController.cs" />
+    <Compile Include="WebApi\UsersConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

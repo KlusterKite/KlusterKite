@@ -18,12 +18,13 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// Link to the nuget feed to download updates
     /// </summary>
-    [ApiDescription(Description = "The link to the nuget feed to download updates", Name = "ClusterKitNugetFeed")]
+    [ApiDescription("The link to the nuget feed to download updates", Name = "NugetFeed")]
     public class NugetFeed : IObjectWithId<int>
     {
         /// <summary>
         /// Type of NuGet feed
         /// </summary>
+        [ApiDescription("The type of nuget feed", Name = "EnFeedType")]
         public enum EnFeedType
         {
             /// <summary>
@@ -40,32 +41,32 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets seed url address
         /// </summary>
-        [DeclareField(Description = "The seed url address")]
+        [DeclareField("The seed url address")]
         public string Address { get; set; }
 
         /// <summary>
         /// Gets or sets unique address identification number
         /// </summary>
-        [DeclareField(Description = "The unique address identification number", IsKey = true)]
+        [DeclareField("The unique address identification number", IsKey = true)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
         public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets user password for basic authentication
         /// </summary>
-        [DeclareField(Description = "The user password for basic authentication")]
+        [DeclareField("The user password for basic authentication")]
         public string Password { get; set; }
 
         /// <summary>
         /// Gets or sets type of feed
         /// </summary>
-        [DeclareField(Description = "The  type of feed")]
+        [DeclareField("The  type of feed")]
         public EnFeedType Type { get; set; }
 
         /// <summary>
         /// Gets or sets username for basic authentication
         /// </summary>
-        [DeclareField(Description = "The username for basic authentication")]
+        [DeclareField("The username for basic authentication")]
         public string UserName { get; set; }
 
         /// <inheritdoc />

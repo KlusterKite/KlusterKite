@@ -18,6 +18,24 @@ namespace ClusterKit.API.Client.Attributes
     public class DeclareFieldAttribute : PublishToApiAttribute
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="DeclareFieldAttribute"/> class.
+        /// </summary>
+        public DeclareFieldAttribute()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeclareFieldAttribute"/> class.
+        /// </summary>
+        /// <param name="description">
+        /// The description.
+        /// </param>
+        public DeclareFieldAttribute(string description)
+            : base(description)
+        {
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether current property is entity identification key.
         /// </summary>
         public bool IsKey { get; set; }

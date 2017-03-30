@@ -22,20 +22,20 @@ namespace ClusterKit.Monitoring.Messages
     /// <summary>
     /// Global cluster actors tree scan result
     /// </summary>
-    [ApiDescription(Description = "Global cluster actors tree scan result", Name = " ClusterKitMonitoringClusterTree")]
+    [ApiDescription("Global cluster actors tree scan result", Name = "ClusterTree")]
     public class ClusterTree
     {
         /// <summary>
-        /// Gets or sets the list of nodes
+        /// Gets the list of nodes
         /// </summary>
-        [DeclareField(Description = "Gets the list of nodes", Converter = typeof(DictionaryConverter<string, Node>))]
-        public Dictionary<string, Node> Nodes { get; set; } = new Dictionary<string, Node>();
+        [DeclareField("Gets the list of nodes", Converter = typeof(DictionaryConverter<string, Node>))]
+        public Dictionary<string, Node> Nodes { get; } = new Dictionary<string, Node>();
 
         /// <summary>
         /// Gets the sum of queue size across tree
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "Gets the sum of queue size across tree")]
+        [DeclareField("Gets the sum of queue size across tree")]
         public int QueueSizeSum
         {
             get
@@ -51,7 +51,7 @@ namespace ClusterKit.Monitoring.Messages
         /// Gets the maximum queue size among tree nodes
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "Gets the maximum queue size among tree nodes")]
+        [DeclareField("Gets the maximum queue size among tree nodes")]
         public int MaxQueueSize
         {
             get

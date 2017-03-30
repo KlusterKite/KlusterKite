@@ -20,19 +20,19 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// The address of fixed cluster seed for new node configuration
     /// </summary>
-    [ApiDescription(Description = "The address of fixed cluster seed for new node configuration", Name = "ClusterKitSeedAddress")]
+    [ApiDescription("The address of fixed cluster seed for new node configuration", Name = "SeedAddress")]
     public class SeedAddress : IObjectWithId<int>
     {
         /// <summary>
         /// Gets or sets seed address in format of akka url
         /// </summary>
-        [DeclareField(Description = "The seed address in format of akka url")]
+        [DeclareField("The seed address in format of akka url")]
         public string Address { get; set; }
 
         /// <summary>
         /// Gets or sets unique address identification number
         /// </summary>
-        [DeclareField(Description = "The unique address identification number", IsKey = true)]
+        [DeclareField("The unique address identification number", IsKey = true)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
         [UsedImplicitly]
         public int Id { get; set; }

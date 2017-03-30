@@ -59,7 +59,7 @@ namespace ClusterKit.Monitoring
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetClusterTree, Scope = EnPrivilegeScope.User)]
-        [DeclareField(Description = "Gets the last cluster scan result. Changes as system receives the scan results from nodes")]
+        [DeclareField("Gets the last cluster scan result. Changes as system receives the scan results from nodes")]
         public async Task<ClusterTree> GetClusterTree()
         {
             try
@@ -85,7 +85,7 @@ namespace ClusterKit.Monitoring
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.InitiateScan, Scope = EnPrivilegeScope.User)]
-        [DeclareMutation(Description = "Initiates the new actor system scan")]
+        [DeclareMutation("Initiates the new actor system scan")]
         public bool InitiateScan()
         {
             this.system.ActorSelection("/user/Monitoring/ClusterScannerProxy").Tell(new ClusterScanRequest());

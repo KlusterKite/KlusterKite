@@ -25,83 +25,83 @@ namespace ClusterKit.NodeManager.Client.Messages
     /// Description of node configuration
     /// </summary>
     [UsedImplicitly]
-    [ApiDescription(Description = "Description of node configuration", Name = "ClusterKitNodeDescription")]
+    [ApiDescription("Description of node configuration", Name = "NodeDescription")]
     public class NodeDescription
     {
         /// <summary>
         /// Gets or sets symbolic container type code
         /// </summary>
-        [DeclareField(Description = "symbolic container type code")]
+        [DeclareField("symbolic container type code")]
         public string ContainerType { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current node is cluster leader
         /// </summary>
-        [DeclareField(Description = "a value indicating whether the current node is cluster leader")]
+        [DeclareField("a value indicating whether the current node is cluster leader")]
         public bool IsClusterLeader { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether software and or configuration is obsolete and needed to be upgraded
         /// </summary>
-        [DeclareField(Description = "a value indicating whether software and or configuration is obsolete and needed to be upgraded")]
+        [DeclareField("a value indicating whether software and or configuration is obsolete and needed to be upgraded")]
         public bool IsObsolete { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this is complete description
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "a value indicating whether this is complete description")]
+        [DeclareField("a value indicating whether this is complete description")]
         public bool IsInitialized { get; set; }
 
         /// <summary>
         /// Gets or sets the list of roles, where current node is leader
         /// </summary>
-        [DeclareField(Description = "the list of roles, where current node is leader")]
+        [DeclareField("the list of roles, where current node is leader")]
         public List<string> LeaderInRoles { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the list of descriptions of installed modules
         /// </summary>
         [DeclareField(
-            Description = "The list of descriptions of installed modules", 
+            "The list of descriptions of installed modules", 
             Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
         public List<PackageDescription> Modules { get; set; }
 
         /// <summary>
         /// Gets or sets node's address
         /// </summary>
-        [DeclareField(Description = "The node's address", Converter = typeof(AkkaAddressSurrogate.Converter))]
+        [DeclareField("The node's address", Converter = typeof(AkkaAddressSurrogate.Converter))]
         public Address NodeAddress { get; set; }
 
         /// <summary>
         /// Gets or sets request id to indicate node instance startup
         /// </summary>
-        [DeclareField(Description = "request id to indicate node instance startup", IsKey = true)]
+        [DeclareField("request id to indicate node instance startup", IsKey = true)]
         public Guid NodeId { get; set; }
 
         /// <summary>
         /// Gets or sets node template code
         /// </summary>
-        [DeclareField(Description = "node template code")]
+        [DeclareField("node template code")]
         public string NodeTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets current node template version
         /// </summary>
-        [DeclareField(Description = "current node template version")]
+        [DeclareField("current node template version")]
         public int NodeTemplateVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the list of cluster roles
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "the list of cluster roles")]
+        [DeclareField("the list of cluster roles")]
         public List<string> Roles { get; set; }
 
         /// <summary>
         /// Gets or sets node start time
         /// </summary>
-        [DeclareField(Description = "node start time")]
+        [DeclareField("node start time")]
         public long StartTimeStamp { get; set; }
     }
 }

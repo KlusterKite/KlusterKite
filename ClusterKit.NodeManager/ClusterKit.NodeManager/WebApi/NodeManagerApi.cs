@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NodeManagerApi.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace ClusterKit.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace ClusterKit.NodeManager
     /// <summary>
     /// The node manager api
     /// </summary>
-    [ApiDescription(Description = "The main ClusterKit node managing methods", Name = "ClusterKitNodeManagement")]
+    [ApiDescription("The main ClusterKit node managing methods", Name = "Root")]
     public class NodeManagerApi
     {
         /// <summary>
@@ -65,7 +65,7 @@ namespace ClusterKit.NodeManager
         /// Gets the list of packages in the nuget repository
         /// </summary>
         [UsedImplicitly]
-        [DeclareConnection(Description = "The packages in the Nuget repository")]
+        [DeclareConnection("The packages in the Nuget repository")]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
@@ -81,7 +81,7 @@ namespace ClusterKit.NodeManager
         /// </summary>
         /// <returns>The list of descriptions</returns>
         [UsedImplicitly]
-        [DeclareField(Description = "The list of known active nodes")]
+        [DeclareField("The list of known active nodes")]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetActiveNodeDescriptions, Scope = EnPrivilegeScope.User)]
@@ -103,7 +103,7 @@ namespace ClusterKit.NodeManager
         /// </summary>
         /// <returns>The list of available packages</returns>
         [UsedImplicitly]
-        [DeclareField(Description = "The list of available packages from local cluster repository",
+        [DeclareField("The list of available packages from local cluster repository",
             Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
         [RequireSession]
         [RequireUser]
@@ -120,7 +120,7 @@ namespace ClusterKit.NodeManager
         /// </summary>
         /// <returns>Current cluster statistics</returns>
         [UsedImplicitly]
-        [DeclareField(Description = "Current cluster node template usage for debug purposes")]
+        [DeclareField("Current cluster node template usage for debug purposes")]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetTemplateStatistics, Scope = EnPrivilegeScope.User)]
@@ -219,9 +219,9 @@ namespace ClusterKit.NodeManager
             CanUpdate = true, UpdateDescription = "Updates the managing system role",
             Description = "ClusterKit managing system security roles")]
         [RequirePrivilege(Privileges.Role, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<Role, Guid> Roles(RequestContext context)
+        public RolesConnection Roles(RequestContext context)
         {
-            return new Connection<Role, Guid>(
+            return new RolesConnection(
                 this.actorSystem,
                 this.GetManagerActorProxyPath(),
                 this.AkkaTimeout,
@@ -253,7 +253,7 @@ namespace ClusterKit.NodeManager
         /// <param name="address">Address of node to upgrade</param>
         /// <returns>Execution task</returns>
         [UsedImplicitly]
-        [DeclareMutation(Description = "Manual node upgrade request")]
+        [DeclareMutation("Manual node reboot request")]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.UpgradeNode, Scope = EnPrivilegeScope.User)]
@@ -275,9 +275,9 @@ namespace ClusterKit.NodeManager
         [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new user", CanUpdate = true,
             UpdateDescription = "Updates the user", Description = "ClusterKit managing system users")]
         [RequirePrivilege(Privileges.User, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<User, Guid> Users(RequestContext context)
+        public UsersConnection Users(RequestContext context)
         {
-            return new Connection<User, Guid>(
+            return new UsersConnection(
                 this.actorSystem,
                 this.GetManagerActorProxyPath(),
                 this.AkkaTimeout,

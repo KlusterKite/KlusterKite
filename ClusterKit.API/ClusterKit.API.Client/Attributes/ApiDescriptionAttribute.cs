@@ -20,6 +20,24 @@ namespace ClusterKit.API.Client.Attributes
     public class ApiDescriptionAttribute : Attribute
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ApiDescriptionAttribute"/> class.
+        /// </summary>
+        public ApiDescriptionAttribute()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiDescriptionAttribute"/> class.
+        /// </summary>
+        /// <param name="description">
+        /// The description.
+        /// </param>
+        public ApiDescriptionAttribute(string description)
+        {
+            this.Description = description;
+        }
+
+        /// <summary>
         /// Gets or sets the published property / method name
         /// </summary>
         public string Name { get; set; }
@@ -57,7 +75,10 @@ namespace ClusterKit.API.Client.Attributes
         public static string GetTypeName(Type type)
         {
             var attr = type.GetCustomAttribute<ApiDescriptionAttribute>();
-            return attr?.GetName(type) ?? NamingUtilities.ToCSharpRepresentation(type);
+            var name = attr?.GetName(type) ?? NamingUtilities.ToCSharpRepresentation(type);
+            return type.IsGenericType && !string.IsNullOrWhiteSpace(attr?.GetName(type))
+                ? $"{name}<{string.Join(",", type.GetGenericArguments().Select(GetTypeName))}>"
+                : name;
         }
 
         /// <summary>

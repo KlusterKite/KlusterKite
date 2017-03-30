@@ -19,6 +19,7 @@ namespace ClusterKit.API.Client
     /// The result of mutation call
     /// </summary>
     /// <typeparam name="T">The type of mutated object</typeparam>
+    [ApiDescription("The standard mutation result", Name = "MutationResult")]
     public class MutationResult<T>
     {
         /// <summary>
@@ -29,14 +30,14 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// Gets or sets the mutated object
         /// </summary>
-        [DeclareField(Description = "The mutated object result")]
+        [DeclareField("The mutated object result")]
         public T Result { get; set; }
 
         /// <summary>
         /// Gets or sets the list of errors
         /// </summary>
         [UsedImplicitly]
-        [DeclareField(Description = "The list of mutation errors")]
+        [DeclareField("The list of mutation errors")]
         public IEnumerable<ErrorDescription> Errors
         {
             get
