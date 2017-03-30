@@ -8,7 +8,7 @@ storiesOf('Homepage')
   .add('nodesList without error, has privilege to upgrade', () => {
     const nodes = getNodesListRelay();
     const props = {
-      nodeDescriptions: nodes.data.api.nodeManagerData,
+      nodeDescriptions: nodes.data.api.clusterKitNodesApi,
       hasError: false,
       upgradeNodePrivilege: true,
       testMode: true
@@ -18,7 +18,7 @@ storiesOf('Homepage')
   .add('nodesList without error, no privilege to upgrade', () => {
     const nodes = getNodesListRelay();
     const props = {
-      nodeDescriptions: nodes.data.api.nodeManagerData,
+      nodeDescriptions: nodes.data.api.clusterKitNodesApi,
       hasError: false,
       upgradeNodePrivilege: false,
       testMode: true
@@ -28,7 +28,7 @@ storiesOf('Homepage')
   .add('nodesList with error', () => {
     const nodes = getNodesListRelay();
     const props = {
-      nodeDescriptions: nodes.data.api.nodeManagerData,
+      nodeDescriptions: nodes.data.api.clusterKitNodesApi,
       hasError: true,
       upgradeNodePrivilege: true,
       testMode: true
@@ -42,7 +42,7 @@ const getNodesListRelay = function () {
     "data": {
       "api": {
         "__typename": "ClusterKitMonitoring_ClusterKitNodeApi",
-        "nodeManagerData": {
+        "clusterKitNodesApi": {
           "id": "W3siZiI6Im5vZGVNYW5hZ2VyRGF0YSJ9XQ==",
           "getActiveNodeDescriptions": {
             "edges": [{

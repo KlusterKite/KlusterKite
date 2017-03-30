@@ -3,12 +3,12 @@ import Relay from 'react-relay'
 export default class ReloadPackagesMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_nodeManagerData_reloadPackages}`
+    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_reloadPackages}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
+      fragment on ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload {
         result {
           result
         }
@@ -21,7 +21,7 @@ export default class ReloadPackagesMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
           Relay.QL`
-          fragment on ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
+          fragment on ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload {
             result {
               result
             }

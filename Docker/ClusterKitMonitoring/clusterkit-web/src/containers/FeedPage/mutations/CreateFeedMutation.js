@@ -3,16 +3,16 @@ import Relay from 'react-relay'
 export default class CreateFeedMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_nodeManagerData_nugetFeeds_create}`
+    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_create}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload {
+      fragment on ClusterKitNodeApi_NugetFeed_NodeMutationPayload {
         node
         edge
         api {
-          nodeManagerData {
+          clusterKitNodesApi {
             nugetFeeds
           }
         }
@@ -24,7 +24,7 @@ export default class CreateFeedMutation extends Relay.Mutation {
   //   return [{
   //     type: 'RANGE_ADD',
   //     parentName: 'nodeManagerData',
-  //     parentID: this.props.nodeManagerDataId,
+  //     parentID: this.props.clusterKitNodesApiId,
   //     connectionName: 'nugetFeeds',
   //     edgeName: 'edge',
   //     rangeBehaviors: {

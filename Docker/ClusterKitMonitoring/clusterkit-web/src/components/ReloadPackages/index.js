@@ -30,7 +30,7 @@ class ReloadPackages extends React.Component {
         new ReloadPackagesMutation({}),
         {
           onSuccess: (response) => {
-            const result = response.clusterKitNodeApi_nodeManagerData_reloadPackages.result && response.clusterKitNodeApi_nodeManagerData_reloadPackages.result.result;
+            const result = response.clusterKitNodeApi_clusterKitNodesApi_reloadPackages.result && response.clusterKitNodeApi_clusterKitNodesApi_reloadPackages.result.result;
             if (result) {
               this.showReloadingMessage();
               this.hideReloadingMessageAfterDelay();

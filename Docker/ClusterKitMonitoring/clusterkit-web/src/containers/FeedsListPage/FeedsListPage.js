@@ -11,7 +11,7 @@ class FeedsListPage extends React.Component {
   render () {
     return (
       <div>
-        <FeedsList feeds={this.props.api.nodeManagerData} />
+        <FeedsList feeds={this.props.api.clusterKitNodesApi} />
       </div>
     )
   }
@@ -24,7 +24,7 @@ export default Relay.createContainer(
     fragments: {
       api: () => Relay.QL`fragment on IClusterKitNodeApi {
         __typename
-        nodeManagerData {
+        clusterKitNodesApi {
           ${FeedsList.getFragment('feeds')},
         }
       }

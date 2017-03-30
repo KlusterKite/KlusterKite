@@ -78,7 +78,6 @@ const processResponse = (response, resolve, reject) => {
  */
 const tokenRefreshPromise = () => {
   const promise = new Promise((resolve, reject) => {
-    const accessToken = Storage.get('accessToken');
     const refreshToken = Storage.get('refreshToken');
 
     if (refreshToken) {

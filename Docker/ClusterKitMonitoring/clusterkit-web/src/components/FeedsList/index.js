@@ -53,7 +53,7 @@ export default Relay.createContainer(
       }
     },
     fragments: {
-      feeds: () => Relay.QL`fragment on IClusterKitNodeApi_ClusterKitNodeManagement {
+      feeds: () => Relay.QL`fragment on IClusterKitNodeApi_Root {
         nugetFeeds(filter: $filter ) {
           edges {
             node {

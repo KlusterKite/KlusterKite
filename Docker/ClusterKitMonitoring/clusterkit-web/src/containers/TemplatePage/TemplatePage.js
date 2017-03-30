@@ -117,7 +117,7 @@ export default Relay.createContainer(
           id
           __typename
           __node(id: $id) @include( if: $nodeExists ) {
-            ...on ClusterKitNodeApi_ClusterKitNodeTemplate {
+            ...on IClusterKitNodeApi_NodeTemplate {
               __id
               code
               configuration

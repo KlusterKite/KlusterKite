@@ -38,11 +38,10 @@ class FeedPage extends React.Component {
   }
 
   _addNode = (model) => {
-    console.log('id', this.props.api.nodeManagerData.id);
     Relay.Store.commitUpdate(
       new CreateFeedMutation(
         {
-          nodeManagerDataId: this.props.api.nodeManagerData.id,
+          clusterKitNodesApiId: this.props.api.clusterKitNodesApi.id,
           userName: model.userName,
           password: model.password,
           address: model.address,
@@ -108,11 +107,11 @@ export default Relay.createContainer(
         fragment on IClusterKitNodeApi {
           __typename
           id
-          nodeManagerData {
+          clusterKitNodesApi {
             id
           }
           __node(id: $id) @include( if: $nodeExists ) {
-            ...on ClusterKitNodeApi_ClusterKitNugetFeed {
+            ...on IClusterKitNodeApi_NugetFeed {
               __id
               address
               type
