@@ -13,7 +13,7 @@ class TemplatesListPage extends React.Component {
     return (
       <div>
         <TemplatesList
-          templates={this.props.api.nodeManagerData}
+          templates={this.props.api.clusterKitNodesApi}
           createNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Create')}
           getNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Get')} />
       </div>
@@ -27,7 +27,7 @@ export default Relay.createContainer(
     fragments: {
       api: () => Relay.QL`fragment on IClusterKitNodeApi {
         __typename
-        nodeManagerData {
+        clusterKitNodesApi {
           ${TemplatesList.getFragment('templates')},
         }
       }

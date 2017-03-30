@@ -9,55 +9,42 @@ type Boolean_MutationPayload {
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
-# Global cluster actors tree scan result
-type ClusterKitMonitoring__ClusterKitMonitoringClusterTree implements IClusterKitMonitoring__ClusterKitMonitoringClusterTree, Node {
-  # Gets the list of nodes
-  nodes(filter: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input, sort: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Connection
-
-  # Gets the sum of queue size across tree
-  queueSizeSum: Int
-
-  # Gets the maximum queue size among tree nodes
-  maxQueueSize: Int
-  id: ID
-}
-
 # Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_ implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_, Node {
+type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_, Node {
   # Gets a dictionary key
   key: String
 
   # Gets a dictionary value
-  value: ClusterKitMonitoring_ClusterKitMonitoringNode
+  value: ClusterKitMonitoring_Node
   id: ID
 }
 
-# The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_
+# The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
 #  Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Connection implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Connection {
+type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Edge]
+  edges: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge]
 }
 
-# The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_ in a connected list
+# The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ in a connected list
 #  Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Edge implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Edge {
+type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge {
   # A value to use with paging positioning
   cursor: String
 
   # Represents a dictionary key-value pair
-  node: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_
+  node: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
 }
 
-input ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input {
+input ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input
+  OR: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input
+  AND: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input
 
   # key exactly equals to the parameter, key: Gets a dictionary key
   key: String
@@ -120,7 +107,7 @@ input ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__
   key_l_not_ends_with: String
 }
 
-enum ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Sort {
+enum ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort {
   key_asc
   key_desc
 }
@@ -129,8 +116,41 @@ input ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input {
   clientMutationId: String
 }
 
+# ClusterKit node monitoring
+# The root provider
+type ClusterKitMonitoring_ClusterKitNodeApi implements IClusterKitMonitoring, IClusterKitNodeApi, Node {
+  # ClusterKit node monitoring
+  clusterKitMonitoringApi: ClusterKitMonitoring_Root
+
+  # The ClusterKit node managing API
+  clusterKitNodesApi: ClusterKitNodeApi_Root
+
+  # The current user
+  me: ClusterKitNodeApi_CurrentUserApi
+  id: ID
+
+  # The node global searcher according to Relay specification
+  __node(
+    # The node global id
+    id: ID
+  ): Node
+}
+
+# Global cluster actors tree scan result
+type ClusterKitMonitoring_ClusterTree implements IClusterKitMonitoring_ClusterTree, Node {
+  # Gets the list of nodes
+  nodes(filter: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input, sort: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection
+
+  # Gets the sum of queue size across tree
+  queueSizeSum: Int
+
+  # Gets the maximum queue size among tree nodes
+  maxQueueSize: Int
+  id: ID
+}
+
 # The actor's description
-type ClusterKitMonitoring_ClusterKitMonitoringNode implements IClusterKitMonitoring_ClusterKitMonitoringNode, Node {
+type ClusterKitMonitoring_Node implements IClusterKitMonitoring_Node, Node {
   # the actor's type
   actorType: String
 
@@ -156,36 +176,36 @@ type ClusterKitMonitoring_ClusterKitMonitoringNode implements IClusterKitMonitor
   queueSizeSum: Int
 
   # the actor's children
-  children(filter: ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input, sort: [ClusterKitMonitoring_ClusterKitMonitoringNode_Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_ClusterKitMonitoringNode_Connection
+  children(filter: ClusterKitMonitoring_Node_Filter_Input, sort: [ClusterKitMonitoring_Node_Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_Node_Connection
   id: ID
 }
 
-# The list of connected ClusterKitMonitoring_ClusterKitMonitoringNode
+# The list of connected ClusterKitMonitoring_Node
 #  The actor's description
-type ClusterKitMonitoring_ClusterKitMonitoringNode_Connection implements IClusterKitMonitoring_ClusterKitMonitoringNode_Connection {
+type ClusterKitMonitoring_Node_Connection implements IClusterKitMonitoring_Node_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitMonitoring_ClusterKitMonitoringNode_Edge]
+  edges: [ClusterKitMonitoring_Node_Edge]
 }
 
-# The ClusterKitMonitoring_ClusterKitMonitoringNode in a connected list
+# The ClusterKitMonitoring_Node in a connected list
 #  The actor's description
-type ClusterKitMonitoring_ClusterKitMonitoringNode_Edge implements IClusterKitMonitoring_ClusterKitMonitoringNode_Edge {
+type ClusterKitMonitoring_Node_Edge implements IClusterKitMonitoring_Node_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # The actor's description
-  node: ClusterKitMonitoring_ClusterKitMonitoringNode
+  node: ClusterKitMonitoring_Node
 }
 
-input ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input {
+input ClusterKitMonitoring_Node_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input
+  OR: ClusterKitMonitoring_Node_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input
+  AND: ClusterKitMonitoring_Node_Filter_Input
 
   # actorType exactly equals to the parameter, actorType: the actor's type
   actorType: String
@@ -542,7 +562,7 @@ input ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input {
   queueSizeSum_gte: Int
 }
 
-enum ClusterKitMonitoring_ClusterKitMonitoringNode_Sort {
+enum ClusterKitMonitoring_Node_Sort {
   actorType_asc
   actorType_desc
   currentMessage_asc
@@ -561,30 +581,10 @@ enum ClusterKitMonitoring_ClusterKitMonitoringNode_Sort {
   queueSizeSum_desc
 }
 
-# ClusterKit node monitoring
-# The root provider
-type ClusterKitMonitoring_ClusterKitNodeApi implements IClusterKitMonitoring, IClusterKitNodeApi, Node {
-  # ClusterKit node monitoring
-  clusterKitMonitoringApi: ClusterKitMonitoring_Root
-
-  # The ClusterKit node managing API
-  nodeManagerData: ClusterKitNodeApi_ClusterKitNodeManagement
-
-  # The current user
-  me: ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
-  id: ID
-
-  # The node global searcher according to Relay specification
-  __node(
-    # The node global id
-    id: ID
-  ): Node
-}
-
 # ClusterKit monitoring api
 type ClusterKitMonitoring_Root implements IClusterKitMonitoring_Root, Node {
   # Gets the last cluster scan result. Changes as system receives the scan results from nodes
-  getClusterTree: ClusterKitMonitoring__ClusterKitMonitoringClusterTree
+  getClusterTree: ClusterKitMonitoring_ClusterTree
   id: ID
 }
 
@@ -607,27 +607,173 @@ type ClusterKitNodeApi_AkkaAddress implements IClusterKitNodeApi_AkkaAddress, No
   id: ID
 }
 
-type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ implements IClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_, Node {
-  # The mutated object result
-  result: Boolean
+input ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_NodeTemplate_Input
+  clientMutationId: String
+}
 
-  # The list of mutation errors
-  errors(filter: ClusterKitNodeApi_ErrorDescription_Filter_Input, sort: [ClusterKitNodeApi_ErrorDescription_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ErrorDescription_Connection
+input ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_NodeTemplate_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_NugetFeed_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_NugetFeed_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_Release_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster_Input {
+  # The id of release that will be applied
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input {
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_setStable_Input {
+  id: Int
+  isStable: Boolean
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_Release_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_updateCluster_Input {
+  # The id of release that will be applied
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_reloadPackages_Input {
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_roles_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_Role_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_roles_update_Input {
+  # The object's id
+  id: Uid
+
+  # The object's data
+  newNode: ClusterKitNodeApi_Role_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_SeedAddress_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_SeedAddress_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_upgradeNode_Input {
+  address: String
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_User_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_update_Input {
+  # The object's id
+  id: Uid
+
+  # The object's data
+  newNode: ClusterKitNodeApi_User_Input
+  clientMutationId: String
+}
+
+# Short user description
+type ClusterKitNodeApi_ClusterKitUserDescription implements IClusterKitNodeApi_ClusterKitUserDescription, Node {
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill: Date
+
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill: Date
+
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The user login
+  login: String
   id: ID
 }
 
-type ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload {
-  result: ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
-}
-
-enum ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType {
-  Public
-  Private
-}
-
-type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi implements IClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi, Node {
+# Publishes access to the authenticated user information
+type ClusterKitNodeApi_CurrentUserApi implements IClusterKitNodeApi_CurrentUserApi, Node {
   # Authenticated user
   clusterKitUser: ClusterKitNodeApi_ClusterKitUserDescription
 
@@ -639,8 +785,234 @@ type ClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi implements ICluster
   id: ID
 }
 
+enum ClusterKitNodeApi_EnFeedType {
+  Public
+  Private
+}
+
+enum ClusterKitNodeApi_EnReleaseState {
+  Draft
+  Ready
+  Active
+  Faulted
+  Obsolete
+}
+
+# The mutation error description
+type ClusterKitNodeApi_ErrorDescription implements IClusterKitNodeApi_ErrorDescription, Node {
+  # The error number
+  number: Int
+
+  # The related field name
+  field: String
+
+  # The error message
+  message: String
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_ErrorDescription
+#  The mutation error description
+type ClusterKitNodeApi_ErrorDescription_Connection implements IClusterKitNodeApi_ErrorDescription_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_ErrorDescription_Edge]
+}
+
+# The ClusterKitNodeApi_ErrorDescription in a connected list
+#  The mutation error description
+type ClusterKitNodeApi_ErrorDescription_Edge implements IClusterKitNodeApi_ErrorDescription_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # The mutation error description
+  node: ClusterKitNodeApi_ErrorDescription
+}
+
+input ClusterKitNodeApi_ErrorDescription_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_ErrorDescription_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_ErrorDescription_Filter_Input
+
+  # number exactly equals to the parameter, number: The error number
+  number: Int
+
+  # number not equals to the parameter, number: The error number
+  number_not: Int
+
+  # number is less then the parameter, number: The error number
+  number_lt: Int
+
+  # number is less then or equal to the parameter, number: The error number
+  number_lte: Int
+
+  # number is greater then the parameter, number: The error number
+  number_gt: Int
+
+  # number is greater then or equal to the parameter, number: The error number
+  number_gte: Int
+
+  # field exactly equals to the parameter, field: The related field name
+  field: String
+
+  # field not equals to the parameter, field: The related field name
+  field_not: String
+
+  # field is a substring of the parameter, field: The related field name
+  field_in: String
+
+  # field is not a substring of the parameter, field: The related field name
+  field_not_in: String
+
+  # field contains the parameter as substring, field: The related field name
+  field_contains: String
+
+  # field doesn't contain the parameter as substring, field: The related field name
+  field_not_contains: String
+
+  # field starts with the parameter value, field: The related field name
+  field_starts_with: String
+
+  # field doesn't start with the parameter value, field: The related field name
+  field_not_starts_with: String
+
+  # field ends with the parameter value, field: The related field name
+  field_ends_with: String
+
+  # field doesn't end with the parameter value, field: The related field name
+  field_not_ends_with: String
+
+  # field lowercased equals the parameter, field: The related field name
+  field_l: String
+
+  # field lowercased doesn't equal the parameter, field: The related field name
+  field_l_not: String
+
+  # field lowercased is a substring of the parameter, field: The related field name
+  field_l_in: String
+
+  # field lowercased is not a substring of the parameter, field: The related field name
+  field_l_not_in: String
+
+  # field lowercased contains the parameter as substring, field: The related field name
+  field_l_contains: String
+
+  # field lowercased doesn't contain the parameter as substring, field: The related field name
+  field_l_not_contains: String
+
+  # field lowercased starts with the parameter value, field: The related field name
+  field_l_starts_with: String
+
+  # field lowercased doesn't start with the parameter value, field: The related field name
+  field_l_not_starts_with: String
+
+  # field lowercased ends with the parameter value, field: The related field name
+  field_l_ends_with: String
+
+  # field lowercased doesn't end with the parameter value, field: The related field name
+  field_l_not_ends_with: String
+
+  # message exactly equals to the parameter, message: The error message
+  message: String
+
+  # message not equals to the parameter, message: The error message
+  message_not: String
+
+  # message is a substring of the parameter, message: The error message
+  message_in: String
+
+  # message is not a substring of the parameter, message: The error message
+  message_not_in: String
+
+  # message contains the parameter as substring, message: The error message
+  message_contains: String
+
+  # message doesn't contain the parameter as substring, message: The error message
+  message_not_contains: String
+
+  # message starts with the parameter value, message: The error message
+  message_starts_with: String
+
+  # message doesn't start with the parameter value, message: The error message
+  message_not_starts_with: String
+
+  # message ends with the parameter value, message: The error message
+  message_ends_with: String
+
+  # message doesn't end with the parameter value, message: The error message
+  message_not_ends_with: String
+
+  # message lowercased equals the parameter, message: The error message
+  message_l: String
+
+  # message lowercased doesn't equal the parameter, message: The error message
+  message_l_not: String
+
+  # message lowercased is a substring of the parameter, message: The error message
+  message_l_in: String
+
+  # message lowercased is not a substring of the parameter, message: The error message
+  message_l_not_in: String
+
+  # message lowercased contains the parameter as substring, message: The error message
+  message_l_contains: String
+
+  # message lowercased doesn't contain the parameter as substring, message: The error message
+  message_l_not_contains: String
+
+  # message lowercased starts with the parameter value, message: The error message
+  message_l_starts_with: String
+
+  # message lowercased doesn't start with the parameter value, message: The error message
+  message_l_not_starts_with: String
+
+  # message lowercased ends with the parameter value, message: The error message
+  message_l_ends_with: String
+
+  # message lowercased doesn't end with the parameter value, message: The error message
+  message_l_not_ends_with: String
+}
+
+enum ClusterKitNodeApi_ErrorDescription_Sort {
+  number_asc
+  number_desc
+  field_asc
+  field_desc
+  message_asc
+  message_desc
+}
+
+input ClusterKitNodeApi_me_changePassword_Input {
+  # The user current password
+  oldPassword: String
+
+  # The user current password
+  newPassword: String
+  clientMutationId: String
+}
+
+# The standard mutation result
+type ClusterKitNodeApi_MutationResult_System_Boolean_ implements IClusterKitNodeApi_MutationResult_System_Boolean_, Node {
+  # The mutated object result
+  result: Boolean
+
+  # The list of mutation errors
+  errors(filter: ClusterKitNodeApi_ErrorDescription_Filter_Input, sort: [ClusterKitNodeApi_ErrorDescription_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ErrorDescription_Connection
+  id: ID
+}
+
+type ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload {
+  result: ClusterKitNodeApi_MutationResult_System_Boolean_
+  clientMutationId: String
+  api: ClusterKitMonitoring_ClusterKitNodeApi
+}
+
 # Description of node configuration
-type ClusterKitNodeApi_ClusterKitNodeDescription implements IClusterKitNodeApi_ClusterKitNodeDescription, Node {
+type ClusterKitNodeApi_NodeDescription implements IClusterKitNodeApi_NodeDescription, Node {
   # symbolic container type code
   containerType: String
 
@@ -657,7 +1029,7 @@ type ClusterKitNodeApi_ClusterKitNodeDescription implements IClusterKitNodeApi_C
   leaderInRoles: [String]
 
   # The list of descriptions of installed modules
-  modules(filter: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitPackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitPackageDescription_Connection
+  modules(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
 
   # The node's address
   nodeAddress: ClusterKitNodeApi_AkkaAddress
@@ -679,32 +1051,32 @@ type ClusterKitNodeApi_ClusterKitNodeDescription implements IClusterKitNodeApi_C
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitNodeDescription
+# The list of connected ClusterKitNodeApi_NodeDescription
 #  Description of node configuration
-type ClusterKitNodeApi_ClusterKitNodeDescription_Connection implements IClusterKitNodeApi_ClusterKitNodeDescription_Connection {
+type ClusterKitNodeApi_NodeDescription_Connection implements IClusterKitNodeApi_NodeDescription_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitNodeDescription_Edge]
+  edges: [ClusterKitNodeApi_NodeDescription_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitNodeDescription in a connected list
+# The ClusterKitNodeApi_NodeDescription in a connected list
 #  Description of node configuration
-type ClusterKitNodeApi_ClusterKitNodeDescription_Edge implements IClusterKitNodeApi_ClusterKitNodeDescription_Edge {
+type ClusterKitNodeApi_NodeDescription_Edge implements IClusterKitNodeApi_NodeDescription_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # Description of node configuration
-  node: ClusterKitNodeApi_ClusterKitNodeDescription
+  node: ClusterKitNodeApi_NodeDescription
 }
 
-input ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input {
+input ClusterKitNodeApi_NodeDescription_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input
+  OR: ClusterKitNodeApi_NodeDescription_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input
+  AND: ClusterKitNodeApi_NodeDescription_Filter_Input
 
   # containerType exactly equals to the parameter, containerType: symbolic container type code
   containerType: String
@@ -891,7 +1263,7 @@ input ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input {
   startTimeStamp_gte: Int
 }
 
-enum ClusterKitNodeApi_ClusterKitNodeDescription_Sort {
+enum ClusterKitNodeApi_NodeDescription_Sort {
   containerType_asc
   containerType_desc
   isClusterLeader_asc
@@ -910,36 +1282,8 @@ enum ClusterKitNodeApi_ClusterKitNodeDescription_Sort {
   startTimeStamp_desc
 }
 
-# The main ClusterKit node managing methods
-type ClusterKitNodeApi_ClusterKitNodeManagement implements IClusterKitNodeApi_ClusterKitNodeManagement, Node {
-  # The list of available packages from local cluster repository
-  getPackages(filter: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitPackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitPackageDescription_Connection
-
-  # Current cluster node template usage for debug purposes
-  getTemplateStatistics: ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics
-
-  # The list of known active nodes
-  getActiveNodeDescriptions(filter: ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNodeDescription_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitNodeDescription_Connection
-
-  # Node templates
-  nodeTemplates(filter: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNodeTemplate_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitNodeTemplate_Connection
-
-  # Node templates
-  nugetFeeds(filter: ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNugetFeed_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitNugetFeed_Connection
-
-  # Node templates
-  seedAddresses(filter: ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitSeedAddress_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitSeedAddress_Connection
-
-  # ClusterKit managing system users
-  users(filter: ClusterKitNodeApi_ClusterKitUser_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitUser_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitUser_Connection
-
-  # ClusterKit managing system security roles
-  roles(filter: ClusterKitNodeApi_ClusterKitRole_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitRole_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitRole_Connection
-  id: ID
-}
-
 # Node template description
-type ClusterKitNodeApi_ClusterKitNodeTemplate implements IClusterKitNodeApi_ClusterKitNodeTemplate, Node {
+type ClusterKitNodeApi_NodeTemplate implements IClusterKitNodeApi_NodeTemplate, Node {
   # The program readable node template name
   code: String
 
@@ -972,32 +1316,32 @@ type ClusterKitNodeApi_ClusterKitNodeTemplate implements IClusterKitNodeApi_Clus
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitNodeTemplate
+# The list of connected ClusterKitNodeApi_NodeTemplate
 #  Node template description
-type ClusterKitNodeApi_ClusterKitNodeTemplate_Connection implements IClusterKitNodeApi_ClusterKitNodeTemplate_Connection {
+type ClusterKitNodeApi_NodeTemplate_Connection implements IClusterKitNodeApi_NodeTemplate_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitNodeTemplate_Edge]
+  edges: [ClusterKitNodeApi_NodeTemplate_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitNodeTemplate in a connected list
+# The ClusterKitNodeApi_NodeTemplate in a connected list
 #  Node template description
-type ClusterKitNodeApi_ClusterKitNodeTemplate_Edge implements IClusterKitNodeApi_ClusterKitNodeTemplate_Edge {
+type ClusterKitNodeApi_NodeTemplate_Edge implements IClusterKitNodeApi_NodeTemplate_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # Node template description
-  node: ClusterKitNodeApi_ClusterKitNodeTemplate
+  node: ClusterKitNodeApi_NodeTemplate
 }
 
-input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input {
+input ClusterKitNodeApi_NodeTemplate_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input
+  OR: ClusterKitNodeApi_NodeTemplate_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input
+  AND: ClusterKitNodeApi_NodeTemplate_Filter_Input
 
   # code exactly equals to the parameter, code: The program readable node template name
   code: String
@@ -1295,7 +1639,7 @@ input ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input {
 }
 
 # Node template description
-input ClusterKitNodeApi_ClusterKitNodeTemplate_Input {
+input ClusterKitNodeApi_NodeTemplate_Input {
   # The program readable node template name
   code: String
 
@@ -1327,16 +1671,16 @@ input ClusterKitNodeApi_ClusterKitNodeTemplate_Input {
   version: Int
 }
 
-type ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload {
+type ClusterKitNodeApi_NodeTemplate_NodeMutationPayload {
   deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitNodeTemplate
-  edge: ClusterKitNodeApi_ClusterKitNodeTemplate_Edge
+  node: ClusterKitNodeApi_NodeTemplate
+  edge: ClusterKitNodeApi_NodeTemplate_Edge
   errors: ClusterKitNodeApi_ErrorDescription_Connection
   clientMutationId: String
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
-enum ClusterKitNodeApi_ClusterKitNodeTemplate_Sort {
+enum ClusterKitNodeApi_NodeTemplate_Sort {
   code_asc
   code_desc
   configuration_asc
@@ -1356,7 +1700,7 @@ enum ClusterKitNodeApi_ClusterKitNodeTemplate_Sort {
 }
 
 # The link to the nuget feed to download updates
-type ClusterKitNodeApi_ClusterKitNugetFeed implements IClusterKitNodeApi_ClusterKitNugetFeed, Node {
+type ClusterKitNodeApi_NugetFeed implements IClusterKitNodeApi_NugetFeed, Node {
   # The seed url address
   address: String
 
@@ -1367,39 +1711,39 @@ type ClusterKitNodeApi_ClusterKitNugetFeed implements IClusterKitNodeApi_Cluster
   password: String
 
   # The  type of feed
-  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+  type: ClusterKitNodeApi_EnFeedType
 
   # The username for basic authentication
   userName: String
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitNugetFeed
+# The list of connected ClusterKitNodeApi_NugetFeed
 #  The link to the nuget feed to download updates
-type ClusterKitNodeApi_ClusterKitNugetFeed_Connection implements IClusterKitNodeApi_ClusterKitNugetFeed_Connection {
+type ClusterKitNodeApi_NugetFeed_Connection implements IClusterKitNodeApi_NugetFeed_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitNugetFeed_Edge]
+  edges: [ClusterKitNodeApi_NugetFeed_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitNugetFeed in a connected list
+# The ClusterKitNodeApi_NugetFeed in a connected list
 #  The link to the nuget feed to download updates
-type ClusterKitNodeApi_ClusterKitNugetFeed_Edge implements IClusterKitNodeApi_ClusterKitNugetFeed_Edge {
+type ClusterKitNodeApi_NugetFeed_Edge implements IClusterKitNodeApi_NugetFeed_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # The link to the nuget feed to download updates
-  node: ClusterKitNodeApi_ClusterKitNugetFeed
+  node: ClusterKitNodeApi_NugetFeed
 }
 
-input ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input {
+input ClusterKitNodeApi_NugetFeed_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input
+  OR: ClusterKitNodeApi_NugetFeed_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input
+  AND: ClusterKitNodeApi_NugetFeed_Filter_Input
 
   # address exactly equals to the parameter, address: The seed url address
   address: String
@@ -1540,10 +1884,10 @@ input ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input {
   password_l_not_ends_with: String
 
   # type exactly equals to the parameter, type: The  type of feed
-  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+  type: ClusterKitNodeApi_EnFeedType
 
   # type not equals to the parameter, type: The  type of feed
-  type_not: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+  type_not: ClusterKitNodeApi_EnFeedType
 
   # userName exactly equals to the parameter, userName: The username for basic authentication
   userName: String
@@ -1607,7 +1951,7 @@ input ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input {
 }
 
 # The link to the nuget feed to download updates
-input ClusterKitNodeApi_ClusterKitNugetFeed_Input {
+input ClusterKitNodeApi_NugetFeed_Input {
   # The seed url address
   address: String
 
@@ -1618,22 +1962,22 @@ input ClusterKitNodeApi_ClusterKitNugetFeed_Input {
   password: String
 
   # The  type of feed
-  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
+  type: ClusterKitNodeApi_EnFeedType
 
   # The username for basic authentication
   userName: String
 }
 
-type ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload {
+type ClusterKitNodeApi_NugetFeed_NodeMutationPayload {
   deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitNugetFeed
-  edge: ClusterKitNodeApi_ClusterKitNugetFeed_Edge
+  node: ClusterKitNodeApi_NugetFeed
+  edge: ClusterKitNodeApi_NugetFeed_Edge
   errors: ClusterKitNodeApi_ErrorDescription_Connection
   clientMutationId: String
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
-enum ClusterKitNodeApi_ClusterKitNugetFeed_Sort {
+enum ClusterKitNodeApi_NugetFeed_Sort {
   address_asc
   address_desc
   id_asc
@@ -1647,7 +1991,7 @@ enum ClusterKitNodeApi_ClusterKitNugetFeed_Sort {
 }
 
 # Short description of NuGet package
-type ClusterKitNodeApi_ClusterKitPackageDescription implements IClusterKitNodeApi_ClusterKitPackageDescription, Node {
+type ClusterKitNodeApi_NugetPackage implements IClusterKitNodeApi_NugetPackage, Node {
   # The package id (name and version)
   __id: String
 
@@ -1656,35 +2000,38 @@ type ClusterKitNodeApi_ClusterKitPackageDescription implements IClusterKitNodeAp
 
   # The package version
   version: String
+
+  # The list of available versions
+  availableVersions: [String]
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitPackageDescription
+# The list of connected ClusterKitNodeApi_NugetPackage
 #  Short description of NuGet package
-type ClusterKitNodeApi_ClusterKitPackageDescription_Connection implements IClusterKitNodeApi_ClusterKitPackageDescription_Connection {
+type ClusterKitNodeApi_NugetPackage_Connection implements IClusterKitNodeApi_NugetPackage_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitPackageDescription_Edge]
+  edges: [ClusterKitNodeApi_NugetPackage_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitPackageDescription in a connected list
+# The ClusterKitNodeApi_NugetPackage in a connected list
 #  Short description of NuGet package
-type ClusterKitNodeApi_ClusterKitPackageDescription_Edge implements IClusterKitNodeApi_ClusterKitPackageDescription_Edge {
+type ClusterKitNodeApi_NugetPackage_Edge implements IClusterKitNodeApi_NugetPackage_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # Short description of NuGet package
-  node: ClusterKitNodeApi_ClusterKitPackageDescription
+  node: ClusterKitNodeApi_NugetPackage
 }
 
-input ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input {
+input ClusterKitNodeApi_NugetPackage_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input
+  OR: ClusterKitNodeApi_NugetPackage_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input
+  AND: ClusterKitNodeApi_NugetPackage_Filter_Input
 
   # id exactly equals to the parameter, id: The package id (name and version)
   id: String
@@ -1867,7 +2214,19 @@ input ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input {
   version_l_not_ends_with: String
 }
 
-enum ClusterKitNodeApi_ClusterKitPackageDescription_Sort {
+# Short description of NuGet package
+input ClusterKitNodeApi_NugetPackage_Input {
+  # The package name
+  name: String
+
+  # The package version
+  version: String
+
+  # The list of available versions
+  availableVersions: [String]
+}
+
+enum ClusterKitNodeApi_NugetPackage_Sort {
   id_asc
   id_desc
   name_asc
@@ -1876,8 +2235,397 @@ enum ClusterKitNodeApi_ClusterKitPackageDescription_Sort {
   version_desc
 }
 
+# The cluster configuration with all program modules versions, node templates and configurations
+type ClusterKitNodeApi_Release implements IClusterKitNodeApi_Release, Node {
+  # The release id
+  __id: Int
+
+  # the release major version number
+  majorVersion: Int
+
+  # the release minor version number
+  minorVersion: Int
+
+  # the release name
+  name: String
+
+  # the release notes
+  notes: String
+
+  # Release creation date
+  created: Date
+
+  # Release start date (the date when cluster was switched on this configuration first time)
+  started: Date
+
+  # Release finish date (the date when cluster was switched from this configuration last time)
+  finished: Date
+
+  # The release state
+  state: ClusterKitNodeApi_EnReleaseState
+
+  # A value indicating whether this release was considered stable
+  isStable: Boolean
+
+  # the release configuration
+  configuration: ClusterKitNodeApi_ReleaseConfiguration
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_Release
+#  The cluster configuration with all program modules versions, node templates and configurations
+type ClusterKitNodeApi_Release_Connection implements IClusterKitNodeApi_Release_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_Release_Edge]
+}
+
+# The ClusterKitNodeApi_Release in a connected list
+#  The cluster configuration with all program modules versions, node templates and configurations
+type ClusterKitNodeApi_Release_Edge implements IClusterKitNodeApi_Release_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # The cluster configuration with all program modules versions, node templates and configurations
+  node: ClusterKitNodeApi_Release
+}
+
+input ClusterKitNodeApi_Release_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_Release_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_Release_Filter_Input
+
+  # id exactly equals to the parameter, id: The release id
+  id: Int
+
+  # id not equals to the parameter, id: The release id
+  id_not: Int
+
+  # id is less then the parameter, id: The release id
+  id_lt: Int
+
+  # id is less then or equal to the parameter, id: The release id
+  id_lte: Int
+
+  # id is greater then the parameter, id: The release id
+  id_gt: Int
+
+  # id is greater then or equal to the parameter, id: The release id
+  id_gte: Int
+
+  # majorVersion exactly equals to the parameter, majorVersion: the release major version number
+  majorVersion: Int
+
+  # majorVersion not equals to the parameter, majorVersion: the release major version number
+  majorVersion_not: Int
+
+  # majorVersion is less then the parameter, majorVersion: the release major version number
+  majorVersion_lt: Int
+
+  # majorVersion is less then or equal to the parameter, majorVersion: the release major version number
+  majorVersion_lte: Int
+
+  # majorVersion is greater then the parameter, majorVersion: the release major version number
+  majorVersion_gt: Int
+
+  # majorVersion is greater then or equal to the parameter, majorVersion: the release major version number
+  majorVersion_gte: Int
+
+  # minorVersion exactly equals to the parameter, minorVersion: the release minor version number
+  minorVersion: Int
+
+  # minorVersion not equals to the parameter, minorVersion: the release minor version number
+  minorVersion_not: Int
+
+  # minorVersion is less then the parameter, minorVersion: the release minor version number
+  minorVersion_lt: Int
+
+  # minorVersion is less then or equal to the parameter, minorVersion: the release minor version number
+  minorVersion_lte: Int
+
+  # minorVersion is greater then the parameter, minorVersion: the release minor version number
+  minorVersion_gt: Int
+
+  # minorVersion is greater then or equal to the parameter, minorVersion: the release minor version number
+  minorVersion_gte: Int
+
+  # name exactly equals to the parameter, name: the release name
+  name: String
+
+  # name not equals to the parameter, name: the release name
+  name_not: String
+
+  # name is a substring of the parameter, name: the release name
+  name_in: String
+
+  # name is not a substring of the parameter, name: the release name
+  name_not_in: String
+
+  # name contains the parameter as substring, name: the release name
+  name_contains: String
+
+  # name doesn't contain the parameter as substring, name: the release name
+  name_not_contains: String
+
+  # name starts with the parameter value, name: the release name
+  name_starts_with: String
+
+  # name doesn't start with the parameter value, name: the release name
+  name_not_starts_with: String
+
+  # name ends with the parameter value, name: the release name
+  name_ends_with: String
+
+  # name doesn't end with the parameter value, name: the release name
+  name_not_ends_with: String
+
+  # name lowercased equals the parameter, name: the release name
+  name_l: String
+
+  # name lowercased doesn't equal the parameter, name: the release name
+  name_l_not: String
+
+  # name lowercased is a substring of the parameter, name: the release name
+  name_l_in: String
+
+  # name lowercased is not a substring of the parameter, name: the release name
+  name_l_not_in: String
+
+  # name lowercased contains the parameter as substring, name: the release name
+  name_l_contains: String
+
+  # name lowercased doesn't contain the parameter as substring, name: the release name
+  name_l_not_contains: String
+
+  # name lowercased starts with the parameter value, name: the release name
+  name_l_starts_with: String
+
+  # name lowercased doesn't start with the parameter value, name: the release name
+  name_l_not_starts_with: String
+
+  # name lowercased ends with the parameter value, name: the release name
+  name_l_ends_with: String
+
+  # name lowercased doesn't end with the parameter value, name: the release name
+  name_l_not_ends_with: String
+
+  # notes exactly equals to the parameter, notes: the release notes
+  notes: String
+
+  # notes not equals to the parameter, notes: the release notes
+  notes_not: String
+
+  # notes is a substring of the parameter, notes: the release notes
+  notes_in: String
+
+  # notes is not a substring of the parameter, notes: the release notes
+  notes_not_in: String
+
+  # notes contains the parameter as substring, notes: the release notes
+  notes_contains: String
+
+  # notes doesn't contain the parameter as substring, notes: the release notes
+  notes_not_contains: String
+
+  # notes starts with the parameter value, notes: the release notes
+  notes_starts_with: String
+
+  # notes doesn't start with the parameter value, notes: the release notes
+  notes_not_starts_with: String
+
+  # notes ends with the parameter value, notes: the release notes
+  notes_ends_with: String
+
+  # notes doesn't end with the parameter value, notes: the release notes
+  notes_not_ends_with: String
+
+  # notes lowercased equals the parameter, notes: the release notes
+  notes_l: String
+
+  # notes lowercased doesn't equal the parameter, notes: the release notes
+  notes_l_not: String
+
+  # notes lowercased is a substring of the parameter, notes: the release notes
+  notes_l_in: String
+
+  # notes lowercased is not a substring of the parameter, notes: the release notes
+  notes_l_not_in: String
+
+  # notes lowercased contains the parameter as substring, notes: the release notes
+  notes_l_contains: String
+
+  # notes lowercased doesn't contain the parameter as substring, notes: the release notes
+  notes_l_not_contains: String
+
+  # notes lowercased starts with the parameter value, notes: the release notes
+  notes_l_starts_with: String
+
+  # notes lowercased doesn't start with the parameter value, notes: the release notes
+  notes_l_not_starts_with: String
+
+  # notes lowercased ends with the parameter value, notes: the release notes
+  notes_l_ends_with: String
+
+  # notes lowercased doesn't end with the parameter value, notes: the release notes
+  notes_l_not_ends_with: String
+
+  # created exactly equals to the parameter, created: Release creation date
+  created: Date
+
+  # created not equals to the parameter, created: Release creation date
+  created_not: Date
+
+  # created is less then the parameter, created: Release creation date
+  created_lt: Date
+
+  # created is less then or equal to the parameter, created: Release creation date
+  created_lte: Date
+
+  # created is greater then the parameter, created: Release creation date
+  created_gt: Date
+
+  # created is greater then or equal to the parameter, created: Release creation date
+  created_gte: Date
+
+  # started exactly equals to the parameter, started: Release start date (the date
+  # when cluster was switched on this configuration first time)
+  started: Date
+
+  # started not equals to the parameter, started: Release start date (the date
+  # when cluster was switched on this configuration first time)
+  started_not: Date
+
+  # started is less then the parameter, started: Release start date (the date when
+  # cluster was switched on this configuration first time)
+  started_lt: Date
+
+  # started is less then or equal to the parameter, started: Release start date
+  # (the date when cluster was switched on this configuration first time)
+  started_lte: Date
+
+  # started is greater then the parameter, started: Release start date (the date
+  # when cluster was switched on this configuration first time)
+  started_gt: Date
+
+  # started is greater then or equal to the parameter, started: Release start date
+  # (the date when cluster was switched on this configuration first time)
+  started_gte: Date
+
+  # finished exactly equals to the parameter, finished: Release finish date (the
+  # date when cluster was switched from this configuration last time)
+  finished: Date
+
+  # finished not equals to the parameter, finished: Release finish date (the date
+  # when cluster was switched from this configuration last time)
+  finished_not: Date
+
+  # finished is less then the parameter, finished: Release finish date (the date
+  # when cluster was switched from this configuration last time)
+  finished_lt: Date
+
+  # finished is less then or equal to the parameter, finished: Release finish date
+  # (the date when cluster was switched from this configuration last time)
+  finished_lte: Date
+
+  # finished is greater then the parameter, finished: Release finish date (the
+  # date when cluster was switched from this configuration last time)
+  finished_gt: Date
+
+  # finished is greater then or equal to the parameter, finished: Release finish
+  # date (the date when cluster was switched from this configuration last time)
+  finished_gte: Date
+
+  # state exactly equals to the parameter, state: The release state
+  state: ClusterKitNodeApi_EnReleaseState
+
+  # state not equals to the parameter, state: The release state
+  state_not: ClusterKitNodeApi_EnReleaseState
+
+  # isStable exactly equals to the parameter, isStable: A value indicating whether this release was considered stable
+  isStable: Boolean
+
+  # isStable not equals to the parameter, isStable: A value indicating whether this release was considered stable
+  isStable_not: Boolean
+}
+
+# The cluster configuration with all program modules versions, node templates and configurations
+input ClusterKitNodeApi_Release_Input {
+  # The release id
+  id: Int
+
+  # the release major version number
+  majorVersion: Int
+
+  # the release minor version number
+  minorVersion: Int
+
+  # the release name
+  name: String
+
+  # the release notes
+  notes: String
+
+  # the release configuration
+  configuration: ClusterKitNodeApi_ReleaseConfiguration_Input
+}
+
+type ClusterKitNodeApi_Release_NodeMutationPayload {
+  deletedId: ID
+  node: ClusterKitNodeApi_Release
+  edge: ClusterKitNodeApi_Release_Edge
+  errors: ClusterKitNodeApi_ErrorDescription_Connection
+  clientMutationId: String
+  api: ClusterKitMonitoring_ClusterKitNodeApi
+}
+
+enum ClusterKitNodeApi_Release_Sort {
+  id_asc
+  id_desc
+  majorVersion_asc
+  majorVersion_desc
+  minorVersion_asc
+  minorVersion_desc
+  name_asc
+  name_desc
+  notes_asc
+  notes_desc
+  created_asc
+  created_desc
+  started_asc
+  started_desc
+  finished_asc
+  finished_desc
+  state_asc
+  state_desc
+  isStable_asc
+  isStable_desc
+}
+
+# The release configuration description
+type ClusterKitNodeApi_ReleaseConfiguration implements IClusterKitNodeApi_ReleaseConfiguration, Node {
+  # the list of available packages with their versions
+  packages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
+
+  # the list of configured node templates
+  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NodeTemplate_Connection
+  id: ID
+}
+
+# The release configuration description
+input ClusterKitNodeApi_ReleaseConfiguration_Input {
+  # the list of available packages with their versions
+  packages: [ClusterKitNodeApi_NugetPackage_Input]
+
+  # the list of configured node templates
+  nodeTemplates: [ClusterKitNodeApi_NodeTemplate_Input]
+}
+
 # Security role. The amount of privileges assigned to the user
-type ClusterKitNodeApi_ClusterKitRole implements IClusterKitNodeApi_ClusterKitRole, Node {
+type ClusterKitNodeApi_Role implements IClusterKitNodeApi_Role, Node {
   # The role uid
   uid: Uid
 
@@ -1891,36 +2639,36 @@ type ClusterKitNodeApi_ClusterKitRole implements IClusterKitNodeApi_ClusterKitRo
   deniedScope: [String]
 
   # The list of users assigned to this role
-  users(filter: ClusterKitNodeApi_ClusterKitUser_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitUser_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitUser_Connection
+  users(filter: ClusterKitNodeApi_User_Filter_Input, sort: [ClusterKitNodeApi_User_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_User_Connection
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitRole
+# The list of connected ClusterKitNodeApi_Role
 #  Security role. The amount of privileges assigned to the user
-type ClusterKitNodeApi_ClusterKitRole_Connection implements IClusterKitNodeApi_ClusterKitRole_Connection {
+type ClusterKitNodeApi_Role_Connection implements IClusterKitNodeApi_Role_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitRole_Edge]
+  edges: [ClusterKitNodeApi_Role_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitRole in a connected list
+# The ClusterKitNodeApi_Role in a connected list
 #  Security role. The amount of privileges assigned to the user
-type ClusterKitNodeApi_ClusterKitRole_Edge implements IClusterKitNodeApi_ClusterKitRole_Edge {
+type ClusterKitNodeApi_Role_Edge implements IClusterKitNodeApi_Role_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # Security role. The amount of privileges assigned to the user
-  node: ClusterKitNodeApi_ClusterKitRole
+  node: ClusterKitNodeApi_Role
 }
 
-input ClusterKitNodeApi_ClusterKitRole_Filter_Input {
+input ClusterKitNodeApi_Role_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitRole_Filter_Input
+  OR: ClusterKitNodeApi_Role_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitRole_Filter_Input
+  AND: ClusterKitNodeApi_Role_Filter_Input
 
   # uid exactly equals to the parameter, uid: The role uid
   uid: Uid
@@ -1990,7 +2738,7 @@ input ClusterKitNodeApi_ClusterKitRole_Filter_Input {
 }
 
 # Security role. The amount of privileges assigned to the user
-input ClusterKitNodeApi_ClusterKitRole_Input {
+input ClusterKitNodeApi_Role_Input {
   # The role uid
   uid: Uid
 
@@ -2004,24 +2752,58 @@ input ClusterKitNodeApi_ClusterKitRole_Input {
   deniedScope: [String]
 }
 
-type ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload {
+type ClusterKitNodeApi_Role_NodeMutationPayload {
   deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitRole
-  edge: ClusterKitNodeApi_ClusterKitRole_Edge
+  node: ClusterKitNodeApi_Role
+  edge: ClusterKitNodeApi_Role_Edge
   errors: ClusterKitNodeApi_ErrorDescription_Connection
   clientMutationId: String
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
-enum ClusterKitNodeApi_ClusterKitRole_Sort {
+enum ClusterKitNodeApi_Role_Sort {
   uid_asc
   uid_desc
   name_asc
   name_desc
 }
 
+# The main ClusterKit node managing methods
+type ClusterKitNodeApi_Root implements IClusterKitNodeApi_Root, Node {
+  # The packages in the Nuget repository
+  nugetPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
+
+  # The list of known active nodes
+  getActiveNodeDescriptions(filter: ClusterKitNodeApi_NodeDescription_Filter_Input, sort: [ClusterKitNodeApi_NodeDescription_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_NodeDescription_Connection
+
+  # The list of available packages from local cluster repository
+  getPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
+
+  # Current cluster node template usage for debug purposes
+  getTemplateStatistics: ClusterKitNodeApi_TemplatesStatistics
+
+  # Node templates
+  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NodeTemplate_Connection
+
+  # Node templates
+  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NugetFeed_Connection
+
+  # ClusterKit managing system security roles
+  releases(filter: ClusterKitNodeApi_Release_Filter_Input, sort: [ClusterKitNodeApi_Release_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_Release_Connection
+
+  # ClusterKit managing system security roles
+  roles(filter: ClusterKitNodeApi_Role_Filter_Input, sort: [ClusterKitNodeApi_Role_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_Role_Connection
+
+  # Node templates
+  seedAddresses(filter: ClusterKitNodeApi_SeedAddress_Filter_Input, sort: [ClusterKitNodeApi_SeedAddress_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_SeedAddress_Connection
+
+  # ClusterKit managing system users
+  users(filter: ClusterKitNodeApi_User_Filter_Input, sort: [ClusterKitNodeApi_User_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_User_Connection
+  id: ID
+}
+
 # The address of fixed cluster seed for new node configuration
-type ClusterKitNodeApi_ClusterKitSeedAddress implements IClusterKitNodeApi_ClusterKitSeedAddress, Node {
+type ClusterKitNodeApi_SeedAddress implements IClusterKitNodeApi_SeedAddress, Node {
   # The seed address in format of akka url
   address: String
 
@@ -2030,32 +2812,32 @@ type ClusterKitNodeApi_ClusterKitSeedAddress implements IClusterKitNodeApi_Clust
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitSeedAddress
+# The list of connected ClusterKitNodeApi_SeedAddress
 #  The address of fixed cluster seed for new node configuration
-type ClusterKitNodeApi_ClusterKitSeedAddress_Connection implements IClusterKitNodeApi_ClusterKitSeedAddress_Connection {
+type ClusterKitNodeApi_SeedAddress_Connection implements IClusterKitNodeApi_SeedAddress_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitSeedAddress_Edge]
+  edges: [ClusterKitNodeApi_SeedAddress_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitSeedAddress in a connected list
+# The ClusterKitNodeApi_SeedAddress in a connected list
 #  The address of fixed cluster seed for new node configuration
-type ClusterKitNodeApi_ClusterKitSeedAddress_Edge implements IClusterKitNodeApi_ClusterKitSeedAddress_Edge {
+type ClusterKitNodeApi_SeedAddress_Edge implements IClusterKitNodeApi_SeedAddress_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # The address of fixed cluster seed for new node configuration
-  node: ClusterKitNodeApi_ClusterKitSeedAddress
+  node: ClusterKitNodeApi_SeedAddress
 }
 
-input ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input {
+input ClusterKitNodeApi_SeedAddress_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input
+  OR: ClusterKitNodeApi_SeedAddress_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input
+  AND: ClusterKitNodeApi_SeedAddress_Filter_Input
 
   # address exactly equals to the parameter, address: The seed address in format of akka url
   address: String
@@ -2137,7 +2919,7 @@ input ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input {
 }
 
 # The address of fixed cluster seed for new node configuration
-input ClusterKitNodeApi_ClusterKitSeedAddress_Input {
+input ClusterKitNodeApi_SeedAddress_Input {
   # The seed address in format of akka url
   address: String
 
@@ -2145,16 +2927,16 @@ input ClusterKitNodeApi_ClusterKitSeedAddress_Input {
   id: Int
 }
 
-type ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload {
+type ClusterKitNodeApi_SeedAddress_NodeMutationPayload {
   deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitSeedAddress
-  edge: ClusterKitNodeApi_ClusterKitSeedAddress_Edge
+  node: ClusterKitNodeApi_SeedAddress
+  edge: ClusterKitNodeApi_SeedAddress_Edge
   errors: ClusterKitNodeApi_ErrorDescription_Connection
   clientMutationId: String
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
-enum ClusterKitNodeApi_ClusterKitSeedAddress_Sort {
+enum ClusterKitNodeApi_SeedAddress_Sort {
   address_asc
   address_desc
   id_asc
@@ -2162,15 +2944,15 @@ enum ClusterKitNodeApi_ClusterKitSeedAddress_Sort {
 }
 
 # Overall debug data of current cluster node template use
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatistics implements IClusterKitNodeApi_ClusterKitTemplatesUsageStatistics, Node {
+type ClusterKitNodeApi_TemplatesStatistics implements IClusterKitNodeApi_TemplatesStatistics, Node {
   # node templates statistics data
-  templates(filter: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Connection
+  templates(filter: ClusterKitNodeApi_TemplatesStatisticsData_Filter_Input, sort: [ClusterKitNodeApi_TemplatesStatisticsData_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_TemplatesStatisticsData_Connection
   id: ID
 }
 
 # Statistics data for template
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData implements IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData, Node {
-  #  current active node count
+type ClusterKitNodeApi_TemplatesStatisticsData implements IClusterKitNodeApi_TemplatesStatisticsData, Node {
+  # current active node count
   activeNodes: Int
 
   # currently configured maximum required active nodes count
@@ -2193,49 +2975,49 @@ type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData implements ICluste
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData
+# The list of connected ClusterKitNodeApi_TemplatesStatisticsData
 #  Statistics data for template
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Connection implements IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Connection {
+type ClusterKitNodeApi_TemplatesStatisticsData_Connection implements IClusterKitNodeApi_TemplatesStatisticsData_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Edge]
+  edges: [ClusterKitNodeApi_TemplatesStatisticsData_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData in a connected list
+# The ClusterKitNodeApi_TemplatesStatisticsData in a connected list
 #  Statistics data for template
-type ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Edge implements IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Edge {
+type ClusterKitNodeApi_TemplatesStatisticsData_Edge implements IClusterKitNodeApi_TemplatesStatisticsData_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # Statistics data for template
-  node: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData
+  node: ClusterKitNodeApi_TemplatesStatisticsData
 }
 
-input ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input {
+input ClusterKitNodeApi_TemplatesStatisticsData_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input
+  OR: ClusterKitNodeApi_TemplatesStatisticsData_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input
+  AND: ClusterKitNodeApi_TemplatesStatisticsData_Filter_Input
 
-  # activeNodes exactly equals to the parameter, activeNodes:  current active node count
+  # activeNodes exactly equals to the parameter, activeNodes: current active node count
   activeNodes: Int
 
-  # activeNodes not equals to the parameter, activeNodes:  current active node count
+  # activeNodes not equals to the parameter, activeNodes: current active node count
   activeNodes_not: Int
 
-  # activeNodes is less then the parameter, activeNodes:  current active node count
+  # activeNodes is less then the parameter, activeNodes: current active node count
   activeNodes_lt: Int
 
-  # activeNodes is less then or equal to the parameter, activeNodes:  current active node count
+  # activeNodes is less then or equal to the parameter, activeNodes: current active node count
   activeNodes_lte: Int
 
-  # activeNodes is greater then the parameter, activeNodes:  current active node count
+  # activeNodes is greater then the parameter, activeNodes: current active node count
   activeNodes_gt: Int
 
-  # activeNodes is greater then or equal to the parameter, activeNodes:  current active node count
+  # activeNodes is greater then or equal to the parameter, activeNodes: current active node count
   activeNodes_gte: Int
 
   # maximumRequiredNodes exactly equals to the parameter, maximumRequiredNodes:
@@ -2406,7 +3188,7 @@ input ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input {
   upgradingNodes_gte: Int
 }
 
-enum ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Sort {
+enum ClusterKitNodeApi_TemplatesStatisticsData_Sort {
   activeNodes_asc
   activeNodes_desc
   maximumRequiredNodes_asc
@@ -2424,9 +3206,9 @@ enum ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Sort {
 }
 
 # The web ui user
-type ClusterKitNodeApi_ClusterKitUser implements IClusterKitNodeApi_ClusterKitUser, Node {
+type ClusterKitNodeApi_User implements IClusterKitNodeApi_User, Node {
   # The list of roles assigned to this user
-  roles(filter: ClusterKitNodeApi_ClusterKitRole_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitRole_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_ClusterKitRole_Connection
+  roles(filter: ClusterKitNodeApi_Role_Filter_Input, sort: [ClusterKitNodeApi_Role_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_Role_Connection
 
   # The user uid
   uid: Uid
@@ -2448,32 +3230,32 @@ type ClusterKitNodeApi_ClusterKitUser implements IClusterKitNodeApi_ClusterKitUs
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_ClusterKitUser
+# The list of connected ClusterKitNodeApi_User
 #  The web ui user
-type ClusterKitNodeApi_ClusterKitUser_Connection implements IClusterKitNodeApi_ClusterKitUser_Connection {
+type ClusterKitNodeApi_User_Connection implements IClusterKitNodeApi_User_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ClusterKitUser_Edge]
+  edges: [ClusterKitNodeApi_User_Edge]
 }
 
-# The ClusterKitNodeApi_ClusterKitUser in a connected list
+# The ClusterKitNodeApi_User in a connected list
 #  The web ui user
-type ClusterKitNodeApi_ClusterKitUser_Edge implements IClusterKitNodeApi_ClusterKitUser_Edge {
+type ClusterKitNodeApi_User_Edge implements IClusterKitNodeApi_User_Edge {
   # A value to use with paging positioning
   cursor: String
 
   # The web ui user
-  node: ClusterKitNodeApi_ClusterKitUser
+  node: ClusterKitNodeApi_User
 }
 
-input ClusterKitNodeApi_ClusterKitUser_Filter_Input {
+input ClusterKitNodeApi_User_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ClusterKitUser_Filter_Input
+  OR: ClusterKitNodeApi_User_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ClusterKitUser_Filter_Input
+  AND: ClusterKitNodeApi_User_Filter_Input
 
   # uid exactly equals to the parameter, uid: The user uid
   uid: Uid
@@ -2613,7 +3395,7 @@ input ClusterKitNodeApi_ClusterKitUser_Filter_Input {
 }
 
 # The web ui user
-input ClusterKitNodeApi_ClusterKitUser_Input {
+input ClusterKitNodeApi_User_Input {
   # The user uid
   uid: Uid
 
@@ -2633,16 +3415,16 @@ input ClusterKitNodeApi_ClusterKitUser_Input {
   login: String
 }
 
-type ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload {
+type ClusterKitNodeApi_User_NodeMutationPayload {
   deletedId: ID
-  node: ClusterKitNodeApi_ClusterKitUser
-  edge: ClusterKitNodeApi_ClusterKitUser_Edge
+  node: ClusterKitNodeApi_User
+  edge: ClusterKitNodeApi_User_Edge
   errors: ClusterKitNodeApi_ErrorDescription_Connection
   clientMutationId: String
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
-enum ClusterKitNodeApi_ClusterKitUser_Sort {
+enum ClusterKitNodeApi_User_Sort {
   uid_asc
   uid_desc
   activeTill_asc
@@ -2655,315 +3437,6 @@ enum ClusterKitNodeApi_ClusterKitUser_Sort {
   isDeleted_desc
   login_asc
   login_desc
-}
-
-# Short user description
-type ClusterKitNodeApi_ClusterKitUserDescription implements IClusterKitNodeApi_ClusterKitUserDescription, Node {
-  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
-  activeTill: Date
-
-  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
-  blockedTill: Date
-
-  # A value indicating whether current user is currently manually blocked
-  isBlocked: Boolean
-
-  # A value indicating whether current user is currently manually blocked
-  isDeleted: Boolean
-
-  # The user login
-  login: String
-  id: ID
-}
-
-# The mutation error description
-type ClusterKitNodeApi_ErrorDescription implements IClusterKitNodeApi_ErrorDescription, Node {
-  # The error number
-  number: Int
-
-  # The related field name
-  field: String
-
-  # The error message
-  message: String
-  id: ID
-}
-
-# The list of connected ClusterKitNodeApi_ErrorDescription
-#  The mutation error description
-type ClusterKitNodeApi_ErrorDescription_Connection implements IClusterKitNodeApi_ErrorDescription_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_ErrorDescription_Edge]
-}
-
-# The ClusterKitNodeApi_ErrorDescription in a connected list
-#  The mutation error description
-type ClusterKitNodeApi_ErrorDescription_Edge implements IClusterKitNodeApi_ErrorDescription_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # The mutation error description
-  node: ClusterKitNodeApi_ErrorDescription
-}
-
-input ClusterKitNodeApi_ErrorDescription_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_ErrorDescription_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_ErrorDescription_Filter_Input
-
-  # number exactly equals to the parameter, number: The error number
-  number: Int
-
-  # number not equals to the parameter, number: The error number
-  number_not: Int
-
-  # number is less then the parameter, number: The error number
-  number_lt: Int
-
-  # number is less then or equal to the parameter, number: The error number
-  number_lte: Int
-
-  # number is greater then the parameter, number: The error number
-  number_gt: Int
-
-  # number is greater then or equal to the parameter, number: The error number
-  number_gte: Int
-
-  # field exactly equals to the parameter, field: The related field name
-  field: String
-
-  # field not equals to the parameter, field: The related field name
-  field_not: String
-
-  # field is a substring of the parameter, field: The related field name
-  field_in: String
-
-  # field is not a substring of the parameter, field: The related field name
-  field_not_in: String
-
-  # field contains the parameter as substring, field: The related field name
-  field_contains: String
-
-  # field doesn't contain the parameter as substring, field: The related field name
-  field_not_contains: String
-
-  # field starts with the parameter value, field: The related field name
-  field_starts_with: String
-
-  # field doesn't start with the parameter value, field: The related field name
-  field_not_starts_with: String
-
-  # field ends with the parameter value, field: The related field name
-  field_ends_with: String
-
-  # field doesn't end with the parameter value, field: The related field name
-  field_not_ends_with: String
-
-  # field lowercased equals the parameter, field: The related field name
-  field_l: String
-
-  # field lowercased doesn't equal the parameter, field: The related field name
-  field_l_not: String
-
-  # field lowercased is a substring of the parameter, field: The related field name
-  field_l_in: String
-
-  # field lowercased is not a substring of the parameter, field: The related field name
-  field_l_not_in: String
-
-  # field lowercased contains the parameter as substring, field: The related field name
-  field_l_contains: String
-
-  # field lowercased doesn't contain the parameter as substring, field: The related field name
-  field_l_not_contains: String
-
-  # field lowercased starts with the parameter value, field: The related field name
-  field_l_starts_with: String
-
-  # field lowercased doesn't start with the parameter value, field: The related field name
-  field_l_not_starts_with: String
-
-  # field lowercased ends with the parameter value, field: The related field name
-  field_l_ends_with: String
-
-  # field lowercased doesn't end with the parameter value, field: The related field name
-  field_l_not_ends_with: String
-
-  # message exactly equals to the parameter, message: The error message
-  message: String
-
-  # message not equals to the parameter, message: The error message
-  message_not: String
-
-  # message is a substring of the parameter, message: The error message
-  message_in: String
-
-  # message is not a substring of the parameter, message: The error message
-  message_not_in: String
-
-  # message contains the parameter as substring, message: The error message
-  message_contains: String
-
-  # message doesn't contain the parameter as substring, message: The error message
-  message_not_contains: String
-
-  # message starts with the parameter value, message: The error message
-  message_starts_with: String
-
-  # message doesn't start with the parameter value, message: The error message
-  message_not_starts_with: String
-
-  # message ends with the parameter value, message: The error message
-  message_ends_with: String
-
-  # message doesn't end with the parameter value, message: The error message
-  message_not_ends_with: String
-
-  # message lowercased equals the parameter, message: The error message
-  message_l: String
-
-  # message lowercased doesn't equal the parameter, message: The error message
-  message_l_not: String
-
-  # message lowercased is a substring of the parameter, message: The error message
-  message_l_in: String
-
-  # message lowercased is not a substring of the parameter, message: The error message
-  message_l_not_in: String
-
-  # message lowercased contains the parameter as substring, message: The error message
-  message_l_contains: String
-
-  # message lowercased doesn't contain the parameter as substring, message: The error message
-  message_l_not_contains: String
-
-  # message lowercased starts with the parameter value, message: The error message
-  message_l_starts_with: String
-
-  # message lowercased doesn't start with the parameter value, message: The error message
-  message_l_not_starts_with: String
-
-  # message lowercased ends with the parameter value, message: The error message
-  message_l_ends_with: String
-
-  # message lowercased doesn't end with the parameter value, message: The error message
-  message_l_not_ends_with: String
-}
-
-enum ClusterKitNodeApi_ErrorDescription_Sort {
-  number_asc
-  number_desc
-  field_asc
-  field_desc
-  message_asc
-  message_desc
-}
-
-input ClusterKitNodeApi_nodeManagerData_nodeTemplates_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitNodeTemplate_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_nodeTemplates_delete_Input {
-  # The object's id
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_nodeTemplates_update_Input {
-  # The object's id
-  id: Int
-
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitNodeTemplate_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_nugetFeeds_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitNugetFeed_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_nugetFeeds_delete_Input {
-  # The object's id
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_nugetFeeds_update_Input {
-  # The object's id
-  id: Int
-
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitNugetFeed_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_reloadPackages_Input {
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_roles_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitRole_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_roles_update_Input {
-  # The object's id
-  id: Uid
-
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitRole_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_seedAddresses_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitSeedAddress_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_seedAddresses_delete_Input {
-  # The object's id
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_seedAddresses_update_Input {
-  # The object's id
-  id: Int
-
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitSeedAddress_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_upgradeNode_Input {
-  address: String
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_users_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitUser_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_nodeManagerData_users_update_Input {
-  # The object's id
-  id: Uid
-
-  # The object's data
-  newNode: ClusterKitNodeApi_ClusterKitUser_Input
-  clientMutationId: String
 }
 
 # The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
@@ -2987,12 +3460,41 @@ interface IClusterKitMonitoring {
   ): Node
 }
 
+# Represents a dictionary key-value pair
+interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ {
+  id: ID
+
+  # Gets a dictionary key
+  key: String
+
+  # Gets a dictionary value
+  value: IClusterKitMonitoring_Node
+}
+
+# The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
+#  Represents a dictionary key-value pair
+interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge]
+}
+
+# The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ in a connected list
+#  Represents a dictionary key-value pair
+interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
+}
+
 # Global cluster actors tree scan result
-interface IClusterKitMonitoring__ClusterKitMonitoringClusterTree {
+interface IClusterKitMonitoring_ClusterTree {
   id: ID
 
   # Gets the list of nodes
-  nodes(filter: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Filter_Input, sort: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Sort], id: String, offset: Int, limit: Int): IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Connection
+  nodes(filter: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input, sort: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort], id: String, offset: Int, limit: Int): IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection
 
   # Gets the sum of queue size across tree
   queueSizeSum: Int
@@ -3001,37 +3503,8 @@ interface IClusterKitMonitoring__ClusterKitMonitoringClusterTree {
   maxQueueSize: Int
 }
 
-# Represents a dictionary key-value pair
-interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_ {
-  id: ID
-
-  # Gets a dictionary key
-  key: String
-
-  # Gets a dictionary value
-  value: IClusterKitMonitoring_ClusterKitMonitoringNode
-}
-
-# The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_
-#  Represents a dictionary key-value pair
-interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Edge]
-}
-
-# The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_ in a connected list
-#  Represents a dictionary key-value pair
-interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node_
-}
-
 # The actor's description
-interface IClusterKitMonitoring_ClusterKitMonitoringNode {
+interface IClusterKitMonitoring_Node {
   id: ID
 
   # the actor's type
@@ -3059,25 +3532,25 @@ interface IClusterKitMonitoring_ClusterKitMonitoringNode {
   queueSizeSum: Int
 
   # the actor's children
-  children(filter: ClusterKitMonitoring_ClusterKitMonitoringNode_Filter_Input, sort: [ClusterKitMonitoring_ClusterKitMonitoringNode_Sort], id: String, offset: Int, limit: Int): IClusterKitMonitoring_ClusterKitMonitoringNode_Connection
+  children(filter: ClusterKitMonitoring_Node_Filter_Input, sort: [ClusterKitMonitoring_Node_Sort], id: String, offset: Int, limit: Int): IClusterKitMonitoring_Node_Connection
 }
 
-# The list of connected ClusterKitMonitoring_ClusterKitMonitoringNode
+# The list of connected ClusterKitMonitoring_Node
 #  The actor's description
-interface IClusterKitMonitoring_ClusterKitMonitoringNode_Connection {
+interface IClusterKitMonitoring_Node_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitMonitoring_ClusterKitMonitoringNode_Edge]
+  edges: [IClusterKitMonitoring_Node_Edge]
 }
 
-# The ClusterKitMonitoring_ClusterKitMonitoringNode in a connected list
+# The ClusterKitMonitoring_Node in a connected list
 #  The actor's description
-interface IClusterKitMonitoring_ClusterKitMonitoringNode_Edge {
+interface IClusterKitMonitoring_Node_Edge {
   # A value to use with paging positioning
   cursor: String
-  node: IClusterKitMonitoring_ClusterKitMonitoringNode
+  node: IClusterKitMonitoring_Node
 }
 
 # ClusterKit monitoring api
@@ -3085,7 +3558,7 @@ interface IClusterKitMonitoring_Root {
   id: ID
 
   # Gets the last cluster scan result. Changes as system receives the scan results from nodes
-  getClusterTree: IClusterKitMonitoring__ClusterKitMonitoringClusterTree
+  getClusterTree: IClusterKitMonitoring_ClusterTree
 }
 
 # The root provider
@@ -3093,10 +3566,10 @@ interface IClusterKitNodeApi {
   id: ID
 
   # The ClusterKit node managing API
-  nodeManagerData: IClusterKitNodeApi_ClusterKitNodeManagement
+  clusterKitNodesApi: IClusterKitNodeApi_Root
 
   # The current user
-  me: IClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi
+  me: IClusterKitNodeApi_CurrentUserApi
 
   # The node global searcher according to Relay specification
   __node(
@@ -3125,403 +3598,6 @@ interface IClusterKitNodeApi_AkkaAddress {
   system: String
 }
 
-interface IClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean_ {
-  id: ID
-
-  # The mutated object result
-  result: Boolean
-
-  # The list of mutation errors
-  errors(filter: ClusterKitNodeApi_ErrorDescription_Filter_Input, sort: [ClusterKitNodeApi_ErrorDescription_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_ErrorDescription_Connection
-}
-
-interface IClusterKitNodeApi_ClusterKit_NodeManager_CurrentUserApi {
-  id: ID
-
-  # Authenticated user
-  clusterKitUser: IClusterKitNodeApi_ClusterKitUserDescription
-
-  # The current user privileges
-  clusterKitUserPrivileges: [String]
-
-  # The current application privileges
-  clusterKitClientPrivileges: [String]
-}
-
-# Description of node configuration
-interface IClusterKitNodeApi_ClusterKitNodeDescription {
-  id: ID
-
-  # symbolic container type code
-  containerType: String
-
-  # a value indicating whether the current node is cluster leader
-  isClusterLeader: Boolean
-
-  # a value indicating whether software and or configuration is obsolete and needed to be upgraded
-  isObsolete: Boolean
-
-  # a value indicating whether this is complete description
-  isInitialized: Boolean
-
-  # the list of roles, where current node is leader
-  leaderInRoles: [String]
-
-  # The list of descriptions of installed modules
-  modules(filter: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitPackageDescription_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitPackageDescription_Connection
-
-  # The node's address
-  nodeAddress: IClusterKitNodeApi_AkkaAddress
-
-  # request id to indicate node instance startup
-  nodeId: Uid
-
-  # node template code
-  nodeTemplate: String
-
-  # current node template version
-  nodeTemplateVersion: Int
-
-  # the list of cluster roles
-  roles: [String]
-
-  # node start time
-  startTimeStamp: Int
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitNodeDescription
-#  Description of node configuration
-interface IClusterKitNodeApi_ClusterKitNodeDescription_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitNodeDescription_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitNodeDescription in a connected list
-#  Description of node configuration
-interface IClusterKitNodeApi_ClusterKitNodeDescription_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitNodeDescription
-}
-
-# The main ClusterKit node managing methods
-interface IClusterKitNodeApi_ClusterKitNodeManagement {
-  id: ID
-
-  # The list of available packages from local cluster repository
-  getPackages(filter: ClusterKitNodeApi_ClusterKitPackageDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitPackageDescription_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitPackageDescription_Connection
-
-  # Current cluster node template usage for debug purposes
-  getTemplateStatistics: IClusterKitNodeApi_ClusterKitTemplatesUsageStatistics
-
-  # The list of known active nodes
-  getActiveNodeDescriptions(filter: ClusterKitNodeApi_ClusterKitNodeDescription_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNodeDescription_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitNodeDescription_Connection
-
-  # Node templates
-  nodeTemplates(filter: ClusterKitNodeApi_ClusterKitNodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNodeTemplate_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitNodeTemplate_Connection
-
-  # Node templates
-  nugetFeeds(filter: ClusterKitNodeApi_ClusterKitNugetFeed_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitNugetFeed_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitNugetFeed_Connection
-
-  # Node templates
-  seedAddresses(filter: ClusterKitNodeApi_ClusterKitSeedAddress_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitSeedAddress_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitSeedAddress_Connection
-
-  # ClusterKit managing system users
-  users(filter: ClusterKitNodeApi_ClusterKitUser_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitUser_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitUser_Connection
-
-  # ClusterKit managing system security roles
-  roles(filter: ClusterKitNodeApi_ClusterKitRole_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitRole_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitRole_Connection
-}
-
-# Node template description
-interface IClusterKitNodeApi_ClusterKitNodeTemplate {
-  id: ID
-
-  # The program readable node template name
-  code: String
-
-  # The akka configuration template for node
-  configuration: String
-
-  # The list of container types to install node templates
-  containerTypes: [String]
-
-  # The unique template identification number
-  __id: Int
-
-  # The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances: Int
-
-  # The minimum number of working node type required for cluster to work
-  minimumRequiredInstances: Int
-
-  # The human readable node template name
-  name: String
-
-  # The list of nuget packages to install (along with there dependencies)
-  packages: [String]
-
-  # The priority weight for service, when deciding witch template should be brought up
-  priority: Float
-
-  # The template version
-  version: Int
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitNodeTemplate
-#  Node template description
-interface IClusterKitNodeApi_ClusterKitNodeTemplate_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitNodeTemplate_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitNodeTemplate in a connected list
-#  Node template description
-interface IClusterKitNodeApi_ClusterKitNodeTemplate_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitNodeTemplate
-}
-
-# The link to the nuget feed to download updates
-interface IClusterKitNodeApi_ClusterKitNugetFeed {
-  id: ID
-
-  # The seed url address
-  address: String
-
-  # The unique address identification number
-  __id: Int
-
-  # The user password for basic authentication
-  password: String
-
-  # The  type of feed
-  type: ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_NugetFeed_EnFeedType
-
-  # The username for basic authentication
-  userName: String
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitNugetFeed
-#  The link to the nuget feed to download updates
-interface IClusterKitNodeApi_ClusterKitNugetFeed_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitNugetFeed_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitNugetFeed in a connected list
-#  The link to the nuget feed to download updates
-interface IClusterKitNodeApi_ClusterKitNugetFeed_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitNugetFeed
-}
-
-# Short description of NuGet package
-interface IClusterKitNodeApi_ClusterKitPackageDescription {
-  id: ID
-
-  # The package id (name and version)
-  __id: String
-
-  # The package name
-  name: String
-
-  # The package version
-  version: String
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitPackageDescription
-#  Short description of NuGet package
-interface IClusterKitNodeApi_ClusterKitPackageDescription_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitPackageDescription_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitPackageDescription in a connected list
-#  Short description of NuGet package
-interface IClusterKitNodeApi_ClusterKitPackageDescription_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitPackageDescription
-}
-
-# Security role. The amount of privileges assigned to the user
-interface IClusterKitNodeApi_ClusterKitRole {
-  id: ID
-
-  # The role uid
-  uid: Uid
-
-  # The role name
-  name: String
-
-  # The list of granted privileges
-  allowedScope: [String]
-
-  # The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)
-  deniedScope: [String]
-
-  # The list of users assigned to this role
-  users(filter: ClusterKitNodeApi_ClusterKitUser_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitUser_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitUser_Connection
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitRole
-#  Security role. The amount of privileges assigned to the user
-interface IClusterKitNodeApi_ClusterKitRole_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitRole_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitRole in a connected list
-#  Security role. The amount of privileges assigned to the user
-interface IClusterKitNodeApi_ClusterKitRole_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitRole
-}
-
-# The address of fixed cluster seed for new node configuration
-interface IClusterKitNodeApi_ClusterKitSeedAddress {
-  id: ID
-
-  # The seed address in format of akka url
-  address: String
-
-  # The unique address identification number
-  __id: Int
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitSeedAddress
-#  The address of fixed cluster seed for new node configuration
-interface IClusterKitNodeApi_ClusterKitSeedAddress_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitSeedAddress_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitSeedAddress in a connected list
-#  The address of fixed cluster seed for new node configuration
-interface IClusterKitNodeApi_ClusterKitSeedAddress_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitSeedAddress
-}
-
-# Overall debug data of current cluster node template use
-interface IClusterKitNodeApi_ClusterKitTemplatesUsageStatistics {
-  id: ID
-
-  # node templates statistics data
-  templates(filter: ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Connection
-}
-
-# Statistics data for template
-interface IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData {
-  id: ID
-
-  #  current active node count
-  activeNodes: Int
-
-  # currently configured maximum required active nodes count
-  maximumRequiredNodes: Int
-
-  # currently configured minimum required active nodes count
-  minimumRequiredNodes: Int
-
-  # name of the node template
-  name: String
-
-  # the number of currently active nodes, that need to be upgraded
-  obsoleteNodes: Int
-
-  # the number of nodes that are in upgrade process now
-  startingNodes: Int
-
-  # the number of nodes that are in upgrade process now
-  upgradingNodes: Int
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData
-#  Statistics data for template
-interface IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData in a connected list
-#  Statistics data for template
-interface IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitTemplatesUsageStatisticsData
-}
-
-# The web ui user
-interface IClusterKitNodeApi_ClusterKitUser {
-  id: ID
-
-  # The list of roles assigned to this user
-  roles(filter: ClusterKitNodeApi_ClusterKitRole_Filter_Input, sort: [ClusterKitNodeApi_ClusterKitRole_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_ClusterKitRole_Connection
-
-  # The user uid
-  uid: Uid
-
-  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
-  activeTill: Date
-
-  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
-  blockedTill: Date
-
-  # A value indicating whether current user is currently manually blocked
-  isBlocked: Boolean
-
-  # A value indicating whether current user is currently manually blocked
-  isDeleted: Boolean
-
-  # The user login
-  login: String
-}
-
-# The list of connected ClusterKitNodeApi_ClusterKitUser
-#  The web ui user
-interface IClusterKitNodeApi_ClusterKitUser_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_ClusterKitUser_Edge]
-}
-
-# The ClusterKitNodeApi_ClusterKitUser in a connected list
-#  The web ui user
-interface IClusterKitNodeApi_ClusterKitUser_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_ClusterKitUser
-}
-
 # Short user description
 interface IClusterKitNodeApi_ClusterKitUserDescription {
   id: ID
@@ -3540,6 +3616,20 @@ interface IClusterKitNodeApi_ClusterKitUserDescription {
 
   # The user login
   login: String
+}
+
+# Publishes access to the authenticated user information
+interface IClusterKitNodeApi_CurrentUserApi {
+  id: ID
+
+  # Authenticated user
+  clusterKitUser: IClusterKitNodeApi_ClusterKitUserDescription
+
+  # The current user privileges
+  clusterKitUserPrivileges: [String]
+
+  # The current application privileges
+  clusterKitClientPrivileges: [String]
 }
 
 # The mutation error description
@@ -3574,55 +3664,540 @@ interface IClusterKitNodeApi_ErrorDescription_Edge {
   node: IClusterKitNodeApi_ErrorDescription
 }
 
+# The standard mutation result
+interface IClusterKitNodeApi_MutationResult_System_Boolean_ {
+  id: ID
+
+  # The mutated object result
+  result: Boolean
+
+  # The list of mutation errors
+  errors(filter: ClusterKitNodeApi_ErrorDescription_Filter_Input, sort: [ClusterKitNodeApi_ErrorDescription_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_ErrorDescription_Connection
+}
+
+# Description of node configuration
+interface IClusterKitNodeApi_NodeDescription {
+  id: ID
+
+  # symbolic container type code
+  containerType: String
+
+  # a value indicating whether the current node is cluster leader
+  isClusterLeader: Boolean
+
+  # a value indicating whether software and or configuration is obsolete and needed to be upgraded
+  isObsolete: Boolean
+
+  # a value indicating whether this is complete description
+  isInitialized: Boolean
+
+  # the list of roles, where current node is leader
+  leaderInRoles: [String]
+
+  # The list of descriptions of installed modules
+  modules(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+
+  # The node's address
+  nodeAddress: IClusterKitNodeApi_AkkaAddress
+
+  # request id to indicate node instance startup
+  nodeId: Uid
+
+  # node template code
+  nodeTemplate: String
+
+  # current node template version
+  nodeTemplateVersion: Int
+
+  # the list of cluster roles
+  roles: [String]
+
+  # node start time
+  startTimeStamp: Int
+}
+
+# The list of connected ClusterKitNodeApi_NodeDescription
+#  Description of node configuration
+interface IClusterKitNodeApi_NodeDescription_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_NodeDescription_Edge]
+}
+
+# The ClusterKitNodeApi_NodeDescription in a connected list
+#  Description of node configuration
+interface IClusterKitNodeApi_NodeDescription_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_NodeDescription
+}
+
+# Node template description
+interface IClusterKitNodeApi_NodeTemplate {
+  id: ID
+
+  # The program readable node template name
+  code: String
+
+  # The akka configuration template for node
+  configuration: String
+
+  # The list of container types to install node templates
+  containerTypes: [String]
+
+  # The unique template identification number
+  __id: Int
+
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
+
+  # The human readable node template name
+  name: String
+
+  # The list of nuget packages to install (along with there dependencies)
+  packages: [String]
+
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The template version
+  version: Int
+}
+
+# The list of connected ClusterKitNodeApi_NodeTemplate
+#  Node template description
+interface IClusterKitNodeApi_NodeTemplate_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_NodeTemplate_Edge]
+}
+
+# The ClusterKitNodeApi_NodeTemplate in a connected list
+#  Node template description
+interface IClusterKitNodeApi_NodeTemplate_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_NodeTemplate
+}
+
+# The link to the nuget feed to download updates
+interface IClusterKitNodeApi_NugetFeed {
+  id: ID
+
+  # The seed url address
+  address: String
+
+  # The unique address identification number
+  __id: Int
+
+  # The user password for basic authentication
+  password: String
+
+  # The  type of feed
+  type: ClusterKitNodeApi_EnFeedType
+
+  # The username for basic authentication
+  userName: String
+}
+
+# The list of connected ClusterKitNodeApi_NugetFeed
+#  The link to the nuget feed to download updates
+interface IClusterKitNodeApi_NugetFeed_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_NugetFeed_Edge]
+}
+
+# The ClusterKitNodeApi_NugetFeed in a connected list
+#  The link to the nuget feed to download updates
+interface IClusterKitNodeApi_NugetFeed_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_NugetFeed
+}
+
+# Short description of NuGet package
+interface IClusterKitNodeApi_NugetPackage {
+  id: ID
+
+  # The package id (name and version)
+  __id: String
+
+  # The package name
+  name: String
+
+  # The package version
+  version: String
+
+  # The list of available versions
+  availableVersions: [String]
+}
+
+# The list of connected ClusterKitNodeApi_NugetPackage
+#  Short description of NuGet package
+interface IClusterKitNodeApi_NugetPackage_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_NugetPackage_Edge]
+}
+
+# The ClusterKitNodeApi_NugetPackage in a connected list
+#  Short description of NuGet package
+interface IClusterKitNodeApi_NugetPackage_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_NugetPackage
+}
+
+# The cluster configuration with all program modules versions, node templates and configurations
+interface IClusterKitNodeApi_Release {
+  id: ID
+
+  # The release id
+  __id: Int
+
+  # the release major version number
+  majorVersion: Int
+
+  # the release minor version number
+  minorVersion: Int
+
+  # the release name
+  name: String
+
+  # the release notes
+  notes: String
+
+  # Release creation date
+  created: Date
+
+  # Release start date (the date when cluster was switched on this configuration first time)
+  started: Date
+
+  # Release finish date (the date when cluster was switched from this configuration last time)
+  finished: Date
+
+  # The release state
+  state: ClusterKitNodeApi_EnReleaseState
+
+  # A value indicating whether this release was considered stable
+  isStable: Boolean
+
+  # the release configuration
+  configuration: IClusterKitNodeApi_ReleaseConfiguration
+}
+
+# The list of connected ClusterKitNodeApi_Release
+#  The cluster configuration with all program modules versions, node templates and configurations
+interface IClusterKitNodeApi_Release_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_Release_Edge]
+}
+
+# The ClusterKitNodeApi_Release in a connected list
+#  The cluster configuration with all program modules versions, node templates and configurations
+interface IClusterKitNodeApi_Release_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_Release
+}
+
+# The release configuration description
+interface IClusterKitNodeApi_ReleaseConfiguration {
+  id: ID
+
+  # the list of available packages with their versions
+  packages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+
+  # the list of configured node templates
+  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NodeTemplate_Connection
+}
+
+# Security role. The amount of privileges assigned to the user
+interface IClusterKitNodeApi_Role {
+  id: ID
+
+  # The role uid
+  uid: Uid
+
+  # The role name
+  name: String
+
+  # The list of granted privileges
+  allowedScope: [String]
+
+  # The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)
+  deniedScope: [String]
+
+  # The list of users assigned to this role
+  users(filter: ClusterKitNodeApi_User_Filter_Input, sort: [ClusterKitNodeApi_User_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_User_Connection
+}
+
+# The list of connected ClusterKitNodeApi_Role
+#  Security role. The amount of privileges assigned to the user
+interface IClusterKitNodeApi_Role_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_Role_Edge]
+}
+
+# The ClusterKitNodeApi_Role in a connected list
+#  Security role. The amount of privileges assigned to the user
+interface IClusterKitNodeApi_Role_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_Role
+}
+
+# The main ClusterKit node managing methods
+interface IClusterKitNodeApi_Root {
+  id: ID
+
+  # The packages in the Nuget repository
+  nugetPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+
+  # The list of known active nodes
+  getActiveNodeDescriptions(filter: ClusterKitNodeApi_NodeDescription_Filter_Input, sort: [ClusterKitNodeApi_NodeDescription_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_NodeDescription_Connection
+
+  # The list of available packages from local cluster repository
+  getPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+
+  # Current cluster node template usage for debug purposes
+  getTemplateStatistics: IClusterKitNodeApi_TemplatesStatistics
+
+  # Node templates
+  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NodeTemplate_Connection
+
+  # Node templates
+  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NugetFeed_Connection
+
+  # ClusterKit managing system security roles
+  releases(filter: ClusterKitNodeApi_Release_Filter_Input, sort: [ClusterKitNodeApi_Release_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_Release_Connection
+
+  # ClusterKit managing system security roles
+  roles(filter: ClusterKitNodeApi_Role_Filter_Input, sort: [ClusterKitNodeApi_Role_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_Role_Connection
+
+  # Node templates
+  seedAddresses(filter: ClusterKitNodeApi_SeedAddress_Filter_Input, sort: [ClusterKitNodeApi_SeedAddress_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_SeedAddress_Connection
+
+  # ClusterKit managing system users
+  users(filter: ClusterKitNodeApi_User_Filter_Input, sort: [ClusterKitNodeApi_User_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_User_Connection
+}
+
+# The address of fixed cluster seed for new node configuration
+interface IClusterKitNodeApi_SeedAddress {
+  id: ID
+
+  # The seed address in format of akka url
+  address: String
+
+  # The unique address identification number
+  __id: Int
+}
+
+# The list of connected ClusterKitNodeApi_SeedAddress
+#  The address of fixed cluster seed for new node configuration
+interface IClusterKitNodeApi_SeedAddress_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_SeedAddress_Edge]
+}
+
+# The ClusterKitNodeApi_SeedAddress in a connected list
+#  The address of fixed cluster seed for new node configuration
+interface IClusterKitNodeApi_SeedAddress_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_SeedAddress
+}
+
+# Overall debug data of current cluster node template use
+interface IClusterKitNodeApi_TemplatesStatistics {
+  id: ID
+
+  # node templates statistics data
+  templates(filter: ClusterKitNodeApi_TemplatesStatisticsData_Filter_Input, sort: [ClusterKitNodeApi_TemplatesStatisticsData_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_TemplatesStatisticsData_Connection
+}
+
+# Statistics data for template
+interface IClusterKitNodeApi_TemplatesStatisticsData {
+  id: ID
+
+  # current active node count
+  activeNodes: Int
+
+  # currently configured maximum required active nodes count
+  maximumRequiredNodes: Int
+
+  # currently configured minimum required active nodes count
+  minimumRequiredNodes: Int
+
+  # name of the node template
+  name: String
+
+  # the number of currently active nodes, that need to be upgraded
+  obsoleteNodes: Int
+
+  # the number of nodes that are in upgrade process now
+  startingNodes: Int
+
+  # the number of nodes that are in upgrade process now
+  upgradingNodes: Int
+}
+
+# The list of connected ClusterKitNodeApi_TemplatesStatisticsData
+#  Statistics data for template
+interface IClusterKitNodeApi_TemplatesStatisticsData_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_TemplatesStatisticsData_Edge]
+}
+
+# The ClusterKitNodeApi_TemplatesStatisticsData in a connected list
+#  Statistics data for template
+interface IClusterKitNodeApi_TemplatesStatisticsData_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_TemplatesStatisticsData
+}
+
+# The web ui user
+interface IClusterKitNodeApi_User {
+  id: ID
+
+  # The list of roles assigned to this user
+  roles(filter: ClusterKitNodeApi_Role_Filter_Input, sort: [ClusterKitNodeApi_Role_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_Role_Connection
+
+  # The user uid
+  uid: Uid
+
+  # A date, till which user is active. After this date the user will be blocked. Null for unlimited work.
+  activeTill: Date
+
+  # A date, till which user is temporary blocked. After this date the user will be blocked. Null for unlimited work.
+  blockedTill: Date
+
+  # A value indicating whether current user is currently manually blocked
+  isBlocked: Boolean
+
+  # A value indicating whether current user is currently manually blocked
+  isDeleted: Boolean
+
+  # The user login
+  login: String
+}
+
+# The list of connected ClusterKitNodeApi_User
+#  The web ui user
+interface IClusterKitNodeApi_User_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_User_Edge]
+}
+
+# The ClusterKitNodeApi_User in a connected list
+#  The web ui user
+interface IClusterKitNodeApi_User_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_User
+}
+
 # The list of all detected mutations
 type Mutations {
   # Initiates the new actor system scan
   ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan(input: ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input): Boolean_MutationPayload
 
   # Request to server to reload package list
-  ClusterKitNodeApi_nodeManagerData_reloadPackages(input: ClusterKitNodeApi_nodeManagerData_reloadPackages_Input): ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_reloadPackages(input: ClusterKitNodeApi_clusterKitNodesApi_reloadPackages_Input): ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload
 
-  # Manual node upgrade request
-  ClusterKitNodeApi_nodeManagerData_upgradeNode(input: ClusterKitNodeApi_nodeManagerData_upgradeNode_Input): ClusterKitNodeApi_ClusterKit_API_Client_MutationResult_System_Boolean__MutationPayload
-
-  # Creates the new node template
-  ClusterKitNodeApi_nodeManagerData_nodeTemplates_create(input: ClusterKitNodeApi_nodeManagerData_nodeTemplates_create_Input): ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload
+  # Manual node reboot request
+  ClusterKitNodeApi_clusterKitNodesApi_upgradeNode(input: ClusterKitNodeApi_clusterKitNodesApi_upgradeNode_Input): ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload
 
   # Creates the new node template
-  ClusterKitNodeApi_nodeManagerData_nodeTemplates_update(input: ClusterKitNodeApi_nodeManagerData_nodeTemplates_update_Input): ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_create(input: ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_create_Input): ClusterKitNodeApi_NodeTemplate_NodeMutationPayload
 
   # Creates the new node template
-  ClusterKitNodeApi_nodeManagerData_nodeTemplates_delete(input: ClusterKitNodeApi_nodeManagerData_nodeTemplates_delete_Input): ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_update(input: ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_update_Input): ClusterKitNodeApi_NodeTemplate_NodeMutationPayload
+
+  # Creates the new node template
+  ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_delete(input: ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_delete_Input): ClusterKitNodeApi_NodeTemplate_NodeMutationPayload
 
   # Creates the new nuget feed link
-  ClusterKitNodeApi_nodeManagerData_nugetFeeds_create(input: ClusterKitNodeApi_nodeManagerData_nugetFeeds_create_Input): ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_create(input: ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_create_Input): ClusterKitNodeApi_NugetFeed_NodeMutationPayload
 
   # Creates the new nuget feed link
-  ClusterKitNodeApi_nodeManagerData_nugetFeeds_update(input: ClusterKitNodeApi_nodeManagerData_nugetFeeds_update_Input): ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update(input: ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update_Input): ClusterKitNodeApi_NugetFeed_NodeMutationPayload
 
   # Creates the new nuget feed link
-  ClusterKitNodeApi_nodeManagerData_nugetFeeds_delete(input: ClusterKitNodeApi_nodeManagerData_nugetFeeds_delete_Input): ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_delete(input: ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_delete_Input): ClusterKitNodeApi_NugetFeed_NodeMutationPayload
 
-  # Creates the new seed address
-  ClusterKitNodeApi_nodeManagerData_seedAddresses_create(input: ClusterKitNodeApi_nodeManagerData_seedAddresses_create_Input): ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload
+  # Initiates cluster upgrade procedure. The previous active release will be marked as failed
+  ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster(input: ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
-  # Creates the new seed address
-  ClusterKitNodeApi_nodeManagerData_seedAddresses_update(input: ClusterKitNodeApi_nodeManagerData_seedAddresses_update_Input): ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload
+  # moves release state from "draft" to "ready"
+  ClusterKitNodeApi_clusterKitNodesApi_releases_setReady(input: ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
-  # Creates the new seed address
-  ClusterKitNodeApi_nodeManagerData_seedAddresses_delete(input: ClusterKitNodeApi_nodeManagerData_seedAddresses_delete_Input): ClusterKitNodeApi_ClusterKitSeedAddress_NodeMutationPayload
+  # moves release state from "draft" to "ready"
+  ClusterKitNodeApi_clusterKitNodesApi_releases_setStable(input: ClusterKitNodeApi_clusterKitNodesApi_releases_setStable_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
-  # Creates the new user
-  ClusterKitNodeApi_nodeManagerData_users_create(input: ClusterKitNodeApi_nodeManagerData_users_create_Input): ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload
+  # Initiates cluster upgrade procedure. The previous active release will be marked as obsolete
+  ClusterKitNodeApi_clusterKitNodesApi_releases_updateCluster(input: ClusterKitNodeApi_clusterKitNodesApi_releases_updateCluster_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
-  # Creates the new user
-  ClusterKitNodeApi_nodeManagerData_users_update(input: ClusterKitNodeApi_nodeManagerData_users_update_Input): ClusterKitNodeApi_ClusterKitUser_NodeMutationPayload
+  # Creates the new draft release
+  ClusterKitNodeApi_clusterKitNodesApi_releases_create(input: ClusterKitNodeApi_clusterKitNodesApi_releases_create_Input): ClusterKitNodeApi_Release_NodeMutationPayload
+
+  # Creates the new draft release
+  ClusterKitNodeApi_clusterKitNodesApi_releases_update(input: ClusterKitNodeApi_clusterKitNodesApi_releases_update_Input): ClusterKitNodeApi_Release_NodeMutationPayload
+
+  # Creates the new draft release
+  ClusterKitNodeApi_clusterKitNodesApi_releases_delete(input: ClusterKitNodeApi_clusterKitNodesApi_releases_delete_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
   # Creates the new managing system role
-  ClusterKitNodeApi_nodeManagerData_roles_create(input: ClusterKitNodeApi_nodeManagerData_roles_create_Input): ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_roles_create(input: ClusterKitNodeApi_clusterKitNodesApi_roles_create_Input): ClusterKitNodeApi_Role_NodeMutationPayload
 
   # Creates the new managing system role
-  ClusterKitNodeApi_nodeManagerData_roles_update(input: ClusterKitNodeApi_nodeManagerData_roles_update_Input): ClusterKitNodeApi_ClusterKitRole_NodeMutationPayload
+  ClusterKitNodeApi_clusterKitNodesApi_roles_update(input: ClusterKitNodeApi_clusterKitNodesApi_roles_update_Input): ClusterKitNodeApi_Role_NodeMutationPayload
+
+  # Creates the new seed address
+  ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_create(input: ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_create_Input): ClusterKitNodeApi_SeedAddress_NodeMutationPayload
+
+  # Creates the new seed address
+  ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_update(input: ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_update_Input): ClusterKitNodeApi_SeedAddress_NodeMutationPayload
+
+  # Creates the new seed address
+  ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete(input: ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete_Input): ClusterKitNodeApi_SeedAddress_NodeMutationPayload
+
+  # Creates the new user
+  ClusterKitNodeApi_clusterKitNodesApi_users_create(input: ClusterKitNodeApi_clusterKitNodesApi_users_create_Input): ClusterKitNodeApi_User_NodeMutationPayload
+
+  # Creates the new user
+  ClusterKitNodeApi_clusterKitNodesApi_users_update(input: ClusterKitNodeApi_clusterKitNodesApi_users_update_Input): ClusterKitNodeApi_User_NodeMutationPayload
+
+  # Changes the current user password
+  ClusterKitNodeApi_me_changePassword(input: ClusterKitNodeApi_me_changePassword_Input): ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload
 }
 
 # The Node interface as described in Relay documentation

@@ -3,16 +3,16 @@ import Relay from 'react-relay'
 export default class CreateTemplateMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_nodeManagerData_nodeTemplates_create}`
+    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_create}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_ClusterKitNodeTemplate_NodeMutationPayload {
+      fragment on ClusterKitNodeApi_NodeTemplate_NodeMutationPayload {
         node
         edge
         api {
-          nodeManagerData {
+          clusterKitNodesApi {
             nugetFeeds
           }
         }

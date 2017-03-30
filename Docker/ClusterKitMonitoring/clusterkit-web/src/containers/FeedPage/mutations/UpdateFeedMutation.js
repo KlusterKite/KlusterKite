@@ -3,15 +3,15 @@ import Relay from 'react-relay'
 export default class UpdateFeedMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_nodeManagerData_nugetFeeds_update}`
+    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_ClusterKitNugetFeed_NodeMutationPayload {
+      fragment on ClusterKitNodeApi_NugetFeed_NodeMutationPayload {
         node
         api {
-          nodeManagerData {
+          clusterKitNodesApi {
             nugetFeeds
           }
         }

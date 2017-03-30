@@ -62,7 +62,7 @@ export class NodesList extends React.Component {
         new UpgradeNodeMutation({address: nodeAddress}),
         {
           onSuccess: (response) => {
-            const result = response.clusterKitNodeApi_nodeManagerData_upgradeNode.result && response.clusterKitNodeApi_nodeManagerData_upgradeNode.result.result;
+            const result = response.clusterKitNodeApi_clusterKitNodesApi_upgradeNode.result && response.clusterKitNodeApi_clusterKitNodesApi_upgradeNode.result.result;
             if (result) {
               this.showUpgrading(nodeId);
               this.hideUpgradingAfterDelay(nodeId);
@@ -240,7 +240,7 @@ export default Relay.createContainer(
   NodesList,
   {
     fragments: {
-      nodeDescriptions: () => Relay.QL`fragment on IClusterKitNodeApi_ClusterKitNodeManagement {
+      nodeDescriptions: () => Relay.QL`fragment on IClusterKitNodeApi_Root {
         getActiveNodeDescriptions
         {
           edges {

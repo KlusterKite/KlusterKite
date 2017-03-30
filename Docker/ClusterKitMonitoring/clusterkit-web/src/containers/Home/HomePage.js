@@ -34,12 +34,12 @@ class HomePage extends React.Component {
         {hasPrivilege('ClusterKit.NodeManager.ReloadPackages') &&
           <ReloadPackages />
         }
-        {hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics') && this.props.api.nodeManagerData &&
-          <NodesWithTemplates data={this.props.api.nodeManagerData}/>
+        {hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics') && this.props.api.clusterKitNodesApi &&
+          <NodesWithTemplates data={this.props.api.clusterKitNodesApi}/>
         }
-        {hasPrivilege('ClusterKit.NodeManager.GetActiveNodeDescriptions') && this.props.api.nodeManagerData &&
+        {hasPrivilege('ClusterKit.NodeManager.GetActiveNodeDescriptions') && this.props.api.clusterKitNodesApi &&
           <NodesList hasError={false} upgradeNodePrivilege={hasPrivilege('ClusterKit.NodeManager.UpgradeNode')}
-                     nodeDescriptions={this.props.api.nodeManagerData}/>
+                     nodeDescriptions={this.props.api.clusterKitNodesApi}/>
         }
       </div>
     )
@@ -52,7 +52,7 @@ export default Relay.createContainer(
     fragments: {
       api: () => Relay.QL`fragment on IClusterKitNodeApi {
         __typename
-        nodeManagerData {
+        clusterKitNodesApi {
           ${NodesWithTemplates.getFragment('data')},
           ${NodesList.getFragment('nodeDescriptions')},
         }
