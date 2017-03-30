@@ -1551,15 +1551,15 @@ namespace ClusterKit.NodeManager
                 {
                     using (var ds = await this.GetContext())
                     {
-                        var user = ds.Users.FirstOrDefault(u => u.Uid == request.UserUid);
+                        var user = ds.Users.FirstOrDefault(u => u.Login == request.Login);
                         if (user == null)
                         {
                             var errors = new List<ErrorDescription>
                                      {
-                                         new ErrorDescription("id", "not found")
+                                         new ErrorDescription("login", "not found")
                                      };
 
-                            this.Sender.Tell(new MutationResult<User> { Errors = errors });
+                            this.Sender.Tell(new MutationResult<bool> { Errors = errors });
                             return;
                         }
 
@@ -1567,10 +1567,10 @@ namespace ClusterKit.NodeManager
                         {
                             var errors = new List<ErrorDescription>
                                      {
-                                         new ErrorDescription("id", "not found")
+                                         new ErrorDescription("login", "not found")
                                      };
 
-                            this.Sender.Tell(new MutationResult<User> { Errors = errors });
+                            this.Sender.Tell(new MutationResult<bool> { Errors = errors });
                             return;
                         }
                         
@@ -1584,7 +1584,7 @@ namespace ClusterKit.NodeManager
                             "User {Login} ({Uid}) have changed his password",
                             user.Login,
                             user.Uid);
-                        this.Sender.Tell(new MutationResult<User> { Result = user });
+                        this.Sender.Tell(new MutationResult<bool> { Result = true });
                     }
                 }
                 catch (Exception exception)
@@ -1593,7 +1593,7 @@ namespace ClusterKit.NodeManager
                                      {
                                          new ErrorDescription(null, exception.Message)
                                      };
-                    this.Sender.Tell(new MutationResult<User> { Errors = errors });
+                    this.Sender.Tell(new MutationResult<bool> { Errors = errors });
                 }
             }
 
@@ -1626,7 +1626,7 @@ namespace ClusterKit.NodeManager
                             user.Login,
                             user.Uid);
 
-                        this.Sender.Tell(new MutationResult<User> { Result = user });
+                        this.Sender.Tell(CrudActionResponse<User>.Success(user, request.ExtraData));
                     }
                 }
                 catch (Exception exception)

@@ -11,12 +11,14 @@ namespace ClusterKit.NodeManager.Messages
 {
     using System;
 
+    using Akka.Routing;
+
     using ClusterKit.Security.Client;
 
     /// <summary>
     /// The request to change the user password
     /// </summary>
-    public class UserResetPasswordRequest
+    public class UserResetPasswordRequest : IConsistentHashable
     {
         /// <summary>
         /// Gets or sets the user uid
@@ -37,5 +39,8 @@ namespace ClusterKit.NodeManager.Messages
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Request { get; set; }
+
+        /// <inheritdoc />
+        public object ConsistentHashKey => this.UserUid;
     }
 }

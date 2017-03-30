@@ -57,6 +57,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// <param name="id">The user uid</param>
         /// <param name="password">The new user password</param>
         /// <returns>The mutation result</returns>
+        [UsedImplicitly]
         [DeclareMutation("Resets the user password")]
         [RequireUser]
         [RequireSession]

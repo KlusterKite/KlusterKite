@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="aa3566fe-4556-4a20-b8a6-e2b4f34ba179" name="Default" comment="" />
+    <ignored path="$PROJECT_DIR$/.tmp/" />
+    <ignored path="$PROJECT_DIR$/temp/" />
+    <ignored path="$PROJECT_DIR$/tmp/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="store.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/utils/store.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="12" column="2" lean-forward="false" selection-start-line="12" selection-start-column="2" selection-end-line="12" selection-end-column="2" />
+              <folding>
+                <element signature="e#0#119#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/containers/Home/HomePage.js" />
+        <option value="$PROJECT_DIR$/src/utils/store.js" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodeModulesDirectoryManager">
+    <handled-path value="$PROJECT_DIR$/node_modules" />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="2514" />
+    <option name="height" value="1456" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="utils" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="containers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="clusterkit-web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="containers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Home" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="nodejs_interpreter_path" value="C:/Program Files/nodejs/node" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" working-dir="">
+      <method />
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="aa3566fe-4556-4a20-b8a6-e2b4f34ba179" name="Default" comment="" />
+      <created>1490878393235</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1490878393235</updated>
+      <workItem from="1490878397597" duration="61000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="72000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="2514" height="1456" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="GraphQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23960695" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/containers/Home/HomePage.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#25#0" expanded="false" />
+            <marker date="1490878149578" expanded="true" signature="1747:1756" ph="{...}" />
+            <marker date="1490878149578" expanded="true" signature="1747:1764" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/NodesWithTemplates/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="952">
+          <caret line="59" column="62" lean-forward="false" selection-start-line="59" selection-start-column="39" selection-end-line="59" selection-end-column="62" />
+          <folding>
+            <marker date="1490873153412" expanded="true" signature="1663:2035" ph="fragment...{&#10;        getActiveNodeDescriptions {&#10;          edges {&#10;            node {&#10;              nodeTemplate&#10;            }&#10;          }&#10;        }&#10;        nodeTemplates {&#10;          edges {&#10;            node {&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }&#10;          }&#10;        }&#10;      }" />
+            <marker date="1490873153412" expanded="true" signature="1675:1698" ph="IClusterKitNodeApi_Root...IClusterKitNodeApi_Root" />
+            <marker date="1490873153412" expanded="true" signature="1699:2035" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1709:1734" ph="getActiveNodeDescriptions...getActiveNodeDescriptions" />
+            <marker date="1490873153412" expanded="true" signature="1709:1836" ph="getActiveNodeDescriptions...{&#10;          edges {&#10;            node {&#10;              nodeTemplate&#10;            }&#10;          }&#10;        }" />
+            <marker date="1490873153412" expanded="true" signature="1735:1836" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1747:1752" ph="edges...edges" />
+            <marker date="1490873153412" expanded="true" signature="1747:1826" ph="edges...{&#10;            node {&#10;              nodeTemplate&#10;            }&#10;          }" />
+            <marker date="1490873153412" expanded="true" signature="1753:1826" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1767:1771" ph="node...node" />
+            <marker date="1490873153412" expanded="true" signature="1767:1814" ph="node...{&#10;              nodeTemplate&#10;            }" />
+            <marker date="1490873153412" expanded="true" signature="1772:1814" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1788:1800" ph="nodeTemplate...nodeTemplate" />
+            <marker date="1490873153412" expanded="true" signature="1845:1858" ph="nodeTemplates...nodeTemplates" />
+            <marker date="1490873153412" expanded="true" signature="1845:2027" ph="nodeTemplates...{&#10;          edges {&#10;            node {&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }&#10;          }&#10;        }" />
+            <marker date="1490873153412" expanded="true" signature="1859:2027" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1871:1876" ph="edges...edges" />
+            <marker date="1490873153412" expanded="true" signature="1871:2017" ph="edges...{&#10;            node {&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }&#10;          }" />
+            <marker date="1490873153412" expanded="true" signature="1877:2017" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1891:1895" ph="node...node" />
+            <marker date="1490873153412" expanded="true" signature="1891:2005" ph="node...{&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }" />
+            <marker date="1490873153412" expanded="true" signature="1896:2005" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1912:1914" ph="id...id" />
+            <marker date="1490873153412" expanded="true" signature="1929:1933" ph="code...code" />
+            <marker date="1490873153412" expanded="true" signature="1948:1972" ph="minimumRequiredInstances...minimumRequiredInstances" />
+            <marker date="1490873153412" expanded="true" signature="1987:1991" ph="name...name" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schema.graphql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="67456">
+          <caret line="3968" column="33" lean-forward="false" selection-start-line="3968" selection-start-column="33" selection-end-line="3968" selection-end-column="33" />
+          <folding>
+            <marker date="1490878149467" expanded="true" signature="25798:25847" ph="input...{&#10;  userUid: Uid&#10;  roleUid: Uid&#10;  clientMutationId: String&#10;}" />
+            <marker date="1490878149467" expanded="true" signature="25804:25847" ph="ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input...ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input" />
+            <marker date="1490878149467" expanded="true" signature="148648:148668" ph="ClusterKitNodeApi_User_NodeMutationPayload...ClusterKitNodeApi_User_NodeMutationPayload" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schema.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="55658">
+          <caret line="3274" column="42" lean-forward="false" selection-start-line="3274" selection-start-column="19" selection-end-line="3274" selection-end-column="42" />
+          <folding>
+            <marker date="1490878149523" expanded="true" signature="596678:596746" ph="{&quot;name&quot;: &quot;ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser&quot;...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.env">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="56" lean-forward="false" selection-start-line="1" selection-start-column="56" selection-end-line="1" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/containers/Home/HomePage.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="52" column="56" lean-forward="false" selection-start-line="52" selection-start-column="38" selection-end-line="52" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#25#0" expanded="false" />
+            <marker date="1490878149578" expanded="true" signature="1747:1756" ph="{...}" />
+            <marker date="1490878149578" expanded="true" signature="1747:1764" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schema.graphql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1490878149467" expanded="true" signature="25798:25847" ph="input...{&#10;  userUid: Uid&#10;  roleUid: Uid&#10;  clientMutationId: String&#10;}" />
+            <marker date="1490878149467" expanded="true" signature="25804:25847" ph="ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input...ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input" />
+            <marker date="1490878149467" expanded="true" signature="148648:148668" ph="ClusterKitNodeApi_User_NodeMutationPayload...ClusterKitNodeApi_User_NodeMutationPayload" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schema.graphql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="67425">
+          <caret line="3968" column="33" lean-forward="false" selection-start-line="3968" selection-start-column="33" selection-end-line="3968" selection-end-column="33" />
+          <folding>
+            <marker date="1490878149467" expanded="true" signature="25798:25847" ph="input...{&#10;  userUid: Uid&#10;  roleUid: Uid&#10;  clientMutationId: String&#10;}" />
+            <marker date="1490878149467" expanded="true" signature="25804:25847" ph="ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input...ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input" />
+            <marker date="1490878149467" expanded="true" signature="148648:148668" ph="ClusterKitNodeApi_User_NodeMutationPayload...ClusterKitNodeApi_User_NodeMutationPayload" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/schema.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="3274" column="42" lean-forward="false" selection-start-line="3274" selection-start-column="19" selection-end-line="3274" selection-end-column="42" />
+          <folding>
+            <marker date="1490878149523" expanded="true" signature="596678:596746" ph="{&quot;name&quot;: &quot;ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser&quot;...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/containers/Home/HomePage.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="20" column="32" lean-forward="true" selection-start-line="20" selection-start-column="32" selection-end-line="20" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#25#0" expanded="false" />
+            <marker date="1490878149578" expanded="true" signature="1747:1756" ph="{...}" />
+            <marker date="1490878149578" expanded="true" signature="1747:1764" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/NodesWithTemplates/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="485">
+          <caret line="59" column="62" lean-forward="false" selection-start-line="59" selection-start-column="39" selection-end-line="59" selection-end-column="62" />
+          <folding>
+            <marker date="1490873153412" expanded="true" signature="1663:2035" ph="fragment...{&#10;        getActiveNodeDescriptions {&#10;          edges {&#10;            node {&#10;              nodeTemplate&#10;            }&#10;          }&#10;        }&#10;        nodeTemplates {&#10;          edges {&#10;            node {&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }&#10;          }&#10;        }&#10;      }" />
+            <marker date="1490873153412" expanded="true" signature="1675:1698" ph="IClusterKitNodeApi_Root...IClusterKitNodeApi_Root" />
+            <marker date="1490873153412" expanded="true" signature="1699:2035" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1709:1734" ph="getActiveNodeDescriptions...getActiveNodeDescriptions" />
+            <marker date="1490873153412" expanded="true" signature="1709:1836" ph="getActiveNodeDescriptions...{&#10;          edges {&#10;            node {&#10;              nodeTemplate&#10;            }&#10;          }&#10;        }" />
+            <marker date="1490873153412" expanded="true" signature="1735:1836" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1747:1752" ph="edges...edges" />
+            <marker date="1490873153412" expanded="true" signature="1747:1826" ph="edges...{&#10;            node {&#10;              nodeTemplate&#10;            }&#10;          }" />
+            <marker date="1490873153412" expanded="true" signature="1753:1826" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1767:1771" ph="node...node" />
+            <marker date="1490873153412" expanded="true" signature="1767:1814" ph="node...{&#10;              nodeTemplate&#10;            }" />
+            <marker date="1490873153412" expanded="true" signature="1772:1814" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1788:1800" ph="nodeTemplate...nodeTemplate" />
+            <marker date="1490873153412" expanded="true" signature="1845:1858" ph="nodeTemplates...nodeTemplates" />
+            <marker date="1490873153412" expanded="true" signature="1845:2027" ph="nodeTemplates...{&#10;          edges {&#10;            node {&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }&#10;          }&#10;        }" />
+            <marker date="1490873153412" expanded="true" signature="1859:2027" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1871:1876" ph="edges...edges" />
+            <marker date="1490873153412" expanded="true" signature="1871:2017" ph="edges...{&#10;            node {&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }&#10;          }" />
+            <marker date="1490873153412" expanded="true" signature="1877:2017" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1891:1895" ph="node...node" />
+            <marker date="1490873153412" expanded="true" signature="1891:2005" ph="node...{&#10;              id&#10;              code&#10;              minimumRequiredInstances&#10;              name&#10;            }" />
+            <marker date="1490873153412" expanded="true" signature="1896:2005" ph="{...}" />
+            <marker date="1490873153412" expanded="true" signature="1912:1914" ph="id...id" />
+            <marker date="1490873153412" expanded="true" signature="1929:1933" ph="code...code" />
+            <marker date="1490873153412" expanded="true" signature="1948:1972" ph="minimumRequiredInstances...minimumRequiredInstances" />
+            <marker date="1490873153412" expanded="true" signature="1987:1991" ph="name...name" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.env">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="56" lean-forward="false" selection-start-line="1" selection-start-column="56" selection-end-line="1" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/utils/store.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="2" lean-forward="false" selection-start-line="12" selection-start-column="2" selection-end-line="12" selection-end-column="2" />
+          <folding>
+            <element signature="e#0#119#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

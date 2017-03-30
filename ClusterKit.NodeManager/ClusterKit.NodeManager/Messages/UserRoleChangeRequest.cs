@@ -11,12 +11,14 @@ namespace ClusterKit.NodeManager.Messages
 {
     using System;
 
+    using Akka.Routing;
+
     using ClusterKit.Security.Client;
 
     /// <summary>
     /// Request to change user role membership
     /// </summary>
-    public abstract class UserRoleChangeRequest
+    public abstract class UserRoleChangeRequest : IConsistentHashable
     {
         /// <summary>
         /// Gets or sets the user uid
@@ -42,5 +44,8 @@ namespace ClusterKit.NodeManager.Messages
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Request { get; set; }
+
+        /// <inheritdoc />
+        public object ConsistentHashKey => this.UserUid;
     }
 }

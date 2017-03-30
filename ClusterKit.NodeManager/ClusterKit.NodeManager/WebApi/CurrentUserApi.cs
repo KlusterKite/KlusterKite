@@ -91,9 +91,9 @@ namespace ClusterKit.NodeManager.WebApi
         public Task<MutationResult<bool>> ChangePassword(
             RequestContext requestContext,
             [ApiDescription("The user current password")] string oldPassword,
-            [ApiDescription("The user current password")] string newPassword)
+            [ApiDescription("The user new password")] string newPassword)
         {
-            var user = requestContext?.Authentication?.User as User;
+            var user = requestContext?.Authentication?.User as UserDescription;
             if (user == null)
             {
                 return Task.FromResult<MutationResult<bool>>(null);
@@ -103,7 +103,7 @@ namespace ClusterKit.NodeManager.WebApi
                               {
                                   NewPassword = newPassword,
                                   OldPassword = oldPassword,
-                                  UserUid = user.Uid
+                                  Login = user.Login
                               };
 
             return
