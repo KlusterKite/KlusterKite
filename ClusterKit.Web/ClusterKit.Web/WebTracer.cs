@@ -133,6 +133,7 @@ namespace ClusterKit.Web
                         this.GetType().Name,
                         n,
                         context.Request.Path);
+                    throw;
                 }
 
                 this.system.Log.Info(

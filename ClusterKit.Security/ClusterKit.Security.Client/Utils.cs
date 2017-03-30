@@ -53,12 +53,23 @@ namespace ClusterKit.Security.Client
                 AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(
                         a =>
-                            a.GetTypes()
-                                .Where(
-                                    t =>
-                                        t.IsAbstract && t.IsSealed
-                                        && t.GetCustomAttribute(typeof(PrivilegesContainerAttribute), true) != null)
-                                .SelectMany(SearchDefinedPrivileges))
+                            {
+                                try
+                                {
+                                    return
+                                        a.GetTypes()
+                                            .Where(
+                                                t =>
+                                                    t.IsAbstract && t.IsSealed
+                                                    && t.GetCustomAttribute(typeof(PrivilegesContainerAttribute), true)
+                                                    != null)
+                                            .SelectMany(SearchDefinedPrivileges);
+                                }
+                                catch (Exception e)
+                                {
+                                    throw new Exception($"Could not get types from module {a.FullName}", e);
+                                }
+                            })
                     .OrderBy(d => d.AssemblyName)
                     .ThenBy(d => d.Privilege)
                     .ThenBy(d => d.Action)

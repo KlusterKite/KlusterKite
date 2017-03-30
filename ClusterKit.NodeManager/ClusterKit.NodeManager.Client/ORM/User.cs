@@ -14,13 +14,18 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Linq;
 
     using BCrypt.Net;
-    
+
+    using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
+
     using JetBrains.Annotations;
 
     /// <summary>
     /// The web ui user
     /// </summary>
-    public class User : UserDescription
+    [ApiDescription(Description = "The web ui user", Name = "ClusterKitUser")]
+    public class User : UserDescription, IObjectWithId<Guid>
     {
         /// <summary>
         /// Gets or sets the password hash
@@ -31,6 +36,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of roles assigned to this user
         /// </summary>
+        [DeclareField(Description = "The list of roles assigned to this user", Access = EnAccessFlag.Queryable)]
         public List<Role> Roles { get; set; } = new List<Role>();
 
         /// <summary>
@@ -38,6 +44,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [Key]
         [UsedImplicitly]
+        [DeclareField(Description = "The user uid", IsKey = true)]
         public Guid Uid { get; set; }
 
         /// <summary>
@@ -89,6 +96,12 @@ namespace ClusterKit.NodeManager.Client.ORM
                            IsBlocked = this.IsBlocked,
                            IsDeleted = this.IsDeleted
                        };
+        }
+
+        /// <inheritdoc />
+        Guid IObjectWithId<Guid>.GetId()
+        {
+            return this.Uid;
         }
     }
 }

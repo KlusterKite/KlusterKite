@@ -12,10 +12,13 @@ namespace ClusterKit.Data.TestKit
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Core.Monads;
     using ClusterKit.Data;
+    using ClusterKit.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
 
@@ -75,21 +78,39 @@ namespace ClusterKit.Data.TestKit
             return this.Storage.TryGetValue(id, out obj) ? Task.FromResult(new Maybe<TObject>(obj)) : Task.FromResult(new Maybe<TObject>(null));
         }
 
-        /// <summary>
-        /// Gets a list of objects from datasource
-        /// </summary>
-        /// <param name="skip">The number of objects to skip from select</param>
-        /// <param name="count">The maximum number of objects to return. Returns all on null.</param>
-        /// <returns>The list of objects from datasource</returns>
-        public override Task<List<TObject>> GetList(int skip, int? count)
+        /// <inheritdoc />
+        public override Task<CollectionResponse<TObject>> GetList(
+            Expression<Func<TObject, bool>> filter,
+            List<SortingCondition> sort,
+            int? skip,
+            int? count,
+            ApiRequest apiRequest)
         {
-            var objects = this.Storage.Values.Skip(skip);
-            if (count.HasValue)
+            var query = this.Storage.Values.AsQueryable();
+            
+            if (filter != null)
             {
-                objects = objects.Take(count.Value);
+                query = query.Where(filter);
             }
 
-            return Task.FromResult(objects.ToList());
+            var result = new CollectionResponse<TObject> { Count = query.Count() };
+            if (sort != null)
+            {
+                query = query.ApplySorting(sort);
+            }
+
+            if (skip.HasValue && query is IOrderedQueryable<TObject>)
+            {
+                query = query.Skip(skip.Value);
+            }
+
+            if (count.HasValue)
+            {
+                query = query.Take(count.Value);
+            }
+
+            result.Items = query.ToList();
+            return Task.FromResult(result);
         }
 
         /// <summary>

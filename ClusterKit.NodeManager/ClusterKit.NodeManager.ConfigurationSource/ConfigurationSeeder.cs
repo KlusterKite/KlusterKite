@@ -94,6 +94,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     "ClusterKit.Log.ElasticSearch",
                                     "ClusterKit.Web.Authentication",
                                     "ClusterKit.Security.SessionRedis",
+                                    "ClusterKit.API.Endpoint",
+                                    "ClusterKit.Web.GraphQL.Publisher"
                                 },
                         Configuration = Configurations.ClusterManager,
                         Version = 0
@@ -154,7 +156,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                             {
                                                 Privileges.GetActiveNodeDescriptions,
                                                 Privileges.GetTemplateStatistics,
-                                                $"{Privileges.NodeTemplate}.GetList"
+                                                $"{Privileges.NodeTemplate}.GetList",
+                                                $"{Privileges.NodeTemplate}.Query"
                                             }
                                 };
             context.Roles.Add(adminRole);

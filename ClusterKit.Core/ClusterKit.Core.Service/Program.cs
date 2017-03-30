@@ -67,8 +67,9 @@ namespace ClusterKit.Core.Service
                 {
                     Log.Logger.Error(
                         eventArgs.ExceptionObject as Exception,
-                        "{Type}: Unhandled domain exception from {SenderType}, terminating: {IsTerminating}\n{StackTrace}", 
+                        "{Type}: Unhandled domain exception {ExceptionMessage} from {SenderType}, terminating: {IsTerminating}\n{StackTrace}", 
                         "System",
+                        (eventArgs.ExceptionObject as Exception)?.Message,
                         sender?.GetType().Name ?? "unknown",
                         eventArgs.IsTerminating,
                         (eventArgs.ExceptionObject as Exception)?.StackTrace);

@@ -31,19 +31,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.1.3.31, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.1.1.3\lib\net45\Akka.dll</HintPath>
+      <HintPath>..\..\packages\Akka.1.1.3.344-beta\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster, Version=1.1.3.31, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Cluster, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Cluster.1.1.3\lib\net45\Akka.Cluster.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Cluster.1.1.3.344-beta\lib\net45\Akka.Cluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Cluster.Tools, Version=1.1.3.32, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Cluster.Tools, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.3.32-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Cluster.Tools.1.1.3.344-beta\lib\net45\Akka.Cluster.Tools.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.DI.CastleWindsor, Version=1.0.8.191, Culture=neutral, processorArchitecture=MSIL">
@@ -51,38 +51,39 @@
       <HintPath>..\..\packages\Akka.DI.CastleWindsor.1.0.8.191-beta\lib\net45\Akka.DI.CastleWindsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.Core, Version=1.1.3.31, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.DI.Core, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.DI.Core.1.1.3\lib\net45\Akka.DI.Core.dll</HintPath>
+      <HintPath>..\..\packages\Akka.DI.Core.1.1.3.344-beta\lib\net45\Akka.DI.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.DI.TestKit, Version=1.1.3.32, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.DI.TestKit, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.DI.TestKit.1.1.3\lib\net45\Akka.DI.TestKit.dll</HintPath>
+      <HintPath>..\..\packages\Akka.DI.TestKit.1.1.3.344-beta\lib\net45\Akka.DI.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Logger.Serilog, Version=1.1.2.6, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Logger.Serilog, Version=1.1.3.12, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Logger.Serilog.1.1.2\lib\net45\Akka.Logger.Serilog.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Logger.Serilog.1.1.3.12-beta\lib\net45\Akka.Logger.Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Remote, Version=1.1.3.31, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.Remote, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.Remote.1.1.3\lib\net45\Akka.Remote.dll</HintPath>
+      <HintPath>..\..\packages\Akka.Remote.1.1.3.344-beta\lib\net45\Akka.Remote.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.Serialization.Hyperion">
-      <HintPath>..\..\packages\Akka.Serialization.Hyperion.1.1.3.32-beta\lib\net45\Akka.Serialization.Hyperion.dll</HintPath>
+    <Reference Include="Akka.Serialization.Hyperion, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Akka.Serialization.Hyperion.1.1.3.344-beta\lib\net45\Akka.Serialization.Hyperion.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.TestKit, Version=1.1.3.31, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.TestKit, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.TestKit.1.1.3\lib\net45\Akka.TestKit.dll</HintPath>
+      <HintPath>..\..\packages\Akka.TestKit.1.1.3.344-beta\lib\net45\Akka.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Akka.TestKit.Xunit2, Version=1.1.3.32, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Akka.TestKit.Xunit2, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.1.3\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
+      <HintPath>..\..\packages\Akka.TestKit.Xunit2.1.1.3.344-beta\lib\net45\Akka.TestKit.Xunit2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="BCrypt.Net">
@@ -100,6 +101,26 @@
     </Reference>
     <Reference Include="CommonServiceLocator.WindsorAdapter">
       <HintPath>..\..\packages\CommonServiceLocator.WindsorAdapter.1.0\lib\NET35\CommonServiceLocator.WindsorAdapter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Buffers">
+      <HintPath>..\..\packages\DotNetty.Buffers.0.3.2\lib\net45\DotNetty.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Codecs">
+      <HintPath>..\..\packages\DotNetty.Codecs.0.3.2\lib\net45\DotNetty.Codecs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Common">
+      <HintPath>..\..\packages\DotNetty.Common.0.3.2\lib\net45\DotNetty.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Handlers">
+      <HintPath>..\..\packages\DotNetty.Handlers.0.3.2\lib\net45\DotNetty.Handlers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetty.Transport">
+      <HintPath>..\..\packages\DotNetty.Transport.0.3.2\lib\net45\DotNetty.Transport.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework">
@@ -121,6 +142,14 @@
     </Reference>
     <Reference Include="Google.ProtocolBuffers.Serialization">
       <HintPath>..\..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GraphQL">
+      <HintPath>..\..\packages\GraphQL.0.14.6.657\lib\net45\GraphQL.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GraphQL-Parser">
+      <HintPath>..\..\packages\GraphQL-Parser.2.0.0\lib\net45\GraphQL-Parser.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Helios, Version=2.1.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -184,7 +213,7 @@
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serilog.2.3.0\lib\net46\Serilog.dll</HintPath>
+      <HintPath>..\..\packages\Serilog.2.4.0\lib\net46\Serilog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Serilog.Sinks.TextWriter, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
@@ -263,6 +292,14 @@
       <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
       <Name>ClusterKit.Core.TestKit</Name>
 </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj">
+      <Project>{7DE19EFC-58C5-4DBF-8A2A-E81E54AF5623}</Project>
+      <Name>ClusterKit.LargeObjects.Client</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
+      <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
+      <Name>ClusterKit.LargeObjects</Name>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj">
       <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
       <Name>ClusterKit.Data.CRUD</Name>
@@ -287,12 +324,53 @@
       <Project>{452AA14F-7657-49D2-8DA5-6A3058821217}</Project>
       <Name>ClusterKit.Data.EF.Npgsql</Name>
 </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj">
+      <Project>{8E543EA4-65DE-475F-8045-C094CDE58E29}</Project>
+      <Name>ClusterKit.Web.Client</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Descriptor/ClusterKit.Web.Descriptor.csproj">
+      <Project>{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}</Project>
+      <Name>ClusterKit.Web.Descriptor</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj">
+      <Project>{477B201A-A30C-4360-B56A-6F61C049BB04}</Project>
+      <Name>ClusterKit.Web</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Rest/ClusterKit.Web.Rest.csproj">
+      <Project>{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}</Project>
+      <Name>ClusterKit.Web.Rest</Name>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
 </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Authorization/ClusterKit.Web.Authorization.csproj">
+      <Project>{6ADFBDDF-E452-46FC-A037-6D57300BE561}</Project>
+      <Name>ClusterKit.Web.Authorization</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Swagger.Messages/ClusterKit.Web.Swagger.Messages.csproj">
+      <Project>{D80F5923-CD1B-4376-BAB5-1785EA4395A9}</Project>
+      <Name>ClusterKit.Web.Swagger.Messages</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.GraphQL.Publisher/ClusterKit.Web.GraphQL.Publisher.csproj">
+      <Project>{45219CB4-7189-49C6-A95B-AEBBAED4645E}</Project>
+      <Name>ClusterKit.Web.GraphQL.Publisher</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj">
+      <Project>{F3216B61-26C8-4AD6-84DF-4531D4C568A2}</Project>
+      <Name>ClusterKit.Monitoring.Client</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
+      <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Provider/ClusterKit.API.Provider.csproj">
+      <Project>{DDC4B9D1-49AC-4CD6-9FC5-FE4A02C54871}</Project>
+      <Name>ClusterKit.API.Provider</Name>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiTests.cs" />
     <Compile Include="ConfigurationSourceTests.cs" />
     <Compile Include="DataFactoryTests.cs" />
     <Compile Include="NodeManagerActorTests.cs" />

@@ -45,6 +45,7 @@ namespace ClusterKit.Web.Authorization
         public void ConfigureApp(IAppBuilder appBuilder)
         {
             appBuilder.Use<Authorizer>(new Authorizer.AuthorizerOptions("Bearer", this.tokenManager));
+            appBuilder.Use<CheckTokenMiddleware>();
         }
     }
 }

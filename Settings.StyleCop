@@ -1,6 +1,7 @@
 <StyleCopSettings Version="105">
   <GlobalSettings>
     <CollectionProperty Name="RecognizedWords">
+      <Value>accessable</Value>
       <Value>Auth</Value>
       <Value>Authorizer</Value>
       <Value>api</Value>
@@ -18,6 +19,7 @@
       <Value>Sharding</Value>
       <Value>sharded</Value>
       <Value>Owin</Value>
+      <Value>parameterless</Value>
       <Value>postgres</Value>
       <Value>precompiled</Value>
       <Value>tcp</Value>
@@ -48,6 +50,23 @@
         </Rule>
       </Rules>
       <AnalyzerSettings />
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.CSharp.LayoutRules">
+      <Rules>
+        <Rule Name="ElementMustNotBeOnSingleLine">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+      </Rules>
+      <AnalyzerSettings />
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.CSharp.NamingRules">
+      <AnalyzerSettings>
+        <CollectionProperty Name="Hungarian">
+          <!--<Value>tp</Value>-->
+        </CollectionProperty>
+      </AnalyzerSettings>
     </Analyzer>
   </Analyzers>
 </StyleCopSettings>

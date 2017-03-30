@@ -11,7 +11,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
     using System.Data.Entity;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
@@ -22,7 +21,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     /// <summary>
     /// Data factory to work with <see cref="User"/>
     /// </summary>
-    public class UserFactoryByLogin : EntityDataFactory<ConfigurationContext, User, string>
+    public class UserFactoryByLogin : EntityDataFactorySync<ConfigurationContext, User, string>
     {
         /// <inheritdoc />
         public UserFactoryByLogin(ConfigurationContext context)
@@ -41,9 +40,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
         /// <inheritdoc />
         public override Expression<Func<User, bool>> GetIdValidationExpression(string id) => obj => id == obj.Login;
-
-        /// <inheritdoc />
-        public override IOrderedQueryable<User> GetSortFunction(IQueryable<User> set) => set.OrderBy(u => u.Login);
 
         /// <inheritdoc />
         protected override DbSet<User> GetDbSet() => this.Context.Users;

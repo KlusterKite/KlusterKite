@@ -123,6 +123,43 @@ namespace ClusterKit.Web.Tests.Auth
         }
 
         /// <summary>
+        /// In case of invalid token, controller should return 401
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task ForbiddenOnInvalidToken()
+        {
+            this.ExpectNoMsg();
+            var client = new RestClient($"http://localhost:{this.OwinPort}/public") { Timeout = 5000 };
+            client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(
+                Guid.NewGuid().ToString("N"),
+                "Bearer");
+
+            var request = new RestRequest { Method = Method.GET, Resource = "test" };
+            request.AddHeader("Accept", "application/json, text/json");
+            var result = await client.ExecuteTaskAsync(request);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, result.StatusCode);
+        }
+
+        /// <summary>
+        /// In case of invalid token, controller should return 401
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task ValidOnNoToken()
+        {
+            this.ExpectNoMsg();
+            var client = new RestClient($"http://localhost:{this.OwinPort}/public") { Timeout = 5000 };
+           
+            var request = new RestRequest { Method = Method.GET, Resource = "test" };
+            request.AddHeader("Accept", "application/json, text/json");
+            var result = await client.ExecuteTaskAsync(request);
+
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        }
+
+        /// <summary>
         /// Sets the user authenticated session
         /// </summary>
         /// <returns>The user token</returns>
@@ -319,6 +356,24 @@ namespace ClusterKit.Web.Tests.Auth
         }
 
         /// <summary>
+        /// The testing web api controller
+        /// </summary>
+        [RoutePrefix("public")]
+        public class PublicTestController : ApiController
+        {
+            /// <summary>
+            /// Tests user authentication
+            /// </summary>
+            /// <returns>The user name</returns>
+            [HttpGet]
+            [Route("test")]
+            public string GetUserSession()
+            {
+                return "Hello world";
+            }
+        }
+
+        /// <summary>
         /// The test installer to register components
         /// </summary> 
         public class TestInstaller : BaseInstaller
@@ -336,6 +391,7 @@ namespace ClusterKit.Web.Tests.Auth
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
                 container.Register(Classes.From(typeof(TestController)));
+                container.Register(Classes.From(typeof(PublicTestController)));
                 container.Register(Component.For<ITokenManager>().ImplementedBy<MoqTokenManager>().LifestyleSingleton());
             }
         }

@@ -10,7 +10,6 @@ namespace ClusterKit.Web.Tests.Auth
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
@@ -225,8 +224,6 @@ namespace ClusterKit.Web.Tests.Auth
                 {{
                     ClusterKit {{
  		                Web {{
-                            Authentication.RedisConnection = ""{ConfigurationManager.ConnectionStrings["redis"]
-                    .ConnectionString}""
                             OwinPort = {port},
  			                OwinBindAddress = ""http://*:{port}"",
                             Debug.Trace = true

@@ -47,7 +47,15 @@ namespace ClusterKit.Security.Client
         /// <param name="extraData">
         /// The extra data.
         /// </param>
-        public AccessTicket([CanBeNull] IUser user, [CanBeNull]IEnumerable<string> userScope, [NotNull] string clientId, [NotNull] string clientType, [NotNull] IEnumerable<string> clientScope, DateTimeOffset created, DateTimeOffset? expiring, object extraData)
+        public AccessTicket(
+            [CanBeNull] IUser user,
+            [CanBeNull] IEnumerable<string> userScope,
+            [NotNull] string clientId,
+            [NotNull] string clientType,
+            [NotNull] IEnumerable<string> clientScope,
+            DateTimeOffset created,
+            DateTimeOffset? expiring,
+            object extraData)
         {
             this.User = user;
             this.UserScope = userScope?.ToList().AsReadOnly() ?? new List<string>().AsReadOnly();

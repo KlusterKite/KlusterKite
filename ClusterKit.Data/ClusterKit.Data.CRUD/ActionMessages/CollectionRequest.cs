@@ -10,9 +10,12 @@
 namespace ClusterKit.Data.CRUD.ActionMessages
 {
     using System;
-    
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+
     using Akka.Routing;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
@@ -40,7 +43,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         /// Gets or sets the number of objects to skip in select
         /// </summary>
         [UsedImplicitly]
-        public int Skip { get; set; }
+        public int? Skip { get; set; }
 
         /// <summary>
         /// Gets or sets some extra data, that will be returned with the response
@@ -49,12 +52,17 @@ namespace ClusterKit.Data.CRUD.ActionMessages
         public byte[] ExtraData { get; set; }
 
         /// <summary>
+        /// Gets or sets the original <see cref="ApiRequest"/>. Optional.
+        /// </summary>
+        public ApiRequest ApiRequest { get; set; }
+
+        /// <summary>
         /// Gets or sets the original requester description
         /// </summary>
         /// <remarks>
         /// This can be used for further authorization checks
         /// </remarks>
-        public RequestDescription RequestDescription { get; set; }
+        public RequestContext RequestContext { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the response is acceptable as parcel.
@@ -74,5 +82,14 @@ namespace ClusterKit.Data.CRUD.ActionMessages
     // ReSharper disable once StyleCop.SA1402
     public class CollectionRequest<TObject> : CollectionRequest
     {
+        /// <summary>
+        /// Gets or sets the filtering condition
+        /// </summary>
+        public Expression<Func<TObject, bool>> Filter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sorting function
+        /// </summary>
+        public List<SortingCondition> Sort { get; set; }
     }
 }

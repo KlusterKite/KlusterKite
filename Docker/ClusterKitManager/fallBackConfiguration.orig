@@ -63,6 +63,17 @@
       "Id": "ClusterKit.Security.SessionRedis",
       "Version": "0.0.0-local"
     },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.API.Endpoint",
+      "Version": "0.0.0-local"
+    },
+    {
+      "BuildDate": null,
+      "Id": "ClusterKit.Web.GraphQL.Publisher",
+      "Version": "0.0.0-local"
+    },
+
 
   ],
   "PackageSources": [

@@ -96,6 +96,9 @@ namespace ClusterKit.NodeManager
                 Component.For<DataFactory<string, IPackage, string>>()
                     .ImplementedBy<NugetPackagesFactory>()
                     .LifestyleTransient());
+
+            container.Register(
+                Component.For<API.Provider.ApiProvider>().ImplementedBy<ApiProvider>().LifestyleSingleton());
         }
     }
 }

@@ -25,7 +25,7 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the package latest version
+        /// Gets or sets the package version
         /// </summary>
         public string Version { get; set; }
 

@@ -15,6 +15,10 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Xml.Serialization;
 
+    using ClusterKit.API.Client;
+    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Data.CRUD;
+
     using JetBrains.Annotations;
 
     using Newtonsoft.Json;
@@ -22,17 +26,20 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// The amount of privileges assigned to the user
     /// </summary>
-    public class Role
+    [ApiDescription(Description = "Security role. The amount of privileges assigned to the user", Name = "ClusterKitRole")]
+    public class Role : IObjectWithId<Guid>
     {
         /// <summary>
         /// Gets or sets the role uid
         /// </summary>
         [Key]
+        [DeclareField(Description = "The role uid", IsKey = true)]
         public Guid Uid { get; set; }
 
         /// <summary>
         /// Gets or sets the role name
         /// </summary>
+        [DeclareField(Description = "The role name")]
         public string Name { get; set; }
 
         /// <summary>
@@ -40,6 +47,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [NotMapped]
         [NotNull]
+        [DeclareField(Description = "The list of granted privileges")]
         public List<string> AllowedScope { get; set; } = new List<string>();
 
         /// <summary>
@@ -66,6 +74,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [NotMapped]
         [NotNull]
+        [DeclareField(Description = "The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)")]
         public List<string> DeniedScope { get; set; } = new List<string>();
 
         /// <summary>
@@ -90,6 +99,14 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of users assigned to this role
         /// </summary>
+        [UsedImplicitly]
+        [DeclareField(Description = "The list of users assigned to this role", Access = EnAccessFlag.Queryable)]
         public List<User> Users { get; set; }
+
+        /// <inheritdoc />
+        Guid IObjectWithId<Guid>.GetId()
+        {
+            return this.Uid;
+        }
     }
 }

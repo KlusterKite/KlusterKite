@@ -9,12 +9,16 @@
 
 namespace ClusterKit.Data
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     using Castle.Windsor;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Core.Monads;
+    using ClusterKit.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
 
@@ -80,10 +84,30 @@ namespace ClusterKit.Data
         /// <summary>
         /// Gets a list of objects from datasource
         /// </summary>
-        /// <param name="skip">The number of objects to skip from select</param>
-        /// <param name="count">The maximum number of objects to return. Returns all on null.</param>
-        /// <returns>The list of objects from datasource</returns>
-        public abstract Task<List<TObject>> GetList(int skip, int? count);
+        /// <param name="filter">
+        /// The filter condition.
+        /// </param>
+        /// <param name="sort">
+        /// The sort condition.
+        /// </param>
+        /// <param name="skip">
+        /// The number of objects to skip from select
+        /// </param>
+        /// <param name="count">
+        /// The maximum number of objects to return. Returns all on null.
+        /// </param>
+        /// <param name="apiRequest">
+        /// The original <see cref="ApiRequest"/>. Optional.
+        /// </param>
+        /// <returns>
+        /// The list of objects from datasource
+        /// </returns>
+        public abstract Task<CollectionResponse<TObject>> GetList(
+            Expression<Func<TObject, bool>> filter,
+            List<SortingCondition> sort,
+            int? skip, 
+            int? count,
+            ApiRequest apiRequest);
 
         /// <summary>
         /// Adds an object to datasource

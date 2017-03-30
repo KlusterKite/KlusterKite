@@ -10,7 +10,7 @@ namespace ClusterKit.Web.Authorization
 {
     using System.Security.Claims;
     using System.Threading.Tasks;
-
+    
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
@@ -96,6 +96,7 @@ namespace ClusterKit.Web.Authorization
                 var session = await this.Options.TokenManager.ValidateAccessToken(token);
                 if (session == null)
                 {
+                    this.Context.Set("InvalidToken", true);
                     return null;
                 }
 
