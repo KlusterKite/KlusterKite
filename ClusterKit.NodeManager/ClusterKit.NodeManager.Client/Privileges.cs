@@ -31,10 +31,22 @@ namespace ClusterKit.NodeManager.Client
         public const string Role = "ClusterKit.NodeManager.Role";
 
         /// <summary>
-        /// The privilege to manage <see cref="ORM.Role"/>
+        /// The privilege to manage <see cref="ORM.Release"/>
         /// </summary>
         [PrivilegeDescription("Release management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
-        public const string Release = "ClusterKit.NodeManager.Role";
+        public const string Release = "ClusterKit.NodeManager.Release";
+
+        /// <summary>
+        /// The privilege to set <see cref="ORM.Release.EnState.Ready"/> state for draft releases
+        /// </summary>
+        [PrivilegeDescription("The privilege to set ready state for draft releases", Target = EnPrivilegeTarget.User)]
+        public const string ReleaseFinish = "ClusterKit.NodeManager.ReleaseFinish";
+
+        /// <summary>
+        /// The privilege to manage global cluster configuration
+        /// </summary>
+        [PrivilegeDescription("Cluster configuration management", Target = EnPrivilegeTarget.User)]
+        public const string ClusterUpdate = "ClusterKit.NodeManager.ClusterUpdate";
 
         /// <summary>
         /// The privilege to manage <see cref="NodeTemplate"/>

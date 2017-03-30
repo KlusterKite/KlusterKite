@@ -350,7 +350,9 @@ namespace ClusterKit.NodeManager.Launcher
             while (true)
             {
                 var result = client.Execute(request);
-                if (result.ResponseStatus != ResponseStatus.Completed || result.StatusCode == HttpStatusCode.BadGateway)
+                if (result.ResponseStatus != ResponseStatus.Completed 
+                    || result.StatusCode == HttpStatusCode.BadGateway 
+                    || result.StatusCode == HttpStatusCode.NotFound)
                 {
                     return false;
                 }

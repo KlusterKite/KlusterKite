@@ -182,9 +182,9 @@ namespace ClusterKit.NodeManager
             UpdateDescription = "Updates the draft release", CanDelete = true,
             DeleteDescription = "Removes the draft release", Description = "ClusterKit managing system security roles")]
         [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<Release, int> Releases(RequestContext context)
+        public ReleaseConnection Releases(RequestContext context)
         {
-            return new Connection<Release, int>(
+            return new ReleaseConnection(
                 this.actorSystem,
                 this.GetManagerActorProxyPath(),
                 this.AkkaTimeout,

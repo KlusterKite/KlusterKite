@@ -19,6 +19,7 @@ namespace ClusterKit.NodeManager
     using Akka.Event;
     using Akka.Util.Internal;
 
+    using ClusterKit.API.Client;
     using ClusterKit.Core;
     using ClusterKit.Core.Ping;
     using ClusterKit.Core.Utils;
@@ -59,12 +60,14 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// List of node by templates
         /// </summary>
-        private readonly Dictionary<string, List<Address>> activeNodesByTemplate = new Dictionary<string, List<Address>>();
+        private readonly Dictionary<string, List<Address>> activeNodesByTemplate =
+            new Dictionary<string, List<Address>>();
 
         /// <summary>
         /// List of node by templates
         /// </summary>
-        private readonly Dictionary<string, List<Guid>> awaitingRequestsByTemplate = new Dictionary<string, List<Guid>>();
+        private readonly Dictionary<string, List<Guid>> awaitingRequestsByTemplate =
+            new Dictionary<string, List<Guid>>();
 
         /// <summary>
         /// The data source context factory
@@ -94,7 +97,8 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// List of known node descriptions
         /// </summary>
-        private readonly Dictionary<Address, NodeDescription> nodeDescriptions = new Dictionary<Address, NodeDescription>();
+        private readonly Dictionary<Address, NodeDescription> nodeDescriptions =
+            new Dictionary<Address, NodeDescription>();
 
         /// <summary>
         /// List of configured node templates
@@ -114,7 +118,8 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// List of pending node description requests
         /// </summary>
-        private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications = new Dictionary<Address, Cancelable>();
+        private readonly Dictionary<Address, Cancelable> requestDescriptionNotifications =
+            new Dictionary<Address, Cancelable>();
 
         /// <summary>
         /// Roles leaders
@@ -180,24 +185,42 @@ namespace ClusterKit.NodeManager
         /// <param name="router">
         /// The node message router
         /// </param>
-        public NodeManagerActor(
-            IContextFactory<ConfigurationContext> contextFactory,
-            IMessageRouter router)
+        public NodeManagerActor(IContextFactory<ConfigurationContext> contextFactory, IMessageRouter router)
         {
             this.contextFactory = contextFactory;
             this.router = router;
 
-            this.fullClusterWaitTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.FullClusterWaitTimeout", TimeSpan.FromSeconds(60), false);
-            this.newNodeJoinTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.NewNodeJoinTimeout", TimeSpan.FromSeconds(30), false);
-            this.newNodeRequestDescriptionNotificationTimeout = Context.System.Settings.Config.GetTimeSpan("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationTimeout", TimeSpan.FromSeconds(10), false);
-            this.newNodeRequestDescriptionNotificationMaxRequests = Context.System.Settings.Config.GetInt("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
-            this.upgradablePart = Context.System.Settings.Config.GetDecimal("ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests", 10);
+            this.fullClusterWaitTimeout =
+                Context.System.Settings.Config.GetTimeSpan(
+                    "ClusterKit.NodeManager.FullClusterWaitTimeout",
+                    TimeSpan.FromSeconds(60),
+                    false);
+            this.newNodeJoinTimeout =
+                Context.System.Settings.Config.GetTimeSpan(
+                    "ClusterKit.NodeManager.NewNodeJoinTimeout",
+                    TimeSpan.FromSeconds(30),
+                    false);
+            this.newNodeRequestDescriptionNotificationTimeout =
+                Context.System.Settings.Config.GetTimeSpan(
+                    "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationTimeout",
+                    TimeSpan.FromSeconds(10),
+                    false);
+            this.newNodeRequestDescriptionNotificationMaxRequests =
+                Context.System.Settings.Config.GetInt(
+                    "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
+                    10);
+            this.upgradablePart =
+                Context.System.Settings.Config.GetDecimal(
+                    "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
+                    10);
 
             this.Receive<InitializationMessage>(m => this.Initialize());
             this.Receive<object>(m => this.Stash.Stash());
+
             // ReSharper disable FormatStringProblem
             // ReSharper disable RedundantToStringCall
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+
             // ReSharper restore RedundantToStringCall
             // ReSharper restore FormatStringProblem
             this.Self.Tell(new InitializationMessage());
@@ -225,12 +248,18 @@ namespace ClusterKit.NodeManager
             {
                 // ReSharper disable FormatStringProblem
                 Context.GetLogger().Warning("{Type}: received null message", this.GetType().Name);
+
                 // ReSharper restore FormatStringProblem
             }
             else
             {
                 // ReSharper disable FormatStringProblem
-                Context.GetLogger().Warning("{Type}: received unsupported message of type {MessageTypeName}", this.GetType().Name, message.GetType().Name);
+                Context.GetLogger()
+                    .Warning(
+                        "{Type}: received unsupported message of type {MessageTypeName}",
+                        this.GetType().Name,
+                        message.GetType().Name);
+
                 // ReSharper restore FormatStringProblem
             }
 
@@ -262,9 +291,7 @@ namespace ClusterKit.NodeManager
                 if (string.IsNullOrWhiteSpace(module.Id))
                 {
                     Context.GetLogger().Error(
-                        // ReSharper disable FormatStringProblem
                         "{Type}: got module with null id from template {TemplateCode} on container {ContainerCode} on address {NodeAddressString}",
-                        // ReSharper restore FormatStringProblem
                         this.GetType().Name,
                         nodeDescription.NodeTemplate,
                         nodeDescription.ContainerType,
@@ -275,15 +302,11 @@ namespace ClusterKit.NodeManager
                 if (!this.packages.TryGetValue(module.Id, out package))
                 {
                     Context.GetLogger().Error(
-                        // ReSharper disable FormatStringProblem
                         "{Type}: node with template {TemplateCode} on container {ContainerCode} on address {NodeAddressString} has module {PackageId} that does not contained in repository. This node cannot be upgraded",
-                        // ReSharper restore FormatStringProblem
                         this.GetType().Name,
                         nodeDescription.NodeTemplate,
                         nodeDescription.ContainerType,
-                        // ReSharper disable RedundantToStringCall
                         nodeDescription.NodeAddress.ToString(),
-                        // ReSharper restore RedundantToStringCall
                         module.Id);
                     nodeDescription.IsObsolete = false;
                     return;
@@ -313,21 +336,23 @@ namespace ClusterKit.NodeManager
                 this.nodeTemplates.Values.Where(t => t.ContainerTypes.Contains(containerType))
                     .Select(
                         t =>
-                        new
-                        {
-                            Template = t,
-                            NodesCount =
-                            (this.activeNodesByTemplate.ContainsKey(t.Code) ? this.activeNodesByTemplate[t.Code].Count : 0)
-                            + (this.awaitingRequestsByTemplate.ContainsKey(t.Code)
-                                   ? this.awaitingRequestsByTemplate[t.Code].Count
-                                   : 0)
-                        })
+                            new
+                                {
+                                    Template = t,
+                                    NodesCount =
+                                    (this.activeNodesByTemplate.ContainsKey(t.Code)
+                                         ? this.activeNodesByTemplate[t.Code].Count
+                                         : 0)
+                                    + (this.awaitingRequestsByTemplate.ContainsKey(t.Code)
+                                           ? this.awaitingRequestsByTemplate[t.Code].Count
+                                           : 0)
+                                })
                     .ToList();
 
             // first we choose among templates that have nodes less then minimum required
             var templates =
                 availableTmplates.Where(
-                    t => t.Template.MinimumRequiredInstances > 0 && t.NodesCount < t.Template.MinimumRequiredInstances)
+                        t => t.Template.MinimumRequiredInstances > 0 && t.NodesCount < t.Template.MinimumRequiredInstances)
                     .Select(t => t.Template)
                     .ToList();
 
@@ -336,10 +361,12 @@ namespace ClusterKit.NodeManager
                 // if all node templates has at least minimum required node quantity, we will use node template, untill it has maximum needed quantity
                 templates =
                     availableTmplates.Where(
-                        t =>
-                        !t.Template.MaximumNeededInstances.HasValue
-                        || (t.Template.MaximumNeededInstances.Value > 0
-                            && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template).ToList();
+                            t =>
+                                !t.Template.MaximumNeededInstances.HasValue
+                                || (t.Template.MaximumNeededInstances.Value > 0
+                                    && t.NodesCount < t.Template.MaximumNeededInstances.Value))
+                        .Select(t => t.Template)
+                        .ToList();
             }
 
             return templates;
@@ -353,22 +380,21 @@ namespace ClusterKit.NodeManager
             this.connectionString = Context.System.Settings.Config.GetString(ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(ConfigDatabaseNamePath);
 
-            using (var context = this.contextFactory.CreateAndUpgradeContext(this.connectionString, this.databaseName).Result)
+            using (
+                var context =
+                    this.contextFactory.CreateAndUpgradeContext(this.connectionString, this.databaseName).Result)
             {
-                DataFactory<ConfigurationContext, NodeTemplate, int>
-                    .CreateFactory(context)
-                    .GetList(null, null, null, null, null).Result.Items
-                    .ForEach(t => this.nodeTemplates[t.Code] = t);
+                DataFactory<ConfigurationContext, NodeTemplate, int>.CreateFactory(context)
+                    .GetList(null, null, null, null, null)
+                    .Result.Items.ForEach(t => this.nodeTemplates[t.Code] = t);
 
-                DataFactory<ConfigurationContext, SeedAddress, int>
-                    .CreateFactory(context)
-                    .GetList(null, null, null, null, null).Result.Items
-                    .ForEach(s => this.seedAddresses[s.Id] = s);
+                DataFactory<ConfigurationContext, SeedAddress, int>.CreateFactory(context)
+                    .GetList(null, null, null, null, null)
+                    .Result.Items.ForEach(s => this.seedAddresses[s.Id] = s);
 
-                DataFactory<ConfigurationContext, NugetFeed, int>
-                    .CreateFactory(context)
-                    .GetList(null, null, null, null, null).Result.Items
-                    .ForEach(f => this.nugetFeeds[f.Id] = f);
+                DataFactory<ConfigurationContext, NugetFeed, int>.CreateFactory(context)
+                    .GetList(null, null, null, null, null)
+                    .Result.Items.ForEach(f => this.nugetFeeds[f.Id] = f);
             }
         }
 
@@ -385,6 +411,7 @@ namespace ClusterKit.NodeManager
             {
                 // ReSharper disable FormatStringProblem
                 Context.GetLogger().Error(e, "{Type}: Exception during initialization", this.GetType().Name);
+
                 // ReSharper restore FormatStringProblem
                 Context.System.Scheduler.ScheduleTellOnce(
                     TimeSpan.FromSeconds(5),
@@ -402,6 +429,7 @@ namespace ClusterKit.NodeManager
             {
                 // ReSharper disable FormatStringProblem
                 Context.GetLogger().Error(e, "{Type}: Exception during package list load", this.GetType().Name);
+
                 // ReSharper restore FormatStringProblem
                 Context.System.Scheduler.ScheduleTellOnce(
                     TimeSpan.FromSeconds(5),
@@ -413,14 +441,17 @@ namespace ClusterKit.NodeManager
 
             this.workers =
                 Context.ActorOf(
-                    Props.Create(() => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
+                    Props.Create(
+                            () => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
                         .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                     "workers");
 
             this.Become(this.Start);
+
             // ReSharper disable FormatStringProblem
             // ReSharper disable RedundantToStringCall
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+
             // ReSharper restore RedundantToStringCall
             // ReSharper restore FormatStringProblem
             this.Stash.UnstashAll();
@@ -493,6 +524,7 @@ namespace ClusterKit.NodeManager
             {
                 // ReSharper disable FormatStringProblem
                 Context.GetLogger().Warning("{Type}: Failed to select template with dice", this.GetType().Name);
+
                 // ReSharper restore FormatStringProblem
                 selectedTemplate = templates.Last();
             }
@@ -511,12 +543,13 @@ namespace ClusterKit.NodeManager
             }
 
             // todo: @kantora create and keep update cache of template packages
-            var packageDescriptions = selectedTemplate.Packages
-                .Select(name => this.packages.ContainsKey(name) ? this.packages[name] : null)
-                .Where(p => p != null)
-                .ToList();
+            var packageDescriptions =
+                selectedTemplate.Packages.Select(name => this.packages.ContainsKey(name) ? this.packages[name] : null)
+                    .Where(p => p != null)
+                    .ToList();
 
-            var dependenciesSet = packageDescriptions.SelectMany(d => d.DependencySets).SelectMany(d => d.Dependencies).ToList();
+            var dependenciesSet =
+                packageDescriptions.SelectMany(d => d.DependencySets).SelectMany(d => d.Dependencies).ToList();
             var dependencies =
                 dependenciesSet.Select(d => d.Id)
                     .Distinct()
@@ -528,39 +561,52 @@ namespace ClusterKit.NodeManager
                                 if (this.packages.TryGetValue(id, out package))
                                 {
                                     return new PackageDescription
-                                    {
-                                        Id = package.Id,
-                                        Version = package.Version.ToString()
-                                    };
+                                               {
+                                                   Id = package.Id,
+                                                   Version = package.Version.ToString()
+                                               };
                                 }
                                 else
                                 {
                                     var dependency =
                                         dependenciesSet.First(
                                             d =>
-                                            d.Id == id
-                                            && d.VersionSpec.MinVersion
-                                            == dependenciesSet.Where(dp => dp.Id == id)
-                                                   .Max(dp => dp.VersionSpec.MinVersion));
+                                                d.Id == id
+                                                && d.VersionSpec.MinVersion
+                                                == dependenciesSet.Where(dp => dp.Id == id)
+                                                    .Max(dp => dp.VersionSpec.MinVersion));
 
                                     return new PackageDescription
-                                    {
-                                        Id = dependency.Id,
-                                        Version = dependency.VersionSpec.MinVersion.ToString()
-                                    };
+                                               {
+                                                   Id = dependency.Id,
+                                                   Version =
+                                                       dependency.VersionSpec.MinVersion.ToString()
+                                               };
                                 }
                             }).ToList();
 
             this.Sender.Tell(
                 new NodeStartUpConfiguration
-                {
-                    NodeTemplate = selectedTemplate.Code,
-                    NodeTemplateVersion = selectedTemplate.Version,
-                    Configuration = selectedTemplate.Configuration,
-                    Seeds = this.seedAddresses.Values.Select(s => s.Address).OrderBy(s => this.random.NextDouble()).ToList(),
-                    Packages = packageDescriptions.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).Union(dependencies).ToList(),
-                    PackageSources = this.nugetFeeds.Values.Select(f => f.Address).ToList()
-                });
+                    {
+                        NodeTemplate = selectedTemplate.Code,
+                        NodeTemplateVersion = selectedTemplate.Version,
+                        Configuration = selectedTemplate.Configuration,
+                        Seeds =
+                            this.seedAddresses.Values.Select(s => s.Address)
+                                .OrderBy(s => this.random.NextDouble())
+                                .ToList(),
+                        Packages =
+                            packageDescriptions.Select(
+                                    p =>
+                                        new PackageDescription
+                                            {
+                                                Id = p.Id,
+                                                Version = p.Version.ToString()
+                                            })
+                                .Union(dependencies)
+                                .ToList(),
+                        PackageSources = this.nugetFeeds.Values.Select(f => f.Address).ToList()
+                    });
 
             List<Guid> requests;
             if (!this.awaitingRequestsByTemplate.TryGetValue(selectedTemplate.Code, out requests))
@@ -588,29 +634,19 @@ namespace ClusterKit.NodeManager
             var address = nodeDescription.NodeAddress;
             if (nodeDescription.NodeAddress == null)
             {
-                Context.GetLogger()
-                    .Warning(
-                        // ReSharper disable FormatStringProblem
-                        "{Type}: received nodeDescription with null address from {NodeAddress}",
-                        // ReSharper restore FormatStringProblem
-                        this.GetType().Name,
-                        // ReSharper disable RedundantToStringCall
-                        this.Sender.Path.Address.ToString());
-                // ReSharper restore RedundantToStringCall
+                Context.GetLogger().Warning(
+                    "{Type}: received nodeDescription with null address from {NodeAddress}",
+                    this.GetType().Name,
+                    this.Sender.Path.Address.ToString());
                 return;
             }
 
             if (!this.requestDescriptionNotifications.TryGetValue(address, out cancelable))
             {
-                Context.GetLogger()
-                    .Warning(
-                        // ReSharper disable FormatStringProblem
-                        "{Type}: received nodeDescription from unknown node with address {NodeAddress}",
-                        // ReSharper restore FormatStringProblem
-                        this.GetType().Name,
-                        // ReSharper disable RedundantToStringCall
-                        address.ToString());
-                // ReSharper restore RedundantToStringCall
+                Context.GetLogger().Warning(
+                    "{Type}: received nodeDescription from unknown node with address {NodeAddress}",
+                    this.GetType().Name,
+                    address.ToString());
                 return;
             }
 
@@ -645,28 +681,18 @@ namespace ClusterKit.NodeManager
                     awaitingRequests.Remove(nodeDescription.NodeId);
                 }
 
-                Context.GetLogger()
-                    .Info(
-                        // ReSharper disable FormatStringProblem
-                        "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
-                        // ReSharper restore FormatStringProblem
-                        this.GetType().Name,
-                        nodeDescription.NodeTemplate,
-                        // ReSharper disable RedundantToStringCall
-                        address.ToString());
-                // ReSharper restore RedundantToStringCall
+                Context.GetLogger().Info(
+                    "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
+                    this.GetType().Name,
+                    nodeDescription.NodeTemplate,
+                    address.ToString());
             }
             else
             {
-                Context.GetLogger()
-                    .Info(
-                        // ReSharper disable FormatStringProblem
-                        "{Type}: New node without nodetemplate on address {NodeAddress}",
-                        // ReSharper restore FormatStringProblem
-                        this.GetType().Name,
-                        // ReSharper disable RedundantToStringCall
-                        address.ToString());
-                // ReSharper restore RedundantToStringCall
+                Context.GetLogger().Info(
+                    "{Type}: New node without nodetemplate on address {NodeAddress}",
+                    this.GetType().Name,
+                    address.ToString());
             }
 
             this.Self.Tell(new UpgradeMessage());
@@ -700,10 +726,11 @@ namespace ClusterKit.NodeManager
             }
             else
             {
-                Context.GetLogger().Warning(
-                    "{Type}: received node down for unknown node with address {NodeAddress}",
-                    this.GetType().ToString(),
-                    address.ToString());
+                Context.GetLogger()
+                    .Warning(
+                        "{Type}: received node down for unknown node with address {NodeAddress}",
+                        this.GetType().ToString(),
+                        address.ToString());
             }
         }
 
@@ -795,11 +822,11 @@ namespace ClusterKit.NodeManager
             this.upgradeMessageSchedule?.Cancel();
 
             var upgradeTimeOut = this.newNodeJoinTimeout + this.newNodeRequestDescriptionNotificationTimeout;
-            
+
             // removing lost nodes
             var obsoleteUpgrades =
-                this.upgradingNodes.Values.Where(
-                    u => DateTimeOffset.Now - u.UpgradeStartTime >= upgradeTimeOut).ToList();
+                this.upgradingNodes.Values.Where(u => DateTimeOffset.Now - u.UpgradeStartTime >= upgradeTimeOut)
+                    .ToList();
 
             obsoleteUpgrades.ForEach(u => this.upgradingNodes.Remove(u.NodeId));
             var isUpgrading = false;
@@ -816,13 +843,10 @@ namespace ClusterKit.NodeManager
                 NodeTemplate nodeTemplate;
                 if (!this.nodeTemplates.TryGetValue(nodeGroup.Key, out nodeTemplate))
                 {
-                    Context.GetLogger()
-                        .Error(
-                            // ReSharper disable FormatStringProblem
-                            "{Type}: could not find template with {TemplateCode} during upgrade process",
-                            // ReSharper restore FormatStringProblem
-                            this.GetType().Name,
-                            nodeGroup.Key);
+                    Context.GetLogger().Error(
+                        "{Type}: could not find template with {TemplateCode} during upgrade process",
+                        this.GetType().Name,
+                        nodeGroup.Key);
                     nodeGroup.ForEach(n => n.IsObsolete = false);
                     continue;
                 }
@@ -848,11 +872,11 @@ namespace ClusterKit.NodeManager
                 foreach (var node in nodes)
                 {
                     this.upgradingNodes[node.NodeId] = new UpgradeData
-                    {
-                        NodeId = node.NodeId,
-                        NodeTemplate = node.NodeTemplate,
-                        UpgradeStartTime = DateTimeOffset.Now
-                    };
+                                                           {
+                                                               NodeId = node.NodeId,
+                                                               NodeTemplate = node.NodeTemplate,
+                                                               UpgradeStartTime = DateTimeOffset.Now
+                                                           };
                     this.OnNodeUpdateRequest(node.NodeAddress);
                 }
             }
@@ -908,10 +932,10 @@ namespace ClusterKit.NodeManager
             }
 
             var notification = new RequestDescriptionNotification
-            {
-                Address = message.Address,
-                Attempt = message.Attempt + 1
-            };
+                                   {
+                                       Address = message.Address,
+                                       Attempt = message.Attempt + 1
+                                   };
 
             Context.System.Scheduler.ScheduleTellOnce(
                 this.newNodeRequestDescriptionNotificationTimeout,
@@ -942,9 +966,8 @@ namespace ClusterKit.NodeManager
         {
             if (string.IsNullOrWhiteSpace(message.Role))
             {
-                Context.GetLogger().Warning(
-                    "{Type}: received RoleLeaderChanged message with empty role",
-                    this.GetType().ToString());
+                Context.GetLogger()
+                    .Warning("{Type}: received RoleLeaderChanged message with empty role", this.GetType().ToString());
                 return;
             }
 
@@ -990,27 +1013,29 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void OnTemplatesStatisticsRequest()
         {
-            var stats = new TemplatesUsageStatistics
-            {
-                Templates =
-                    this.nodeTemplates.Values.Select(
-                        t =>
-                        new TemplatesUsageStatistics.TemplateUsageStatistics
+            Func<NodeTemplate, TemplatesUsageStatistics.TemplateUsageStatistics> selector =
+                t =>
+                    new TemplatesUsageStatistics.TemplateUsageStatistics
                         {
                             MaximumRequiredNodes = t.MaximumNeededInstances,
                             MinimumRequiredNodes = t.MinimumRequiredInstances,
                             Name = t.Code,
-                            ActiveNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
-                                ? this.activeNodesByTemplate[t.Code].Count
-                                : 0,
-                            ObsoleteNodes = this.activeNodesByTemplate.ContainsKey(t.Code)
-                                ? this.activeNodesByTemplate[t.Code].Count(a => this.nodeDescriptions[a].IsObsolete)
-                                : 0,
-                            UpgradingNodes = this.upgradingNodes.Values.Count(d => d.NodeTemplate == t.Code),
-                            StartingNodes = this.awaitingRequestsByTemplate.ContainsKey(t.Code) ? this.awaitingRequestsByTemplate[t.Code].Count : 0,
-                        })
-                    .ToList()
-            };
+                            ActiveNodes =
+                                this.activeNodesByTemplate.ContainsKey(t.Code)
+                                    ? this.activeNodesByTemplate[t.Code].Count
+                                    : 0,
+                            ObsoleteNodes =
+                                this.activeNodesByTemplate.ContainsKey(t.Code)
+                                    ? this.activeNodesByTemplate[t.Code].Count(a => this.nodeDescriptions[a].IsObsolete)
+                                    : 0,
+                            UpgradingNodes =
+                                this.upgradingNodes.Values.Count(d => d.NodeTemplate == t.Code),
+                            StartingNodes =
+                                this.awaitingRequestsByTemplate.ContainsKey(t.Code)
+                                    ? this.awaitingRequestsByTemplate[t.Code].Count
+                                    : 0,
+                        };
+            var stats = new TemplatesUsageStatistics { Templates = this.nodeTemplates.Values.Select(selector).ToList() };
 
             this.Sender.Tell(stats, this.Self);
         }
@@ -1039,13 +1064,13 @@ namespace ClusterKit.NodeManager
         private void Start()
         {
             Cluster.Get(Context.System)
-               .Subscribe(
-                   this.Self,
-                   ClusterEvent.InitialStateAsEvents,
-                   typeof(ClusterEvent.MemberRemoved),
-                   typeof(ClusterEvent.MemberUp),
-                   typeof(ClusterEvent.LeaderChanged),
-                   typeof(ClusterEvent.RoleLeaderChanged));
+                .Subscribe(
+                    this.Self,
+                    ClusterEvent.InitialStateAsEvents,
+                    typeof(ClusterEvent.MemberRemoved),
+                    typeof(ClusterEvent.MemberUp),
+                    typeof(ClusterEvent.LeaderChanged),
+                    typeof(ClusterEvent.RoleLeaderChanged));
 
             // ping message will indicate that actor started and ready to work
             this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
@@ -1059,10 +1084,7 @@ namespace ClusterKit.NodeManager
             this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
             this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
             this.Receive<ActiveNodeDescriptionsRequest>(
-                m =>
-                    {
-                        this.Sender.Tell(this.nodeDescriptions.Values.ToList());
-                    });
+                m => { this.Sender.Tell(this.nodeDescriptions.Values.ToList()); });
             this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
             this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m.Address));
 
@@ -1073,7 +1095,13 @@ namespace ClusterKit.NodeManager
             this.Receive<NewNodeTemplateRequest>(m => this.OnNewNodeTemplateRequest(m));
             this.Receive<RequestTimeOut>(m => this.OnRequestTimeOut(m));
 
-            this.Receive<PackageListRequest>(m => this.Sender.Tell(this.packages.Values.Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList()));
+            this.Receive<PackageListRequest>(
+                m =>
+                    this.Sender.Tell(this.packages.Values.Select(p => new PackageDescription
+                                                                          {
+                                                                              Id = p.Id,
+                        Version = p.Version.ToString()
+                                                                          }).ToList()));
 
             this.Receive<ReloadPackageListRequest>(
                 m =>
@@ -1086,8 +1114,11 @@ namespace ClusterKit.NodeManager
                         catch (Exception e)
                         {
                             this.Sender.Tell(false);
+
                             // ReSharper disable FormatStringProblem
-                            Context.GetLogger().Error(e, "{Type}: Exception during package list load", this.GetType().Name);
+                            Context.GetLogger()
+                                .Error(e, "{Type}: Exception during package list load", this.GetType().Name);
+
                             // ReSharper restore FormatStringProblem
                         }
                     });
@@ -1110,8 +1141,12 @@ namespace ClusterKit.NodeManager
             this.Receive<CrudActionMessage<User, Guid>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<Role>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<Role, Guid>>(m => this.workers.Forward(m));
+
             this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<Release, int>>(m => this.workers.Forward(m));
+            this.Receive<ReleaseSetReadyRequest>(m => this.workers.Forward(m));
+            this.Receive<ReleaseSetStableRequest>(m => this.workers.Forward(m));
+            this.Receive<UpdateClusterRequest>(m => this.workers.Forward(m));
         }
 
         /// <summary>
@@ -1220,10 +1255,12 @@ namespace ClusterKit.NodeManager
                 string connectionString,
                 string databaseName,
                 IContextFactory<ConfigurationContext> contextFactory,
-                IActorRef parent) : base(parent)
+                IActorRef parent)
+                : base(parent)
             {
                 // ReSharper disable FormatStringProblem
                 Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
+
                 // ReSharper restore FormatStringProblem
                 this.connectionString = connectionString;
                 this.databaseName = databaseName;
@@ -1235,6 +1272,10 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CrudActionMessage<User, Guid>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<Role, Guid>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
+
+                this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
+                this.ReceiveAsync<ReleaseSetStableRequest>(this.OnReleaseSetStable);
+                this.ReceiveAsync<UpdateClusterRequest>(this.OnUpdateCluster);
 
                 this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
                 this.ReceiveAsync<CollectionRequest<SeedAddress>>(this.OnCollectionRequest<SeedAddress, int>);
@@ -1261,6 +1302,14 @@ namespace ClusterKit.NodeManager
                 if (typeof(TObject) == typeof(NodeTemplate))
                 {
                     ((NodeTemplate)(object)newObject).Version = ((NodeTemplate)(object)oldObject).Version + 1;
+                }
+
+                if (typeof(TObject) == typeof(Release))
+                {
+                    if (((Release)(object)oldObject).State != Release.EnState.Draft)
+                    {
+                        throw new Exception("Only draft releases can be updated");
+                    }
                 }
 
                 // ReSharper disable once RedundantTypeArgumentsOfMethod
@@ -1300,7 +1349,9 @@ namespace ClusterKit.NodeManager
                     {
                         this.Sender.Tell(
                             CrudActionResponse<User>.Error(
-                                new DatasourceInnerException("Exception on AuthenticateUserWithCredentials operation", exception),
+                                new DatasourceInnerException(
+                                    "Exception on AuthenticateUserWithCredentials operation",
+                                    exception),
                                 null));
                     }
                 }
@@ -1330,9 +1381,132 @@ namespace ClusterKit.NodeManager
                     {
                         this.Sender.Tell(
                             CrudActionResponse<User>.Error(
-                                new DatasourceInnerException("Exception on AuthenticateUserWithCredentials operation", exception),
+                                new DatasourceInnerException(
+                                    "Exception on AuthenticateUserWithCredentials operation",
+                                    exception),
                                 null));
                     }
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="ReleaseSetReadyRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnReleaseSetReady(ReleaseSetReadyRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                        if (release == null)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                            return;
+                        }
+
+                        if (release.State != Release.EnState.Draft)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new Exception("Only draft releases can be made ready"), null));
+                            return;
+                        }
+
+                        release.State = Release.EnState.Ready;
+                        ds.SaveChanges();
+                        this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="ReleaseSetStableRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnReleaseSetStable(ReleaseSetStableRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                        if (release == null)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                            return;
+                        }
+
+                        if (release.State != Release.EnState.Active)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new Exception("Only active releases can be marked as stable"), null));
+                            return;
+                        }
+
+                        if (release.IsStable != request.IsStable)
+                        {
+                            var error = new ErrorDescription("isStable", "The value is not changed");
+                            var mutationException = new MutationException(new List<ErrorDescription> { error });
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(mutationException, null));
+                            return;
+                        }
+
+                        release.IsStable = request.IsStable;
+                        ds.SaveChanges();
+                        this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="UpdateClusterRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnUpdateCluster(UpdateClusterRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                        if (release == null)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                            return;
+                        }
+
+                        if (release.State == Release.EnState.Active)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new Exception("This releas is already marked as active"), null));
+                            return;
+                        }
+
+                        var currentActiveRelease = ds.Releases.FirstOrDefault(r => r.State == Release.EnState.Active);
+                        if (currentActiveRelease != null)
+                        {
+                            currentActiveRelease.State = request.CurrentReleaseState != Release.EnState.Active
+                                                             ? request.CurrentReleaseState
+                                                             : Release.EnState.Obsolete;
+                        }
+
+                        release.State = Release.EnState.Active;
+                        ds.SaveChanges();
+                        this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
                 }
             }
         }

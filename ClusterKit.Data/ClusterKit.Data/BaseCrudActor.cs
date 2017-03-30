@@ -288,7 +288,16 @@ namespace ClusterKit.Data
         protected virtual async Task OnRequest<TObject, TId>(CrudActionMessage<TObject, TId> request)
             where TObject : class
         {
-            var response = await this.ProcessRequest(request);
+            CrudActionResponse<TObject> response;
+            try
+            {
+                response = await this.ProcessRequest(request);
+            }
+            catch (Exception exception)
+            {
+                response = new CrudActionResponse<TObject> { Exception = exception, ExtraData = request.ExtraData };
+            }
+
             if (typeof(ILargeObject).IsAssignableFrom(typeof(TObject)))
             {
                 Context.GetParcelManager().Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);

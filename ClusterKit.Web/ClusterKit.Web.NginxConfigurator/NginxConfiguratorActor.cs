@@ -307,14 +307,14 @@ namespace ClusterKit.Web.NginxConfigurator
                 var arguments = this.reloadCommand.GetString("Arguments");
                 if (command != null)
                 {
-                    var proccess = Process.Start(
+                    var process = Process.Start(
                         new ProcessStartInfo(command, arguments)
                         {
                             UseShellExecute = false,
-                            WorkingDirectory = Path.GetDirectoryName(command)
+                            WorkingDirectory = Path.GetDirectoryName(command) ?? command
                         });
 
-                    if (proccess != null && !proccess.WaitForExit(10000))
+                    if (process != null && !process.WaitForExit(10000))
                     {
                         Context.GetLogger().Error("{Type}: NGinx reload command timeout", this.GetType().Name);
                     }

@@ -32,36 +32,37 @@ namespace ClusterKit.Data.CRUD
     /// The type of object id
     /// </typeparam>
     /// TODO: remove TId type parameter and recover it from type data
-    public class Connection<TObject, TId> : INodeConnection<TObject> where TObject : class, IObjectWithId<TId>, new()
+    public class Connection<TObject, TId> : INodeConnection<TObject>
+        where TObject : class, IObjectWithId<TId>, new()
     {
-        /// <summary>
-        /// The actor system
-        /// </summary>
-        private readonly ActorSystem actorSystem;
-
-        /// <summary>
-        /// The path to the data actor
-        /// </summary>
-        private readonly string dataActorPath;
-
-        /// <summary>
-        /// The request timeout
-        /// </summary>
-        private readonly TimeSpan? timeout;
-
-        /// <summary>
-        /// The request context
-        /// </summary>
-        private readonly RequestContext context;
-
         /// <inheritdoc />
         public Connection(ActorSystem actorSystem, string dataActorPath, TimeSpan? timeout, RequestContext context)
         {
-            this.actorSystem = actorSystem;
-            this.dataActorPath = dataActorPath;
-            this.timeout = timeout;
-            this.context = context;
+            this.System = actorSystem;
+            this.DataActorPath = dataActorPath;
+            this.Timeout = timeout;
+            this.Context = context;
         }
+
+        /// <summary>
+        /// Gets the request context
+        /// </summary>
+        protected RequestContext Context { get; }
+
+        /// <summary>
+        /// Gets the path to the data actor
+        /// </summary>
+        protected string DataActorPath { get; }
+
+        /// <summary>
+        /// Gets the actor system
+        /// </summary>
+        protected ActorSystem System { get; }
+
+        /// <summary>
+        /// Gets the request timeout
+        /// </summary>
+        protected TimeSpan? Timeout { get; }
 
         /// <inheritdoc />
         public async Task<MutationResult<TObject>> Create(TObject newNode)
@@ -70,17 +71,18 @@ namespace ClusterKit.Data.CRUD
                               {
                                   ActionType = EnActionType.Create,
                                   Data = newNode,
-                                  RequestContext = this.context
+                                  RequestContext = this.Context
                               };
 
-            var result =
-                await this.actorSystem.ActorSelection(this.dataActorPath)
-                    .Ask<CrudActionResponse<TObject>>(request, this.timeout);
+            var result = await this.System.ActorSelection(this.DataActorPath)
+                             .Ask<CrudActionResponse<TObject>>(request, this.Timeout);
 
             if (result.Exception != null)
             {
                 var errorDescription = new ErrorDescription { Message = result.Exception.Message };
-                var errorDescriptions = result.Exception != null ? new List<ErrorDescription> { errorDescription } : null;
+                var errorDescriptions = result.Exception != null
+                                            ? new List<ErrorDescription> { errorDescription }
+                                            : null;
                 return new MutationResult<TObject> { Result = result.Data, Errors = errorDescriptions };
             }
 
@@ -94,12 +96,11 @@ namespace ClusterKit.Data.CRUD
                               {
                                   ActionType = EnActionType.Delete,
                                   Id = id,
-                                  RequestContext = this.context
+                                  RequestContext = this.Context
                               };
 
-            var result =
-                await this.actorSystem.ActorSelection(this.dataActorPath)
-                    .Ask<CrudActionResponse<TObject>>(request, this.timeout);
+            var result = await this.System.ActorSelection(this.DataActorPath)
+                             .Ask<CrudActionResponse<TObject>>(request, this.Timeout);
 
             if (result.Exception != null)
             {
@@ -111,6 +112,12 @@ namespace ClusterKit.Data.CRUD
             }
 
             return new MutationResult<TObject> { Result = result.Data };
+        }
+
+        /// <inheritdoc />
+        public TId GetId(TObject node)
+        {
+            return node.GetId();
         }
 
         /// <inheritdoc />
@@ -148,37 +155,35 @@ namespace ClusterKit.Data.CRUD
                                   Sort = sortingConditions,
                                   AcceptAsParcel = true,
                                   ApiRequest = combinedRequest
-            };
+                              };
 
-            var parcel = await this.actorSystem.ActorSelection(this.dataActorPath).Ask<ParcelNotification>(request, this.timeout);
-            var result = (CollectionResponse<TObject>)await parcel.Receive(this.actorSystem);
-            return new QueryResult<TObject>
-                       {
-                           Count = result.Count,
-                           Items = result.Items
-                       };
+            var parcel = await this.System.ActorSelection(this.DataActorPath)
+                             .Ask<ParcelNotification>(request, this.Timeout);
+            var result = (CollectionResponse<TObject>)await parcel.Receive(this.System);
+            return new QueryResult<TObject> { Count = result.Count, Items = result.Items };
         }
 
         /// <inheritdoc />
         public async Task<MutationResult<TObject>> Update(TId id, TObject newNode, ApiRequest apiRequest)
         {
             var request = new CrudActionMessage<TObject, TId>
-            {
-                ActionType = EnActionType.Update,
-                Id = id,
-                Data = newNode,
-                RequestContext = this.context,
-                ApiRequest = apiRequest
-            };
+                              {
+                                  ActionType = EnActionType.Update,
+                                  Id = id,
+                                  Data = newNode,
+                                  RequestContext = this.Context,
+                                  ApiRequest = apiRequest
+                              };
 
-            var result =
-                await this.actorSystem.ActorSelection(this.dataActorPath)
-                    .Ask<CrudActionResponse<TObject>>(request, this.timeout);
+            var result = await this.System.ActorSelection(this.DataActorPath)
+                             .Ask<CrudActionResponse<TObject>>(request, this.Timeout);
 
             if (result.Exception != null)
             {
                 var errorDescription = new ErrorDescription { Message = result.Exception.Message };
-                var errorDescriptions = result.Exception != null ? new List<ErrorDescription> { errorDescription } : null;
+                var errorDescriptions = result.Exception != null
+                                            ? new List<ErrorDescription> { errorDescription }
+                                            : null;
                 return new MutationResult<TObject> { Result = result.Data, Errors = errorDescriptions };
             }
 
@@ -186,21 +191,15 @@ namespace ClusterKit.Data.CRUD
         }
 
         /// <inheritdoc />
-        public TId GetId(TObject node)
+        Task<MutationResult<TObject>> INodeConnection<TObject>.Delete(object id)
         {
-            return node.GetId();
+            return this.Delete((TId)id);
         }
 
         /// <inheritdoc />
         Task<MutationResult<TObject>> INodeConnection<TObject>.Update(object id, TObject newNode, ApiRequest request)
         {
             return this.Update((TId)id, newNode, request);
-        }
-
-        /// <inheritdoc />
-        Task<MutationResult<TObject>> INodeConnection<TObject>.Delete(object id)
-        {
-            return this.Delete((TId)id);
         }
     }
 }
