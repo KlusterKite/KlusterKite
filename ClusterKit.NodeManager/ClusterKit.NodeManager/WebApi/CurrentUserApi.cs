@@ -9,15 +9,19 @@
 
 namespace ClusterKit.NodeManager.WebApi
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Akka.Actor;
+
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.ORM;
+    using ClusterKit.NodeManager.Messages;
     using ClusterKit.Security.Client;
+    using ClusterKit.Web.Authorization.Attributes;
 
     using JetBrains.Annotations;
 
@@ -33,14 +37,23 @@ namespace ClusterKit.NodeManager.WebApi
         private readonly RequestContext context;
 
         /// <summary>
+        /// The actor system
+        /// </summary>
+        private readonly ActorSystem system;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CurrentUserApi"/> class.
         /// </summary>
         /// <param name="context">
         /// The context.
         /// </param>
-        public CurrentUserApi(RequestContext context)
+        /// <param name="system">
+        /// The actor system
+        /// </param>
+        public CurrentUserApi(RequestContext context, ActorSystem system)
         {
             this.context = context;
+            this.system = system;
         }
 
         /// <summary>
@@ -67,16 +80,35 @@ namespace ClusterKit.NodeManager.WebApi
         /// <summary>
         /// Changes the current user password
         /// </summary>
+        /// <param name="requestContext">The request context</param>
         /// <param name="oldPassword">The user current password</param>
         /// <param name="newPassword">The user new password</param>
         /// <returns>The success of the operation</returns>
         [UsedImplicitly]
+        [RequireSession]
+        [RequireUser]
         [DeclareMutation("Changes the current user password")]
         public Task<MutationResult<bool>> ChangePassword(
+            RequestContext requestContext,
             [ApiDescription("The user current password")] string oldPassword,
             [ApiDescription("The user current password")] string newPassword)
         {
-            throw new NotImplementedException();
+            var user = requestContext?.Authentication?.User as User;
+            if (user == null)
+            {
+                return Task.FromResult<MutationResult<bool>>(null);
+            }
+
+            var request = new UserChangePasswordRequest
+                              {
+                                  NewPassword = newPassword,
+                                  OldPassword = oldPassword,
+                                  UserUid = user.Uid
+                              };
+
+            return
+                this.system.ActorSelection(NodeManagerApi.GetManagerActorProxyPath())
+                    .Ask<MutationResult<bool>>(request, ConfigurationUtils.GetRestTimeout(this.system));
         }
     }
 }

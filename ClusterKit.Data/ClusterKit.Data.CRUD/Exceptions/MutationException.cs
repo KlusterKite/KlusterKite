@@ -32,9 +32,9 @@ namespace ClusterKit.Data.CRUD.Exceptions
         /// <param name="errors">
         /// The list of errors.
         /// </param>
-        public MutationException(List<ErrorDescription> errors)
+        public MutationException(params ErrorDescription[] errors)
         {
-            this.Errors = errors;
+            this.Errors = new List<ErrorDescription>(errors);
         }
 
         /// <summary>

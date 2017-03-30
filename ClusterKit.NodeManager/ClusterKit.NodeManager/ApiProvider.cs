@@ -24,6 +24,11 @@ namespace ClusterKit.NodeManager
     public class ApiProvider : API.Provider.ApiProvider
     {
         /// <summary>
+        /// The actor system
+        /// </summary>
+        private readonly ActorSystem actorSystem;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ApiProvider"/> class.
         /// </summary>
         /// <param name="actorSystem">
@@ -31,6 +36,7 @@ namespace ClusterKit.NodeManager
         /// </param>
         public ApiProvider(ActorSystem actorSystem)
         {
+            this.actorSystem = actorSystem;
             this.ClusterKitNodesApi = new NodeManagerApi(actorSystem);
         }
 
@@ -48,6 +54,6 @@ namespace ClusterKit.NodeManager
         /// <returns>The current user API</returns>
         [UsedImplicitly]
         [DeclareField(Description = "The current user")]
-        public CurrentUserApi Me(RequestContext context) => new CurrentUserApi(context);
+        public CurrentUserApi Me(RequestContext context) => new CurrentUserApi(context, this.actorSystem);
     }
 }

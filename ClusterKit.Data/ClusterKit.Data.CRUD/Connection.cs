@@ -15,10 +15,12 @@ namespace ClusterKit.Data.CRUD
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using Akka;
     using Akka.Actor;
 
     using ClusterKit.API.Client;
     using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects.Client;
     using ClusterKit.Security.Client;
 
@@ -76,17 +78,7 @@ namespace ClusterKit.Data.CRUD
 
             var result = await this.System.ActorSelection(this.DataActorPath)
                              .Ask<CrudActionResponse<TObject>>(request, this.Timeout);
-
-            if (result.Exception != null)
-            {
-                var errorDescription = new ErrorDescription { Message = result.Exception.Message };
-                var errorDescriptions = result.Exception != null
-                                            ? new List<ErrorDescription> { errorDescription }
-                                            : null;
-                return new MutationResult<TObject> { Result = result.Data, Errors = errorDescriptions };
-            }
-
-            return new MutationResult<TObject> { Result = result.Data };
+            return CreateResponse(result);
         }
 
         /// <inheritdoc />
@@ -101,23 +93,7 @@ namespace ClusterKit.Data.CRUD
 
             var result = await this.System.ActorSelection(this.DataActorPath)
                              .Ask<CrudActionResponse<TObject>>(request, this.Timeout);
-
-            if (result.Exception != null)
-            {
-                var errorDescription = new ErrorDescription { Message = result.Exception.Message };
-                var errorDescriptions = result.Exception != null
-                                            ? new List<ErrorDescription> { errorDescription }
-                                            : null;
-                return new MutationResult<TObject> { Result = result.Data, Errors = errorDescriptions };
-            }
-
-            return new MutationResult<TObject> { Result = result.Data };
-        }
-
-        /// <inheritdoc />
-        public TId GetId(TObject node)
-        {
-            return node.GetId();
+            return CreateResponse(result);
         }
 
         /// <inheritdoc />
@@ -177,17 +153,7 @@ namespace ClusterKit.Data.CRUD
 
             var result = await this.System.ActorSelection(this.DataActorPath)
                              .Ask<CrudActionResponse<TObject>>(request, this.Timeout);
-
-            if (result.Exception != null)
-            {
-                var errorDescription = new ErrorDescription { Message = result.Exception.Message };
-                var errorDescriptions = result.Exception != null
-                                            ? new List<ErrorDescription> { errorDescription }
-                                            : null;
-                return new MutationResult<TObject> { Result = result.Data, Errors = errorDescriptions };
-            }
-
-            return new MutationResult<TObject> { Result = result.Data };
+            return CreateResponse(result);
         }
 
         /// <inheritdoc />
@@ -200,6 +166,34 @@ namespace ClusterKit.Data.CRUD
         Task<MutationResult<TObject>> INodeConnection<TObject>.Update(object id, TObject newNode, ApiRequest request)
         {
             return this.Update((TId)id, newNode, request);
+        }
+
+        /// <summary>
+        /// Creates mutation response from actor response
+        /// </summary>
+        /// <param name="response">The actor response</param>
+        /// <returns>The mutation response</returns>
+        protected static MutationResult<TObject> CreateResponse(CrudActionResponse<TObject> response)
+        {
+            if (response.Data != null)
+            {
+                return new MutationResult<TObject> { Result = response.Data };
+            }
+
+            var errors =
+                response.Exception.Match<List<ErrorDescription>>()
+                    .With<EntityNotFoundException>(e => new List<ErrorDescription> { new ErrorDescription("id", "not found") })
+                    .With<MutationException>(e => e.Errors)
+                    .ResultOrDefault(
+                        e =>
+                            new List<ErrorDescription>
+                                {
+                                    new ErrorDescription(
+                                        "null",
+                                        ((Exception)e)?.Message ?? "unknown error")
+                                });
+
+            return new MutationResult<TObject> { Errors = errors };
         }
     }
 }

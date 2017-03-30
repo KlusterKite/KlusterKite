@@ -10,17 +10,14 @@
 namespace ClusterKit.NodeManager.WebApi
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using Akka;
     using Akka.Actor;
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Messages;
@@ -171,35 +168,6 @@ namespace ClusterKit.NodeManager.WebApi
                 this.System.Log.Error(exception, "{Type}: error on ClusterUpdate", this.GetType().Name);
                 return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
             }
-        }
-
-        /// <summary>
-        /// Creates mutation response from actor response
-        /// </summary>
-        /// <param name="response">The actor response</param>
-        /// <returns>The mutation response</returns>
-        private static MutationResult<Release> CreateResponse(CrudActionResponse<Release> response)
-        {
-            if (response.Data != null)
-            {
-                return new MutationResult<Release> { Result = response.Data };
-            }
-
-            var errors =
-                response.Exception.Match<List<ErrorDescription>>()
-                    .With<EntityNotFoundException>(
-                        e => new List<ErrorDescription> { new ErrorDescription("releaseId", "not found") })
-                    .With<MutationException>(e => e.Errors)
-                    .ResultOrDefault(
-                        e =>
-                            new List<ErrorDescription>
-                                {
-                                    new ErrorDescription(
-                                        "null",
-                                        ((Exception)e)?.Message ?? "unknown error")
-                                });
-
-            return new MutationResult<Release> { Errors = errors };
         }
     }
 }

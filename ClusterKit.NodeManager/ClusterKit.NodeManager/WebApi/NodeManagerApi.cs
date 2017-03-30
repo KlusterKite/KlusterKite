@@ -88,7 +88,7 @@ namespace ClusterKit.NodeManager.WebApi
         public async Task<List<NodeDescription>> GetActiveNodeDescriptions()
         {
             var activeNodeDescriptions =
-                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
                     .Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
 
             return
@@ -111,7 +111,7 @@ namespace ClusterKit.NodeManager.WebApi
         public Task<List<PackageDescription>> GetPackages()
         {
             return
-                this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                this.actorSystem.ActorSelection(GetManagerActorProxyPath())
                     .Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
         }
 
@@ -127,7 +127,7 @@ namespace ClusterKit.NodeManager.WebApi
         public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
         {
             return
-                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
                     .Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
         }
 
@@ -148,7 +148,7 @@ namespace ClusterKit.NodeManager.WebApi
         {
             return new Connection<NodeTemplate, int>(
                 this.actorSystem,
-                this.GetManagerActorProxyPath(),
+                GetManagerActorProxyPath(),
                 this.AkkaTimeout,
                 context);
         }
@@ -167,7 +167,7 @@ namespace ClusterKit.NodeManager.WebApi
         {
             return new Connection<NugetFeed, int>(
                 this.actorSystem,
-                this.GetManagerActorProxyPath(),
+                GetManagerActorProxyPath(),
                 this.AkkaTimeout,
                 context);
         }
@@ -186,7 +186,7 @@ namespace ClusterKit.NodeManager.WebApi
         {
             return new ReleaseConnection(
                 this.actorSystem,
-                this.GetManagerActorProxyPath(),
+                GetManagerActorProxyPath(),
                 this.AkkaTimeout,
                 context);
         }
@@ -204,7 +204,7 @@ namespace ClusterKit.NodeManager.WebApi
         public async Task<MutationResult<bool>> ReloadPackages()
         {
             var result =
-                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
                     .Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);
             return new MutationResult<bool> { Result = result };
         }
@@ -223,7 +223,7 @@ namespace ClusterKit.NodeManager.WebApi
         {
             return new RolesConnection(
                 this.actorSystem,
-                this.GetManagerActorProxyPath(),
+                GetManagerActorProxyPath(),
                 this.AkkaTimeout,
                 context);
         }
@@ -242,7 +242,7 @@ namespace ClusterKit.NodeManager.WebApi
         {
             return new Connection<SeedAddress, int>(
                 this.actorSystem,
-                this.GetManagerActorProxyPath(),
+                GetManagerActorProxyPath(),
                 this.AkkaTimeout,
                 context);
         }
@@ -261,7 +261,7 @@ namespace ClusterKit.NodeManager.WebApi
         public async Task<MutationResult<bool>> UpgradeNode(string address)
         {
             var result =
-                await this.actorSystem.ActorSelection(this.GetManagerActorProxyPath())
+                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
                     .Ask<bool>(new NodeUpgradeRequest { Address = Address.Parse(address) }, this.AkkaTimeout);
             return new MutationResult<bool> { Result = result };
         }
@@ -279,7 +279,7 @@ namespace ClusterKit.NodeManager.WebApi
         {
             return new UsersConnection(
                 this.actorSystem,
-                this.GetManagerActorProxyPath(),
+                GetManagerActorProxyPath(),
                 this.AkkaTimeout,
                 context);
         }
@@ -288,6 +288,6 @@ namespace ClusterKit.NodeManager.WebApi
         /// Gets akka actor path for database worker
         /// </summary>
         /// <returns>Akka actor path</returns>
-        private string GetManagerActorProxyPath() => "/user/NodeManager/NodeManagerProxy";
+        internal static string GetManagerActorProxyPath() => "/user/NodeManager/NodeManagerProxy";
     }
 }

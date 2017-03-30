@@ -31,6 +31,7 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
+    using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
 
@@ -290,24 +291,26 @@ namespace ClusterKit.NodeManager
                 IPackage package;
                 if (string.IsNullOrWhiteSpace(module.Id))
                 {
-                    Context.GetLogger().Error(
-                        "{Type}: got module with null id from template {TemplateCode} on container {ContainerCode} on address {NodeAddressString}",
-                        this.GetType().Name,
-                        nodeDescription.NodeTemplate,
-                        nodeDescription.ContainerType,
-                        nodeDescription.NodeAddress.ToString());
+                    Context.GetLogger()
+                        .Error(
+                            "{Type}: got module with null id from template {TemplateCode} on container {ContainerCode} on address {NodeAddressString}",
+                            this.GetType().Name,
+                            nodeDescription.NodeTemplate,
+                            nodeDescription.ContainerType,
+                            nodeDescription.NodeAddress.ToString());
                     continue;
                 }
 
                 if (!this.packages.TryGetValue(module.Id, out package))
                 {
-                    Context.GetLogger().Error(
-                        "{Type}: node with template {TemplateCode} on container {ContainerCode} on address {NodeAddressString} has module {PackageId} that does not contained in repository. This node cannot be upgraded",
-                        this.GetType().Name,
-                        nodeDescription.NodeTemplate,
-                        nodeDescription.ContainerType,
-                        nodeDescription.NodeAddress.ToString(),
-                        module.Id);
+                    Context.GetLogger()
+                        .Error(
+                            "{Type}: node with template {TemplateCode} on container {ContainerCode} on address {NodeAddressString} has module {PackageId} that does not contained in repository. This node cannot be upgraded",
+                            this.GetType().Name,
+                            nodeDescription.NodeTemplate,
+                            nodeDescription.ContainerType,
+                            nodeDescription.NodeAddress.ToString(),
+                            module.Id);
                     nodeDescription.IsObsolete = false;
                     return;
                 }
@@ -634,19 +637,21 @@ namespace ClusterKit.NodeManager
             var address = nodeDescription.NodeAddress;
             if (nodeDescription.NodeAddress == null)
             {
-                Context.GetLogger().Warning(
-                    "{Type}: received nodeDescription with null address from {NodeAddress}",
-                    this.GetType().Name,
-                    this.Sender.Path.Address.ToString());
+                Context.GetLogger()
+                    .Warning(
+                        "{Type}: received nodeDescription with null address from {NodeAddress}",
+                        this.GetType().Name,
+                        this.Sender.Path.Address.ToString());
                 return;
             }
 
             if (!this.requestDescriptionNotifications.TryGetValue(address, out cancelable))
             {
-                Context.GetLogger().Warning(
-                    "{Type}: received nodeDescription from unknown node with address {NodeAddress}",
-                    this.GetType().Name,
-                    address.ToString());
+                Context.GetLogger()
+                    .Warning(
+                        "{Type}: received nodeDescription from unknown node with address {NodeAddress}",
+                        this.GetType().Name,
+                        address.ToString());
                 return;
             }
 
@@ -681,18 +686,20 @@ namespace ClusterKit.NodeManager
                     awaitingRequests.Remove(nodeDescription.NodeId);
                 }
 
-                Context.GetLogger().Info(
-                    "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
-                    this.GetType().Name,
-                    nodeDescription.NodeTemplate,
-                    address.ToString());
+                Context.GetLogger()
+                    .Info(
+                        "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
+                        this.GetType().Name,
+                        nodeDescription.NodeTemplate,
+                        address.ToString());
             }
             else
             {
-                Context.GetLogger().Info(
-                    "{Type}: New node without nodetemplate on address {NodeAddress}",
-                    this.GetType().Name,
-                    address.ToString());
+                Context.GetLogger()
+                    .Info(
+                        "{Type}: New node without nodetemplate on address {NodeAddress}",
+                        this.GetType().Name,
+                        address.ToString());
             }
 
             this.Self.Tell(new UpgradeMessage());
@@ -843,10 +850,11 @@ namespace ClusterKit.NodeManager
                 NodeTemplate nodeTemplate;
                 if (!this.nodeTemplates.TryGetValue(nodeGroup.Key, out nodeTemplate))
                 {
-                    Context.GetLogger().Error(
-                        "{Type}: could not find template with {TemplateCode} during upgrade process",
-                        this.GetType().Name,
-                        nodeGroup.Key);
+                    Context.GetLogger()
+                        .Error(
+                            "{Type}: could not find template with {TemplateCode} during upgrade process",
+                            this.GetType().Name,
+                            nodeGroup.Key);
                     nodeGroup.ForEach(n => n.IsObsolete = false);
                     continue;
                 }
@@ -1026,10 +1034,12 @@ namespace ClusterKit.NodeManager
                                     : 0,
                             ObsoleteNodes =
                                 this.activeNodesByTemplate.ContainsKey(t.Code)
-                                    ? this.activeNodesByTemplate[t.Code].Count(a => this.nodeDescriptions[a].IsObsolete)
+                                    ? this.activeNodesByTemplate[t.Code].Count(
+                                        a => this.nodeDescriptions[a].IsObsolete)
                                     : 0,
                             UpgradingNodes =
-                                this.upgradingNodes.Values.Count(d => d.NodeTemplate == t.Code),
+                                this.upgradingNodes.Values.Count(
+                                    d => d.NodeTemplate == t.Code),
                             StartingNodes =
                                 this.awaitingRequestsByTemplate.ContainsKey(t.Code)
                                     ? this.awaitingRequestsByTemplate[t.Code].Count
@@ -1097,11 +1107,13 @@ namespace ClusterKit.NodeManager
 
             this.Receive<PackageListRequest>(
                 m =>
-                    this.Sender.Tell(this.packages.Values.Select(p => new PackageDescription
-                                                                          {
-                                                                              Id = p.Id,
-                        Version = p.Version.ToString()
-                                                                          }).ToList()));
+                    this.Sender.Tell(
+                        this.packages.Values.Select(
+                            p => new PackageDescription
+                                     {
+                                         Id = p.Id,
+                                         Version = p.Version.ToString()
+                                     }).ToList()));
 
             this.Receive<ReloadPackageListRequest>(
                 m =>
@@ -1141,6 +1153,10 @@ namespace ClusterKit.NodeManager
             this.Receive<CrudActionMessage<User, Guid>>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<Role>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<Role, Guid>>(m => this.workers.Forward(m));
+            this.Receive<UserChangePasswordRequest>(m => this.workers.Forward(m));
+            this.Receive<UserResetPasswordRequest>(m => this.workers.Forward(m));
+            this.Receive<UserRoleAddRequest>(m => this.workers.Forward(m));
+            this.Receive<UserRoleRemoveRequest>(m => this.workers.Forward(m));
 
             this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<Release, int>>(m => this.workers.Forward(m));
@@ -1284,6 +1300,11 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, Guid>);
                 this.ReceiveAsync<CollectionRequest<Release>>(this.OnCollectionRequest<Release, int>);
 
+                this.ReceiveAsync<UserChangePasswordRequest>(this.OnUserChangePassword);
+                this.ReceiveAsync<UserResetPasswordRequest>(this.OnUserResetPassword);
+                this.ReceiveAsync<UserRoleAddRequest>(this.OnUserRoleAdd);
+                this.ReceiveAsync<UserRoleRemoveRequest>(this.UserRoleRemove);
+
                 this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
                 this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);
             }
@@ -1409,7 +1430,10 @@ namespace ClusterKit.NodeManager
 
                         if (release.State != Release.EnState.Draft)
                         {
-                            this.Sender.Tell(CrudActionResponse<Release>.Error(new Exception("Only draft releases can be made ready"), null));
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new Exception("Only draft releases can be made ready"),
+                                    null));
                             return;
                         }
 
@@ -1444,14 +1468,17 @@ namespace ClusterKit.NodeManager
 
                         if (release.State != Release.EnState.Active)
                         {
-                            this.Sender.Tell(CrudActionResponse<Release>.Error(new Exception("Only active releases can be marked as stable"), null));
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new Exception("Only active releases can be marked as stable"),
+                                    null));
                             return;
                         }
 
                         if (release.IsStable != request.IsStable)
                         {
                             var error = new ErrorDescription("isStable", "The value is not changed");
-                            var mutationException = new MutationException(new List<ErrorDescription> { error });
+                            var mutationException = new MutationException(error);
                             this.Sender.Tell(CrudActionResponse<Release>.Error(mutationException, null));
                             return;
                         }
@@ -1487,7 +1514,10 @@ namespace ClusterKit.NodeManager
 
                         if (release.State == Release.EnState.Active)
                         {
-                            this.Sender.Tell(CrudActionResponse<Release>.Error(new Exception("This releas is already marked as active"), null));
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new Exception("This release is already marked as active"),
+                                    null));
                             return;
                         }
 
@@ -1507,6 +1537,233 @@ namespace ClusterKit.NodeManager
                 catch (Exception exception)
                 {
                     this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="UserChangePasswordRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnUserChangePassword(UserChangePasswordRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var user = ds.Users.FirstOrDefault(u => u.Uid == request.UserUid);
+                        if (user == null)
+                        {
+                            var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription("id", "not found")
+                                     };
+
+                            this.Sender.Tell(new MutationResult<User> { Errors = errors });
+                            return;
+                        }
+
+                        if (!user.CheckPassword(request.OldPassword))
+                        {
+                            var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription("id", "not found")
+                                     };
+
+                            this.Sender.Tell(new MutationResult<User> { Errors = errors });
+                            return;
+                        }
+                        
+                        user.SetPassword(request.NewPassword);
+                        ds.SaveChanges();
+                        
+                        SecurityLog.CreateRecord(
+                            SecurityLog.EnType.DataUpdateGranted, 
+                            EnSeverity.Trivial, 
+                            request.Request,
+                            "User {Login} ({Uid}) have changed his password",
+                            user.Login,
+                            user.Uid);
+                        this.Sender.Tell(new MutationResult<User> { Result = user });
+                    }
+                }
+                catch (Exception exception)
+                {
+                    var errors = new List<ErrorDescription>
+                                     {
+                                         new ErrorDescription(null, exception.Message)
+                                     };
+                    this.Sender.Tell(new MutationResult<User> { Errors = errors });
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="UserResetPasswordRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnUserResetPassword(UserResetPasswordRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var user = ds.Users.FirstOrDefault(u => u.Uid == request.UserUid);
+                        if (user == null)
+                        {
+                            this.Sender.Tell(CrudActionResponse<User>.Error(new EntityNotFoundException(), null));
+                            return;
+                        }
+
+                        user.SetPassword(request.NewPassword);
+                        ds.SaveChanges();
+
+                        SecurityLog.CreateRecord(
+                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSeverity.Crucial,
+                            request.Request,
+                            "The password for user {Login} ({Uid}) was reset",
+                            user.Login,
+                            user.Uid);
+
+                        this.Sender.Tell(new MutationResult<User> { Result = user });
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(CrudActionResponse<User>.Error(exception, null));
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="UserRoleAddRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnUserRoleAdd(UserRoleAddRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var user = ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid);
+                        var role = ds.Roles.Include(nameof(Role.Users)).FirstOrDefault(r => r.Uid == request.RoleUid);
+
+                        if (user == null || role == null)
+                        {
+                            this.Sender.Tell(
+                                request.ReturnUser
+                                    ? (object)CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
+                                    : CrudActionResponse<Role>.Error(new EntityNotFoundException(), request.ExtraData));
+                            return;
+                        }
+
+                        if (user.Roles.Any(r => r.Uid == role.Uid))
+                        {
+                            var exception = new MutationException(new ErrorDescription(null, "The role is already granted"));
+                            this.Sender.Tell(request.ReturnUser
+                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
+                            return;
+                        }
+
+                        user.Roles.Add(role);
+                        ds.SaveChanges();
+                        SecurityLog.CreateRecord(
+                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSeverity.Crucial,
+                            request.Request,
+                            "The user {Login} ({UserUid}) was granted with role {RoleName} ({RoleUid})",
+                            user.Login,
+                            user.Uid,
+                            role.Name,
+                            role.Uid);
+                    }
+
+                    using (var ds = await this.GetContext())
+                    {
+                        this.Sender.Tell(
+                            request.ReturnUser
+                                ? (object)
+                                CrudActionResponse<User>.Success(
+                                    ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid),
+                                    request.ExtraData)
+                                : CrudActionResponse<Role>.Success(
+                                    ds.Roles.Include(nameof(Role.Users)).FirstOrDefault(r => r.Uid == request.RoleUid),
+                                    request.ExtraData));
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(request.ReturnUser
+                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="UserRoleRemoveRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task UserRoleRemove(UserRoleRemoveRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var user = ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid);
+                        var role = ds.Roles.Include(nameof(Role.Users)).FirstOrDefault(r => r.Uid == request.RoleUid);
+
+                        if (user == null || role == null)
+                        {
+                            this.Sender.Tell(
+                                request.ReturnUser
+                                    ? (object)CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
+                                    : CrudActionResponse<Role>.Error(new EntityNotFoundException(), request.ExtraData));
+                            return;
+                        }
+
+                        if (user.Roles.All(r => r.Uid != role.Uid))
+                        {
+                            var exception = new MutationException(new ErrorDescription(null, "The role is not granted"));
+                            this.Sender.Tell(request.ReturnUser
+                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
+                            return;
+                        }
+
+                        user.Roles.Add(role);
+                        ds.SaveChanges();
+                        SecurityLog.CreateRecord(
+                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSeverity.Crucial,
+                            request.Request,
+                            "The role {RoleName} ({RoleUid}) was withdrawed from user {Login} ({UserUid})",
+                            role.Name,
+                            role.Uid,
+                            user.Login,
+                            user.Uid);
+                    }
+
+                    using (var ds = await this.GetContext())
+                    {
+                        this.Sender.Tell(
+                            request.ReturnUser
+                                ? (object)
+                                CrudActionResponse<User>.Success(
+                                    ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid),
+                                    request.ExtraData)
+                                : CrudActionResponse<Role>.Success(
+                                    ds.Roles.Include(nameof(Role.Users)).FirstOrDefault(r => r.Uid == request.RoleUid),
+                                    request.ExtraData));
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(request.ReturnUser
+                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
                 }
             }
         }

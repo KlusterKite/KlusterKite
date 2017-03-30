@@ -25,10 +25,22 @@ namespace ClusterKit.NodeManager.Client
         public const string User = "ClusterKit.NodeManager.User";
 
         /// <summary>
+        /// The privilege to reset any <see cref="User"/> password
+        /// </summary>
+        [PrivilegeDescription("Reset any user password", Target = EnPrivilegeTarget.User)]
+        public const string UserResetPassword = "ClusterKit.NodeManager.UserResetPassword";
+
+        /// <summary>
         /// The privilege to manage <see cref="ORM.Role"/>
         /// </summary>
         [PrivilegeDescription("Role management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
         public const string Role = "ClusterKit.NodeManager.Role";
+
+        /// <summary>
+        /// The privilege to grant and withdraw roles to users
+        /// </summary>
+        [PrivilegeDescription("The privilege to grant and withdraw roles to users", Target = EnPrivilegeTarget.User)]
+        public const string UserRole = "ClusterKit.NodeManager.UserRole";
 
         /// <summary>
         /// The privilege to manage <see cref="ORM.Release"/>
