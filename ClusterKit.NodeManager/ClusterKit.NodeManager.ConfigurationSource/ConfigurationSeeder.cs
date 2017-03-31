@@ -13,8 +13,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using System.Collections.Generic;
     using System.Linq;
 
-    using Akka.Configuration;
-
+    using Akka.Actor;
+    using Akka.Cluster;
+    
     using ClusterKit.Data;
     using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.ORM;
@@ -43,10 +44,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             }
 
             SetupUsers(context);
-            context.Templates.AddRange(GetDefaultTemplates());
+            context.Templates.AddRange(this.GetDefaultTemplates());
 
-            var config = ServiceLocator.Current.GetInstance<Config>();
-            var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
+            var system = ServiceLocator.Current.GetInstance<ActorSystem>();
+            var nugetUrl = system.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
             var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
             var initialPackages =
                 nugetRepository.Search(string.Empty, true)
@@ -55,10 +56,37 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     .Select(p => new PackageDescriptionSurrogate { Name = p.Id, Version = p.Version.ToString() })
                     .ToList();
 
+            var seedsFromConfig =
+                    Cluster.Get(system)
+                        .Settings.SeedNodes.Select(
+                            address => $"{address.Protocol}://{address.System}@{address.Host}:{address.Port}").ToList();
+
+            var config = system.Settings.Config.GetConfig("ClusterKit.NodeManager.DefaultNugetFeeds");
+            var nugetFeeds = new List<NugetFeed>();
+
+            if (config != null)
+            {
+                foreach (var pair in config.AsEnumerable())
+                {
+                    var feedConfig = config.GetConfig(pair.Key);
+
+                    NugetFeed.EnFeedType feedType;
+                    if (!Enum.TryParse(feedConfig.GetString("type"), out feedType))
+                    {
+                        feedType = NugetFeed.EnFeedType.Private;
+                    }
+
+                    nugetFeeds.Add(
+                        new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType });
+                }
+            }
+
             var configuration = new ReleaseConfiguration
                                     {
-                                        NodeTemplates = new List<NodeTemplate>(GetDefaultTemplates()),
-                                        Packages = initialPackages
+                                        NodeTemplates = new List<NodeTemplate>(this.GetDefaultTemplates()),
+                                        Packages = initialPackages,
+                                        SeedAddresses = seedsFromConfig,
+                                        NugetFeeds = nugetFeeds
                                     };
             var initialRelease = new Release
                                      {
@@ -76,7 +104,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// Gets the default templates
         /// </summary>
         /// <returns>The list of default templates</returns>
-        private static IEnumerable<NodeTemplate> GetDefaultTemplates()
+        protected virtual IEnumerable<NodeTemplate> GetDefaultTemplates()
         {
             yield return new NodeTemplate
                                 {
