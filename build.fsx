@@ -77,6 +77,15 @@ Target "DockerContainers" (fun _ ->
                 OutputPath = "./packages"
                 ExcludeVersion = true})
 
+    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
+    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build"
+
+    NpmHelper.Npm(fun p -> 
+              { p with
+                  Command = NpmHelper.Install NpmHelper.Standard
+                  WorkingDirectory = "./Docker/ClusterKitMonitoring/clusterkit-web" 
+              })
+
     NpmHelper.Npm(fun p ->
             { p with
                 Command = (NpmHelper.Run "build")
@@ -84,6 +93,9 @@ Target "DockerContainers" (fun _ ->
             })
 
     buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
+
+    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
+    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local"
 )
 
 "DockerBase" ?=> "CleanDockerImages"
