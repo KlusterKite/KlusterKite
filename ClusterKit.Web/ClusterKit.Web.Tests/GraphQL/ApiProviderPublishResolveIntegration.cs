@@ -192,6 +192,195 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
+        /// Testing connection method query request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task ConnectionMethodQueryTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+            var globalId =
+                JArray.Parse(
+                    "[{\"f\":\"connectionMethod\", \"a\": {\"key\": \"test\", \"obj\": {\"name\": \"hello\"}}, \"id\":\"3beee369-11df-4a30-bf11-1d8465c87110" + "\"}]")
+                    .PackGlobalId().Replace("\"", "\\\"");
+            var query = @"
+            {                
+                api {
+                        connectionMethod(key: ""test"", obj: {name: ""hello""}, sort: [value_asc, name_asc]) {
+                            count,
+                            edges {
+                                cursor,
+                                node { 
+                                    id,                                   
+                                    __id,
+                                    name,
+                                    value
+                                }                    
+                            }
+                        }
+                }                
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                                 r.ComplexityConfiguration = new ComplexityConfiguration
+                                 {
+                                     FieldImpact = 2.0,
+                                     MaxDepth = 15,
+                                     MaxComplexity = 200
+                                 };
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = $@"
+                            {{
+                              ""data"": {{
+                                ""api"": {{
+                                  ""connectionMethod"": {{
+                                    ""count"": 1,
+                                    ""edges"": [
+                                      {{
+                                        ""cursor"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
+                                        ""node"": {{
+                                          ""id"": ""{globalId}"",
+                                          ""__id"": ""3beee369-11df-4a30-bf11-1d8465c87110"",
+                                          ""name"": ""1-test"",
+                                          ""value"": 100.0
+                                        }}
+                                      }}
+                                    ]
+                                  }}
+                                }}
+                              }}
+                            }}
+                            ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing connection query request from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task ConnectionQueryWithDoubleFragmentsTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "{3BEEE369-11DF-4A30-BF11-1D8465C87110}"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+
+            var globalId =
+            JArray.Parse(
+                "[{\"f\":\"listOfNested\"," + $"\"id\":\"{internalApiProvider.ListOfNested.First().Uid.ToString("D")}" + "\"},"
+                + "{\"f\":\"connection\", \"id\":\"3beee369-11df-4a30-bf11-1d8465c87110" + "\"}]")
+                .PackGlobalId().Replace("\"", "\\\"");
+
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = @"
+            query {                
+                api {
+                    ...F0
+                    ...F1
+                }                
+            }
+
+            fragment F0 on ITestApi {
+                listOfNested {
+                    edges {
+                        node {
+                            syncScalarField
+                        }
+                    }
+                }
+            }
+            fragment F1 on ITestApi {
+                listOfNested {
+                    edges {
+                        node {
+                            connection {
+                                edges {
+                                    node {
+                                        id,
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                             {
+                                 r.Schema = schema;
+                                 r.Query = query;
+                                 r.UserContext = new RequestContext();
+                             }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = $@"
+                            {{
+                              ""data"": {{
+                                ""api"": {{
+                                  ""listOfNested"": {{
+                                    ""edges"": [
+                                      {{
+                                        ""node"": {{
+                                          ""syncScalarField"": ""SyncScalarField"",
+                                          ""connection"": {{
+                                            ""edges"": [
+                                              {{
+                                                ""node"": {{
+                                                  ""id"": ""{globalId}"",
+                                                  ""name"": ""1-test""
+                                                }}
+                                              }}
+                                            ]
+                                          }}
+                                        }}
+                                      }}
+                                    ]
+                                  }}
+                                }}
+                              }}
+                            }}
+                            ";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
         /// Testing connection query split request from <see cref="ApiDescription"/>
         /// </summary>
         /// <returns>Async task</returns>
@@ -1607,6 +1796,94 @@ namespace ClusterKit.Web.Tests.GraphQL
             var globalId =
                 JArray.Parse("[{\"f\":\"connection\"," + "\"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1\"}]")
                     .PackGlobalId();
+
+            var query = $@"
+                {{
+                    node(id: ""{globalId.Replace("\"", "\\\"")}"") 
+                    {{
+                    ...F0
+                    }}
+                }}
+
+                fragment F0 on TestApi_TestObject 
+                {{
+                    __id,
+                    id,
+                    name,
+                    value
+                }}            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var expectedResult = $@"
+                            {{
+                              ""data"": {{
+                                ""node"": {{
+                                  ""__id"": ""67885ba0-b284-438f-8393-ee9a9eb299d1"",
+                                  ""id"": ""{globalId.Replace("\"", "\\\"")}"",
+                                  ""name"": ""1-test"",
+                                  ""value"": 100.0
+                                }}
+                              }}
+                            }}";
+            Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing node requests from <see cref="ApiDescription"/>
+        /// </summary>
+        /// <returns>Async task</returns>
+        [Fact]
+        public async Task NodeQueryForMethodTest()
+        {
+            var initialObjects = new List<TestObject>
+                                     {
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d0"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d1"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             },
+                                         new TestObject
+                                             {
+                                                 Id =
+                                                     Guid.Parse(
+                                                         "67885ba0-b284-438f-8393-ee9a9eb299d2"),
+                                                 Name = "1-test",
+                                                 Value = 100m
+                                             }
+                                     };
+
+            var internalApiProvider = new TestProvider(initialObjects);
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine)
+                                         {
+                                             UseJsonRepack =
+                                                 true
+                                         };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var globalId =
+                JArray.Parse(
+                    "[{\"f\":\"connectionMethod\", \"a\": {\"key\": \"test\", \"obj\": {\"name\": \"hello\"}}, \"id\":\"67885ba0-b284-438f-8393-ee9a9eb299d1"
+                    + "\"}]").PackGlobalId();
 
             var query = $@"
                 {{
@@ -3275,9 +3552,9 @@ namespace ClusterKit.Web.Tests.GraphQL
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var apiId = JArray.Parse("[]").PackGlobalId().Replace("\"", "\\\"");
-            var nestedId = JArray.Parse("[{\"f\":\"nestedAsync\"}]").PackGlobalId().Replace("\"", "\\\"");
-            var nested2Id = JArray.Parse("[{\"f\":\"nestedSync\"}]").PackGlobalId().Replace("\"", "\\\"");
-            var nestedNestedId = JArray.Parse("[{\"f\":\"nestedAsync\"},{\"f\":\"this\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var nestedId = JArray.Parse("[{\"f\":\"nestedAsync\",\"id\":\"00000000-0000-0000-0000-000000000000\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var nested2Id = JArray.Parse("[{\"f\":\"nestedSync\",\"id\":\"00000000-0000-0000-0000-000000000000\"}]").PackGlobalId().Replace("\"", "\\\"");
+            var nestedNestedId = JArray.Parse("[{\"f\":\"nestedAsync\",\"id\":\"00000000-0000-0000-0000-000000000000\"},{\"f\":\"this\",\"id\":\"00000000-0000-0000-0000-000000000000\"}]").PackGlobalId().Replace("\"", "\\\"");
             var nodeId = JArray.Parse("[{\"f\":\"arrayOfObjectNoIds\",\"id\":\"code1\"}]").PackGlobalId().Replace("\"", "\\\"");
 
             var query = @"

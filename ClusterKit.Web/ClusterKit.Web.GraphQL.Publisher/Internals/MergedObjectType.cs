@@ -348,59 +348,39 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <summary>
         /// Resolves parent data
         /// </summary>
-        /// <param name="context">The request context</param>
-        /// <param name="source">The parent data</param>
-        /// <returns>The resolved data</returns>
-        public virtual JObject ResolveData(ResolveFieldContext context, JObject source)
+        /// <param name="context">
+        /// The request context
+        /// </param>
+        /// <param name="source">
+        /// The parent data
+        /// </param>
+        /// <param name="setLocalRequest">
+        /// A value indicating whether to set "local request" bread crumbs
+        /// </param>
+        /// <returns>
+        /// The resolved data
+        /// </returns>
+        public virtual JObject ResolveData(ResolveFieldContext context, JObject source, bool setLocalRequest = true)
         {
-            // setting request data for child elements
-            foreach (var field in GetRequestedFields(context.FieldAst.SelectionSet, context, this))
+            if (setLocalRequest)
             {
-                MergedField localField;
-                if (!this.Fields.TryGetValue(field.Name, out localField))
-                {
-                    continue;
-                }
-
-                var propertyName = field.Alias ?? field.Name;
-                var property = source.Property(propertyName)?.Value as JObject;
-                if (property == null)
-                {
-                    if ((localField.Type as MergedObjectType)?.Category == EnCategory.MultipleApiType)
-                    {
-                        source.Add(propertyName, new JObject());
-                        property = (JObject)source.Property(propertyName).Value;
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }
-
-                if (property.Property(RequestPropertyName) != null)
-                {
-                    continue;
-                }
-
-                var localRequest = new JObject { { "f", localField.FieldName } };
-                if (field.Arguments != null && field.Arguments.Any())
+                var localRequest = new JObject { { "f", context.FieldName } };
+                if (context.Arguments != null && context.Arguments.Any())
                 {
                     var args =
-                        field.Arguments.Where(
-                                a =>
-                                    localField.Arguments.ContainsKey(a.Name)
-                                    && !localField.Arguments[a.Name].Flags.HasFlag(EnFieldFlags.IsTypeArgument))
-                            .OrderBy(a => a.Name)
-                            .ToList();
-                    if (args.Count > 0)
+                        context.Arguments
+                            .OrderBy(p => p.Key)
+                            .ToDictionary(p => p.Key, p => p.Value);
+                    if (args.Any())
                     {
-                        localRequest.Add("a", args.ToJson(context));
+                        var argumentsValue = JObject.FromObject(args);
+                        localRequest.Add("a", argumentsValue);
                     }
                 }
 
-                property.Add(RequestPropertyName, localRequest);
+                source.Add(RequestPropertyName, localRequest);
             }
-
+            
             // generating self globalId data
             var globalId = GetGlobalId(source, source.Property("__id")?.Value);
             if (globalId != null)
@@ -430,7 +410,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             /// <inheritdoc />
             public object Resolve(ResolveFieldContext context)
             {
-                var id = (context.Source as JObject)?.Property("__newGlobalId")?.Value;
+                var id = (context.Source as JObject)?.Property(GlobalIdPropertyName)?.Value;
                 return id?.PackGlobalId();
             }
         }

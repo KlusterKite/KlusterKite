@@ -82,11 +82,27 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
             var graphType = new VirtualGraphType(this.ComplexTypeName);
-            graphType.AddField(new FieldType { Name = "deletedId", ResolvedType = new IdGraphType(), Resolver = new DeletedIdResolver() });
-            graphType.AddField(this.CreateField("node", this.EdgeType.ObjectType));
+            graphType.AddField(
+                new FieldType
+                    {
+                        Name = "deletedId",
+                        ResolvedType = new IdGraphType(),
+                        Resolver = new DeletedIdResolver()
+                    });
+            graphType.AddField(
+                this.CreateField(
+                    "node",
+                    this.EdgeType.ObjectType,
+                    new NodeResolver(this.EdgeType.ObjectType)));
             graphType.AddField(this.CreateField("edge", this.EdgeType));
             graphType.AddField(this.CreateField("errors", this.ErrorType, new ResultErrorsResolver()));
-            graphType.AddField(new FieldType { Name = "clientMutationId", ResolvedType = new StringGraphType(), Resolver = new ClientMutationIdIdResolver() });
+            graphType.AddField(
+                new FieldType
+                    {
+                        Name = "clientMutationId",
+                        ResolvedType = new StringGraphType(),
+                        Resolver = new ClientMutationIdIdResolver()
+                    });
             graphType.AddField(this.CreateField("api", this.root, this.root));
             return graphType;
         }
@@ -131,6 +147,41 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             public object Resolve(ResolveFieldContext context)
             {
                 return (context.Source as JObject)?.Property("clientMutationId")?.Value;
+            }
+        }
+
+        /// <summary>
+        /// Resolves the "node" field of mutation payload
+        /// </summary>
+        private class NodeResolver : IFieldResolver
+        {
+            /// <summary>
+            /// The original node type
+            /// </summary>
+            private readonly MergedObjectType nodeType;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="NodeResolver"/> class.
+            /// </summary>
+            /// <param name="nodeType">
+            /// The original node type.
+            /// </param>
+            public NodeResolver(MergedObjectType nodeType)
+            {
+                this.nodeType = nodeType;
+            }
+
+            /// <inheritdoc />
+            public object Resolve(ResolveFieldContext context)
+            {
+                var source = context.Source as JObject;
+                var resolvedSource = source?.Property(context.FieldAst.Alias ?? context.FieldAst.Name)?.Value as JObject;
+                if (resolvedSource == null)
+                {
+                    return null;
+                }
+
+                return this.nodeType.ResolveData(context, resolvedSource, false);
             }
         }
 

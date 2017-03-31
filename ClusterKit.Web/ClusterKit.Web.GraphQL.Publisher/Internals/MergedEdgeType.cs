@@ -161,18 +161,6 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         }
 
         /// <summary>
-        /// Resolves value for the edge cursor
-        /// </summary>
-        private class CursorResolver : IFieldResolver
-        {
-            /// <inheritdoc />
-            public object Resolve(ResolveFieldContext context)
-            {
-                return (context.Source as JObject)?.GetValue("__id");
-            }
-        }
-
-        /// <summary>
         /// The node resolver
         /// </summary>
         private class NodeResolver : IFieldResolver
@@ -212,7 +200,19 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
 
                 source.Add(fieldName, filteredSource);
 
-                return this.originalType.ResolveData(context, filteredSource);
+                return this.originalType.ResolveData(context, filteredSource, false);
+            }
+        }
+
+        /// <summary>
+        /// Resolves value for the edge cursor
+        /// </summary>
+        private class CursorResolver : IFieldResolver
+        {
+            /// <inheritdoc />
+            public object Resolve(ResolveFieldContext context)
+            {
+                return (context.Source as JObject)?.GetValue("__id");
             }
         }
     }

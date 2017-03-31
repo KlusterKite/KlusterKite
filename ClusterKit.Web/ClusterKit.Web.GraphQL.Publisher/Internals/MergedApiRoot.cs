@@ -203,7 +203,15 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                 data = this.ResolveData(context, response);
             }
 
-            data.Add("__newGlobalId", new JArray());
+            if (data.Property(GlobalIdPropertyName) != null)
+            {
+                data.Property(GlobalIdPropertyName).Value = new JArray();
+            }
+            else
+            {
+                data.Add(GlobalIdPropertyName, new JArray());
+            }
+
             return data;
         }
 

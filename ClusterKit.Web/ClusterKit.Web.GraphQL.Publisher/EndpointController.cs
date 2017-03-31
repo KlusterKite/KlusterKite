@@ -23,7 +23,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
     using global::GraphQL;
     using global::GraphQL.Http;
-    using global::GraphQL.Instrumentation;
     using global::GraphQL.Validation.Complexity;
 
     using JetBrains.Annotations;
@@ -150,8 +149,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                      options.Inputs = inputs;
                                      options.UserContext = requestContext;
 
-                                     options.ComplexityConfiguration = this.complexityConfiguration;
-                                     options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                                     // options.ComplexityConfiguration = this.complexityConfiguration;
+                                     // options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                                  }).ConfigureAwait(false);
 
             var httpResult = result.Errors?.Count > 0 ? HttpStatusCode.BadRequest : HttpStatusCode.OK;

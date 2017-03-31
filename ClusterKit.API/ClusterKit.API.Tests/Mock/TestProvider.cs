@@ -50,6 +50,10 @@ namespace ClusterKit.API.Tests.Mock
         {
             this.objects = objects ?? new List<TestObject>();
             this.Connection = new TestObjectConnection(this.objects.ToDictionary(o => o.Id));
+            this.ListOfNested = new List<NestedProvider>
+                                    {
+                                        new NestedProvider(this.objects) { Uid = Guid.NewGuid() }
+                                    };
         }
 
         /// <summary>
@@ -86,6 +90,13 @@ namespace ClusterKit.API.Tests.Mock
             /// </summary>
             EnumItem2 = 2
         }
+
+        /// <summary>
+        /// Gets or sets the list of nested providers
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public List<NestedProvider> ListOfNested { get; set; }
 
         /// <summary>
         /// Async scalar field
@@ -374,6 +385,25 @@ namespace ClusterKit.API.Tests.Mock
         [RequireSession]
         [RequirePrivilege("allow")]
         public string AuthorizedMutation() => "ok";
+
+        /// <summary>
+        /// The method returning connection
+        /// </summary>
+        /// <param name="key">
+        /// The method argument
+        /// </param>
+        /// <param name="obj">
+        /// The object argument
+        /// </param>
+        /// <returns>
+        /// The connection
+        /// </returns>
+        [UsedImplicitly]
+        [DeclareField]
+        public TestObjectConnection ConnectionMethod(string key, TestObject obj)
+        {
+            return this.Connection;
+        }
 
         /// <summary>
         /// The method with <seealso cref="DateTime"/> argument

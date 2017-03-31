@@ -392,11 +392,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="apiObjectType">The node object type</param>
         /// <param name="provider">The api provider</param>
         /// <param name="typesCreated">The list of types created to fill</param>
+        /// <param name="typedArgumentNames">The list of field arguments received from type</param>
         /// <returns>The connection type</returns>
         private static MergedType CreateConnectionType(
             ApiObjectType apiObjectType,
             ApiProvider provider,
-            Dictionary<string, MergedType> typesCreated)
+            Dictionary<string, MergedType> typesCreated,
+            List<string> typedArgumentNames = null)
         {
             MergedType createdType;
             var nodeType =
@@ -410,6 +412,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     typesCreated);
 
             var connectionType = new MergedConnectionType(nodeType.OriginalTypeName, provider, nodeType);
+            if (typedArgumentNames != null)
+            {
+                connectionType.TypedArgumentNames = typedArgumentNames;
+            }
 
             if (typesCreated.TryGetValue(connectionType.ComplexTypeName, out createdType))
             {
@@ -485,7 +491,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var apiObjectType = (ApiObjectType)apiType;
             if (apiField.Flags.HasFlag(EnFieldFlags.IsConnection))
             {
-                return CreateConnectionType(apiObjectType, provider, typesCreated);
+                var typedArgumentNames =
+                    apiField.Arguments.Where(a => a.Flags.HasFlag(EnFieldFlags.IsTypeArgument))
+                        .Select(f => f.Name)
+                        .ToList();
+                return CreateConnectionType(apiObjectType, provider, typesCreated, typedArgumentNames);
             }
 
             var objectType = (complexField?.Type as MergedObjectType)?.Clone()

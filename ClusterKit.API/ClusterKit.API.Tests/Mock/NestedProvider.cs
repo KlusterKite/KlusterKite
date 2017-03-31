@@ -46,6 +46,12 @@ namespace ClusterKit.API.Tests.Mock
         }
 
         /// <summary>
+        /// Gets or sets the key field
+        /// </summary>
+        [DeclareField(IsKey = true)]
+        public Guid Uid { get; set; }
+
+        /// <summary>
         /// Gets or sets the field that is visible only in "input" objects
         /// </summary>
         [DeclareField(Access = EnAccessFlag.Writable)]

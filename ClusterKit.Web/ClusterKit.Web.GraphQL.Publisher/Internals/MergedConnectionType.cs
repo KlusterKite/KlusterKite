@@ -19,6 +19,8 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
 
+    using JetBrains.Annotations;
+
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -67,6 +69,12 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// Gets the field provider
         /// </summary>
         public ApiProvider Provider { get; }
+
+        /// <summary>
+        /// Gets or sets the list of containing field argument names that came from type itself
+        /// </summary>
+        [NotNull]
+        public List<string> TypedArgumentNames { get; set; } = new List<string>();
 
         /// <inheritdoc />
         public override IEnumerable<ApiRequest> GatherSingleApiRequest(
@@ -206,31 +214,28 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
         /// <inheritdoc />
         public override object Resolve(ResolveFieldContext context)
         {
-            var resolve = base.Resolve(context) as JObject;
-            resolve?.Add("__requestPath", new JArray(this.ResolveRequestPath(resolve)));
-            return resolve;
-        }
-
-        /// <summary>
-        /// Resolves provided request path to the current connection
-        /// </summary>
-        /// <param name="source">The source element</param>
-        /// <returns>The list of requests in path</returns>
-        private IEnumerable<JObject> ResolveRequestPath(JToken source)
-        {
-            if (source.Parent != null)
+            var source = base.Resolve(context) as JObject;
+            if (source == null)
             {
-                foreach (var element in this.ResolveRequestPath(source.Parent))
+                return null;
+            }
+
+            var localRequest = new JObject { { "f", context.FieldName } };
+            if (context.Arguments != null && context.Arguments.Any())
+            {
+                var args =
+                    context.Arguments.Where(p => !this.TypedArgumentNames.Contains(p.Key))
+                        .OrderBy(p => p.Key)
+                        .ToDictionary(p => p.Key, p => p.Value);
+                if (args.Any())
                 {
-                    yield return element;
+                    var argumentsValue = JObject.FromObject(args);
+                    localRequest.Add("a", argumentsValue);
                 }
             }
 
-            var request = (source as JObject)?.Property("__request")?.Value as JObject;
-            if (request != null)
-            {
-                yield return request;
-            }
+            source.Add(MergedObjectType.RequestPropertyName, localRequest);
+            return source;
         }
 
         /// <summary>
