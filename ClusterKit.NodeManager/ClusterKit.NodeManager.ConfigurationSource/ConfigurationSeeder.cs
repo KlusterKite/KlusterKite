@@ -66,6 +66,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
             if (config != null)
             {
+                int feedTemplate = 0;
                 foreach (var pair in config.AsEnumerable())
                 {
                     var feedConfig = config.GetConfig(pair.Key);
@@ -77,13 +78,16 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     }
 
                     nugetFeeds.Add(
-                        new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType });
+                        new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType, Id = feedTemplate++ });
                 }
             }
 
+            int templateId = 0;
+            var defaultTemplates = this.GetDefaultTemplates().ToList();
+            defaultTemplates.ForEach(t => t.Id = templateId++);
             var configuration = new ReleaseConfiguration
                                     {
-                                        NodeTemplates = new List<NodeTemplate>(this.GetDefaultTemplates()),
+                                        NodeTemplates = new List<NodeTemplate>(defaultTemplates),
                                         Packages = initialPackages,
                                         SeedAddresses = seedsFromConfig,
                                         NugetFeeds = nugetFeeds

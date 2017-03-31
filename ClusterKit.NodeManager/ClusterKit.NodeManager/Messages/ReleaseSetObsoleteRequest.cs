@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseSetReadyRequest.cs" company="ClusterKit">
+// <copyright file="ReleaseSetObsoleteRequest.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Moves <see cref="FSMBase.State{TS,TD}" /> from <see cref="Release.EnState.Draft" /> to <see cref="Release.EnState.Ready" />
+//   Moves <see cref="FSMBase.State{TS,TD}" /> from <see cref="Release.EnState.Ready" /> to <see cref="Release.EnState.Obsolete" />
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,10 +15,10 @@ namespace ClusterKit.NodeManager.Messages
     using ClusterKit.Security.Client;
 
     /// <summary>
-    /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="Release.EnState.Draft"/> to <see cref="Release.EnState.Ready"/>
+    /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="Release.EnState.Ready"/> to <see cref="Release.EnState.Obsolete"/>
     /// </summary>
     /// <returns>The mutation result</returns>
-    public class ReleaseSetReadyRequest
+    public class ReleaseSetObsoleteRequest
     {
         /// <summary>
         /// Gets or sets the release id

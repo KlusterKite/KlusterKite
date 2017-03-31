@@ -10,6 +10,7 @@
 namespace ClusterKit.NodeManager.Client.ORM
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -130,6 +131,13 @@ namespace ClusterKit.NodeManager.Client.ORM
         [NotMapped]
         public ReleaseConfiguration Configuration { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of compatible node templates
+        /// </summary>
+        [DeclareField("the list of compatible node templates", Access = EnAccessFlag.Queryable)]
+        [ForeignKey(nameof(CompatibleTemplate.ReleaseId))]
+        public List<CompatibleTemplate> CompatibleTemplates { get; set; }
+        
         /// <summary>
         ///  Gets or sets the release configuration as json to store in database
         /// </summary>

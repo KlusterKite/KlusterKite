@@ -1161,6 +1161,7 @@ namespace ClusterKit.NodeManager
             this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<Release, int>>(m => this.workers.Forward(m));
             this.Receive<ReleaseSetReadyRequest>(m => this.workers.Forward(m));
+            this.Receive<ReleaseSetObsoleteRequest>(m => this.workers.Forward(m));
             this.Receive<ReleaseSetStableRequest>(m => this.workers.Forward(m));
             this.Receive<UpdateClusterRequest>(m => this.workers.Forward(m));
         }
@@ -1290,6 +1291,7 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
 
                 this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
+                this.ReceiveAsync<ReleaseSetObsoleteRequest>(this.OnReleaseSetObsolete);
                 this.ReceiveAsync<ReleaseSetStableRequest>(this.OnReleaseSetStable);
                 this.ReceiveAsync<UpdateClusterRequest>(this.OnUpdateCluster);
 
@@ -1407,6 +1409,44 @@ namespace ClusterKit.NodeManager
                                     exception),
                                 null));
                     }
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="ReleaseSetObsoleteRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnReleaseSetObsolete(ReleaseSetObsoleteRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                        if (release == null)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                            return;
+                        }
+
+                        if (release.State != Release.EnState.Ready)
+                        {
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new Exception("Only ready releases can be made obsolete manually"),
+                                    null));
+                            return;
+                        }
+
+                        release.State = Release.EnState.Obsolete;
+                        ds.SaveChanges();
+                        this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
                 }
             }
 
@@ -1554,10 +1594,7 @@ namespace ClusterKit.NodeManager
                         var user = ds.Users.FirstOrDefault(u => u.Login == request.Login);
                         if (user == null)
                         {
-                            var errors = new List<ErrorDescription>
-                                     {
-                                         new ErrorDescription("login", "not found")
-                                     };
+                            var errors = new List<ErrorDescription> { new ErrorDescription("login", "not found") };
 
                             this.Sender.Tell(new MutationResult<bool> { Errors = errors });
                             return;
@@ -1565,21 +1602,18 @@ namespace ClusterKit.NodeManager
 
                         if (!user.CheckPassword(request.OldPassword))
                         {
-                            var errors = new List<ErrorDescription>
-                                     {
-                                         new ErrorDescription("login", "not found")
-                                     };
+                            var errors = new List<ErrorDescription> { new ErrorDescription("login", "not found") };
 
                             this.Sender.Tell(new MutationResult<bool> { Errors = errors });
                             return;
                         }
-                        
+
                         user.SetPassword(request.NewPassword);
                         ds.SaveChanges();
-                        
+
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.DataUpdateGranted, 
-                            EnSeverity.Trivial, 
+                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSeverity.Trivial,
                             request.Request,
                             "User {Login} ({Uid}) have changed his password",
                             user.Login,
@@ -1589,10 +1623,7 @@ namespace ClusterKit.NodeManager
                 }
                 catch (Exception exception)
                 {
-                    var errors = new List<ErrorDescription>
-                                     {
-                                         new ErrorDescription(null, exception.Message)
-                                     };
+                    var errors = new List<ErrorDescription> { new ErrorDescription(null, exception.Message) };
                     this.Sender.Tell(new MutationResult<bool> { Errors = errors });
                 }
             }
@@ -1653,17 +1684,20 @@ namespace ClusterKit.NodeManager
                         {
                             this.Sender.Tell(
                                 request.ReturnUser
-                                    ? (object)CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
+                                    ? (object)
+                                    CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
                                     : CrudActionResponse<Role>.Error(new EntityNotFoundException(), request.ExtraData));
                             return;
                         }
 
                         if (user.Roles.Any(r => r.Uid == role.Uid))
                         {
-                            var exception = new MutationException(new ErrorDescription(null, "The role is already granted"));
-                            this.Sender.Tell(request.ReturnUser
-                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
-                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
+                            var exception =
+                                new MutationException(new ErrorDescription(null, "The role is already granted"));
+                            this.Sender.Tell(
+                                request.ReturnUser
+                                    ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                                    : CrudActionResponse<Role>.Error(exception, request.ExtraData));
                             return;
                         }
 
@@ -1695,9 +1729,10 @@ namespace ClusterKit.NodeManager
                 }
                 catch (Exception exception)
                 {
-                    this.Sender.Tell(request.ReturnUser
-                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
-                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
+                    this.Sender.Tell(
+                        request.ReturnUser
+                            ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                            : CrudActionResponse<Role>.Error(exception, request.ExtraData));
                 }
             }
 
@@ -1719,7 +1754,8 @@ namespace ClusterKit.NodeManager
                         {
                             this.Sender.Tell(
                                 request.ReturnUser
-                                    ? (object)CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
+                                    ? (object)
+                                    CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
                                     : CrudActionResponse<Role>.Error(new EntityNotFoundException(), request.ExtraData));
                             return;
                         }
@@ -1727,9 +1763,10 @@ namespace ClusterKit.NodeManager
                         if (user.Roles.All(r => r.Uid != role.Uid))
                         {
                             var exception = new MutationException(new ErrorDescription(null, "The role is not granted"));
-                            this.Sender.Tell(request.ReturnUser
-                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
-                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
+                            this.Sender.Tell(
+                                request.ReturnUser
+                                    ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                                    : CrudActionResponse<Role>.Error(exception, request.ExtraData));
                             return;
                         }
 
@@ -1761,9 +1798,10 @@ namespace ClusterKit.NodeManager
                 }
                 catch (Exception exception)
                 {
-                    this.Sender.Tell(request.ReturnUser
-                                ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
-                                : CrudActionResponse<Role>.Error(exception, request.ExtraData));
+                    this.Sender.Tell(
+                        request.ReturnUser
+                            ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
+                            : CrudActionResponse<Role>.Error(exception, request.ExtraData));
                 }
             }
         }

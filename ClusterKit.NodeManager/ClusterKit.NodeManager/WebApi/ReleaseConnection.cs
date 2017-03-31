@@ -113,6 +113,34 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Mutation that moves <see cref="Release.State"/> from <see cref="Release.EnState.Ready"/> to <see cref="Release.EnState.Obsolete"/>
+        /// </summary>
+        /// <param name="id">The id of release draft</param>
+        /// <returns>The mutation result</returns>
+        [DeclareMutation("moves release state from \"ready\" to \"obsolete\"")]
+        [UsedImplicitly]
+        [RequireSession]
+        [RequireUser]
+        [RequireUserPrivilege(Privileges.ReleaseFinish)]
+        public async Task<MutationResult<Release>> SetObsolete(int id)
+        {
+            try
+            {
+                var response =
+                    await this.System.ActorSelection(this.DataActorPath)
+                        .Ask<CrudActionResponse<Release>>(
+                            new ReleaseSetObsoleteRequest { Id = id, Context = this.Context },
+                            this.Timeout);
+                return CreateResponse(response);
+            }
+            catch (Exception exception)
+            {
+                this.System.Log.Error(exception, "{Type}: error on SetObsolete", this.GetType().Name);
+                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
+            }
+        }
+
+        /// <summary>
         /// Mutation that sets the <see cref="Release.IsStable"/>
         /// </summary>
         /// <param name="id">The id of release draft</param>

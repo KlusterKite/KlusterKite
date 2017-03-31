@@ -194,6 +194,7 @@
     <Compile Include="Messages\ShutdownMessage.cs" />
     <Compile Include="Navigation.cs" />
     <Compile Include="NodeManagerReceiverActor.cs" />
+    <Compile Include="ORM\CompatibleTemplate.cs" />
     <Compile Include="ORM\NodeTemplate.cs" />
     <Compile Include="ORM\NugetFeed.cs" />
     <Compile Include="ORM\Release.cs" />

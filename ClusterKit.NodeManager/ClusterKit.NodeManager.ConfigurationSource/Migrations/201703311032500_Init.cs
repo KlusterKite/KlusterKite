@@ -1,9 +1,9 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="201703280617533_Init.cs" company="ClusterKit">
+// <copyright file="201703311032500_Init.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The initial database configuration
+//   The initial database creation
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
     using System.Data.Entity.Migrations;
 
     /// <summary>
-    /// The initial database configuration
+    /// The initial database creation
     /// </summary>
     public partial class Init : DbMigration
     {
@@ -21,14 +21,19 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
         {
             this.DropForeignKey("dbo.UserRoles", "Role_Uid", "dbo.Roles");
             this.DropForeignKey("dbo.UserRoles", "User_Uid", "dbo.Users");
+            this.DropForeignKey("dbo.CompatibleTemplates", "ReleaseId", "dbo.Releases");
+            this.DropForeignKey("dbo.CompatibleTemplates", "CompatibleReleaseId", "dbo.Releases");
             this.DropIndex("dbo.UserRoles", new[] { "Role_Uid" });
             this.DropIndex("dbo.UserRoles", new[] { "User_Uid" });
             this.DropIndex("dbo.Users", new[] { "Login" });
+            this.DropIndex("dbo.CompatibleTemplates", new[] { "ReleaseId" });
+            this.DropIndex("dbo.CompatibleTemplates", new[] { "CompatibleReleaseId" });
             this.DropTable("dbo.UserRoles");
             this.DropTable("dbo.NodeTemplates");
             this.DropTable("dbo.SeedAddresses");
             this.DropTable("dbo.Users");
             this.DropTable("dbo.Roles");
+            this.DropTable("dbo.CompatibleTemplates");
             this.DropTable("dbo.Releases");
             this.DropTable("dbo.NugetFeeds");
         }
@@ -65,6 +70,22 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                             IsStable = c.Boolean(nullable: false),
                             ConfigurationJson = c.String(),
                         }).PrimaryKey(t => t.Id);
+
+            this.CreateTable(
+                    "dbo.CompatibleTemplates",
+                    c =>
+                        new
+                            {
+                                Id = c.Int(nullable: false, identity: true),
+                                CompatibleReleaseId = c.Int(nullable: false),
+                                ReleaseId = c.Int(nullable: false),
+                                TemplateCode = c.String(),
+                            })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Releases", t => t.CompatibleReleaseId, cascadeDelete: true)
+                .ForeignKey("dbo.Releases", t => t.ReleaseId, cascadeDelete: true)
+                .Index(t => t.CompatibleReleaseId)
+                .Index(t => t.ReleaseId);
 
             this.CreateTable(
                 "dbo.Roles",

@@ -235,9 +235,9 @@
     </Compile>
     <Compile Include="ConfigurationSeeder.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="Migrations\201703280617533_Init.cs" />
-    <Compile Include="Migrations\201703280617533_Init.Designer.cs">
-      <DependentUpon>201703280617533_Init.cs</DependentUpon>
+    <Compile Include="Migrations\201703311032500_Init.cs" />
+    <Compile Include="Migrations\201703311032500_Init.Designer.cs">
+      <DependentUpon>201703311032500_Init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeTemplateFactory.cs" />
@@ -262,8 +262,8 @@
       <LastGenOutput>Configurations.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201703280617533_Init.resx">
-      <DependentUpon>201703280617533_Init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201703311032500_Init.resx">
+      <DependentUpon>201703311032500_Init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
