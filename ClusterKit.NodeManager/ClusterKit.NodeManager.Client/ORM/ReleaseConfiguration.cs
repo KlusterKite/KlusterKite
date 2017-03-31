@@ -17,19 +17,31 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// <summary>
     /// The release configuration description
     /// </summary>
-    [ApiDescription(Description = "The release configuration description", Name = "ReleaseConfiguration")]
+    [ApiDescription("The release configuration description", Name = "ReleaseConfiguration")]
     public class ReleaseConfiguration
     { 
         /// <summary>
         /// Gets or sets the list of available packages with their versions
         /// </summary>
-        [DeclareField(Description = "the list of available packages with their versions")]
+        [DeclareField("the list of available packages with their versions")]
         public List<PackageDescriptionSurrogate> Packages { get; set; }
 
         /// <summary>
         /// Gets or sets the list of configured node templates
         /// </summary>
-        [DeclareField(Description = "the list of configured node templates")]
+        [DeclareField("the list of configured node templates")]
         public List<NodeTemplate> NodeTemplates { get; set; }
+
+        /// <summary>
+        /// Gets or sets the seed addresses
+        /// </summary>
+        [DeclareField("the list of seed addresses")]
+        public List<string> SeedAddresses { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of nuget feeds
+        /// </summary>
+        [DeclareField("the list of nuget feeds")]
+        public List<NugetFeed> NugetFeeds { get; set; }
     }
 }
