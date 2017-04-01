@@ -44,45 +44,69 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             }
 
             SetupUsers(context);
+
             context.Templates.AddRange(this.GetDefaultTemplates());
+            var nugetFeeds = new List<NugetFeed>();
+            List<string> seedsFromConfig = new List<string>();
+            List<PackageDescriptionSurrogate> initialPackages = new List<PackageDescriptionSurrogate>();
 
-            var system = ServiceLocator.Current.GetInstance<ActorSystem>();
-            var nugetUrl = system.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
-            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
-            var initialPackages =
-                nugetRepository.Search(string.Empty, true)
-                    .Where(p => p.IsLatestVersion)
-                    .ToList()
-                    .Select(p => new PackageDescriptionSurrogate { Name = p.Id, Version = p.Version.ToString() })
-                    .ToList();
+            try
+            {
+                var system = ServiceLocator.Current.GetInstance<ActorSystem>();
+                var nugetUrl = system.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
+                var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
 
-            var seedsFromConfig =
+
+                if (nugetRepository != null)
+                {
+                    initialPackages =
+                        nugetRepository.Search(string.Empty, true)
+                            .Where(p => p.IsLatestVersion)
+                            .ToList()
+                            .Select(
+                                p => new PackageDescriptionSurrogate { Name = p.Id, Version = p.Version.ToString() })
+                            .ToList();
+                }
+
+                seedsFromConfig =
                     Cluster.Get(system)
                         .Settings.SeedNodes.Select(
-                            address => $"{address.Protocol}://{address.System}@{address.Host}:{address.Port}").ToList();
+                            address => $"{address.Protocol}://{address.System}@{address.Host}:{address.Port}")
+                        .ToList();
 
-            var config = system.Settings.Config.GetConfig("ClusterKit.NodeManager.DefaultNugetFeeds");
-            var nugetFeeds = new List<NugetFeed>();
+                var config = system.Settings.Config.GetConfig("ClusterKit.NodeManager.DefaultNugetFeeds");
 
-            if (config != null)
-            {
-                int feedTemplate = 0;
-                foreach (var pair in config.AsEnumerable())
+
+                if (config != null)
                 {
-                    var feedConfig = config.GetConfig(pair.Key);
-
-                    NugetFeed.EnFeedType feedType;
-                    if (!Enum.TryParse(feedConfig.GetString("type"), out feedType))
+                    int feedTemplate = 0;
+                    foreach (var pair in config.AsEnumerable())
                     {
-                        feedType = NugetFeed.EnFeedType.Private;
-                    }
+                        var feedConfig = config.GetConfig(pair.Key);
 
-                    nugetFeeds.Add(
-                        new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType, Id = feedTemplate++ });
+                        NugetFeed.EnFeedType feedType;
+                        if (!Enum.TryParse(feedConfig.GetString("type"), out feedType))
+                        {
+                            feedType = NugetFeed.EnFeedType.Private;
+                        }
+
+                        nugetFeeds.Add(
+                            new NugetFeed
+                                {
+                                    Address = feedConfig.GetString("address"),
+                                    Type = feedType,
+                                    Id = feedTemplate++
+                                });
+                    }
                 }
+            }
+            // ReSharper disable once EmptyGeneralCatchClause
+            catch
+            {
             }
 
             int templateId = 0;
+
             var defaultTemplates = this.GetDefaultTemplates().ToList();
             defaultTemplates.ForEach(t => t.Id = templateId++);
             var configuration = new ReleaseConfiguration

@@ -9,6 +9,7 @@
 namespace ClusterKit.NodeManager.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Configuration;
     using System.Data;
     using System.Data.Entity;
@@ -87,8 +88,34 @@ namespace ClusterKit.NodeManager.Tests
                     Assert.NotNull(guest.Roles);
                     Assert.Equal(1, guest.Roles.Count);
                     Assert.Equal("Guest", guest.Roles.First().Name);
-                    Assert.Equal(3, guest.GetScope().Count());
+                    Assert.Equal(4, guest.GetScope().Count());
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tests the release compatibility set-up
+        /// </summary>
+        [Fact]
+        public void TestReleaseCompatibilitySet()
+        {
+            using (var connection = TempDatabaseConnection.Create(this.output).Result)
+            {
+                var activeRelease = new Release
+                                        {
+                    MinorVersion = 3,
+                    Name = "active",
+                    State = Release.EnState.Active,
+                    Configuration = new ReleaseConfiguration
+                                        {
+                                            NodeTemplates = new List<NodeTemplate>
+                                                                 {
+                                                                     new NodeTemplate { Id = 1, Code = "compatible", Configuration = "1", PackagesList = "p1; p2" },
+                                                                     new NodeTemplate { Id = 1, Code = "incompatible", Configuration = "1", PackagesList = "p2; p3" },
+                                                                 }
+                                        }
+                                        };
+
             }
         }
 
