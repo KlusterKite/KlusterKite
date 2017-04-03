@@ -24,13 +24,13 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the list of available packages with their versions
         /// </summary>
         [DeclareField("the list of available packages with their versions")]
-        public List<PackageDescriptionSurrogate> Packages { get; set; }
+        public List<PackageDescription> Packages { get; set; }
 
         /// <summary>
         /// Gets or sets the list of configured node templates
         /// </summary>
         [DeclareField("the list of configured node templates")]
-        public List<NodeTemplate> NodeTemplates { get; set; }
+        public List<Template> NodeTemplates { get; set; }
 
         /// <summary>
         /// Gets or sets the seed addresses

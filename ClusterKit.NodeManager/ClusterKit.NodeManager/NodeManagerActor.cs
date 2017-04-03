@@ -1477,7 +1477,17 @@ namespace ClusterKit.NodeManager
                             return;
                         }
 
+                        if (ds.Releases.Any(r => r.State == Release.EnState.Active))
+                        {
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new Exception("There is an already defined ready release. Please remove the previous one."),
+                                    null));
+                            return;
+                        }
+
                         release.State = Release.EnState.Ready;
+                        release.CompatibleTemplates = release.GetCompatibleTemplates(ds).ToList();
                         ds.SaveChanges();
                         this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
                     }

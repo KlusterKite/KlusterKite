@@ -31,12 +31,14 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the compatible release id
         /// </summary>
         [DeclareField("the compatible release id")]
+        [ForeignKey(nameof(CompatibleRelease))]
         public int CompatibleReleaseId { get; set; }
 
         /// <summary>
         /// Gets or sets the parent release id
         /// </summary>
         [DeclareField("the parent release id")]
+        [ForeignKey(nameof(Release))]
         public int ReleaseId { get; set; }
 
         /// <summary>
@@ -48,14 +50,12 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the compatible release
         /// </summary>
-        [ForeignKey(nameof(CompatibleReleaseId))]
         [DeclareField("the compatible release")]
         public Release CompatibleRelease { get; set; }
 
         /// <summary>
         /// Gets or sets the parent release
         /// </summary>
-        [ForeignKey(nameof(ReleaseId))]
         [DeclareField("the parent release")]
         public Release Release { get; set; }
     }

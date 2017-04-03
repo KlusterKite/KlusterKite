@@ -23,7 +23,7 @@ namespace ClusterKit.NodeManager.WebApi
     /// <summary>
     /// The connection to the nuget server
     /// </summary>
-    public class NugetPackagesConnection : INodeConnection<PackageDescriptionSurrogate>
+    public class NugetPackagesConnection : INodeConnection<PackageDescription>
     {
         /// <summary>
         /// The nuget server url
@@ -42,8 +42,8 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <inheritdoc />
-        public Task<QueryResult<PackageDescriptionSurrogate>> Query(
-            Expression<Func<PackageDescriptionSurrogate, bool>> filter,
+        public Task<QueryResult<PackageDescription>> Query(
+            Expression<Func<PackageDescription, bool>> filter,
             IEnumerable<SortingCondition> sort,
             int? limit,
             int? offset,
@@ -51,14 +51,14 @@ namespace ClusterKit.NodeManager.WebApi
         {
             var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(this.nugetServerUrl);
 
-            IQueryable<PackageDescriptionSurrogate> query;
+            IQueryable<PackageDescription> query;
             if (apiRequest.Fields.Where(f => f.FieldName == "items").SelectMany(f => f.Fields).Any(f => f.FieldName == "availableVersions"))
             {
                 query = nugetRepository.Search(string.Empty, true).ToList().GroupBy(p => p.Id).Select(
                     g =>
                         {
                             var package = g.FirstOrDefault(p => p.IsLatestVersion) ?? g.First();
-                            return new PackageDescriptionSurrogate
+                            return new PackageDescription
                                        {
                                            Name = package.Id,
                                            Version = package.Version.ToString(),
@@ -75,7 +75,7 @@ namespace ClusterKit.NodeManager.WebApi
                     nugetRepository.Search(string.Empty, true)
                         .Where(p => p.IsLatestVersion)
                         .ToList()
-                        .Select(p => new PackageDescriptionSurrogate { Name = p.Id, Version = p.Version.ToString() })
+                        .Select(p => new PackageDescription { Name = p.Id, Version = p.Version.ToString() })
                         .AsQueryable();
             }
 
@@ -101,23 +101,23 @@ namespace ClusterKit.NodeManager.WebApi
                 query = query.Take(limit.Value);
             }
 
-            return Task.FromResult(new QueryResult<PackageDescriptionSurrogate> { Count = count, Items = query });
+            return Task.FromResult(new QueryResult<PackageDescription> { Count = count, Items = query });
         }
 
         /// <inheritdoc />
-        public Task<MutationResult<PackageDescriptionSurrogate>> Create(PackageDescriptionSurrogate newNode)
+        public Task<MutationResult<PackageDescription>> Create(PackageDescription newNode)
         {
             throw new InvalidOperationException();
         }
 
         /// <inheritdoc />
-        public Task<MutationResult<PackageDescriptionSurrogate>> Update(object id, PackageDescriptionSurrogate newNode, ApiRequest request)
+        public Task<MutationResult<PackageDescription>> Update(object id, PackageDescription newNode, ApiRequest request)
         {
             throw new InvalidOperationException();
         }
 
         /// <inheritdoc />
-        public Task<MutationResult<PackageDescriptionSurrogate>> Delete(object id)
+        public Task<MutationResult<PackageDescription>> Delete(object id)
         {
             throw new InvalidOperationException();
         }

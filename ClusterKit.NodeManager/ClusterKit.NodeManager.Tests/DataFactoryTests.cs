@@ -9,7 +9,6 @@
 namespace ClusterKit.NodeManager.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.Configuration;
     using System.Data;
     using System.Data.Entity;
@@ -94,32 +93,6 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Tests the release compatibility set-up
-        /// </summary>
-        [Fact]
-        public void TestReleaseCompatibilitySet()
-        {
-            using (var connection = TempDatabaseConnection.Create(this.output).Result)
-            {
-                var activeRelease = new Release
-                                        {
-                    MinorVersion = 3,
-                    Name = "active",
-                    State = Release.EnState.Active,
-                    Configuration = new ReleaseConfiguration
-                                        {
-                                            NodeTemplates = new List<NodeTemplate>
-                                                                 {
-                                                                     new NodeTemplate { Id = 1, Code = "compatible", Configuration = "1", PackagesList = "p1; p2" },
-                                                                     new NodeTemplate { Id = 1, Code = "incompatible", Configuration = "1", PackagesList = "p2; p3" },
-                                                                 }
-                                        }
-                                        };
-
-            }
-        }
-
-        /// <summary>
         /// Tests the default user operations
         /// </summary>
         [Fact]
@@ -177,7 +150,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// Opens connection to the newly created database. Database is destroyed after connection is closed.
         /// </summary>
-        private class TempDatabaseConnection : IDisposable
+        internal class TempDatabaseConnection : IDisposable
         {
             /// <summary>
             /// The test output stream

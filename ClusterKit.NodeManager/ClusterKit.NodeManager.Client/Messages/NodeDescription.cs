@@ -17,9 +17,10 @@ namespace ClusterKit.NodeManager.Client.Messages
     using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Client.Converters;
     using ClusterKit.NodeManager.Client.ApiSurrogates;
-    using ClusterKit.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
+
+    using PackageDescription = ClusterKit.NodeManager.Client.ApiSurrogates.PackageDescription;
 
     /// <summary>
     /// Description of node configuration
@@ -64,8 +65,8 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// </summary>
         [DeclareField(
             "The list of descriptions of installed modules", 
-            Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
-        public List<PackageDescription> Modules { get; set; }
+            Converter = typeof(ArrayConverter<PackageDescription.Converter, PackageDescription>))]
+        public List<Launcher.Messages.PackageDescription> Modules { get; set; }
 
         /// <summary>
         /// Gets or sets node's address

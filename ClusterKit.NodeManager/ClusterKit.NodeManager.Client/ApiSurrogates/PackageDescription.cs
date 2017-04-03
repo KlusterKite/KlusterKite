@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PackageDescriptionSurrogate.cs" company="ClusterKit">
+// <copyright file="PackageDescription.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -13,20 +13,44 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Attributes;
-    using ClusterKit.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
 
+    using Newtonsoft.Json;
+
     /// <summary>
-    /// Represents the <see cref="PackageDescription"/> for public API
+    /// Represents the <see cref="Launcher.Messages.PackageDescription"/> for public API
     /// </summary>
     [ApiDescription(Description = "Short description of NuGet package", Name = "NugetPackage")]
-    public class PackageDescriptionSurrogate
+    public class PackageDescription
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageDescription"/> class.
+        /// </summary>
+        public PackageDescription()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageDescription"/> class.
+        /// </summary>
+        /// <param name="name">
+        /// The name.
+        /// </param>
+        /// <param name="version">
+        /// The version.
+        /// </param>
+        public PackageDescription(string name, string version)
+        {
+            this.Name = name;
+            this.Version = version;
+        }
+
         /// <summary>
         /// Gets the package id (name and version)
         /// </summary>
         [UsedImplicitly]
+        [JsonIgnore]
         [DeclareField(Description = "The package id (name and version)", IsKey = true, Access = EnAccessFlag.Queryable)]
         public string Id => $"{this.Name} {this.Version}";
 
@@ -48,24 +72,25 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
         /// Gets or sets the list of available versions
         /// </summary>
         [UsedImplicitly]
+        [JsonIgnore]
         [DeclareField(Description = "The list of available versions")]
         public List<string> AvailableVersions { get; set; }
 
         /// <summary>
-        /// Converts <see cref="PackageDescription"/> to <see cref="AkkaAddressSurrogate"/>
+        /// Converts <see cref="Launcher.Messages.PackageDescription"/> to <see cref="AkkaAddressSurrogate"/>
         /// </summary>
-        public class Converter : IValueConverter<PackageDescriptionSurrogate>
+        public class Converter : IValueConverter<PackageDescription>
         {
             /// <inheritdoc />
-            public PackageDescriptionSurrogate Convert(object source)
+            public PackageDescription Convert(object source)
             {
-                var packageDescription = source as PackageDescription;
+                var packageDescription = source as Launcher.Messages.PackageDescription;
                 if (packageDescription == null)
                 {
                     return null;
                 }
 
-                return new PackageDescriptionSurrogate
+                return new PackageDescription
                 {
                     Name = packageDescription.Id,
                     Version = packageDescription.Version

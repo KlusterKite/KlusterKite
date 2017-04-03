@@ -138,5 +138,59 @@ namespace ClusterKit.NodeManager.Client.ORM
         {
             return this.Id;
         }
+
+        /// <summary>
+        /// Clones current object
+        /// </summary>
+        /// <param name="configuration">
+        /// The configuration replacement, if set
+        /// </param>
+        /// <param name="code">
+        /// The code replacement, if set
+        /// </param>
+        /// <param name="containerTypesList">
+        /// The container types list replacement, if set
+        /// </param>
+        /// <param name="packagesList">
+        /// The packages list replacement, if set
+        /// </param>
+        /// <param name="id">
+        /// The id replacement, if set
+        /// </param>
+        /// <param name="maximumNeededInstances">
+        /// The maximum needed instances replacement, if set
+        /// </param>
+        /// <param name="minimumRequiredInstances">
+        /// The minimum required instances replacement, if set
+        /// </param>
+        /// <param name="priority">
+        /// The priority replacement, if set
+        /// </param>
+        /// <returns>
+        /// The new instance of <see cref="NodeTemplate"/>.
+        /// </returns>
+        public NodeTemplate Clone(
+            string configuration = null,
+            string code = null,
+            string containerTypesList = null,
+            string packagesList = null,
+            int? id = null,
+            int? maximumNeededInstances = null,
+            int? minimumRequiredInstances = null,
+            int? priority = null)
+        {
+            return new NodeTemplate
+                       {
+                           Configuration = configuration ?? this.Configuration,
+                           Code = code ?? this.Code,
+                           ContainerTypesList = containerTypesList ?? this.ContainerTypesList,
+                           PackagesList = packagesList ?? this.PackagesList,
+                           Id = id ?? this.Id,
+                           MaximumNeededInstances = maximumNeededInstances ?? this.MaximumNeededInstances,
+                           MinimumRequiredInstances =
+                               minimumRequiredInstances ?? this.MinimumRequiredInstances,
+                           Priority = priority ?? this.Priority
+                       };
+        }
     }
 }

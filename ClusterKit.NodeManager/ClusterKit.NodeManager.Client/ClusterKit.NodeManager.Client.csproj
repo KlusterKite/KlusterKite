@@ -177,7 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiSurrogates\AkkaAddressSurrogate.cs" />
-    <Compile Include="ApiSurrogates\PackageDescriptionSurrogate.cs" />
+    <Compile Include="ApiSurrogates\PackageDescription.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -201,6 +201,7 @@
     <Compile Include="ORM\ReleaseConfiguration.cs" />
     <Compile Include="ORM\Role.cs" />
     <Compile Include="ORM\SeedAddress.cs" />
+    <Compile Include="ORM\Template.cs" />
     <Compile Include="ORM\User.cs" />
     <Compile Include="ORM\UserDescription.cs" />
     <Compile Include="Privileges.cs" />

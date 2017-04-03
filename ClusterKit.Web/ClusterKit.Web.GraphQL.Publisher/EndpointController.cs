@@ -23,8 +23,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
     using global::GraphQL;
     using global::GraphQL.Http;
-    using global::GraphQL.Validation.Complexity;
-
+    
     using JetBrains.Annotations;
 
     using Newtonsoft.Json.Linq;
@@ -51,11 +50,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
         private readonly IDocumentWriter writer;
 
         /// <summary>
-        /// The graphQL complexity configuration
-        /// </summary>
-        private ComplexityConfiguration complexityConfiguration;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="EndpointController"/> class.
         /// </summary>
         /// <param name="schemaProvider">
@@ -79,6 +73,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             this.schemaProvider = schemaProvider;
             this.executer = executer;
             this.writer = writer;
+            /*
             this.complexityConfiguration = new ComplexityConfiguration
                                                {
                                                    MaxDepth =
@@ -89,6 +84,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                                        config.GetInt(
                                                            "ClusterKit.Web.GraphQL.MaxComplexity")
                                                };
+                                               */
         }
 
         /// <summary>

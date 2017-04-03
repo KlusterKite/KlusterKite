@@ -23,14 +23,14 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.Core;
     using ClusterKit.Data.CRUD;
     using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
+
+    using PackageDescription = ClusterKit.NodeManager.Client.ApiSurrogates.PackageDescription;
 
     /// <summary>
     /// The node manager api
@@ -104,15 +104,15 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>The list of available packages</returns>
         [UsedImplicitly]
         [DeclareField("The list of available packages from local cluster repository",
-            Converter = typeof(ArrayConverter<PackageDescriptionSurrogate.Converter, PackageDescriptionSurrogate>))]
+            Converter = typeof(ArrayConverter<PackageDescription.Converter, PackageDescription>))]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
-        public Task<List<PackageDescription>> GetPackages()
+        public Task<List<Launcher.Messages.PackageDescription>> GetPackages()
         {
             return
                 this.actorSystem.ActorSelection(GetManagerActorProxyPath())
-                    .Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
+                    .Ask<List<Launcher.Messages.PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
         }
 
         /// <summary>

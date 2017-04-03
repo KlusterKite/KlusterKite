@@ -48,7 +48,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             context.Templates.AddRange(this.GetDefaultTemplates());
             var nugetFeeds = new List<NugetFeed>();
             List<string> seedsFromConfig = new List<string>();
-            List<PackageDescriptionSurrogate> initialPackages = new List<PackageDescriptionSurrogate>();
+            List<PackageDescription> initialPackages = new List<PackageDescription>();
 
             try
             {
@@ -56,15 +56,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 var nugetUrl = system.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
                 var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
 
-
                 if (nugetRepository != null)
                 {
                     initialPackages =
                         nugetRepository.Search(string.Empty, true)
                             .Where(p => p.IsLatestVersion)
                             .ToList()
-                            .Select(
-                                p => new PackageDescriptionSurrogate { Name = p.Id, Version = p.Version.ToString() })
+                            .Select(p => new PackageDescription { Name = p.Id, Version = p.Version.ToString() })
                             .ToList();
                 }
 
@@ -75,7 +73,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                         .ToList();
 
                 var config = system.Settings.Config.GetConfig("ClusterKit.NodeManager.DefaultNugetFeeds");
-
 
                 if (config != null)
                 {
@@ -105,13 +102,28 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             {
             }
 
-            int templateId = 0;
+            var defaultTemplates =
+                this.GetDefaultTemplates()
+                    .Select(
+                        t =>
+                            new Template
+                                {
+                                    Name = t.Name,
+                                    Code = t.Code,
+                                    Configuration = t.Configuration,
+                                    ContainerTypes = t.ContainerTypes,
+                                    MinimumRequiredInstances = t.MinimumRequiredInstances,
+                                    MaximumNeededInstances = t.MinimumRequiredInstances,
+                                    Priority = t.Priority,
+                                    PackageRequirements =
+                                        t.Packages.Select(p => new Template.PackageRequirement(p, null))
+                                            .ToList()
+                                })
+                    .ToList();
 
-            var defaultTemplates = this.GetDefaultTemplates().ToList();
-            defaultTemplates.ForEach(t => t.Id = templateId++);
             var configuration = new ReleaseConfiguration
                                     {
-                                        NodeTemplates = new List<NodeTemplate>(defaultTemplates),
+                                        NodeTemplates = new List<Template>(defaultTemplates),
                                         Packages = initialPackages,
                                         SeedAddresses = seedsFromConfig,
                                         NugetFeeds = nugetFeeds
