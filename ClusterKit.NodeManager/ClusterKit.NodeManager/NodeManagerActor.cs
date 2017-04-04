@@ -247,21 +247,20 @@ namespace ClusterKit.NodeManager
         {
             if (message == null)
             {
-                // ReSharper disable FormatStringProblem
-                Context.GetLogger().Warning("{Type}: received null message", this.GetType().Name);
-
-                // ReSharper restore FormatStringProblem
+                Context.GetLogger()
+                    .Warning(
+                        "{Type}: received null message from {ActorAddress}",
+                        this.GetType().Name,
+                        this.Sender.Path.ToString());
             }
             else
             {
-                // ReSharper disable FormatStringProblem
                 Context.GetLogger()
                     .Warning(
-                        "{Type}: received unsupported message of type {MessageTypeName}",
+                        "{Type}: received unsupported message of type {MessageTypeName} from {ActorAddress}",
                         this.GetType().Name,
-                        message.GetType().Name);
-
-                // ReSharper restore FormatStringProblem
+                        message.GetType().Name,
+                        this.Sender.Path.ToString());
             }
 
             base.Unhandled(message);
@@ -450,13 +449,7 @@ namespace ClusterKit.NodeManager
                     "workers");
 
             this.Become(this.Start);
-
-            // ReSharper disable FormatStringProblem
-            // ReSharper disable RedundantToStringCall
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
-
-            // ReSharper restore RedundantToStringCall
-            // ReSharper restore FormatStringProblem
             this.Stash.UnstashAll();
         }
 
@@ -525,10 +518,7 @@ namespace ClusterKit.NodeManager
             // this could never happen, but code analyzers can't understand it
             if (selectedTemplate == null)
             {
-                // ReSharper disable FormatStringProblem
                 Context.GetLogger().Warning("{Type}: Failed to select template with dice", this.GetType().Name);
-
-                // ReSharper restore FormatStringProblem
                 selectedTemplate = templates.Last();
             }
 
@@ -1160,6 +1150,7 @@ namespace ClusterKit.NodeManager
 
             this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
             this.Receive<CrudActionMessage<Release, int>>(m => this.workers.Forward(m));
+            this.Receive<ReleaseCheckRequest>(m => this.workers.Forward(m));
             this.Receive<ReleaseSetReadyRequest>(m => this.workers.Forward(m));
             this.Receive<ReleaseSetObsoleteRequest>(m => this.workers.Forward(m));
             this.Receive<ReleaseSetStableRequest>(m => this.workers.Forward(m));
@@ -1290,6 +1281,7 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CrudActionMessage<Role, Guid>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
 
+                this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
                 this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
                 this.ReceiveAsync<ReleaseSetObsoleteRequest>(this.OnReleaseSetObsolete);
                 this.ReceiveAsync<ReleaseSetStableRequest>(this.OnReleaseSetStable);
@@ -1442,6 +1434,12 @@ namespace ClusterKit.NodeManager
                         release.State = Release.EnState.Obsolete;
                         ds.SaveChanges();
                         this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                        SecurityLog.CreateRecord(
+                            SecurityLog.EnType.OperationGranted,
+                            EnSeverity.Crucial,
+                            request.Context,
+                            "Release {ReleaseId} marked as obsolete",
+                            release.Id);
                     }
                 }
                 catch (Exception exception)
@@ -1486,9 +1484,85 @@ namespace ClusterKit.NodeManager
                             return;
                         }
 
+                        var nugetUrl = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
+                        var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
+                        var supportedFrameworks = Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                        var errors = release.CheckAll(ds, nugetRepository, supportedFrameworks.ToList()).ToArray();
+                        if (errors.Length > 0)
+                        {
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new MutationException(errors), 
+                                    null));
+                            return;
+                        }
+
                         release.State = Release.EnState.Ready;
-                        release.CompatibleTemplates = release.GetCompatibleTemplates(ds).ToList();
                         ds.SaveChanges();
+                        this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                        SecurityLog.CreateRecord(
+                            SecurityLog.EnType.OperationGranted,
+                            EnSeverity.Crucial,
+                            request.Context,
+                            "Release {ReleaseId} marked as Ready",
+                            release.Id);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                }
+            }
+
+            /// <summary>
+            /// Process the <see cref="ReleaseSetReadyRequest"/>
+            /// </summary>
+            /// <param name="request">The request</param>
+            /// <returns>The async task</returns>
+            private async Task OnReleaseCheck(ReleaseCheckRequest request)
+            {
+                try
+                {
+                    using (var ds = await this.GetContext())
+                    {
+                        var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                        if (release == null)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                            return;
+                        }
+
+                        if (release.State != Release.EnState.Draft)
+                        {
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new Exception("Only draft releases can be made ready"),
+                                    null));
+                            return;
+                        }
+
+                        if (ds.Releases.Any(r => r.State == Release.EnState.Active))
+                        {
+                            this.Sender.Tell(
+                                CrudActionResponse<Release>.Error(
+                                    new Exception(
+                                        "There is an already defined ready release. Please remove the previous one."),
+                                    null));
+                            return;
+                        }
+
+                        var nugetUrl =
+                            Context.System.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
+                        var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
+                        var supportedFrameworks =
+                            Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                        var errors = release.CheckAll(ds, nugetRepository, supportedFrameworks.ToList()).ToArray();
+                        if (errors.Length > 0)
+                        {
+                            this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors), null));
+                            return;
+                        }
+
                         this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
                     }
                 }
@@ -1571,17 +1645,35 @@ namespace ClusterKit.NodeManager
                             return;
                         }
 
+                        var now = DateTimeOffset.Now;
                         var currentActiveRelease = ds.Releases.FirstOrDefault(r => r.State == Release.EnState.Active);
                         if (currentActiveRelease != null)
                         {
                             currentActiveRelease.State = request.CurrentReleaseState != Release.EnState.Active
                                                              ? request.CurrentReleaseState
                                                              : Release.EnState.Obsolete;
+                            currentActiveRelease.Finished = now;
                         }
 
                         release.State = Release.EnState.Active;
+                        if (release.Started == null)
+                        {
+                            release.Started = now;
+                        }
+
+                        release.Finished = null;
                         ds.SaveChanges();
                         this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                        const string SecurityMessage = "Cluster upgrade with release {ReleaseId} initiated. "
+                                                       + "Previous release {PreviousReleaseId} marked as {PreviousReleaseState}";
+                        SecurityLog.CreateRecord(
+                            SecurityLog.EnType.OperationGranted, 
+                            EnSeverity.Crucial, 
+                            request.Context,
+                            SecurityMessage,
+                            release.Id,
+                            currentActiveRelease?.Id,
+                            request.CurrentReleaseState.ToString());
                     }
                 }
                 catch (Exception exception)

@@ -15,11 +15,6 @@ namespace ClusterKit.NodeManager.Launcher.Messages
     public class PackageDescription
     {
         /// <summary>
-        /// Gets or sets build time of assembly (if specified)
-        /// </summary>
-        public string BuildDate { get; set; }
-
-        /// <summary>
         /// Gets or sets the package Id
         /// </summary>
         public string Id { get; set; }
@@ -78,8 +73,7 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         {
             unchecked
             {
-                var hashCode = this.BuildDate?.GetHashCode() ?? 0;
-                hashCode = (hashCode * 397) ^ (this.Id?.GetHashCode() ?? 0);
+                var hashCode = this.Id?.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ (this.Version?.GetHashCode() ?? 0);
                 return hashCode;
             }
@@ -90,7 +84,7 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         /// <param name="other">The object to compare with the current object. </param>
         private bool Equals(PackageDescription other)
         {
-            return string.Equals(this.BuildDate, other.BuildDate) && string.Equals(this.Id, other.Id) && string.Equals(this.Version, other.Version);
+            return string.Equals(this.Id, other.Id) && string.Equals(this.Version, other.Version);
         }
     }
 }

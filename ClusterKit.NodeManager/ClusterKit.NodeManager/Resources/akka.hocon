@@ -3,23 +3,27 @@
 
 		NodeManager {
 			PackageRepository = "http://nuget/"
+			SupportedFrameworks = [
+				".NET Framework,Version=v4.5"
+			]
+
 			//ConfigurationDatabaseConnectionString = ""
-                        ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
-                        FullClusterWaitTimeout = 60s // In case of cluster is full, timespan that new node candidate will repeat join request
-                        NewNodeJoinTimeout = 30s // After configuration request, it is assumed that new node of template shuld be up soon, and this is taken into account on subsequient configuration templates. This is timeout, after it it is supposed that something have gone wrong and that request is obsolete.
-                        NewNodeRequestDescriptionNotificationTimeout = 10s
-                        NewNodeRequestDescriptionNotificationMaxRequests = 10
-			
-                        DefaultNugetFeeds {
-                                //privateFeed {
-                                //        address = "http://private-nuget-server/feed/"
-                                //        type = private
-                                //}
-                                //publicFeed {
-                                //        address = "http://public-nuget-server/feed/"
-                                //        type = public
-                                //}
-                        }
+            ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
+            FullClusterWaitTimeout = 60s // In case of cluster is full, timespan that new node candidate will repeat join request
+            NewNodeJoinTimeout = 30s // After configuration request, it is assumed that new node of template shuld be up soon, and this is taken into account on subsequient configuration templates. This is timeout, after it it is supposed that something have gone wrong and that request is obsolete.
+            NewNodeRequestDescriptionNotificationTimeout = 10s
+            NewNodeRequestDescriptionNotificationMaxRequests = 10
+
+            DefaultNugetFeeds {
+                    //privateFeed {
+                    //        address = "http://private-nuget-server/feed/"
+                    //        type = private
+                    //}
+                    //publicFeed {
+                    //        address = "http://public-nuget-server/feed/"
+                    //        type = public
+                    //}
+            }
 
 		}
 

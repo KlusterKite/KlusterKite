@@ -87,8 +87,15 @@ namespace ClusterKit.NodeManager.Client.Messages
         public string NodeTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the installed release id
+        /// </summary>
+        [DeclareField("the installed release id")]
+        public int ReleaseId { get; set; }
+
+        /// <summary>
         /// Gets or sets current node template version
         /// </summary>
+        [Obsolete]
         [DeclareField("current node template version")]
         public int NodeTemplateVersion { get; set; }
 

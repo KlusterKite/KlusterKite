@@ -13,6 +13,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Linq;
 
     using ClusterKit.API.Client.Attributes;
+    using ClusterKit.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
 
@@ -85,6 +86,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         [UsedImplicitly]
         [DeclareField("The list of package requirements")]
         public List<PackageRequirement> PackageRequirements { get; set; } = new List<PackageRequirement>();
+
+        /// <summary>
+        /// Gets or sets the list of packages to install for current template
+        /// </summary>
+        public Dictionary<string, List<PackageDescription>> PackagesToInstall { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether no other nodes from previous releases are compatible

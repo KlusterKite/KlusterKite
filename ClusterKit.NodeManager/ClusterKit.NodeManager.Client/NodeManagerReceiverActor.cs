@@ -58,6 +58,7 @@ namespace ClusterKit.NodeManager.Client
                     NodeTemplate = config.GetString("ClusterKit.NodeManager.NodeTemplate"),
                     ContainerType = config.GetString("ClusterKit.NodeManager.ContainerType"),
                     NodeTemplateVersion = config.GetInt("ClusterKit.NodeManager.NodeTemplateVersion"),
+                    ReleaseId = config.GetInt("ClusterKit.NodeManager.ReleaseId"),
                     NodeId = nodeId,
                     StartTimeStamp = this.startTimeStamp,
                     Roles = config.GetStringList("akka.cluster.roles")?.ToList() ?? new List<string>(),
@@ -68,9 +69,7 @@ namespace ClusterKit.NodeManager.Client
                                         new PackageDescription
                                         {
                                             Id = a.GetName().Name,
-                                            Version = a.GetName().Version.ToString(),
-                                            BuildDate = a.GetCustomAttributes<AssemblyMetadataAttribute>()
-                                                        .FirstOrDefault(attr => attr.Key == "BuildDate")?.Value
+                                            Version = a.GetName().Version.ToString()
                                         })
                                 .OrderBy(a => a.Id)
                                 .ToList()

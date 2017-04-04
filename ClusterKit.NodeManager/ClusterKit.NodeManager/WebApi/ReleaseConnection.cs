@@ -85,6 +85,34 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Checks the draft release if it can be moved to ready state.
+        /// </summary>
+        /// <param name="id">The id of release draft</param>
+        /// <returns>The mutation result</returns>
+        [DeclareMutation("checks the draft releas if it can be moved to ready state.")]
+        [UsedImplicitly]
+        [RequireSession]
+        [RequireUser]
+        [RequireUserPrivilege(Privileges.ReleaseFinish)]
+        public async Task<MutationResult<Release>> Check(int id)
+        {
+            try
+            {
+                var response =
+                    await this.System.ActorSelection(this.DataActorPath)
+                        .Ask<CrudActionResponse<Release>>(
+                            new ReleaseCheckRequest { Id = id, Context = this.Context },
+                            this.Timeout);
+                return CreateResponse(response);
+            }
+            catch (Exception exception)
+            {
+                this.System.Log.Error(exception, "{Type}: error on check", this.GetType().Name);
+                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
+            }
+        }
+
+        /// <summary>
         /// Mutation that moves <see cref="Release.State"/> from <see cref="Release.EnState.Draft"/> to <see cref="Release.EnState.Ready"/>
         /// </summary>
         /// <param name="id">The id of release draft</param>

@@ -375,6 +375,8 @@
     <Compile Include="DataFactoryTests.cs" />
     <Compile Include="NodeManagerActorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReleaseCheckTests.cs" />
+    <Compile Include="ReleaseCheckTestsBase.cs" />
     <Compile Include="ReleaseTests.cs" />
   </ItemGroup>
   <ItemGroup>
