@@ -5045,6 +5045,18 @@
               "deprecationReason": null
             },
             {
+              "name": "releaseId",
+              "description": "the installed release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "nodeTemplateVersion",
               "description": "current node template version",
               "args": [],
@@ -5702,6 +5714,66 @@
               "defaultValue": null
             },
             {
+              "name": "releaseId",
+              "description": "releaseId exactly equals to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_not",
+              "description": "releaseId not equals to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_lt",
+              "description": "releaseId is less then the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_lte",
+              "description": "releaseId is less then or equal to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_gt",
+              "description": "releaseId is greater then the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_gte",
+              "description": "releaseId is greater then or equal to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "nodeTemplateVersion",
               "description": "nodeTemplateVersion exactly equals to the parameter, nodeTemplateVersion: current node template version",
               "type": {
@@ -5902,6 +5974,18 @@
             },
             {
               "name": "nodeTemplate_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId_desc",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -18044,6 +18128,18 @@
               "deprecationReason": null
             },
             {
+              "name": "releaseId",
+              "description": "the installed release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "nodeTemplateVersion",
               "description": "current node template version",
               "args": [],
@@ -21198,6 +21294,29 @@
               "deprecationReason": null
             },
             {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_check",
+              "description": "checks the draft releas if it can be moved to ready state.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Release_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_setReady",
               "description": "moves release state from \"draft\" to \"ready\"",
               "args": [
@@ -22743,6 +22862,37 @@
             {
               "name": "id",
               "description": "The id of release that will be applied",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": null,
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",

@@ -32,7 +32,7 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
   };
 
   arrayToString(data) {
-    return this.replaceAll(data.join(), ',', '\n');
+    return data && this.replaceAll(data.join(), ',', '\n');
   }
 
   stringToArray(data) {
@@ -48,7 +48,6 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     model.containerTypes = this.stringToArray(model.containerTypes);
     model.maximumNeededInstances = Number.parseInt(model.maximumNeededInstances, 10);
     model.minimumRequiredInstances = model.minimumRequiredInstances ? Number.parseInt(model.minimumRequiredInstances, 10) : 0;
-    model.version = model.version ? Number.parseInt(model.version, 10) : 0;
     model.priority = model.priority ? Number.parseInt(model.priority, 10) : 0;
     this.props.onSubmit(model);
   }
@@ -71,10 +70,8 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
         <Form onSubmit={this.submit} onCancel={this.props.onCancel} onDelete={this.props.onDelete ? this.props.onDelete : null} className="form-horizontal form-margin" saving={this.props.saving} saved={this.props.saved} saveError={this.props.saveError}>
           <fieldset>
             <Input name="__id" value={initialValues && initialValues.__id} type="hidden" />
-            <Input name="version" value={(initialValues && initialValues.version) || ""} type="hidden" />
             <Input name="code" label="Code" value={(initialValues && initialValues.code) || ""} required />
             <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />
-            <Input name="version" label="Version" value={(initialValues && initialValues.version) || ""} validations="isNumeric" validationError="Must be numeric" elementWrapperClassName="col-sm-2" />
             <Input
               name="minimumRequiredInstances"
               label="Minimum Required Instances"

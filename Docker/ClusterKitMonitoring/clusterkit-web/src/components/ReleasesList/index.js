@@ -40,7 +40,7 @@ export class ReleasesList extends React.Component {
             return (
               <tr key={`${node.nodeId}`}>
                 <td>
-                  <Link to={`/clusterkit/Release/${encodeURIComponent(node.id)}`}>
+                  <Link to={`/clusterkit/Releases/${encodeURIComponent(node.id)}`}>
                     {node.name}
                   </Link>
                 </td>

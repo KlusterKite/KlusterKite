@@ -83,6 +83,11 @@ class TemplatesList extends React.Component {
               <tr key={item.node.id}>
                 <td>
                   {this.props.getNodeTemplatePrivilege &&
+                    <Link to={`/clusterkit/Templates/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
+                      {item.node.code}
+                    </Link>
+                  }
+                  {false && this.props.getNodeTemplatePrivilege &&
                     <a onClick={() => this.showEditForm(item.node)} className="pointer">
                       {item.node.code}
                     </a>

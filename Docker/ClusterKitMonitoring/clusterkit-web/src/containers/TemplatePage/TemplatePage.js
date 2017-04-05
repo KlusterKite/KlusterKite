@@ -38,61 +38,64 @@ class TemplatePage extends React.Component {
   }
 
   _addNode = (model) => {
-    Relay.Store.commitUpdate(
-      new CreateTemplateMutation(
-        {
-          code: model.code,
-          configuration: model.configuration,
-          containerTypes: model.containerTypes,
-          maximumNeededInstances: model.maximumNeededInstances,
-          minimumRequiredInstances: model.minimumRequiredInstances,
-          name: model.name,
-          packages: model.packages,
-          priority: model.priority,
-          version: model.version
-        }),
-      {
-        onSuccess: () => browserHistory.push('/clusterkit/Templates'),
-        onFailure: (transaction) => console.log(transaction),
-      },
-    )
+    console.log('add', model);
+    // Relay.Store.commitUpdate(
+    //   new CreateTemplateMutation(
+    //     {
+    //       code: model.code,
+    //       configuration: model.configuration,
+    //       containerTypes: model.containerTypes,
+    //       maximumNeededInstances: model.maximumNeededInstances,
+    //       minimumRequiredInstances: model.minimumRequiredInstances,
+    //       name: model.name,
+    //       packages: model.packages,
+    //       priority: model.priority,
+    //       version: model.version
+    //     }),
+    //   {
+    //     onSuccess: () => browserHistory.push('/clusterkit/Templates'),
+    //     onFailure: (transaction) => console.log(transaction),
+    //   },
+    // )
   }
 
   _editNode = (model) => {
-    Relay.Store.commitUpdate(
-      new UpdateTemplateMutation(
-        {
-          nodeId: this.props.params.id,
-          __id: model.__id,
-          code: model.code,
-          configuration: model.configuration,
-          containerTypes: model.containerTypes,
-          maximumNeededInstances: model.maximumNeededInstances,
-          minimumRequiredInstances: model.minimumRequiredInstances,
-          name: model.name,
-          packages: model.packages,
-          priority: model.priority,
-          version: model.version
-        }),
-      {
-        onSuccess: () => browserHistory.push('/clusterkit/Templates'),
-        onFailure: (transaction) => console.log(transaction),
-      },
-    )
+    console.log('edit', model);
+    // Relay.Store.commitUpdate(
+    //   new UpdateTemplateMutation(
+    //     {
+    //       nodeId: this.props.params.id,
+    //       __id: model.__id,
+    //       code: model.code,
+    //       configuration: model.configuration,
+    //       containerTypes: model.containerTypes,
+    //       maximumNeededInstances: model.maximumNeededInstances,
+    //       minimumRequiredInstances: model.minimumRequiredInstances,
+    //       name: model.name,
+    //       packages: model.packages,
+    //       priority: model.priority,
+    //       version: model.version
+    //     }),
+    //   {
+    //     onSuccess: () => browserHistory.push('/clusterkit/Templates'),
+    //     onFailure: (transaction) => console.log(transaction),
+    //   },
+    // )
   }
 
   _onDelete = () => {
-    Relay.Store.commitUpdate(
-      new DeleteTemplateMutation({deletedId: this.props.api.__node.__id}),
-      {
-        onSuccess: () => this.context.router.replace('/clusterkit/Templates'),
-        onFailure: (transaction) => console.log(transaction),
-      },
-    )
+    console.log('delete', this.props.api.template.id);
+    // Relay.Store.commitUpdate(
+    //   new DeleteTemplateMutation({deletedId: this.props.api.template.__id}),
+    //   {
+    //     onSuccess: () => this.context.router.replace('/clusterkit/Templates'),
+    //     onFailure: (transaction) => console.log(transaction),
+    //   },
+    // )
   }
 
   render () {
-    const model = this.props.api.__node;
+    const model = this.props.api.template;
     return (
       <div>
         <TemplateForm onSubmit={this._onSubmit} onDelete={this._onDelete} initialValues={model} />
@@ -116,18 +119,24 @@ export default Relay.createContainer(
         fragment on IClusterKitNodeApi {
           id
           __typename
-          __node(id: $id) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_NodeTemplate {
-              __id
+          template:__node(id: $id) @include( if: $nodeExists ) {
+            ...on IClusterKitNodeApi_Template {
+              id
               code
               configuration
               containerTypes
               maximumNeededInstances
               minimumRequiredInstances
               name
-              packages
+              packageRequirements {
+                edges {
+                  node {
+                    __id
+                    specificVersion
+                  }
+                }
+              },
               priority
-              version
             }
           }
         }

@@ -18,7 +18,10 @@ storiesOf('Form')
     return <Submit canSubmit={true} buttonText="Place an order" />;
   })
   .add('submit saving', () => {
-    return <Submit canSubmit={true} saving={true} />;
+    return <Submit canSubmit={true} saving={true} onDelete={action('delete')} />;
+  })
+  .add('submit deleting', () => {
+    return <Submit canSubmit={true} deleting={true} onDelete={action('delete')} />;
   })
   .add('submit saved', () => {
     return <Submit canSubmit={true} saved={true} />;

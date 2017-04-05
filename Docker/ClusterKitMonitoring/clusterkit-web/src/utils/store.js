@@ -10,7 +10,6 @@ import Authorization from './auth-middleware';
 let instance = null;
 
 const refresh = () => {
-  console.log(process.env.REACT_APP_GRAPHQL_URL);
   instance = new RelayNetworkLayer([
     urlMiddleware({
       url: (req) => process.env.REACT_APP_GRAPHQL_URL,

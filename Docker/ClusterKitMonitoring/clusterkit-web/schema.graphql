@@ -649,6 +649,11 @@ input ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update_Input {
   clientMutationId: String
 }
 
+input ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input {
+  id: Int
+  clientMutationId: String
+}
+
 input ClusterKitNodeApi_clusterKitNodesApi_releases_create_Input {
   # The object's data
   newNode: ClusterKitNodeApi_Release_Input
@@ -1250,6 +1255,9 @@ type ClusterKitNodeApi_NodeDescription implements IClusterKitNodeApi_NodeDescrip
   # node template code
   nodeTemplate: String
 
+  # the installed release id
+  releaseId: Int
+
   # current node template version
   nodeTemplateVersion: Int
 
@@ -1436,6 +1444,24 @@ input ClusterKitNodeApi_NodeDescription_Filter_Input {
   # nodeTemplate lowercased doesn't end with the parameter value, nodeTemplate: node template code
   nodeTemplate_l_not_ends_with: String
 
+  # releaseId exactly equals to the parameter, releaseId: the installed release id
+  releaseId: Int
+
+  # releaseId not equals to the parameter, releaseId: the installed release id
+  releaseId_not: Int
+
+  # releaseId is less then the parameter, releaseId: the installed release id
+  releaseId_lt: Int
+
+  # releaseId is less then or equal to the parameter, releaseId: the installed release id
+  releaseId_lte: Int
+
+  # releaseId is greater then the parameter, releaseId: the installed release id
+  releaseId_gt: Int
+
+  # releaseId is greater then or equal to the parameter, releaseId: the installed release id
+  releaseId_gte: Int
+
   # nodeTemplateVersion exactly equals to the parameter, nodeTemplateVersion: current node template version
   nodeTemplateVersion: Int
 
@@ -1486,6 +1512,8 @@ enum ClusterKitNodeApi_NodeDescription_Sort {
   nodeId_desc
   nodeTemplate_asc
   nodeTemplate_desc
+  releaseId_asc
+  releaseId_desc
   nodeTemplateVersion_asc
   nodeTemplateVersion_desc
   startTimeStamp_asc
@@ -4611,6 +4639,9 @@ interface IClusterKitNodeApi_NodeDescription {
   # node template code
   nodeTemplate: String
 
+  # the installed release id
+  releaseId: Int
+
   # current node template version
   nodeTemplateVersion: Int
 
@@ -5152,6 +5183,9 @@ type Mutations {
 
   # Initiates cluster upgrade procedure. The previous active release will be marked as failed
   ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster(input: ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster_Input): ClusterKitNodeApi_Release_NodeMutationPayload
+
+  # checks the draft releas if it can be moved to ready state.
+  ClusterKitNodeApi_clusterKitNodesApi_releases_check(input: ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
   # moves release state from "draft" to "ready"
   ClusterKitNodeApi_clusterKitNodesApi_releases_setReady(input: ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input): ClusterKitNodeApi_Release_NodeMutationPayload

@@ -10,6 +10,7 @@ export default class Submit extends React.Component { // eslint-disable-line rea
     buttonText: React.PropTypes.string,
     savedText: React.PropTypes.string,
     saving: React.PropTypes.bool,
+    deleting: React.PropTypes.bool,
     saved: React.PropTypes.bool,
     saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
     saveError: React.PropTypes.string,
@@ -24,6 +25,11 @@ export default class Submit extends React.Component { // eslint-disable-line rea
       saveClassName += ' fa-spin';
     }
 
+    let deleteClassName = '';
+    if (this.props.deleting) {
+      deleteClassName += ' fa-spin';
+    }
+
     let text = 'Save';
     if (this.props.buttonText) {
       text = this.props.buttonText;
@@ -35,7 +41,7 @@ export default class Submit extends React.Component { // eslint-disable-line rea
     }
 
     let disabled = !this.props.canSubmit;
-    if (this.props.disabled || this.props.saving){
+    if (this.props.disabled || this.props.saving || this.props.deleting){
       disabled = true;
     }
 
@@ -83,7 +89,7 @@ export default class Submit extends React.Component { // eslint-disable-line rea
 
           {this.props.onDelete &&
             <button className="btn btn-danger btn-margined" disabled={disabled} type="button" onClick={this.props.onDelete}>
-              <Icon name="remove" className={saveClassName}/> {' '} {deleteText}
+              <Icon name="remove" className={deleteClassName}/> {' '} {deleteText}
             </button>
           }
         </Row>
