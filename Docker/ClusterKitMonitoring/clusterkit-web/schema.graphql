@@ -667,6 +667,11 @@ input ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster_Input {
   clientMutationId: String
 }
 
+input ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete_Input {
+  id: Int
+  clientMutationId: String
+}
+
 input ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input {
   id: Int
   clientMutationId: String
@@ -703,12 +708,24 @@ input ClusterKitNodeApi_clusterKitNodesApi_roles_create_Input {
   clientMutationId: String
 }
 
+input ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input {
+  userUid: Uid
+  roleUid: Uid
+  clientMutationId: String
+}
+
 input ClusterKitNodeApi_clusterKitNodesApi_roles_update_Input {
   # The object's id
   id: Uid
 
   # The object's data
   newNode: ClusterKitNodeApi_Role_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser_Input {
+  userUid: Uid
+  roleUid: Uid
   clientMutationId: String
 }
 
@@ -744,12 +761,30 @@ input ClusterKitNodeApi_clusterKitNodesApi_users_create_Input {
   clientMutationId: String
 }
 
+input ClusterKitNodeApi_clusterKitNodesApi_users_grantRole_Input {
+  userUid: Uid
+  roleUid: Uid
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword_Input {
+  id: Uid
+  password: String
+  clientMutationId: String
+}
+
 input ClusterKitNodeApi_clusterKitNodesApi_users_update_Input {
   # The object's id
   id: Uid
 
   # The object's data
   newNode: ClusterKitNodeApi_User_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole_Input {
+  userUid: Uid
+  roleUid: Uid
   clientMutationId: String
 }
 
@@ -770,6 +805,181 @@ type ClusterKitNodeApi_ClusterKitUserDescription implements IClusterKitNodeApi_C
   # The user login
   login: String
   id: ID
+}
+
+# The compatible node template
+type ClusterKitNodeApi_CompatibleTemplate implements IClusterKitNodeApi_CompatibleTemplate, Node {
+  # the relation id
+  __id: Int
+
+  # the compatible release id
+  compatibleReleaseId: Int
+
+  # the parent release id
+  releaseId: Int
+
+  # the template code
+  templateCode: String
+
+  # the compatible release
+  compatibleRelease: ClusterKitNodeApi_Release
+
+  # the parent release
+  release: ClusterKitNodeApi_Release
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_CompatibleTemplate
+#  The compatible node template
+type ClusterKitNodeApi_CompatibleTemplate_Connection implements IClusterKitNodeApi_CompatibleTemplate_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_CompatibleTemplate_Edge]
+}
+
+# The ClusterKitNodeApi_CompatibleTemplate in a connected list
+#  The compatible node template
+type ClusterKitNodeApi_CompatibleTemplate_Edge implements IClusterKitNodeApi_CompatibleTemplate_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # The compatible node template
+  node: ClusterKitNodeApi_CompatibleTemplate
+}
+
+input ClusterKitNodeApi_CompatibleTemplate_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_CompatibleTemplate_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_CompatibleTemplate_Filter_Input
+
+  # id exactly equals to the parameter, id: the relation id
+  id: Int
+
+  # id not equals to the parameter, id: the relation id
+  id_not: Int
+
+  # id is less then the parameter, id: the relation id
+  id_lt: Int
+
+  # id is less then or equal to the parameter, id: the relation id
+  id_lte: Int
+
+  # id is greater then the parameter, id: the relation id
+  id_gt: Int
+
+  # id is greater then or equal to the parameter, id: the relation id
+  id_gte: Int
+
+  # compatibleReleaseId exactly equals to the parameter, compatibleReleaseId: the compatible release id
+  compatibleReleaseId: Int
+
+  # compatibleReleaseId not equals to the parameter, compatibleReleaseId: the compatible release id
+  compatibleReleaseId_not: Int
+
+  # compatibleReleaseId is less then the parameter, compatibleReleaseId: the compatible release id
+  compatibleReleaseId_lt: Int
+
+  # compatibleReleaseId is less then or equal to the parameter, compatibleReleaseId: the compatible release id
+  compatibleReleaseId_lte: Int
+
+  # compatibleReleaseId is greater then the parameter, compatibleReleaseId: the compatible release id
+  compatibleReleaseId_gt: Int
+
+  # compatibleReleaseId is greater then or equal to the parameter, compatibleReleaseId: the compatible release id
+  compatibleReleaseId_gte: Int
+
+  # releaseId exactly equals to the parameter, releaseId: the parent release id
+  releaseId: Int
+
+  # releaseId not equals to the parameter, releaseId: the parent release id
+  releaseId_not: Int
+
+  # releaseId is less then the parameter, releaseId: the parent release id
+  releaseId_lt: Int
+
+  # releaseId is less then or equal to the parameter, releaseId: the parent release id
+  releaseId_lte: Int
+
+  # releaseId is greater then the parameter, releaseId: the parent release id
+  releaseId_gt: Int
+
+  # releaseId is greater then or equal to the parameter, releaseId: the parent release id
+  releaseId_gte: Int
+
+  # templateCode exactly equals to the parameter, templateCode: the template code
+  templateCode: String
+
+  # templateCode not equals to the parameter, templateCode: the template code
+  templateCode_not: String
+
+  # templateCode is a substring of the parameter, templateCode: the template code
+  templateCode_in: String
+
+  # templateCode is not a substring of the parameter, templateCode: the template code
+  templateCode_not_in: String
+
+  # templateCode contains the parameter as substring, templateCode: the template code
+  templateCode_contains: String
+
+  # templateCode doesn't contain the parameter as substring, templateCode: the template code
+  templateCode_not_contains: String
+
+  # templateCode starts with the parameter value, templateCode: the template code
+  templateCode_starts_with: String
+
+  # templateCode doesn't start with the parameter value, templateCode: the template code
+  templateCode_not_starts_with: String
+
+  # templateCode ends with the parameter value, templateCode: the template code
+  templateCode_ends_with: String
+
+  # templateCode doesn't end with the parameter value, templateCode: the template code
+  templateCode_not_ends_with: String
+
+  # templateCode lowercased equals the parameter, templateCode: the template code
+  templateCode_l: String
+
+  # templateCode lowercased doesn't equal the parameter, templateCode: the template code
+  templateCode_l_not: String
+
+  # templateCode lowercased is a substring of the parameter, templateCode: the template code
+  templateCode_l_in: String
+
+  # templateCode lowercased is not a substring of the parameter, templateCode: the template code
+  templateCode_l_not_in: String
+
+  # templateCode lowercased contains the parameter as substring, templateCode: the template code
+  templateCode_l_contains: String
+
+  # templateCode lowercased doesn't contain the parameter as substring, templateCode: the template code
+  templateCode_l_not_contains: String
+
+  # templateCode lowercased starts with the parameter value, templateCode: the template code
+  templateCode_l_starts_with: String
+
+  # templateCode lowercased doesn't start with the parameter value, templateCode: the template code
+  templateCode_l_not_starts_with: String
+
+  # templateCode lowercased ends with the parameter value, templateCode: the template code
+  templateCode_l_ends_with: String
+
+  # templateCode lowercased doesn't end with the parameter value, templateCode: the template code
+  templateCode_l_not_ends_with: String
+}
+
+enum ClusterKitNodeApi_CompatibleTemplate_Sort {
+  id_asc
+  id_desc
+  compatibleReleaseId_asc
+  compatibleReleaseId_desc
+  releaseId_asc
+  releaseId_desc
+  templateCode_asc
+  templateCode_desc
 }
 
 # Publishes access to the authenticated user information
@@ -990,7 +1200,7 @@ input ClusterKitNodeApi_me_changePassword_Input {
   # The user current password
   oldPassword: String
 
-  # The user current password
+  # The user new password
   newPassword: String
   clientMutationId: String
 }
@@ -2235,6 +2445,205 @@ enum ClusterKitNodeApi_NugetPackage_Sort {
   version_desc
 }
 
+# The package requirement for the template
+type ClusterKitNodeApi_PackageRequirement implements IClusterKitNodeApi_PackageRequirement, Node {
+  # the Nuget package id
+  __id: String
+
+  # the required specific version (in case of null the default version for release will be used)
+  specificVersion: String
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_PackageRequirement
+#  The package requirement for the template
+type ClusterKitNodeApi_PackageRequirement_Connection implements IClusterKitNodeApi_PackageRequirement_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_PackageRequirement_Edge]
+}
+
+# The ClusterKitNodeApi_PackageRequirement in a connected list
+#  The package requirement for the template
+type ClusterKitNodeApi_PackageRequirement_Edge implements IClusterKitNodeApi_PackageRequirement_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # The package requirement for the template
+  node: ClusterKitNodeApi_PackageRequirement
+}
+
+input ClusterKitNodeApi_PackageRequirement_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_PackageRequirement_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_PackageRequirement_Filter_Input
+
+  # id exactly equals to the parameter, id: the Nuget package id
+  id: String
+
+  # id not equals to the parameter, id: the Nuget package id
+  id_not: String
+
+  # id is a substring of the parameter, id: the Nuget package id
+  id_in: String
+
+  # id is not a substring of the parameter, id: the Nuget package id
+  id_not_in: String
+
+  # id contains the parameter as substring, id: the Nuget package id
+  id_contains: String
+
+  # id doesn't contain the parameter as substring, id: the Nuget package id
+  id_not_contains: String
+
+  # id starts with the parameter value, id: the Nuget package id
+  id_starts_with: String
+
+  # id doesn't start with the parameter value, id: the Nuget package id
+  id_not_starts_with: String
+
+  # id ends with the parameter value, id: the Nuget package id
+  id_ends_with: String
+
+  # id doesn't end with the parameter value, id: the Nuget package id
+  id_not_ends_with: String
+
+  # id lowercased equals the parameter, id: the Nuget package id
+  id_l: String
+
+  # id lowercased doesn't equal the parameter, id: the Nuget package id
+  id_l_not: String
+
+  # id lowercased is a substring of the parameter, id: the Nuget package id
+  id_l_in: String
+
+  # id lowercased is not a substring of the parameter, id: the Nuget package id
+  id_l_not_in: String
+
+  # id lowercased contains the parameter as substring, id: the Nuget package id
+  id_l_contains: String
+
+  # id lowercased doesn't contain the parameter as substring, id: the Nuget package id
+  id_l_not_contains: String
+
+  # id lowercased starts with the parameter value, id: the Nuget package id
+  id_l_starts_with: String
+
+  # id lowercased doesn't start with the parameter value, id: the Nuget package id
+  id_l_not_starts_with: String
+
+  # id lowercased ends with the parameter value, id: the Nuget package id
+  id_l_ends_with: String
+
+  # id lowercased doesn't end with the parameter value, id: the Nuget package id
+  id_l_not_ends_with: String
+
+  # specificVersion exactly equals to the parameter, specificVersion: the required
+  # specific version (in case of null the default version for release will be used)
+  specificVersion: String
+
+  # specificVersion not equals to the parameter, specificVersion: the required
+  # specific version (in case of null the default version for release will be used)
+  specificVersion_not: String
+
+  # specificVersion is a substring of the parameter, specificVersion: the required
+  # specific version (in case of null the default version for release will be used)
+  specificVersion_in: String
+
+  # specificVersion is not a substring of the parameter, specificVersion: the
+  # required specific version (in case of null the default version for release will be used)
+  specificVersion_not_in: String
+
+  # specificVersion contains the parameter as substring, specificVersion: the
+  # required specific version (in case of null the default version for release will be used)
+  specificVersion_contains: String
+
+  # specificVersion doesn't contain the parameter as substring, specificVersion:
+  # the required specific version (in case of null the default version for release will be used)
+  specificVersion_not_contains: String
+
+  # specificVersion starts with the parameter value, specificVersion: the required
+  # specific version (in case of null the default version for release will be used)
+  specificVersion_starts_with: String
+
+  # specificVersion doesn't start with the parameter value, specificVersion: the
+  # required specific version (in case of null the default version for release will be used)
+  specificVersion_not_starts_with: String
+
+  # specificVersion ends with the parameter value, specificVersion: the required
+  # specific version (in case of null the default version for release will be used)
+  specificVersion_ends_with: String
+
+  # specificVersion doesn't end with the parameter value, specificVersion: the
+  # required specific version (in case of null the default version for release will be used)
+  specificVersion_not_ends_with: String
+
+  # specificVersion lowercased equals the parameter, specificVersion: the required
+  # specific version (in case of null the default version for release will be used)
+  specificVersion_l: String
+
+  # specificVersion lowercased doesn't equal the parameter, specificVersion: the
+  # required specific version (in case of null the default version for release will be used)
+  specificVersion_l_not: String
+
+  # specificVersion lowercased is a substring of the parameter, specificVersion:
+  # the required specific version (in case of null the default version for release will be used)
+  specificVersion_l_in: String
+
+  # specificVersion lowercased is not a substring of the parameter,
+  # specificVersion: the required specific version (in case of null the default
+  # version for release will be used)
+  specificVersion_l_not_in: String
+
+  # specificVersion lowercased contains the parameter as substring,
+  # specificVersion: the required specific version (in case of null the default
+  # version for release will be used)
+  specificVersion_l_contains: String
+
+  # specificVersion lowercased doesn't contain the parameter as substring,
+  # specificVersion: the required specific version (in case of null the default
+  # version for release will be used)
+  specificVersion_l_not_contains: String
+
+  # specificVersion lowercased starts with the parameter value, specificVersion:
+  # the required specific version (in case of null the default version for release will be used)
+  specificVersion_l_starts_with: String
+
+  # specificVersion lowercased doesn't start with the parameter value,
+  # specificVersion: the required specific version (in case of null the default
+  # version for release will be used)
+  specificVersion_l_not_starts_with: String
+
+  # specificVersion lowercased ends with the parameter value, specificVersion: the
+  # required specific version (in case of null the default version for release will be used)
+  specificVersion_l_ends_with: String
+
+  # specificVersion lowercased doesn't end with the parameter value,
+  # specificVersion: the required specific version (in case of null the default
+  # version for release will be used)
+  specificVersion_l_not_ends_with: String
+}
+
+# The package requirement for the template
+input ClusterKitNodeApi_PackageRequirement_Input {
+  # the Nuget package id
+  id: String
+
+  # the required specific version (in case of null the default version for release will be used)
+  specificVersion: String
+}
+
+enum ClusterKitNodeApi_PackageRequirement_Sort {
+  id_asc
+  id_desc
+  specificVersion_asc
+  specificVersion_desc
+}
+
 # The cluster configuration with all program modules versions, node templates and configurations
 type ClusterKitNodeApi_Release implements IClusterKitNodeApi_Release, Node {
   # The release id
@@ -2269,6 +2678,9 @@ type ClusterKitNodeApi_Release implements IClusterKitNodeApi_Release, Node {
 
   # the release configuration
   configuration: ClusterKitNodeApi_ReleaseConfiguration
+
+  # the list of compatible node templates
+  compatibleTemplates(filter: ClusterKitNodeApi_CompatibleTemplate_Filter_Input, sort: [ClusterKitNodeApi_CompatibleTemplate_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_CompatibleTemplate_Connection
   id: ID
 }
 
@@ -2611,7 +3023,13 @@ type ClusterKitNodeApi_ReleaseConfiguration implements IClusterKitNodeApi_Releas
   packages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
 
   # the list of configured node templates
-  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NodeTemplate_Connection
+  nodeTemplates(filter: ClusterKitNodeApi_Template_Filter_Input, sort: [ClusterKitNodeApi_Template_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_Template_Connection
+
+  # the list of seed addresses
+  seedAddresses: [String]
+
+  # the list of nuget feeds
+  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NugetFeed_Connection
   id: ID
 }
 
@@ -2621,7 +3039,13 @@ input ClusterKitNodeApi_ReleaseConfiguration_Input {
   packages: [ClusterKitNodeApi_NugetPackage_Input]
 
   # the list of configured node templates
-  nodeTemplates: [ClusterKitNodeApi_NodeTemplate_Input]
+  nodeTemplates: [ClusterKitNodeApi_Template_Input]
+
+  # the list of seed addresses
+  seedAddresses: [String]
+
+  # the list of nuget feeds
+  nugetFeeds: [ClusterKitNodeApi_NugetFeed_Input]
 }
 
 # Security role. The amount of privileges assigned to the user
@@ -2941,6 +3365,446 @@ enum ClusterKitNodeApi_SeedAddress_Sort {
   address_desc
   id_asc
   id_desc
+}
+
+# Node template description
+type ClusterKitNodeApi_Template implements IClusterKitNodeApi_Template, Node {
+  # The program readable node template name
+  code: String
+
+  # The akka configuration template for node
+  configuration: String
+
+  # The list of container types to install node templates
+  containerTypes: [String]
+
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
+
+  # The human readable node template name
+  name: String
+
+  # The template description for other users
+  notes: String
+
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The list of package requirements
+  packageRequirements(filter: ClusterKitNodeApi_PackageRequirement_Filter_Input, sort: [ClusterKitNodeApi_PackageRequirement_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_PackageRequirement_Connection
+
+  # A value indicating whether no other nodes from previous releases are compatible
+  forceUpdate: Boolean
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_Template
+#  Node template description
+type ClusterKitNodeApi_Template_Connection implements IClusterKitNodeApi_Template_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_Template_Edge]
+}
+
+# The ClusterKitNodeApi_Template in a connected list
+#  Node template description
+type ClusterKitNodeApi_Template_Edge implements IClusterKitNodeApi_Template_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # Node template description
+  node: ClusterKitNodeApi_Template
+}
+
+input ClusterKitNodeApi_Template_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_Template_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_Template_Filter_Input
+
+  # code exactly equals to the parameter, code: The program readable node template name
+  code: String
+
+  # code not equals to the parameter, code: The program readable node template name
+  code_not: String
+
+  # code is a substring of the parameter, code: The program readable node template name
+  code_in: String
+
+  # code is not a substring of the parameter, code: The program readable node template name
+  code_not_in: String
+
+  # code contains the parameter as substring, code: The program readable node template name
+  code_contains: String
+
+  # code doesn't contain the parameter as substring, code: The program readable node template name
+  code_not_contains: String
+
+  # code starts with the parameter value, code: The program readable node template name
+  code_starts_with: String
+
+  # code doesn't start with the parameter value, code: The program readable node template name
+  code_not_starts_with: String
+
+  # code ends with the parameter value, code: The program readable node template name
+  code_ends_with: String
+
+  # code doesn't end with the parameter value, code: The program readable node template name
+  code_not_ends_with: String
+
+  # code lowercased equals the parameter, code: The program readable node template name
+  code_l: String
+
+  # code lowercased doesn't equal the parameter, code: The program readable node template name
+  code_l_not: String
+
+  # code lowercased is a substring of the parameter, code: The program readable node template name
+  code_l_in: String
+
+  # code lowercased is not a substring of the parameter, code: The program readable node template name
+  code_l_not_in: String
+
+  # code lowercased contains the parameter as substring, code: The program readable node template name
+  code_l_contains: String
+
+  # code lowercased doesn't contain the parameter as substring, code: The program readable node template name
+  code_l_not_contains: String
+
+  # code lowercased starts with the parameter value, code: The program readable node template name
+  code_l_starts_with: String
+
+  # code lowercased doesn't start with the parameter value, code: The program readable node template name
+  code_l_not_starts_with: String
+
+  # code lowercased ends with the parameter value, code: The program readable node template name
+  code_l_ends_with: String
+
+  # code lowercased doesn't end with the parameter value, code: The program readable node template name
+  code_l_not_ends_with: String
+
+  # configuration exactly equals to the parameter, configuration: The akka configuration template for node
+  configuration: String
+
+  # configuration not equals to the parameter, configuration: The akka configuration template for node
+  configuration_not: String
+
+  # configuration is a substring of the parameter, configuration: The akka configuration template for node
+  configuration_in: String
+
+  # configuration is not a substring of the parameter, configuration: The akka configuration template for node
+  configuration_not_in: String
+
+  # configuration contains the parameter as substring, configuration: The akka configuration template for node
+  configuration_contains: String
+
+  # configuration doesn't contain the parameter as substring, configuration: The akka configuration template for node
+  configuration_not_contains: String
+
+  # configuration starts with the parameter value, configuration: The akka configuration template for node
+  configuration_starts_with: String
+
+  # configuration doesn't start with the parameter value, configuration: The akka configuration template for node
+  configuration_not_starts_with: String
+
+  # configuration ends with the parameter value, configuration: The akka configuration template for node
+  configuration_ends_with: String
+
+  # configuration doesn't end with the parameter value, configuration: The akka configuration template for node
+  configuration_not_ends_with: String
+
+  # configuration lowercased equals the parameter, configuration: The akka configuration template for node
+  configuration_l: String
+
+  # configuration lowercased doesn't equal the parameter, configuration: The akka configuration template for node
+  configuration_l_not: String
+
+  # configuration lowercased is a substring of the parameter, configuration: The akka configuration template for node
+  configuration_l_in: String
+
+  # configuration lowercased is not a substring of the parameter, configuration: The akka configuration template for node
+  configuration_l_not_in: String
+
+  # configuration lowercased contains the parameter as substring, configuration: The akka configuration template for node
+  configuration_l_contains: String
+
+  # configuration lowercased doesn't contain the parameter as substring,
+  # configuration: The akka configuration template for node
+  configuration_l_not_contains: String
+
+  # configuration lowercased starts with the parameter value, configuration: The akka configuration template for node
+  configuration_l_starts_with: String
+
+  # configuration lowercased doesn't start with the parameter value, configuration: The akka configuration template for node
+  configuration_l_not_starts_with: String
+
+  # configuration lowercased ends with the parameter value, configuration: The akka configuration template for node
+  configuration_l_ends_with: String
+
+  # configuration lowercased doesn't end with the parameter value, configuration: The akka configuration template for node
+  configuration_l_not_ends_with: String
+
+  # maximumNeededInstances exactly equals to the parameter,
+  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # maximumNeededInstances not equals to the parameter, maximumNeededInstances:
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_not: Int
+
+  # maximumNeededInstances is less then the parameter, maximumNeededInstances: The
+  # maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_lt: Int
+
+  # maximumNeededInstances is less then or equal to the parameter,
+  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_lte: Int
+
+  # maximumNeededInstances is greater then the parameter, maximumNeededInstances:
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_gt: Int
+
+  # maximumNeededInstances is greater then or equal to the parameter,
+  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances_gte: Int
+
+  # minimumRequiredInstances exactly equals to the parameter,
+  # minimumRequiredInstances: The minimum number of working node type required for
+  # cluster to work
+  minimumRequiredInstances: Int
+
+  # minimumRequiredInstances not equals to the parameter,
+  # minimumRequiredInstances: The minimum number of working node type required for
+  # cluster to work
+  minimumRequiredInstances_not: Int
+
+  # minimumRequiredInstances is less then the parameter, minimumRequiredInstances:
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances_lt: Int
+
+  # minimumRequiredInstances is less then or equal to the parameter,
+  # minimumRequiredInstances: The minimum number of working node type required for
+  # cluster to work
+  minimumRequiredInstances_lte: Int
+
+  # minimumRequiredInstances is greater then the parameter,
+  # minimumRequiredInstances: The minimum number of working node type required for
+  # cluster to work
+  minimumRequiredInstances_gt: Int
+
+  # minimumRequiredInstances is greater then or equal to the parameter,
+  # minimumRequiredInstances: The minimum number of working node type required for
+  # cluster to work
+  minimumRequiredInstances_gte: Int
+
+  # name exactly equals to the parameter, name: The human readable node template name
+  name: String
+
+  # name not equals to the parameter, name: The human readable node template name
+  name_not: String
+
+  # name is a substring of the parameter, name: The human readable node template name
+  name_in: String
+
+  # name is not a substring of the parameter, name: The human readable node template name
+  name_not_in: String
+
+  # name contains the parameter as substring, name: The human readable node template name
+  name_contains: String
+
+  # name doesn't contain the parameter as substring, name: The human readable node template name
+  name_not_contains: String
+
+  # name starts with the parameter value, name: The human readable node template name
+  name_starts_with: String
+
+  # name doesn't start with the parameter value, name: The human readable node template name
+  name_not_starts_with: String
+
+  # name ends with the parameter value, name: The human readable node template name
+  name_ends_with: String
+
+  # name doesn't end with the parameter value, name: The human readable node template name
+  name_not_ends_with: String
+
+  # name lowercased equals the parameter, name: The human readable node template name
+  name_l: String
+
+  # name lowercased doesn't equal the parameter, name: The human readable node template name
+  name_l_not: String
+
+  # name lowercased is a substring of the parameter, name: The human readable node template name
+  name_l_in: String
+
+  # name lowercased is not a substring of the parameter, name: The human readable node template name
+  name_l_not_in: String
+
+  # name lowercased contains the parameter as substring, name: The human readable node template name
+  name_l_contains: String
+
+  # name lowercased doesn't contain the parameter as substring, name: The human readable node template name
+  name_l_not_contains: String
+
+  # name lowercased starts with the parameter value, name: The human readable node template name
+  name_l_starts_with: String
+
+  # name lowercased doesn't start with the parameter value, name: The human readable node template name
+  name_l_not_starts_with: String
+
+  # name lowercased ends with the parameter value, name: The human readable node template name
+  name_l_ends_with: String
+
+  # name lowercased doesn't end with the parameter value, name: The human readable node template name
+  name_l_not_ends_with: String
+
+  # notes exactly equals to the parameter, notes: The template description for other users
+  notes: String
+
+  # notes not equals to the parameter, notes: The template description for other users
+  notes_not: String
+
+  # notes is a substring of the parameter, notes: The template description for other users
+  notes_in: String
+
+  # notes is not a substring of the parameter, notes: The template description for other users
+  notes_not_in: String
+
+  # notes contains the parameter as substring, notes: The template description for other users
+  notes_contains: String
+
+  # notes doesn't contain the parameter as substring, notes: The template description for other users
+  notes_not_contains: String
+
+  # notes starts with the parameter value, notes: The template description for other users
+  notes_starts_with: String
+
+  # notes doesn't start with the parameter value, notes: The template description for other users
+  notes_not_starts_with: String
+
+  # notes ends with the parameter value, notes: The template description for other users
+  notes_ends_with: String
+
+  # notes doesn't end with the parameter value, notes: The template description for other users
+  notes_not_ends_with: String
+
+  # notes lowercased equals the parameter, notes: The template description for other users
+  notes_l: String
+
+  # notes lowercased doesn't equal the parameter, notes: The template description for other users
+  notes_l_not: String
+
+  # notes lowercased is a substring of the parameter, notes: The template description for other users
+  notes_l_in: String
+
+  # notes lowercased is not a substring of the parameter, notes: The template description for other users
+  notes_l_not_in: String
+
+  # notes lowercased contains the parameter as substring, notes: The template description for other users
+  notes_l_contains: String
+
+  # notes lowercased doesn't contain the parameter as substring, notes: The template description for other users
+  notes_l_not_contains: String
+
+  # notes lowercased starts with the parameter value, notes: The template description for other users
+  notes_l_starts_with: String
+
+  # notes lowercased doesn't start with the parameter value, notes: The template description for other users
+  notes_l_not_starts_with: String
+
+  # notes lowercased ends with the parameter value, notes: The template description for other users
+  notes_l_ends_with: String
+
+  # notes lowercased doesn't end with the parameter value, notes: The template description for other users
+  notes_l_not_ends_with: String
+
+  # priority exactly equals to the parameter, priority: The priority weight for
+  # service, when deciding witch template should be brought up
+  priority: Float
+
+  # priority not equals to the parameter, priority: The priority weight for
+  # service, when deciding witch template should be brought up
+  priority_not: Float
+
+  # priority is less then the parameter, priority: The priority weight for
+  # service, when deciding witch template should be brought up
+  priority_lt: Float
+
+  # priority is less then or equal to the parameter, priority: The priority weight
+  # for service, when deciding witch template should be brought up
+  priority_lte: Float
+
+  # priority is greater then the parameter, priority: The priority weight for
+  # service, when deciding witch template should be brought up
+  priority_gt: Float
+
+  # priority is greater then or equal to the parameter, priority: The priority
+  # weight for service, when deciding witch template should be brought up
+  priority_gte: Float
+
+  # forceUpdate exactly equals to the parameter, forceUpdate: A value indicating
+  # whether no other nodes from previous releases are compatible
+  forceUpdate: Boolean
+
+  # forceUpdate not equals to the parameter, forceUpdate: A value indicating
+  # whether no other nodes from previous releases are compatible
+  forceUpdate_not: Boolean
+}
+
+# Node template description
+input ClusterKitNodeApi_Template_Input {
+  # The program readable node template name
+  code: String
+
+  # The akka configuration template for node
+  configuration: String
+
+  # The list of container types to install node templates
+  containerTypes: [String]
+
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
+
+  # The human readable node template name
+  name: String
+
+  # The template description for other users
+  notes: String
+
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The list of package requirements
+  packageRequirements: [ClusterKitNodeApi_PackageRequirement_Input]
+
+  # A value indicating whether no other nodes from previous releases are compatible
+  forceUpdate: Boolean
+}
+
+enum ClusterKitNodeApi_Template_Sort {
+  code_asc
+  code_desc
+  configuration_asc
+  configuration_desc
+  maximumNeededInstances_asc
+  maximumNeededInstances_desc
+  minimumRequiredInstances_asc
+  minimumRequiredInstances_desc
+  name_asc
+  name_desc
+  notes_asc
+  notes_desc
+  priority_asc
+  priority_desc
+  forceUpdate_asc
+  forceUpdate_desc
 }
 
 # Overall debug data of current cluster node template use
@@ -3618,6 +4482,47 @@ interface IClusterKitNodeApi_ClusterKitUserDescription {
   login: String
 }
 
+# The compatible node template
+interface IClusterKitNodeApi_CompatibleTemplate {
+  id: ID
+
+  # the relation id
+  __id: Int
+
+  # the compatible release id
+  compatibleReleaseId: Int
+
+  # the parent release id
+  releaseId: Int
+
+  # the template code
+  templateCode: String
+
+  # the compatible release
+  compatibleRelease: IClusterKitNodeApi_Release
+
+  # the parent release
+  release: IClusterKitNodeApi_Release
+}
+
+# The list of connected ClusterKitNodeApi_CompatibleTemplate
+#  The compatible node template
+interface IClusterKitNodeApi_CompatibleTemplate_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_CompatibleTemplate_Edge]
+}
+
+# The ClusterKitNodeApi_CompatibleTemplate in a connected list
+#  The compatible node template
+interface IClusterKitNodeApi_CompatibleTemplate_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_CompatibleTemplate
+}
+
 # Publishes access to the authenticated user information
 interface IClusterKitNodeApi_CurrentUserApi {
   id: ID
@@ -3860,6 +4765,35 @@ interface IClusterKitNodeApi_NugetPackage_Edge {
   node: IClusterKitNodeApi_NugetPackage
 }
 
+# The package requirement for the template
+interface IClusterKitNodeApi_PackageRequirement {
+  id: ID
+
+  # the Nuget package id
+  __id: String
+
+  # the required specific version (in case of null the default version for release will be used)
+  specificVersion: String
+}
+
+# The list of connected ClusterKitNodeApi_PackageRequirement
+#  The package requirement for the template
+interface IClusterKitNodeApi_PackageRequirement_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_PackageRequirement_Edge]
+}
+
+# The ClusterKitNodeApi_PackageRequirement in a connected list
+#  The package requirement for the template
+interface IClusterKitNodeApi_PackageRequirement_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_PackageRequirement
+}
+
 # The cluster configuration with all program modules versions, node templates and configurations
 interface IClusterKitNodeApi_Release {
   id: ID
@@ -3896,6 +4830,9 @@ interface IClusterKitNodeApi_Release {
 
   # the release configuration
   configuration: IClusterKitNodeApi_ReleaseConfiguration
+
+  # the list of compatible node templates
+  compatibleTemplates(filter: ClusterKitNodeApi_CompatibleTemplate_Filter_Input, sort: [ClusterKitNodeApi_CompatibleTemplate_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_CompatibleTemplate_Connection
 }
 
 # The list of connected ClusterKitNodeApi_Release
@@ -3924,7 +4861,13 @@ interface IClusterKitNodeApi_ReleaseConfiguration {
   packages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
 
   # the list of configured node templates
-  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NodeTemplate_Connection
+  nodeTemplates(filter: ClusterKitNodeApi_Template_Filter_Input, sort: [ClusterKitNodeApi_Template_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_Template_Connection
+
+  # the list of seed addresses
+  seedAddresses: [String]
+
+  # the list of nuget feeds
+  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NugetFeed_Connection
 }
 
 # Security role. The amount of privileges assigned to the user
@@ -4027,6 +4970,59 @@ interface IClusterKitNodeApi_SeedAddress_Edge {
   # A value to use with paging positioning
   cursor: String
   node: IClusterKitNodeApi_SeedAddress
+}
+
+# Node template description
+interface IClusterKitNodeApi_Template {
+  id: ID
+
+  # The program readable node template name
+  code: String
+
+  # The akka configuration template for node
+  configuration: String
+
+  # The list of container types to install node templates
+  containerTypes: [String]
+
+  # The maximum number of working nodes that is reasonable for cluster
+  maximumNeededInstances: Int
+
+  # The minimum number of working node type required for cluster to work
+  minimumRequiredInstances: Int
+
+  # The human readable node template name
+  name: String
+
+  # The template description for other users
+  notes: String
+
+  # The priority weight for service, when deciding witch template should be brought up
+  priority: Float
+
+  # The list of package requirements
+  packageRequirements(filter: ClusterKitNodeApi_PackageRequirement_Filter_Input, sort: [ClusterKitNodeApi_PackageRequirement_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_PackageRequirement_Connection
+
+  # A value indicating whether no other nodes from previous releases are compatible
+  forceUpdate: Boolean
+}
+
+# The list of connected ClusterKitNodeApi_Template
+#  Node template description
+interface IClusterKitNodeApi_Template_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_Template_Edge]
+}
+
+# The ClusterKitNodeApi_Template in a connected list
+#  Node template description
+interface IClusterKitNodeApi_Template_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_Template
 }
 
 # Overall debug data of current cluster node template use
@@ -4160,6 +5156,9 @@ type Mutations {
   # moves release state from "draft" to "ready"
   ClusterKitNodeApi_clusterKitNodesApi_releases_setReady(input: ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
+  # moves release state from "ready" to "obsolete"
+  ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete(input: ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete_Input): ClusterKitNodeApi_Release_NodeMutationPayload
+
   # moves release state from "draft" to "ready"
   ClusterKitNodeApi_clusterKitNodesApi_releases_setStable(input: ClusterKitNodeApi_clusterKitNodesApi_releases_setStable_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
@@ -4175,6 +5174,12 @@ type Mutations {
   # Creates the new draft release
   ClusterKitNodeApi_clusterKitNodesApi_releases_delete(input: ClusterKitNodeApi_clusterKitNodesApi_releases_delete_Input): ClusterKitNodeApi_Release_NodeMutationPayload
 
+  # Grants a new role to the user
+  ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser(input: ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input): ClusterKitNodeApi_Role_NodeMutationPayload
+
+  # Withdraws the role from the user
+  ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser(input: ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser_Input): ClusterKitNodeApi_Role_NodeMutationPayload
+
   # Creates the new managing system role
   ClusterKitNodeApi_clusterKitNodesApi_roles_create(input: ClusterKitNodeApi_clusterKitNodesApi_roles_create_Input): ClusterKitNodeApi_Role_NodeMutationPayload
 
@@ -4189,6 +5194,15 @@ type Mutations {
 
   # Creates the new seed address
   ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete(input: ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete_Input): ClusterKitNodeApi_SeedAddress_NodeMutationPayload
+
+  # Resets the user password
+  ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword(input: ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword_Input): ClusterKitNodeApi_User_NodeMutationPayload
+
+  # Grants a new role to the user
+  ClusterKitNodeApi_clusterKitNodesApi_users_grantRole(input: ClusterKitNodeApi_clusterKitNodesApi_users_grantRole_Input): ClusterKitNodeApi_User_NodeMutationPayload
+
+  # Withdraws the role from the user
+  ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole(input: ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole_Input): ClusterKitNodeApi_User_NodeMutationPayload
 
   # Creates the new user
   ClusterKitNodeApi_clusterKitNodesApi_users_create(input: ClusterKitNodeApi_clusterKitNodesApi_users_create_Input): ClusterKitNodeApi_User_NodeMutationPayload

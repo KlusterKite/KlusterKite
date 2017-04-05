@@ -11,8 +11,10 @@ export default class Submit extends React.Component { // eslint-disable-line rea
     savedText: React.PropTypes.string,
     saving: React.PropTypes.bool,
     saved: React.PropTypes.bool,
+    saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
     saveError: React.PropTypes.string,
     disabled: React.PropTypes.bool,
+    onCancel: React.PropTypes.func,
     onDelete: React.PropTypes.func,
   };
 
@@ -50,6 +52,17 @@ export default class Submit extends React.Component { // eslint-disable-line rea
           </div>
           }
 
+          {this.props.saveErrors && this.props.saveErrors.map((error, index) => {
+            return (
+            <div className="alert alert-danger" role="alert" key={`error-${index}`}>
+              <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+              {' '}
+              {error}
+            </div>
+            );
+            })
+          }
+
           {this.props.saved &&
           <div className="alert alert-success" role="alert">
             <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -61,6 +74,12 @@ export default class Submit extends React.Component { // eslint-disable-line rea
           <button className="btn btn-primary" disabled={disabled} type="submit">
             <Icon name="pencil" className={saveClassName} /> {' '} {text}
           </button>
+
+          {this.props.onCancel &&
+            <button className="btn btn-default btn-margined" type="button" onClick={this.props.onCancel}>
+              Cancel
+            </button>
+          }
 
           {this.props.onDelete &&
             <button className="btn btn-danger btn-margined" disabled={disabled} type="button" onClick={this.props.onDelete}>

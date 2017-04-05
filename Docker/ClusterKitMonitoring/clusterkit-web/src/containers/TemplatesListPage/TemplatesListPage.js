@@ -2,7 +2,7 @@ import React from 'react'
 import Relay from 'react-relay'
 
 import { hasPrivilege } from '../../utils/privileges';
-import TemplatesList from '../../components/TemplatesList/index';
+import TemplatesList from '../../components/TemplatesListOld/index';
 
 class TemplatesListPage extends React.Component {
   static propTypes = {

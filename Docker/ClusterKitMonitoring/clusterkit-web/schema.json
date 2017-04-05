@@ -3225,6 +3225,21 @@
             },
             {
               "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Template",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageRequirement",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_CompatibleTemplate",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "ClusterKitNodeApi_Role",
               "ofType": null
             },
@@ -9394,6 +9409,73 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "compatibleTemplates",
+              "description": "the list of compatible node templates",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_CompatibleTemplate_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_CompatibleTemplate_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_CompatibleTemplate_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -9541,7 +9623,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NodeTemplate_Filter_Input",
+                    "name": "ClusterKitNodeApi_Template_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -9554,7 +9636,90 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NodeTemplate_Sort",
+                      "name": "ClusterKitNodeApi_Template_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_Template_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "seedAddresses",
+              "description": "the list of seed addresses",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "nugetFeeds",
+              "description": "the list of nuget feeds",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_NugetFeed_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_NugetFeed_Sort",
                       "ofType": null
                     }
                   },
@@ -9593,7 +9758,7 @@
               ],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitNodeApi_NodeTemplate_Connection",
+                "name": "IClusterKitNodeApi_NugetFeed_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -9610,6 +9775,2700 @@
               "ofType": null
             }
           ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_Template_Connection",
+          "description": "The list of connected ClusterKitNodeApi_Template\n Node template description",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INTERFACE",
+                  "name": "IClusterKitNodeApi_Template_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Template_Connection",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_Template_Edge",
+          "description": "The ClusterKitNodeApi_Template in a connected list\n Node template description",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_Template",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Template_Edge",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_Template",
+          "description": "Node template description",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "code",
+              "description": "The program readable node template name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "configuration",
+              "description": "The akka configuration template for node",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "containerTypes",
+              "description": "The list of container types to install node templates",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "maximumNeededInstances",
+              "description": "The maximum number of working nodes that is reasonable for cluster",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "minimumRequiredInstances",
+              "description": "The minimum number of working node type required for cluster to work",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "The human readable node template name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notes",
+              "description": "The template description for other users",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "priority",
+              "description": "The priority weight for service, when deciding witch template should be brought up",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "packageRequirements",
+              "description": "The list of package requirements",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_PackageRequirement_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_PackageRequirement_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_PackageRequirement_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "forceUpdate",
+              "description": "A value indicating whether no other nodes from previous releases are compatible",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Template",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_PackageRequirement_Connection",
+          "description": "The list of connected ClusterKitNodeApi_PackageRequirement\n The package requirement for the template",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INTERFACE",
+                  "name": "IClusterKitNodeApi_PackageRequirement_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageRequirement_Connection",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_PackageRequirement_Edge",
+          "description": "The ClusterKitNodeApi_PackageRequirement in a connected list\n The package requirement for the template",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_PackageRequirement",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageRequirement_Edge",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_PackageRequirement",
+          "description": "The package requirement for the template",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "__id",
+              "description": "the Nuget package id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "specificVersion",
+              "description": "the required specific version (in case of null the default version for release will be used)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageRequirement",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_PackageRequirement_Filter_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "OR",
+              "description": "Combine filter conditions with logic \"OR\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_PackageRequirement_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "AND",
+              "description": "Combine filter conditions with logic \"AND\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_PackageRequirement_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id",
+              "description": "id exactly equals to the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not",
+              "description": "id not equals to the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_in",
+              "description": "id is a substring of the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_in",
+              "description": "id is not a substring of the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_contains",
+              "description": "id contains the parameter as substring, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_contains",
+              "description": "id doesn't contain the parameter as substring, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_starts_with",
+              "description": "id starts with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_starts_with",
+              "description": "id doesn't start with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_ends_with",
+              "description": "id ends with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_ends_with",
+              "description": "id doesn't end with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l",
+              "description": "id lowercased equals the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not",
+              "description": "id lowercased doesn't equal the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_in",
+              "description": "id lowercased is a substring of the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_in",
+              "description": "id lowercased is not a substring of the parameter, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_contains",
+              "description": "id lowercased contains the parameter as substring, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_contains",
+              "description": "id lowercased doesn't contain the parameter as substring, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_starts_with",
+              "description": "id lowercased starts with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_starts_with",
+              "description": "id lowercased doesn't start with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_ends_with",
+              "description": "id lowercased ends with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_ends_with",
+              "description": "id lowercased doesn't end with the parameter value, id: the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion",
+              "description": "specificVersion exactly equals to the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_not",
+              "description": "specificVersion not equals to the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_in",
+              "description": "specificVersion is a substring of the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_not_in",
+              "description": "specificVersion is not a substring of the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_contains",
+              "description": "specificVersion contains the parameter as substring, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_not_contains",
+              "description": "specificVersion doesn't contain the parameter as substring, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_starts_with",
+              "description": "specificVersion starts with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_not_starts_with",
+              "description": "specificVersion doesn't start with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_ends_with",
+              "description": "specificVersion ends with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_not_ends_with",
+              "description": "specificVersion doesn't end with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l",
+              "description": "specificVersion lowercased equals the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_not",
+              "description": "specificVersion lowercased doesn't equal the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_in",
+              "description": "specificVersion lowercased is a substring of the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_not_in",
+              "description": "specificVersion lowercased is not a substring of the parameter, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_contains",
+              "description": "specificVersion lowercased contains the parameter as substring, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_not_contains",
+              "description": "specificVersion lowercased doesn't contain the parameter as substring, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_starts_with",
+              "description": "specificVersion lowercased starts with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_not_starts_with",
+              "description": "specificVersion lowercased doesn't start with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_ends_with",
+              "description": "specificVersion lowercased ends with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion_l_not_ends_with",
+              "description": "specificVersion lowercased doesn't end with the parameter value, specificVersion: the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "ClusterKitNodeApi_PackageRequirement_Sort",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "id_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "specificVersion_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "specificVersion_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_Template_Filter_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "OR",
+              "description": "Combine filter conditions with logic \"OR\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_Template_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "AND",
+              "description": "Combine filter conditions with logic \"AND\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_Template_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code",
+              "description": "code exactly equals to the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_not",
+              "description": "code not equals to the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_in",
+              "description": "code is a substring of the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_not_in",
+              "description": "code is not a substring of the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_contains",
+              "description": "code contains the parameter as substring, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_not_contains",
+              "description": "code doesn't contain the parameter as substring, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_starts_with",
+              "description": "code starts with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_not_starts_with",
+              "description": "code doesn't start with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_ends_with",
+              "description": "code ends with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_not_ends_with",
+              "description": "code doesn't end with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l",
+              "description": "code lowercased equals the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not",
+              "description": "code lowercased doesn't equal the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_in",
+              "description": "code lowercased is a substring of the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_in",
+              "description": "code lowercased is not a substring of the parameter, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_contains",
+              "description": "code lowercased contains the parameter as substring, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_contains",
+              "description": "code lowercased doesn't contain the parameter as substring, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_starts_with",
+              "description": "code lowercased starts with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_starts_with",
+              "description": "code lowercased doesn't start with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_ends_with",
+              "description": "code lowercased ends with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "code_l_not_ends_with",
+              "description": "code lowercased doesn't end with the parameter value, code: The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration",
+              "description": "configuration exactly equals to the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_not",
+              "description": "configuration not equals to the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_in",
+              "description": "configuration is a substring of the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_not_in",
+              "description": "configuration is not a substring of the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_contains",
+              "description": "configuration contains the parameter as substring, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_not_contains",
+              "description": "configuration doesn't contain the parameter as substring, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_starts_with",
+              "description": "configuration starts with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_not_starts_with",
+              "description": "configuration doesn't start with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_ends_with",
+              "description": "configuration ends with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_not_ends_with",
+              "description": "configuration doesn't end with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l",
+              "description": "configuration lowercased equals the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not",
+              "description": "configuration lowercased doesn't equal the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_in",
+              "description": "configuration lowercased is a substring of the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_in",
+              "description": "configuration lowercased is not a substring of the parameter, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_contains",
+              "description": "configuration lowercased contains the parameter as substring, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_contains",
+              "description": "configuration lowercased doesn't contain the parameter as substring, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_starts_with",
+              "description": "configuration lowercased starts with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_starts_with",
+              "description": "configuration lowercased doesn't start with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_ends_with",
+              "description": "configuration lowercased ends with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration_l_not_ends_with",
+              "description": "configuration lowercased doesn't end with the parameter value, configuration: The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maximumNeededInstances",
+              "description": "maximumNeededInstances exactly equals to the parameter, maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maximumNeededInstances_not",
+              "description": "maximumNeededInstances not equals to the parameter, maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maximumNeededInstances_lt",
+              "description": "maximumNeededInstances is less then the parameter, maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maximumNeededInstances_lte",
+              "description": "maximumNeededInstances is less then or equal to the parameter, maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maximumNeededInstances_gt",
+              "description": "maximumNeededInstances is greater then the parameter, maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maximumNeededInstances_gte",
+              "description": "maximumNeededInstances is greater then or equal to the parameter, maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "minimumRequiredInstances",
+              "description": "minimumRequiredInstances exactly equals to the parameter, minimumRequiredInstances: The minimum number of working node type required for cluster to work",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "minimumRequiredInstances_not",
+              "description": "minimumRequiredInstances not equals to the parameter, minimumRequiredInstances: The minimum number of working node type required for cluster to work",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "minimumRequiredInstances_lt",
+              "description": "minimumRequiredInstances is less then the parameter, minimumRequiredInstances: The minimum number of working node type required for cluster to work",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "minimumRequiredInstances_lte",
+              "description": "minimumRequiredInstances is less then or equal to the parameter, minimumRequiredInstances: The minimum number of working node type required for cluster to work",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "minimumRequiredInstances_gt",
+              "description": "minimumRequiredInstances is greater then the parameter, minimumRequiredInstances: The minimum number of working node type required for cluster to work",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "minimumRequiredInstances_gte",
+              "description": "minimumRequiredInstances is greater then or equal to the parameter, minimumRequiredInstances: The minimum number of working node type required for cluster to work",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "name exactly equals to the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_not",
+              "description": "name not equals to the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_in",
+              "description": "name is a substring of the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_not_in",
+              "description": "name is not a substring of the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_contains",
+              "description": "name contains the parameter as substring, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_not_contains",
+              "description": "name doesn't contain the parameter as substring, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_starts_with",
+              "description": "name starts with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_not_starts_with",
+              "description": "name doesn't start with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_ends_with",
+              "description": "name ends with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_not_ends_with",
+              "description": "name doesn't end with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l",
+              "description": "name lowercased equals the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not",
+              "description": "name lowercased doesn't equal the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_in",
+              "description": "name lowercased is a substring of the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_in",
+              "description": "name lowercased is not a substring of the parameter, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_contains",
+              "description": "name lowercased contains the parameter as substring, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_contains",
+              "description": "name lowercased doesn't contain the parameter as substring, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_starts_with",
+              "description": "name lowercased starts with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_starts_with",
+              "description": "name lowercased doesn't start with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_ends_with",
+              "description": "name lowercased ends with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name_l_not_ends_with",
+              "description": "name lowercased doesn't end with the parameter value, name: The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes",
+              "description": "notes exactly equals to the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_not",
+              "description": "notes not equals to the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_in",
+              "description": "notes is a substring of the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_not_in",
+              "description": "notes is not a substring of the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_contains",
+              "description": "notes contains the parameter as substring, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_not_contains",
+              "description": "notes doesn't contain the parameter as substring, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_starts_with",
+              "description": "notes starts with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_not_starts_with",
+              "description": "notes doesn't start with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_ends_with",
+              "description": "notes ends with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_not_ends_with",
+              "description": "notes doesn't end with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l",
+              "description": "notes lowercased equals the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_not",
+              "description": "notes lowercased doesn't equal the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_in",
+              "description": "notes lowercased is a substring of the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_not_in",
+              "description": "notes lowercased is not a substring of the parameter, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_contains",
+              "description": "notes lowercased contains the parameter as substring, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_not_contains",
+              "description": "notes lowercased doesn't contain the parameter as substring, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_starts_with",
+              "description": "notes lowercased starts with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_not_starts_with",
+              "description": "notes lowercased doesn't start with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_ends_with",
+              "description": "notes lowercased ends with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes_l_not_ends_with",
+              "description": "notes lowercased doesn't end with the parameter value, notes: The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "priority",
+              "description": "priority exactly equals to the parameter, priority: The priority weight for service, when deciding witch template should be brought up",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "priority_not",
+              "description": "priority not equals to the parameter, priority: The priority weight for service, when deciding witch template should be brought up",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "priority_lt",
+              "description": "priority is less then the parameter, priority: The priority weight for service, when deciding witch template should be brought up",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "priority_lte",
+              "description": "priority is less then or equal to the parameter, priority: The priority weight for service, when deciding witch template should be brought up",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "priority_gt",
+              "description": "priority is greater then the parameter, priority: The priority weight for service, when deciding witch template should be brought up",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "priority_gte",
+              "description": "priority is greater then or equal to the parameter, priority: The priority weight for service, when deciding witch template should be brought up",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "forceUpdate",
+              "description": "forceUpdate exactly equals to the parameter, forceUpdate: A value indicating whether no other nodes from previous releases are compatible",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "forceUpdate_not",
+              "description": "forceUpdate not equals to the parameter, forceUpdate: A value indicating whether no other nodes from previous releases are compatible",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "ClusterKitNodeApi_Template_Sort",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "code_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "code_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "configuration_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "configuration_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "maximumNeededInstances_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "maximumNeededInstances_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "minimumRequiredInstances_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "minimumRequiredInstances_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notes_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notes_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "priority_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "priority_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "forceUpdate_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "forceUpdate_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_CompatibleTemplate_Connection",
+          "description": "The list of connected ClusterKitNodeApi_CompatibleTemplate\n The compatible node template",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INTERFACE",
+                  "name": "IClusterKitNodeApi_CompatibleTemplate_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_CompatibleTemplate_Connection",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_CompatibleTemplate_Edge",
+          "description": "The ClusterKitNodeApi_CompatibleTemplate in a connected list\n The compatible node template",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_CompatibleTemplate",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_CompatibleTemplate_Edge",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_CompatibleTemplate",
+          "description": "The compatible node template",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "__id",
+              "description": "the relation id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "compatibleReleaseId",
+              "description": "the compatible release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId",
+              "description": "the parent release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "templateCode",
+              "description": "the template code",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "compatibleRelease",
+              "description": "the compatible release",
+              "args": [],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_Release",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "release",
+              "description": "the parent release",
+              "args": [],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_Release",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_CompatibleTemplate",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_CompatibleTemplate_Filter_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "OR",
+              "description": "Combine filter conditions with logic \"OR\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_CompatibleTemplate_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "AND",
+              "description": "Combine filter conditions with logic \"AND\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_CompatibleTemplate_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id",
+              "description": "id exactly equals to the parameter, id: the relation id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not",
+              "description": "id not equals to the parameter, id: the relation id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_lt",
+              "description": "id is less then the parameter, id: the relation id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_lte",
+              "description": "id is less then or equal to the parameter, id: the relation id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_gt",
+              "description": "id is greater then the parameter, id: the relation id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_gte",
+              "description": "id is greater then or equal to the parameter, id: the relation id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "compatibleReleaseId",
+              "description": "compatibleReleaseId exactly equals to the parameter, compatibleReleaseId: the compatible release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "compatibleReleaseId_not",
+              "description": "compatibleReleaseId not equals to the parameter, compatibleReleaseId: the compatible release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "compatibleReleaseId_lt",
+              "description": "compatibleReleaseId is less then the parameter, compatibleReleaseId: the compatible release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "compatibleReleaseId_lte",
+              "description": "compatibleReleaseId is less then or equal to the parameter, compatibleReleaseId: the compatible release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "compatibleReleaseId_gt",
+              "description": "compatibleReleaseId is greater then the parameter, compatibleReleaseId: the compatible release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "compatibleReleaseId_gte",
+              "description": "compatibleReleaseId is greater then or equal to the parameter, compatibleReleaseId: the compatible release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId",
+              "description": "releaseId exactly equals to the parameter, releaseId: the parent release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_not",
+              "description": "releaseId not equals to the parameter, releaseId: the parent release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_lt",
+              "description": "releaseId is less then the parameter, releaseId: the parent release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_lte",
+              "description": "releaseId is less then or equal to the parameter, releaseId: the parent release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_gt",
+              "description": "releaseId is greater then the parameter, releaseId: the parent release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_gte",
+              "description": "releaseId is greater then or equal to the parameter, releaseId: the parent release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode",
+              "description": "templateCode exactly equals to the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_not",
+              "description": "templateCode not equals to the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_in",
+              "description": "templateCode is a substring of the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_not_in",
+              "description": "templateCode is not a substring of the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_contains",
+              "description": "templateCode contains the parameter as substring, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_not_contains",
+              "description": "templateCode doesn't contain the parameter as substring, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_starts_with",
+              "description": "templateCode starts with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_not_starts_with",
+              "description": "templateCode doesn't start with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_ends_with",
+              "description": "templateCode ends with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_not_ends_with",
+              "description": "templateCode doesn't end with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l",
+              "description": "templateCode lowercased equals the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_not",
+              "description": "templateCode lowercased doesn't equal the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_in",
+              "description": "templateCode lowercased is a substring of the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_not_in",
+              "description": "templateCode lowercased is not a substring of the parameter, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_contains",
+              "description": "templateCode lowercased contains the parameter as substring, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_not_contains",
+              "description": "templateCode lowercased doesn't contain the parameter as substring, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_starts_with",
+              "description": "templateCode lowercased starts with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_not_starts_with",
+              "description": "templateCode lowercased doesn't start with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_ends_with",
+              "description": "templateCode lowercased ends with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "templateCode_l_not_ends_with",
+              "description": "templateCode lowercased doesn't end with the parameter value, templateCode: the template code",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "ClusterKitNodeApi_CompatibleTemplate_Sort",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "id_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "compatibleReleaseId_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "compatibleReleaseId_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "templateCode_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "templateCode_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
         },
         {
           "kind": "INPUT_OBJECT",
@@ -16304,6 +19163,73 @@
               "deprecationReason": null
             },
             {
+              "name": "compatibleTemplates",
+              "description": "the list of compatible node templates",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_CompatibleTemplate_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_CompatibleTemplate_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_CompatibleTemplate_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "id",
               "description": null,
               "args": [],
@@ -16413,7 +19339,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NodeTemplate_Filter_Input",
+                    "name": "ClusterKitNodeApi_Template_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16426,7 +19352,90 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NodeTemplate_Sort",
+                      "name": "ClusterKitNodeApi_Template_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Template_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "seedAddresses",
+              "description": "the list of seed addresses",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "nugetFeeds",
+              "description": "the list of nuget feeds",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_NugetFeed_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_NugetFeed_Sort",
                       "ofType": null
                     }
                   },
@@ -16465,7 +19474,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_NodeTemplate_Connection",
+                "name": "ClusterKitNodeApi_NugetFeed_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -16489,6 +19498,641 @@
             {
               "kind": "INTERFACE",
               "name": "IClusterKitNodeApi_ReleaseConfiguration",
+              "ofType": null
+            },
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_Template_Connection",
+          "description": "The list of connected ClusterKitNodeApi_Template\n Node template description",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ClusterKitNodeApi_Template_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_Template_Connection",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_Template_Edge",
+          "description": "The ClusterKitNodeApi_Template in a connected list\n Node template description",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "Node template description",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Template",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_Template_Edge",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_Template",
+          "description": "Node template description",
+          "fields": [
+            {
+              "name": "code",
+              "description": "The program readable node template name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "configuration",
+              "description": "The akka configuration template for node",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "containerTypes",
+              "description": "The list of container types to install node templates",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "maximumNeededInstances",
+              "description": "The maximum number of working nodes that is reasonable for cluster",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "minimumRequiredInstances",
+              "description": "The minimum number of working node type required for cluster to work",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "The human readable node template name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notes",
+              "description": "The template description for other users",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "priority",
+              "description": "The priority weight for service, when deciding witch template should be brought up",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "packageRequirements",
+              "description": "The list of package requirements",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_PackageRequirement_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_PackageRequirement_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_PackageRequirement_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "forceUpdate",
+              "description": "A value indicating whether no other nodes from previous releases are compatible",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_Template",
+              "ofType": null
+            },
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_PackageRequirement_Connection",
+          "description": "The list of connected ClusterKitNodeApi_PackageRequirement\n The package requirement for the template",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ClusterKitNodeApi_PackageRequirement_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_PackageRequirement_Connection",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_PackageRequirement_Edge",
+          "description": "The ClusterKitNodeApi_PackageRequirement in a connected list\n The package requirement for the template",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "The package requirement for the template",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_PackageRequirement",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_PackageRequirement_Edge",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_PackageRequirement",
+          "description": "The package requirement for the template",
+          "fields": [
+            {
+              "name": "__id",
+              "description": "the Nuget package id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "specificVersion",
+              "description": "the required specific version (in case of null the default version for release will be used)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_PackageRequirement",
+              "ofType": null
+            },
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_CompatibleTemplate_Connection",
+          "description": "The list of connected ClusterKitNodeApi_CompatibleTemplate\n The compatible node template",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ClusterKitNodeApi_CompatibleTemplate_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_CompatibleTemplate_Connection",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_CompatibleTemplate_Edge",
+          "description": "The ClusterKitNodeApi_CompatibleTemplate in a connected list\n The compatible node template",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "The compatible node template",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_CompatibleTemplate",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_CompatibleTemplate_Edge",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_CompatibleTemplate",
+          "description": "The compatible node template",
+          "fields": [
+            {
+              "name": "__id",
+              "description": "the relation id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "compatibleReleaseId",
+              "description": "the compatible release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId",
+              "description": "the parent release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "templateCode",
+              "description": "the template code",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "compatibleRelease",
+              "description": "the compatible release",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Release",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "release",
+              "description": "the parent release",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Release",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_CompatibleTemplate",
               "ofType": null
             },
             {
@@ -17577,6 +21221,29 @@
               "deprecationReason": null
             },
             {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete",
+              "description": "moves release state from \"ready\" to \"obsolete\"",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Release_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_setStable",
               "description": "moves release state from \"draft\" to \"ready\"",
               "args": [
@@ -17692,6 +21359,52 @@
               "deprecationReason": null
             },
             {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser",
+              "description": "Grants a new role to the user",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Role_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser",
+              "description": "Withdraws the role from the user",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Role_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "ClusterKitNodeApi_clusterKitNodesApi_roles_create",
               "description": "Creates the new managing system role",
               "args": [
@@ -17801,6 +21514,75 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "ClusterKitNodeApi_SeedAddress_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword",
+              "description": "Resets the user password",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_User_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_users_grantRole",
+              "description": "Grants a new role to the user",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_users_grantRole_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_User_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole",
+              "description": "Withdraws the role from the user",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_User_NodeMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -19016,6 +22798,37 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_setStable_Input",
           "description": "",
           "fields": null,
@@ -19216,7 +23029,35 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKitNodeApi_NodeTemplate_Input",
+                  "name": "ClusterKitNodeApi_Template_Input",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "seedAddresses",
+              "description": "the list of seed addresses",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "nugetFeeds",
+              "description": "the list of nuget feeds",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ClusterKitNodeApi_NugetFeed_Input",
                   "ofType": null
                 }
               },
@@ -19264,6 +23105,156 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_Template_Input",
+          "description": "Node template description",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "code",
+              "description": "The program readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "configuration",
+              "description": "The akka configuration template for node",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "containerTypes",
+              "description": "The list of container types to install node templates",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maximumNeededInstances",
+              "description": "The maximum number of working nodes that is reasonable for cluster",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "minimumRequiredInstances",
+              "description": "The minimum number of working node type required for cluster to work",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "The human readable node template name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "notes",
+              "description": "The template description for other users",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "priority",
+              "description": "The priority weight for service, when deciding witch template should be brought up",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "packageRequirements",
+              "description": "The list of package requirements",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ClusterKitNodeApi_PackageRequirement_Input",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "forceUpdate",
+              "description": "A value indicating whether no other nodes from previous releases are compatible",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_PackageRequirement_Input",
+          "description": "The package requirement for the template",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "the Nuget package id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "specificVersion",
+              "description": "the required specific version (in case of null the default version for release will be used)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             }
@@ -19424,6 +23415,88 @@
           ],
           "inputFields": null,
           "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "userUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "roleUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "userUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "roleUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
@@ -19860,6 +23933,129 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "password",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_users_grantRole_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "userUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "roleUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "userUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "roleUid",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Uid",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "ClusterKitNodeApi_clusterKitNodesApi_users_create_Input",
           "description": "",
           "fields": null,
@@ -20019,7 +24215,7 @@
             },
             {
               "name": "newPassword",
-              "description": "The user current password",
+              "description": "The user new password",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",

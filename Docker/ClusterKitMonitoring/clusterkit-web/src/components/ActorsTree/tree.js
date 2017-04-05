@@ -180,10 +180,16 @@ class ActorsTree extends React.Component {
 
         ReactDom.render(this.getActorToolTip(d.data), div.node());
 
-        const offsetX = 13;
-        const offsetY = 10;
+        const svgOffsetY = this.refs.actorsTree.getBoundingClientRect().top;
+        const offsetX = -20;
+        const offsetY = 20 + svgOffsetY;
         const positionX = d3Event.layerX;
         const positionY = d3Event.layerY;
+
+        console.log('positionX', positionX);
+        console.log('positionY', positionY);
+        console.log(this.refs.actorsTree.getBoundingClientRect().top);
+
         const tooltipWidth = div.node().clientWidth;
         const tooltipHeight = div.node().clientHeight;
         const containerWidth = d3Event.path[4].clientWidth;
@@ -203,10 +209,18 @@ class ActorsTree extends React.Component {
         let tooltipY = offsetY;
         if ((positionY - offsetY + tooltipHeight) < containerHeight) {
           tooltipY = positionY - offsetY;
+          console.log('first case', tooltipY);
+          console.log('positionY', positionY);
+          console.log('offsetY', offsetY);
+          console.log('tooltipHeight', tooltipHeight);
+          console.log('containerHeight', containerHeight);
+
         } else if ((positionY + offsetY - tooltipHeight) > 0 && positionY + offsetY < containerHeight) {
           tooltipY = positionY + offsetY - tooltipHeight;
+          console.log('second case', tooltipY);
         } else if ((positionY - tooltipHeight) > 1) {
           tooltipY = positionY - tooltipHeight - 1;
+          console.log('third case', tooltipY);
         }
 
         tooltipY += containerOffsetY;
@@ -235,7 +249,7 @@ class ActorsTree extends React.Component {
 
   render() {
     return (
-      <svg width="10" height="10"></svg>
+      <svg className="actors-tree" width="10" height="10" ref="actorsTree"></svg>
     );
   }
 }

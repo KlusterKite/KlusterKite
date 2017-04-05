@@ -33,6 +33,13 @@ export default class App extends React.Component {
               </LinkContainer>
             </Nav>
             <Nav navbar>
+              {hasPrivilege('ClusterKit.NodeManager.Release.GetList') &&
+              <LinkContainer to="/clusterkit/Releases">
+                <NavItem>Releases</NavItem>
+              </LinkContainer>
+              }
+            </Nav>
+            <Nav navbar>
               {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Query') &&
                 <LinkContainer to="/clusterkit/Templates">
                   <NavItem>Templates</NavItem>
