@@ -9,7 +9,7 @@ storiesOf('Homepage')
     const data = getData();
 
     const props = {
-      data: data.data.api.nodeManagerData,
+      data: data.data.api.clusterKitNodesApi,
       hasError: false,
       upgradeNodePrivilege: true,
       onManualUpgrade: action('onManualUpgrade')
@@ -23,7 +23,7 @@ const getData = () => {
     "data": {
       "api": {
         "__typename": "ClusterKitMonitoring_ClusterKitNodeApi",
-        "nodeManagerData": {
+        "clusterKitNodesApi": {
           "id": "W3siZiI6Im5vZGVNYW5hZ2VyRGF0YSJ9XQ==",
           "getActiveNodeDescriptions": {
             "edges": [{

@@ -29,7 +29,16 @@ storiesOf('Form')
   .add('submit failed', () => {
     return <Submit canSubmit={true} saveError="Epic fail. How did that happen?!" />;
   })
+  .add('submit failed, multiple errors', () => {
+    return <Submit canSubmit={true} saveErrors={["Epic fail. How did that happen?!", "Cat on keyboard detected"]} />;
+  })
   .add('submit with delete', () => {
     return <Submit canSubmit={true} onDelete={action('deleted')} />;
+  })
+  .add('submit with cancel', () => {
+    return <Submit canSubmit={true} onCancel={action('cancelled')} />;
+  })
+  .add('submit with delete and cancel', () => {
+    return <Submit canSubmit={true} onCancel={action('cancelled')} onDelete={action('deleted')} />;
   })
 ;

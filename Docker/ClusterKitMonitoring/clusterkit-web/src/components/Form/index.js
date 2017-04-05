@@ -19,10 +19,12 @@ export default class Form extends React.Component { // eslint-disable-line react
 
   static propTypes = {
     onSubmit: React.PropTypes.func.isRequired,
+    onCancel: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     className: React.PropTypes.string,
     saving: React.PropTypes.bool,
     saved: React.PropTypes.bool,
+    saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
     saveError: React.PropTypes.string,
     buttonText: React.PropTypes.string,
     savedText: React.PropTypes.string,
@@ -55,9 +57,11 @@ export default class Form extends React.Component { // eslint-disable-line react
           saved={this.props.saved}
           disabled={this.props.disabled}
           saveError={this.props.saveError}
+          saveErrors={this.props.saveErrors}
           buttonText={this.props.buttonText}
           savedText={this.props.savedText}
           onDelete={this.props.onDelete}
+          onCancel={this.props.onCancel}
         />
       </FormsyForm>
     );

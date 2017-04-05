@@ -23,6 +23,7 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
 
   static propTypes = {
     onSubmit: React.PropTypes.func.isRequired,
+    onCancel: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     initialValues: React.PropTypes.object,
     saving: React.PropTypes.bool,
@@ -52,6 +53,11 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     this.props.onSubmit(model);
   }
 
+  cancel() {
+    console.log('cancel function');
+    this.props.onCancel();
+  }
+
   render() {
     const { initialValues } = this.props;
     return (
@@ -62,7 +68,7 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
         {!initialValues &&
           <h2>Create a new Template</h2>
         }
-        <Form onSubmit={this.submit} onDelete={this.props.onDelete ? this.props.onDelete : null} className="form-horizontal form-margin" saving={this.props.saving} saved={this.props.saved} saveError={this.props.saveError}>
+        <Form onSubmit={this.submit} onCancel={this.props.onCancel} onDelete={this.props.onDelete ? this.props.onDelete : null} className="form-horizontal form-margin" saving={this.props.saving} saved={this.props.saved} saveError={this.props.saveError}>
           <fieldset>
             <Input name="__id" value={initialValues && initialValues.__id} type="hidden" />
             <Input name="version" value={(initialValues && initialValues.version) || ""} type="hidden" />
@@ -86,7 +92,6 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
               elementWrapperClassName="col-sm-2"
             />
             <Input name="priority" label="Priority" value={(initialValues && initialValues.priority) || ""} validations="isNumeric" validationError="Must be numeric" elementWrapperClassName="col-sm-2" />
-            <Textarea name="packages" label="Packages" value={(initialValues && this.arrayToString(initialValues.packages)) || ""} rows={6} />
             <Textarea name="containerTypes" label="Container Types" value={(initialValues && this.arrayToString(initialValues.containerTypes)) || ""} rows={3} />
             <Textarea name="configuration" label="Configuration" value={(initialValues && initialValues.configuration) || ""} rows={10} />
           </fieldset>
@@ -95,3 +100,6 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     );
   }
 }
+
+// <Textarea name="packages" label="Packages" value={(initialValues && this.arrayToString(initialValues.packages)) || ""} rows={6} />
+
