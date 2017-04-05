@@ -9,8 +9,7 @@
 
 namespace ClusterKit.NodeManager.Client
 {
-    using ClusterKit.Security.Client;
-    using ClusterKit.Security.Client.Attributes;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The list of defined module privileges

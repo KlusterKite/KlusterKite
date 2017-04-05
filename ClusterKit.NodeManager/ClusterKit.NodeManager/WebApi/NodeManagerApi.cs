@@ -16,21 +16,20 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
+    using ClusterKit.API.Attributes;
+    using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
-    using ClusterKit.API.Client.Attributes.Authorization;
     using ClusterKit.API.Client.Converters;
     using ClusterKit.Core;
     using ClusterKit.Data.CRUD;
     using ClusterKit.NodeManager.Client;
+    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
-
-    using PackageDescription = ClusterKit.NodeManager.Client.ApiSurrogates.PackageDescription;
 
     /// <summary>
     /// The node manager api
@@ -104,7 +103,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>The list of available packages</returns>
         [UsedImplicitly]
         [DeclareField("The list of available packages from local cluster repository",
-            Converter = typeof(ArrayConverter<PackageDescription.Converter, PackageDescription>))]
+            Converter = typeof(ArrayConverter<PackageFamily.Converter, PackageFamily>))]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]

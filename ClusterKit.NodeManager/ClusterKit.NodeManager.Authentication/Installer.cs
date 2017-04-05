@@ -17,7 +17,7 @@ namespace ClusterKit.NodeManager.Authentication
     using Castle.Windsor;
 
     using ClusterKit.Core;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

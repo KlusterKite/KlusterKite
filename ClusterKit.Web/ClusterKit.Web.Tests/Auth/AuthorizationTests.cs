@@ -24,7 +24,7 @@ namespace ClusterKit.Web.Tests.Auth
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization;
     using ClusterKit.Web.Authorization.Attributes;
 

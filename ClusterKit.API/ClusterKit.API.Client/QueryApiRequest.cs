@@ -11,7 +11,7 @@ namespace ClusterKit.API.Client
 {
     using System.Collections.Generic;
 
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The read-only query api request

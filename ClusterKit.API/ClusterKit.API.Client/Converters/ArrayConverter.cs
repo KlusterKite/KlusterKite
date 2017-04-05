@@ -12,6 +12,8 @@ namespace ClusterKit.API.Client.Converters
     using System.Collections.Generic;
     using System.Linq;
 
+    using ClusterKit.API.Attributes;
+
     using JetBrains.Annotations;
 
     /// <summary>

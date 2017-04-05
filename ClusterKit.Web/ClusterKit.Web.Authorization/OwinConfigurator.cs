@@ -11,7 +11,7 @@ namespace ClusterKit.Web.Authorization
 {
     using System.Web.Http;
 
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using Owin;
 

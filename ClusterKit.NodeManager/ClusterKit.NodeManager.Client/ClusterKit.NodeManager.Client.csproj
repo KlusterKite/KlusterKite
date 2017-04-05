@@ -177,7 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiSurrogates\AkkaAddressSurrogate.cs" />
-    <Compile Include="ApiSurrogates\PackageDescription.cs" />
+    <Compile Include="ApiSurrogates\PackageFamily.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -220,6 +220,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj">
+      <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
+      <Name>ClusterKit.API.Attributes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj">
       <Project>{874ac41b-a084-4eed-9b7f-6b82efc416ee}</Project>
       <Name>ClusterKit.NodeManager.Launcher.Messages</Name>

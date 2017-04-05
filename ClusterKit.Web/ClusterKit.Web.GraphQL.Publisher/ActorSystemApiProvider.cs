@@ -20,7 +20,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using ClusterKit.API.Client;
     using ClusterKit.API.Client.Messages;
     using ClusterKit.Core;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using Newtonsoft.Json.Linq;
 

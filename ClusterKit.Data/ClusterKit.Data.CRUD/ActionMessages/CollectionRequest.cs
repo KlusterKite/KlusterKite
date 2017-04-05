@@ -16,7 +16,7 @@ namespace ClusterKit.Data.CRUD.ActionMessages
     using Akka.Routing;
 
     using ClusterKit.API.Client;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

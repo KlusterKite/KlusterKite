@@ -9,7 +9,7 @@
 
 namespace ClusterKit.NodeManager.Messages
 {
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// Makes the draft release check

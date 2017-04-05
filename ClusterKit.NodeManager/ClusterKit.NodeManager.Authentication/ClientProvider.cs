@@ -14,7 +14,7 @@ namespace ClusterKit.NodeManager.Authentication
     using Akka.Actor;
 
     using ClusterKit.NodeManager.Authentication.Clients;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

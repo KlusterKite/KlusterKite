@@ -21,7 +21,7 @@ namespace ClusterKit.API.Tests
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

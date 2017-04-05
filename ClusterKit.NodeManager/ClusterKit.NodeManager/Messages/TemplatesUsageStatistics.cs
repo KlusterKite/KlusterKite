@@ -10,7 +10,8 @@
 namespace ClusterKit.NodeManager.Messages
 {
     using System.Collections.Generic;
-    using ClusterKit.API.Client.Attributes;
+
+    using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
 

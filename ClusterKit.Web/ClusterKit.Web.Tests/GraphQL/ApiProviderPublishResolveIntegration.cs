@@ -14,11 +14,11 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Linq;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Core.Log;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Web.GraphQL.Publisher;
 
     using global::GraphQL;

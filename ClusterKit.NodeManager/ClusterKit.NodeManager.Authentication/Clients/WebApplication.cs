@@ -19,7 +19,7 @@ namespace ClusterKit.NodeManager.Authentication.Clients
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The ClusterKit node manager web UI
@@ -91,10 +91,10 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         }
 
         /// <summary>
-        /// Creates <see cref="AuthenticationResult"/> from user data
+        /// Creates <see cref="ClusterKit.Security.Attributes.AuthenticationResult"/> from user data
         /// </summary>
         /// <param name="user">The user</param>
-        /// <returns>The <see cref="AuthenticationResult"/></returns>
+        /// <returns>The <see cref="ClusterKit.Security.Attributes.AuthenticationResult"/></returns>
         private AuthenticationResult CreateUserAuthenticationResult(User user)
         {
             // ReSharper disable ArrangeRedundantParentheses

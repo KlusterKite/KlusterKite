@@ -11,8 +11,7 @@ namespace ClusterKit.NodeManager.Client.ApiSurrogates
 {
     using Akka.Actor;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
 

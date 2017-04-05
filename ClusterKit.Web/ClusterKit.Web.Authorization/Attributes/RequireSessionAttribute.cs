@@ -17,6 +17,7 @@ namespace ClusterKit.Web.Authorization.Attributes
     using System.Web.Http.Filters;
     using System.Web.Http.Results;
 
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
     /// <summary>
@@ -48,7 +49,7 @@ namespace ClusterKit.Web.Authorization.Attributes
             }
 
             SecurityLog.CreateRecord(
-                SecurityLog.EnType.OperationDenied,
+                EnSecurityLogType.OperationDenied,
                 this.Severity,
                 context.Request.GetOwinContext().GetRequestDescription(),
                 "Attempt to access {ControllerName} action {ActionName} without authenticated session",

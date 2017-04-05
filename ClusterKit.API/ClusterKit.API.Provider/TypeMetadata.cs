@@ -15,8 +15,8 @@ namespace ClusterKit.API.Provider
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
 
     /// <summary>
     /// Property or method return type description
@@ -106,7 +106,7 @@ namespace ClusterKit.API.Provider
         /// <returns>The corresponding scalar type</returns>
         public static EnScalarType CheckScalarType(Type type)
         {
-            var nullable = CheckType(type, typeof(Nullable<>));
+            var nullable = ApiDescriptionAttribute.CheckType(type, typeof(Nullable<>));
             if (nullable != null)
             {
                 type = nullable.GenericTypeArguments[0];
@@ -153,53 +153,6 @@ namespace ClusterKit.API.Provider
         }
 
         /// <summary>
-        /// Checks the interface implementation
-        /// </summary>
-        /// <param name="type">The type to check</param>
-        /// <param name="typeToCheck">The type of an interface</param>
-        /// <returns>The interface or null</returns>
-        public static Type CheckType(Type type, Type typeToCheck)
-        {
-            if (type == typeToCheck)
-            {
-                return type;
-            }
-
-            if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeToCheck)
-            {
-                return type;
-            }
-
-            foreach (var @interface in type.GetInterfaces())
-            {
-                if (@interface == typeToCheck)
-                {
-                    return @interface;
-                }
-
-                if (@interface.IsConstructedGenericType && @interface.GetGenericTypeDefinition() == typeToCheck)
-                {
-                    return @interface;
-                }
-            }
-
-            foreach (var baseType in GetBaseTypes(type))
-            {
-                if (baseType == typeToCheck)
-                {
-                    return baseType;
-                }
-
-                if (baseType.IsConstructedGenericType && baseType.GetGenericTypeDefinition() == typeToCheck)
-                {
-                    return baseType;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Parses the metadata of returning type for the field
         /// </summary>
         /// <param name="type">The original field return type</param>
@@ -208,7 +161,7 @@ namespace ClusterKit.API.Provider
         public static TypeMetadata GenerateTypeMetadata(Type type, PublishToApiAttribute attribute)
         {
             var metadata = new TypeMetadata();
-            var asyncType = CheckType(type, typeof(Task<>));
+            var asyncType = ApiDescriptionAttribute.CheckType(type, typeof(Task<>));
             if (asyncType != null)
             {
                 metadata.IsAsync = true;
@@ -241,8 +194,8 @@ namespace ClusterKit.API.Provider
             metadata.MetaType = EnMetaType.Scalar;
             if (scalarType == EnScalarType.None)
             {
-                var enumerable = CheckType(type, typeof(IEnumerable<>));
-                var connection = CheckType(type, typeof(INodeConnection<>));
+                var enumerable = ApiDescriptionAttribute.CheckType(type, typeof(IEnumerable<>));
+                var connection = ApiDescriptionAttribute.CheckType(type, typeof(INodeConnection<>));
 
                 if (connection != null)
                 {
@@ -318,25 +271,6 @@ namespace ClusterKit.API.Provider
 
             flags |= EnFieldFlags.Queryable;
             return flags;
-        }
-
-        /// <summary>
-        /// Gets the base type hierarchy
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <returns>The list of base types</returns>
-        private static IEnumerable<Type> GetBaseTypes(Type type)
-        {
-            if (type.BaseType == null)
-            {
-                yield break;
-            }
-
-            yield return type.BaseType;
-            foreach (var baseType in GetBaseTypes(type.BaseType))
-            {
-                yield return baseType;
-            }
         }
     }
 }

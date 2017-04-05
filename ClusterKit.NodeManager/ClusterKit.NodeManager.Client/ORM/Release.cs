@@ -14,8 +14,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
     using ClusterKit.Data.CRUD;
 
     using JetBrains.Annotations;

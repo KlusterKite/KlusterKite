@@ -37,6 +37,10 @@
       <Project>{2a6edcc4-c729-4bee-9bb5-ac6f76b3bac8}</Project>
       <Name>ClusterKit.API.Client</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
       <Project>{983DAEB9-B058-41A9-8403-29851F2244B7}</Project>
       <Name>ClusterKit.NodeManager.Client</Name>

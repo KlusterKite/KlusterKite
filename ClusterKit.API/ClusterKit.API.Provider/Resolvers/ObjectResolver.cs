@@ -20,8 +20,9 @@ namespace ClusterKit.API.Provider.Resolvers
 
     using Castle.Core.Internal;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
     using Newtonsoft.Json;
@@ -336,7 +337,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// <param name="argumentsSerializer">
         /// The arguments serializer.
         /// </param>
-        /// <param name="onErrorCallback">
+        /// <param name="onErrorCallback"> 
         /// The on error callback.
         /// </param>
         /// <returns>The value</returns>
@@ -354,14 +355,9 @@ namespace ClusterKit.API.Provider.Resolvers
             => Fields.ToImmutableDictionary(f => f.Key, f => f.Value.TypeMember);
 
         /// <summary>
-        /// Gets the generated api type for <see cref="T"/>
+        /// Gets the generated api type for typed argument
         /// </summary>
         public static ApiObjectType GeneratedType { get; }
-
-        /// <summary>
-        /// Gets the list of errors occurred on generation stage
-        /// </summary>
-        public static List<string> GetGenerationErrors => new List<string>(GenerationErrors);
 
         /// <summary>
         /// Gets the list of errors occurred during initialization
@@ -449,7 +445,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
                             var rule = field.Field.LogAccessRules.OrderByDescending(r => r.Severity).First();
                             SecurityLog.CreateRecord(
-                                SecurityLog.EnType.OperationGranted,
+                                EnSecurityLogType.OperationGranted,
                                 rule.Severity,
                                 context,
                                 rule.LogMessage,
@@ -1068,7 +1064,7 @@ namespace ClusterKit.API.Provider.Resolvers
             Expression getValue,
             Func<Expression, Expression> converterExpression)
         {
-            var asyncType = TypeMetadata.CheckType(returnType, typeof(Task<>));
+            var asyncType = ApiDescriptionAttribute.CheckType(returnType, typeof(Task<>));
             if (asyncType != null)
             {
                 returnType = asyncType.GenericTypeArguments[0];

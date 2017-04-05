@@ -14,7 +14,7 @@ namespace ClusterKit.API.Provider.Resolvers
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

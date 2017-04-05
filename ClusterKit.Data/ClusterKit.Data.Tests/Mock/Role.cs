@@ -13,8 +13,7 @@ namespace ClusterKit.Data.Tests.Mock
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
 
     /// <summary>
     /// The role for test data context

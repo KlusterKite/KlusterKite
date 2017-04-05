@@ -17,9 +17,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using Akka.Cluster;
     
     using ClusterKit.Data;
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Client;
+    using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.Security.Attributes;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -49,20 +49,19 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             var nugetFeeds = new List<NugetFeed>();
             List<string> seedsFromConfig = new List<string>();
             List<PackageDescription> initialPackages = new List<PackageDescription>();
-
+            var system = ServiceLocator.Current.GetInstance<ActorSystem>();
+            var nugetUrl = system.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
+            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
+            
             try
             {
-                var system = ServiceLocator.Current.GetInstance<ActorSystem>();
-                var nugetUrl = system.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
-                var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
-
                 if (nugetRepository != null)
                 {
                     initialPackages =
                         nugetRepository.Search(string.Empty, true)
                             .Where(p => p.IsLatestVersion)
                             .ToList()
-                            .Select(p => new PackageDescription { Name = p.Id, Version = p.Version.ToString() })
+                            .Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() })
                             .ToList();
                 }
 
@@ -135,6 +134,21 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                          Started = DateTimeOffset.Now,
                                          Configuration = configuration
                                      };
+
+            var supportedFrameworks = system.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+            var initialErrors = initialRelease.SetPackagesDescriptionsForTemplates(
+                nugetRepository,
+                supportedFrameworks.ToList()).ToList();
+
+            foreach (var errorDescription in initialErrors)
+            {
+                system.Log.Error(
+                    "{Type}: initial error in {Field} - {Message}",
+                    this.GetType().Name,
+                    errorDescription.Field,
+                    errorDescription.Message);
+            }
+
             context.Releases.Add(initialRelease);
 
             context.SaveChanges();

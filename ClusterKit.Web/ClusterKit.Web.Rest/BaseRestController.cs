@@ -27,6 +27,7 @@ namespace ClusterKit.Web.Rest
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects;
     using ClusterKit.LargeObjects.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.Authorization;
 
@@ -165,7 +166,7 @@ namespace ClusterKit.Web.Rest
             var response = await this.SendRequest(request);
 
             SecurityLog.CreateRecord(
-                SecurityLog.EnType.DataReadGranted,
+                EnSecurityLogType.DataReadGranted,
                 response is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
                 this.Request.GetOwinContext().GetRequestDescription(),
                 "{ObjectType} with id {ObjectId} was read.",
@@ -225,7 +226,7 @@ namespace ClusterKit.Web.Rest
                                  : EnSeverity.Trivial;
 
             SecurityLog.CreateRecord(
-                SecurityLog.EnType.DataReadGranted,
+                EnSecurityLogType.DataReadGranted,
                 severity,
                 this.Request.GetOwinContext().GetRequestDescription(),
                 "The list of {ObjectType} was read.",

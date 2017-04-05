@@ -15,6 +15,7 @@ namespace ClusterKit.Web.Authorization.Attributes
     using System.Web.Http;
     using System.Web.Http.Controllers;
 
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
     /// <summary>
@@ -72,7 +73,7 @@ namespace ClusterKit.Web.Authorization.Attributes
             if (!isAuthorized)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.OperationDenied,
+                    EnSecurityLogType.OperationDenied,
                     this.Severity,
                     actionContext.Request.GetOwinContext().GetRequestDescription(),
                     "Attempt to access {ControllerName} action {ActionName} without required client privilege {Privilege}",

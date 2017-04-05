@@ -9,19 +9,46 @@
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
+    using ClusterKit.API.Attributes;
+
     /// <summary>
     /// Short description of NuGet package
     /// </summary>
+    [ApiDescription("Short description of NuGet package", Name = "PackageDescription")]
     public class PackageDescription
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="PackageDescription"/> class.
+        /// </summary>
+        public PackageDescription()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageDescription"/> class.
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <param name="version">
+        /// The version.
+        /// </param>
+        public PackageDescription(string id, string version)
+        {
+            this.Id = id;
+            this.Version = version;
+        }
+
+        /// <summary>
         /// Gets or sets the package Id
         /// </summary>
+        [DeclareField("the package Id", IsKey = true)]
         public string Id { get; set; }
 
         /// <summary>
         /// Gets or sets the package version
         /// </summary>
+        [DeclareField("the package version")]
         public string Version { get; set; }
 
         /// <summary>

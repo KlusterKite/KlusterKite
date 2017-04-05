@@ -10,7 +10,7 @@
 namespace ClusterKit.NodeManager.Messages
 {
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// Performs the cluster update

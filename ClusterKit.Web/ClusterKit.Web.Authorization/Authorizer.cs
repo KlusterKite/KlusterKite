@@ -10,8 +10,8 @@ namespace ClusterKit.Web.Authorization
 {
     using System.Security.Claims;
     using System.Threading.Tasks;
-    
-    using ClusterKit.Security.Client;
+
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

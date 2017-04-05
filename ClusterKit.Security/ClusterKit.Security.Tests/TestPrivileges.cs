@@ -9,8 +9,7 @@
 
 namespace ClusterKit.Security.Tests
 {
-    using ClusterKit.Security.Client;
-    using ClusterKit.Security.Client.Attributes;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

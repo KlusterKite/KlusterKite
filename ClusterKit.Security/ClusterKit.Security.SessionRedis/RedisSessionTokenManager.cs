@@ -16,7 +16,7 @@ namespace ClusterKit.Security.SessionRedis
     using Akka.Actor;
 
     using ClusterKit.Core.Utils;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

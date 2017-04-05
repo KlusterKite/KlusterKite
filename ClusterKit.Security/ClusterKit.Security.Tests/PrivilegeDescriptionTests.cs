@@ -13,8 +13,8 @@ namespace ClusterKit.Security.Tests
 
     using Akka.Configuration;
 
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
-    using ClusterKit.Security.Client.Attributes;
 
     using JetBrains.Annotations;
 

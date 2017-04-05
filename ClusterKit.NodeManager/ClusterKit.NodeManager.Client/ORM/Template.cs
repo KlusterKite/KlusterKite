@@ -12,7 +12,8 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
+    using ClusterKit.API.Client.Converters;
     using ClusterKit.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
@@ -90,6 +91,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the list of packages to install for current template
         /// </summary>
+        [DeclareField("The list of packages to install for current template", Converter = typeof(DictionaryConverter<string, List<PackageDescription>>))]
         public Dictionary<string, List<PackageDescription>> PackagesToInstall { get; set; }
 
         /// <summary>

@@ -14,8 +14,9 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Linq;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes.Authorization;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
 
@@ -336,7 +337,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                        : EnSeverity.Trivial;
 
                     SecurityLog.CreateRecord(
-                        SecurityLog.EnType.OperationDenied,
+                        EnSecurityLogType.OperationDenied,
                         severity,
                         context.UserContext as RequestContext,
                         "Unauthorized call to {ApiPath}",
@@ -497,7 +498,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
                                        : EnSeverity.Trivial;
 
                     SecurityLog.CreateRecord(
-                        SecurityLog.EnType.OperationDenied,
+                        EnSecurityLogType.OperationDenied,
                         severity,
                         context.UserContext as RequestContext,
                         "Unauthorized call to {ApiPath}",

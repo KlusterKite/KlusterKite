@@ -15,9 +15,9 @@ namespace ClusterKit.API.Provider.Resolvers
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes.Authorization;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

@@ -16,12 +16,14 @@ namespace ClusterKit.Data
     using Akka.Actor;
     using Akka.Event;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
     using ClusterKit.Data.CRUD;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects;
     using ClusterKit.LargeObjects.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
@@ -401,7 +403,7 @@ namespace ClusterKit.Data
                                 
                                 // security update logs are set here to be sure that they are made independently of client notification success
                                 SecurityLog.CreateRecord(
-                                    SecurityLog.EnType.DataCreateGranted,
+                                    EnSecurityLogType.DataCreateGranted,
                                     entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
                                     request.RequestContext,
                                     "{ObjectType} with {ObjectId} id was created",
@@ -464,7 +466,7 @@ namespace ClusterKit.Data
                                 if (!factory.GetId(entity).Equals(factory.GetId(oldObject)))
                                 {
                                     SecurityLog.CreateRecord(
-                                        SecurityLog.EnType.DataUpdateGranted,
+                                        EnSecurityLogType.DataUpdateGranted,
                                         entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
                                         request.RequestContext,
                                         "{ObjectType} with id {ObjectId} was updated. New id is {NewObjectId}",
@@ -475,7 +477,7 @@ namespace ClusterKit.Data
                                 else
                                 {
                                     SecurityLog.CreateRecord(
-                                        SecurityLog.EnType.DataUpdateGranted,
+                                        EnSecurityLogType.DataUpdateGranted,
                                         entity is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
                                         request.RequestContext,
                                         "{ObjectType} with id {ObjectId} was updated.",
@@ -533,7 +535,7 @@ namespace ClusterKit.Data
 
                             // security update logs are set here to be sure that they are made independently of client notification success
                             SecurityLog.CreateRecord(
-                                SecurityLog.EnType.DataDeleteGranted,
+                                EnSecurityLogType.DataDeleteGranted,
                                 oldObject.Value is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
                                 request.RequestContext,
                                 "{ObjectType} with id {ObjectId} was deleted.",

@@ -11,9 +11,9 @@ namespace ClusterKit.NodeManager
 {
     using Akka.Actor;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
     using ClusterKit.NodeManager.WebApi;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

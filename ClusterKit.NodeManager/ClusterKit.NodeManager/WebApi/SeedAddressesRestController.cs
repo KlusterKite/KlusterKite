@@ -19,7 +19,7 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization.Attributes;
     using ClusterKit.Web.Rest;
 

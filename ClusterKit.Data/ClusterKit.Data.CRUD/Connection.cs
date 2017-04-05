@@ -22,7 +22,7 @@ namespace ClusterKit.Data.CRUD
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.LargeObjects.Client;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The base connection using data actors

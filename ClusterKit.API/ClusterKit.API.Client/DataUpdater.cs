@@ -15,7 +15,7 @@ namespace ClusterKit.API.Client
     using System.Linq.Expressions;
     using System.Reflection;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
 
     using Newtonsoft.Json.Linq;
 

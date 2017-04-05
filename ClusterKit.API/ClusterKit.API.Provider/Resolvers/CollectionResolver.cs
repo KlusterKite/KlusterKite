@@ -17,9 +17,10 @@ namespace ClusterKit.API.Provider.Resolvers
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Attributes;
+    using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
-    using ClusterKit.API.Client.Attributes.Authorization;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
     using Newtonsoft.Json;
@@ -292,17 +293,17 @@ namespace ClusterKit.API.Provider.Resolvers
                 return;
             }
 
-            var operationGranted = SecurityLog.EnType.OperationGranted;
+            var operationGranted = EnSecurityLogType.OperationGranted;
             switch (action)
             {
                 case EnConnectionAction.Create:
-                    operationGranted = SecurityLog.EnType.DataCreateGranted;
+                    operationGranted = EnSecurityLogType.DataCreateGranted;
                     break;
                 case EnConnectionAction.Update:
-                    operationGranted = SecurityLog.EnType.DataUpdateGranted;
+                    operationGranted = EnSecurityLogType.DataUpdateGranted;
                     break;
                 case EnConnectionAction.Delete:
-                    operationGranted = SecurityLog.EnType.DataDeleteGranted;
+                    operationGranted = EnSecurityLogType.DataDeleteGranted;
                     break;
             }
 

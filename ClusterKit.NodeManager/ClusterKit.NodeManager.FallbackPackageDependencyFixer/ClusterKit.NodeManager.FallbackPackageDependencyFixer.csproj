@@ -85,6 +85,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj">
+      <Project>{7654b200-7c4f-450c-8013-c59d7b6ce8b7}</Project>
+      <Name>ClusterKit.API.Attributes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
+      <Project>{42524c94-892d-4258-bd2c-d6f24d7bfabb}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj">
       <Project>{874ac41b-a084-4eed-9b7f-6b82efc416ee}</Project>
       <Name>ClusterKit.NodeManager.Launcher.Messages</Name>

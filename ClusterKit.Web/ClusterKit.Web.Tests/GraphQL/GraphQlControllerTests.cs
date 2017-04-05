@@ -25,7 +25,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Web.GraphQL.Publisher;
 
     using Newtonsoft.Json;

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SecurityLog.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -14,64 +14,17 @@ namespace ClusterKit.Security.Client
     using System.Linq;
 
     using ClusterKit.Core.Log;
+    using ClusterKit.Security.Attributes;
 
     using Newtonsoft.Json;
 
     using Serilog.Events;
-
-    using LogEvent = Serilog.Events.LogEvent;
 
     /// <summary>
     /// Logging utilities
     /// </summary>
     public static class SecurityLog
     {
-        /// <summary>
-        /// The log record type
-        /// </summary>
-        public enum EnType
-        {
-            /// <summary>
-            /// Data read operation was successful
-            /// </summary>
-            DataReadGranted,
-
-            /// <summary>
-            /// Data create operation was successful
-            /// </summary>
-            DataCreateGranted,
-
-            /// <summary>
-            /// Data update / change operation was successful
-            /// </summary>
-            DataUpdateGranted,
-
-            /// <summary>
-            /// Data removal operation was successful
-            /// </summary>
-            DataDeleteGranted,
-
-            /// <summary>
-            /// Some uncategorized operation was successfully made
-            /// </summary>
-            OperationGranted,
-
-            /// <summary>
-            /// Authentication grant was successful
-            /// </summary>
-            AuthenticationGranted,
-
-            /// <summary>
-            /// Unsuccessful authentication attempt
-            /// </summary>
-            AuthenticationDenied,
-
-            /// <summary>
-            /// Attempt to make unauthorized operation
-            /// </summary>
-            OperationDenied,
-        }
-
         /// <summary>
         /// Creates a record to the security log
         /// </summary>
@@ -81,7 +34,7 @@ namespace ClusterKit.Security.Client
         /// <param name="format">The message format</param>
         /// <param name="parameters">Additional message parameters</param>
         public static void CreateRecord(
-            EnType recordType,
+            EnSecurityLogType recordType,
             EnSeverity severity,
             RequestContext requestContext,
             string format,
@@ -165,24 +118,24 @@ namespace ClusterKit.Security.Client
         /// <param name="recordType">The record type</param>
         /// <param name="severity">The data severity</param>
         /// <returns>The log record level</returns>
-        private static LogEventLevel GetLogLevel(EnType recordType, EnSeverity severity)
+        private static LogEventLevel GetLogLevel(EnSecurityLogType recordType, EnSeverity severity)
         {
             switch (severity)
             {
                 case EnSeverity.Trivial:
                     switch (recordType)
                     {
-                        case EnType.DataReadGranted:
-                        case EnType.OperationGranted:
+                        case EnSecurityLogType.DataReadGranted:
+                        case EnSecurityLogType.OperationGranted:
                             return LogEventLevel.Debug;
-                        case EnType.DataCreateGranted:
-                        case EnType.DataUpdateGranted:
-                        case EnType.DataDeleteGranted:
-                        case EnType.AuthenticationGranted:
+                        case EnSecurityLogType.DataCreateGranted:
+                        case EnSecurityLogType.DataUpdateGranted:
+                        case EnSecurityLogType.DataDeleteGranted:
+                        case EnSecurityLogType.AuthenticationGranted:
                             return LogEventLevel.Information;
-                        case EnType.AuthenticationDenied:
+                        case EnSecurityLogType.AuthenticationDenied:
                             return LogEventLevel.Warning;
-                        case EnType.OperationDenied:
+                        case EnSecurityLogType.OperationDenied:
                             return LogEventLevel.Error;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(recordType), recordType, null);
@@ -191,16 +144,16 @@ namespace ClusterKit.Security.Client
                 case EnSeverity.Crucial:
                     switch (recordType)
                     {
-                        case EnType.DataReadGranted:
-                        case EnType.OperationGranted:
-                        case EnType.DataCreateGranted:
-                        case EnType.DataUpdateGranted:
-                        case EnType.DataDeleteGranted:
-                        case EnType.AuthenticationGranted:
+                        case EnSecurityLogType.DataReadGranted:
+                        case EnSecurityLogType.OperationGranted:
+                        case EnSecurityLogType.DataCreateGranted:
+                        case EnSecurityLogType.DataUpdateGranted:
+                        case EnSecurityLogType.DataDeleteGranted:
+                        case EnSecurityLogType.AuthenticationGranted:
                             return LogEventLevel.Information;
-                        case EnType.AuthenticationDenied:
+                        case EnSecurityLogType.AuthenticationDenied:
                             return LogEventLevel.Warning;
-                        case EnType.OperationDenied:
+                        case EnSecurityLogType.OperationDenied:
                             return LogEventLevel.Error;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(recordType), recordType, null);

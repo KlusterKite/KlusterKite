@@ -247,27 +247,27 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj">
       <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
       <Name>ClusterKit.Core.TestKit</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
       <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
       <Name>ClusterKit.API.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Provider/ClusterKit.API.Provider.csproj">
       <Project>{DDC4B9D1-49AC-4CD6-9FC5-FE4A02C54871}</Project>
       <Name>ClusterKit.API.Provider</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Tests/ClusterKit.API.Tests.csproj">
       <Project>{2126CED2-507D-4C77-A79A-5E07D59B4712}</Project>
       <Name>ClusterKit.API.Tests</Name>
-</ProjectReference>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth\AuthenticationTests.cs" />
@@ -293,6 +293,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj">
+      <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
+      <Name>ClusterKit.API.Attributes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Authentication\ClusterKit.Web.Authentication.csproj">
       <Project>{4975b025-a1d7-48e8-99d6-96d3722acd78}</Project>
       <Name>ClusterKit.Web.Authentication</Name>

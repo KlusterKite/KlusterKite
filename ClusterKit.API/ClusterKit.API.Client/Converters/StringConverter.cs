@@ -9,6 +9,8 @@
 
 namespace ClusterKit.API.Client.Converters
 {
+    using ClusterKit.API.Attributes;
+
     /// <summary>
     /// The basic converter that returns <see cref="object.ToString"/>
     /// </summary>

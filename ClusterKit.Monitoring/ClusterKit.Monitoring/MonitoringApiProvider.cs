@@ -11,7 +11,7 @@ namespace ClusterKit.Monitoring
 {
     using Akka.Actor;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Provider;
 
     using JetBrains.Annotations;

@@ -14,7 +14,7 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;

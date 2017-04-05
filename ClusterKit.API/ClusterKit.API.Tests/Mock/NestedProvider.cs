@@ -14,8 +14,8 @@ namespace ClusterKit.API.Tests.Mock
     using System.Linq;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
 
     using JetBrains.Annotations;
 

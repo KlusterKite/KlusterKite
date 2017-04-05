@@ -13,7 +13,7 @@ namespace ClusterKit.Monitoring.Messages
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client.Converters;
     using ClusterKit.Monitoring.Client.Messages;
 

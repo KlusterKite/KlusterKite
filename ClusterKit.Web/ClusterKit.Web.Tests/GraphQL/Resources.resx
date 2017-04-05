@@ -1144,12 +1144,69 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "__node",
+              "description": "The node global searcher according to Relay specification",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "The node global id",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "Node",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
           "interfaces": null,
           "enumValues": null,
           "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "TestApi",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "Node",
+          "description": "The Node interface as described in Relay documentation",
+          "fields": [
+            {
+              "name": "id",
+              "description": "The node id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "Query",
+              "ofType": null
+            },
             {
               "kind": "OBJECT",
               "name": "TestApi",
@@ -1277,40 +1334,6 @@
           ],
           "enumValues": null,
           "possibleTypes": null
-        },
-        {
-          "kind": "INTERFACE",
-          "name": "Node",
-          "description": "The Node interface as described in Relay documentation",
-          "fields": [
-            {
-              "name": "id",
-              "description": "The node id",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": null,
-          "enumValues": null,
-          "possibleTypes": [
-            {
-              "kind": "OBJECT",
-              "name": "Query",
-              "ofType": null
-            },
-            {
-              "kind": "OBJECT",
-              "name": "TestApi",
-              "ofType": null
-            }
-          ]
         }
       ],
       "directives": [

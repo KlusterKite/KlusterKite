@@ -16,7 +16,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System.Linq;
     using System.Xml.Serialization;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
     using ClusterKit.Data.CRUD;
 
     using JetBrains.Annotations;

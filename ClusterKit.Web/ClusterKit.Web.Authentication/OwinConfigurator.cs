@@ -15,7 +15,7 @@ namespace ClusterKit.Web.Authentication
 
     using Castle.Windsor;
 
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using Microsoft.Owin;
     using Microsoft.Owin.Cors;

@@ -13,7 +13,7 @@ namespace ClusterKit.Web.Authorization
     using System.Net.Http;
     using System.Web.Http;
 
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

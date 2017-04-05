@@ -11,8 +11,8 @@ namespace ClusterKit.NodeManager.Client.ORM
 {
     using System.Collections.Generic;
 
-    using ClusterKit.API.Client.Attributes;
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
+    using ClusterKit.API.Attributes;
+    using ClusterKit.NodeManager.Launcher.Messages;
 
     /// <summary>
     /// The release configuration description

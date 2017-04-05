@@ -15,7 +15,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Web.GraphQL.Publisher;
 
     using global::GraphQL;

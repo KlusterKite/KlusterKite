@@ -15,12 +15,12 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
     using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization.Attributes;
 
     using JetBrains.Annotations;

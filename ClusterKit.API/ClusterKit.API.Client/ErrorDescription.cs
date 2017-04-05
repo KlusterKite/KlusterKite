@@ -9,7 +9,7 @@
 
 namespace ClusterKit.API.Client
 {
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
 

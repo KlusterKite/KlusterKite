@@ -15,8 +15,7 @@ namespace ClusterKit.NodeManager.Client.ORM
 
     using BCrypt.Net;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
     using ClusterKit.Data.CRUD;
 
     using JetBrains.Annotations;

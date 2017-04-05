@@ -11,7 +11,7 @@ namespace ClusterKit.API.Tests.Mock
 {
     using System;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
 

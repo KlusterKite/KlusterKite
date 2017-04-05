@@ -17,10 +17,10 @@ namespace ClusterKit.API.Tests
 
     using Castle.Core.Internal;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
     using ClusterKit.API.Provider;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

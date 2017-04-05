@@ -12,6 +12,8 @@ namespace ClusterKit.API.Client.Converters
     using System.Collections.Generic;
     using System.Linq;
 
+    using ClusterKit.API.Attributes;
+
     /// <summary>
     /// Converts dictionary to the api list
     /// </summary>

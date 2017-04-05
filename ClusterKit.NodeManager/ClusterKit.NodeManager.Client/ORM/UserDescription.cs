@@ -12,8 +12,8 @@ namespace ClusterKit.NodeManager.Client.ORM
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    using ClusterKit.API.Client.Attributes;
-    using ClusterKit.Security.Client;
+    using ClusterKit.API.Attributes;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The short public user description

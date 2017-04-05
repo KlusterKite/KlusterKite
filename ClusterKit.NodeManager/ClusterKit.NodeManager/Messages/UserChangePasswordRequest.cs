@@ -11,7 +11,7 @@ namespace ClusterKit.NodeManager.Messages
 {
     using Akka.Routing;
 
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The request to change the user password

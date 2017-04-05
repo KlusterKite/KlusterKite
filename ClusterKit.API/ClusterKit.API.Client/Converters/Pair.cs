@@ -9,7 +9,7 @@
 
 namespace ClusterKit.API.Client.Converters
 {
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
 
@@ -22,7 +22,7 @@ namespace ClusterKit.API.Client.Converters
     /// <typeparam name="TValue">
     /// The type of value
     /// </typeparam>
-    [ApiDescription(Description = "Represents a dictionary key-value pair")]
+    [ApiDescription(Description = "Represents a dictionary key-value pair", Name = "Pair")]
     public class Pair<TKey, TValue>
     {
         /// <summary>

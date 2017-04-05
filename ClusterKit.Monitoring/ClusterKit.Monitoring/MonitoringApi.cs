@@ -14,8 +14,8 @@ namespace ClusterKit.Monitoring
 
     using Akka.Actor;
 
-    using ClusterKit.API.Client.Attributes;
-    using ClusterKit.API.Client.Attributes.Authorization;
+    using ClusterKit.API.Attributes;
+    using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.LargeObjects.Client;
     using ClusterKit.Monitoring.Client;
     using ClusterKit.Monitoring.Messages;

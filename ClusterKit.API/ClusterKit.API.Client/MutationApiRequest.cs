@@ -9,7 +9,7 @@
 
 namespace ClusterKit.API.Client
 {
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The request for mutation

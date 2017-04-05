@@ -13,7 +13,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using Newtonsoft.Json.Linq;
 

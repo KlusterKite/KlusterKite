@@ -31,6 +31,7 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
@@ -1435,7 +1436,7 @@ namespace ClusterKit.NodeManager
                         ds.SaveChanges();
                         this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.OperationGranted,
+                            EnSecurityLogType.OperationGranted,
                             EnSeverity.Crucial,
                             request.Context,
                             "Release {ReleaseId} marked as obsolete",
@@ -1501,7 +1502,7 @@ namespace ClusterKit.NodeManager
                         ds.SaveChanges();
                         this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.OperationGranted,
+                            EnSecurityLogType.OperationGranted,
                             EnSeverity.Crucial,
                             request.Context,
                             "Release {ReleaseId} marked as Ready",
@@ -1667,7 +1668,7 @@ namespace ClusterKit.NodeManager
                         const string SecurityMessage = "Cluster upgrade with release {ReleaseId} initiated. "
                                                        + "Previous release {PreviousReleaseId} marked as {PreviousReleaseState}";
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.OperationGranted, 
+                            EnSecurityLogType.OperationGranted, 
                             EnSeverity.Crucial, 
                             request.Context,
                             SecurityMessage,
@@ -1714,7 +1715,7 @@ namespace ClusterKit.NodeManager
                         ds.SaveChanges();
 
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSecurityLogType.DataUpdateGranted,
                             EnSeverity.Trivial,
                             request.Request,
                             "User {Login} ({Uid}) have changed his password",
@@ -1752,7 +1753,7 @@ namespace ClusterKit.NodeManager
                         ds.SaveChanges();
 
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSecurityLogType.DataUpdateGranted,
                             EnSeverity.Crucial,
                             request.Request,
                             "The password for user {Login} ({Uid}) was reset",
@@ -1806,7 +1807,7 @@ namespace ClusterKit.NodeManager
                         user.Roles.Add(role);
                         ds.SaveChanges();
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSecurityLogType.DataUpdateGranted,
                             EnSeverity.Crucial,
                             request.Request,
                             "The user {Login} ({UserUid}) was granted with role {RoleName} ({RoleUid})",
@@ -1875,7 +1876,7 @@ namespace ClusterKit.NodeManager
                         user.Roles.Add(role);
                         ds.SaveChanges();
                         SecurityLog.CreateRecord(
-                            SecurityLog.EnType.DataUpdateGranted,
+                            EnSecurityLogType.DataUpdateGranted,
                             EnSeverity.Crucial,
                             request.Request,
                             "The role {RoleName} ({RoleUid}) was withdrawed from user {Login} ({UserUid})",

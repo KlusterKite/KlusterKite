@@ -14,7 +14,7 @@ namespace ClusterKit.NodeManager.Authentication.Clients
     using System.Threading.Tasks;
 
     using ClusterKit.NodeManager.Client;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// The launcher program, that configures and starts individual nodes

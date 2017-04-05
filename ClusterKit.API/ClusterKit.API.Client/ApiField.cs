@@ -14,8 +14,9 @@ namespace ClusterKit.API.Client
     using System.Linq;
     using System.Reflection;
 
-    using ClusterKit.API.Client.Attributes.Authorization;
-    using ClusterKit.Security.Client;
+    using ClusterKit.API.Attributes;
+    using ClusterKit.API.Attributes.Authorization;
+    using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 

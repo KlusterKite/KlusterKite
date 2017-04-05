@@ -13,7 +13,7 @@ namespace ClusterKit.NodeManager.Messages
 
     using Akka.Routing;
 
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// Request to change user role membership

@@ -17,8 +17,8 @@ namespace ClusterKit.Data.EF
     using System.Linq;
     using System.Reflection;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
 
     /// <summary>
     /// Creates a EF query based on <see cref="ApiRequest"/>

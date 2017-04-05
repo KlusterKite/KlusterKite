@@ -16,6 +16,7 @@ namespace ClusterKit.Security.Client
     using Castle.Windsor;
 
     using ClusterKit.Core;
+    using ClusterKit.Security.Attributes;
 
     /// <summary>
     /// Installing components from current library

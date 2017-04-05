@@ -140,8 +140,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 var needPackageUpdate = false;
                 foreach (var requirement in currentTemplate.PackageRequirements.Where(r => r.SpecificVersion == null))
                 {
-                    var oldVersion = release.Configuration.Packages.FirstOrDefault(p => p.Name == requirement.Id);
-                    var newVersion = currentRelease.Configuration.Packages.FirstOrDefault(p => p.Name == requirement.Id);
+                    var oldVersion = release.Configuration.Packages.FirstOrDefault(p => p.Id == requirement.Id);
+                    var newVersion = currentRelease.Configuration.Packages.FirstOrDefault(p => p.Id == requirement.Id);
                     if (newVersion == null || oldVersion?.Version != newVersion.Version)
                     {
                         needPackageUpdate = true;
@@ -248,7 +248,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         {
             foreach (var description in release.Configuration.Packages)
             {
-                var packageField = $"configuration.packages[\"{description.Name}\"]";
+                var packageField = $"configuration.packages[\"{description.Id}\"]";
                 SemanticVersion requiredVersion = null;
                 try
                 {
@@ -266,8 +266,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 }
 
                 var package =
-                    nugetRepository.GetPackages()
-                        .FirstOrDefault(p => p.Id == description.Name && p.Version == requiredVersion);
+                    nugetRepository.Search(description.Id, true)
+                        .ToList()
+                        .FirstOrDefault(p => p.Id == description.Id && p.Version == requiredVersion);
 
                 if (package == null)
                 {
@@ -278,7 +279,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     continue;
                 }
 
-                definedPackagesToFill[description.Name] = package;
+                definedPackagesToFill[description.Id] = package;
             }
 
             foreach (var package in definedPackagesToFill.Values)
@@ -348,12 +349,17 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
                 Dictionary<string, IPackage> directPackages = new Dictionary<string, IPackage>();
                 foreach (var errorDescription in
-                    GetTemplateDirectPackages(definedPackages, nugetRepository, template, templateField, directPackages))
+                    GetTemplateDirectPackages(
+                        definedPackages,
+                        nugetRepository,
+                        template,
+                        templateField,
+                        directPackages))
                 {
                     yield return errorDescription;
                 }
-
-                template.PackagesToInstall = new Dictionary<string, List<PackageDescription>>();
+            
+            template.PackagesToInstall = new Dictionary<string, List<PackageDescription>>();
                 foreach (var supportedFramework in supportedFrameworks)
                 {
                     var packagesToInstall = new List<IPackage>();
@@ -363,7 +369,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                         var requirementField = $"{templateField}.packageRequirements[\"{package.Id}\"]";
                         var dependencySet =
                             package.DependencySets.FirstOrDefault(
-                                s => s.SupportedFrameworks.Any(f => f.FullName == supportedFramework));
+                                s => s.TargetFramework == null || s.SupportedFrameworks.Any(f => f.FullName == supportedFramework));
                         if (dependencySet == null)
                         {
                             continue;
@@ -468,7 +474,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 }
 
                 package =
-                    nugetRepository.GetPackages()
+                    nugetRepository.Search(requirement.Id, true)
+                        .ToList()
                         .FirstOrDefault(p => p.Id == requirement.Id && p.Version == requiredVersion);
 
                 if (package == null)

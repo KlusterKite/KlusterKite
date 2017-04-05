@@ -33,9 +33,17 @@
     <DocumentationFile>bin\Release\ClusterKit.Web.GraphQL.Publisher.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj">
+      <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
+      <Name>ClusterKit.API.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj">
       <Project>{ddc4b9d1-49ac-4cd6-9fc5-fe4a02c54871}</Project>
       <Name>ClusterKit.API.Provider</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj">
       <Project>{6adfbddf-e452-46fc-a037-6d57300be561}</Project>

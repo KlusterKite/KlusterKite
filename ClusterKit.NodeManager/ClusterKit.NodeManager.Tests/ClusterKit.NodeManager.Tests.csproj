@@ -384,6 +384,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
       <Project>{983daeb9-b058-41a9-8403-29851f2244b7}</Project>
       <Name>ClusterKit.NodeManager.Client</Name>

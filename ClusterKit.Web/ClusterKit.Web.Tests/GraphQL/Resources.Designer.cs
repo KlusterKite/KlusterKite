@@ -121,7 +121,7 @@ namespace ClusterKit.Web.Tests.GraphQL {
         ///        {
         ///          &quot;kind&quot;: &quot;SCALAR&quot;,
         ///          &quot;name&quot;: &quot;Boolean&quot;,
-        ///          &quot;description&quot;:  [rest of string was truncated]&quot;;.
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SchemaDescriptionTestSnapshot {
             get {

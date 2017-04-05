@@ -15,9 +15,9 @@ namespace ClusterKit.API.Provider.Resolvers
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Attributes;
-    using ClusterKit.Security.Client;
+    using ClusterKit.Security.Attributes;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -51,7 +51,7 @@ namespace ClusterKit.API.Provider.Resolvers
         }
 
         /// <summary>
-        /// Gets the generated api type for <see cref="T"/>
+        /// Gets the generated api type for typed argument
         /// </summary>
         public static ApiType GeneratedType { get; }
 

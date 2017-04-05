@@ -15,6 +15,7 @@ namespace ClusterKit.Web.Authentication
     using System.Security.Claims;
     using System.Threading.Tasks;
 
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
     using ClusterKit.Web.Authorization;
 
@@ -93,7 +94,7 @@ namespace ClusterKit.Web.Authentication
                                  ? "Failed authentication for client {ClientId} without secret"
                                  : "Failed authentication for client {ClientId} with secret";
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied, 
+                    EnSecurityLogType.AuthenticationDenied, 
                     EnSeverity.Crucial, 
                     context.OwinContext.GetRequestDescription(),
                     message,
@@ -119,7 +120,7 @@ namespace ClusterKit.Web.Authentication
             if (client == null)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSecurityLogType.AuthenticationDenied,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Unexpected operation. Grant password authentication without client data attempt.");
@@ -130,7 +131,7 @@ namespace ClusterKit.Web.Authentication
             if (result?.AccessTicket.User == null)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSecurityLogType.AuthenticationDenied,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Grant password failed for user {UserName} with client {ClientId}",
@@ -145,7 +146,7 @@ namespace ClusterKit.Web.Authentication
             context.Validated(identity);
 
             SecurityLog.CreateRecord(
-                SecurityLog.EnType.AuthenticationGranted,
+                EnSecurityLogType.AuthenticationGranted,
                 EnSeverity.Crucial,
                 context.OwinContext.GetRequestDescription(),
                 "Grant password was successfull for user {UserName} with client {ClientId}",
@@ -170,7 +171,7 @@ namespace ClusterKit.Web.Authentication
             if (client == null)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSecurityLogType.AuthenticationDenied,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Unexpected operation. Grant client_credentials authentication without client data attempt.");
@@ -181,7 +182,7 @@ namespace ClusterKit.Web.Authentication
             if (result == null)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSecurityLogType.AuthenticationDenied,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Grant client_credentials denied for {ClientId}",
@@ -194,7 +195,7 @@ namespace ClusterKit.Web.Authentication
             var identity = new ClaimsIdentity(result.AccessTicket.ClientId);
             context.Validated(identity);
             SecurityLog.CreateRecord(
-                SecurityLog.EnType.AuthenticationGranted,
+                EnSecurityLogType.AuthenticationGranted,
                 EnSeverity.Crucial,
                 context.OwinContext.GetRequestDescription(),
                 "Grant client_credentials was successfull for client {ClientId}",
@@ -222,7 +223,7 @@ namespace ClusterKit.Web.Authentication
             if (refreshTicket == null)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSecurityLogType.AuthenticationDenied,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Unexpected operation. Grant refresh_token authentication without validated refresh ticket.");
@@ -233,7 +234,7 @@ namespace ClusterKit.Web.Authentication
             if (client == null)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSecurityLogType.AuthenticationDenied,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Unexpected operation. Grant refresh_token authentication without client data attempt.");
@@ -243,7 +244,7 @@ namespace ClusterKit.Web.Authentication
             if (client.ClientId != refreshTicket.ClientId)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationDenied,
+                    EnSecurityLogType.AuthenticationDenied,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Attempt to authenticate with refresh ticket from other client. Request client id: {RequestClientId}, Ticket client id: {TicketClientId}",
@@ -258,7 +259,7 @@ namespace ClusterKit.Web.Authentication
                 if (refreshTicket.UserId != null)
                 {
                     SecurityLog.CreateRecord(
-                        SecurityLog.EnType.AuthenticationDenied,
+                        EnSecurityLogType.AuthenticationDenied,
                         EnSeverity.Crucial,
                         context.OwinContext.GetRequestDescription(),
                         "Grant refresh_token denied for {ClientId} with user {UserId}",
@@ -268,7 +269,7 @@ namespace ClusterKit.Web.Authentication
                 else
                 {
                     SecurityLog.CreateRecord(
-                        SecurityLog.EnType.AuthenticationDenied,
+                        EnSecurityLogType.AuthenticationDenied,
                         EnSeverity.Crucial,
                         context.OwinContext.GetRequestDescription(),
                         "Grant refresh_token denied for {ClientId}",
@@ -285,7 +286,7 @@ namespace ClusterKit.Web.Authentication
             if (refreshTicket.UserId != null)
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationGranted,
+                    EnSecurityLogType.AuthenticationGranted,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Grant refresh_token for {ClientId} with user {UserId} succeeded",
@@ -295,7 +296,7 @@ namespace ClusterKit.Web.Authentication
             else
             {
                 SecurityLog.CreateRecord(
-                    SecurityLog.EnType.AuthenticationGranted,
+                    EnSecurityLogType.AuthenticationGranted,
                     EnSeverity.Crucial,
                     context.OwinContext.GetRequestDescription(),
                     "Grant refresh_token for {ClientId} succeeded",

@@ -18,9 +18,9 @@ namespace ClusterKit.NodeManager.Tests
     using System.Runtime.Versioning;
 
     using ClusterKit.API.Client;
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Messages;
 
     using NuGet;
 

@@ -9,12 +9,10 @@
 
 namespace ClusterKit.Web.Authentication
 {
-    using ClusterKit.Security.Client;
-
     using Microsoft.Owin.Security.DataProtection;
 
     /// <summary>
-    /// Substitute for data protection as data protection is provided by <see cref="ITokenManager"/>
+    /// Substitute for data protection as data protection is provided by <see cref="ClusterKit.Security.Attributes.ITokenManager"/>
     /// </summary>
     public class DataNoProtectionProvider : IDataProtectionProvider
     {
@@ -25,7 +23,7 @@ namespace ClusterKit.Web.Authentication
         }
 
         /// <summary>
-        /// Substitute for data protection as data protection is provided by <see cref="ITokenManager"/>
+        /// Substitute for data protection as data protection is provided by <see cref="ClusterKit.Security.Attributes.ITokenManager"/>
         /// </summary>
         private class DataNotProtector : IDataProtector
         {

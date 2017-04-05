@@ -13,9 +13,9 @@ namespace ClusterKit.NodeManager.Tests
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Messages;
 
     using Xunit;
     using Xunit.Abstractions;

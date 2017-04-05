@@ -11,7 +11,7 @@ namespace ClusterKit.Monitoring.Client.Messages
 {
     using System.Xml.Serialization;
 
-    using ClusterKit.API.Client.Attributes;
+    using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
 
