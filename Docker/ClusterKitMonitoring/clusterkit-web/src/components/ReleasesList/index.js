@@ -80,7 +80,8 @@ export default Relay.createContainer(
                 packages(limit: 5) {
                   edges {
                     node {
-                      name
+                      __id
+                      version
                     }
                   }
                 }

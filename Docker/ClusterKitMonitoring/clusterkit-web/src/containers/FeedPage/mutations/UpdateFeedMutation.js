@@ -41,9 +41,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         packages {
           edges {
             node {
-              name
               version
-              availableVersions
               id
               __id
             }

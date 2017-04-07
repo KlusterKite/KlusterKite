@@ -173,7 +173,61 @@ const getPackages = () => {
                     "3.2.3"
                   ]
                 }
-              }
+              },
+              {
+                "node": {
+                  "name": "ClusterKit.Web.NginxConfigurator",
+                  "version": "0.0.0-local",
+                  "availableVersions": [
+                    "0.0.0-local"
+                  ]
+                }
+              },
+              {
+                "node": {
+                  "name": "ClusterKit.Web.NginxConfigurator",
+                  "version": "0.0.0-local",
+                  "availableVersions": [
+                    "0.0.0-local"
+                  ]
+                }
+              },
+              {
+                "node": {
+                  "name": "ClusterKit.NodeManager.Client",
+                  "version": "0.0.0-local",
+                  "availableVersions": [
+                    "0.0.0-local"
+                  ]
+                }
+              },
+              {
+                "node": {
+                  "name": "ClusterKit.Log.Console",
+                  "version": "0.0.0-local",
+                  "availableVersions": [
+                    "0.0.0-local"
+                  ]
+                }
+              },
+              {
+                "node": {
+                  "name": "ClusterKit.Log.ElasticSearch",
+                  "version": "0.0.0-local",
+                  "availableVersions": [
+                    "0.0.0-local"
+                  ]
+                }
+              },
+              {
+                "node": {
+                  "name": "ClusterKit.Monitoring.Client",
+                  "version": "0.0.0-local",
+                  "availableVersions": [
+                    "0.0.0-local"
+                  ]
+                }
+              },
             ]
           }
         }

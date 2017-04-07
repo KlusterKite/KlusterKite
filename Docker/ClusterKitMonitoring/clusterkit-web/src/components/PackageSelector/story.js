@@ -18,8 +18,8 @@ storiesOf('Packages')
   .add('name and version input, package', () => {
     const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     const initialValues = {
-      package: 'ClusterKit.API.Client',
-      version: null
+      id: 'ClusterKit.API.Client',
+      specificVersion: null
     };
     return <PackagesSelector
             packages={packagesList}
@@ -32,8 +32,8 @@ storiesOf('Packages')
   .add('name and version input, version', () => {
     const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     const initialValues = {
-      package: 'ClusterKit.API.Client',
-      version: '0.1.1'
+      id: 'ClusterKit.API.Client',
+      specificVersion: '0.1.1'
     };
     return <PackagesSelector
       packages={packagesList}
@@ -53,24 +53,24 @@ storiesOf('Packages')
     const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     const values = [
       {
-        package: 'ClusterKit.API.Client',
-        version: '0.1.0'
+        id: 'ClusterKit.API.Client',
+        specificVersion: '0.1.0'
       },
       {
-        package: 'ClusterKit.API.Provider',
-        version: ''
+        id: 'ClusterKit.API.Provider',
+        specificVersion: ''
       },
       {
-        package: 'Microsoft.AspNet.WebApi.OwinSelfHost',
-        version: '5.2.3'
+        id: 'Microsoft.AspNet.WebApi.OwinSelfHost',
+        specificVersion: '5.2.3'
       },
       {
-        package: 'System.Text.Encoding.Extensions',
-        version: ''
+        id: 'System.Text.Encoding.Extensions',
+        specificVersion: ''
       },
       {
-        package: 'System.Text.RegularExpressions',
-        version: ''
+        id: 'System.Text.RegularExpressions',
+        specificVersion: ''
       },
     ];
 

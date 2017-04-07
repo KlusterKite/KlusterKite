@@ -61,21 +61,21 @@ export default class PackagesSelector extends React.Component {
    */
   initInputValuesFromProps(nextProps) {
     this.setState({
-      packageValue: nextProps.initialValues.package ? nextProps.initialValues.package : '',
+      packageValue: nextProps.initialValues.id ? nextProps.initialValues.id : '',
       isPackageValid: true,
-      versionValue: nextProps.initialValues.version ? nextProps.initialValues.version : '',
+      versionValue: nextProps.initialValues.specificVersion ? nextProps.initialValues.specificVersion : '',
       isVersionValid: true
     });
 
-    if (this.props.initialValues.package) {
+    if (this.props.initialValues.id) {
       const nodes = this.props.packages.edges.map(x => x.node);
-      const node = nodes.find(x => x.name === this.props.initialValues.package);
+      const node = nodes.find(x => x.name === this.props.initialValues.id);
       if (node) {
         this.setState({
           packageVersions: node.availableVersions,
         });
       } else {
-        console.warn('Package ' + this.props.initialValues.package + ' not found in the packages list!');
+        console.warn('Package ' + this.props.initialValues.id + ' not found in the packages list!');
       }
     }
   }
@@ -108,8 +108,8 @@ export default class PackagesSelector extends React.Component {
 
     if (isPackageValid && this.props.onChange) {
       this.props.onChange({
-        package: newValue,
-        version: null,
+        id: newValue,
+        specificVersion: null,
       });
     }
   };
@@ -156,8 +156,8 @@ export default class PackagesSelector extends React.Component {
 
     if (isVersionValid && this.props.onChange) {
       this.props.onChange({
-        package: this.state.packageValue,
-        version: newValue,
+        id: this.state.packageValue,
+        specificVersion: newValue,
       });
     }
   };

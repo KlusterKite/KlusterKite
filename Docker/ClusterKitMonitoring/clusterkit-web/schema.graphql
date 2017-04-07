@@ -9,109 +9,6 @@ type Boolean_MutationPayload {
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
-# Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_, Node {
-  # Gets a dictionary key
-  key: String
-
-  # Gets a dictionary value
-  value: ClusterKitMonitoring_Node
-  id: ID
-}
-
-# The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
-#  Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge]
-}
-
-# The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ in a connected list
-#  Represents a dictionary key-value pair
-type ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge implements IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # Represents a dictionary key-value pair
-  node: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
-}
-
-input ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input
-
-  # key exactly equals to the parameter, key: Gets a dictionary key
-  key: String
-
-  # key not equals to the parameter, key: Gets a dictionary key
-  key_not: String
-
-  # key is a substring of the parameter, key: Gets a dictionary key
-  key_in: String
-
-  # key is not a substring of the parameter, key: Gets a dictionary key
-  key_not_in: String
-
-  # key contains the parameter as substring, key: Gets a dictionary key
-  key_contains: String
-
-  # key doesn't contain the parameter as substring, key: Gets a dictionary key
-  key_not_contains: String
-
-  # key starts with the parameter value, key: Gets a dictionary key
-  key_starts_with: String
-
-  # key doesn't start with the parameter value, key: Gets a dictionary key
-  key_not_starts_with: String
-
-  # key ends with the parameter value, key: Gets a dictionary key
-  key_ends_with: String
-
-  # key doesn't end with the parameter value, key: Gets a dictionary key
-  key_not_ends_with: String
-
-  # key lowercased equals the parameter, key: Gets a dictionary key
-  key_l: String
-
-  # key lowercased doesn't equal the parameter, key: Gets a dictionary key
-  key_l_not: String
-
-  # key lowercased is a substring of the parameter, key: Gets a dictionary key
-  key_l_in: String
-
-  # key lowercased is not a substring of the parameter, key: Gets a dictionary key
-  key_l_not_in: String
-
-  # key lowercased contains the parameter as substring, key: Gets a dictionary key
-  key_l_contains: String
-
-  # key lowercased doesn't contain the parameter as substring, key: Gets a dictionary key
-  key_l_not_contains: String
-
-  # key lowercased starts with the parameter value, key: Gets a dictionary key
-  key_l_starts_with: String
-
-  # key lowercased doesn't start with the parameter value, key: Gets a dictionary key
-  key_l_not_starts_with: String
-
-  # key lowercased ends with the parameter value, key: Gets a dictionary key
-  key_l_ends_with: String
-
-  # key lowercased doesn't end with the parameter value, key: Gets a dictionary key
-  key_l_not_ends_with: String
-}
-
-enum ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort {
-  key_asc
-  key_desc
-}
-
 input ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input {
   clientMutationId: String
 }
@@ -139,7 +36,7 @@ type ClusterKitMonitoring_ClusterKitNodeApi implements IClusterKitMonitoring, IC
 # Global cluster actors tree scan result
 type ClusterKitMonitoring_ClusterTree implements IClusterKitMonitoring_ClusterTree, Node {
   # Gets the list of nodes
-  nodes(filter: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input, sort: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection
+  nodes(filter: ClusterKitMonitoring_Pair_System_String_Node__Filter_Input, sort: [ClusterKitMonitoring_Pair_System_String_Node__Sort], id: String, offset: Int, limit: Int): ClusterKitMonitoring_Pair_System_String_Node__Connection
 
   # Gets the sum of queue size across tree
   queueSizeSum: Int
@@ -579,6 +476,109 @@ enum ClusterKitMonitoring_Node_Sort {
   queueSize_desc
   queueSizeSum_asc
   queueSizeSum_desc
+}
+
+# Represents a dictionary key-value pair
+type ClusterKitMonitoring_Pair_System_String_Node_ implements IClusterKitMonitoring_Pair_System_String_Node_, Node {
+  # Gets a dictionary key
+  key: String
+
+  # Gets a dictionary value
+  value: ClusterKitMonitoring_Node
+  id: ID
+}
+
+# The list of connected ClusterKitMonitoring_Pair_System_String_Node_
+#  Represents a dictionary key-value pair
+type ClusterKitMonitoring_Pair_System_String_Node__Connection implements IClusterKitMonitoring_Pair_System_String_Node__Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitMonitoring_Pair_System_String_Node__Edge]
+}
+
+# The ClusterKitMonitoring_Pair_System_String_Node_ in a connected list
+#  Represents a dictionary key-value pair
+type ClusterKitMonitoring_Pair_System_String_Node__Edge implements IClusterKitMonitoring_Pair_System_String_Node__Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # Represents a dictionary key-value pair
+  node: ClusterKitMonitoring_Pair_System_String_Node_
+}
+
+input ClusterKitMonitoring_Pair_System_String_Node__Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitMonitoring_Pair_System_String_Node__Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitMonitoring_Pair_System_String_Node__Filter_Input
+
+  # key exactly equals to the parameter, key: Gets a dictionary key
+  key: String
+
+  # key not equals to the parameter, key: Gets a dictionary key
+  key_not: String
+
+  # key is a substring of the parameter, key: Gets a dictionary key
+  key_in: String
+
+  # key is not a substring of the parameter, key: Gets a dictionary key
+  key_not_in: String
+
+  # key contains the parameter as substring, key: Gets a dictionary key
+  key_contains: String
+
+  # key doesn't contain the parameter as substring, key: Gets a dictionary key
+  key_not_contains: String
+
+  # key starts with the parameter value, key: Gets a dictionary key
+  key_starts_with: String
+
+  # key doesn't start with the parameter value, key: Gets a dictionary key
+  key_not_starts_with: String
+
+  # key ends with the parameter value, key: Gets a dictionary key
+  key_ends_with: String
+
+  # key doesn't end with the parameter value, key: Gets a dictionary key
+  key_not_ends_with: String
+
+  # key lowercased equals the parameter, key: Gets a dictionary key
+  key_l: String
+
+  # key lowercased doesn't equal the parameter, key: Gets a dictionary key
+  key_l_not: String
+
+  # key lowercased is a substring of the parameter, key: Gets a dictionary key
+  key_l_in: String
+
+  # key lowercased is not a substring of the parameter, key: Gets a dictionary key
+  key_l_not_in: String
+
+  # key lowercased contains the parameter as substring, key: Gets a dictionary key
+  key_l_contains: String
+
+  # key lowercased doesn't contain the parameter as substring, key: Gets a dictionary key
+  key_l_not_contains: String
+
+  # key lowercased starts with the parameter value, key: Gets a dictionary key
+  key_l_starts_with: String
+
+  # key lowercased doesn't start with the parameter value, key: Gets a dictionary key
+  key_l_not_starts_with: String
+
+  # key lowercased ends with the parameter value, key: Gets a dictionary key
+  key_l_ends_with: String
+
+  # key lowercased doesn't end with the parameter value, key: Gets a dictionary key
+  key_l_not_ends_with: String
+}
+
+enum ClusterKitMonitoring_Pair_System_String_Node__Sort {
+  key_asc
+  key_desc
 }
 
 # ClusterKit monitoring api
@@ -1244,7 +1244,7 @@ type ClusterKitNodeApi_NodeDescription implements IClusterKitNodeApi_NodeDescrip
   leaderInRoles: [String]
 
   # The list of descriptions of installed modules
-  modules(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
+  modules(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackageFamily_Connection
 
   # The node's address
   nodeAddress: ClusterKitNodeApi_AkkaAddress
@@ -2228,8 +2228,8 @@ enum ClusterKitNodeApi_NugetFeed_Sort {
   userName_desc
 }
 
-# Short description of NuGet package
-type ClusterKitNodeApi_NugetPackage implements IClusterKitNodeApi_NugetPackage, Node {
+# Short description of NuGet package family
+type ClusterKitNodeApi_NugetPackageFamily implements IClusterKitNodeApi_NugetPackageFamily, Node {
   # The package id (name and version)
   __id: String
 
@@ -2244,32 +2244,32 @@ type ClusterKitNodeApi_NugetPackage implements IClusterKitNodeApi_NugetPackage, 
   id: ID
 }
 
-# The list of connected ClusterKitNodeApi_NugetPackage
-#  Short description of NuGet package
-type ClusterKitNodeApi_NugetPackage_Connection implements IClusterKitNodeApi_NugetPackage_Connection {
+# The list of connected ClusterKitNodeApi_NugetPackageFamily
+#  Short description of NuGet package family
+type ClusterKitNodeApi_NugetPackageFamily_Connection implements IClusterKitNodeApi_NugetPackageFamily_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_NugetPackage_Edge]
+  edges: [ClusterKitNodeApi_NugetPackageFamily_Edge]
 }
 
-# The ClusterKitNodeApi_NugetPackage in a connected list
-#  Short description of NuGet package
-type ClusterKitNodeApi_NugetPackage_Edge implements IClusterKitNodeApi_NugetPackage_Edge {
+# The ClusterKitNodeApi_NugetPackageFamily in a connected list
+#  Short description of NuGet package family
+type ClusterKitNodeApi_NugetPackageFamily_Edge implements IClusterKitNodeApi_NugetPackageFamily_Edge {
   # A value to use with paging positioning
   cursor: String
 
-  # Short description of NuGet package
-  node: ClusterKitNodeApi_NugetPackage
+  # Short description of NuGet package family
+  node: ClusterKitNodeApi_NugetPackageFamily
 }
 
-input ClusterKitNodeApi_NugetPackage_Filter_Input {
+input ClusterKitNodeApi_NugetPackageFamily_Filter_Input {
   # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_NugetPackage_Filter_Input
+  OR: ClusterKitNodeApi_NugetPackageFamily_Filter_Input
 
   # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_NugetPackage_Filter_Input
+  AND: ClusterKitNodeApi_NugetPackageFamily_Filter_Input
 
   # id exactly equals to the parameter, id: The package id (name and version)
   id: String
@@ -2452,23 +2452,185 @@ input ClusterKitNodeApi_NugetPackage_Filter_Input {
   version_l_not_ends_with: String
 }
 
-# Short description of NuGet package
-input ClusterKitNodeApi_NugetPackage_Input {
-  # The package name
-  name: String
-
-  # The package version
-  version: String
-
-  # The list of available versions
-  availableVersions: [String]
-}
-
-enum ClusterKitNodeApi_NugetPackage_Sort {
+enum ClusterKitNodeApi_NugetPackageFamily_Sort {
   id_asc
   id_desc
   name_asc
   name_desc
+  version_asc
+  version_desc
+}
+
+# Short description of NuGet package
+type ClusterKitNodeApi_PackageDescription implements IClusterKitNodeApi_PackageDescription, Node {
+  # the package Id
+  __id: String
+
+  # the package version
+  version: String
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_PackageDescription
+#  Short description of NuGet package
+type ClusterKitNodeApi_PackageDescription_Connection implements IClusterKitNodeApi_PackageDescription_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_PackageDescription_Edge]
+}
+
+# The ClusterKitNodeApi_PackageDescription in a connected list
+#  Short description of NuGet package
+type ClusterKitNodeApi_PackageDescription_Edge implements IClusterKitNodeApi_PackageDescription_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # Short description of NuGet package
+  node: ClusterKitNodeApi_PackageDescription
+}
+
+input ClusterKitNodeApi_PackageDescription_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_PackageDescription_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_PackageDescription_Filter_Input
+
+  # id exactly equals to the parameter, id: the package Id
+  id: String
+
+  # id not equals to the parameter, id: the package Id
+  id_not: String
+
+  # id is a substring of the parameter, id: the package Id
+  id_in: String
+
+  # id is not a substring of the parameter, id: the package Id
+  id_not_in: String
+
+  # id contains the parameter as substring, id: the package Id
+  id_contains: String
+
+  # id doesn't contain the parameter as substring, id: the package Id
+  id_not_contains: String
+
+  # id starts with the parameter value, id: the package Id
+  id_starts_with: String
+
+  # id doesn't start with the parameter value, id: the package Id
+  id_not_starts_with: String
+
+  # id ends with the parameter value, id: the package Id
+  id_ends_with: String
+
+  # id doesn't end with the parameter value, id: the package Id
+  id_not_ends_with: String
+
+  # id lowercased equals the parameter, id: the package Id
+  id_l: String
+
+  # id lowercased doesn't equal the parameter, id: the package Id
+  id_l_not: String
+
+  # id lowercased is a substring of the parameter, id: the package Id
+  id_l_in: String
+
+  # id lowercased is not a substring of the parameter, id: the package Id
+  id_l_not_in: String
+
+  # id lowercased contains the parameter as substring, id: the package Id
+  id_l_contains: String
+
+  # id lowercased doesn't contain the parameter as substring, id: the package Id
+  id_l_not_contains: String
+
+  # id lowercased starts with the parameter value, id: the package Id
+  id_l_starts_with: String
+
+  # id lowercased doesn't start with the parameter value, id: the package Id
+  id_l_not_starts_with: String
+
+  # id lowercased ends with the parameter value, id: the package Id
+  id_l_ends_with: String
+
+  # id lowercased doesn't end with the parameter value, id: the package Id
+  id_l_not_ends_with: String
+
+  # version exactly equals to the parameter, version: the package version
+  version: String
+
+  # version not equals to the parameter, version: the package version
+  version_not: String
+
+  # version is a substring of the parameter, version: the package version
+  version_in: String
+
+  # version is not a substring of the parameter, version: the package version
+  version_not_in: String
+
+  # version contains the parameter as substring, version: the package version
+  version_contains: String
+
+  # version doesn't contain the parameter as substring, version: the package version
+  version_not_contains: String
+
+  # version starts with the parameter value, version: the package version
+  version_starts_with: String
+
+  # version doesn't start with the parameter value, version: the package version
+  version_not_starts_with: String
+
+  # version ends with the parameter value, version: the package version
+  version_ends_with: String
+
+  # version doesn't end with the parameter value, version: the package version
+  version_not_ends_with: String
+
+  # version lowercased equals the parameter, version: the package version
+  version_l: String
+
+  # version lowercased doesn't equal the parameter, version: the package version
+  version_l_not: String
+
+  # version lowercased is a substring of the parameter, version: the package version
+  version_l_in: String
+
+  # version lowercased is not a substring of the parameter, version: the package version
+  version_l_not_in: String
+
+  # version lowercased contains the parameter as substring, version: the package version
+  version_l_contains: String
+
+  # version lowercased doesn't contain the parameter as substring, version: the package version
+  version_l_not_contains: String
+
+  # version lowercased starts with the parameter value, version: the package version
+  version_l_starts_with: String
+
+  # version lowercased doesn't start with the parameter value, version: the package version
+  version_l_not_starts_with: String
+
+  # version lowercased ends with the parameter value, version: the package version
+  version_l_ends_with: String
+
+  # version lowercased doesn't end with the parameter value, version: the package version
+  version_l_not_ends_with: String
+}
+
+# Short description of NuGet package
+input ClusterKitNodeApi_PackageDescription_Input {
+  # the package Id
+  id: String
+
+  # the package version
+  version: String
+}
+
+enum ClusterKitNodeApi_PackageDescription_Sort {
+  id_asc
+  id_desc
   version_asc
   version_desc
 }
@@ -2670,6 +2832,109 @@ enum ClusterKitNodeApi_PackageRequirement_Sort {
   id_desc
   specificVersion_asc
   specificVersion_desc
+}
+
+# Represents a dictionary key-value pair
+type ClusterKitNodeApi_Pair_System_String_List_PackageDescription__ implements IClusterKitNodeApi_Pair_System_String_List_PackageDescription__, Node {
+  # Gets a dictionary key
+  key: String
+
+  # Gets a dictionary value
+  value(filter: ClusterKitNodeApi_PackageDescription_Filter_Input, sort: [ClusterKitNodeApi_PackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_PackageDescription_Connection
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_Pair_System_String_List_PackageDescription__
+#  Represents a dictionary key-value pair
+type ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection implements IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge]
+}
+
+# The ClusterKitNodeApi_Pair_System_String_List_PackageDescription__ in a connected list
+#  Represents a dictionary key-value pair
+type ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge implements IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # Represents a dictionary key-value pair
+  node: ClusterKitNodeApi_Pair_System_String_List_PackageDescription__
+}
+
+input ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input
+
+  # key exactly equals to the parameter, key: Gets a dictionary key
+  key: String
+
+  # key not equals to the parameter, key: Gets a dictionary key
+  key_not: String
+
+  # key is a substring of the parameter, key: Gets a dictionary key
+  key_in: String
+
+  # key is not a substring of the parameter, key: Gets a dictionary key
+  key_not_in: String
+
+  # key contains the parameter as substring, key: Gets a dictionary key
+  key_contains: String
+
+  # key doesn't contain the parameter as substring, key: Gets a dictionary key
+  key_not_contains: String
+
+  # key starts with the parameter value, key: Gets a dictionary key
+  key_starts_with: String
+
+  # key doesn't start with the parameter value, key: Gets a dictionary key
+  key_not_starts_with: String
+
+  # key ends with the parameter value, key: Gets a dictionary key
+  key_ends_with: String
+
+  # key doesn't end with the parameter value, key: Gets a dictionary key
+  key_not_ends_with: String
+
+  # key lowercased equals the parameter, key: Gets a dictionary key
+  key_l: String
+
+  # key lowercased doesn't equal the parameter, key: Gets a dictionary key
+  key_l_not: String
+
+  # key lowercased is a substring of the parameter, key: Gets a dictionary key
+  key_l_in: String
+
+  # key lowercased is not a substring of the parameter, key: Gets a dictionary key
+  key_l_not_in: String
+
+  # key lowercased contains the parameter as substring, key: Gets a dictionary key
+  key_l_contains: String
+
+  # key lowercased doesn't contain the parameter as substring, key: Gets a dictionary key
+  key_l_not_contains: String
+
+  # key lowercased starts with the parameter value, key: Gets a dictionary key
+  key_l_starts_with: String
+
+  # key lowercased doesn't start with the parameter value, key: Gets a dictionary key
+  key_l_not_starts_with: String
+
+  # key lowercased ends with the parameter value, key: Gets a dictionary key
+  key_l_ends_with: String
+
+  # key lowercased doesn't end with the parameter value, key: Gets a dictionary key
+  key_l_not_ends_with: String
+}
+
+enum ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Sort {
+  key_asc
+  key_desc
 }
 
 # The cluster configuration with all program modules versions, node templates and configurations
@@ -3048,7 +3313,7 @@ enum ClusterKitNodeApi_Release_Sort {
 # The release configuration description
 type ClusterKitNodeApi_ReleaseConfiguration implements IClusterKitNodeApi_ReleaseConfiguration, Node {
   # the list of available packages with their versions
-  packages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
+  packages(filter: ClusterKitNodeApi_PackageDescription_Filter_Input, sort: [ClusterKitNodeApi_PackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_PackageDescription_Connection
 
   # the list of configured node templates
   nodeTemplates(filter: ClusterKitNodeApi_Template_Filter_Input, sort: [ClusterKitNodeApi_Template_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_Template_Connection
@@ -3064,7 +3329,7 @@ type ClusterKitNodeApi_ReleaseConfiguration implements IClusterKitNodeApi_Releas
 # The release configuration description
 input ClusterKitNodeApi_ReleaseConfiguration_Input {
   # the list of available packages with their versions
-  packages: [ClusterKitNodeApi_NugetPackage_Input]
+  packages: [ClusterKitNodeApi_PackageDescription_Input]
 
   # the list of configured node templates
   nodeTemplates: [ClusterKitNodeApi_Template_Input]
@@ -3223,13 +3488,13 @@ enum ClusterKitNodeApi_Role_Sort {
 # The main ClusterKit node managing methods
 type ClusterKitNodeApi_Root implements IClusterKitNodeApi_Root, Node {
   # The packages in the Nuget repository
-  nugetPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
+  nugetPackages(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackageFamily_Connection
 
   # The list of known active nodes
   getActiveNodeDescriptions(filter: ClusterKitNodeApi_NodeDescription_Filter_Input, sort: [ClusterKitNodeApi_NodeDescription_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_NodeDescription_Connection
 
   # The list of available packages from local cluster repository
-  getPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackage_Connection
+  getPackages(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackageFamily_Connection
 
   # Current cluster node template usage for debug purposes
   getTemplateStatistics: ClusterKitNodeApi_TemplatesStatistics
@@ -3423,6 +3688,9 @@ type ClusterKitNodeApi_Template implements IClusterKitNodeApi_Template, Node {
 
   # The list of package requirements
   packageRequirements(filter: ClusterKitNodeApi_PackageRequirement_Filter_Input, sort: [ClusterKitNodeApi_PackageRequirement_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_PackageRequirement_Connection
+
+  # The list of packages to install for current template
+  packagesToInstall(filter: ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, sort: [ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection
 
   # A value indicating whether no other nodes from previous releases are compatible
   forceUpdate: Boolean
@@ -4352,41 +4620,12 @@ interface IClusterKitMonitoring {
   ): Node
 }
 
-# Represents a dictionary key-value pair
-interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ {
-  id: ID
-
-  # Gets a dictionary key
-  key: String
-
-  # Gets a dictionary value
-  value: IClusterKitMonitoring_Node
-}
-
-# The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
-#  Represents a dictionary key-value pair
-interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge]
-}
-
-# The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ in a connected list
-#  Represents a dictionary key-value pair
-interface IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_
-}
-
 # Global cluster actors tree scan result
 interface IClusterKitMonitoring_ClusterTree {
   id: ID
 
   # Gets the list of nodes
-  nodes(filter: ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input, sort: [ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort], id: String, offset: Int, limit: Int): IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection
+  nodes(filter: ClusterKitMonitoring_Pair_System_String_Node__Filter_Input, sort: [ClusterKitMonitoring_Pair_System_String_Node__Sort], id: String, offset: Int, limit: Int): IClusterKitMonitoring_Pair_System_String_Node__Connection
 
   # Gets the sum of queue size across tree
   queueSizeSum: Int
@@ -4443,6 +4682,35 @@ interface IClusterKitMonitoring_Node_Edge {
   # A value to use with paging positioning
   cursor: String
   node: IClusterKitMonitoring_Node
+}
+
+# Represents a dictionary key-value pair
+interface IClusterKitMonitoring_Pair_System_String_Node_ {
+  id: ID
+
+  # Gets a dictionary key
+  key: String
+
+  # Gets a dictionary value
+  value: IClusterKitMonitoring_Node
+}
+
+# The list of connected ClusterKitMonitoring_Pair_System_String_Node_
+#  Represents a dictionary key-value pair
+interface IClusterKitMonitoring_Pair_System_String_Node__Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitMonitoring_Pair_System_String_Node__Edge]
+}
+
+# The ClusterKitMonitoring_Pair_System_String_Node_ in a connected list
+#  Represents a dictionary key-value pair
+interface IClusterKitMonitoring_Pair_System_String_Node__Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitMonitoring_Pair_System_String_Node_
 }
 
 # ClusterKit monitoring api
@@ -4628,7 +4896,7 @@ interface IClusterKitNodeApi_NodeDescription {
   leaderInRoles: [String]
 
   # The list of descriptions of installed modules
-  modules(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+  modules(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackageFamily_Connection
 
   # The node's address
   nodeAddress: IClusterKitNodeApi_AkkaAddress
@@ -4761,8 +5029,8 @@ interface IClusterKitNodeApi_NugetFeed_Edge {
   node: IClusterKitNodeApi_NugetFeed
 }
 
-# Short description of NuGet package
-interface IClusterKitNodeApi_NugetPackage {
+# Short description of NuGet package family
+interface IClusterKitNodeApi_NugetPackageFamily {
   id: ID
 
   # The package id (name and version)
@@ -4778,22 +5046,51 @@ interface IClusterKitNodeApi_NugetPackage {
   availableVersions: [String]
 }
 
-# The list of connected ClusterKitNodeApi_NugetPackage
-#  Short description of NuGet package
-interface IClusterKitNodeApi_NugetPackage_Connection {
+# The list of connected ClusterKitNodeApi_NugetPackageFamily
+#  Short description of NuGet package family
+interface IClusterKitNodeApi_NugetPackageFamily_Connection {
   # The total count of objects satisfying filter conditions
   count: Int
 
   # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_NugetPackage_Edge]
+  edges: [IClusterKitNodeApi_NugetPackageFamily_Edge]
 }
 
-# The ClusterKitNodeApi_NugetPackage in a connected list
-#  Short description of NuGet package
-interface IClusterKitNodeApi_NugetPackage_Edge {
+# The ClusterKitNodeApi_NugetPackageFamily in a connected list
+#  Short description of NuGet package family
+interface IClusterKitNodeApi_NugetPackageFamily_Edge {
   # A value to use with paging positioning
   cursor: String
-  node: IClusterKitNodeApi_NugetPackage
+  node: IClusterKitNodeApi_NugetPackageFamily
+}
+
+# Short description of NuGet package
+interface IClusterKitNodeApi_PackageDescription {
+  id: ID
+
+  # the package Id
+  __id: String
+
+  # the package version
+  version: String
+}
+
+# The list of connected ClusterKitNodeApi_PackageDescription
+#  Short description of NuGet package
+interface IClusterKitNodeApi_PackageDescription_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_PackageDescription_Edge]
+}
+
+# The ClusterKitNodeApi_PackageDescription in a connected list
+#  Short description of NuGet package
+interface IClusterKitNodeApi_PackageDescription_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_PackageDescription
 }
 
 # The package requirement for the template
@@ -4823,6 +5120,35 @@ interface IClusterKitNodeApi_PackageRequirement_Edge {
   # A value to use with paging positioning
   cursor: String
   node: IClusterKitNodeApi_PackageRequirement
+}
+
+# Represents a dictionary key-value pair
+interface IClusterKitNodeApi_Pair_System_String_List_PackageDescription__ {
+  id: ID
+
+  # Gets a dictionary key
+  key: String
+
+  # Gets a dictionary value
+  value(filter: ClusterKitNodeApi_PackageDescription_Filter_Input, sort: [ClusterKitNodeApi_PackageDescription_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_PackageDescription_Connection
+}
+
+# The list of connected ClusterKitNodeApi_Pair_System_String_List_PackageDescription__
+#  Represents a dictionary key-value pair
+interface IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge]
+}
+
+# The ClusterKitNodeApi_Pair_System_String_List_PackageDescription__ in a connected list
+#  Represents a dictionary key-value pair
+interface IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_Pair_System_String_List_PackageDescription__
 }
 
 # The cluster configuration with all program modules versions, node templates and configurations
@@ -4889,7 +5215,7 @@ interface IClusterKitNodeApi_ReleaseConfiguration {
   id: ID
 
   # the list of available packages with their versions
-  packages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+  packages(filter: ClusterKitNodeApi_PackageDescription_Filter_Input, sort: [ClusterKitNodeApi_PackageDescription_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_PackageDescription_Connection
 
   # the list of configured node templates
   nodeTemplates(filter: ClusterKitNodeApi_Template_Filter_Input, sort: [ClusterKitNodeApi_Template_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_Template_Connection
@@ -4944,13 +5270,13 @@ interface IClusterKitNodeApi_Root {
   id: ID
 
   # The packages in the Nuget repository
-  nugetPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+  nugetPackages(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackageFamily_Connection
 
   # The list of known active nodes
   getActiveNodeDescriptions(filter: ClusterKitNodeApi_NodeDescription_Filter_Input, sort: [ClusterKitNodeApi_NodeDescription_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_NodeDescription_Connection
 
   # The list of available packages from local cluster repository
-  getPackages(filter: ClusterKitNodeApi_NugetPackage_Filter_Input, sort: [ClusterKitNodeApi_NugetPackage_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackage_Connection
+  getPackages(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackageFamily_Connection
 
   # Current cluster node template usage for debug purposes
   getTemplateStatistics: IClusterKitNodeApi_TemplatesStatistics
@@ -5033,6 +5359,9 @@ interface IClusterKitNodeApi_Template {
 
   # The list of package requirements
   packageRequirements(filter: ClusterKitNodeApi_PackageRequirement_Filter_Input, sort: [ClusterKitNodeApi_PackageRequirement_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_PackageRequirement_Connection
+
+  # The list of packages to install for current template
+  packagesToInstall(filter: ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, sort: [ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection
 
   # A value indicating whether no other nodes from previous releases are compatible
   forceUpdate: Boolean

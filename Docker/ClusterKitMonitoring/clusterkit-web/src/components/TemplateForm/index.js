@@ -1,6 +1,7 @@
 import React from 'react';
 import Formsy from 'formsy-react';
 import { Input, Textarea } from 'formsy-react-components';
+import isEqual from 'lodash/isEqual';
 
 import Form from '../Form/index';
 import PackagesMultiSelector from '../PackageSelector/multiselector';
@@ -9,6 +10,10 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
   constructor(props) {
     super(props);
     this.submit = this.submit.bind(this);
+
+    this.state = {
+      packagesList: []
+    };
 
     Formsy.addValidationRule('isLessOrEqualThan', function (values, value, otherField) {
       if (isNaN(Number(value))) return true;
@@ -30,9 +35,34 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     initialValues: React.PropTypes.object,
     packagesList: React.PropTypes.object,
     saving: React.PropTypes.bool,
+    deleting: React.PropTypes.bool,
     saved: React.PropTypes.bool,
+    saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
     saveError: React.PropTypes.string,
   };
+
+  componentWillMount() {
+    this.onReceiveProps(this.props, true);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.onReceiveProps(nextProps, false);
+  }
+
+  onReceiveProps(nextProps, skipCheck) {
+    if (nextProps.initialValues && (!isEqual(nextProps.initialValues, this.props.initialValues) || skipCheck)) {
+      const packageRequirements = nextProps.initialValues.packageRequirements.edges.map(x => x.node).map(x => {
+        return {
+          id: x.__id,
+          specificVersion: x.specificVersion
+        }
+      });
+
+      this.setState({
+        packageRequirements: packageRequirements
+      });
+    }
+  }
 
   arrayToString(data) {
     return data && this.replaceAll(data.join(), ',', '\n');
@@ -46,8 +76,14 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     return value.replace(new RegExp(search, 'g'), replacement);
   }
 
+  onPackageRequirementsChange(data) {
+    this.setState({
+      packageRequirements: data
+    });
+  }
+
   submit(model) {
-    model.packages = this.stringToArray(model.packages);
+    model.packageRequirements = this.state.packageRequirements;
     model.containerTypes = this.stringToArray(model.containerTypes);
     model.maximumNeededInstances = Number.parseInt(model.maximumNeededInstances, 10);
     model.minimumRequiredInstances = model.minimumRequiredInstances ? Number.parseInt(model.minimumRequiredInstances, 10) : 0;
@@ -61,12 +97,6 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
 
   render() {
     const { initialValues } = this.props;
-    const packageRequirements = initialValues.packageRequirements.edges.map(x => x.node).map(x => {
-      return {
-        package: x.__id,
-        version: x.specificVersion
-      }
-    });
 
     return (
       <div>
@@ -76,9 +106,18 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
         {!initialValues &&
           <h2>Create a new Template</h2>
         }
-        <Form onSubmit={this.submit} onCancel={this.props.onCancel} onDelete={this.props.onDelete ? this.props.onDelete : null} className="form-horizontal form-margin" saving={this.props.saving} saved={this.props.saved} saveError={this.props.saveError}>
+        <Form
+          onSubmit={this.submit}
+          onCancel={this.props.onCancel}
+          onDelete={this.props.onDelete ? this.props.onDelete : null}
+          className="form-horizontal form-margin"
+          saving={this.props.saving}
+          deleting={this.props.deleting}
+          saved={this.props.saved}
+          saveError={this.props.saveError}
+          saveErrors={this.props.saveErrors}
+        >
           <fieldset>
-            <Input name="__id" value={initialValues && initialValues.__id} type="hidden" />
             <Input name="code" label="Code" value={(initialValues && initialValues.code) || ""} required />
             <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />
             <Input
@@ -98,7 +137,7 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
               elementWrapperClassName="col-sm-2"
             />
             {this.props.packagesList &&
-              <PackagesMultiSelector packages={this.props.packagesList} values={packageRequirements} />
+              <PackagesMultiSelector packages={this.props.packagesList} values={this.state.packageRequirements} onChange={this.onPackageRequirementsChange.bind(this)} />
             }
             <Input name="priority" label="Priority" value={(initialValues && initialValues.priority) || ""} validations="isNumeric" validationError="Must be numeric" elementWrapperClassName="col-sm-2" />
             <Textarea name="containerTypes" label="Container Types" value={(initialValues && this.arrayToString(initialValues.containerTypes)) || ""} rows={3} />

@@ -16,8 +16,8 @@ export default class PackagesMultiSelector extends React.Component {
     this.state = {
       values: [
         {
-          package: '',
-          version: ''
+          id: '',
+          specificVersion: ''
         }
       ]
     };
@@ -57,8 +57,8 @@ export default class PackagesMultiSelector extends React.Component {
 
   onAdd() {
     const newItem = {
-      package: '',
-      version: ''
+      id: '',
+      specificVersion: ''
     };
 
     this.setState((prevState, props) => ({
@@ -79,7 +79,7 @@ export default class PackagesMultiSelector extends React.Component {
     const recordsCount = this.state.values && this.state.values.length;
     return (
       <div className="form-group row package-selector-outer">
-        <label className="control-label col-sm-3" data-required="false">Maximum Needed Instances</label>
+        <label className="control-label col-sm-3" data-required="false">Packages</label>
         <div className="col-sm-9">
         {this.state.values && this.state.values.length > 0 && this.state.values.map((item, index) => {
             let onDelete = () => this.onDelete(index);

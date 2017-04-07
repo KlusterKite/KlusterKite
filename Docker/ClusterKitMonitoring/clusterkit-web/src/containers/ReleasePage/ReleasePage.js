@@ -221,9 +221,7 @@ export default Relay.createContainer(
                 packages {
                   edges {
                     node {
-                      name
                       version
-                      availableVersions
                       id
                       __id
                     }
