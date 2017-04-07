@@ -15,7 +15,6 @@ class FeedList extends React.Component {
   static propTypes = {
     releaseId: React.PropTypes.string,
     configuration: React.PropTypes.object,
-    onChange: React.PropTypes.func,
   };
 
   render() {

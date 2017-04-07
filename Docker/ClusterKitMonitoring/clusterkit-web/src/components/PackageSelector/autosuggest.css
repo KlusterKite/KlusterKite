@@ -9,7 +9,7 @@
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
     font-size: 14px;
-    border: 1px solid #d5d5d5;
+    border: 1px solid #ccc;
     border-radius: 4px;
     -webkit-appearance: none;
 }
@@ -35,7 +35,7 @@
     display: block;
     position: absolute;
     top: 35px;
-    width: 350px;
+    width: 100%;
     border: 1px solid #aaa;
     background-color: #fff;
     font-family: 'Open Sans', sans-serif;

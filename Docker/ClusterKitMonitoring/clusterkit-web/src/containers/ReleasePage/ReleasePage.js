@@ -156,7 +156,6 @@ class ReleasePage extends React.Component {
           <ReleaseForm onSubmit={this.onSubmit} onDelete={this.onDelete} initialValues={model}/>
           <FeedsList
             configuration={model.configuration}
-            onChange={this.updateStateFeed}
             releaseId={this.props.params.id}
           />
           <TemplatesList

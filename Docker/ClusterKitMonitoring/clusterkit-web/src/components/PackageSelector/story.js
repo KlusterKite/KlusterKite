@@ -1,13 +1,84 @@
 import React from 'react';
-import { storiesOf } from '@kadira/storybook';
+import { storiesOf, action } from '@kadira/storybook';
 // import StubContainer from 'react-storybooks-relay-container';
 
-import PackagesSelector from './index';
+import PackagesSelector from './selector';
+import PackagesMultiSelector from './multiselector';
 
 storiesOf('Packages')
-  .add('input with autocomplete', () => {
+  .add('name and version input, empty', () => {
     const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
-    return <PackagesSelector packages={packagesList} />;
+    return <PackagesSelector
+            packages={packagesList}
+            onChange={action('changed')}
+            onDelete={action('deleted')}
+            onAdd={action('add')}
+           />;
+  })
+  .add('name and version input, package', () => {
+    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const initialValues = {
+      package: 'ClusterKit.API.Client',
+      version: null
+    };
+    return <PackagesSelector
+            packages={packagesList}
+            onChange={action('changed')}
+            onDelete={action('deleted')}
+            onAdd={action('add')}
+            initialValues={initialValues}
+           />;
+  })
+  .add('name and version input, version', () => {
+    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const initialValues = {
+      package: 'ClusterKit.API.Client',
+      version: '0.1.1'
+    };
+    return <PackagesSelector
+      packages={packagesList}
+      onChange={action('changed')}
+      onDelete={action('deleted')}
+      onAdd={action('add')}
+      initialValues={initialValues}
+    />;
+  })
+  .add('multiselector empty', () => {
+    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    return <PackagesMultiSelector
+            packages={packagesList}
+            />;
+  })
+  .add('multiselector filled', () => {
+    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const values = [
+      {
+        package: 'ClusterKit.API.Client',
+        version: '0.1.0'
+      },
+      {
+        package: 'ClusterKit.API.Provider',
+        version: ''
+      },
+      {
+        package: 'Microsoft.AspNet.WebApi.OwinSelfHost',
+        version: '5.2.3'
+      },
+      {
+        package: 'System.Text.Encoding.Extensions',
+        version: ''
+      },
+      {
+        package: 'System.Text.RegularExpressions',
+        version: ''
+      },
+    ];
+
+    return <PackagesMultiSelector
+      packages={packagesList}
+      values={values}
+      onChange={action('changed')}
+    />;
   })
 ;
 

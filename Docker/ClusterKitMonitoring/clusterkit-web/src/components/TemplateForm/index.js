@@ -1,7 +1,9 @@
 import React from 'react';
 import Formsy from 'formsy-react';
 import { Input, Textarea } from 'formsy-react-components';
+
 import Form from '../Form/index';
+import PackagesMultiSelector from '../PackageSelector/multiselector';
 
 export default class TemplateForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -26,6 +28,7 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     onCancel: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     initialValues: React.PropTypes.object,
+    packagesList: React.PropTypes.object,
     saving: React.PropTypes.bool,
     saved: React.PropTypes.bool,
     saveError: React.PropTypes.string,
@@ -53,12 +56,18 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
   }
 
   cancel() {
-    console.log('cancel function');
     this.props.onCancel();
   }
 
   render() {
     const { initialValues } = this.props;
+    const packageRequirements = initialValues.packageRequirements.edges.map(x => x.node).map(x => {
+      return {
+        package: x.__id,
+        version: x.specificVersion
+      }
+    });
+
     return (
       <div>
         {initialValues &&
@@ -88,6 +97,9 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
               validationErrors={{isNumeric: 'You have to type a number', isMoreOrEqualThan: 'Cannot be less than Minimum Required Instances'}}
               elementWrapperClassName="col-sm-2"
             />
+            {this.props.packagesList &&
+              <PackagesMultiSelector packages={this.props.packagesList} values={packageRequirements} />
+            }
             <Input name="priority" label="Priority" value={(initialValues && initialValues.priority) || ""} validations="isNumeric" validationError="Must be numeric" elementWrapperClassName="col-sm-2" />
             <Textarea name="containerTypes" label="Container Types" value={(initialValues && this.arrayToString(initialValues.containerTypes)) || ""} rows={3} />
             <Textarea name="configuration" label="Configuration" value={(initialValues && initialValues.configuration) || ""} rows={10} />
@@ -97,6 +109,3 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     );
   }
 }
-
-// <Textarea name="packages" label="Packages" value={(initialValues && this.arrayToString(initialValues.packages)) || ""} rows={6} />
-

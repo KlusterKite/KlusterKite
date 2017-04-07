@@ -96,9 +96,10 @@ class TemplatePage extends React.Component {
 
   render () {
     const model = this.props.api.template;
+    const packages = this.props.api.clusterKitNodesApi.nugetPackages;
     return (
       <div>
-        <TemplateForm onSubmit={this._onSubmit} onDelete={this._onDelete} initialValues={model} />
+        <TemplateForm onSubmit={this._onSubmit} onDelete={this._onDelete} initialValues={model} packagesList={packages} />
       </div>
     )
   }
@@ -119,6 +120,17 @@ export default Relay.createContainer(
         fragment on IClusterKitNodeApi {
           id
           __typename
+          clusterKitNodesApi {
+            nugetPackages {
+              edges {
+                node {
+                  name
+                  version
+                  availableVersions
+                }
+              }
+            }
+          }
           template:__node(id: $id) @include( if: $nodeExists ) {
             ...on IClusterKitNodeApi_Template {
               id
