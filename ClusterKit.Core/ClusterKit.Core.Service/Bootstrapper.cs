@@ -50,11 +50,11 @@ namespace ClusterKit.Core.Service
         ///  Dependency injection configuration
         /// </summary>
         /// <param name="container">Dependency injection container</param>
-        /// <param name="args">
+        /// <param name="configurations">
         /// Startup parameters
         /// </param>
         /// <returns>The actor system</returns>
-        public static ActorSystem ConfigureAndStart(IWindsorContainer container, string[] args)
+        public static ActorSystem ConfigureAndStart(IWindsorContainer container, string[] configurations)
         {
             Console.WriteLine(@"Starting bootstrapper");
 
@@ -65,7 +65,7 @@ namespace ClusterKit.Core.Service
             container.RegisterWindsorInstallers();
 
             Console.WriteLine(@"Preparing config");
-            var config = BaseInstaller.GetStackedConfig(container, CreateTopLevelConfig(args));
+            var config = BaseInstaller.GetStackedConfig(container, CreateTopLevelConfig(configurations));
 
             Log.Debug($"Cluster configuration: seed-nodes { string.Join(", ", config.GetStringList("akka.cluster.seed-nodes") ?? new List<string>())}");
             Log.Debug($"Cluster configuration: min-nr-of-members { config.GetInt("akka.cluster.min-nr-of-members")}");
@@ -109,7 +109,7 @@ namespace ClusterKit.Core.Service
 
             // log configuration finished
 
-            // performing prestart checks
+            // performing pre-start checks
             BaseInstaller.RunPreCheck(container, config);
 
             // starting Akka system
@@ -128,7 +128,7 @@ namespace ClusterKit.Core.Service
         /// <summary>
         /// Creates configuration file from environment variables, start-up parameters and local files
         /// </summary>
-        /// <param name="args">Start up parameters</param>
+        /// <param name="configurations">Start up parameters</param>
         /// <returns>Top level configuration</returns>
         /// <remarks>
         /// Load priority:
@@ -137,16 +137,18 @@ namespace ClusterKit.Core.Service
         ///     * akka.hocon file in local application directory
         ///     * Akka config section in application configuration file
         /// </remarks>
-        private static Config CreateTopLevelConfig(string[] args)
+        private static Config CreateTopLevelConfig(string[] configurations)
         {
             var config = ConfigurationFactory.Empty;
-            if (args != null)
+            if (configurations != null)
             {
-                Console.WriteLine(@"loading config from command line parameters");
-                config = args
+                Console.WriteLine($@"loading config from command line parameters: {string.Join(", ", configurations)}");
+                config = configurations
                     .Where(File.Exists)
                     .Select(File.ReadAllText)
-                    .Aggregate(config, (current, configText) => current.WithFallback(ConfigurationFactory.ParseString(configText)));
+                    .Aggregate(
+                    config,
+                        (current, configText) => current.WithFallback(ConfigurationFactory.ParseString(configText)));
             }
 
             Console.WriteLine(@"loading config from environment");
@@ -171,7 +173,7 @@ namespace ClusterKit.Core.Service
                 Log.Warning("File {fileName} was not found", hoconPath);
             }
 
-            Console.WriteLine(@"loading aplication configuration");
+            Console.WriteLine(@"loading application configuration");
             var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
             if (section?.AkkaConfig != null)
             {

@@ -48,13 +48,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<DataFactory<ConfigurationContext, NodeTemplate, int>>()
-                .ImplementedBy<NodeTemplateFactory>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, NugetFeed, int>>()
-                .ImplementedBy<NugetFeedFactory>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, SeedAddress, int>>()
-                .ImplementedBy<SeedAddressFactorycs>().LifestyleTransient());
-
             container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactoryByLogin>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, Guid>>().ImplementedBy<UserFactoryByUid>().LifestyleTransient());

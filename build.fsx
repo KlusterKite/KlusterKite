@@ -70,7 +70,6 @@ Target "DockerContainers" (fun _ ->
 
     buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
     
-
     if not (directoryExists "./packages/Npm.js") then
         "Npm.js" |> RestorePackageId(fun p-> 
             { p with

@@ -201,6 +201,10 @@
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
 </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConnectionManager.cs" />

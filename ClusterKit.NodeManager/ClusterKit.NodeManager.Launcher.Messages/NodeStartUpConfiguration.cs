@@ -3,13 +3,12 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Defines the NodeStarttupConfiguration type.
+//   Set of instructions needed to create new node
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -26,12 +25,6 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         /// Gets or sets node template code name
         /// </summary>
         public string NodeTemplate { get; set; }
-
-        /// <summary>
-        /// Gets or sets current node template version
-        /// </summary>
-        [Obsolete]
-        public int NodeTemplateVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the node configuration release id

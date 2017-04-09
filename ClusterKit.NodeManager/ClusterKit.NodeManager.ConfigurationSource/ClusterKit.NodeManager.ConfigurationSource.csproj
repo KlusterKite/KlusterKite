@@ -33,14 +33,6 @@
     <DocumentationFile>bin\Release\ClusterKit.NodeManager.ConfigurationSource.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj">
-      <Project>{2a6edcc4-c729-4bee-9bb5-ac6f76b3bac8}</Project>
-      <Name>ClusterKit.API.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
-      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
-      <Name>ClusterKit.Security.Attributes</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
       <Project>{983DAEB9-B058-41A9-8403-29851F2244B7}</Project>
       <Name>ClusterKit.NodeManager.Client</Name>
@@ -228,6 +220,10 @@
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
     </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Swagger.Messages/ClusterKit.Web.Swagger.Messages.csproj">
       <Project>{D80F5923-CD1B-4376-BAB5-1785EA4395A9}</Project>
       <Name>ClusterKit.Web.Swagger.Messages</Name>
@@ -235,6 +231,14 @@
     <ProjectReference Include="../.././ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj">
       <Project>{F3216B61-26C8-4AD6-84DF-4531D4C568A2}</Project>
       <Name>ClusterKit.Monitoring.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
+      <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
+      <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Attributes/ClusterKit.API.Attributes.csproj">
+      <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
+      <Name>ClusterKit.API.Attributes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -247,18 +251,15 @@
     </Compile>
     <Compile Include="ConfigurationSeeder.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="Migrations\201703311032500_Init.cs" />
-    <Compile Include="Migrations\201703311032500_Init.Designer.cs">
-      <DependentUpon>201703311032500_Init.cs</DependentUpon>
+    <Compile Include="Migrations\201704081342363_Init.cs" />
+    <Compile Include="Migrations\201704081342363_Init.Designer.cs">
+      <DependentUpon>201704081342363_Init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="NodeTemplateFactory.cs" />
-    <Compile Include="NugetFeedFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReleaseDataFactory.cs" />
     <Compile Include="ReleaseExtensions.cs" />
     <Compile Include="RoleFactory.cs" />
-    <Compile Include="SeedAddressFactorycs.cs" />
     <Compile Include="UserFactoryByLogin.cs" />
     <Compile Include="UserFactoryByUid.cs" />
   </ItemGroup>
@@ -275,8 +276,8 @@
       <LastGenOutput>Configurations.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201703311032500_Init.resx">
-      <DependentUpon>201703311032500_Init.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201704081342363_Init.resx">
+      <DependentUpon>201704081342363_Init.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

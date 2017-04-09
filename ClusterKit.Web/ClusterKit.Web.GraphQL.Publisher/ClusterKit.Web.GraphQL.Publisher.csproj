@@ -41,10 +41,6 @@
       <Project>{ddc4b9d1-49ac-4cd6-9fc5-fe4a02c54871}</Project>
       <Name>ClusterKit.API.Provider</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
-      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
-      <Name>ClusterKit.Security.Attributes</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj">
       <Project>{6adfbddf-e452-46fc-a037-6d57300be561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>
@@ -253,15 +249,19 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
       <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
       <Name>ClusterKit.API.Client</Name>
-    </ProjectReference>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActorSystemApiProvider.cs" />

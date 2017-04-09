@@ -60,24 +60,6 @@ namespace ClusterKit.NodeManager.Client
         public const string ClusterUpdate = "ClusterKit.NodeManager.ClusterUpdate";
 
         /// <summary>
-        /// The privilege to manage <see cref="NodeTemplate"/>
-        /// </summary>
-        [PrivilegeDescription("Node template management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
-        public const string NodeTemplate = "ClusterKit.NodeManager.NodeTemplate";
-
-        /// <summary>
-        /// The privilege to manage <see cref="NugetFeed"/>
-        /// </summary>
-        [PrivilegeDescription("Nuget feed management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
-        public const string NugetFeed = "ClusterKit.NodeManager.NugetFeed";
-
-        /// <summary>
-        /// The privilege to manage <see cref="SeedAddress"/>
-        /// </summary>
-        [PrivilegeDescription("Seed addresses management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
-        public const string SeedAddress = "ClusterKit.NodeManager.SeedAddress";
-
-        /// <summary>
         /// The privilege to get the list of all registered privileges
         /// </summary>
         [PrivilegeDescription("Get the list of all system defined privilege descriptions", Target = EnPrivilegeTarget.User)]

@@ -23,12 +23,6 @@ namespace ClusterKit.Data.Tests.Mock
     public class TestContextFactory : BaseContextFactory<TestDataContext, TestDataContextMigrationConfiguration>
     {
         /// <summary>
-        /// The connection manager.
-        /// </summary>
-        [NotNull]
-        private readonly BaseConnectionManager connectionManager;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TestContextFactory"/> class.
         /// </summary>
         /// <param name="connectionManager">
@@ -37,7 +31,6 @@ namespace ClusterKit.Data.Tests.Mock
         public TestContextFactory([NotNull] BaseConnectionManager connectionManager)
             : base(connectionManager)
         {
-            this.connectionManager = connectionManager;
         }
 
         /// <inheritdoc />
@@ -49,14 +42,14 @@ namespace ClusterKit.Data.Tests.Mock
             context.Database.Delete();
 
             if (!context.Users.Any())
-            {
+             {
                 var user1 = new User
                                 {
                                     Login = "user1",
                                     Password = "123",
                                     Uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}")
                                 };
-
+                 
                 var user2 = new User
                                 {
                                     Login = "user2",
@@ -75,7 +68,7 @@ namespace ClusterKit.Data.Tests.Mock
         /// <inheritdoc />
         public override async Task<TestDataContext> CreateContext(string connectionString, string databaseName)
         {
-            var connection = this.connectionManager.CreateConnection(connectionString);
+            var connection = this.ConnectionManager.CreateConnection(connectionString);
             await connection.OpenAsync();
             var context = Creator(connection, true);
             return context;

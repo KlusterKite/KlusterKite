@@ -641,10 +641,17 @@ namespace ClusterKit.API.Provider.Resolvers
                 else
                 {
                     var collectionType = typeof(CollectionResolver<>).MakeGenericType(metadata.Type);
+
                     var filterType =
                         (ApiObjectType)
                         collectionType.GetProperty("FilterType", BindingFlags.Static | BindingFlags.Public)
-                            .GetValue(null);
+                            ?.GetValue(null);
+
+                    if (filterType == null)
+                    {
+                        throw new InvalidOperationException("Unexpected CollectionResolver signature change");
+                    }
+
                     if (filterType.Fields.Count > 2 && RelatedTypes.All(rt => rt.ApiType != filterType))
                     {
                         RelatedTypes.Add(new RelatedType { ApiType = filterType });
@@ -652,7 +659,12 @@ namespace ClusterKit.API.Provider.Resolvers
 
                     var sortType =
                         (ApiEnumType)
-                        collectionType.GetProperty("SortType", BindingFlags.Static | BindingFlags.Public).GetValue(null);
+                        collectionType.GetProperty("SortType", BindingFlags.Static | BindingFlags.Public)?.GetValue(null);
+
+                    if (sortType == null)
+                    {
+                        throw new InvalidOperationException("Unexpected CollectionResolver signature change");
+                    }
 
                     if (sortType.Values.Any() && RelatedTypes.All(rt => rt.ApiType != sortType))
                     {
@@ -944,13 +956,24 @@ namespace ClusterKit.API.Provider.Resolvers
                 valueType = methodInfo.ReturnType;
                 var methodArguments = new List<Expression>();
 
-                var jsonPropertyMethod = typeof(JObject).GetMethod("Property", new[] { typeof(string) });
-                var jsonPropertyValue = typeof(JProperty).GetProperty("Value");
-                var jsonTokenToObject = typeof(JToken).GetMethod("ToObject", new[] { typeof(JsonSerializer) });
+                var jsonPropertyMethod = typeof(JObject).GetMethod(nameof(JObject.Property), new[] { typeof(string) });
+                var jsonPropertyValue = typeof(JProperty).GetProperty(nameof(JProperty.Value));
+                var jsonTokenToObject = typeof(JToken).GetMethod(nameof(JProperty.ToObject), new[] { typeof(JsonSerializer) });
+
+                if (jsonPropertyMethod == null || jsonPropertyValue == null || jsonTokenToObject == null)
+                {
+                    throw new InvalidOperationException("Unexpected Json library signature change");
+                }
+
+                var argumentsProperty = typeof(ApiRequest).GetProperty(nameof(ApiRequest.Arguments));
+                if (argumentsProperty == null)
+                {
+                    throw new InvalidOperationException("Unexpected ApiRequest signature change");
+                }
 
                 var arguments =
                     Expression.Convert(
-                        Expression.Property(requestParam, typeof(ApiRequest).GetProperty("Arguments")),
+                        Expression.Property(requestParam, argumentsProperty),
                         typeof(JObject));
 
                 foreach (var parameterInfo in methodInfo.GetParameters())
@@ -1073,6 +1096,10 @@ namespace ClusterKit.API.Provider.Resolvers
             var taskType = typeof(Task<>).MakeGenericType(returnType);
 
             var taskResult = taskType.GetProperty("Result");
+            if (taskResult == null)
+            {
+                throw new InvalidOperationException("Unexpected task signature changed");
+            }
 
             var continueMethod =
                 taskType.GetMethods()

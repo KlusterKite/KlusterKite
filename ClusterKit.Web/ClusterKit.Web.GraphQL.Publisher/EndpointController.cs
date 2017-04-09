@@ -35,9 +35,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
     public class EndpointController : ApiController
     {
         /// <summary>
-        /// The executer.
+        /// The executor.
         /// </summary>
-        private readonly IDocumentExecuter executer;
+        private readonly IDocumentExecuter executor;
 
         /// <summary>
         /// The schema provider.
@@ -55,8 +55,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="schemaProvider">
         /// The schema provider.
         /// </param>
-        /// <param name="executer">
-        /// The executer.
+        /// <param name="executor">
+        /// The executor.
         /// </param>
         /// <param name="writer">
         /// The writer.
@@ -66,12 +66,12 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// </param>
         public EndpointController(
             SchemaProvider schemaProvider,
-            IDocumentExecuter executer,
+            IDocumentExecuter executor,
             IDocumentWriter writer,
             Config config)
         {
             this.schemaProvider = schemaProvider;
-            this.executer = executer;
+            this.executor = executor;
             this.writer = writer;
             /*
             this.complexityConfiguration = new ComplexityConfiguration
@@ -136,7 +136,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 return request.CreateResponse(HttpStatusCode.ServiceUnavailable);
             }
 
-            var result = await this.executer.ExecuteAsync(
+            var result = await this.executor.ExecuteAsync(
                              options =>
                                  {
                                      options.Schema = schema;

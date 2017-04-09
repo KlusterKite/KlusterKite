@@ -110,10 +110,10 @@ namespace ClusterKit.Core.TestKit
         /// <param name="obj">The original message</param>
         protected virtual void ForwardMessage(object obj)
         {
-            var messsageToSendType = typeof(TestMessage<>).MakeGenericType(obj.GetType());
-            var messageToSend = Activator.CreateInstance(messsageToSendType);
-            messsageToSendType.GetProperty("Message").SetValue(messageToSend, obj);
-            messsageToSendType.GetProperty("ReceiverPath").SetValue(messageToSend, this.Self.Path.ToString());
+            var messageToSendType = typeof(TestMessage<>).MakeGenericType(obj.GetType());
+            var messageToSend = Activator.CreateInstance(messageToSendType);
+            messageToSendType.GetProperty("Message")?.SetValue(messageToSend, obj);
+            messageToSendType.GetProperty("ReceiverPath")?.SetValue(messageToSend, this.Self.Path.ToString());
             this.testActor.Tell(messageToSend, Context.Sender);
         }
 

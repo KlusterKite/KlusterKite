@@ -18,5 +18,10 @@ namespace ClusterKit.NodeManager.Messages
         /// Gets or sets the container type
         /// </summary>
         public string ContainerType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the framework runtime type name
+        /// </summary>
+        public string FrameworkRuntimeType { get; set; }
     }
 }

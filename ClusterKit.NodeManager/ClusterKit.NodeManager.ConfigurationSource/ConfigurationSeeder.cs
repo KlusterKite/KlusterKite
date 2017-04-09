@@ -38,20 +38,18 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="context">Current opened context</param>
         public void Seed(ConfigurationContext context)
         {
-            if (context.Templates.Any())
+            if (context.Releases.Any())
             {
                 return;
             }
 
             SetupUsers(context);
 
-            context.Templates.AddRange(this.GetDefaultTemplates());
             var nugetFeeds = new List<NugetFeed>();
             List<string> seedsFromConfig = new List<string>();
             List<PackageDescription> initialPackages = new List<PackageDescription>();
             var system = ServiceLocator.Current.GetInstance<ActorSystem>();
-            var nugetUrl = system.Settings.Config.GetString("ClusterKit.NodeManager.PackageRepository");
-            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(nugetUrl);
+            var nugetRepository = ServiceLocator.Current.GetInstance<IPackageRepository>();
             
             try
             {
@@ -112,7 +110,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     Configuration = t.Configuration,
                                     ContainerTypes = t.ContainerTypes,
                                     MinimumRequiredInstances = t.MinimumRequiredInstances,
-                                    MaximumNeededInstances = t.MinimumRequiredInstances,
+                                    MaximumNeededInstances = t.MaximumNeededInstances,
                                     Priority = t.Priority,
                                     PackageRequirements =
                                         t.Packages.Select(p => new Template.PackageRequirement(p, null))
@@ -138,7 +136,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             var supportedFrameworks = system.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
             var initialErrors = initialRelease.SetPackagesDescriptionsForTemplates(
                 nugetRepository,
-                supportedFrameworks.ToList()).ToList();
+                supportedFrameworks.ToList());
 
             foreach (var errorDescription in initialErrors)
             {
@@ -265,8 +263,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                             {
                                                 Privileges.GetActiveNodeDescriptions,
                                                 Privileges.GetTemplateStatistics,
-                                                $"{Privileges.NodeTemplate}.GetList",
-                                                $"{Privileges.NodeTemplate}.Query"
+                                                $"{Privileges.Release}.Query"
                                             }
                                 };
             context.Roles.Add(adminRole);

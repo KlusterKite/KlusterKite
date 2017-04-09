@@ -57,7 +57,6 @@ namespace ClusterKit.NodeManager.Client
                     NodeAddress = Cluster.Get(Context.System).SelfAddress,
                     NodeTemplate = config.GetString("ClusterKit.NodeManager.NodeTemplate"),
                     ContainerType = config.GetString("ClusterKit.NodeManager.ContainerType"),
-                    NodeTemplateVersion = config.GetInt("ClusterKit.NodeManager.NodeTemplateVersion"),
                     ReleaseId = config.GetInt("ClusterKit.NodeManager.ReleaseId"),
                     NodeId = nodeId,
                     StartTimeStamp = this.startTimeStamp,

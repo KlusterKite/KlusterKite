@@ -84,8 +84,8 @@ namespace ClusterKit.Core.TestKit
         {
             var messsageToSendType = typeof(TestMessage<>).MakeGenericType(obj.GetType());
             var messageToSend = Activator.CreateInstance(messsageToSendType);
-            messsageToSendType.GetProperty("Message").SetValue(messageToSend, obj);
-            messsageToSendType.GetProperty("ReceiverPath").SetValue(messageToSend, this.Self.Path.ToString());
+            messsageToSendType.GetProperty("Message")?.SetValue(messageToSend, obj);
+            messsageToSendType.GetProperty("ReceiverPath")?.SetValue(messageToSend, this.Self.Path.ToString());
             this.TestActor.Tell(messageToSend, Context.Sender);
         }
 

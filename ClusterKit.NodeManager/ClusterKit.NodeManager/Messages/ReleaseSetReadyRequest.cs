@@ -10,6 +10,7 @@
 namespace ClusterKit.NodeManager.Messages
 {
     using Akka.Actor;
+    using Akka.Routing;
 
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Security.Attributes;
@@ -18,7 +19,7 @@ namespace ClusterKit.NodeManager.Messages
     /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="Release.EnState.Draft"/> to <see cref="Release.EnState.Ready"/>
     /// </summary>
     /// <returns>The mutation result</returns>
-    public class ReleaseSetReadyRequest
+    public class ReleaseSetReadyRequest : IConsistentHashable
     {
         /// <summary>
         /// Gets or sets the release id
@@ -29,5 +30,8 @@ namespace ClusterKit.NodeManager.Messages
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Context { get; set; }
+
+        /// <inheritdoc />
+        public object ConsistentHashKey => this.Id;
     }
 }

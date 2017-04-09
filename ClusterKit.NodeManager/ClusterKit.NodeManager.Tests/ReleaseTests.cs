@@ -11,6 +11,7 @@ namespace ClusterKit.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.Common;
     using System.Linq;
 
     using ClusterKit.NodeManager.Client.ORM;
@@ -18,36 +19,19 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Launcher.Messages;
 
     using Xunit;
-    using Xunit.Abstractions;
-
+    
     /// <summary>
     /// Testing basic work with <see cref="Release"/>
     /// </summary>
     public class ReleaseTests
     {
         /// <summary>
-        /// The test output stream
-        /// </summary>
-        private readonly ITestOutputHelper output;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReleaseTests"/> class.
-        /// </summary>
-        /// <param name="output">
-        /// The output.
-        /// </param>
-        public ReleaseTests(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
-
-        /// <summary>
         /// Tests the release compatibility set-up - templates with changed modules versions are incompatible
         /// </summary>
         [Fact]
         public void TestReleaseCompatibilityModuleVersionSet()
         {
-            using (var connection = DataFactoryTests.TempDatabaseConnection.Create(this.output).Result)
+            using (var connection = Effort.DbConnectionFactory.CreatePersistent(Guid.NewGuid().ToString("N")))
             {
                 this.CreateTestDatabase(connection);
 
@@ -104,7 +88,7 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void TestReleaseCompatibilityModuleListSet()
         {
-            using (var connection = DataFactoryTests.TempDatabaseConnection.Create(this.output).Result)
+            using (var connection = Effort.DbConnectionFactory.CreatePersistent(Guid.NewGuid().ToString("N")))
             {
                 this.CreateTestDatabase(connection);
 
@@ -161,7 +145,7 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void TestReleaseCompatibilityConfigurationsSet()
         {
-            using (var connection = DataFactoryTests.TempDatabaseConnection.Create(this.output).Result)
+            using (var connection = Effort.DbConnectionFactory.CreatePersistent(Guid.NewGuid().ToString("N")))
             {
                 this.CreateTestDatabase(connection);
 
@@ -216,7 +200,7 @@ namespace ClusterKit.NodeManager.Tests
         /// Creates the database with test data
         /// </summary>
         /// <param name="connection">The database connection</param>
-        private void CreateTestDatabase(DataFactoryTests.TempDatabaseConnection connection)
+        private void CreateTestDatabase(DbConnection connection)
         {
             var template1 = new Template
             {

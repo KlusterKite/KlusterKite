@@ -10,8 +10,6 @@
 namespace ClusterKit.NodeManager.WebApi
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -21,8 +19,6 @@ namespace ClusterKit.NodeManager.WebApi
 
     using ClusterKit.Core;
     using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
     using ClusterKit.Web.Authorization.Attributes;
@@ -44,7 +40,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// The system.
         /// </param>
         public NodeManagerController(ActorSystem system)
-        {
+        { 
             this.System = system;
             this.AkkaTimeout = ConfigurationUtils.GetRestTimeout(system);
         }
@@ -60,44 +56,6 @@ namespace ClusterKit.NodeManager.WebApi
         private ActorSystem System { get; }
 
         /// <summary>
-        /// Gets current cluster active nodes descriptions
-        /// </summary>
-        /// <returns>The list of descriptions</returns>
-        [Route("getDescriptions")]
-        [RequireUserPrivilege(Privileges.GetActiveNodeDescriptions)]
-        public async Task<List<NodeDescription>> GetActiveNodeDescriptions()
-        {
-            var activeNodeDescriptions =
-                await
-                    this.System.ActorSelection(this.GetManagerActorProxyPath())
-                        .Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
-
-            return activeNodeDescriptions
-                .OrderBy(n => n.NodeTemplate)
-                .ThenBy(n => n.ContainerType)
-                .ThenBy(n => n.NodeAddress.ToString())
-                .ToList();
-        }
-
-        /// <summary>
-        /// Gets list of available templates for specified container type for current cluster state
-        /// </summary>
-        /// <param name="containerType">
-        /// The container type.
-        /// </param>
-        /// <returns>
-        /// The list of available templates
-        /// </returns>
-        [Route("availableTemplates/{containerType}")]
-        [HttpGet]
-        [RequireUserPrivilege(Privileges.GetAvailableTemplates, IgnoreOnClientOwnBehalf = true)]
-        [RequireClientPrivilege(Privileges.GetAvailableTemplates, IgnoreOnUserPresent = true)]
-        public async Task<List<NodeTemplate>> GetAvailableTemplates(string containerType)
-        {
-            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = containerType }, this.AkkaTimeout);
-        }
-
-        /// <summary>
         /// Gets configuration for new empty node
         /// </summary>
         /// <param name="request">The configuration request</param>
@@ -110,7 +68,6 @@ namespace ClusterKit.NodeManager.WebApi
             object result;
             try
             {
-                this.System.Log.Info("{Type}: sending message to {Path}", this.GetType().Name, this.GetManagerActorProxyPath());
                 result = await this.System.ActorSelection(this.GetManagerActorProxyPath())
                              .Ask<object>(request, this.AkkaTimeout);
             }
@@ -123,61 +80,26 @@ namespace ClusterKit.NodeManager.WebApi
             var configuration = result as NodeStartUpConfiguration;
             if (configuration != null)
             {
+                this.System.Log.Info("{Type}: sending configuration", this.GetType().Name);
                 return configuration;
             }
 
             var waitMessage = result as NodeStartupWaitMessage;
             if (waitMessage != null)
             {
-                var httpResponseMessage = new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.ServiceUnavailable
-                };
+                this.System.Log.Info(
+                    "{Type}: cluster is full. Container {ContainerType} with framework {FrameworkName} in not needed now",
+                    this.GetType().Name,
+                    request.ContainerType,
+                    request.FrameworkRuntimeType);
+                var httpResponseMessage = new HttpResponseMessage { StatusCode = HttpStatusCode.ServiceUnavailable };
 
                 httpResponseMessage.Headers.Add("Retry-After", ((int)waitMessage.WaitTime.TotalSeconds).ToString());
                 throw new HttpResponseException(httpResponseMessage);
             }
 
+            this.System.Log.Info("{Type}: NewNodeTemplateRequest - unknown response of type {ResponseType}", this.GetType().Name, result?.GetType().Name);
             throw new HttpResponseException(HttpStatusCode.InternalServerError);
-        }
-
-        /// <summary>
-        /// Gets the list of available packages from local cluster repository
-        /// </summary>
-        /// <returns>The list of available packages</returns>
-        [Route("getPackages")]
-        [HttpGet]
-        [RequireUserPrivilege(Privileges.GetPackages)]
-        public async Task<List<PackageDescription>> GetPackages()
-        {
-            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<List<PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
-        }
-
-        /// <summary>
-        /// Gets current cluster node template usage for debug purposes
-        /// </summary>
-        /// <returns>Current cluster statistics</returns>
-        [Route("stats")]
-        [HttpGet]
-        [RequireUserPrivilege(Privileges.GetTemplateStatistics)]
-        public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
-        {
-            return await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
-        }
-
-        /// <summary>
-        /// Request to server to reload package list
-        /// </summary>
-        /// <returns>Success of the operation</returns>
-        [Route("reloadPackages")]
-        [HttpPost]
-        [RequireUserPrivilege(Privileges.ReloadPackages)]
-        public async Task ReloadPackages()
-        {
-            var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);
-            throw result
-                      ? new HttpResponseException(HttpStatusCode.OK)
-                      : new HttpResponseException(HttpStatusCode.InternalServerError);
         }
 
         /// <summary>

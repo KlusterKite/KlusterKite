@@ -43,6 +43,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiDescriptionAttribute.cs" />
@@ -64,10 +68,6 @@
     <Compile Include="PublishToApiAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
-      <Project>{42524c94-892d-4258-bd2c-d6f24d7bfabb}</Project>
-      <Name>ClusterKit.Security.Attributes</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

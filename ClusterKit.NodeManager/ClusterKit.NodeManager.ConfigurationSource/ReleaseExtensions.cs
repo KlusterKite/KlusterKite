@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -17,6 +18,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
+
+    using JetBrains.Annotations;
 
     using NuGet;
 
@@ -58,6 +61,20 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <returns>The list of errors</returns>
         public static IEnumerable<ErrorDescription> CheckTemplatesConfigurations(this Release release)
         {
+            if (release?.Configuration?.SeedAddresses == null || release.Configuration.SeedAddresses.Count == 0)
+            {
+                yield return new ErrorDescription(
+                    "configuration.seedAddresses",
+                    "Seeds addresses is empty");
+            }
+
+            if (release?.Configuration?.NugetFeeds == null || release.Configuration.NugetFeeds.Count == 0)
+            {
+                yield return new ErrorDescription(
+                    "configuration.nugetFeeds",
+                    "Nuget feeds list is empty");
+            }
+
             if (release?.Configuration?.NodeTemplates == null || release.Configuration.NodeTemplates.Count == 0)
             {
                 yield break;
@@ -332,13 +349,48 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// The list of possible errors
         /// </returns>
         private static IEnumerable<ErrorDescription> CheckTemplatesPackages(
-            Release release,
-            List<string> supportedFrameworks,
-            Dictionary<string, IPackage> definedPackages,
-            IPackageRepository nugetRepository)
+            [NotNull] Release release,
+            [NotNull] List<string> supportedFrameworks,
+            [NotNull] Dictionary<string, IPackage> definedPackages,
+            [NotNull] IPackageRepository nugetRepository)
         {
+            if (release == null)
+            {
+                throw new ArgumentNullException(nameof(release));
+            }
+
+            if (release.Configuration == null)
+            {
+                throw new ArgumentNullException(nameof(release.Configuration));
+            }
+
+            if (release.Configuration.NodeTemplates == null)
+            {
+                throw new ArgumentNullException(nameof(release.Configuration.NodeTemplates));
+            }
+
+            if (supportedFrameworks == null)
+            {
+                throw new ArgumentNullException(nameof(supportedFrameworks));
+            }
+
+            if (definedPackages == null)
+            {
+                throw new ArgumentNullException(nameof(definedPackages));
+            }
+
+            if (nugetRepository == null)
+            {
+                throw new ArgumentNullException(nameof(nugetRepository));
+            }
+
             foreach (var template in release.Configuration.NodeTemplates)
             {
+               if (template == null)
+                {
+                    continue;
+                }
+
                 var templateField = $"configuration.nodeTemplates[\"{template.Code}\"]";
 
                 if (template.PackageRequirements == null || template.PackageRequirements.Count == 0)
@@ -348,52 +400,62 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 }
 
                 Dictionary<string, IPackage> directPackages = new Dictionary<string, IPackage>();
-                foreach (var errorDescription in
-                    GetTemplateDirectPackages(
-                        definedPackages,
-                        nugetRepository,
-                        template,
-                        templateField,
-                        directPackages))
+                foreach (var errorDescription in GetTemplateDirectPackages(
+                    definedPackages,
+                    nugetRepository,
+                    template,
+                    templateField,
+                    directPackages))
                 {
                     yield return errorDescription;
                 }
-            
-            template.PackagesToInstall = new Dictionary<string, List<PackageDescription>>();
+
+                template.PackagesToInstall = new Dictionary<string, List<PackageDescription>>();
                 foreach (var supportedFramework in supportedFrameworks)
                 {
                     var packagesToInstall = new List<IPackage>();
                     foreach (var package in directPackages.Values)
                     {
+                        if (package == null)
+                        {
+                            continue;
+                        }
+
                         packagesToInstall.Add(package);
                         var requirementField = $"{templateField}.packageRequirements[\"{package.Id}\"]";
-                        var dependencySet =
-                            package.DependencySets.FirstOrDefault(
-                                s => s.TargetFramework == null || s.SupportedFrameworks.Any(f => f.FullName == supportedFramework));
-                        if (dependencySet == null)
+                        var dependencySet = package.DependencySets?.FirstOrDefault(
+                            s => s.TargetFramework == null
+                                 || s.SupportedFrameworks.Any(f => f.FullName == supportedFramework));
+                        if (dependencySet?.Dependencies == null)
                         {
                             continue;
                         }
 
                         foreach (var dependency in dependencySet.Dependencies)
                         {
-                            IPackage dependentPackage;
-                            if (!directPackages.TryGetValue(dependency.Id, out dependentPackage)
-                                && !definedPackages.TryGetValue(dependency.Id, out dependentPackage))
+                            if (dependency?.VersionSpec == null)
                             {
-                                yield return
-                                    new ErrorDescription(
-                                        requirementField,
-                                        $"Package dependency for {dependencySet.TargetFramework.FullName} {dependency.Id} is not defined");
+                                yield return new ErrorDescription(
+                                    requirementField,
+                                    $"Package dependency for {supportedFramework} {dependency?.Id} is undefined of corrupted");
+                                continue;
+                            }
+
+                            IPackage dependentPackage;
+                            if ((!directPackages.TryGetValue(dependency.Id, out dependentPackage)
+                                && !definedPackages.TryGetValue(dependency.Id, out dependentPackage)) || dependentPackage == null)
+                            {
+                                yield return new ErrorDescription(
+                                    requirementField,
+                                    $"Package dependency for {dependencySet.TargetFramework?.FullName} {dependency.Id} is not defined");
                                 continue;
                             }
 
                             if (!dependency.VersionSpec.Satisfies(dependentPackage.Version))
                             {
-                                yield return
-                                    new ErrorDescription(
-                                        requirementField,
-                                        $"Package dependency for {supportedFramework} {dependency.Id} doesn't satisify version requirements");
+                                yield return new ErrorDescription(
+                                    requirementField,
+                                    $"Package dependency for {supportedFramework} {dependency.Id} doesn't satisfy version requirements");
                             }
 
                             if (packagesToInstall.All(p => p.Id != dependentPackage.Id))
@@ -403,9 +465,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                         }
                     }
 
-                    template.PackagesToInstall[supportedFramework] =
-                        packagesToInstall.Select(
-                            p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList();
+                    template.PackagesToInstall[supportedFramework] = packagesToInstall
+                        .Select(p => new PackageDescription { Id = p.Id, Version = p.Version?.ToString() })
+                        .ToList();
                 }
             }
         }

@@ -22,6 +22,11 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         public string ContainerType { get; set; }
 
         /// <summary>
+        /// Gets or sets the framework runtime type name
+        /// </summary>
+        public string FrameworkRuntimeType { get; set; }
+
+        /// <summary>
         /// Gets or sets the unique node identification number.
         /// </summary>
         public Guid NodeUid { get; set; }

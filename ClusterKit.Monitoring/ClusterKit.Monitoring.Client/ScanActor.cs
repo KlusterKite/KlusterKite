@@ -58,12 +58,12 @@ namespace ClusterKit.Monitoring.Client
         public ScanActor()
         {
             // ClusterKit.NodeManager writes some properties to config... but this is not necessary
-            var nodeTemplateVersion = Context.System.Settings.Config.GetInt("ClusterKit.NodeManager.NodeTemplateVersion");
+            var releaseId = Context.System.Settings.Config.GetInt("ClusterKit.NodeManager.ReleaseId");
             var templateName = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.NodeTemplate");
 
             this.nodeTemplateName = string.IsNullOrWhiteSpace(templateName)
                                         ? null
-                                        : $"{templateName}-v{nodeTemplateVersion}";
+                                        : $"{templateName}-v{releaseId}";
 
             this.scanMemoize = Context.System.Settings.Config.GetTimeSpan(
                 "ClusterKit.Monitoring.ScanMemoize",

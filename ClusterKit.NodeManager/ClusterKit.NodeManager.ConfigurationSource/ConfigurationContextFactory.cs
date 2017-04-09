@@ -10,15 +10,12 @@
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
 
     using Akka.Actor;
-    using Akka.Cluster;
 
     using ClusterKit.Data;
     using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
 
@@ -68,50 +65,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                              ? new ConfigurationSeeder()
                              : (IDataSeeder<ConfigurationContext>)Activator.CreateInstance(seederType);
             seeder.Seed(context);
-
-            if (!context.SeedAddresses.Any())
-            {
-                var seedsFromConfig =
-                    Cluster.Get(this.akkaSystem)
-                        .Settings.SeedNodes.Select(
-                            address =>
-                            new SeedAddress
-                            {
-                                Address =
-                                        $"{address.Protocol}://{address.System}@{address.Host}:{address.Port}"
-                            });
-
-                foreach (var seedAddress in seedsFromConfig)
-                {
-                    context.SeedAddresses.Add(seedAddress);
-                }
-
-                context.SaveChanges();
-            }
-
-            if (!context.NugetFeeds.Any())
-            {
-                var config = this.akkaSystem.Settings.Config.GetConfig("ClusterKit.NodeManager.DefaultNugetFeeds");
-                if (config != null)
-                {
-                    foreach (var pair in config.AsEnumerable())
-                    {
-                        var feedConfig = config.GetConfig(pair.Key);
-
-                        NugetFeed.EnFeedType feedType;
-                        if (!Enum.TryParse(feedConfig.GetString("type"), out feedType))
-                        {
-                            feedType = NugetFeed.EnFeedType.Private;
-                        }
-
-                        context.NugetFeeds.Add(
-                            new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType });
-                    }
-
-                    context.SaveChanges();
-                }
-            }
-
             return context;
         }
     }

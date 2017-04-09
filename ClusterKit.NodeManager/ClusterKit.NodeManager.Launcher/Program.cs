@@ -118,6 +118,8 @@ namespace ClusterKit.NodeManager.Launcher
 
             this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE")
                                  ?? ConfigurationManager.AppSettings["containerType"];
+
+            this.FrameworkRuntimeType = ConfigurationManager.AppSettings["frameworkRuntimeType"];
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
                 Console.WriteLine(@"containerType is not configured");
@@ -174,6 +176,11 @@ namespace ClusterKit.NodeManager.Launcher
         /// Gets the type of container assigned to current machine
         /// </summary>
         private string ContainerType { get; }
+
+        /// <summary>
+        /// Gets the type of runtime framework
+        /// </summary>
+        private string FrameworkRuntimeType { get; }
 
         /// <summary>
         /// Gets or sets the current api access token 
@@ -292,18 +299,23 @@ namespace ClusterKit.NodeManager.Launcher
                     return this.GetFallBackConfig();
                 }
 
-                var authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(this.CurrentApiToken.AccessToken, "Bearer");
-                var client = new RestClient(this.ConfigurationUrl)
-                                 {
-                                     Timeout = 5000,
-                                     Authenticator = authenticator
-                                 };
+                var authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(
+                    this.CurrentApiToken.AccessToken,
+                    "Bearer");
+                var client = new RestClient(this.ConfigurationUrl) { Timeout = 5000, Authenticator = authenticator };
 
                 var request = new RestRequest { Method = Method.POST };
-                request.AddBody(new NewNodeTemplateRequest { ContainerType = this.ContainerType, NodeUid = this.Uid });
+                request.AddBody(
+                    new NewNodeTemplateRequest
+                        {
+                            ContainerType = this.ContainerType,
+                            NodeUid = this.Uid,
+                            FrameworkRuntimeType = this.FrameworkRuntimeType
+                        });
                 var response = client.Execute<NodeStartUpConfiguration>(request);
 
-                if (response.ResponseStatus != ResponseStatus.Completed || response.StatusCode == HttpStatusCode.BadGateway)
+                if (response.ResponseStatus != ResponseStatus.Completed
+                    || response.StatusCode == HttpStatusCode.BadGateway)
                 {
                     return this.GetFallBackConfig();
                 }
@@ -415,14 +427,16 @@ namespace ClusterKit.NodeManager.Launcher
             // cluster self-join is not welcomed
             var seeds = configuration.Seeds.ToList();
             string startConfig = $@"{{
-                ClusterKit.NodeManager.NodeTemplateVersion = {configuration.NodeTemplateVersion}
+                ClusterKit.NodeManager.ReleaseId = {configuration.ReleaseId}
                 ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 ClusterKit.NodeManager.ContainerType = {this.ContainerType}
+                ClusterKit.NodeManager.FrameworkType = ""{this.FrameworkRuntimeType.Replace("\"", "\\\"")}""
                 ClusterKit.NodeManager.NodeId = {this.Uid}
                 akka.cluster.seed-nodes = [{string.Join(", ", seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
-            Console.WriteLine($@"Start configuration: \n {startConfig}");
+            Console.WriteLine($@"Start configuration: 
+                                {startConfig}");
         }
 
         /// <summary>

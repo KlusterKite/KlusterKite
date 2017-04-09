@@ -9,6 +9,8 @@
 
 namespace ClusterKit.Web.NginxConfigurator
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using Akka.Actor;
 
     using ClusterKit.Web.Client.Messages;
@@ -85,6 +87,7 @@ namespace ClusterKit.Web.NginxConfigurator
 
         /// <summary>Serves as the default hash function. </summary>
         /// <returns>A hash code for the current object.</returns>
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode", Justification = "Properties are non readonly for serialization purposes")]
         public override int GetHashCode()
         {
             unchecked

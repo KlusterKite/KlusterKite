@@ -33,10 +33,6 @@
     <DocumentationFile>bin\Release\ClusterKit.API.Client.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
-      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
-      <Name>ClusterKit.Security.Attributes</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj">
       <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
       <Name>ClusterKit.API.Attributes</Name>
@@ -70,11 +66,15 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiDescription.cs" />

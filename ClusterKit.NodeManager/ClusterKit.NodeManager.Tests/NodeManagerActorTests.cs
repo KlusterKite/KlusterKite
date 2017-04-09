@@ -12,9 +12,7 @@ namespace ClusterKit.NodeManager.Tests
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.IO;
     using System.Linq;
-    using System.Runtime.Versioning;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -35,29 +33,33 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Data;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.EF;
-    using ClusterKit.Data.EF.TestKit;
-    using ClusterKit.Data.TestKit;
+    using ClusterKit.Data.EF.Effort;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.ConfigurationSource.Migrations;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
+
+    using JetBrains.Annotations;
 
     using NuGet;
 
     using Xunit;
     using Xunit.Abstractions;
 
+    using Installer = ClusterKit.Core.TestKit.Installer;
+
     /// <summary>
-    /// Testing node manager actor
+    ///     Testing node manager actor
     /// </summary>
     public class NodeManagerActorTests : BaseActorTest<NodeManagerActorTests.Configurator>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodeManagerActorTests"/> class.
+        ///     Initializes a new instance of the <see cref="NodeManagerActorTests" /> class.
         /// </summary>
         /// <param name="output">
-        /// The output.
+        ///     The output.
         /// </param>
         public NodeManagerActorTests(ITestOutputHelper output)
             : base(output)
@@ -65,107 +67,117 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Tests actor start
+        ///     Tests actor start
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
         [Fact]
         public async Task ActorStartTest()
         {
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-            var response = await testActor.Ask<PongMessage>(new PingMessage(), TimeSpan.FromSeconds(600));
+            var response = await testActor.Ask<PongMessage>(new PingMessage(), TimeSpan.FromSeconds(10));
             Assert.NotNull(response);
         }
 
         /// <summary>
-        /// Tests node is obsolete on start
+        ///     Tests node is obsolete on start
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
+        /// TODO: this
         [Fact]
         public async Task ClusterUpgradeTest()
         {
-            var templatesFactory =
-                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
-                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
-
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
-
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template",
-                        Code = "test-template",
-                        Id = 1,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 1
-                    });
-
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-
+            this.ExpectNoMsg();
             var virtualNodes = new List<VirtualNode>
                                    {
-                                       new VirtualNode(1, testActor, this.Sys),
-                                       new VirtualNode(2, testActor, this.Sys),
-                                       new VirtualNode(3, testActor, this.Sys),
+                                       new VirtualNode(1, testActor, this.Sys, 1, "t1"),
+                                       new VirtualNode(2, testActor, this.Sys, 1, "t1"),
+                                       new VirtualNode(3, testActor, this.Sys, 1, "t1")
                                    };
 
-            virtualNodes.ForEach(
-                n =>
-                    {
-                        router.RegisterVirtualNode(n.Address.Address, n.Client);
-                        n.GoUp();
-                    });
+            foreach (var n in virtualNodes)
+            {
+                router.RegisterVirtualNode(n.Address.Address, n.Client);
+                n.GoUp();
+            }
 
             this.ExpectNoMsg();
             this.Log.Warning("!!!!!!!!!!! Nodes started");
 
-            var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+            var descriptions = await testActor.Ask<List<NodeDescription>>(
+                                   new ActiveNodeDescriptionsRequest(),
+                                   TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(3, descriptions.Count);
             Assert.True(descriptions.All(d => !d.IsObsolete));
 
-            ((TestPackage)packageFactory.Storage["TestModule-1"]).Version = new SemanticVersion(0, 2, 0, 0);
+            // defining new release
+            var newRelease = ReleaseCheckTestsBase.CreateRelease();
+            newRelease.Configuration.SeedAddresses = new List<string> { virtualNodes[0].Address.ToString() };
+            newRelease.Configuration.NugetFeeds = new List<NugetFeed> { new NugetFeed { Address = "url" } };
+            newRelease.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
+            newRelease.Configuration.Packages = ReleaseCheckTestsBase
+                .CreatePackageDescriptions("p1 2.0.0", "dp1 2.0.0", "p2 2.0.0", "dp2 2.0.0")
+                .ToList();
 
-            testActor.Tell(new ReloadPackageListRequest());
-            this.ExpectMsg(true);
+            // saving new release
+            var response = await testActor.Ask<CrudActionResponse<Release>>(
+                               new CrudActionMessage<Release, int>
+                                   {
+                                       ActionType = EnActionType.Create,
+                                       Data = newRelease
+                                   },
+                               TimeSpan.FromSeconds(1));
+
+            Assert.NotNull(response.Data);
+            var newReleaseId = response.Data.Id;
+            Assert.Equal(2, newReleaseId);
             this.ExpectNoMsg();
-            this.Log.Warning("!!!!!!!!!!! Packages reloaded");
 
-            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+            // setting state Ready to the new release
+            response = await testActor.Ask<CrudActionResponse<Release>>(
+                           new ReleaseSetReadyRequest { Id = newReleaseId },
+                           TimeSpan.FromSeconds(1));
+            Assert.NotNull(response.Data);
+            this.ExpectNoMsg();
+
+            // requesting cluster upgrade
+            response = await testActor.Ask<CrudActionResponse<Release>>(
+                           new UpdateClusterRequest { Id = newReleaseId },
+                           TimeSpan.FromSeconds(1));
+            Assert.NotNull(response.Data);
+            Assert.Equal(Release.EnState.Active, response.Data.State);
+            this.ExpectNoMsg();
+            this.Log.Warning("!!!!!!!!!!! Cluster upgrade initiated");
+
+            descriptions = await testActor.Ask<List<NodeDescription>>(
+                               new ActiveNodeDescriptionsRequest(),
+                               TimeSpan.FromSeconds(5));
 
             Assert.NotNull(descriptions);
             Assert.Equal(2, descriptions.Count);
             Assert.Equal(2, virtualNodes.Count(n => n.IsUp));
             Assert.True(descriptions.All(d => d.IsObsolete));
 
-            // this will check that no additional upgrades will cause new nodes to reboot
-            testActor.Tell(new ReloadPackageListRequest());
-            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
-
-            Assert.NotNull(descriptions);
-            Assert.Equal(2, descriptions.Count);
-            Assert.Equal(2, virtualNodes.Count(n => n.IsUp));
-            Assert.True(descriptions.All(d => d.IsObsolete));
+            this.ExpectNoMsg();
 
             var virtualNode = virtualNodes.First(n => n.Number == 1);
             Assert.False(virtualNode.IsUp); // the oldest node gone to upgrade
 
             virtualNode.Description.StartTimeStamp = VirtualNode.GetNextTime();
-            virtualNode.Description.Modules[0].Version = "0.2.0.0";
+            virtualNode.Description.ReleaseId = newReleaseId;
             virtualNode.GoUp();
 
-            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+            this.ExpectNoMsg();
+
+            descriptions = await testActor.Ask<List<NodeDescription>>(
+                               new ActiveNodeDescriptionsRequest(),
+                               TimeSpan.FromSeconds(1));
 
             Assert.NotNull(descriptions);
             Assert.Equal(2, descriptions.Count);
@@ -174,10 +186,10 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Node description collection test
+        ///     Node description collection test
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
         [Fact]
         public async Task NodeDescriptionCollection()
@@ -187,38 +199,37 @@ namespace ClusterKit.NodeManager.Tests
             var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
 
             this.SetAutoPilot(
-                new DelegateAutoPilot(
-                    delegate(IActorRef sender, object message)
+                new DelegateAutoPilot(delegate(IActorRef sender, object message)
+                    {
+                        var identifyMessage = message as RemoteTestMessage<Identify>;
+                        if (identifyMessage != null)
                         {
-                            var identifyMessage = message as RemoteTestMessage<Identify>;
-                            if (identifyMessage != null)
-                            {
-                                sender.Tell(new ActorIdentity(identifyMessage.Message.MessageId, this.TestActor));
-                            }
+                            sender.Tell(new ActorIdentity(identifyMessage.Message.MessageId, this.TestActor));
+                        }
 
-                            if (message is NodeDescriptionRequest)
-                            {
-                                sender.Tell(
-                                    new NodeDescription
+                        if (message is NodeDescriptionRequest)
+                        {
+                            sender.Tell(
+                                new NodeDescription
                                     {
                                         ContainerType = "test",
                                         Modules =
-                                                new List<PackageDescription>
-                                                    {
-                                                        new PackageDescription
-                                                            {
-                                                                Id = "TestModule",
-                                                                Version = "0.1.0"
-                                                            }
-                                                    },
+                                            new List<PackageDescription>
+                                                {
+                                                    new PackageDescription
+                                                        {
+                                                            Id = "TestModule",
+                                                            Version = "0.1.0"
+                                                        }
+                                                },
                                         NodeAddress = nodeAddress.Address,
                                         NodeId = Guid.NewGuid(),
                                         NodeTemplate = "test-template",
                                         StartTimeStamp = 10
                                     });
-                            }
+                        }
 
-                            return AutoPilot.KeepRunning;
+                        return AutoPilot.KeepRunning;
                         }));
             this.ExpectNoMsg();
             testActor.Tell(
@@ -228,612 +239,247 @@ namespace ClusterKit.NodeManager.Tests
             this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
             this.ExpectMsg<NodeDescriptionRequest>();
 
-            var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+            var descriptions = await testActor.Ask<List<NodeDescription>>(
+                                   new ActiveNodeDescriptionsRequest(),
+                                   TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(1, descriptions.Count);
             Assert.Equal("test-template", descriptions[0].NodeTemplate);
         }
 
         /// <summary>
-        /// Tests that nodes became obsolete on node template edit
+        ///     Tests node is obsolete on start
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        [Fact]
-        public async Task NodeIsObsoleteOnNodeTemplateEditTest()
-        {
-            var templatesFactory =
-                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
-                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
-
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template",
-                        Code = "test-template",
-                        Id = 1,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 1
-                    });
-
-            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-            this.ExpectNoMsg();
-            var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
-            this.SetAutoPilot(
-                new DelegateAutoPilot(
-                    delegate(IActorRef sender, object message)
-                    {
-                        var identifyMessage = message as RemoteTestMessage<Identify>;
-                        if (identifyMessage != null)
-                        {
-                            sender.Tell(new ActorIdentity(identifyMessage.Message.MessageId, this.TestActor));
-                        }
-
-                        if (message is NodeDescriptionRequest)
-                        {
-                            sender.Tell(
-                                new NodeDescription
-                                {
-                                    ContainerType = "test",
-                                    Modules =
-                                            new List<PackageDescription>
-                                                {
-                                                        new PackageDescription
-                                                            {
-                                                                Id = "TestModule-1",
-                                                                Version = "0.1.0.0"
-                                                            }
-                                                },
-                                    NodeAddress = nodeAddress.Address,
-                                    NodeId = Guid.NewGuid(),
-                                    NodeTemplate = "test-template",
-                                    StartTimeStamp = 10,
-                                    NodeTemplateVersion = 0
-                                });
-                        }
-
-                        return AutoPilot.KeepRunning;
-                    }));
-
-            testActor.Tell(
-                new ClusterEvent.MemberUp(
-                    ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
-            this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
-            this.ExpectMsg<NodeDescriptionRequest>();
-
-            var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
-            Assert.NotNull(descriptions);
-            Assert.Equal(1, descriptions.Count);
-            Assert.Equal(false, descriptions[0].IsObsolete);
-
-            var nodeTemplate = templatesFactory.Storage[1];
-            testActor.Tell(new CrudActionMessage<NodeTemplate, int> { ActionType = EnActionType.Update, Data = nodeTemplate, Id = nodeTemplate.Id });
-            this.ExpectMsg<CrudActionResponse<NodeTemplate>>();
-            this.ExpectNoMsg();
-
-            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
-            Assert.NotNull(descriptions);
-            Assert.Equal(1, descriptions.Count);
-            Assert.Equal(true, descriptions[0].IsObsolete);
-        }
-
-        /// <summary>
-        /// Tests that nodes become obsolete on new package version upload
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        [Fact]
-        public async Task NodeIsObsoleteOnPackageUpgradeTest()
-        {
-            var templatesFactory =
-                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
-                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
-
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.0.0-local") });
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
-
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template",
-                        Code = "test-template",
-                        Id = 1,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 1
-                    });
-
-            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-
-            var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
-            this.SetAutoPilot(
-                new DelegateAutoPilot(
-                    delegate(IActorRef sender, object message)
-                    {
-                        var identifyMessage = message as RemoteTestMessage<Identify>;
-                        if (identifyMessage != null)
-                        {
-                            sender.Tell(new ActorIdentity(identifyMessage.Message.MessageId, this.TestActor));
-                        }
-
-                        if (message is NodeDescriptionRequest)
-                        {
-                            sender.Tell(
-                                new NodeDescription
-                                {
-                                    ContainerType = "test",
-                                    Modules =
-                                            new List<PackageDescription>
-                                                {
-                                                        new PackageDescription
-                                                            {
-                                                                Id = "TestModule-1",
-                                                                Version = "0.0.0.0"
-                                                            }
-                                                },
-                                    NodeAddress = nodeAddress.Address,
-                                    NodeId = Guid.NewGuid(),
-                                    NodeTemplate = "test-template",
-                                    StartTimeStamp = 10,
-                                    NodeTemplateVersion = 0
-                                });
-                        }
-
-                        return AutoPilot.KeepRunning;
-                    }));
-
-            this.ExpectNoMsg();
-            testActor.Tell(
-                new ClusterEvent.MemberUp(
-                    ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
-            this.ExpectMsg<Identify>("/user/NodeManager/Receiver");
-            this.ExpectMsg<NodeDescriptionRequest>();
-
-            var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
-            Assert.NotNull(descriptions);
-            Assert.Equal(1, descriptions.Count);
-            Assert.Equal(false, descriptions[0].IsObsolete);
-
-            ((TestPackage)packageFactory.Storage["TestModule-1"]).Version = SemanticVersion.Parse("0.2.0");
-            testActor.Tell(new ReloadPackageListRequest());
-            descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
-            Assert.NotNull(descriptions);
-            Assert.Equal(1, descriptions.Count);
-            Assert.Equal(true, descriptions[0].IsObsolete);
-        }
-
-        /// <summary>
-        /// Tests node is obsolete on start
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
         [Fact]
         public async Task NodeIsObsoleteOnStartTest()
         {
-            var templatesFactory =
-                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
-                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
-
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.2.0") });
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template",
-                        Code = "test-template",
-                        Id = 1,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 1
-                    });
-
-            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>().WithDispatcher("akka.test.calling-thread-dispatcher"), "nodemanager");
-
-            var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
-            this.SetAutoPilot(
-                new DelegateAutoPilot(
-                    delegate(IActorRef sender, object message)
-                    {
-                        var identifyMessage = message as RemoteTestMessage<Identify>;
-                        if (identifyMessage != null)
-                        {
-                            sender.Tell(new ActorIdentity(identifyMessage.Message.MessageId, this.TestActor));
-                        }
-
-                        if (message is NodeDescriptionRequest)
-                        {
-                            sender.Tell(
-                                new NodeDescription
-                                {
-                                    ContainerType = "test",
-                                    Modules =
-                                            new List<PackageDescription>
-                                                {
-                                                        new PackageDescription
-                                                            {
-                                                                Id = "TestModule-1",
-                                                                Version = "0.1.0"
-                                                            }
-                                                },
-                                    NodeAddress = nodeAddress.Address,
-                                    NodeId = Guid.NewGuid(),
-                                    NodeTemplate = "test-template",
-                                    StartTimeStamp = 10,
-                                    NodeTemplateVersion = 0
-                                });
-                        }
-
-                        return AutoPilot.KeepRunning;
-                    }));
-
+            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+            this.ExpectNoMsg();
+            var activeNode = new VirtualNode(1, testActor, this.Sys, 1);
+            var obsoleteNode = new VirtualNode(2, testActor, this.Sys, 2);
+            router.RegisterVirtualNode(activeNode.Address.Address, activeNode.Client);
+            router.RegisterVirtualNode(obsoleteNode.Address.Address, obsoleteNode.Client);
+            activeNode.GoUp();
+            obsoleteNode.GoUp();
             this.ExpectNoMsg();
 
-            testActor.Tell(
-                new ClusterEvent.MemberUp(
-                    ClusterExtensions.MemberCreate(nodeAddress, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
-            this.ExpectMsg<Identify>("/user/NodeManager/Receiver", TimeSpan.FromSeconds(1));
-            this.ExpectMsg<NodeDescriptionRequest>();
-
-            var descriptions = await testActor.Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), TimeSpan.FromSeconds(1));
+            var descriptions = await testActor.Ask<List<NodeDescription>>(
+                                   new ActiveNodeDescriptionsRequest(),
+                                   TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
-            Assert.Equal(1, descriptions.Count);
-            Assert.Equal(true, descriptions[0].IsObsolete);
+            Assert.Equal(2, descriptions.Count);
+            Assert.Equal(
+                false,
+                descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
+            Assert.Equal(
+                true,
+                descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
         }
 
         /// <summary>
-        /// Tests actor initialization
+        ///     Tests node is obsolete on start
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
         [Fact]
-        public async Task PackageListRequestTest()
+        public async Task NodeWithCompatibleTemplateTest()
         {
-            /*
-            var templatesFactory = (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var addressFactory = (UniversalTestDa taFactory<ConfigurationContext, SeedAddress, int>)this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, SeedAddress, int>>();
-            var feedFactory = (UniversalTestDataFactory<ConfigurationContext, NugetFeed, int>)this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NugetFeed, int>>();
-            */
+            using (var context = this.GetContext())
+            {
+                var oldRelease = context.Releases.First(r => r.State == Release.EnState.Active);
+                oldRelease.State = Release.EnState.Obsolete;
 
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
+                var newRelease = ReleaseCheckTestsBase.CreateRelease();
+                newRelease.State = Release.EnState.Active;
+                newRelease.Configuration.SeedAddresses = new List<string>();
+                newRelease.Configuration.NugetFeeds = new List<NugetFeed>();
+                newRelease.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
+                newRelease.Configuration.NodeTemplates[0].PackagesToInstall =
+                    new Dictionary<string, List<PackageDescription>>
+                        {
+                            [ReleaseCheckTestsBase.Net45] =
+                            new List<PackageDescription>(
+                                newRelease.Configuration.Packages)
+                        };
 
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-2", Version = SemanticVersion.Parse("0.1.0") });
+                newRelease.CompatibleTemplates =
+                    new List<CompatibleTemplate>
+                        {
+                            new CompatibleTemplate
+                                {
+                                    CompatibleReleaseId = 1,
+                                    TemplateCode = "t1"
+                                }
+                        };
 
-            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-            var response = await testActor.Ask<List<PackageDescription>>(new PackageListRequest(), TimeSpan.FromSeconds(1));
-            Assert.NotNull(response);
-            Assert.Equal(2, response.Count);
-        }
-
-        /// <summary>
-        /// Tests template distribution
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        [Fact]
-        public async Task TemplateDistributionTest()
-        {
-            var templatesFactory =
-                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
-                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
-
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0.0") });
+                context.Releases.Add(newRelease);
+                context.SaveChanges();
+            }
 
             var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
-
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template",
-                        Code = "test-template",
-                        Id = 1,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 1,
-                        MaximumNeededInstances = 2
-                    });
-
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template2",
-                        Code = "test-template2",
-                        Id = 2,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 0,
-                        MaximumNeededInstances = null
-                    });
-
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-            var stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
-            Assert.NotNull(stats);
-            Assert.Equal(2, stats.Templates.Count);
-
-            var templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
-            Assert.NotNull(templates);
-            Assert.Equal(1, templates.Count);
-            Assert.Equal("test-template", templates.First().Code); // there is less then minimum required of test-template
-
-            var node1 = new VirtualNode(1, testActor, this.Sys)
-            {
-                Description =
-                                    {
-                                        NodeTemplate = "test-template",
-                                        ContainerType = "test",
-                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.0.0.0" } }
-                                    }
-            };
-
-            router.RegisterVirtualNode(node1.Address.Address, node1.Client);
-            node1.GoUp();
-
-            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
-            Assert.NotNull(stats);
-            Assert.Equal(2, stats.Templates.Count);
-            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
-            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
-
-            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
-            Assert.NotNull(templates);
-            Assert.Equal(2, templates.Count);
-
-            var node2 = new VirtualNode(2, testActor, this.Sys)
-            {
-                Description =
-                                    {
-                                        NodeTemplate = "test-template",
-                                        ContainerType = "test",
-                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
-                                    }
-            };
-            router.RegisterVirtualNode(node2.Address.Address, node2.Client);
-            node2.GoUp();
             this.ExpectNoMsg();
-            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
-            Assert.NotNull(stats);
-            Assert.Equal(2, stats.Templates.Count);
-            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
-            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
-            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").UpgradingNodes);
-            Assert.False(node1.IsUp);
-
-            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
-            Assert.NotNull(templates);
-            Assert.Equal(2, templates.Count);
-
-            node1.Description.Modules[0].Version = "0.1.0.0";
-            node1.GoUp();
+            var activeNode = new VirtualNode(1, testActor, this.Sys, 1);
+            var obsoleteNode = new VirtualNode(2, testActor, this.Sys, 2);
+            router.RegisterVirtualNode(activeNode.Address.Address, activeNode.Client);
+            router.RegisterVirtualNode(obsoleteNode.Address.Address, obsoleteNode.Client);
+            activeNode.GoUp();
+            obsoleteNode.GoUp();
             this.ExpectNoMsg();
 
-            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
-            Assert.NotNull(stats);
-            Assert.Equal(2, stats.Templates.Count);
-            Assert.Equal(2, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
-            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
-            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").UpgradingNodes);
-
-            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
-            Assert.NotNull(templates);
-            Assert.Equal(1, templates.Count);
+            var descriptions = await testActor.Ask<List<NodeDescription>>(
+                                   new ActiveNodeDescriptionsRequest(),
+                                   TimeSpan.FromSeconds(1));
+            Assert.NotNull(descriptions);
+            Assert.Equal(2, descriptions.Count);
+            Assert.Equal(
+                false,
+                descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
+            Assert.Equal(
+                false,
+                descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
         }
 
         /// <summary>
-        /// Tests template distribution
+        ///     Tests template selection
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        [Fact]
-        public async Task TemplateDistributionWithUpgradeTest()
-        {
-            var templatesFactory =
-                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
-                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
-
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0") });
-
-            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
-
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template",
-                        Code = "test-template",
-                        Id = 1,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 1,
-                        MaximumNeededInstances = 2
-                    });
-
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template2",
-                        Code = "test-template2",
-                        Id = 2,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 0,
-                        MaximumNeededInstances = null
-                    });
-
-            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-            var stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
-            Assert.NotNull(stats);
-            Assert.Equal(2, stats.Templates.Count);
-
-            var templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
-            Assert.NotNull(templates);
-            Assert.Equal(1, templates.Count);
-            Assert.Equal("test-template", templates.First().Code); // there is less then minimum required of test-template
-
-            var node1 = new VirtualNode(1, testActor, this.Sys)
-            {
-                Description =
-                                    {
-                                        NodeTemplate = "test-template",
-                                        ContainerType = "test",
-                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
-                                    }
-            };
-
-            router.RegisterVirtualNode(node1.Address.Address, node1.Client);
-            node1.GoUp();
-
-            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
-            Assert.NotNull(stats);
-            Assert.Equal(2, stats.Templates.Count);
-            Assert.Equal(1, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
-            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
-
-            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
-            Assert.NotNull(templates);
-            Assert.Equal(2, templates.Count);
-
-            var node2 = new VirtualNode(2, testActor, this.Sys)
-            {
-                Description =
-                                    {
-                                        NodeTemplate = "test-template",
-                                        ContainerType = "test",
-                                        Modules = new List<PackageDescription> { new PackageDescription { Id = "TestModule-1", Version = "0.1.0.0" } }
-                                    }
-            };
-            router.RegisterVirtualNode(node2.Address.Address, node2.Client);
-            node2.GoUp();
-
-            stats = await testActor.Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest());
-            Assert.NotNull(stats);
-            Assert.Equal(2, stats.Templates.Count);
-            Assert.Equal(2, stats.Templates.First(t => t.Name == "test-template").ActiveNodes);
-            Assert.Equal(0, stats.Templates.First(t => t.Name == "test-template").ObsoleteNodes);
-
-            templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
-            Assert.NotNull(templates);
-            Assert.Equal(1, templates.Count);
-        }
-
-        /// <summary>
-        /// Tests template selection
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
         [Fact]
         public async Task TemplateSelectionTest()
         {
-            var templatesFactory =
-                (UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>)
-                this.WindsorContainer.Resolve<DataFactory<ConfigurationContext, NodeTemplate, int>>();
-            var packageFactory =
-                (UniversalTestDataFactory<string, IPackage, string>)
-                this.WindsorContainer.Resolve<DataFactory<string, IPackage, string>>();
+            using (var context = this.GetContext())
+            {
+                var release = context.Releases.First(r => r.State == Release.EnState.Active);
 
-            await packageFactory.Insert(new TestPackage { Id = "TestModule-1", Version = SemanticVersion.Parse("0.1.0"), DependencySets = new List<PackageDependencySet>() });
+                var template1 = ReleaseCheckTestsBase.CreateRelease().Configuration.NodeTemplates.First();
+                template1.Code = "t1";
+                template1.Priority = 1;
+                template1.PackagesToInstall =
+                    new Dictionary<string, List<PackageDescription>>
+                        {
+                            {
+                                ReleaseCheckTestsBase.Net45,
+                                new List<PackageDescription>()
+                            }
+                        };
 
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template",
-                        Code = "test-template",
-                        Id = 1,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 0,
-                        MaximumNeededInstances = null,
-                        Priority = 1000000
-                    });
+                var template2 = ReleaseCheckTestsBase.CreateRelease().Configuration.NodeTemplates.First();
+                template2.Code = "t2";
+                template2.Priority = 1000000;
+                template2.PackagesToInstall =
+                    new Dictionary<string, List<PackageDescription>>
+                        {
+                            {
+                                ReleaseCheckTestsBase.Net45,
+                                new List<PackageDescription>()
+                            }
+                        };
 
-            await
-                templatesFactory.Insert(
-                    new NodeTemplate
-                    {
-                        Name = "test-template2",
-                        Code = "test-template2",
-                        Id = 2,
-                        Version = 0,
-                        ContainerTypes = new List<string> { "test" },
-                        Packages = new List<string> { "TestModule-1" },
-                        MinimumRequiredInstances = 0,
-                        MaximumNeededInstances = null,
-                        Priority = 1
-                    });
+                release.Configuration.NodeTemplates = new[] { template1, template2 }.ToList();
+                context.SaveChanges();
+            }
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
 
-            var templates = await testActor.Ask<List<NodeTemplate>>(new AvailableTemplatesRequest { ContainerType = "test" });
+            var templates = await testActor.Ask<List<Template>>(
+                                new AvailableTemplatesRequest
+                                    {
+                                        ContainerType = "test",
+                                        FrameworkRuntimeType = ReleaseCheckTestsBase.Net45
+                                    },
+                                TimeSpan.FromSeconds(1));
             Assert.NotNull(templates);
             Assert.Equal(2, templates.Count);
 
-            var description =
-                await
-                testActor.Ask<NodeStartUpConfiguration>(
-                    new NewNodeTemplateRequest { ContainerType = "test", NodeUid = Guid.NewGuid() });
+            var description = await testActor.Ask<NodeStartUpConfiguration>(
+                                  new NewNodeTemplateRequest
+                                      {
+                                          ContainerType = "test",
+                                          FrameworkRuntimeType = ReleaseCheckTestsBase.Net45,
+                                          NodeUid = Guid.NewGuid()
+                                      },
+                                  TimeSpan.FromSeconds(1));
             Assert.NotNull(description);
-            Assert.Equal("test-template", description.NodeTemplate); // we have 1 in million chance of false failure
+            Assert.Equal("t2", description.NodeTemplate); // we have 1 in million chance of false failure
         }
 
         /// <summary>
-        /// Configures current test system
+        ///     Creates database context
+        /// </summary>
+        /// <returns>The database context</returns>
+        private ConfigurationContext GetContext()
+        {
+            var config = this.Sys.Settings.Config;
+            var connectionString = config.GetString("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString");
+            return this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>()
+                .CreateAndUpgradeContext(connectionString, string.Empty)
+                .Result;
+        }
+
+        /// <summary>
+        ///     Configures current test system
         /// </summary>
         public class Configurator : TestConfigurator
         {
             /// <summary>
-            /// Gets list of all used plugin installers
+            ///     Gets list of all used plugin installers
             /// </summary>
             /// <returns>The list of installers</returns>
             public override List<BaseInstaller> GetPluginInstallers()
             {
-                var pluginInstallers = new List<BaseInstaller> { new Core.TestKit.Installer(), new TestInstaller() };
+                var pluginInstallers = new List<BaseInstaller> { new Installer(), new TestInstaller() };
                 return pluginInstallers;
             }
         }
 
         /// <summary>
-        /// Replaces production data sources with the test ones
+        ///     A <see cref="ConfigurationContext" /> factory with test seeding
+        /// </summary>
+        private class ContextFactory : EffortContextFactory<ConfigurationContext, Configuration>
+        {
+            /// <inheritdoc />
+            public ContextFactory([NotNull] BaseConnectionManager connectionManager)
+                : base(connectionManager)
+            {
+            }
+
+            /// <inheritdoc />
+            public override async Task<ConfigurationContext> CreateAndUpgradeContext(
+                string connectionString,
+                string databaseName)
+            {
+                var context = await base.CreateAndUpgradeContext(connectionString, databaseName);
+                if (!context.Releases.Any())
+                {
+                    var release = ReleaseCheckTestsBase.CreateRelease();
+                    release.State = Release.EnState.Active;
+                    release.Configuration.SeedAddresses = new List<string>();
+                    release.Configuration.NugetFeeds = new List<NugetFeed>();
+                    release.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
+                    release.Configuration.NodeTemplates[0].PackagesToInstall =
+                        new Dictionary<string, List<PackageDescription>>
+                            {
+                                [ReleaseCheckTestsBase.Net45] =
+                                new List<PackageDescription>(
+                                    release.Configuration.Packages)
+                            };
+                    context.Releases.Add(release);
+                    context.SaveChanges();
+                }
+
+                return context;
+            }
+        }
+
+        /// <summary>
+        ///     Replaces production data sources with the test ones
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
@@ -841,266 +487,316 @@ namespace ClusterKit.NodeManager.Tests
             protected override decimal AkkaConfigLoadPriority => -1M;
 
             /// <inheritdoc />
-            protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(@"
+            protected override Config GetAkkaConfig()
             {
-                ClusterKit.NodeManager.ConfigurationDatabaseName = ""TestConfigurationDatabase""
+                return ConfigurationFactory.ParseString(
+                    $@"
+            {{
+                ClusterKit.NodeManager.ConfigurationDatabaseName = """"
+                ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = ""{Guid.NewGuid():N}""
 
-                akka : {
-                  actor: {
+                akka : {{
+                  actor: {{
                     provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
-                    deployment {
-                        /nodemanager {
+                    deployment {{
+                        /nodemanager {{
                             dispatcher = akka.test.calling-thread-dispatcher
-                        }
-                        /nodemanager/workers {
+                        }}
+                        /nodemanager/workers {{
                             router = consistent-hashing-pool
                             nr-of-instances = 5
                             dispatcher = akka.test.calling-thread-dispatcher
-                        }
-                    }
+                        }}
+                    }}
 
-                    serializers {
+                    serializers {{
 		                hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
-                    }
-                    serialization-bindings {
+                    }}
+                    serialization-bindings {{
                         ""System.Object"" = hyperion
-                    }
-                  }
+                    }}
+                  }}
 
-                 remote : {
-                        helios.tcp : {
+                    remote : {{
+                        helios.tcp : {{
                           hostname = 127.0.0.1
                           port = 0
-                        }
-                      }
+                        }}
+                      }}
 
-                      cluster: {
+                      cluster: {{
                         auto-down-unreachable-after = 15s
 		                min-nr-of-members = 3
                         seed-nodes = []
-                        singleton {
+                        singleton {{
                             # The number of retries are derived from hand-over-retry-interval and
                             # akka.cluster.down-removal-margin (or ClusterSingletonManagerSettings.removalMargin),
                             # but it will never be less than this property.
                             min-number-of-hand-over-retries = 10
-                        }
-                      }
-                }
-            }");
+                        }}
+                      }}
+                }}
+            }}");
+            }
 
             /// <inheritdoc />
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
-                container.Register(Classes.FromAssemblyContaining<NodeManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-                container.Register(Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-                container.Register(Component.For<BaseConnectionManager>().Instance(new TestConnectionManager()).LifestyleSingleton());
-
-                container.Register(Component.For<DataFactory<ConfigurationContext, NodeTemplate, int>>()
-                    .Instance(new UniversalTestDataFactory<ConfigurationContext, NodeTemplate, int>(null, o => o.Id)).LifestyleSingleton());
-                container.Register(Component.For<DataFactory<ConfigurationContext, NugetFeed, int>>()
-                    .Instance(new UniversalTestDataFactory<ConfigurationContext, NugetFeed, int>(null, o => o.Id)).LifestyleSingleton());
-                container.Register(Component.For<DataFactory<ConfigurationContext, SeedAddress, int>>()
-                    .Instance(new UniversalTestDataFactory<ConfigurationContext, SeedAddress, int>(null, o => o.Id)).LifestyleSingleton());
+                container.Register(
+                    Classes.FromAssemblyContaining<NodeManagerActor>()
+                        .Where(t => t.IsSubclassOf(typeof(ActorBase)))
+                        .LifestyleTransient());
+                container.Register(
+                    Classes.FromAssemblyContaining<Core.Installer>()
+                        .Where(t => t.IsSubclassOf(typeof(ActorBase)))
+                        .LifestyleTransient());
 
                 container.Register(
-                    Component.For<DataFactory<string, IPackage, string>>()
-                        .Instance(new UniversalTestDataFactory<string, IPackage, string>(null, o => o.Id))
-                        .LifestyleSingleton());
+                    Component.For<BaseConnectionManager>().Instance(new ConnectionManager()).LifestyleSingleton());
+                container.Register(
+                    Component.For<IContextFactory<ConfigurationContext>>()
+                        .ImplementedBy<ContextFactory>()
+                        .LifestyleTransient());
 
-                container.Register(Component.For<IContextFactory<ConfigurationContext>>().Instance(new TestContextFactory<ConfigurationContext>()).LifestyleSingleton());
-                container.Register(Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
+                container.Register(
+                    Component.For<DataFactory<ConfigurationContext, Release, int>>()
+                        .ImplementedBy<ReleaseDataFactory>()
+                        .LifestyleTransient());
+
+                var packageRepository = this.CreateTestRepository();
+
+                container.Register(Component.For<IPackageRepository>().Instance(packageRepository));
+                container.Register(
+                    Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
+            }
+
+            /// <summary>
+            ///     Creates the test repository
+            /// </summary>
+            /// <returns>The test repository</returns>
+            private IPackageRepository CreateTestRepository()
+            {
+                var p1 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "p1",
+                            Version = SemanticVersion.Parse("1.0.0"),
+                            DependencySets =
+                                new[]
+                                    {
+                                        ReleaseCheckTestsBase
+                                            .CreatePackageDependencySet(
+                                                ReleaseCheckTestsBase.Net45,
+                                                "dp1 1.0.0")
+                                    }
+                        };
+
+                var p2 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "p2",
+                            Version = SemanticVersion.Parse("1.0.0"),
+                            DependencySets =
+                                new[]
+                                    {
+                                        ReleaseCheckTestsBase
+                                            .CreatePackageDependencySet(
+                                                ReleaseCheckTestsBase.Net45,
+                                                "dp2 1.0.0")
+                                    }
+                        };
+
+                var p3 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "p3",
+                            Version = SemanticVersion.Parse("1.0.0"),
+                            DependencySets =
+                                new[]
+                                    {
+                                        ReleaseCheckTestsBase
+                                            .CreatePackageDependencySet(
+                                                ReleaseCheckTestsBase.Net45,
+                                                "dp3 2.0.0")
+                                    }
+                        };
+                var dp1 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "dp1",
+                            Version = SemanticVersion.Parse("1.0.0"),
+                            DependencySets = new PackageDependencySet[0]
+                        };
+
+                var dp2 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "dp2",
+                            Version = SemanticVersion.Parse("1.0.0"),
+                            DependencySets = new PackageDependencySet[0]
+                        };
+
+                var dp3 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "dp3",
+                            Version = SemanticVersion.Parse("1.0.0"),
+                            DependencySets = new PackageDependencySet[0]
+                        };
+
+                var p12 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "p1",
+                            Version = SemanticVersion.Parse("2.0.0"),
+                            DependencySets =
+                                new[]
+                                    {
+                                        ReleaseCheckTestsBase
+                                            .CreatePackageDependencySet(
+                                                ReleaseCheckTestsBase.Net45,
+                                                "dp1 2.0.0")
+                                    }
+                        };
+
+                var p22 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "p2",
+                            Version = SemanticVersion.Parse("2.0.0"),
+                            DependencySets =
+                                new[]
+                                    {
+                                        ReleaseCheckTestsBase
+                                            .CreatePackageDependencySet(
+                                                ReleaseCheckTestsBase.Net45,
+                                                "dp2 2.0.0")
+                                    }
+                        };
+
+                var p32 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "p3",
+                            Version = SemanticVersion.Parse("2.0.0"),
+                            DependencySets =
+                                new[]
+                                    {
+                                        ReleaseCheckTestsBase
+                                            .CreatePackageDependencySet(
+                                                ReleaseCheckTestsBase.Net45,
+                                                "dp3 2.0.0")
+                                    }
+                        };
+                var dp12 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "dp1",
+                            Version = SemanticVersion.Parse("2.0.0"),
+                            DependencySets = new PackageDependencySet[0]
+                        };
+
+                var dp22 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "dp2",
+                            Version = SemanticVersion.Parse("2.0.0"),
+                            DependencySets = new PackageDependencySet[0]
+                        };
+
+                var dp32 =
+                    new ReleaseCheckTestsBase.TestPackage
+                        {
+                            Id = "dp3",
+                            Version = SemanticVersion.Parse("2.0.0"),
+                            DependencySets = new PackageDependencySet[0]
+                        };
+
+                return new ReleaseCheckTestsBase.TestRepository(
+                    p1,
+                    p2,
+                    p3,
+                    dp1,
+                    dp2,
+                    dp3,
+                    p12,
+                    p22,
+                    p32,
+                    dp12,
+                    dp22,
+                    dp32);
             }
         }
 
         /// <summary>
-        /// The test package description
-        /// </summary>
-        private class TestPackage : IPackage
-        {
-            /// <inheritdoc />
-            public IEnumerable<IPackageAssemblyReference> AssemblyReferences
-            {
-                get
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-
-            /// <inheritdoc />
-            public IEnumerable<string> Authors => null;
-
-            /// <inheritdoc />
-            public string Copyright => null;
-
-            /// <inheritdoc />
-            public IEnumerable<PackageDependencySet> DependencySets { get; set; }
-
-            /// <inheritdoc />
-            public string Description => null;
-
-            /// <inheritdoc />
-            public bool DevelopmentDependency => false;
-
-            /// <inheritdoc />
-            public int DownloadCount => 0;
-
-            /// <inheritdoc />
-            public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies => null;
-
-            /// <inheritdoc />
-            public Uri IconUrl => null;
-
-            /// <inheritdoc />
-            public string Id { get; set; }
-
-            /// <inheritdoc />
-            public bool IsAbsoluteLatestVersion => false;
-
-            /// <inheritdoc />
-            public bool IsLatestVersion => false;
-
-            /// <inheritdoc />
-            public string Language => null;
-
-            /// <inheritdoc />
-            public Uri LicenseUrl => null;
-
-            /// <inheritdoc />
-            public bool Listed => false;
-
-            /// <inheritdoc />
-            public Version MinClientVersion => null;
-
-            /// <inheritdoc />
-            public IEnumerable<string> Owners => null;
-
-            /// <inheritdoc />
-            public ICollection<PackageReferenceSet> PackageAssemblyReferences => null;
-
-            /// <inheritdoc />
-            public Uri ProjectUrl => null;
-
-            /// <inheritdoc />
-            public DateTimeOffset? Published => null;
-
-            /// <inheritdoc />
-            public string ReleaseNotes => null;
-
-            /// <inheritdoc />
-            public Uri ReportAbuseUrl => null;
-
-            /// <inheritdoc />
-            public bool RequireLicenseAcceptance => false;
-
-            /// <inheritdoc />
-            public string Summary => null;
-
-            /// <inheritdoc />
-            public string Tags => null;
-
-            /// <inheritdoc />
-            public string Title => null;
-
-            /// <inheritdoc />
-            public SemanticVersion Version { get; set; }
-
-            /// <inheritdoc />
-            public void ExtractContents(IFileSystem fileSystem, string extractPath)
-            {
-                throw new InvalidOperationException();
-            }
-
-            /// <inheritdoc />
-            public IEnumerable<IPackageFile> GetFiles()
-            {
-                throw new InvalidOperationException();
-            }
-
-            /// <inheritdoc />
-            public Stream GetStream()
-            {
-                throw new InvalidOperationException();
-            }
-
-            /// <inheritdoc />
-            public IEnumerable<FrameworkName> GetSupportedFrameworks()
-            {
-                throw new InvalidOperationException();
-            }
-        }
-
-        /// <summary>
-        /// Virtual node to emulate cluster node responses to update
+        ///     Virtual node to emulate cluster node responses to update
         /// </summary>
         private class VirtualNode
         {
             /// <summary>
-            /// Current virtual timestamp
+            ///     Current virtual timestamp
             /// </summary>
             private static long time;
 
             /// <summary>
-            /// Reference to node manager actor
+            ///     Reference to node manager actor
             /// </summary>
             private readonly IActorRef nodeManager;
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="VirtualNode"/> class.
+            ///     Initializes a new instance of the <see cref="VirtualNode" /> class.
             /// </summary>
             /// <param name="num">
-            /// The node number.
+            ///     The node number.
             /// </param>
             /// <param name="nodeManager">
-            /// The node manager.
+            ///     The node manager.
             /// </param>
             /// <param name="system">
-            /// The system.
+            ///     The system.
             /// </param>
-            public VirtualNode(int num, IActorRef nodeManager, ActorSystem system)
+            /// <param name="releaseId">
+            ///     The installed release id
+            /// </param>
+            /// <param name="template">
+            ///     The installed template
+            /// </param>
+            public VirtualNode(
+                int num,
+                IActorRef nodeManager,
+                ActorSystem system,
+                int? releaseId = null,
+                string template = null)
             {
                 this.nodeManager = nodeManager;
                 this.Number = num;
                 this.NodeId = Guid.NewGuid();
                 this.Address = new UniqueAddress(new Address("akka.tcp", "ClusterKit", $"testNode{num}", num), num);
                 this.Description = new NodeDescription
-                {
-                    ContainerType = "test",
-                    Modules =
-                                               new List<PackageDescription>
-                                                   {
-                                                       new PackageDescription
-                                                           {
-                                                               Id
-                                                                   =
-                                                                   "TestModule-1",
-                                                               Version
-                                                                   =
-                                                                   "0.1.0.0"
-                                                           }
-                                                   },
-                    NodeAddress = this.Address.Address,
-                    NodeId = this.NodeId,
-                    NodeTemplate = "test-template",
-                    StartTimeStamp = GetNextTime(),
-                    NodeTemplateVersion = 0
-                };
+                                       {
+                                           ContainerType = "test",
+                                           NodeAddress = this.Address.Address,
+                                           NodeId = this.NodeId,
+                                           NodeTemplate = template ?? "t1",
+                                           StartTimeStamp = GetNextTime(),
+                                           ReleaseId = releaseId ?? 1
+                                       };
 
                 this.Client = system.ActorOf(Props.Create(() => new VirtualClient(this)), $"virtualNode{num}");
             }
 
             /// <summary>
-            /// Gets the node address
+            ///     Gets the node address
             /// </summary>
             public UniqueAddress Address { get; }
 
             /// <summary>
-            /// Gets the virtual node client actor
+            ///     Gets the virtual node client actor
             /// </summary>
             public IActorRef Client { get; }
 
             /// <summary>
-            /// Gets the node description
+            ///     Gets the node description
             /// </summary>
             public NodeDescription Description { get; }
 
@@ -1110,17 +806,17 @@ namespace ClusterKit.NodeManager.Tests
             public bool IsUp { get; private set; }
 
             /// <summary>
-            /// Gets the node uid
+            ///     Gets the node uid
             /// </summary>
             public Guid NodeId { get; }
 
             /// <summary>
-            /// Gets the node number
+            ///     Gets the node number
             /// </summary>
             public int Number { get; }
 
             /// <summary>
-            /// Gets the next timestamp (1 second later)
+            ///     Gets the next timestamp (1 second later)
             /// </summary>
             /// <returns>The timestamp</returns>
             public static long GetNextTime()
@@ -1129,7 +825,7 @@ namespace ClusterKit.NodeManager.Tests
             }
 
             /// <summary>
-            /// Commands virtual node to emulate shutdown process
+            ///     Commands virtual node to emulate shutdown process
             /// </summary>
             public void GoDown()
             {
@@ -1140,12 +836,17 @@ namespace ClusterKit.NodeManager.Tests
 
                 this.nodeManager.Tell(
                     new ClusterEvent.MemberRemoved(
-                        ClusterExtensions.MemberCreate(this.Address, 1, MemberStatus.Removed, ImmutableHashSet<string>.Empty), MemberStatus.Up));
+                        ClusterExtensions.MemberCreate(
+                            this.Address,
+                            1,
+                            MemberStatus.Removed,
+                            ImmutableHashSet<string>.Empty),
+                        MemberStatus.Up));
                 this.IsUp = false;
             }
 
             /// <summary>
-            /// Commands virtual node to emulate start process
+            ///     Commands virtual node to emulate start process
             /// </summary>
             public void GoUp()
             {
@@ -1156,24 +857,29 @@ namespace ClusterKit.NodeManager.Tests
 
                 this.nodeManager.Tell(
                     new ClusterEvent.MemberUp(
-                        ClusterExtensions.MemberCreate(this.Address, 1, MemberStatus.Up, ImmutableHashSet<string>.Empty)));
+                        ClusterExtensions.MemberCreate(
+                            this.Address,
+                            1,
+                            MemberStatus.Up,
+                            ImmutableHashSet<string>.Empty)));
                 this.IsUp = true;
             }
 
             /// <summary>
-            /// Virtual client actor
+            ///     Virtual client actor
             /// </summary>
             public class VirtualClient : ReceiveActor
             {
                 /// <summary>
-                /// Initializes a new instance of the <see cref="VirtualClient"/> class.
+                ///     Initializes a new instance of the <see cref="VirtualClient" /> class.
                 /// </summary>
                 /// <param name="node">
-                /// The virtual node.
+                ///     The virtual node.
                 /// </param>
                 public VirtualClient(VirtualNode node)
                 {
-                    this.Receive<TestMessage<Identify>>(m => this.Sender.Tell(new ActorIdentity(m.Message.MessageId, this.Self)));
+                    this.Receive<TestMessage<Identify>>(
+                        m => this.Sender.Tell(new ActorIdentity(m.Message.MessageId, this.Self)));
                     this.Receive<NodeDescriptionRequest>(m => this.Sender.Tell(node.Description, this.Self));
                     this.Receive<TestMessage<ShutdownMessage>>(m => node.GoDown());
                 }

@@ -15,7 +15,6 @@ namespace ClusterKit.NodeManager.Client.Messages
     using Akka.Actor;
 
     using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client.Converters;
     using ClusterKit.NodeManager.Client.ApiSurrogates;
 
     using JetBrains.Annotations;
@@ -61,9 +60,6 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// <summary>
         /// Gets or sets the list of descriptions of installed modules
         /// </summary>
-        [DeclareField(
-            "The list of descriptions of installed modules", 
-            Converter = typeof(ArrayConverter<PackageFamily.Converter, PackageFamily>))]
         public List<Launcher.Messages.PackageDescription> Modules { get; set; }
 
         /// <summary>
@@ -89,13 +85,6 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// </summary>
         [DeclareField("the installed release id")]
         public int ReleaseId { get; set; }
-
-        /// <summary>
-        /// Gets or sets current node template version
-        /// </summary>
-        [Obsolete]
-        [DeclareField("current node template version")]
-        public int NodeTemplateVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the list of cluster roles

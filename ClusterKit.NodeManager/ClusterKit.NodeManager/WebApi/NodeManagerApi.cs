@@ -19,11 +19,8 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Converters;
     using ClusterKit.Core;
-    using ClusterKit.Data.CRUD;
     using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Messages;
@@ -98,23 +95,6 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Gets the list of available packages from local cluster repository
-        /// </summary>
-        /// <returns>The list of available packages</returns>
-        [UsedImplicitly]
-        [DeclareField("The list of available packages from local cluster repository",
-            Converter = typeof(ArrayConverter<PackageFamily.Converter, PackageFamily>))]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
-        public Task<List<Launcher.Messages.PackageDescription>> GetPackages()
-        {
-            return
-                this.actorSystem.ActorSelection(GetManagerActorProxyPath())
-                    .Ask<List<Launcher.Messages.PackageDescription>>(new PackageListRequest(), this.AkkaTimeout);
-        }
-
-        /// <summary>
         /// Gets current cluster node template usage for debug purposes
         /// </summary>
         /// <returns>Current cluster statistics</returns>
@@ -128,47 +108,6 @@ namespace ClusterKit.NodeManager.WebApi
             return
                 await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
                     .Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
-        }
-
-        /// <summary>
-        /// The connection to the <see cref="NodeTemplate"/>
-        /// </summary>
-        /// <param name="context">The request context</param>
-        /// <returns>The data connection</returns>
-        [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new node template", CanDelete = true,
-            DeleteDescription = "Deletes the node template", CanUpdate = true,
-            UpdateDescription = "Updates the node template", Description = "Node templates")]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.NodeTemplate, Scope = EnPrivilegeScope.User,
-            AddActionNameToRequiredPrivilege = true)]
-        public Connection<NodeTemplate, int> NodeTemplates(RequestContext context)
-        {
-            return new Connection<NodeTemplate, int>(
-                this.actorSystem,
-                GetManagerActorProxyPath(),
-                this.AkkaTimeout,
-                context);
-        }
-
-        /// <summary>
-        /// The connection to the <see cref="NugetFeed"/>
-        /// </summary>
-        /// <param name="context">The request context</param>
-        /// <returns>The data connection</returns>
-        [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new nuget feed link", CanDelete = true,
-            DeleteDescription = "Deletes the nuget feed link", CanUpdate = true,
-            UpdateDescription = "Updates the nuget feed link", Description = "Node templates")]
-        [RequirePrivilege(Privileges.NugetFeed, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<NugetFeed, int> NugetFeeds(RequestContext context)
-        {
-            return new Connection<NugetFeed, int>(
-                this.actorSystem,
-                GetManagerActorProxyPath(),
-                this.AkkaTimeout,
-                context);
         }
 
         /// <summary>
@@ -191,24 +130,6 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Request to server to reload package list
-        /// </summary>
-        /// <returns>Success of the operation</returns>
-        [UsedImplicitly]
-        [DeclareMutation(Description = "Request to server to reload package list")]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.ReloadPackages, Scope = EnPrivilegeScope.User)]
-        [LogAccess]
-        public async Task<MutationResult<bool>> ReloadPackages()
-        {
-            var result =
-                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
-                    .Ask<bool>(new ReloadPackageListRequest(), this.AkkaTimeout);
-            return new MutationResult<bool> { Result = result };
-        }
-
-        /// <summary>
         /// The connection to the <see cref="Role"/>
         /// </summary>
         /// <param name="context">The request context</param>
@@ -221,25 +142,6 @@ namespace ClusterKit.NodeManager.WebApi
         public RolesConnection Roles(RequestContext context)
         {
             return new RolesConnection(
-                this.actorSystem,
-                GetManagerActorProxyPath(),
-                this.AkkaTimeout,
-                context);
-        }
-
-        /// <summary>
-        /// The connection to the <see cref="SeedAddress"/>
-        /// </summary>
-        /// <param name="context">The request context</param>
-        /// <returns>The data connection</returns>
-        [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new seed address", CanDelete = true,
-            DeleteDescription = "Deletes the seed address", CanUpdate = true,
-            UpdateDescription = "Updates the seed address", Description = "Node templates")]
-        [RequirePrivilege(Privileges.SeedAddress, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public Connection<SeedAddress, int> SeedAddresses(RequestContext context)
-        {
-            return new Connection<SeedAddress, int>(
                 this.actorSystem,
                 GetManagerActorProxyPath(),
                 this.AkkaTimeout,

@@ -134,10 +134,10 @@ namespace ClusterKit.LargeObjects.Client
 
                     var length = BitConverter.ToInt32(lengthBuffer, 0);
                     var buffer = new byte[length];
-                    const int ChunkSize = 1024;
+                    const int chunkSize = 1024;
                     var bytesRead = 0;
                     int chunkRead;
-                    while ((chunkRead = await this.ReadWithTimeout(stream, buffer, bytesRead, length - bytesRead > ChunkSize ? ChunkSize : length - bytesRead, timeOut)) > 0)
+                    while ((chunkRead = await this.ReadWithTimeout(stream, buffer, bytesRead, length - bytesRead > chunkSize ? chunkSize : length - bytesRead, timeOut)) > 0)
                     {
                         bytesRead += chunkRead;
                     }

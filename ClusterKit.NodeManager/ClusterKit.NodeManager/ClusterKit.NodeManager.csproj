@@ -258,6 +258,10 @@
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
     </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
+      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
+      <Name>ClusterKit.Security.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Authorization/ClusterKit.Web.Authorization.csproj">
       <Project>{6ADFBDDF-E452-46FC-A037-6D57300BE561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>
@@ -273,6 +277,10 @@
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
       <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
       <Name>ClusterKit.API.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Attributes/ClusterKit.API.Attributes.csproj">
+      <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
+      <Name>ClusterKit.API.Attributes</Name>
     </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Provider/ClusterKit.API.Provider.csproj">
       <Project>{DDC4B9D1-49AC-4CD6-9FC5-FE4A02C54871}</Project>
@@ -309,12 +317,9 @@
     <Compile Include="WebApi\CurrentUserApi.cs" />
     <Compile Include="WebApi\NodeManagerApi.cs" />
     <Compile Include="WebApi\NodeManagerController.cs" />
-    <Compile Include="WebApi\NodeTemplatesRestController.cs" />
-    <Compile Include="WebApi\NugetFeedsRestController.cs" />
     <Compile Include="WebApi\NugetPackagesConnection.cs" />
     <Compile Include="WebApi\ReleaseConnection.cs" />
     <Compile Include="WebApi\RolesConnection.cs" />
-    <Compile Include="WebApi\SeedAddressesRestController.cs" />
     <Compile Include="WebApi\UsersConnection.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -329,14 +334,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj">
-      <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
-      <Name>ClusterKit.API.Attributes</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj">
-      <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
-      <Name>ClusterKit.Security.Attributes</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj">
       <Project>{983daeb9-b058-41a9-8403-29851f2244b7}</Project>
       <Name>ClusterKit.NodeManager.Client</Name>

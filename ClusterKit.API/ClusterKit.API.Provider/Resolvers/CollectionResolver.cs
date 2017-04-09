@@ -139,10 +139,10 @@ namespace ClusterKit.API.Provider.Resolvers
 
             if (SortType.Values.Any())
             {
-                const EnFieldFlags SortFlags =
+                const EnFieldFlags sortFlags =
                     EnFieldFlags.CanBeUsedInInput | EnFieldFlags.Queryable | EnFieldFlags.IsTypeArgument
                     | EnFieldFlags.IsArray;
-                yield return ApiField.Object("sort", SortType.TypeName, SortFlags);
+                yield return ApiField.Object("sort", SortType.TypeName, sortFlags);
             }
 
             if (NodeMetaData.KeyProperty != null)

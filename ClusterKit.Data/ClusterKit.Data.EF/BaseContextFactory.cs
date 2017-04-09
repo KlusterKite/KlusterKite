@@ -42,11 +42,6 @@ namespace ClusterKit.Data.EF
         public static readonly Func<DbConnection, bool, TContext> Creator;
 
         /// <summary>
-        ///  The connection manager.
-        /// </summary>
-        private readonly BaseConnectionManager connectionManager;
-
-        /// <summary>
         /// Initializes static members of the <see cref="BaseContextFactory{TContext, TMigrationConfiguration}"/> class.
         /// </summary>
         static BaseContextFactory()
@@ -72,6 +67,11 @@ namespace ClusterKit.Data.EF
         }
 
         /// <summary>
+        ///  Gets the connection manager.
+        /// </summary>
+        protected BaseConnectionManager ConnectionManager { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BaseContextFactory{TContext, TMigrationConfiguration}"/> class.
         /// </summary>
         /// <param name="connectionManager">
@@ -84,7 +84,7 @@ namespace ClusterKit.Data.EF
                 throw new ArgumentNullException(nameof(connectionManager));
             }
 
-            this.connectionManager = connectionManager;
+            this.ConnectionManager = connectionManager;
         }
 
         /// <summary>
@@ -114,13 +114,13 @@ namespace ClusterKit.Data.EF
                 throw new ArgumentNullException(nameof(databaseName));
             }
 
-            if (this.connectionManager == null)
+            if (this.ConnectionManager == null)
             {
                 throw new Exception(@"connectionManager is null");
             }
 
-            databaseName = this.connectionManager.EscapeDatabaseName(databaseName);
-            var connection = this.connectionManager.CreateConnection(connectionString);
+            databaseName = this.ConnectionManager.EscapeDatabaseName(databaseName);
+            var connection = this.ConnectionManager.CreateConnection(connectionString);
 
             if (connection == null)
             {
@@ -128,8 +128,9 @@ namespace ClusterKit.Data.EF
             }
 
             await connection.OpenAsync();
-            this.connectionManager.CheckCreateDatabase(connection, databaseName);
-            connection.ChangeDatabase(databaseName);
+            this.ConnectionManager.CheckCreateDatabase(connection, databaseName);
+
+            this.ConnectionManager.SwitchDatabase(connection, databaseName);
 
             if (Creator == null)
             {
@@ -181,10 +182,12 @@ namespace ClusterKit.Data.EF
         /// </returns>
         public virtual async Task<TContext> CreateContext(string connectionString, string databaseName)
         {
-            databaseName = this.connectionManager.EscapeDatabaseName(databaseName);
-            var connection = this.connectionManager.CreateConnection(connectionString);
+            databaseName = this.ConnectionManager.EscapeDatabaseName(databaseName);
+            var connection = this.ConnectionManager.CreateConnection(connectionString);
             await connection.OpenAsync();
-            connection.ChangeDatabase(databaseName);
+
+            this.ConnectionManager.SwitchDatabase(connection, databaseName);
+
             var context = Creator(connection, true);
             return context;
         }

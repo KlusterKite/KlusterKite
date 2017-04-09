@@ -34,12 +34,12 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// The .NET Framework 4.5 name
         /// </summary> 
-        protected const string Net45 = ".NET Framework,Version=v4.5";
+        public const string Net45 = ".NET Framework,Version=v4.5";
 
         /// <summary>
         /// The .NET Standard 1.1 name
         /// </summary>
-        protected const string NetStandard = ".NET Standard,Version=v1.1";
+        public const string NetStandard = ".NET Standard,Version=v1.1";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseCheckTestsBase"/> class.
@@ -58,6 +58,25 @@ namespace ClusterKit.NodeManager.Tests
         protected ITestOutputHelper Output { get; }
 
         /// <summary>
+        /// Creates a <see cref="PackageDependencySet"/> from string definition
+        /// </summary>
+        /// <param name="framework">The framework name</param>
+        /// <param name="definition">The dependencies definition</param>
+        /// <returns>The dependency set</returns>
+        internal static PackageDependencySet CreatePackageDependencySet(string framework, params string[] definition)
+        {
+            var frameworkName = new FrameworkName(framework);
+            return new PackageDependencySet(
+                frameworkName,
+                definition.Select(
+                    d =>
+                        {
+                            var parts = d.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            return new PackageDependency(parts[0], CreateVersionSpec(parts[1]));
+                        }));
+        }
+
+        /// <summary>
         /// Creates the list of package descriptions.
         /// </summary>
         /// <param name="packages">
@@ -66,7 +85,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>
         /// The list of package descriptions.
         /// </returns>
-        protected static IEnumerable<PackageDescription> CreatePackageDescriptions(params string[] packages)
+        internal static IEnumerable<PackageDescription> CreatePackageDescriptions(params string[] packages)
         {
             return packages.Select(
                 p =>
@@ -85,7 +104,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>
         /// The list of package requirements.
         /// </returns>
-        protected static List<Template.PackageRequirement> CreatePackageRequirement(params string[] packages)
+        internal static List<Template.PackageRequirement> CreatePackageRequirement(params string[] packages)
         {
             return packages.Select(
                 p =>
@@ -101,7 +120,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <param name="packages">The list of defined packages to override</param>
         /// <param name="templatePackageRequirements">The template package requirements</param>
         /// <returns>The release</returns>
-        protected static Release CreateRelease(string[] packages = null, string[] templatePackageRequirements = null)
+        internal static Release CreateRelease(string[] packages = null, string[] templatePackageRequirements = null)
         {
             if (packages == null)
             {
@@ -120,7 +139,8 @@ namespace ClusterKit.NodeManager.Tests
                          {
                              Code = "t1",
                              Configuration = "t1",
-                             PackageRequirements = CreatePackageRequirement(templatePackageRequirements)
+                             PackageRequirements = CreatePackageRequirement(templatePackageRequirements),
+                             ContainerTypes = new List<string> { "test" }
                          };
             nodeTemplates.Add(t1);
 
@@ -137,7 +157,7 @@ namespace ClusterKit.NodeManager.Tests
         /// Creates a test repository
         /// </summary>
         /// <returns>The test repository</returns>
-        protected static TestRepository CreateRepository()
+        internal static TestRepository CreateRepository()
         {
             var p1 = new TestPackage
                          {
@@ -184,37 +204,6 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Writes the error list to the output
-        /// </summary>
-        /// <param name="errors">The output list</param>
-        protected void WriteErrors(IEnumerable<ErrorDescription> errors)
-        {
-            foreach (var error in errors)
-            {
-                this.Output.WriteLine($"{error.Field}: {error.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Creates a <see cref="PackageDependencySet"/> from string definition
-        /// </summary>
-        /// <param name="framework">The framework name</param>
-        /// <param name="definition">The dependencies definition</param>
-        /// <returns>The dependency set</returns>
-        private static PackageDependencySet CreatePackageDependencySet(string framework, params string[] definition)
-        {
-            var frameworkName = new FrameworkName(framework);
-            return new PackageDependencySet(
-                frameworkName,
-                definition.Select(
-                    d =>
-                        {
-                            var parts = d.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                            return new PackageDependency(parts[0], CreateVersionSpec(parts[1]));
-                        }));
-        }
-
-        /// <summary>
         /// Creates the <see cref="VersionSpec"/> with specified version as minimum version inclusive
         /// </summary>
         /// <param name="version">
@@ -223,16 +212,28 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>
         /// The <see cref="VersionSpec"/>.
         /// </returns>
-        private static VersionSpec CreateVersionSpec(string version)
+        internal static VersionSpec CreateVersionSpec(string version)
         {
             return new VersionSpec { IsMinInclusive = true, MinVersion = SemanticVersion.Parse(version) };
+        }
+
+        /// <summary>
+        /// Writes the error list to the output
+        /// </summary>
+        /// <param name="errors">The output list</param>
+        internal void WriteErrors(IEnumerable<ErrorDescription> errors)
+        {
+            foreach (var error in errors)
+            {
+                this.Output.WriteLine($"{error.Field}: {error.Message}");
+            }
         }
 
         /// <summary>
         /// The test package representation
         /// </summary>
         [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "This is the test class")]
-        protected class TestPackage : IPackage
+        internal class TestPackage : IPackage
         {
             /// <inheritdoc />
             public IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; set; }
@@ -343,7 +344,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// The test nuget repository
         /// </summary>
-        protected class TestRepository : IPackageRepository
+        internal class TestRepository : IPackageRepository
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="TestRepository"/> class.

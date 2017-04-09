@@ -123,9 +123,9 @@ namespace ClusterKit.Core.TestKit
         {
             var returnType = typeof(RemoteTestMessage<>).MakeGenericType(message.GetType());
             var forwardedMessage = Activator.CreateInstance(returnType);
-            returnType.GetProperty("Message").SetValue(forwardedMessage, message);
-            returnType.GetProperty("ReceiverPath").SetValue(forwardedMessage, path);
-            returnType.GetProperty("RecipientAddress").SetValue(forwardedMessage, nodeAddress);
+            returnType.GetProperty("Message")?.SetValue(forwardedMessage, message);
+            returnType.GetProperty("ReceiverPath")?.SetValue(forwardedMessage, path);
+            returnType.GetProperty("RecipientAddress")?.SetValue(forwardedMessage, nodeAddress);
             return forwardedMessage;
         }
     }

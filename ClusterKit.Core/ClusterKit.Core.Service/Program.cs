@@ -59,6 +59,7 @@ namespace ClusterKit.Core.Service
             if (arguments.TryGetValue("--config", out config) && config != null)
             {
                 configurations.Add(config.ToString());
+                Console.WriteLine($@"Will use config from {config}");
             }
 
             Container = new WindsorContainer();

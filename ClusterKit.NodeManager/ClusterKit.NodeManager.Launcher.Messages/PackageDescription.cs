@@ -9,6 +9,8 @@
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using ClusterKit.API.Attributes;
 
     /// <summary>
@@ -96,6 +98,7 @@ namespace ClusterKit.NodeManager.Launcher.Messages
 
         /// <summary>Serves as the default hash function. </summary>
         /// <returns>A hash code for the current object.</returns>
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode", Justification = "Properties are non readonly for serialization purposes")]
         public override int GetHashCode()
         {
             unchecked

@@ -9,6 +9,8 @@
 
 namespace ClusterKit.Web.Client.Messages
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -103,6 +105,7 @@ namespace ClusterKit.Web.Client.Messages
         /// <returns>
         /// A 32-bit signed integer that is the hash code for this instance.
         /// </returns>
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode", Justification = "Properties are made so for serialization purposes")]
         public override int GetHashCode()
         {
             unchecked

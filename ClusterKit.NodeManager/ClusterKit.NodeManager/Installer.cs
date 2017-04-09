@@ -99,6 +99,11 @@ namespace ClusterKit.NodeManager
 
             container.Register(
                 Component.For<API.Provider.ApiProvider>().ImplementedBy<ApiProvider>().LifestyleSingleton());
+
+            var config = this.GetAkkaConfig();
+            var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
+            container.Register(Component.For<IPackageRepository>()
+                .UsingFactoryMethod(() => PackageRepositoryFactory.Default.CreateRepository(nugetUrl)));
         }
     }
 }
