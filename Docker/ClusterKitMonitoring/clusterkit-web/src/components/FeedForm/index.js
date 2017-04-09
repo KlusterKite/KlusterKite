@@ -15,6 +15,7 @@ export default class FeedForm extends React.Component {
     onDelete: React.PropTypes.func,
     initialValues: React.PropTypes.object,
     saving: React.PropTypes.bool,
+    deleting: React.PropTypes.bool,
     saved: React.PropTypes.bool,
     saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
     saveError: React.PropTypes.string,
@@ -45,7 +46,9 @@ export default class FeedForm extends React.Component {
           onSubmit={this.submit}
           onCancel={this.props.onCancel ? this.props.onCancel : null}
           onDelete={this.props.onDelete ? this.props.onDelete : null}
-          className="form-horizontal form-margin" saving={this.props.saving}
+          className="form-horizontal form-margin"
+          saving={this.props.saving}
+          deleting={this.props.deleting}
           saved={this.props.saved}
           saveError={this.props.saveError}
           saveErrors={this.props.saveErrors}

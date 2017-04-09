@@ -2,9 +2,7 @@ import React from 'react'
 import Relay from 'react-relay'
 import { browserHistory } from 'react-router'
 
-import CreateTemplateMutation from './mutations/CreateTemplateMutation'
-import UpdateTemplateMutation from './mutations/UpdateTemplateMutation'
-import DeleteTemplateMutation from './mutations/DeleteTemplateMutation'
+import UpdateFeedMutation from './../FeedPage/mutations/UpdateFeedMutation'
 
 import TemplateForm from '../../components/TemplateForm/index'
 
@@ -25,77 +23,116 @@ class TemplatePage extends React.Component {
     }
   }
 
-  _isAddNew = () => {
+  isAddNew = () => {
     return !this.props.params.hasOwnProperty('id')
   }
 
-  _onSubmit = (model) => {
-    if (this._isAddNew()){
-      this._addNode(model);
+  onSubmit = (model) => {
+    if (this.isAddNew()){
+      this.editNode(model, null);
     } else {
-      this._editNode(model);
+      this.editNode(model, this.props.api.template.id);
     }
-  }
+  };
 
-  _addNode = (model) => {
+  editNode = (model, editId) => {
+    this.setState({
+      saving: true
+    });
+
     Relay.Store.commitUpdate(
-      new CreateTemplateMutation(
+      new UpdateFeedMutation(
         {
-          code: model.code,
-          configuration: model.configuration,
-          containerTypes: model.containerTypes,
-          maximumNeededInstances: model.maximumNeededInstances,
-          minimumRequiredInstances: model.minimumRequiredInstances,
-          name: model.name,
-          packages: model.packages,
-          priority: model.priority,
-          version: model.version
+          nodeId: this.props.params.releaseId,
+          releaseId: this.props.api.release.__id,
+          configuration: this.props.api.release.configuration,
+          nodeTemplateId: editId,
+          nodeTemplate: model
         }),
       {
-        onSuccess: () => browserHistory.push('/clusterkit/Templates'),
-        onFailure: (transaction) => console.log(transaction),
+        onSuccess: (response) => {
+          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
+            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            saving: false
+          });
+          console.log(transaction)},
       },
     )
+  };
+
+  getErrorMessagesFromEdge = (edges) => {
+    return edges.map(x => x.node).map(x => x.message);
   }
 
-  _editNode = (model) => {
+  onDelete = () => {
+    this.setState({
+      deleting: true
+    });
+
     Relay.Store.commitUpdate(
-      new UpdateTemplateMutation(
+      new UpdateFeedMutation(
         {
-          nodeId: this.props.params.id,
-          __id: model.__id,
-          code: model.code,
-          configuration: model.configuration,
-          containerTypes: model.containerTypes,
-          maximumNeededInstances: model.maximumNeededInstances,
-          minimumRequiredInstances: model.minimumRequiredInstances,
-          name: model.name,
-          packages: model.packages,
-          priority: model.priority,
-          version: model.version
+          nodeId: this.props.params.releaseId,
+          releaseId: this.props.api.release.__id,
+          configuration: this.props.api.release.configuration,
+          nodeTemplateId: this.props.api.release.id,
+          nodeTemplate: {},
+          nodeTemplateDeleteId: this.props.api.release.id,
         }),
       {
-        onSuccess: () => browserHistory.push('/clusterkit/Templates'),
-        onFailure: (transaction) => console.log(transaction),
-      },
-    )
-  }
+        onSuccess: (response) => {
+          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
+            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
 
-  _onDelete = () => {
-    Relay.Store.commitUpdate(
-      new DeleteTemplateMutation({deletedId: this.props.api.__node.__id}),
-      {
-        onSuccess: () => this.context.router.replace('/clusterkit/Templates'),
-        onFailure: (transaction) => console.log(transaction),
+            this.setState({
+              deleting: false,
+              saveErrors: messages
+            });
+          } else {
+            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            deleting: false
+          });
+          console.log(transaction)},
       },
     )
-  }
+  };
+
+  onCancel = () => {
+    browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`)
+  };
 
   render () {
-    const model = this.props.api.__node;
+    const model = this.props.api.template;
+    const packages = this.props.api.clusterKitNodesApi.nugetPackages;
     return (
       <div>
-        <TemplateForm onSubmit={this._onSubmit} onDelete={this._onDelete} initialValues={model} />
+        <TemplateForm
+          onSubmit={this.onSubmit}
+          onDelete={this.onDelete}
+          onCancel={this.onCancel}
+          initialValues={model}
+          packagesList={packages}
+          saving={this.state.saving}
+          deleting={this.state.deleting}
+          saveErrors={this.state.saveErrors}
+        />
       </div>
     )
   }
@@ -106,6 +143,7 @@ export default Relay.createContainer(
   {
     initialVariables: {
       id: null,
+      releaseId: null,
       nodeExists: false,
     },
     prepareVariables: (prevVariables) => Object.assign({}, prevVariables, {
@@ -116,18 +154,43 @@ export default Relay.createContainer(
         fragment on IClusterKitNodeApi {
           id
           __typename
-          __node(id: $id) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_NodeTemplate {
+          clusterKitNodesApi {
+            nugetPackages {
+              edges {
+                node {
+                  name
+                  version
+                  availableVersions
+                }
+              }
+            }
+          }
+          release:__node(id: $releaseId) {
+            ...on IClusterKitNodeApi_Release {
               __id
+              configuration {
+                ${UpdateFeedMutation.getFragment('configuration')},
+              }
+            }
+          }
+          template:__node(id: $id) @include( if: $nodeExists ) {
+            ...on IClusterKitNodeApi_Template {
+              id
               code
               configuration
               containerTypes
               maximumNeededInstances
               minimumRequiredInstances
               name
-              packages
+              packageRequirements {
+                edges {
+                  node {
+                    __id
+                    specificVersion
+                  }
+                }
+              },
               priority
-              version
             }
           }
         }

@@ -41,9 +41,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         packages {
           edges {
             node {
-              name
               version
-              availableVersions
               id
               __id
             }
@@ -130,12 +128,28 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         }
       });
 
-      if (this.props[typeSingular] && (this.props[`${typeSingular}Id`] === node.__id || !this.props[`${typeSingular}Id`])) {
+      // Updating a record
+      if (this.props[typeSingular] && this.props[`${typeSingular}Id`] === node.id) {
         newNode = this.props[typeSingular];
       }
 
-      nodes.push(newNode);
+      // Delete a record
+      if (this.props[typeSingular] && this.props[`${typeSingular}DeleteId`] === node.id) {
+        newNode = null
+      }
+
+      if (newNode) {
+        nodes.push(newNode);
+      }
     });
+
+    // Adding a record
+    if (this.props[typeSingular]) {
+      console.log('Creating or updating', this.props[`${typeSingular}Id`]);
+    }
+    if (this.props[typeSingular] && this.props[`${typeSingular}Id`] === null) {
+      nodes.push(this.props[typeSingular]);
+    }
 
     return nodes;
   }

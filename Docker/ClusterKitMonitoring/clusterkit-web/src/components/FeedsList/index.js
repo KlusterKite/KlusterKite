@@ -1,4 +1,5 @@
 import React from 'react';
+import Relay from 'react-relay'
 
 import { Link } from 'react-router';
 import FeedForm from '../FeedForm/index';
@@ -13,87 +14,11 @@ class FeedList extends React.Component {
 
   static propTypes = {
     releaseId: React.PropTypes.string,
-    feeds: React.PropTypes.object,
-    onChange: React.PropTypes.func,
+    configuration: React.PropTypes.object,
   };
-
-  /**
-   * Shows edit form for the selected feed
-   * @param node {Object} Feed data or null (if new)
-   */
-  showEditForm(node) {
-    this.setState({
-      isEditing: true,
-      editedObject: node
-    });
-  };
-
-  /**
-   * Creates or updates a feed record. Pushes data to the this.props.onChange method.
-   * @param model {Object} New feed model
-   */
-  createOrUpdate(model) {
-    const oldFeeds = this.props.feeds && this.props.feeds.edges;
-    let newFeeds;
-
-    if (model.id) {
-      // updating
-      const index = this.findIndex(oldFeeds, model.id);
-      const newNode = this.updateNode(oldFeeds[index], model);
-
-      newFeeds = [
-        ...oldFeeds.slice(0, index),
-        newNode,
-        ...oldFeeds.slice(index + 1)
-      ];
-    } else {
-      // creating
-      const newNode = {
-        node: model
-      };
-      newFeeds = [...oldFeeds, newNode];
-    }
-
-    this.setState({
-      isEditing: false,
-      editedObject: null
-    });
-    this.props.onChange(newFeeds);
-  }
-
-  /**
-   * Updates feed's node in the old feed data with a new model
-   * @param oldFeed {Object} Old feed data
-   * @param newModel {Object} New feed model
-   * @return {Object} New feed data
-   */
-  updateNode(oldFeed, newModel) {
-    const newNode = Object.assign({}, oldFeed.node, newModel);
-
-    return Object.assign({}, oldFeed, {
-      node: newNode
-    });
-  }
-
-
-  /**
-   * Find index of a feed with a known id
-   * @param feeds {Object} Feeds list
-   * @param id {string} Feed's id to find
-   * @return {number} Feed's index or -1, if not found
-   */
-  findIndex(feeds, id) {
-    for (let i = 0; i < feeds.length; i++) {
-      if (feeds[i].node.id === id) {
-        return i;
-      }
-    }
-
-    return -1;
-  }
 
   render() {
-    const feeds = this.props.feeds && this.props.feeds.edges;
+    const feeds = this.props.configuration.nugetFeeds && this.props.configuration.nugetFeeds.edges;
 
     return (
       <div>
@@ -136,4 +61,25 @@ class FeedList extends React.Component {
   }
 }
 
-export default FeedList
+export default Relay.createContainer(
+  FeedList,
+  {
+    fragments: {
+      configuration: () => Relay.QL`fragment on IClusterKitNodeApi_ReleaseConfiguration {
+        nugetFeeds {
+          edges {
+            node {
+              __id
+              id
+              address
+              type
+              userName
+              password
+            }
+          }
+        }
+      }
+      `,
+    },
+  },
+)

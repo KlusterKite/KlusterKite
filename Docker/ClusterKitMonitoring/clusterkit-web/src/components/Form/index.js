@@ -23,6 +23,7 @@ export default class Form extends React.Component { // eslint-disable-line react
     onDelete: React.PropTypes.func,
     className: React.PropTypes.string,
     saving: React.PropTypes.bool,
+    deleting: React.PropTypes.bool,
     saved: React.PropTypes.bool,
     saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
     saveError: React.PropTypes.string,
@@ -54,6 +55,7 @@ export default class Form extends React.Component { // eslint-disable-line react
         <Submit
           canSubmit={this.state.canSubmit}
           saving={this.props.saving}
+          deleting={this.props.deleting}
           saved={this.props.saved}
           disabled={this.props.disabled}
           saveError={this.props.saveError}

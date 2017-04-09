@@ -154,11 +154,17 @@ class ReleasePage extends React.Component {
         {model &&
         <div>
           <ReleaseForm onSubmit={this.onSubmit} onDelete={this.onDelete} initialValues={model}/>
-          <FeedsList feeds={model.configuration.nugetFeeds} onChange={this.updateStateFeed} releaseId={this.props.params.id} />
+          <FeedsList
+            configuration={model.configuration}
+            releaseId={this.props.params.id}
+          />
           <TemplatesList
+            configuration={model.configuration}
             nodeTemplates={model.configuration.nodeTemplates}
             createNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Create')}
-            getNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Get')}/>
+            getNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Get')}
+            releaseId={this.props.params.id}
+          />
         </div>
         }
       </div>
@@ -189,18 +195,7 @@ export default Relay.createContainer(
               majorVersion
               state
               configuration {
-                nugetFeeds {
-                  edges {
-                    node {
-                      __id
-                      id
-                      address
-                      type
-                      userName
-                      password
-                    }
-                  }
-                }
+                ${FeedsList.getFragment('configuration')},
                 nodeTemplates {
                   edges {
                     node {
@@ -226,9 +221,7 @@ export default Relay.createContainer(
                 packages {
                   edges {
                     node {
-                      name
                       version
-                      availableVersions
                       id
                       __id
                     }

@@ -984,7 +984,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input",
+                    "name": "ClusterKitMonitoring_Pair_System_String_Node__Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -997,7 +997,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort",
+                      "name": "ClusterKitMonitoring_Pair_System_String_Node__Sort",
                       "ofType": null
                     }
                   },
@@ -1036,7 +1036,7 @@
               ],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection",
+                "name": "IClusterKitMonitoring_Pair_System_String_Node__Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1080,8 +1080,8 @@
         },
         {
           "kind": "INTERFACE",
-          "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection",
-          "description": "The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_\n Represents a dictionary key-value pair",
+          "name": "IClusterKitMonitoring_Pair_System_String_Node__Connection",
+          "description": "The list of connected ClusterKitMonitoring_Pair_System_String_Node_\n Represents a dictionary key-value pair",
           "fields": [
             {
               "name": "count",
@@ -1104,7 +1104,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INTERFACE",
-                  "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge",
+                  "name": "IClusterKitMonitoring_Pair_System_String_Node__Edge",
                   "ofType": null
                 }
               },
@@ -1118,15 +1118,15 @@
           "possibleTypes": [
             {
               "kind": "OBJECT",
-              "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection",
+              "name": "ClusterKitMonitoring_Pair_System_String_Node__Connection",
               "ofType": null
             }
           ]
         },
         {
           "kind": "INTERFACE",
-          "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge",
-          "description": "The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ in a connected list\n Represents a dictionary key-value pair",
+          "name": "IClusterKitMonitoring_Pair_System_String_Node__Edge",
+          "description": "The ClusterKitMonitoring_Pair_System_String_Node_ in a connected list\n Represents a dictionary key-value pair",
           "fields": [
             {
               "name": "cursor",
@@ -1146,7 +1146,7 @@
               "args": [],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_",
+                "name": "IClusterKitMonitoring_Pair_System_String_Node_",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1159,14 +1159,14 @@
           "possibleTypes": [
             {
               "kind": "OBJECT",
-              "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge",
+              "name": "ClusterKitMonitoring_Pair_System_String_Node__Edge",
               "ofType": null
             }
           ]
         },
         {
           "kind": "INTERFACE",
-          "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_",
+          "name": "IClusterKitMonitoring_Pair_System_String_Node_",
           "description": "Represents a dictionary key-value pair",
           "fields": [
             {
@@ -1212,7 +1212,7 @@
           "possibleTypes": [
             {
               "kind": "OBJECT",
-              "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_",
+              "name": "ClusterKitMonitoring_Pair_System_String_Node_",
               "ofType": null
             }
           ]
@@ -2815,7 +2815,7 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input",
+          "name": "ClusterKitMonitoring_Pair_System_String_Node__Filter_Input",
           "description": "",
           "fields": null,
           "inputFields": [
@@ -2824,7 +2824,7 @@
               "description": "Combine filter conditions with logic \"OR\"",
               "type": {
                 "kind": "INPUT_OBJECT",
-                "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input",
+                "name": "ClusterKitMonitoring_Pair_System_String_Node__Filter_Input",
                 "ofType": null
               },
               "defaultValue": null
@@ -2834,7 +2834,7 @@
               "description": "Combine filter conditions with logic \"AND\"",
               "type": {
                 "kind": "INPUT_OBJECT",
-                "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input",
+                "name": "ClusterKitMonitoring_Pair_System_String_Node__Filter_Input",
                 "ofType": null
               },
               "defaultValue": null
@@ -3046,7 +3046,7 @@
         },
         {
           "kind": "ENUM",
-          "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort",
+          "name": "ClusterKitMonitoring_Pair_System_String_Node__Sort",
           "description": null,
           "fields": null,
           "inputFields": null,
@@ -3165,7 +3165,7 @@
             },
             {
               "kind": "OBJECT",
-              "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_",
+              "name": "ClusterKitMonitoring_Pair_System_String_Node_",
               "ofType": null
             },
             {
@@ -3180,7 +3180,7 @@
             },
             {
               "kind": "OBJECT",
-              "name": "ClusterKitNodeApi_NugetPackage",
+              "name": "ClusterKitNodeApi_NugetPackageFamily",
               "ofType": null
             },
             {
@@ -3225,12 +3225,22 @@
             },
             {
               "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageDescription",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "ClusterKitNodeApi_Template",
               "ofType": null
             },
             {
               "kind": "OBJECT",
               "name": "ClusterKitNodeApi_PackageRequirement",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription__",
               "ofType": null
             },
             {
@@ -3311,7 +3321,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3324,7 +3334,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_NugetPackageFamily_Sort",
                       "ofType": null
                     }
                   },
@@ -3363,7 +3373,7 @@
               ],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitNodeApi_NugetPackage_Connection",
+                "name": "IClusterKitNodeApi_NugetPackageFamily_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3445,7 +3455,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3458,7 +3468,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_NugetPackageFamily_Sort",
                       "ofType": null
                     }
                   },
@@ -3497,7 +3507,7 @@
               ],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitNodeApi_NugetPackage_Connection",
+                "name": "IClusterKitNodeApi_NugetPackageFamily_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3931,8 +3941,8 @@
         },
         {
           "kind": "INTERFACE",
-          "name": "IClusterKitNodeApi_NugetPackage_Connection",
-          "description": "The list of connected ClusterKitNodeApi_NugetPackage\n Short description of NuGet package",
+          "name": "IClusterKitNodeApi_NugetPackageFamily_Connection",
+          "description": "The list of connected ClusterKitNodeApi_NugetPackageFamily\n Short description of NuGet package family",
           "fields": [
             {
               "name": "count",
@@ -3955,7 +3965,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INTERFACE",
-                  "name": "IClusterKitNodeApi_NugetPackage_Edge",
+                  "name": "IClusterKitNodeApi_NugetPackageFamily_Edge",
                   "ofType": null
                 }
               },
@@ -3969,15 +3979,15 @@
           "possibleTypes": [
             {
               "kind": "OBJECT",
-              "name": "ClusterKitNodeApi_NugetPackage_Connection",
+              "name": "ClusterKitNodeApi_NugetPackageFamily_Connection",
               "ofType": null
             }
           ]
         },
         {
           "kind": "INTERFACE",
-          "name": "IClusterKitNodeApi_NugetPackage_Edge",
-          "description": "The ClusterKitNodeApi_NugetPackage in a connected list\n Short description of NuGet package",
+          "name": "IClusterKitNodeApi_NugetPackageFamily_Edge",
+          "description": "The ClusterKitNodeApi_NugetPackageFamily in a connected list\n Short description of NuGet package family",
           "fields": [
             {
               "name": "cursor",
@@ -3997,7 +4007,7 @@
               "args": [],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitNodeApi_NugetPackage",
+                "name": "IClusterKitNodeApi_NugetPackageFamily",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4010,15 +4020,15 @@
           "possibleTypes": [
             {
               "kind": "OBJECT",
-              "name": "ClusterKitNodeApi_NugetPackage_Edge",
+              "name": "ClusterKitNodeApi_NugetPackageFamily_Edge",
               "ofType": null
             }
           ]
         },
         {
           "kind": "INTERFACE",
-          "name": "IClusterKitNodeApi_NugetPackage",
-          "description": "Short description of NuGet package",
+          "name": "IClusterKitNodeApi_NugetPackageFamily",
+          "description": "Short description of NuGet package family",
           "fields": [
             {
               "name": "id",
@@ -4091,14 +4101,14 @@
           "possibleTypes": [
             {
               "kind": "OBJECT",
-              "name": "ClusterKitNodeApi_NugetPackage",
+              "name": "ClusterKitNodeApi_NugetPackageFamily",
               "ofType": null
             }
           ]
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+          "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
           "description": "",
           "fields": null,
           "inputFields": [
@@ -4107,7 +4117,7 @@
               "description": "Combine filter conditions with logic \"OR\"",
               "type": {
                 "kind": "INPUT_OBJECT",
-                "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                 "ofType": null
               },
               "defaultValue": null
@@ -4117,7 +4127,7 @@
               "description": "Combine filter conditions with logic \"AND\"",
               "type": {
                 "kind": "INPUT_OBJECT",
-                "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                 "ofType": null
               },
               "defaultValue": null
@@ -4729,7 +4739,7 @@
         },
         {
           "kind": "ENUM",
-          "name": "ClusterKitNodeApi_NugetPackage_Sort",
+          "name": "ClusterKitNodeApi_NugetPackageFamily_Sort",
           "description": null,
           "fields": null,
           "inputFields": null,
@@ -4950,7 +4960,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4963,7 +4973,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_NugetPackageFamily_Sort",
                       "ofType": null
                     }
                   },
@@ -5002,7 +5012,7 @@
               ],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitNodeApi_NugetPackage_Connection",
+                "name": "IClusterKitNodeApi_NugetPackageFamily_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -5039,6 +5049,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId",
+              "description": "the installed release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -5702,6 +5724,66 @@
               "defaultValue": null
             },
             {
+              "name": "releaseId",
+              "description": "releaseId exactly equals to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_not",
+              "description": "releaseId not equals to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_lt",
+              "description": "releaseId is less then the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_lte",
+              "description": "releaseId is less then or equal to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_gt",
+              "description": "releaseId is greater then the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseId_gte",
+              "description": "releaseId is greater then or equal to the parameter, releaseId: the installed release id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "nodeTemplateVersion",
               "description": "nodeTemplateVersion exactly equals to the parameter, nodeTemplateVersion: current node template version",
               "type": {
@@ -5902,6 +5984,18 @@
             },
             {
               "name": "nodeTemplate_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId_desc",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -9556,7 +9650,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -9569,7 +9663,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_PackageDescription_Sort",
                       "ofType": null
                     }
                   },
@@ -9608,7 +9702,7 @@
               ],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IClusterKitNodeApi_NugetPackage_Connection",
+                "name": "IClusterKitNodeApi_PackageDescription_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -9775,6 +9869,611 @@
               "ofType": null
             }
           ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_PackageDescription_Connection",
+          "description": "The list of connected ClusterKitNodeApi_PackageDescription\n Short description of NuGet package",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INTERFACE",
+                  "name": "IClusterKitNodeApi_PackageDescription_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageDescription_Connection",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_PackageDescription_Edge",
+          "description": "The ClusterKitNodeApi_PackageDescription in a connected list\n Short description of NuGet package",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_PackageDescription",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageDescription_Edge",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_PackageDescription",
+          "description": "Short description of NuGet package",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "__id",
+              "description": "the package Id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "version",
+              "description": "the package version",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_PackageDescription",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "OR",
+              "description": "Combine filter conditions with logic \"OR\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "AND",
+              "description": "Combine filter conditions with logic \"AND\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id",
+              "description": "id exactly equals to the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not",
+              "description": "id not equals to the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_in",
+              "description": "id is a substring of the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_in",
+              "description": "id is not a substring of the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_contains",
+              "description": "id contains the parameter as substring, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_contains",
+              "description": "id doesn't contain the parameter as substring, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_starts_with",
+              "description": "id starts with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_starts_with",
+              "description": "id doesn't start with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_ends_with",
+              "description": "id ends with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_not_ends_with",
+              "description": "id doesn't end with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l",
+              "description": "id lowercased equals the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not",
+              "description": "id lowercased doesn't equal the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_in",
+              "description": "id lowercased is a substring of the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_in",
+              "description": "id lowercased is not a substring of the parameter, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_contains",
+              "description": "id lowercased contains the parameter as substring, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_contains",
+              "description": "id lowercased doesn't contain the parameter as substring, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_starts_with",
+              "description": "id lowercased starts with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_starts_with",
+              "description": "id lowercased doesn't start with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_ends_with",
+              "description": "id lowercased ends with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id_l_not_ends_with",
+              "description": "id lowercased doesn't end with the parameter value, id: the package Id",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version",
+              "description": "version exactly equals to the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_not",
+              "description": "version not equals to the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_in",
+              "description": "version is a substring of the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_not_in",
+              "description": "version is not a substring of the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_contains",
+              "description": "version contains the parameter as substring, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_not_contains",
+              "description": "version doesn't contain the parameter as substring, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_starts_with",
+              "description": "version starts with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_not_starts_with",
+              "description": "version doesn't start with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_ends_with",
+              "description": "version ends with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_not_ends_with",
+              "description": "version doesn't end with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l",
+              "description": "version lowercased equals the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_not",
+              "description": "version lowercased doesn't equal the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_in",
+              "description": "version lowercased is a substring of the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_not_in",
+              "description": "version lowercased is not a substring of the parameter, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_contains",
+              "description": "version lowercased contains the parameter as substring, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_not_contains",
+              "description": "version lowercased doesn't contain the parameter as substring, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_starts_with",
+              "description": "version lowercased starts with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_not_starts_with",
+              "description": "version lowercased doesn't start with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_ends_with",
+              "description": "version lowercased ends with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "version_l_not_ends_with",
+              "description": "version lowercased doesn't end with the parameter value, version: the package version",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "ClusterKitNodeApi_PackageDescription_Sort",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "id_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "version_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "version_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
         },
         {
           "kind": "INTERFACE",
@@ -10041,6 +10740,73 @@
               "type": {
                 "kind": "INTERFACE",
                 "name": "IClusterKitNodeApi_PackageRequirement_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "packagesToInstall",
+              "description": "The list of packages to install for current template",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -10668,6 +11434,454 @@
             },
             {
               "name": "specificVersion_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection",
+          "description": "The list of connected ClusterKitNodeApi_Pair_System_String_List_PackageDescription__\n Represents a dictionary key-value pair",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "INTERFACE",
+                  "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge",
+          "description": "The ClusterKitNodeApi_Pair_System_String_List_PackageDescription__ in a connected list\n Represents a dictionary key-value pair",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription__",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INTERFACE",
+          "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription__",
+          "description": "Represents a dictionary key-value pair",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "key",
+              "description": "Gets a dictionary key",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "value",
+              "description": "Gets a dictionary value",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_PackageDescription_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_PackageDescription_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": [
+            {
+              "kind": "OBJECT",
+              "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription__",
+              "ofType": null
+            }
+          ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "OR",
+              "description": "Combine filter conditions with logic \"OR\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "AND",
+              "description": "Combine filter conditions with logic \"AND\"",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key",
+              "description": "key exactly equals to the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_not",
+              "description": "key not equals to the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_in",
+              "description": "key is a substring of the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_not_in",
+              "description": "key is not a substring of the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_contains",
+              "description": "key contains the parameter as substring, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_not_contains",
+              "description": "key doesn't contain the parameter as substring, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_starts_with",
+              "description": "key starts with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_not_starts_with",
+              "description": "key doesn't start with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_ends_with",
+              "description": "key ends with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_not_ends_with",
+              "description": "key doesn't end with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l",
+              "description": "key lowercased equals the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_not",
+              "description": "key lowercased doesn't equal the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_in",
+              "description": "key lowercased is a substring of the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_not_in",
+              "description": "key lowercased is not a substring of the parameter, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_contains",
+              "description": "key lowercased contains the parameter as substring, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_not_contains",
+              "description": "key lowercased doesn't contain the parameter as substring, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_starts_with",
+              "description": "key lowercased starts with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_not_starts_with",
+              "description": "key lowercased doesn't start with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_ends_with",
+              "description": "key lowercased ends with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "key_l_not_ends_with",
+              "description": "key lowercased doesn't end with the parameter value, key: Gets a dictionary key",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Sort",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "key_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "key_desc",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -16426,7 +17640,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Filter_Input",
+                    "name": "ClusterKitMonitoring_Pair_System_String_Node__Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16439,7 +17653,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Sort",
+                      "name": "ClusterKitMonitoring_Pair_System_String_Node__Sort",
                       "ofType": null
                     }
                   },
@@ -16478,7 +17692,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection",
+                "name": "ClusterKitMonitoring_Pair_System_String_Node__Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -16539,8 +17753,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection",
-          "description": "The list of connected ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_\n Represents a dictionary key-value pair",
+          "name": "ClusterKitMonitoring_Pair_System_String_Node__Connection",
+          "description": "The list of connected ClusterKitMonitoring_Pair_System_String_Node_\n Represents a dictionary key-value pair",
           "fields": [
             {
               "name": "count",
@@ -16563,7 +17777,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge",
+                  "name": "ClusterKitMonitoring_Pair_System_String_Node__Edge",
                   "ofType": null
                 }
               },
@@ -16575,7 +17789,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Connection",
+              "name": "IClusterKitMonitoring_Pair_System_String_Node__Connection",
               "ofType": null
             }
           ],
@@ -16584,8 +17798,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge",
-          "description": "The ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_ in a connected list\n Represents a dictionary key-value pair",
+          "name": "ClusterKitMonitoring_Pair_System_String_Node__Edge",
+          "description": "The ClusterKitMonitoring_Pair_System_String_Node_ in a connected list\n Represents a dictionary key-value pair",
           "fields": [
             {
               "name": "cursor",
@@ -16605,7 +17819,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_",
+                "name": "ClusterKitMonitoring_Pair_System_String_Node_",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -16616,7 +17830,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node__Edge",
+              "name": "IClusterKitMonitoring_Pair_System_String_Node__Edge",
               "ofType": null
             }
           ],
@@ -16625,7 +17839,7 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_",
+          "name": "ClusterKitMonitoring_Pair_System_String_Node_",
           "description": "Represents a dictionary key-value pair",
           "fields": [
             {
@@ -16669,7 +17883,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "IClusterKitMonitoring_ClusterKit_API_Client_Converters_Pair_System_String__ClusterKit_Monitoring_Client_Messages_Node__System_String_Node_",
+              "name": "IClusterKitMonitoring_Pair_System_String_Node_",
               "ofType": null
             },
             {
@@ -16978,7 +18192,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16991,7 +18205,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_NugetPackageFamily_Sort",
                       "ofType": null
                     }
                   },
@@ -17030,7 +18244,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_NugetPackage_Connection",
+                "name": "ClusterKitNodeApi_NugetPackageFamily_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -17112,7 +18326,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -17125,7 +18339,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_NugetPackageFamily_Sort",
                       "ofType": null
                     }
                   },
@@ -17164,7 +18378,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_NugetPackage_Connection",
+                "name": "ClusterKitNodeApi_NugetPackageFamily_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -17615,8 +18829,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKitNodeApi_NugetPackage_Connection",
-          "description": "The list of connected ClusterKitNodeApi_NugetPackage\n Short description of NuGet package",
+          "name": "ClusterKitNodeApi_NugetPackageFamily_Connection",
+          "description": "The list of connected ClusterKitNodeApi_NugetPackageFamily\n Short description of NuGet package family",
           "fields": [
             {
               "name": "count",
@@ -17639,7 +18853,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "ClusterKitNodeApi_NugetPackage_Edge",
+                  "name": "ClusterKitNodeApi_NugetPackageFamily_Edge",
                   "ofType": null
                 }
               },
@@ -17651,7 +18865,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "IClusterKitNodeApi_NugetPackage_Connection",
+              "name": "IClusterKitNodeApi_NugetPackageFamily_Connection",
               "ofType": null
             }
           ],
@@ -17660,8 +18874,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKitNodeApi_NugetPackage_Edge",
-          "description": "The ClusterKitNodeApi_NugetPackage in a connected list\n Short description of NuGet package",
+          "name": "ClusterKitNodeApi_NugetPackageFamily_Edge",
+          "description": "The ClusterKitNodeApi_NugetPackageFamily in a connected list\n Short description of NuGet package family",
           "fields": [
             {
               "name": "cursor",
@@ -17677,11 +18891,11 @@
             },
             {
               "name": "node",
-              "description": "Short description of NuGet package",
+              "description": "Short description of NuGet package family",
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_NugetPackage",
+                "name": "ClusterKitNodeApi_NugetPackageFamily",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -17692,7 +18906,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "IClusterKitNodeApi_NugetPackage_Edge",
+              "name": "IClusterKitNodeApi_NugetPackageFamily_Edge",
               "ofType": null
             }
           ],
@@ -17701,8 +18915,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "ClusterKitNodeApi_NugetPackage",
-          "description": "Short description of NuGet package",
+          "name": "ClusterKitNodeApi_NugetPackageFamily",
+          "description": "Short description of NuGet package family",
           "fields": [
             {
               "name": "__id",
@@ -17773,7 +18987,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "IClusterKitNodeApi_NugetPackage",
+              "name": "IClusterKitNodeApi_NugetPackageFamily",
               "ofType": null
             },
             {
@@ -17949,7 +19163,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_NugetPackageFamily_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -17962,7 +19176,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_NugetPackageFamily_Sort",
                       "ofType": null
                     }
                   },
@@ -18001,7 +19215,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_NugetPackage_Connection",
+                "name": "ClusterKitNodeApi_NugetPackageFamily_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -18038,6 +19252,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "releaseId",
+              "description": "the installed release id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -19272,7 +20498,7 @@
                   "description": null,
                   "type": {
                     "kind": "INPUT_OBJECT",
-                    "name": "ClusterKitNodeApi_NugetPackage_Filter_Input",
+                    "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -19285,7 +20511,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "ENUM",
-                      "name": "ClusterKitNodeApi_NugetPackage_Sort",
+                      "name": "ClusterKitNodeApi_PackageDescription_Sort",
                       "ofType": null
                     }
                   },
@@ -19324,7 +20550,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "ClusterKitNodeApi_NugetPackage_Connection",
+                "name": "ClusterKitNodeApi_PackageDescription_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -19498,6 +20724,150 @@
             {
               "kind": "INTERFACE",
               "name": "IClusterKitNodeApi_ReleaseConfiguration",
+              "ofType": null
+            },
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_PackageDescription_Connection",
+          "description": "The list of connected ClusterKitNodeApi_PackageDescription\n Short description of NuGet package",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ClusterKitNodeApi_PackageDescription_Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_PackageDescription_Connection",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_PackageDescription_Edge",
+          "description": "The ClusterKitNodeApi_PackageDescription in a connected list\n Short description of NuGet package",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "Short description of NuGet package",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_PackageDescription",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_PackageDescription_Edge",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_PackageDescription",
+          "description": "Short description of NuGet package",
+          "fields": [
+            {
+              "name": "__id",
+              "description": "the package Id",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "version",
+              "description": "the package version",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_PackageDescription",
               "ofType": null
             },
             {
@@ -19768,6 +21138,73 @@
               "deprecationReason": null
             },
             {
+              "name": "packagesToInstall",
+              "description": "The list of packages to install for current template",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "forceUpdate",
               "description": "A value indicating whether no other nodes from previous releases are compatible",
               "args": [],
@@ -19941,6 +21378,205 @@
             {
               "kind": "INTERFACE",
               "name": "IClusterKitNodeApi_PackageRequirement",
+              "ofType": null
+            },
+            {
+              "kind": "INTERFACE",
+              "name": "Node",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection",
+          "description": "The list of connected ClusterKitNodeApi_Pair_System_String_List_PackageDescription__\n Represents a dictionary key-value pair",
+          "fields": [
+            {
+              "name": "count",
+              "description": "The total count of objects satisfying filter conditions",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "edges",
+              "description": "The list of edges according to filtering and paging conditions",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge",
+          "description": "The ClusterKitNodeApi_Pair_System_String_List_PackageDescription__ in a connected list\n Represents a dictionary key-value pair",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A value to use with paging positioning",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "Represents a dictionary key-value pair",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription__",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Edge",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription__",
+          "description": "Represents a dictionary key-value pair",
+          "fields": [
+            {
+              "name": "key",
+              "description": "Gets a dictionary key",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "value",
+              "description": "Gets a dictionary value",
+              "args": [
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_PackageDescription_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_PackageDescription_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "IClusterKitNodeApi_Pair_System_String_List_PackageDescription__",
               "ofType": null
             },
             {
@@ -21184,6 +22820,29 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_Release_NodeMutationPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_check",
+              "description": "checks the draft releas if it can be moved to ready state.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -22767,6 +24426,37 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input",
+          "description": "",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input",
           "description": "",
           "fields": null,
@@ -23015,7 +24705,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "INPUT_OBJECT",
-                  "name": "ClusterKitNodeApi_NugetPackage_Input",
+                  "name": "ClusterKitNodeApi_PackageDescription_Input",
                   "ofType": null
                 }
               },
@@ -23070,13 +24760,13 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "ClusterKitNodeApi_NugetPackage_Input",
+          "name": "ClusterKitNodeApi_PackageDescription_Input",
           "description": "Short description of NuGet package",
           "fields": null,
           "inputFields": [
             {
-              "name": "name",
-              "description": "The package name",
+              "name": "id",
+              "description": "the package Id",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -23086,25 +24776,11 @@
             },
             {
               "name": "version",
-              "description": "The package version",
+              "description": "the package version",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "availableVersions",
-              "description": "The list of available versions",
-              "type": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
               },
               "defaultValue": null
             }

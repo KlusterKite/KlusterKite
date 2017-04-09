@@ -33,29 +33,11 @@ class FeedPage extends React.Component {
     if (this.isAddNew()){
       this.editNode(model, null);
     } else {
-      this.editNode(model, this.props.api.feed.__id);
+      this.editNode(model, this.props.api.feed.id);
     }
   };
 
-  addNode = (model) => {
-    console.log('createFeed', model);
-    // Relay.Store.commitUpdate(
-    //   new CreateFeedMutation(
-    //     {
-    //       clusterKitNodesApiId: this.props.api.clusterKitNodesApi.id,
-    //       userName: model.userName,
-    //       password: model.password,
-    //       address: model.address,
-    //       type: model.type,
-    //     }),
-    //   {
-    //     onSuccess: () => browserHistory.push('/clusterkit/NugetFeeds'),
-    //     onFailure: (transaction) => console.log(transaction),
-    //   },
-    // )
-  };
-
-  editNode = (model, id) => {
+  editNode = (model, editId) => {
     this.setState({
       saving: true
     });
@@ -66,7 +48,7 @@ class FeedPage extends React.Component {
           nodeId: this.props.params.releaseId,
           releaseId: this.props.api.release.__id,
           configuration: this.props.api.release.configuration,
-          nugetFeedId: id,
+          nugetFeedId: editId,
           nugetFeed: {
             userName: model.userName,
             password: model.password,
@@ -85,7 +67,7 @@ class FeedPage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push('/clusterkit/releases');
+            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
           }
         },
         onFailure: (transaction) => {
@@ -102,18 +84,45 @@ class FeedPage extends React.Component {
   }
 
   onDelete = () => {
-    console.log('delete', this.props.api.feed.__id);
-    // Relay.Store.commitUpdate(
-    //   new DeleteFeedMutation({deletedId: this.props.api.__node.__id}),
-    //   {
-    //     onSuccess: () => this.context.router.replace('/clusterkit/NugetFeeds'),
-    //     onFailure: (transaction) => console.log(transaction),
-    //   },
-    // )
+    this.setState({
+      deleting: true
+    });
+
+    Relay.Store.commitUpdate(
+      new UpdateFeedMutation(
+        {
+          nodeId: this.props.params.releaseId,
+          releaseId: this.props.api.release.__id,
+          configuration: this.props.api.release.configuration,
+          nugetFeedId: this.props.api.feed.id,
+          nugetFeed: {},
+          nugetFeedDeleteId: this.props.api.feed.id,
+        }),
+      {
+        onSuccess: (response) => {
+          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
+            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
+
+            this.setState({
+              deleting: false,
+              saveErrors: messages
+            });
+          } else {
+            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            deleting: false
+          });
+          console.log(transaction)},
+      },
+    )
   };
 
   onCancel = () => {
-    browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`)
+    browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`)
   };
 
   render () {
@@ -122,10 +131,11 @@ class FeedPage extends React.Component {
       <div>
         <FeedForm
           onSubmit={this.onSubmit}
-          onDelete={this.onDelete}
+          onDelete={model && this.onDelete}
           onCancel={this.onCancel}
           initialValues={model}
           saving={this.state.saving}
+          deleting={this.state.deleting}
           saveErrors={this.state.saveErrors}
         />
       </div>
@@ -149,7 +159,7 @@ export default Relay.createContainer(
         fragment on IClusterKitNodeApi {
           __typename
           id
-          release:__node(id: $releaseId) @include( if: $nodeExists ) {
+          release:__node(id: $releaseId) {
             ...on IClusterKitNodeApi_Release {
               __id
               configuration {
@@ -159,7 +169,7 @@ export default Relay.createContainer(
           }
           feed:__node(id: $id) @include( if: $nodeExists ) {
             ...on IClusterKitNodeApi_NugetFeed {
-              __id
+              id
               address
               type
               userName

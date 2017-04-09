@@ -38,10 +38,10 @@ export default class RoutesList extends React.Component {
           <Route path='/clusterkit/NugetFeeds/:releaseId/:id' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Releases' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Release/create' component={ReleasePage} queries={ApiQueries} />
-          <Route path='/clusterkit/Release/:id' component={ReleasePage} queries={ApiQueries} render={({ props }) => props ? <ReleasePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Releases/:id' component={ReleasePage} queries={ApiQueries} render={({ props }) => props ? <ReleasePage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Templates' component={TemplatesListPage} queries={ApiQueries} />
-          <Route path='/clusterkit/Templates/create' component={TemplatePage} queries={ApiQueries} />
-          <Route path='/clusterkit/Templates/:id' component={TemplatePage} queries={ApiQueries} />
+          <Route path='/clusterkit/Templates/:releaseId/create' component={TemplatePage} queries={ApiQueries} render={({ props }) => props ? <TemplatePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Templates/:releaseId/:id' component={TemplatePage} queries={ApiQueries} render={({ props }) => props ? <TemplatePage {...props} /> : <Loading />} />
           <Route path='*' components={NotFoundPage} />
         </Route>
         <Redirect from="/" to="clusterkit/" />

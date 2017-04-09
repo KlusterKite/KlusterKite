@@ -1,12 +1,16 @@
 import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
+import StubContainer from 'react-storybooks-relay-container';
 
 import FeedList from './index';
 
 storiesOf('Feeds')
   .add('list', () => {
-    const list = getFeedsListRelay();
-    return <FeedList feeds={list.data.api.nodeManagerData.nugetFeeds} />;
+    const nodes = getFeedsListRelay();
+    const props = {
+      configuration: nodes.data.api.nodeManagerData,
+    };
+    return <StubContainer Component={FeedList} props={props} />;
   })
 ;
 
