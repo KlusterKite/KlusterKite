@@ -30,8 +30,8 @@ class ReleaseConfigCopyPage extends React.Component {
       this.setState({
         processing: true
       });
-      this.cloneConfig(oldConfiguration);
 
+      this.cloneConfig(oldConfiguration);
     } else {
       this.setState({
         oldConifgNotFoundError: true

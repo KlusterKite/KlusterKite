@@ -56,7 +56,6 @@ export default class CloneConfigMutation extends Relay.Mutation {
    */
   convertEdgesToArray(edges, type){
     const oldNodes = edges.map(x => x.node);
-    const typeSingular = type.substring(0, type.length - 1);
 
     let nodes = [];
     oldNodes.forEach(node => {
@@ -72,6 +71,10 @@ export default class CloneConfigMutation extends Relay.Mutation {
         }
 
         if (type === 'packages' && key === '__id') {
+          newNode['id'] = node[key];
+        }
+
+        if (type === 'packageRequirements' && key === '__id') {
           newNode['id'] = node[key];
         }
       });

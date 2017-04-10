@@ -6,6 +6,7 @@ import ReleaseOperations from '../../components/ReleaseOperations/ReleaseOperati
 import ReleaseForm from '../../components/ReleaseForm/ReleaseForm'
 import FeedsList from '../../components/FeedsList/FeedList'
 import PackagesList from '../../components/PackagesList/PackagesList'
+import SeedsList from '../../components/SeedsList/SeedsList'
 import TemplatesList from '../../components/TemplatesList/TemplatesList'
 
 import CreateReleaseMutation from './mutations/CreateReleaseMutation'
@@ -169,6 +170,10 @@ class ReleasePage extends React.Component {
             getNodeTemplatePrivilege={true}
             releaseId={this.props.params.id}
           />
+          <SeedsList
+            configuration={model.configuration}
+            releaseId={this.props.params.id}
+          />
           <PackagesList
             configuration={model.configuration}
             releaseId={this.props.params.id}
@@ -206,7 +211,7 @@ export default Relay.createContainer(
                 ${FeedsList.getFragment('configuration')},
                 ${TemplatesList.getFragment('configuration')}
                 ${PackagesList.getFragment('configuration')}
-                seedAddresses
+                ${SeedsList.getFragment('configuration')}
                 id
               }
             }

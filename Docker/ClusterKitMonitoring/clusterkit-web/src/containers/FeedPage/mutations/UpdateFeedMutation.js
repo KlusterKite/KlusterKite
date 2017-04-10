@@ -125,6 +125,10 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         if (type === 'packages' && key === '__id') {
           newNode['id'] = node[key];
         }
+
+        if (type === 'packageRequirements' && key === '__id') {
+          newNode['id'] = node[key];
+        }
       });
 
       // Updating a record
