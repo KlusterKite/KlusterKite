@@ -73,7 +73,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
                 if (config != null)
                 {
-                    int feedTemplate = 0;
                     foreach (var pair in config.AsEnumerable())
                     {
                         var feedConfig = config.GetConfig(pair.Key);
@@ -88,8 +87,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                             new NugetFeed
                                 {
                                     Address = feedConfig.GetString("address"),
-                                    Type = feedType,
-                                    Id = feedTemplate++
+                                    Type = feedType
                                 });
                     }
                 }

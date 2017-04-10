@@ -268,6 +268,29 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Method called before object modification in database
+        /// </summary>
+        /// <typeparam name="TObject">The type of object</typeparam>
+        /// <param name="newObject">The new Object.</param>
+        /// <param name="oldObject">The old Object.</param>
+        /// <returns>
+        /// The new version of object or null to prevent update
+        /// </returns>
+        protected override TObject BeforeUpdate<TObject>(TObject newObject, TObject oldObject)
+        {
+            if (typeof(TObject) == typeof(Release))
+            {
+                if (((Release)(object)oldObject).State != Release.EnState.Draft)
+                {
+                    throw new Exception("Only draft releases can be updated");
+                }
+            }
+
+            // ReSharper disable once RedundantTypeArgumentsOfMethod
+            return base.BeforeUpdate<TObject>(newObject, oldObject);
+        }
+
+        /// <summary>
         /// Checks node for available upgrades
         /// </summary>
         /// <param name="nodeDescription">Node description to check</param>
@@ -1159,17 +1182,7 @@ namespace ClusterKit.NodeManager
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
-                                new Exception("Only draft releases can be made ready"),
-                                null));
-                        return;
-                    }
-
-                    if (ds.Releases.Any(r => r.State == Release.EnState.Active))
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception(
-                                    "There is an already defined ready release. Please remove the previous one."),
+                                new Exception("Only draft releases can be checked"),
                                 null));
                         return;
                     }
@@ -1376,34 +1389,6 @@ namespace ClusterKit.NodeManager
 
                 this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
                 this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);
-            }
-
-            /// <summary>
-            /// Method called before object modification in database
-            /// </summary>
-            /// <typeparam name="TObject">The type of object</typeparam>
-            /// <param name="newObject">The new Object.</param>
-            /// <param name="oldObject">The old Object.</param>
-            /// <returns>
-            /// The new version of object or null to prevent update
-            /// </returns>
-            protected override TObject BeforeUpdate<TObject>(TObject newObject, TObject oldObject)
-            {
-                if (typeof(TObject) == typeof(NodeTemplate))
-                {
-                    ((NodeTemplate)(object)newObject).Version = ((NodeTemplate)(object)oldObject).Version + 1;
-                }
-
-                if (typeof(TObject) == typeof(Release))
-                {
-                    if (((Release)(object)oldObject).State != Release.EnState.Draft)
-                    {
-                        throw new Exception("Only draft releases can be updated");
-                    }
-                }
-
-                // ReSharper disable once RedundantTypeArgumentsOfMethod
-                return base.BeforeUpdate<TObject>(newObject, oldObject);
             }
 
             /// <summary>
