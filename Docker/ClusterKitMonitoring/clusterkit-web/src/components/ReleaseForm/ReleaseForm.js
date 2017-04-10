@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input, Textarea } from 'formsy-react-components';
 
-import Form from '../Form/index';
+import Form from '../Form/Form';
 
 export default class ReleaseForm extends React.Component {
   constructor(props) {
@@ -14,8 +14,10 @@ export default class ReleaseForm extends React.Component {
     onDelete: React.PropTypes.func,
     initialValues: React.PropTypes.object,
     saving: React.PropTypes.bool,
+    deleting: React.PropTypes.bool,
     saved: React.PropTypes.bool,
     saveError: React.PropTypes.string,
+    saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
   };
 
   submit(model) {
@@ -39,7 +41,16 @@ export default class ReleaseForm extends React.Component {
         {!initialValues &&
           <h2>Create a new Release</h2>
         }
-        <Form onSubmit={this.submit} onDelete={this.props.onDelete ? this.props.onDelete : null} className="form-horizontal form-margin" saving={this.props.saving} saved={this.props.saved} saveError={this.props.saveError}>
+        <Form
+          onSubmit={this.submit}
+          onDelete={this.props.onDelete ? this.props.onDelete : null}
+          className="form-horizontal form-margin"
+          saving={this.props.saving}
+          deleting={this.props.deleting}
+          saved={this.props.saved}
+          saveError={this.props.saveError}
+          saveErrors={this.props.saveErrors}
+        >
           <fieldset>
             <Input name="__id" value={(initialValues && initialValues.__id) || ""} type="hidden" />
             <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />

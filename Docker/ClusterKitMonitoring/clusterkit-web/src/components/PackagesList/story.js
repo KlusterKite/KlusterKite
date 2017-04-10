@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@kadira/storybook';
 // import StubContainer from 'react-storybooks-relay-container';
 
-import PackagesList from './index';
+import PackagesList from './PackagesList';
 
 storiesOf('Packages')
   .add('list', () => {

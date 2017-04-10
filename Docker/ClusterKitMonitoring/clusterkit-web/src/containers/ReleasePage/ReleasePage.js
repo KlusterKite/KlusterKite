@@ -2,87 +2,92 @@ import React from 'react'
 import Relay from 'react-relay'
 import { browserHistory } from 'react-router'
 
-import ReleaseForm from '../../components/ReleaseForm/index'
-import FeedsList from '../../components/FeedsList/index'
-import TemplatesList from '../../components/TemplatesList/index'
+import ReleaseOperations from '../../components/ReleaseOperations/ReleaseOperations';
+import ReleaseForm from '../../components/ReleaseForm/ReleaseForm'
+import FeedsList from '../../components/FeedsList/FeedList'
+import PackagesList from '../../components/PackagesList/PackagesList'
+import TemplatesList from '../../components/TemplatesList/TemplatesList'
 
-// import CreateFeedMutation from './mutations/CreateFeedMutation'
+import CreateReleaseMutation from './mutations/CreateReleaseMutation'
 import UpdateReleaseMutation from './mutations/UpdateReleaseMutation'
 // import DeleteFeedMutation from './mutations/DeleteFeedMutation'
-import { hasPrivilege } from '../../utils/privileges'
 
 class ReleasePage extends React.Component {
 
   static propTypes = {
     api: React.PropTypes.object,
     params: React.PropTypes.object,
-  }
+  };
 
   static contextTypes = {
     router: React.PropTypes.object,
-  }
+  };
 
   constructor (props) {
-    super(props)
+    super(props);
     this.state = {
-      model: null
-    }
-  }
-
-  componentWillMount() {
-    if (this.props.api && this.props.api.__node) {
-      this.setState({
-        model: this.props.api.__node
-      });
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps', nextProps);
-    if (nextProps.api && nextProps.api.__node) {
-      this.setState({
-        model: nextProps.api.__node
-      });
+      saving: false,
+      saveErrors: null,
     }
   }
 
   isAddNew = () => {
     return !this.props.params.hasOwnProperty('id')
-  }
+  };
 
   onSubmit = (releaseModel) => {
     console.log('submitting release', releaseModel);
-    console.log('current model', this.state.model);
-
-    const newModel = this.updateStateRelease(releaseModel);
+    console.log('current model', this.props.api.release);
 
     if (this.isAddNew()){
-      this.addNode(newModel);
+      this.addNode(releaseModel);
     } else {
-      this.editNode(newModel);
+      this.editNode(releaseModel);
     }
-  }
+  };
 
   addNode = (model) => {
     console.log('create', model);
-    // Relay.Store.commitUpdate(
-    //   new CreateFeedMutation(
-    //     {
-    //       clusterKitNodesApiId: this.props.api.clusterKitNodesApi.id,
-    //       userName: model.userName,
-    //       password: model.password,
-    //       address: model.address,
-    //       type: model.type,
-    //     }),
-    //   {
-    //     onSuccess: () => browserHistory.push('/clusterkit/NugetFeeds'),
-    //     onFailure: (transaction) => console.log(transaction),
-    //   },
-    // )
-  }
+    Relay.Store.commitUpdate(
+      new CreateReleaseMutation(
+        {
+          majorVersion: model.majorVersion,
+          minorVersion: model.minorVersion,
+          name: model.name,
+          notes: model.notes,
+        }),
+      {
+        onSuccess: (response) => {
+          console.log('response', response);
+          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors &&
+            response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            console.log('success', response);
+            this.setState({
+              saving: false,
+              saveErrors: null
+            });
+            browserHistory.push(`/clusterkit/Releases/${response.clusterKitNodeApi_clusterKitNodesApi_releases_create.node.id}`);
+          }
+        },
+        onFailure: (transaction) => console.log(transaction),
+      },
+    )
+  };
 
   editNode = (model) => {
-    console.log('edit', model);
+    console.log('saving', model);
+
+    this.setState({
+      saving: true
+    });
+
     Relay.Store.commitUpdate(
       new UpdateReleaseMutation(
         {
@@ -91,14 +96,38 @@ class ReleasePage extends React.Component {
           majorVersion: model.majorVersion,
           minorVersion: model.minorVersion,
           name: model.name,
-          notes: model.notes,
-          configuration: model.configuration
+          notes: model.notes
         }),
       {
-        onSuccess: (transaction) => browserHistory.push('/clusterkit/releases'),
-        onFailure: (transaction) => console.log(transaction),
+        onSuccess: (response) => {
+          console.log('response', response);
+          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
+            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            this.setState({
+              saving: false,
+              saveErrors: null
+            });
+            this.props.relay.forceFetch();
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            saving: false
+          });
+          console.log(transaction)},
       },
     )
+  };
+
+  getErrorMessagesFromEdge = (edges) => {
+    return edges.map(x => x.node).map(x => x.message);
   }
 
   onDelete = () => {
@@ -112,57 +141,36 @@ class ReleasePage extends React.Component {
     // )
   }
 
-  /**
-   * Update model's nugetFeeds list with the new one, save if to the state
-   * @param nugetFeeds {Object[]} List of new nuget feeds
-   */
-  updateStateFeed = (nugetFeeds) => {
-    this.setState((prevState, props) => {
-      const newModel = Object.assign({}, prevState.model);
-      newModel.configuration.nugetFeeds.edges = nugetFeeds;
-
-      return ({
-        model: newModel
-      });
-    });
-  };
-
-  /**
-   * Update model's release info the new one, save if to the state
-   * @param release {Object} Release info
-   * @return {Object} new data model
-   */
-  updateStateRelease = (release) => {
-    const newModel = Object.assign({}, this.state.model);
-    const keys = Object.keys(release);
-
-    keys.forEach(key => {
-      newModel[key] = release[key];
-    });
-
-    this.setState({
-      model: newModel
-    });
-
-    return newModel;
-  };
-
   render () {
-    const model = this.state.model;
+    const model = this.props.api.release;
     return (
       <div>
+        <ReleaseForm
+          onSubmit={this.onSubmit}
+          onDelete={this.onDelete}
+          initialValues={model}
+          saving={this.state.saving}
+          saveErrors={this.state.saveErrors}
+        />
         {model &&
         <div>
-          <ReleaseForm onSubmit={this.onSubmit} onDelete={this.onDelete} initialValues={model}/>
+          <ReleaseOperations
+            releaseId={this.props.params.id}
+            releaseInnerId={model.__id}
+          />
           <FeedsList
             configuration={model.configuration}
             releaseId={this.props.params.id}
           />
           <TemplatesList
             configuration={model.configuration}
-            nodeTemplates={model.configuration.nodeTemplates}
-            createNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Create')}
-            getNodeTemplatePrivilege={hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Get')}
+            nodeTemplates={model.configuration && model.configuration.nodeTemplates}
+            createNodeTemplatePrivilege={true}
+            getNodeTemplatePrivilege={true}
+            releaseId={this.props.params.id}
+          />
+          <PackagesList
+            configuration={model.configuration}
             releaseId={this.props.params.id}
           />
         </div>
@@ -186,7 +194,7 @@ export default Relay.createContainer(
       api: () => Relay.QL`
         fragment on IClusterKitNodeApi {
           id
-          __node(id: $id) @include( if: $nodeExists ) {
+          release: __node(id: $id) @include( if: $nodeExists ) {
             ...on IClusterKitNodeApi_Release {
               __id
               name
@@ -196,37 +204,8 @@ export default Relay.createContainer(
               state
               configuration {
                 ${FeedsList.getFragment('configuration')},
-                nodeTemplates {
-                  edges {
-                    node {
-                      id
-                      code
-                      configuration
-                      containerTypes
-                      minimumRequiredInstances
-                      maximumNeededInstances
-                      name
-                      packageRequirements {
-                        edges {
-                          node {
-                            __id
-                            specificVersion
-                          }
-                        }
-                      }
-                      priority
-                    }
-                  }
-                }
-                packages {
-                  edges {
-                    node {
-                      version
-                      id
-                      __id
-                    }
-                  }
-                }
+                ${TemplatesList.getFragment('configuration')}
+                ${PackagesList.getFragment('configuration')}
                 seedAddresses
                 id
               }

@@ -1,57 +1,6 @@
 import Relay from 'react-relay'
 
-export default class UpdateFeedMutation extends Relay.Mutation {
-  static fragments = {
-    configuration: () => Relay.QL`
-      fragment on IClusterKitNodeApi_ReleaseConfiguration {
-        nodeTemplates {
-          edges {
-            node {
-              id
-              code
-              configuration
-              containerTypes
-              minimumRequiredInstances
-              maximumNeededInstances
-              name
-              packageRequirements {
-                edges {
-                  node {
-                    __id
-                    specificVersion
-                  }
-                }
-              }
-              priority
-            }
-          }
-        }
-        nugetFeeds {
-          edges {
-            node {
-              id
-              address
-              type
-              userName
-              password
-            }
-          }
-        }
-        packages {
-          edges {
-            node {
-              version
-              id
-              __id
-            }
-          }
-        }
-        seedAddresses
-        id
-      }
-    `,
-  };
-
+export default class CloneConfigMutation extends Relay.Mutation {
   getMutation () {
     return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_update}`
   }
@@ -127,28 +76,10 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         }
       });
 
-      // Updating a record
-      if (this.props[typeSingular] && this.props[`${typeSingular}Id`] === node.id) {
-        newNode = this.props[typeSingular];
-      }
-
-      // Delete a record
-      if (this.props[typeSingular] && this.props[`${typeSingular}DeleteId`] === node.id) {
-        newNode = null
-      }
-
       if (newNode) {
         nodes.push(newNode);
       }
     });
-
-    // Adding a record
-    if (this.props[typeSingular]) {
-      console.log('Creating or updating', this.props[`${typeSingular}Id`]);
-    }
-    if (this.props[typeSingular] && this.props[`${typeSingular}Id`] === null) {
-      nodes.push(this.props[typeSingular]);
-    }
 
     return nodes;
   }

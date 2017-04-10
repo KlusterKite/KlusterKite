@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 
 import delay from 'lodash/delay'
 
-import ReloadPackages from '../../components/ReloadPackages/index';
+import ReloadPackages from '../../components/ReloadPackages/ReloadPackages';
 import NodesList from '../../components/NodesList/index';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 
@@ -53,6 +53,7 @@ export default Relay.createContainer(
       api: () => Relay.QL`fragment on IClusterKitNodeApi {
         __typename
         clusterKitNodesApi {
+          id
           ${NodesWithTemplates.getFragment('data')},
           ${NodesList.getFragment('nodeDescriptions')},
         }

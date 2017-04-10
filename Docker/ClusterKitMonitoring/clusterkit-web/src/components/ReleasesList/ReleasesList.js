@@ -24,6 +24,7 @@ export class ReleasesList extends React.Component {
     return (
       <div>
         <h3>Releases list</h3>
+        <Link to={`/clusterkit/Releases/create`} className="btn btn-primary" role="button">Add a new release</Link>
         <table className="table table-hover">
           <thead>
             <tr>
@@ -38,7 +39,7 @@ export class ReleasesList extends React.Component {
             const dateCreated = new Date(node.created);
 
             return (
-              <tr key={`${node.nodeId}`}>
+              <tr key={`${node.id}`}>
                 <td>
                   <Link to={`/clusterkit/Releases/${encodeURIComponent(node.id)}`}>
                     {node.name}
@@ -76,31 +77,6 @@ export default Relay.createContainer(
               finished
               state
               isStable
-              configuration {
-                packages(limit: 5) {
-                  edges {
-                    node {
-                      __id
-                      version
-                    }
-                  }
-                }
-                nodeTemplates(limit: 5) {
-                  edges {
-                    node {
-                      name
-                    }
-                  }
-                }
-                nugetFeeds(limit: 5) {
-                  edges {
-                    node {
-                      address
-                    }
-                  }
-                }
-                seedAddresses
-              }
             }
           }
         }

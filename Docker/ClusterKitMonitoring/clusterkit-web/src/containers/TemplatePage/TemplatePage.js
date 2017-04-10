@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import UpdateFeedMutation from './../FeedPage/mutations/UpdateFeedMutation'
 
-import TemplateForm from '../../components/TemplateForm/index'
+import TemplateForm from '../../components/TemplateForm/TemplateForm'
 
 class TemplatePage extends React.Component {
 
@@ -60,7 +60,7 @@ class TemplatePage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
+            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -102,7 +102,7 @@ class TemplatePage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
+            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {

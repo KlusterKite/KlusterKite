@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class UpdateReleaseMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_update}`
+    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_create}`
   }
 
   getFatQuery () {
@@ -66,12 +66,14 @@ export default class UpdateReleaseMutation extends Relay.Mutation {
 
   getOptimisticResponse () {
     return {
-      model: {
-        id: this.props.nodeId,
-        majorVersion: this.props.majorVersion,
-        minorVersion: this.props.minorVersion,
-        name: this.props.name,
-        notes: this.props.notes
+      edge: {
+        node: {
+          id: this.props.nodeId,
+          majorVersion: this.props.majorVersion,
+          minorVersion: this.props.minorVersion,
+          name: this.props.name,
+          notes: this.props.notes
+        },
       },
     }
   }

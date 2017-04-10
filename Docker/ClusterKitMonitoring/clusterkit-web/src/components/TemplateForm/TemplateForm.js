@@ -3,7 +3,7 @@ import Formsy from 'formsy-react';
 import { Input, Textarea } from 'formsy-react-components';
 import isEqual from 'lodash/isEqual';
 
-import Form from '../Form/index';
+import Form from '../Form/Form';
 import PackagesMultiSelector from '../PackageSelector/multiselector';
 
 export default class TemplateForm extends React.Component { // eslint-disable-line react/prefer-stateless-function

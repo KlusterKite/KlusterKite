@@ -6,7 +6,7 @@ import CreateFeedMutation from './mutations/CreateFeedMutation'
 import UpdateFeedMutation from './mutations/UpdateFeedMutation'
 import DeleteFeedMutation from './mutations/DeleteFeedMutation'
 
-import FeedForm from '../../components/FeedForm/index'
+import FeedForm from '../../components/FeedForm/FeedForm'
 
 class FeedPage extends React.Component {
 

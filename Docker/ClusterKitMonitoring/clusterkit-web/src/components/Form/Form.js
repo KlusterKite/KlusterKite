@@ -48,9 +48,22 @@ export default class Form extends React.Component { // eslint-disable-line react
     this.props.onSubmit(model);
   }
 
+  onKeyPress(event) {
+    if (event.which === 13 /* Enter */) {
+      event.preventDefault();
+    }
+  }
+
   render() {
     return (
-      <FormsyForm onValidSubmit={this.submit} onValid={this.enableButton} onInvalid={this.disableButton} className={this.props.className} validatePristine={true}>
+      <FormsyForm
+        onKeyPress={this.onKeyPress}
+        onValidSubmit={this.submit}
+        onValid={this.enableButton}
+        onInvalid={this.disableButton}
+        className={this.props.className}
+        validatePristine={true}
+      >
         {this.props.children}
         <Submit
           canSubmit={this.state.canSubmit}

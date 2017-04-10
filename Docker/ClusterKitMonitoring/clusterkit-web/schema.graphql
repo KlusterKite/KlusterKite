@@ -607,48 +607,6 @@ type ClusterKitNodeApi_AkkaAddress implements IClusterKitNodeApi_AkkaAddress, No
   id: ID
 }
 
-input ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_NodeTemplate_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_delete_Input {
-  # The object's id
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_update_Input {
-  # The object's id
-  id: Int
-
-  # The object's data
-  newNode: ClusterKitNodeApi_NodeTemplate_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_NugetFeed_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_delete_Input {
-  # The object's id
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update_Input {
-  # The object's id
-  id: Int
-
-  # The object's data
-  newNode: ClusterKitNodeApi_NugetFeed_Input
-  clientMutationId: String
-}
-
 input ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input {
   id: Int
   clientMutationId: String
@@ -703,10 +661,6 @@ input ClusterKitNodeApi_clusterKitNodesApi_releases_updateCluster_Input {
   clientMutationId: String
 }
 
-input ClusterKitNodeApi_clusterKitNodesApi_reloadPackages_Input {
-  clientMutationId: String
-}
-
 input ClusterKitNodeApi_clusterKitNodesApi_roles_create_Input {
   # The object's data
   newNode: ClusterKitNodeApi_Role_Input
@@ -731,27 +685,6 @@ input ClusterKitNodeApi_clusterKitNodesApi_roles_update_Input {
 input ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser_Input {
   userUid: Uid
   roleUid: Uid
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_SeedAddress_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete_Input {
-  # The object's id
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_update_Input {
-  # The object's id
-  id: Int
-
-  # The object's data
-  newNode: ClusterKitNodeApi_SeedAddress_Input
   clientMutationId: String
 }
 
@@ -1243,9 +1176,6 @@ type ClusterKitNodeApi_NodeDescription implements IClusterKitNodeApi_NodeDescrip
   # the list of roles, where current node is leader
   leaderInRoles: [String]
 
-  # The list of descriptions of installed modules
-  modules(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackageFamily_Connection
-
   # The node's address
   nodeAddress: ClusterKitNodeApi_AkkaAddress
 
@@ -1257,9 +1187,6 @@ type ClusterKitNodeApi_NodeDescription implements IClusterKitNodeApi_NodeDescrip
 
   # the installed release id
   releaseId: Int
-
-  # current node template version
-  nodeTemplateVersion: Int
 
   # the list of cluster roles
   roles: [String]
@@ -1462,24 +1389,6 @@ input ClusterKitNodeApi_NodeDescription_Filter_Input {
   # releaseId is greater then or equal to the parameter, releaseId: the installed release id
   releaseId_gte: Int
 
-  # nodeTemplateVersion exactly equals to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion: Int
-
-  # nodeTemplateVersion not equals to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_not: Int
-
-  # nodeTemplateVersion is less then the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_lt: Int
-
-  # nodeTemplateVersion is less then or equal to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_lte: Int
-
-  # nodeTemplateVersion is greater then the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_gt: Int
-
-  # nodeTemplateVersion is greater then or equal to the parameter, nodeTemplateVersion: current node template version
-  nodeTemplateVersion_gte: Int
-
   # startTimeStamp exactly equals to the parameter, startTimeStamp: node start time
   startTimeStamp: Int
 
@@ -1514,427 +1423,8 @@ enum ClusterKitNodeApi_NodeDescription_Sort {
   nodeTemplate_desc
   releaseId_asc
   releaseId_desc
-  nodeTemplateVersion_asc
-  nodeTemplateVersion_desc
   startTimeStamp_asc
   startTimeStamp_desc
-}
-
-# Node template description
-type ClusterKitNodeApi_NodeTemplate implements IClusterKitNodeApi_NodeTemplate, Node {
-  # The program readable node template name
-  code: String
-
-  # The akka configuration template for node
-  configuration: String
-
-  # The list of container types to install node templates
-  containerTypes: [String]
-
-  # The unique template identification number
-  __id: Int
-
-  # The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances: Int
-
-  # The minimum number of working node type required for cluster to work
-  minimumRequiredInstances: Int
-
-  # The human readable node template name
-  name: String
-
-  # The list of nuget packages to install (along with there dependencies)
-  packages: [String]
-
-  # The priority weight for service, when deciding witch template should be brought up
-  priority: Float
-
-  # The template version
-  version: Int
-  id: ID
-}
-
-# The list of connected ClusterKitNodeApi_NodeTemplate
-#  Node template description
-type ClusterKitNodeApi_NodeTemplate_Connection implements IClusterKitNodeApi_NodeTemplate_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_NodeTemplate_Edge]
-}
-
-# The ClusterKitNodeApi_NodeTemplate in a connected list
-#  Node template description
-type ClusterKitNodeApi_NodeTemplate_Edge implements IClusterKitNodeApi_NodeTemplate_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # Node template description
-  node: ClusterKitNodeApi_NodeTemplate
-}
-
-input ClusterKitNodeApi_NodeTemplate_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_NodeTemplate_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_NodeTemplate_Filter_Input
-
-  # code exactly equals to the parameter, code: The program readable node template name
-  code: String
-
-  # code not equals to the parameter, code: The program readable node template name
-  code_not: String
-
-  # code is a substring of the parameter, code: The program readable node template name
-  code_in: String
-
-  # code is not a substring of the parameter, code: The program readable node template name
-  code_not_in: String
-
-  # code contains the parameter as substring, code: The program readable node template name
-  code_contains: String
-
-  # code doesn't contain the parameter as substring, code: The program readable node template name
-  code_not_contains: String
-
-  # code starts with the parameter value, code: The program readable node template name
-  code_starts_with: String
-
-  # code doesn't start with the parameter value, code: The program readable node template name
-  code_not_starts_with: String
-
-  # code ends with the parameter value, code: The program readable node template name
-  code_ends_with: String
-
-  # code doesn't end with the parameter value, code: The program readable node template name
-  code_not_ends_with: String
-
-  # code lowercased equals the parameter, code: The program readable node template name
-  code_l: String
-
-  # code lowercased doesn't equal the parameter, code: The program readable node template name
-  code_l_not: String
-
-  # code lowercased is a substring of the parameter, code: The program readable node template name
-  code_l_in: String
-
-  # code lowercased is not a substring of the parameter, code: The program readable node template name
-  code_l_not_in: String
-
-  # code lowercased contains the parameter as substring, code: The program readable node template name
-  code_l_contains: String
-
-  # code lowercased doesn't contain the parameter as substring, code: The program readable node template name
-  code_l_not_contains: String
-
-  # code lowercased starts with the parameter value, code: The program readable node template name
-  code_l_starts_with: String
-
-  # code lowercased doesn't start with the parameter value, code: The program readable node template name
-  code_l_not_starts_with: String
-
-  # code lowercased ends with the parameter value, code: The program readable node template name
-  code_l_ends_with: String
-
-  # code lowercased doesn't end with the parameter value, code: The program readable node template name
-  code_l_not_ends_with: String
-
-  # configuration exactly equals to the parameter, configuration: The akka configuration template for node
-  configuration: String
-
-  # configuration not equals to the parameter, configuration: The akka configuration template for node
-  configuration_not: String
-
-  # configuration is a substring of the parameter, configuration: The akka configuration template for node
-  configuration_in: String
-
-  # configuration is not a substring of the parameter, configuration: The akka configuration template for node
-  configuration_not_in: String
-
-  # configuration contains the parameter as substring, configuration: The akka configuration template for node
-  configuration_contains: String
-
-  # configuration doesn't contain the parameter as substring, configuration: The akka configuration template for node
-  configuration_not_contains: String
-
-  # configuration starts with the parameter value, configuration: The akka configuration template for node
-  configuration_starts_with: String
-
-  # configuration doesn't start with the parameter value, configuration: The akka configuration template for node
-  configuration_not_starts_with: String
-
-  # configuration ends with the parameter value, configuration: The akka configuration template for node
-  configuration_ends_with: String
-
-  # configuration doesn't end with the parameter value, configuration: The akka configuration template for node
-  configuration_not_ends_with: String
-
-  # configuration lowercased equals the parameter, configuration: The akka configuration template for node
-  configuration_l: String
-
-  # configuration lowercased doesn't equal the parameter, configuration: The akka configuration template for node
-  configuration_l_not: String
-
-  # configuration lowercased is a substring of the parameter, configuration: The akka configuration template for node
-  configuration_l_in: String
-
-  # configuration lowercased is not a substring of the parameter, configuration: The akka configuration template for node
-  configuration_l_not_in: String
-
-  # configuration lowercased contains the parameter as substring, configuration: The akka configuration template for node
-  configuration_l_contains: String
-
-  # configuration lowercased doesn't contain the parameter as substring,
-  # configuration: The akka configuration template for node
-  configuration_l_not_contains: String
-
-  # configuration lowercased starts with the parameter value, configuration: The akka configuration template for node
-  configuration_l_starts_with: String
-
-  # configuration lowercased doesn't start with the parameter value, configuration: The akka configuration template for node
-  configuration_l_not_starts_with: String
-
-  # configuration lowercased ends with the parameter value, configuration: The akka configuration template for node
-  configuration_l_ends_with: String
-
-  # configuration lowercased doesn't end with the parameter value, configuration: The akka configuration template for node
-  configuration_l_not_ends_with: String
-
-  # id exactly equals to the parameter, id: The unique template identification number
-  id: Int
-
-  # id not equals to the parameter, id: The unique template identification number
-  id_not: Int
-
-  # id is less then the parameter, id: The unique template identification number
-  id_lt: Int
-
-  # id is less then or equal to the parameter, id: The unique template identification number
-  id_lte: Int
-
-  # id is greater then the parameter, id: The unique template identification number
-  id_gt: Int
-
-  # id is greater then or equal to the parameter, id: The unique template identification number
-  id_gte: Int
-
-  # maximumNeededInstances exactly equals to the parameter,
-  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances: Int
-
-  # maximumNeededInstances not equals to the parameter, maximumNeededInstances:
-  # The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances_not: Int
-
-  # maximumNeededInstances is less then the parameter, maximumNeededInstances: The
-  # maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances_lt: Int
-
-  # maximumNeededInstances is less then or equal to the parameter,
-  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances_lte: Int
-
-  # maximumNeededInstances is greater then the parameter, maximumNeededInstances:
-  # The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances_gt: Int
-
-  # maximumNeededInstances is greater then or equal to the parameter,
-  # maximumNeededInstances: The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances_gte: Int
-
-  # minimumRequiredInstances exactly equals to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
-  minimumRequiredInstances: Int
-
-  # minimumRequiredInstances not equals to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
-  minimumRequiredInstances_not: Int
-
-  # minimumRequiredInstances is less then the parameter, minimumRequiredInstances:
-  # The minimum number of working node type required for cluster to work
-  minimumRequiredInstances_lt: Int
-
-  # minimumRequiredInstances is less then or equal to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
-  minimumRequiredInstances_lte: Int
-
-  # minimumRequiredInstances is greater then the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
-  minimumRequiredInstances_gt: Int
-
-  # minimumRequiredInstances is greater then or equal to the parameter,
-  # minimumRequiredInstances: The minimum number of working node type required for
-  # cluster to work
-  minimumRequiredInstances_gte: Int
-
-  # name exactly equals to the parameter, name: The human readable node template name
-  name: String
-
-  # name not equals to the parameter, name: The human readable node template name
-  name_not: String
-
-  # name is a substring of the parameter, name: The human readable node template name
-  name_in: String
-
-  # name is not a substring of the parameter, name: The human readable node template name
-  name_not_in: String
-
-  # name contains the parameter as substring, name: The human readable node template name
-  name_contains: String
-
-  # name doesn't contain the parameter as substring, name: The human readable node template name
-  name_not_contains: String
-
-  # name starts with the parameter value, name: The human readable node template name
-  name_starts_with: String
-
-  # name doesn't start with the parameter value, name: The human readable node template name
-  name_not_starts_with: String
-
-  # name ends with the parameter value, name: The human readable node template name
-  name_ends_with: String
-
-  # name doesn't end with the parameter value, name: The human readable node template name
-  name_not_ends_with: String
-
-  # name lowercased equals the parameter, name: The human readable node template name
-  name_l: String
-
-  # name lowercased doesn't equal the parameter, name: The human readable node template name
-  name_l_not: String
-
-  # name lowercased is a substring of the parameter, name: The human readable node template name
-  name_l_in: String
-
-  # name lowercased is not a substring of the parameter, name: The human readable node template name
-  name_l_not_in: String
-
-  # name lowercased contains the parameter as substring, name: The human readable node template name
-  name_l_contains: String
-
-  # name lowercased doesn't contain the parameter as substring, name: The human readable node template name
-  name_l_not_contains: String
-
-  # name lowercased starts with the parameter value, name: The human readable node template name
-  name_l_starts_with: String
-
-  # name lowercased doesn't start with the parameter value, name: The human readable node template name
-  name_l_not_starts_with: String
-
-  # name lowercased ends with the parameter value, name: The human readable node template name
-  name_l_ends_with: String
-
-  # name lowercased doesn't end with the parameter value, name: The human readable node template name
-  name_l_not_ends_with: String
-
-  # priority exactly equals to the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
-  priority: Float
-
-  # priority not equals to the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
-  priority_not: Float
-
-  # priority is less then the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
-  priority_lt: Float
-
-  # priority is less then or equal to the parameter, priority: The priority weight
-  # for service, when deciding witch template should be brought up
-  priority_lte: Float
-
-  # priority is greater then the parameter, priority: The priority weight for
-  # service, when deciding witch template should be brought up
-  priority_gt: Float
-
-  # priority is greater then or equal to the parameter, priority: The priority
-  # weight for service, when deciding witch template should be brought up
-  priority_gte: Float
-
-  # version exactly equals to the parameter, version: The template version
-  version: Int
-
-  # version not equals to the parameter, version: The template version
-  version_not: Int
-
-  # version is less then the parameter, version: The template version
-  version_lt: Int
-
-  # version is less then or equal to the parameter, version: The template version
-  version_lte: Int
-
-  # version is greater then the parameter, version: The template version
-  version_gt: Int
-
-  # version is greater then or equal to the parameter, version: The template version
-  version_gte: Int
-}
-
-# Node template description
-input ClusterKitNodeApi_NodeTemplate_Input {
-  # The program readable node template name
-  code: String
-
-  # The akka configuration template for node
-  configuration: String
-
-  # The list of container types to install node templates
-  containerTypes: [String]
-
-  # The unique template identification number
-  id: Int
-
-  # The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances: Int
-
-  # The minimum number of working node type required for cluster to work
-  minimumRequiredInstances: Int
-
-  # The human readable node template name
-  name: String
-
-  # The list of nuget packages to install (along with there dependencies)
-  packages: [String]
-
-  # The priority weight for service, when deciding witch template should be brought up
-  priority: Float
-
-  # The template version
-  version: Int
-}
-
-type ClusterKitNodeApi_NodeTemplate_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_NodeTemplate
-  edge: ClusterKitNodeApi_NodeTemplate_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
-}
-
-enum ClusterKitNodeApi_NodeTemplate_Sort {
-  code_asc
-  code_desc
-  configuration_asc
-  configuration_desc
-  id_asc
-  id_desc
-  maximumNeededInstances_asc
-  maximumNeededInstances_desc
-  minimumRequiredInstances_asc
-  minimumRequiredInstances_desc
-  name_asc
-  name_desc
-  priority_asc
-  priority_desc
-  version_asc
-  version_desc
 }
 
 # The link to the nuget feed to download updates
@@ -2204,15 +1694,6 @@ input ClusterKitNodeApi_NugetFeed_Input {
 
   # The username for basic authentication
   userName: String
-}
-
-type ClusterKitNodeApi_NugetFeed_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_NugetFeed
-  edge: ClusterKitNodeApi_NugetFeed_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
 enum ClusterKitNodeApi_NugetFeed_Sort {
@@ -3493,17 +2974,8 @@ type ClusterKitNodeApi_Root implements IClusterKitNodeApi_Root, Node {
   # The list of known active nodes
   getActiveNodeDescriptions(filter: ClusterKitNodeApi_NodeDescription_Filter_Input, sort: [ClusterKitNodeApi_NodeDescription_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_NodeDescription_Connection
 
-  # The list of available packages from local cluster repository
-  getPackages(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetPackageFamily_Connection
-
   # Current cluster node template usage for debug purposes
   getTemplateStatistics: ClusterKitNodeApi_TemplatesStatistics
-
-  # Node templates
-  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NodeTemplate_Connection
-
-  # Node templates
-  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NugetFeed_Connection
 
   # ClusterKit managing system security roles
   releases(filter: ClusterKitNodeApi_Release_Filter_Input, sort: [ClusterKitNodeApi_Release_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_Release_Connection
@@ -3511,153 +2983,9 @@ type ClusterKitNodeApi_Root implements IClusterKitNodeApi_Root, Node {
   # ClusterKit managing system security roles
   roles(filter: ClusterKitNodeApi_Role_Filter_Input, sort: [ClusterKitNodeApi_Role_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_Role_Connection
 
-  # Node templates
-  seedAddresses(filter: ClusterKitNodeApi_SeedAddress_Filter_Input, sort: [ClusterKitNodeApi_SeedAddress_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_SeedAddress_Connection
-
   # ClusterKit managing system users
   users(filter: ClusterKitNodeApi_User_Filter_Input, sort: [ClusterKitNodeApi_User_Sort], id: Uid, offset: Int, limit: Int): ClusterKitNodeApi_User_Connection
   id: ID
-}
-
-# The address of fixed cluster seed for new node configuration
-type ClusterKitNodeApi_SeedAddress implements IClusterKitNodeApi_SeedAddress, Node {
-  # The seed address in format of akka url
-  address: String
-
-  # The unique address identification number
-  __id: Int
-  id: ID
-}
-
-# The list of connected ClusterKitNodeApi_SeedAddress
-#  The address of fixed cluster seed for new node configuration
-type ClusterKitNodeApi_SeedAddress_Connection implements IClusterKitNodeApi_SeedAddress_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_SeedAddress_Edge]
-}
-
-# The ClusterKitNodeApi_SeedAddress in a connected list
-#  The address of fixed cluster seed for new node configuration
-type ClusterKitNodeApi_SeedAddress_Edge implements IClusterKitNodeApi_SeedAddress_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # The address of fixed cluster seed for new node configuration
-  node: ClusterKitNodeApi_SeedAddress
-}
-
-input ClusterKitNodeApi_SeedAddress_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_SeedAddress_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_SeedAddress_Filter_Input
-
-  # address exactly equals to the parameter, address: The seed address in format of akka url
-  address: String
-
-  # address not equals to the parameter, address: The seed address in format of akka url
-  address_not: String
-
-  # address is a substring of the parameter, address: The seed address in format of akka url
-  address_in: String
-
-  # address is not a substring of the parameter, address: The seed address in format of akka url
-  address_not_in: String
-
-  # address contains the parameter as substring, address: The seed address in format of akka url
-  address_contains: String
-
-  # address doesn't contain the parameter as substring, address: The seed address in format of akka url
-  address_not_contains: String
-
-  # address starts with the parameter value, address: The seed address in format of akka url
-  address_starts_with: String
-
-  # address doesn't start with the parameter value, address: The seed address in format of akka url
-  address_not_starts_with: String
-
-  # address ends with the parameter value, address: The seed address in format of akka url
-  address_ends_with: String
-
-  # address doesn't end with the parameter value, address: The seed address in format of akka url
-  address_not_ends_with: String
-
-  # address lowercased equals the parameter, address: The seed address in format of akka url
-  address_l: String
-
-  # address lowercased doesn't equal the parameter, address: The seed address in format of akka url
-  address_l_not: String
-
-  # address lowercased is a substring of the parameter, address: The seed address in format of akka url
-  address_l_in: String
-
-  # address lowercased is not a substring of the parameter, address: The seed address in format of akka url
-  address_l_not_in: String
-
-  # address lowercased contains the parameter as substring, address: The seed address in format of akka url
-  address_l_contains: String
-
-  # address lowercased doesn't contain the parameter as substring, address: The seed address in format of akka url
-  address_l_not_contains: String
-
-  # address lowercased starts with the parameter value, address: The seed address in format of akka url
-  address_l_starts_with: String
-
-  # address lowercased doesn't start with the parameter value, address: The seed address in format of akka url
-  address_l_not_starts_with: String
-
-  # address lowercased ends with the parameter value, address: The seed address in format of akka url
-  address_l_ends_with: String
-
-  # address lowercased doesn't end with the parameter value, address: The seed address in format of akka url
-  address_l_not_ends_with: String
-
-  # id exactly equals to the parameter, id: The unique address identification number
-  id: Int
-
-  # id not equals to the parameter, id: The unique address identification number
-  id_not: Int
-
-  # id is less then the parameter, id: The unique address identification number
-  id_lt: Int
-
-  # id is less then or equal to the parameter, id: The unique address identification number
-  id_lte: Int
-
-  # id is greater then the parameter, id: The unique address identification number
-  id_gt: Int
-
-  # id is greater then or equal to the parameter, id: The unique address identification number
-  id_gte: Int
-}
-
-# The address of fixed cluster seed for new node configuration
-input ClusterKitNodeApi_SeedAddress_Input {
-  # The seed address in format of akka url
-  address: String
-
-  # The unique address identification number
-  id: Int
-}
-
-type ClusterKitNodeApi_SeedAddress_NodeMutationPayload {
-  deletedId: ID
-  node: ClusterKitNodeApi_SeedAddress
-  edge: ClusterKitNodeApi_SeedAddress_Edge
-  errors: ClusterKitNodeApi_ErrorDescription_Connection
-  clientMutationId: String
-  api: ClusterKitMonitoring_ClusterKitNodeApi
-}
-
-enum ClusterKitNodeApi_SeedAddress_Sort {
-  address_asc
-  address_desc
-  id_asc
-  id_desc
 }
 
 # Node template description
@@ -4895,9 +4223,6 @@ interface IClusterKitNodeApi_NodeDescription {
   # the list of roles, where current node is leader
   leaderInRoles: [String]
 
-  # The list of descriptions of installed modules
-  modules(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackageFamily_Connection
-
   # The node's address
   nodeAddress: IClusterKitNodeApi_AkkaAddress
 
@@ -4909,9 +4234,6 @@ interface IClusterKitNodeApi_NodeDescription {
 
   # the installed release id
   releaseId: Int
-
-  # current node template version
-  nodeTemplateVersion: Int
 
   # the list of cluster roles
   roles: [String]
@@ -4936,59 +4258,6 @@ interface IClusterKitNodeApi_NodeDescription_Edge {
   # A value to use with paging positioning
   cursor: String
   node: IClusterKitNodeApi_NodeDescription
-}
-
-# Node template description
-interface IClusterKitNodeApi_NodeTemplate {
-  id: ID
-
-  # The program readable node template name
-  code: String
-
-  # The akka configuration template for node
-  configuration: String
-
-  # The list of container types to install node templates
-  containerTypes: [String]
-
-  # The unique template identification number
-  __id: Int
-
-  # The maximum number of working nodes that is reasonable for cluster
-  maximumNeededInstances: Int
-
-  # The minimum number of working node type required for cluster to work
-  minimumRequiredInstances: Int
-
-  # The human readable node template name
-  name: String
-
-  # The list of nuget packages to install (along with there dependencies)
-  packages: [String]
-
-  # The priority weight for service, when deciding witch template should be brought up
-  priority: Float
-
-  # The template version
-  version: Int
-}
-
-# The list of connected ClusterKitNodeApi_NodeTemplate
-#  Node template description
-interface IClusterKitNodeApi_NodeTemplate_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_NodeTemplate_Edge]
-}
-
-# The ClusterKitNodeApi_NodeTemplate in a connected list
-#  Node template description
-interface IClusterKitNodeApi_NodeTemplate_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_NodeTemplate
 }
 
 # The link to the nuget feed to download updates
@@ -5275,17 +4544,8 @@ interface IClusterKitNodeApi_Root {
   # The list of known active nodes
   getActiveNodeDescriptions(filter: ClusterKitNodeApi_NodeDescription_Filter_Input, sort: [ClusterKitNodeApi_NodeDescription_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_NodeDescription_Connection
 
-  # The list of available packages from local cluster repository
-  getPackages(filter: ClusterKitNodeApi_NugetPackageFamily_Filter_Input, sort: [ClusterKitNodeApi_NugetPackageFamily_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetPackageFamily_Connection
-
   # Current cluster node template usage for debug purposes
   getTemplateStatistics: IClusterKitNodeApi_TemplatesStatistics
-
-  # Node templates
-  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NodeTemplate_Connection
-
-  # Node templates
-  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NugetFeed_Connection
 
   # ClusterKit managing system security roles
   releases(filter: ClusterKitNodeApi_Release_Filter_Input, sort: [ClusterKitNodeApi_Release_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_Release_Connection
@@ -5293,40 +4553,8 @@ interface IClusterKitNodeApi_Root {
   # ClusterKit managing system security roles
   roles(filter: ClusterKitNodeApi_Role_Filter_Input, sort: [ClusterKitNodeApi_Role_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_Role_Connection
 
-  # Node templates
-  seedAddresses(filter: ClusterKitNodeApi_SeedAddress_Filter_Input, sort: [ClusterKitNodeApi_SeedAddress_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_SeedAddress_Connection
-
   # ClusterKit managing system users
   users(filter: ClusterKitNodeApi_User_Filter_Input, sort: [ClusterKitNodeApi_User_Sort], id: Uid, offset: Int, limit: Int): IClusterKitNodeApi_User_Connection
-}
-
-# The address of fixed cluster seed for new node configuration
-interface IClusterKitNodeApi_SeedAddress {
-  id: ID
-
-  # The seed address in format of akka url
-  address: String
-
-  # The unique address identification number
-  __id: Int
-}
-
-# The list of connected ClusterKitNodeApi_SeedAddress
-#  The address of fixed cluster seed for new node configuration
-interface IClusterKitNodeApi_SeedAddress_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_SeedAddress_Edge]
-}
-
-# The ClusterKitNodeApi_SeedAddress in a connected list
-#  The address of fixed cluster seed for new node configuration
-interface IClusterKitNodeApi_SeedAddress_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_SeedAddress
 }
 
 # Node template description
@@ -5486,29 +4714,8 @@ type Mutations {
   # Initiates the new actor system scan
   ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan(input: ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input): Boolean_MutationPayload
 
-  # Request to server to reload package list
-  ClusterKitNodeApi_clusterKitNodesApi_reloadPackages(input: ClusterKitNodeApi_clusterKitNodesApi_reloadPackages_Input): ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload
-
   # Manual node reboot request
   ClusterKitNodeApi_clusterKitNodesApi_upgradeNode(input: ClusterKitNodeApi_clusterKitNodesApi_upgradeNode_Input): ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload
-
-  # Creates the new node template
-  ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_create(input: ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_create_Input): ClusterKitNodeApi_NodeTemplate_NodeMutationPayload
-
-  # Creates the new node template
-  ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_update(input: ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_update_Input): ClusterKitNodeApi_NodeTemplate_NodeMutationPayload
-
-  # Creates the new node template
-  ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_delete(input: ClusterKitNodeApi_clusterKitNodesApi_nodeTemplates_delete_Input): ClusterKitNodeApi_NodeTemplate_NodeMutationPayload
-
-  # Creates the new nuget feed link
-  ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_create(input: ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_create_Input): ClusterKitNodeApi_NugetFeed_NodeMutationPayload
-
-  # Creates the new nuget feed link
-  ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update(input: ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_update_Input): ClusterKitNodeApi_NugetFeed_NodeMutationPayload
-
-  # Creates the new nuget feed link
-  ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_delete(input: ClusterKitNodeApi_clusterKitNodesApi_nugetFeeds_delete_Input): ClusterKitNodeApi_NugetFeed_NodeMutationPayload
 
   # Initiates cluster upgrade procedure. The previous active release will be marked as failed
   ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster(input: ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster_Input): ClusterKitNodeApi_Release_NodeMutationPayload
@@ -5548,15 +4755,6 @@ type Mutations {
 
   # Creates the new managing system role
   ClusterKitNodeApi_clusterKitNodesApi_roles_update(input: ClusterKitNodeApi_clusterKitNodesApi_roles_update_Input): ClusterKitNodeApi_Role_NodeMutationPayload
-
-  # Creates the new seed address
-  ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_create(input: ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_create_Input): ClusterKitNodeApi_SeedAddress_NodeMutationPayload
-
-  # Creates the new seed address
-  ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_update(input: ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_update_Input): ClusterKitNodeApi_SeedAddress_NodeMutationPayload
-
-  # Creates the new seed address
-  ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete(input: ClusterKitNodeApi_clusterKitNodesApi_seedAddresses_delete_Input): ClusterKitNodeApi_SeedAddress_NodeMutationPayload
 
   # Resets the user password
   ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword(input: ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword_Input): ClusterKitNodeApi_User_NodeMutationPayload

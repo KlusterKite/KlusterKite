@@ -3,7 +3,7 @@ import { browserHistory } from 'react-router'
 
 import Storage from '../../utils/ttl-storage';
 
-import AuthForm from '../../components/AuthForm';
+import AuthForm from '../../components/AuthForm/AuthForm';
 
 export default class AuthPage extends React.Component {
   constructor(props) {

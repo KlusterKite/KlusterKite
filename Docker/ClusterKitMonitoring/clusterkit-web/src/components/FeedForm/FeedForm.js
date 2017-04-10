@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input, RadioGroup } from 'formsy-react-components';
 
-import Form from '../Form/index';
+import Form from '../Form/Form';
 
 export default class FeedForm extends React.Component {
   constructor(props) {

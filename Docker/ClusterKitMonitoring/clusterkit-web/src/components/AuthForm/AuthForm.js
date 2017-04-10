@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from 'formsy-react-components';
 
-import Form from '../Form/index';
+import Form from '../Form/Form';
 
 import './styles.css';
 

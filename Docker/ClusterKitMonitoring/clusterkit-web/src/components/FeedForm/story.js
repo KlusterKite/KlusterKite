@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 // import StubContainer from 'react-storybooks-relay-container';
 
-import FeedForm from './index';
+import FeedForm from './FeedForm';
 
 storiesOf('Feeds')
   .add('edit', () => {
