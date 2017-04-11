@@ -30,6 +30,7 @@ export default class Form extends React.Component { // eslint-disable-line react
     buttonText: React.PropTypes.string,
     savedText: React.PropTypes.string,
     disabled: React.PropTypes.bool,
+    forbidEdit: React.PropTypes.bool
   };
 
   enableButton() {
@@ -45,19 +46,14 @@ export default class Form extends React.Component { // eslint-disable-line react
   }
 
   submit(model) {
-    this.props.onSubmit(model);
-  }
-
-  onKeyPress(event) {
-    if (event.which === 13 /* Enter */) {
-      event.preventDefault();
+    if (!this.props.forbidEdit) {
+      this.props.onSubmit(model);
     }
   }
 
   render() {
     return (
       <FormsyForm
-        onKeyPress={this.onKeyPress}
         onValidSubmit={this.submit}
         onValid={this.enableButton}
         onInvalid={this.disableButton}
@@ -65,19 +61,21 @@ export default class Form extends React.Component { // eslint-disable-line react
         validatePristine={true}
       >
         {this.props.children}
-        <Submit
-          canSubmit={this.state.canSubmit}
-          saving={this.props.saving}
-          deleting={this.props.deleting}
-          saved={this.props.saved}
-          disabled={this.props.disabled}
-          saveError={this.props.saveError}
-          saveErrors={this.props.saveErrors}
-          buttonText={this.props.buttonText}
-          savedText={this.props.savedText}
-          onDelete={this.props.onDelete}
-          onCancel={this.props.onCancel}
-        />
+        {!this.props.forbidEdit &&
+          <Submit
+            canSubmit={this.state.canSubmit}
+            saving={this.props.saving}
+            deleting={this.props.deleting}
+            saved={this.props.saved}
+            disabled={this.props.disabled}
+            saveError={this.props.saveError}
+            saveErrors={this.props.saveErrors}
+            buttonText={this.props.buttonText}
+            savedText={this.props.savedText}
+            onDelete={this.props.onDelete}
+            onCancel={this.props.onCancel}
+          />
+        }
       </FormsyForm>
     );
   }

@@ -13,8 +13,9 @@ export class PackagesList extends React.Component { // eslint-disable-line react
 
     return (
       <div>
-        <h3>Packages list</h3>
         {packages && packages.length > 0 &&
+          <div>
+          <h3>Packages list</h3>
           <table className="table table-hover">
             <thead>
             <tr>
@@ -36,6 +37,7 @@ export class PackagesList extends React.Component { // eslint-disable-line react
             }
             </tbody>
           </table>
+          </div>
         }
       </div>
     );

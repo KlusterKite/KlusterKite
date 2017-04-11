@@ -15,6 +15,7 @@ class TemplatesList extends React.Component {
     configuration: React.PropTypes.object,
     createNodeTemplatePrivilege: React.PropTypes.bool.isRequired,
     getNodeTemplatePrivilege: React.PropTypes.bool.isRequired,
+    canEdit: React.PropTypes.bool
   };
 
   render() {
@@ -23,7 +24,7 @@ class TemplatesList extends React.Component {
     return (
       <div>
         <h3>Templates list</h3>
-        {this.props.createNodeTemplatePrivilege &&
+        {this.props.canEdit &&
           <Link to={`/clusterkit/Templates/${this.props.releaseId}/create`} className="btn btn-primary" role="button">Add a new template</Link>
         }
         {templates && templates.length > 0 &&
@@ -42,12 +43,12 @@ class TemplatesList extends React.Component {
           {templates.map((item) =>
             <tr key={item.node.id}>
               <td>
-                {this.props.getNodeTemplatePrivilege &&
+                {this.props.canEdit &&
                 <Link to={`/clusterkit/Templates/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
                   {item.node.code}
                 </Link>
                 }
-                {false && this.props.getNodeTemplatePrivilege &&
+                {false && this.props.canEdit &&
                 <a onClick={() => this.showEditForm(item.node)} className="pointer">
                   {item.node.code}
                 </a>

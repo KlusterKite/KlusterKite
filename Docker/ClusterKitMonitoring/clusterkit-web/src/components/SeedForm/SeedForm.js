@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Textarea } from 'formsy-react-components';
+import { Textarea } from 'formsy-react-components';
 
 import Form from '../Form/Form';
 
@@ -22,7 +22,7 @@ export default class SeedForm extends React.Component {
   };
 
   submit(model) {
-    // model.Type = Number.parseInt(model.Type);
+    model.seedAddresses = model.seedAddresses.split('\n');
     this.props.onSubmit(model);
   }
 
@@ -46,7 +46,7 @@ export default class SeedForm extends React.Component {
           saveErrors={this.props.saveErrors}
         >
           <fieldset>
-            <Textarea name="seedAddresses" label="Seed Addresses" value={initialValues || ""} rows={6} />
+            <Textarea name="seedAddresses" label="Seed Addresses" value={(initialValues && initialValues.join('\n')) || ""} rows={6} />
           </fieldset>
         </Form>
       </div>

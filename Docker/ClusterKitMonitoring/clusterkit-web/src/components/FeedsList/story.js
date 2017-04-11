@@ -9,6 +9,7 @@ storiesOf('Feeds')
     const nodes = getFeedsListRelay();
     const props = {
       configuration: nodes.data.api.nodeManagerData,
+      canEdit: true
     };
     return <StubContainer Component={FeedList} props={props} />;
   })

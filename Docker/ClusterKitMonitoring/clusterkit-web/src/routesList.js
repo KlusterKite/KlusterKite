@@ -32,7 +32,7 @@ export default class RoutesList extends React.Component {
           <Route path='/clusterkit/Login' component={AuthPage} />
           <Route path='/clusterkit/Logout' component={LogoutPage} />
           <Route path='/clusterkit/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
-          <Route path='/clusterkit/CopyConfig/:releaseId' component={ReleaseConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ReleaseConfigCopyPage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/CopyConfig/:releaseId/:mode' component={ReleaseConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ReleaseConfigCopyPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/GraphQL' component={GraphQLPage} />
           <Route path='/clusterkit/NugetFeeds/:releaseId/create' component={FeedPage} queries={ApiQueries} />
           <Route path='/clusterkit/NugetFeeds/:releaseId/:id' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />

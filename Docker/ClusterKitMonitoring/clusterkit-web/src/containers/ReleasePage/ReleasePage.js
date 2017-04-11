@@ -144,24 +144,29 @@ class ReleasePage extends React.Component {
 
   render () {
     const model = this.props.api.release;
+    const canEdit = !model || model.state === 'Draft';
     return (
       <div>
         <ReleaseForm
           onSubmit={this.onSubmit}
-          onDelete={this.onDelete}
+//          onDelete={this.onDelete}
           initialValues={model}
           saving={this.state.saving}
           saveErrors={this.state.saveErrors}
+          canEdit={canEdit}
         />
         {model &&
         <div>
           <ReleaseOperations
+            configuration={model.configuration}
             releaseId={this.props.params.id}
             releaseInnerId={model.__id}
+            currentState={model.state}
           />
           <FeedsList
             configuration={model.configuration}
             releaseId={this.props.params.id}
+            canEdit={canEdit}
           />
           <TemplatesList
             configuration={model.configuration}
@@ -169,10 +174,12 @@ class ReleasePage extends React.Component {
             createNodeTemplatePrivilege={true}
             getNodeTemplatePrivilege={true}
             releaseId={this.props.params.id}
+            canEdit={canEdit}
           />
           <SeedsList
             configuration={model.configuration}
             releaseId={this.props.params.id}
+            canEdit={canEdit}
           />
           <PackagesList
             configuration={model.configuration}
@@ -212,6 +219,7 @@ export default Relay.createContainer(
                 ${TemplatesList.getFragment('configuration')}
                 ${PackagesList.getFragment('configuration')}
                 ${SeedsList.getFragment('configuration')}
+                ${ReleaseOperations.getFragment('configuration')}
                 id
               }
             }

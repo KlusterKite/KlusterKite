@@ -13,6 +13,7 @@ class FeedList extends React.Component {
   static propTypes = {
     releaseId: React.PropTypes.string,
     configuration: React.PropTypes.object,
+    canEdit: React.PropTypes.bool
   };
 
   render() {
@@ -22,7 +23,10 @@ class FeedList extends React.Component {
       <div>
         <div>
           <h3>Nuget feeds list</h3>
-          <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}/create`} className="btn btn-primary" role="button">Add a new feed</Link>
+          {this.props.canEdit &&
+          <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}/create`} className="btn btn-primary" role="button">Add
+            a new feed</Link>
+          }
           {feeds && feeds.length > 0 &&
           <table className="table table-hover">
             <thead>
@@ -35,9 +39,14 @@ class FeedList extends React.Component {
             {feeds.map((item) =>
               <tr key={item.node.id || item.node.address}>
                 <td>
-                  <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
-                    {item.node.address}
-                  </Link>
+                  {this.props.canEdit &&
+                    <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
+                      {item.node.address}
+                    </Link>
+                  }
+                  {!this.props.canEdit &&
+                    <span>{item.node.address}</span>
+                  }
                 </td>
                 <td>
                   {item.node.type}

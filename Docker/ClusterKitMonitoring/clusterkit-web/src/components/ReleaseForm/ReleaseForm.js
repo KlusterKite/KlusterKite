@@ -18,6 +18,7 @@ export default class ReleaseForm extends React.Component {
     saved: React.PropTypes.bool,
     saveError: React.PropTypes.string,
     saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
+    canEdit: React.PropTypes.bool
   };
 
   submit(model) {
@@ -50,6 +51,7 @@ export default class ReleaseForm extends React.Component {
           saved={this.props.saved}
           saveError={this.props.saveError}
           saveErrors={this.props.saveErrors}
+          forbidEdit={!this.props.canEdit}
         >
           <fieldset>
             <Input name="__id" value={(initialValues && initialValues.__id) || ""} type="hidden" />

@@ -13,6 +13,7 @@ class SeedsList extends React.Component {
   static propTypes = {
     releaseId: React.PropTypes.string,
     configuration: React.PropTypes.object,
+    canEdit: React.PropTypes.bool
   };
 
   render() {
@@ -22,7 +23,10 @@ class SeedsList extends React.Component {
       <div>
         <div>
           <h3>Seed list</h3>
-          <Link to={`/clusterkit/Seeds/${this.props.releaseId}`} className="btn btn-primary" role="button">Add a new seed</Link>
+          {this.props.canEdit &&
+            <Link to={`/clusterkit/Seeds/${this.props.releaseId}`} className="btn btn-primary" role="button">Add a new
+              seed</Link>
+          }
           {seeds && seeds.length > 0 &&
           <table className="table table-hover">
             <thead>
@@ -34,9 +38,14 @@ class SeedsList extends React.Component {
             {seeds.map((item, index) =>
               <tr key={index}>
                 <td>
-                  <Link to={`/clusterkit/Seeds/${this.props.releaseId}`}>
-                    {item}
-                  </Link>
+                  {this.props.canEdit &&
+                    <Link to={`/clusterkit/Seeds/${this.props.releaseId}`}>
+                      {item}
+                    </Link>
+                  }
+                  {!this.props.canEdit &&
+                    <span>{item}</span>
+                  }
                 </td>
               </tr>
             )

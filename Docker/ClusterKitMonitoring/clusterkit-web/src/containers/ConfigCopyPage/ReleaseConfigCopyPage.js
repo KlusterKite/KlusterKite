@@ -23,9 +23,23 @@ class ReleaseConfigCopyPage extends React.Component {
     this.copyConfiguration();
   }
 
+  convertNameToId = (nugetPackages) => {
+    // Temporary hack while nugetPackages __id is incorrect
+    nugetPackages.edges.forEach((item => {
+      item.node.__id = item.node.name;
+      delete item.node.name;
+    }));
+
+    return nugetPackages;
+  };
+
   copyConfiguration = () => {
     if (this.props.api.clusterKitNodesApi.releases.edges && this.props.api.clusterKitNodesApi.releases.edges.length > 0){
-      const oldConfiguration = this.props.api.clusterKitNodesApi.releases.edges[0].node.configuration;
+      let oldConfiguration = this.props.api.clusterKitNodesApi.releases.edges[0].node.configuration;
+
+      if (this.props.params.mode === 'update') {
+        oldConfiguration.packages = this.convertNameToId(this.props.api.clusterKitNodesApi.nugetPackages);
+      }
 
       this.setState({
         processing: true
@@ -163,6 +177,15 @@ export default Relay.createContainer(
                     seedAddresses
                     id
                   }
+                }
+              }
+            }
+            nugetPackages {
+              edges {
+                node {
+                  __id
+                  name
+                  version
                 }
               }
             }

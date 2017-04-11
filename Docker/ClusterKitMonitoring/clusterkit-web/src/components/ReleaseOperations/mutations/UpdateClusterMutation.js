@@ -1,9 +1,9 @@
 import Relay from 'react-relay'
 
-export default class CheckReleaseMutation extends Relay.Mutation {
+export default class UpdateClusterMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_check}`
+    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_updateCluster}`
   }
 
   getFatQuery () {
@@ -34,29 +34,6 @@ export default class CheckReleaseMutation extends Relay.Mutation {
                 node {
                   field
                   message
-                }
-              }
-            }
-            node {
-              compatibleTemplates {
-                edges {
-                  node {
-                    templateCode
-                    releaseId
-                    compatibleReleaseId
-                  }
-                }
-              }
-            }
-            api {
-              clusterKitNodesApi {
-                getActiveNodeDescriptions {
-                  edges {
-                    node {
-                      nodeTemplate
-                      releaseId
-                    }
-                  }
                 }
               }
             }

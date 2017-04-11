@@ -44,7 +44,7 @@ class SeedPage extends React.Component {
           nodeId: this.props.params.releaseId,
           releaseId: this.props.api.release.__id,
           configuration: this.props.api.release.configuration,
-          seedAddresses: model
+          seedAddresses: model.seedAddresses
         }),
       {
         onSuccess: (response) => {
@@ -57,7 +57,8 @@ class SeedPage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
+            console.log('success');
+            // browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {

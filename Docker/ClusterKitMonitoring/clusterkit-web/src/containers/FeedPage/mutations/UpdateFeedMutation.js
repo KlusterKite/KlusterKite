@@ -154,7 +154,27 @@ export default class UpdateFeedMutation extends Relay.Mutation {
       nodes.push(this.props[typeSingular]);
     }
 
+    // seedAddresses are passed as an simple string array, without id's or anything
+    if (this.props[typeSingular] === 'seedAddresses') {
+      nodes = this.props[typeSingular];
+    }
+
     return nodes;
+  }
+
+  /**
+   * Checks if seed addresses are being updated and return old / updated list as needed
+   * @param seedAddresses {string[]} Seed addresses list
+   * @return {string[]} Updated seed addresses list
+   */
+  updateSeedAddresses(seedAddresses) {
+    console.log('old seedAddresses', seedAddresses);
+    console.log('new seedAddresses', this.props.seedAddresses);
+    if (this.props.seedAddresses) {
+      return this.props.seedAddresses;
+    }
+
+    return seedAddresses;
   }
 
   getVariables () {
@@ -166,7 +186,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
           nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
           nugetFeeds: this.convertEdgesToArray(this.props.configuration.nugetFeeds.edges, 'nugetFeeds'),
           packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
-          seedAddresses: this.props.configuration.seedAddresses
+          seedAddresses: this.updateSeedAddresses(this.props.configuration.seedAddresses),
         },
       }
     }
