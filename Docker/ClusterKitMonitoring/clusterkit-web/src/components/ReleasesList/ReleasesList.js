@@ -30,13 +30,16 @@ export class ReleasesList extends React.Component {
             <tr>
               <th>Name</th>
               <th>Created</th>
+              <th>Finished</th>
               <th>State</th>
+              <th>Stable?</th>
             </tr>
           </thead>
           <tbody>
           {edges && edges.map((edge) => {
             const node = edge.node;
             const dateCreated = new Date(node.created);
+            const dateFinished = node.finished ? new Date(node.finished) : null;
 
             return (
               <tr key={`${node.id}`}>
@@ -46,7 +49,9 @@ export class ReleasesList extends React.Component {
                   </Link>
                 </td>
                 <td>{DateFormat.formatDateTime(dateCreated)}</td>
+                <td>{dateFinished && DateFormat.formatDateTime(dateFinished)}</td>
                 <td>{node.state}</td>
+                <td>{node.isStable.toString()}</td>
               </tr>
             )
           })
@@ -64,7 +69,7 @@ export default Relay.createContainer(
   {
     fragments: {
       clusterKitNodesApi: () => Relay.QL`fragment on IClusterKitNodeApi_Root {
-        releases {
+        releases(sort: created_asc) {
           edges {
             node {
               id

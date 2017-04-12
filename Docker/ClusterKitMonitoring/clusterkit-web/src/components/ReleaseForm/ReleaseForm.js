@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, Textarea } from 'formsy-react-components';
 
 import Form from '../Form/Form';
+import Row from '../Form/Row';
 
 export default class ReleaseForm extends React.Component {
   constructor(props) {
@@ -57,20 +58,21 @@ export default class ReleaseForm extends React.Component {
             <Input name="__id" value={(initialValues && initialValues.__id) || ""} type="hidden" />
             <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />
             <Textarea name="notes" label="Notes" value={(initialValues && initialValues.notes) || ""} rows={3} />
-            <Input name="minorVersion" label="Minor version" value={(initialValues && initialValues.minorVersion.toString()) || ""}
-                   required
-                   validations={{isNumeric:true}}
-                   validationErrors={{isNumeric: 'You have to type a number'}}
-                   elementWrapperClassName="col-sm-2" />
             <Input name="majorVersion" label="Major version" value={(initialValues && initialValues.majorVersion.toString()) || ""}
                    required
                    validations={{isNumeric:true}}
                    validationErrors={{isNumeric: 'You have to type a number'}}
                    elementWrapperClassName="col-sm-2" />
+            <Input name="minorVersion" label="Minor version" value={(initialValues && initialValues.minorVersion.toString()) || ""}
+                   required
+                   validations={{isNumeric:true}}
+                   validationErrors={{isNumeric: 'You have to type a number'}}
+                   elementWrapperClassName="col-sm-2" />
+            <Row label="Is stable" text={(initialValues && initialValues.isStable.toString()) || "false"} />
+            <Row label="State" text={(initialValues && initialValues.state) || "Draft"} />
           </fieldset>
         </Form>
       </div>
     );
   }
 }
-

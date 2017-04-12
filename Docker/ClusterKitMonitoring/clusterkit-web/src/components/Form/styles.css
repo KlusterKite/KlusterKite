@@ -5,3 +5,16 @@
 .btn-margined {
   margin-left: 10px;
 }
+
+.row-text {
+  margin-top: 7px;
+  margin-bottom: 0;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.static-modal-center .modal-dialog {
+  margin-top: calc(50% - 200px);
+}

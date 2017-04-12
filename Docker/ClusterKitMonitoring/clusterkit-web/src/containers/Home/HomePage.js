@@ -4,7 +4,7 @@ import Relay from 'react-relay'
 import delay from 'lodash/delay'
 
 import ReloadPackages from '../../components/ReloadPackages/ReloadPackages';
-import NodesList from '../../components/NodesList/index';
+import NodesList from '../../components/NodesList/NodesList';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 
 import { hasPrivilege } from '../../utils/privileges';

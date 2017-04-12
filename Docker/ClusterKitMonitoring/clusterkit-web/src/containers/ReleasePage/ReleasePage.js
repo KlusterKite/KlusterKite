@@ -162,6 +162,8 @@ class ReleasePage extends React.Component {
             releaseId={this.props.params.id}
             releaseInnerId={model.__id}
             currentState={model.state}
+            onForceFetch={this.props.relay.forceFetch}
+            isStable={model.isStable}
           />
           <FeedsList
             configuration={model.configuration}
@@ -214,6 +216,7 @@ export default Relay.createContainer(
               minorVersion
               majorVersion
               state
+              isStable
               configuration {
                 ${FeedsList.getFragment('configuration')},
                 ${TemplatesList.getFragment('configuration')}
