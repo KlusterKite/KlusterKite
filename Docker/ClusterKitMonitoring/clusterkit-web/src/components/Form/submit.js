@@ -101,7 +101,7 @@ export default class Submit extends React.Component { // eslint-disable-line rea
             </button>
           }
 
-          <button type="submit" ref="submitButton" disabled={true} className="hidden">
+          <button type="submit" ref="submitButton" disabled={!this.props.submitOnEnter} className="hidden">
             Submit
           </button>
         </Row>

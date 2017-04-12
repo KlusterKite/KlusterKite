@@ -1432,9 +1432,6 @@ type ClusterKitNodeApi_NugetFeed implements IClusterKitNodeApi_NugetFeed, Node {
   # The seed url address
   address: String
 
-  # The unique address identification number
-  __id: Int
-
   # The user password for basic authentication
   password: String
 
@@ -1532,24 +1529,6 @@ input ClusterKitNodeApi_NugetFeed_Filter_Input {
 
   # address lowercased doesn't end with the parameter value, address: The seed url address
   address_l_not_ends_with: String
-
-  # id exactly equals to the parameter, id: The unique address identification number
-  id: Int
-
-  # id not equals to the parameter, id: The unique address identification number
-  id_not: Int
-
-  # id is less then the parameter, id: The unique address identification number
-  id_lt: Int
-
-  # id is less then or equal to the parameter, id: The unique address identification number
-  id_lte: Int
-
-  # id is greater then the parameter, id: The unique address identification number
-  id_gt: Int
-
-  # id is greater then or equal to the parameter, id: The unique address identification number
-  id_gte: Int
 
   # password exactly equals to the parameter, password: The user password for basic authentication
   password: String
@@ -1683,9 +1662,6 @@ input ClusterKitNodeApi_NugetFeed_Input {
   # The seed url address
   address: String
 
-  # The unique address identification number
-  id: Int
-
   # The user password for basic authentication
   password: String
 
@@ -1699,8 +1675,6 @@ input ClusterKitNodeApi_NugetFeed_Input {
 enum ClusterKitNodeApi_NugetFeed_Sort {
   address_asc
   address_desc
-  id_asc
-  id_desc
   password_asc
   password_desc
   type_asc
@@ -2803,7 +2777,7 @@ type ClusterKitNodeApi_ReleaseConfiguration implements IClusterKitNodeApi_Releas
   seedAddresses: [String]
 
   # the list of nuget feeds
-  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): ClusterKitNodeApi_NugetFeed_Connection
+  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetFeed_Connection
   id: ID
 }
 
@@ -4267,9 +4241,6 @@ interface IClusterKitNodeApi_NugetFeed {
   # The seed url address
   address: String
 
-  # The unique address identification number
-  __id: Int
-
   # The user password for basic authentication
   password: String
 
@@ -4493,7 +4464,7 @@ interface IClusterKitNodeApi_ReleaseConfiguration {
   seedAddresses: [String]
 
   # the list of nuget feeds
-  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_NugetFeed_Connection
+  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetFeed_Connection
 }
 
 # Security role. The amount of privileges assigned to the user

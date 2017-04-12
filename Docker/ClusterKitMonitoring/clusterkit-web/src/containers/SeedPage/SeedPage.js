@@ -57,8 +57,7 @@ class SeedPage extends React.Component {
               saveErrors: messages
             });
           } else {
-            console.log('success');
-            // browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
+            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {

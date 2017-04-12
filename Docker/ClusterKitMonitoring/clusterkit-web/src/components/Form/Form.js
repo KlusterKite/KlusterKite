@@ -30,7 +30,8 @@ export default class Form extends React.Component { // eslint-disable-line react
     buttonText: React.PropTypes.string,
     savedText: React.PropTypes.string,
     disabled: React.PropTypes.bool,
-    forbidEdit: React.PropTypes.bool
+    forbidEdit: React.PropTypes.bool,
+    submitOnEnter: React.PropTypes.bool,
   };
 
   enableButton() {
@@ -74,6 +75,7 @@ export default class Form extends React.Component { // eslint-disable-line react
             savedText={this.props.savedText}
             onDelete={this.props.onDelete}
             onCancel={this.props.onCancel}
+            submitOnEnter={this.props.submitOnEnter}
           />
         }
       </FormsyForm>

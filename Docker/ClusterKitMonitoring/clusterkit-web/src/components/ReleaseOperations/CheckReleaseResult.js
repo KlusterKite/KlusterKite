@@ -27,7 +27,7 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
         releaseId: item.node.releaseId
       };
 
-      if (node.nodeTemplate) {
+      if (node.template) {
         const indexInRelease = this.findNodeTemplateInRelease(node.template, newNodeTemplates);
 
         if (indexInRelease === -1) {
@@ -55,7 +55,7 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
    * @return {number} Index of an object found, or -1 if not found
    */
   findNodeTemplateInRelease(nodeTemplate, newNodeTemplates) {
-    console.log('findNodeTemplateInRelease', nodeTemplate, newNodeTemplates.findIndex(x => x.node.code === nodeTemplate));
+    // console.log('findNodeTemplateInRelease', nodeTemplate, newNodeTemplates.findIndex(x => x.node.code === nodeTemplate));
     return newNodeTemplates.findIndex(x => x.node.code === nodeTemplate);
   }
 
@@ -66,7 +66,7 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
    * @return {number} Index of an object found, or -1 if not found
    */
   findNodeTemplateInCompatible(nodeTemplate, compatibleList) {
-    console.log('findNodeTemplateInCompatible', nodeTemplate, compatibleList.findIndex(x => x.node.templateCode === nodeTemplate));
+    // console.log('findNodeTemplateInCompatible', nodeTemplate, compatibleList.findIndex(x => x.node.templateCode === nodeTemplate));
     return compatibleList.findIndex(x => x.node.templateCode === nodeTemplate);
   }
 
