@@ -33,6 +33,12 @@ namespace ClusterKit.NodeManager.Client.ORM
         public List<Template> NodeTemplates { get; set; }
 
         /// <summary>
+        /// Gets or sets the list of configured cluster migrator templates
+        /// </summary>
+        [DeclareField("the list of configured cluster migrator templates")]
+        public List<MigratorTemplate> MigratorTemplates { get; set; }
+
+        /// <summary>
         /// Gets or sets the seed addresses
         /// </summary>
         [DeclareField("the list of seed addresses")]

@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Moves <see cref="FSMBase.State{TS,TD}" /> from <see cref="Release.EnState.Ready" /> to <see cref="Release.EnState.Obsolete" />
+//   Moves <see cref="FSMBase.State{TS,TD}" /> from <see cref="Release.EnReleaseState.Ready" /> to <see cref="Release.EnReleaseState.Obsolete" />
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ namespace ClusterKit.NodeManager.Messages
     using ClusterKit.Security.Attributes;
 
     /// <summary>
-    /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="Release.EnState.Ready"/> to <see cref="Release.EnState.Obsolete"/>
+    /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnReleaseState.Ready"/> to <see cref="EnReleaseState.Obsolete"/>
     /// </summary>
     /// <returns>The mutation result</returns>
     public class ReleaseSetObsoleteRequest

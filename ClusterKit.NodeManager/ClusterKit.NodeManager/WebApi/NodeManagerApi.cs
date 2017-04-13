@@ -20,6 +20,7 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
     using ClusterKit.Core;
+    using ClusterKit.Data.CRUD;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
@@ -58,6 +59,17 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Gets the list of defined system privileges
+        /// todo: put converter 
+        /// </summary>
+        [UsedImplicitly]
+        [RequirePrivilege(
+            Privileges.GetPrivilegesList,
+            Scope = EnPrivilegeScope.User,
+            AddActionNameToRequiredPrivilege = true)]
+        public List<PrivilegeDescription> DefinedPrivilegeDescriptions => Utils.DefinedPrivileges.ToList();
+
+        /// <summary>
         /// Gets the list of packages in the nuget repository
         /// </summary>
         [UsedImplicitly]
@@ -83,15 +95,15 @@ namespace ClusterKit.NodeManager.WebApi
         [RequirePrivilege(Privileges.GetActiveNodeDescriptions, Scope = EnPrivilegeScope.User)]
         public async Task<List<NodeDescription>> GetActiveNodeDescriptions()
         {
-            var activeNodeDescriptions =
-                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
-                    .Ask<List<NodeDescription>>(new ActiveNodeDescriptionsRequest(), this.AkkaTimeout);
+            var activeNodeDescriptions = await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
+                                             .Ask<List<NodeDescription>>(
+                                                 new ActiveNodeDescriptionsRequest(),
+                                                 this.AkkaTimeout);
 
-            return
-                activeNodeDescriptions.OrderBy(n => n.NodeTemplate)
-                    .ThenBy(n => n.ContainerType)
-                    .ThenBy(n => n.NodeAddress.ToString())
-                    .ToList();
+            return activeNodeDescriptions.OrderBy(n => n.NodeTemplate)
+                .ThenBy(n => n.ContainerType)
+                .ThenBy(n => n.NodeAddress.ToString())
+                .ToList();
         }
 
         /// <summary>
@@ -105,24 +117,25 @@ namespace ClusterKit.NodeManager.WebApi
         [RequirePrivilege(Privileges.GetTemplateStatistics, Scope = EnPrivilegeScope.User)]
         public async Task<TemplatesUsageStatistics> GetTemplateStatistics()
         {
-            return
-                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
-                    .Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
+            return await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
+                       .Ask<TemplatesUsageStatistics>(new TemplatesStatisticsRequest(), this.AkkaTimeout);
         }
 
         /// <summary>
-        /// The connection to the <see cref="Role"/>
+        /// Gets the history of migrations
         /// </summary>
         /// <param name="context">The request context</param>
-        /// <returns>The data connection</returns>
-        [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new draft release", CanUpdate = true,
-            UpdateDescription = "Updates the draft release", CanDelete = true,
-            DeleteDescription = "Removes the draft release", Description = "ClusterKit managing system security roles")]
-        [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public ReleaseConnection Releases(RequestContext context)
+        /// <returns>the history of migrations</returns>
+        [DeclareConnection("the history of migrations")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(
+            Privileges.ClusterMigration,
+            Scope = EnPrivilegeScope.User,
+            AddActionNameToRequiredPrivilege = true)]
+        public Connection<Migration, int> Migrations(RequestContext context)
         {
-            return new ReleaseConnection(
+            return new Connection<Migration, int>(
                 this.actorSystem,
                 GetManagerActorProxyPath(),
                 this.AkkaTimeout,
@@ -135,17 +148,38 @@ namespace ClusterKit.NodeManager.WebApi
         /// <param name="context">The request context</param>
         /// <returns>The data connection</returns>
         [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new managing system role",
-            CanUpdate = true, UpdateDescription = "Updates the managing system role",
+        [RequireSession]
+        [RequireUser]
+        [DeclareConnection(
+            CanCreate = true,
+            CreateDescription = "Creates the new draft release",
+            CanUpdate = true,
+            UpdateDescription = "Updates the draft release",
+            CanDelete = true,
+            DeleteDescription = "Removes the draft release",
+            Description = "ClusterKit managing system security roles")]
+        [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
+        public ReleaseConnection Releases(RequestContext context)
+        {
+            return new ReleaseConnection(this.actorSystem, GetManagerActorProxyPath(), this.AkkaTimeout, context);
+        }
+
+        /// <summary>
+        /// The connection to the <see cref="Role"/>
+        /// </summary>
+        /// <param name="context">The request context</param>
+        /// <returns>The data connection</returns>
+        [UsedImplicitly]
+        [DeclareConnection(
+            CanCreate = true,
+            CreateDescription = "Creates the new managing system role",
+            CanUpdate = true,
+            UpdateDescription = "Updates the managing system role",
             Description = "ClusterKit managing system security roles")]
         [RequirePrivilege(Privileges.Role, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public RolesConnection Roles(RequestContext context)
         {
-            return new RolesConnection(
-                this.actorSystem,
-                GetManagerActorProxyPath(),
-                this.AkkaTimeout,
-                context);
+            return new RolesConnection(this.actorSystem, GetManagerActorProxyPath(), this.AkkaTimeout, context);
         }
 
         /// <summary>
@@ -161,9 +195,8 @@ namespace ClusterKit.NodeManager.WebApi
         [LogAccess]
         public async Task<MutationResult<bool>> UpgradeNode(string address)
         {
-            var result =
-                await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
-                    .Ask<bool>(new NodeUpgradeRequest { Address = Address.Parse(address) }, this.AkkaTimeout);
+            var result = await this.actorSystem.ActorSelection(GetManagerActorProxyPath())
+                             .Ask<bool>(new NodeUpgradeRequest { Address = Address.Parse(address) }, this.AkkaTimeout);
             return new MutationResult<bool> { Result = result };
         }
 
@@ -173,16 +206,16 @@ namespace ClusterKit.NodeManager.WebApi
         /// <param name="context">The request context</param>
         /// <returns>The data connection</returns>
         [UsedImplicitly]
-        [DeclareConnection(CanCreate = true, CreateDescription = "Creates the new user", CanUpdate = true,
-            UpdateDescription = "Updates the user", Description = "ClusterKit managing system users")]
+        [DeclareConnection(
+            CanCreate = true,
+            CreateDescription = "Creates the new user",
+            CanUpdate = true,
+            UpdateDescription = "Updates the user",
+            Description = "ClusterKit managing system users")]
         [RequirePrivilege(Privileges.User, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public UsersConnection Users(RequestContext context)
         {
-            return new UsersConnection(
-                this.actorSystem,
-                GetManagerActorProxyPath(),
-                this.AkkaTimeout,
-                context);
+            return new UsersConnection(this.actorSystem, GetManagerActorProxyPath(), this.AkkaTimeout, context);
         }
 
         /// <summary>

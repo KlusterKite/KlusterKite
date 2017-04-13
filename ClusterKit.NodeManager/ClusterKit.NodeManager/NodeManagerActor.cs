@@ -280,7 +280,7 @@ namespace ClusterKit.NodeManager
         {
             if (typeof(TObject) == typeof(Release))
             {
-                if (((Release)(object)oldObject).State != Release.EnState.Draft)
+                if (((Release)(object)oldObject).State != EnReleaseState.Draft)
                 {
                     throw new Exception("Only draft releases can be updated");
                 }
@@ -393,7 +393,7 @@ namespace ClusterKit.NodeManager
             {
                 var releases =
                     context.Releases.Include(nameof(Release.CompatibleTemplates))
-                        .Where(r => r.State == Release.EnState.Active).ToList();
+                        .Where(r => r.State == EnReleaseState.Active).ToList();
                 this.currentRelease = releases.SingleOrDefault();
             }
         }
@@ -937,13 +937,6 @@ namespace ClusterKit.NodeManager
                 m => this.Sender.Tell(this.GetPossibleTemplatesForContainer(m.ContainerType, m.FrameworkRuntimeType)));
             this.Receive<TemplatesStatisticsRequest>(m => this.OnTemplatesStatisticsRequest());
 
-            this.Receive<CollectionRequest<NodeTemplate>>(m => this.workers.Forward(m));
-            this.Receive<CrudActionMessage<NodeTemplate, int>>(m => this.workers.Forward(m));
-            this.Receive<CollectionRequest<SeedAddress>>(m => this.workers.Forward(m));
-            this.Receive<CrudActionMessage<SeedAddress, int>>(m => this.workers.Forward(m));
-            this.Receive<CollectionRequest<NugetFeed>>(m => this.workers.Forward(m));
-            this.Receive<CrudActionMessage<NugetFeed, int>>(m => this.workers.Forward(m));
-
             this.Receive<AuthenticateUserWithCredentials>(m => this.workers.Forward(m));
             this.Receive<AuthenticateUserWithUid>(m => this.workers.Forward(m));
             this.Receive<CollectionRequest<User>>(m => this.workers.Forward(m));
@@ -1004,7 +997,7 @@ namespace ClusterKit.NodeManager
                         return null;
                     }
 
-                    if (release.State == Release.EnState.Active)
+                    if (release.State == EnReleaseState.Active)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
@@ -1014,16 +1007,16 @@ namespace ClusterKit.NodeManager
                     }
 
                     var now = DateTimeOffset.Now;
-                    var currentActiveRelease = ds.Releases.FirstOrDefault(r => r.State == Release.EnState.Active);
+                    var currentActiveRelease = ds.Releases.FirstOrDefault(r => r.State == EnReleaseState.Active);
                     if (currentActiveRelease != null)
                     {
-                        currentActiveRelease.State = request.CurrentReleaseState != Release.EnState.Active
+                        currentActiveRelease.State = request.CurrentReleaseState != EnReleaseState.Active
                             ? request.CurrentReleaseState
-                            : Release.EnState.Obsolete;
+                            : EnReleaseState.Obsolete;
                         currentActiveRelease.Finished = now;
                     }
 
-                    release.State = Release.EnState.Active;
+                    release.State = EnReleaseState.Active;
                     if (release.Started == null)
                     {
                         release.Started = now;
@@ -1070,7 +1063,7 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
-                    if (release.State != Release.EnState.Ready)
+                    if (release.State != EnReleaseState.Ready)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
@@ -1079,7 +1072,7 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
-                    release.State = Release.EnState.Obsolete;
+                    release.State = EnReleaseState.Obsolete;
                     ds.SaveChanges();
                     this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
                     SecurityLog.CreateRecord(
@@ -1114,7 +1107,7 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
-                    if (release.State != Release.EnState.Draft)
+                    if (release.State != EnReleaseState.Draft)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
@@ -1123,7 +1116,7 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
-                    if (ds.Releases.Any(r => r.State == Release.EnState.Ready))
+                    if (ds.Releases.Any(r => r.State == EnReleaseState.Ready))
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
@@ -1143,7 +1136,7 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
-                    release.State = Release.EnState.Ready;
+                    release.State = EnReleaseState.Ready;
                     ds.SaveChanges();
                     this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
                     SecurityLog.CreateRecord(
@@ -1178,7 +1171,7 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
-                    if (release.State != Release.EnState.Draft)
+                    if (release.State != EnReleaseState.Draft)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
@@ -1223,7 +1216,7 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
-                    if (release.State != Release.EnState.Active)
+                    if (release.State != EnReleaseState.Active)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
@@ -1368,16 +1361,10 @@ namespace ClusterKit.NodeManager
                 this.databaseName = databaseName;
                 this.contextFactory = contextFactory;
 
-                this.ReceiveAsync<CrudActionMessage<NodeTemplate, int>>(this.OnRequest);
-                this.ReceiveAsync<CrudActionMessage<SeedAddress, int>>(this.OnRequest);
-                this.ReceiveAsync<CrudActionMessage<NugetFeed, int>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<User, Guid>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<Role, Guid>>(this.OnRequest);
                 this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
 
-                this.ReceiveAsync<CollectionRequest<NodeTemplate>>(this.OnCollectionRequest<NodeTemplate, int>);
-                this.ReceiveAsync<CollectionRequest<SeedAddress>>(this.OnCollectionRequest<SeedAddress, int>);
-                this.ReceiveAsync<CollectionRequest<NugetFeed>>(this.OnCollectionRequest<NugetFeed, int>);
                 this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, Guid>);
                 this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, Guid>);
                 this.ReceiveAsync<CollectionRequest<Release>>(this.OnCollectionRequest<Release, int>);

@@ -1,0 +1,15 @@
+﻿{
+	ExecutionFramework = ".NETFramework,Version=v4.5"
+
+	RequiredPackages = [
+		"ClusterKit.NodeManager.Seeder",
+		"ClusterKit.NodeManager.ConfigurationSource.Seeder"
+	]
+
+	Nuget = "http://nuget/"
+	NugetCheckPeriod = 30s
+
+	Seeders = [
+		"ClusterKit.NodeManager.ConfigurationSource.Seeder.Seeder"
+	]
+}

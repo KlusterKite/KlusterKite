@@ -298,95 +298,95 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core.TestKit/ClusterKit.Core.TestKit.csproj">
       <Project>{33F25E93-E58E-4F90-A6EB-E7C64546D732}</Project>
       <Name>ClusterKit.Core.TestKit</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj">
       <Project>{7DE19EFC-58C5-4DBF-8A2A-E81E54AF5623}</Project>
       <Name>ClusterKit.LargeObjects.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
       <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
       <Name>ClusterKit.LargeObjects</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj">
       <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
       <Name>ClusterKit.Data.CRUD</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data/ClusterKit.Data.csproj">
       <Project>{0D6871D1-5A69-4533-BA4B-073B876232C5}</Project>
       <Name>ClusterKit.Data</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.TestKit/ClusterKit.Data.TestKit.csproj">
       <Project>{1A6EF5ED-C0C0-478A-A1B4-CA6366541B5E}</Project>
       <Name>ClusterKit.Data.TestKit</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF/ClusterKit.Data.EF.csproj">
       <Project>{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}</Project>
       <Name>ClusterKit.Data.EF</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF.TestKit/ClusterKit.Data.EF.TestKit.csproj">
       <Project>{6D78C999-7A74-488B-A55D-919C593197CA}</Project>
       <Name>ClusterKit.Data.EF.TestKit</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF.Effort/ClusterKit.Data.EF.Effort.csproj">
       <Project>{D832A3C8-FBBD-466F-90A9-E406E773EC67}</Project>
       <Name>ClusterKit.Data.EF.Effort</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj">
       <Project>{8E543EA4-65DE-475F-8045-C094CDE58E29}</Project>
       <Name>ClusterKit.Web.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Descriptor/ClusterKit.Web.Descriptor.csproj">
       <Project>{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}</Project>
       <Name>ClusterKit.Web.Descriptor</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj">
       <Project>{477B201A-A30C-4360-B56A-6F61C049BB04}</Project>
       <Name>ClusterKit.Web</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Rest/ClusterKit.Web.Rest.csproj">
       <Project>{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}</Project>
       <Name>ClusterKit.Web.Rest</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
       <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
       <Name>ClusterKit.Security.Attributes</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Authorization/ClusterKit.Web.Authorization.csproj">
       <Project>{6ADFBDDF-E452-46FC-A037-6D57300BE561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Swagger.Messages/ClusterKit.Web.Swagger.Messages.csproj">
       <Project>{D80F5923-CD1B-4376-BAB5-1785EA4395A9}</Project>
       <Name>ClusterKit.Web.Swagger.Messages</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.GraphQL.Publisher/ClusterKit.Web.GraphQL.Publisher.csproj">
       <Project>{45219CB4-7189-49C6-A95B-AEBBAED4645E}</Project>
       <Name>ClusterKit.Web.GraphQL.Publisher</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj">
       <Project>{F3216B61-26C8-4AD6-84DF-4531D4C568A2}</Project>
       <Name>ClusterKit.Monitoring.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
       <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
       <Name>ClusterKit.API.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Attributes/ClusterKit.API.Attributes.csproj">
       <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
       <Name>ClusterKit.API.Attributes</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Provider/ClusterKit.API.Provider.csproj">
       <Project>{DDC4B9D1-49AC-4CD6-9FC5-FE4A02C54871}</Project>
       <Name>ClusterKit.API.Provider</Name>
-    </ProjectReference>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiTests.cs" />

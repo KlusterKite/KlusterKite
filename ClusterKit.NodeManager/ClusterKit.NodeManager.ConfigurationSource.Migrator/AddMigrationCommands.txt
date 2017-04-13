@@ -1,0 +1,5 @@
+﻿Enable-Migrations -ContextTypeName ClusterKit.NodeManager.ConfigurationSource.ConfigurationContext -ContextProjectName ClusterKit.NodeManager.ConfigurationSource -ProjectName ClusterKit.NodeManager.ConfigurationSource.Migrator -StartUpProjectName ClusterKit.NodeManager.ConfigurationSource.Migrator
+
+Update-Database -ConfigurationTypeName ClusterKit.NodeManager.ConfigurationSource.Migrations.Configuration -ConnectionString "User ID=postgres;Host=docker;Port=5432;Database=clusterkit.nodemanager.configuration;Pooling=true" -ConnectionProviderName Npgsql -StartUpProjectName ClusterKit.NodeManager.ConfigurationSource.Migrator -ProjectName ClusterKit.NodeManager.ConfigurationSource.Migrator
+
+Add-Migration [MigrationName] -ConfigurationTypeName ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations.Configuration -ConnectionString "User ID=postgres;Host=docker;Port=5432;Database=clusterkit.nodemanager.configuration;Pooling=true" -ConnectionProviderName Npgsql -StartUpProjectName ClusterKit.NodeManager.ConfigurationSource.Migrator -ProjectName ClusterKit.NodeManager.ConfigurationSource.Migrator

@@ -15,7 +15,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using Akka.Actor;
     using Akka.Cluster;
-    
+
+    using Castle.Components.DictionaryAdapter;
+
     using ClusterKit.Data;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -50,24 +52,22 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             List<PackageDescription> initialPackages = new List<PackageDescription>();
             var system = ServiceLocator.Current.GetInstance<ActorSystem>();
             var nugetRepository = ServiceLocator.Current.GetInstance<IPackageRepository>();
-            
+
             try
             {
                 if (nugetRepository != null)
                 {
-                    initialPackages =
-                        nugetRepository.Search(string.Empty, true)
-                            .Where(p => p.IsLatestVersion)
-                            .ToList()
-                            .Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() })
-                            .ToList();
+                    initialPackages = nugetRepository.Search(string.Empty, true)
+                        .Where(p => p.IsLatestVersion)
+                        .ToList()
+                        .Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() })
+                        .ToList();
                 }
 
-                seedsFromConfig =
-                    Cluster.Get(system)
-                        .Settings.SeedNodes.Select(
-                            address => $"{address.Protocol}://{address.System}@{address.Host}:{address.Port}")
-                        .ToList();
+                seedsFromConfig = Cluster.Get(system)
+                    .Settings.SeedNodes.Select(
+                        address => $"{address.Protocol}://{address.System}@{address.Host}:{address.Port}")
+                    .ToList();
 
                 var config = system.Settings.Config.GetConfig("ClusterKit.NodeManager.DefaultNugetFeeds");
 
@@ -83,12 +83,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                             feedType = NugetFeed.EnFeedType.Private;
                         }
 
-                        nugetFeeds.Add(
-                            new NugetFeed
-                                {
-                                    Address = feedConfig.GetString("address"),
-                                    Type = feedType
-                                });
+                        nugetFeeds.Add(new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType });
                     }
                 }
             }
@@ -97,44 +92,46 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             {
             }
 
-            var defaultTemplates =
-                this.GetDefaultTemplates()
-                    .Select(
-                        t =>
-                            new Template
+            var defaultTemplates = this.GetDefaultTemplates().ToList();
+
+            var migrators = new[]
                                 {
-                                    Name = t.Name,
-                                    Code = t.Code,
-                                    Configuration = t.Configuration,
-                                    ContainerTypes = t.ContainerTypes,
-                                    MinimumRequiredInstances = t.MinimumRequiredInstances,
-                                    MaximumNeededInstances = t.MaximumNeededInstances,
-                                    Priority = t.Priority,
-                                    PackageRequirements =
-                                        t.Packages.Select(p => new Template.PackageRequirement(p, null))
-                                            .ToList()
-                                })
-                    .ToList();
+                                    new MigratorTemplate
+                                        {
+                                            Name = "ClusterKit Migrator",
+                                            Code = "ClusterKit",
+                                            Configuration = Configurations.Migrator,
+                                            PackageRequirements =
+                                                new[]
+                                                    {
+                                                        new Template.PackageRequirement(
+                                                            "ClusterKit.NodeManager.ConfigurationSource.Migrator",
+                                                            null)
+                                                    }.ToList(),
+                                            Priority = 1d
+                                        }
+                                }.ToList();
 
             var configuration = new ReleaseConfiguration
                                     {
-                                        NodeTemplates = new List<Template>(defaultTemplates),
+                                        NodeTemplates = defaultTemplates,
+                                        MigratorTemplates = migrators,
                                         Packages = initialPackages,
                                         SeedAddresses = seedsFromConfig,
                                         NugetFeeds = nugetFeeds
                                     };
             var initialRelease = new Release
                                      {
-                                         State = Release.EnState.Active,
+                                         State = EnReleaseState.Active,
                                          Name = "Initial configuration",
                                          Started = DateTimeOffset.Now,
                                          Configuration = configuration
                                      };
 
-            var supportedFrameworks = system.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-            var initialErrors = initialRelease.SetPackagesDescriptionsForTemplates(
-                nugetRepository,
-                supportedFrameworks.ToList());
+            var supportedFrameworks =
+                system.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+            var initialErrors =
+                initialRelease.SetPackagesDescriptionsForTemplates(nugetRepository, supportedFrameworks.ToList());
 
             foreach (var errorDescription in initialErrors)
             {
@@ -154,18 +151,18 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// Gets the default templates
         /// </summary>
         /// <returns>The list of default templates</returns>
-        protected virtual IEnumerable<NodeTemplate> GetDefaultTemplates()
+        protected virtual IEnumerable<Template> GetDefaultTemplates()
         {
-            yield return new NodeTemplate
-                                {
+            yield return new Template
+            {
                                     Code = "publisher",
                                     Name = "Cluster Nginx configurator",
                                     MinimumRequiredInstances = 1,
                                     MaximumNeededInstances = null,
                                     ContainerTypes = new List<string> { "publisher" },
                                     Priority = 1000.0,
-                                    Packages =
-                                        new List<string>
+                                    PackageRequirements = 
+                                        new[]
                                             {
                                                 "ClusterKit.Core.Service",
                                                 "ClusterKit.Web.NginxConfigurator",
@@ -173,20 +170,19 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                                 "ClusterKit.Log.Console",
                                                 "ClusterKit.Log.ElasticSearch",
                                                 "ClusterKit.Monitoring.Client",
-                                            },
-                                    Configuration = Configurations.Publisher,
-                                    Version = 0
+                                            }.Select(p => new Template.PackageRequirement(p, null)).ToList(),
+                                    Configuration = Configurations.Publisher
                                 };
-            yield return new NodeTemplate
-                              {
+            yield return new Template
+            {
                                   Code = "clusterManager",
                                   Name = "Cluster manager (cluster monitoring and managing)",
                                   MinimumRequiredInstances = 1,
                                   MaximumNeededInstances = 3,
                                   ContainerTypes = new List<string> { "manager", "worker" },
                                   Priority = 100.0,
-                                  Packages =
-                                      new List<string>
+                                  PackageRequirements = 
+                                      new[]
                                           {
                                               "ClusterKit.Core.Service",
                                               "ClusterKit.NodeManager.Client",
@@ -202,28 +198,26 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                               "ClusterKit.Security.SessionRedis",
                                               "ClusterKit.API.Endpoint",
                                               "ClusterKit.Web.GraphQL.Publisher"
-                                          },
+                                          }.Select(p => new Template.PackageRequirement(p, null)).ToList(),
                                   Configuration = Configurations.ClusterManager,
-                                  Version = 0
-                              };
+            };
 
-            yield return new NodeTemplate
-                            {
+            yield return new Template
+            {
                                 Code = "empty",
                                 Name = "Cluster empty instance, just for demo",
                                 MinimumRequiredInstances = 0,
                                 MaximumNeededInstances = null,
                                 ContainerTypes = new List<string> { "worker" },
                                 Priority = 1.0,
-                                Packages =
-                                    new List<string>
+                                PackageRequirements =
+                                    new[]
                                         {
                                             "ClusterKit.Core.Service",
                                             "ClusterKit.NodeManager.Client",
                                             "ClusterKit.Monitoring.Client"
-                                        },
+                                        }.Select(p => new Template.PackageRequirement(p, null)).ToList(),
                                 Configuration = Configurations.Empty,
-                                Version = 0
                             };
         }
 

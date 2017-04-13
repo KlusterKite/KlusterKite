@@ -24,7 +24,8 @@ namespace ClusterKit.Core
     /// Base class to install ClusterKit plugin components
     /// </summary>
     [UsedImplicitly]
-    public abstract class BaseInstaller : IWindsorInstaller
+    // todo: remove MarshalByRefObject
+    public abstract class BaseInstaller : MarshalByRefObject, IWindsorInstaller
     {
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles node role functionality

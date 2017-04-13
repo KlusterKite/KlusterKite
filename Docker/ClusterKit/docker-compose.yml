@@ -127,7 +127,18 @@ services:
             max-size: "1m"
     networks:
       default:
-        ipv4_address: 172.18.0.12         
+        ipv4_address: 172.18.0.12
+  
+  seeder:
+    image: clusterkit/seeder
+    logging:
+        driver: json-file
+        options:
+            max-size: "1m"
+    networks:
+      default:
+        ipv4_address: 172.18.0.13
+
 
   worker:
     image: clusterkit/worker

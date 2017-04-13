@@ -132,7 +132,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// the list of package requirements
         /// </param>
         /// <returns>
-        /// The new instance of <see cref="NodeTemplate"/>.
+        /// The new instance of <see cref="Template"/>.
         /// </returns>
         [UsedImplicitly]
         public Template Clone(

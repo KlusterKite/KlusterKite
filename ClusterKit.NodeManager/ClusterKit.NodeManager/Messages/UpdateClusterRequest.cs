@@ -30,6 +30,6 @@ namespace ClusterKit.NodeManager.Messages
         /// <summary>
         /// Gets or sets the new state of current release
         /// </summary>
-        public Release.EnState CurrentReleaseState { get; set; }
+        public EnReleaseState CurrentReleaseState { get; set; }
     }
 }

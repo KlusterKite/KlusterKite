@@ -15,6 +15,8 @@
       <Value>Xunit</Value>
       <Value>OAuth</Value>
       <Value>redis</Value>
+      <Value>rollbacked</Value>
+      <Value>rollbacking</Value>
       <Value>serilog</Value>
       <Value>Sharding</Value>
       <Value>sharded</Value>
@@ -22,11 +24,13 @@
       <Value>parameterless</Value>
       <Value>postgres</Value>
       <Value>precompiled</Value>
+      <Value>prioritised</Value>
       <Value>tcp</Value>
       <Value>nginx</Value>
       <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>nuspec</Value>
+      <Value>migratable</Value>
       <Value>ui</Value>
       <Value>uid</Value>
       <Value>urls</Value>

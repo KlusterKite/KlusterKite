@@ -151,7 +151,7 @@ namespace ClusterKit.NodeManager.Tests
                            new UpdateClusterRequest { Id = newReleaseId },
                            TimeSpan.FromSeconds(1));
             Assert.NotNull(response.Data);
-            Assert.Equal(Release.EnState.Active, response.Data.State);
+            Assert.Equal(EnReleaseState.Active, response.Data.State);
             this.ExpectNoMsg();
             this.Log.Warning("!!!!!!!!!!! Cluster upgrade initiated");
 
@@ -291,11 +291,11 @@ namespace ClusterKit.NodeManager.Tests
         {
             using (var context = this.GetContext())
             {
-                var oldRelease = context.Releases.First(r => r.State == Release.EnState.Active);
-                oldRelease.State = Release.EnState.Obsolete;
+                var oldRelease = context.Releases.First(r => r.State == EnReleaseState.Active);
+                oldRelease.State = EnReleaseState.Obsolete;
 
                 var newRelease = ReleaseCheckTestsBase.CreateRelease();
-                newRelease.State = Release.EnState.Active;
+                newRelease.State = EnReleaseState.Active;
                 newRelease.Configuration.SeedAddresses = new List<string>();
                 newRelease.Configuration.NugetFeeds = new List<NugetFeed>();
                 newRelease.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
@@ -356,7 +356,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             using (var context = this.GetContext())
             {
-                var release = context.Releases.First(r => r.State == Release.EnState.Active);
+                var release = context.Releases.First(r => r.State == EnReleaseState.Active);
 
                 var template1 = ReleaseCheckTestsBase.CreateRelease().Configuration.NodeTemplates.First();
                 template1.Code = "t1";
@@ -459,7 +459,7 @@ namespace ClusterKit.NodeManager.Tests
                 if (!context.Releases.Any())
                 {
                     var release = ReleaseCheckTestsBase.CreateRelease();
-                    release.State = Release.EnState.Active;
+                    release.State = EnReleaseState.Active;
                     release.Configuration.SeedAddresses = new List<string>();
                     release.Configuration.NugetFeeds = new List<NugetFeed>();
                     release.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;

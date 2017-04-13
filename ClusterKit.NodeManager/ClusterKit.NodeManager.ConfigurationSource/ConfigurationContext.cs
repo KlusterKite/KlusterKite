@@ -43,21 +43,27 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <summary>
+        /// Gets or sets the list of migrations
+        /// </summary>
+        [UsedImplicitly]
+        public DbSet<Migration> Migrations { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of web API users
         /// </summary>
         [UsedImplicitly]
-        public virtual DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
 
         /// <summary>
         /// Gets or sets the list of web API user roles
         /// </summary>
         [UsedImplicitly]
-        public virtual DbSet<Role> Roles { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         /// <summary>
         /// Gets or sets the list of releases
         /// </summary>
         [UsedImplicitly]
-        public virtual DbSet<Release> Releases { get; set; }
+        public DbSet<Release> Releases { get; set; }
     }
 }

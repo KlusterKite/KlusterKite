@@ -99,10 +99,6 @@
       <HintPath>..\..\packages\ClusterKit.Core.TestKit.0.0.0-local\lib\net45\ClusterKit.Core.TestKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClusterKit.Web.GraphQL.Publisher">
-      <HintPath>..\..\packages\ClusterKit.Web.GraphQL.Publisher.0.0.0-local\lib\net45\ClusterKit.Web.GraphQL.Publisher.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="CommonServiceLocator.WindsorAdapter">
       <HintPath>..\..\packages\CommonServiceLocator.WindsorAdapter.1.0\lib\NET35\CommonServiceLocator.WindsorAdapter.dll</HintPath>
       <Private>True</Private>
@@ -328,6 +324,10 @@
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Attributes/ClusterKit.API.Attributes.csproj">
       <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
       <Name>ClusterKit.API.Attributes</Name>
+</ProjectReference>
+    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.GraphQL.Publisher/ClusterKit.Web.GraphQL.Publisher.csproj">
+      <Project>{45219CB4-7189-49C6-A95B-AEBBAED4645E}</Project>
+      <Name>ClusterKit.Web.GraphQL.Publisher</Name>
 </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -254,7 +254,7 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
-        /// Removes all files and subdirectories from working directory
+        /// Removes all files and sub-directories from working directory
         /// </summary>
         private void CleanWorkingDir()
         {

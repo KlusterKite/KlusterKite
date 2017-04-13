@@ -38,6 +38,8 @@ Target "DockerContainers" (fun _ ->
     // MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.ElasticSearch/ClusterKit.Log.ElasticSearch.csproj"|] |> ignore
     MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj"|] |> ignore
     MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"|] |> ignore
+
+    MSBuildRelease "./build/seeder" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Seeder.Launcher/ClusterKit.NodeManager.Seeder.Launcher.csproj"|] |> ignore
     
 
     let copyLauncherData (path : string) =
@@ -62,6 +64,10 @@ Target "DockerContainers" (fun _ ->
     Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeed/build"|]
     Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seed" (fun file -> true)
     buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
+
+    Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeeder/build"|]
+    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeeder/build" "./build/seeder" (fun file -> true)
+    buildDocker "clusterkit/seeder" "Docker/ClusterKitSeeder"
 
     copyLauncherData "./Docker/ClusterKitWorker" |> ignore
     copyLauncherData "./Docker/ClusterKitPublisher" |> ignore

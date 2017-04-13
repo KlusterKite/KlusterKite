@@ -28,43 +28,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     public class Release : IObjectWithId<int>
     {
         /// <summary>
-        /// The list of release states
-        /// </summary>
-        [ApiDescription("The list of release states", Name = "EnReleaseState")]
-        public enum EnState
-        {
-            /// <summary>
-            /// This is the draft of release and can be edited
-            /// </summary>
-            [ApiDescription("This is the draft of release and can be edited")]
-            Draft,
-
-            /// <summary>
-            /// This is the new release, ready to be applied
-            /// </summary>
-            [ApiDescription("This is the new release, ready to be applied")]
-            Ready,
-
-            /// <summary>
-            /// This is the current active release
-            /// </summary>
-            [ApiDescription("This is the current active release")]
-            Active,
-
-            /// <summary>
-            /// This release was faulted and cluster roll-backed to the latest stable release (or some other)
-            /// </summary>
-            [ApiDescription("This release was faulted and cluster rollbacked to the latest stable release (or some other)")]
-            Faulted,
-
-            /// <summary>
-            /// This release is obsolete and was replaced by some new one
-            /// </summary>
-            [ApiDescription("This release is obsolete and was replaced by some new one")]
-            Obsolete
-        }
-
-        /// <summary>
         /// Gets or sets the release id
         /// </summary>
         [DeclareField("The release id", IsKey = true)]
@@ -126,7 +89,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [UsedImplicitly]
         [DeclareField("The release state", Access = EnAccessFlag.Queryable)]
-        public EnState State { get; set; } = EnState.Draft;
+        public EnReleaseState State { get; set; } = EnReleaseState.Draft;
 
         /// <summary>
         /// Gets or sets a value indicating whether this release was considered stable

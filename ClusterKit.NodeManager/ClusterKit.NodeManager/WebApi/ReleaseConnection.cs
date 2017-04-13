@@ -56,7 +56,7 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Initiates cluster upgrade procedure. The previous active release will be marked as <see cref="Release.EnState.Obsolete"/>
+        /// Initiates cluster upgrade procedure. The previous active release will be marked as <see cref="EnReleaseState.Obsolete"/>
         /// </summary>
         /// <param name="id">The id of release that will be applied</param>
         /// <returns>The mutation result</returns>
@@ -73,7 +73,7 @@ namespace ClusterKit.NodeManager.WebApi
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
                         .Ask<CrudActionResponse<Release>>(
-                            new UpdateClusterRequest { Id = id, Context = this.Context, CurrentReleaseState = Release.EnState.Faulted },
+                            new UpdateClusterRequest { Id = id, Context = this.Context, CurrentReleaseState = EnReleaseState.Faulted },
                             this.Timeout);
                 return CreateResponse(response);
             }
@@ -113,7 +113,7 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Mutation that moves <see cref="Release.State"/> from <see cref="Release.EnState.Draft"/> to <see cref="Release.EnState.Ready"/>
+        /// Mutation that moves <see cref="Release.State"/> from <see cref="EnReleaseState.Draft"/> to <see cref="EnReleaseState.Ready"/>
         /// </summary>
         /// <param name="id">The id of release draft</param>
         /// <returns>The mutation result</returns>
@@ -141,7 +141,7 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Mutation that moves <see cref="Release.State"/> from <see cref="Release.EnState.Ready"/> to <see cref="Release.EnState.Obsolete"/>
+        /// Mutation that moves <see cref="Release.State"/> from <see cref="EnReleaseState.Ready"/> to <see cref="EnReleaseState.Obsolete"/>
         /// </summary>
         /// <param name="id">The id of release draft</param>
         /// <returns>The mutation result</returns>
@@ -198,7 +198,7 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Initiates cluster upgrade procedure. The previous active release will be marked as <see cref="Release.EnState.Obsolete"/>
+        /// Initiates cluster upgrade procedure. The previous active release will be marked as <see cref="EnReleaseState.Obsolete"/>
         /// </summary>
         /// <param name="id">The id of release that will be applied</param>
         /// <returns>The mutation result</returns>
@@ -215,7 +215,7 @@ namespace ClusterKit.NodeManager.WebApi
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
                         .Ask<CrudActionResponse<Release>>(
-                            new UpdateClusterRequest { Id = id, Context = this.Context, CurrentReleaseState = Release.EnState.Obsolete },
+                            new UpdateClusterRequest { Id = id, Context = this.Context, CurrentReleaseState = EnReleaseState.Obsolete },
                             this.Timeout);
                 return CreateResponse(response);
             }

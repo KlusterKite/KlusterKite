@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Client
 {
+    using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Security.Attributes;
 
     /// <summary>
@@ -48,7 +49,7 @@ namespace ClusterKit.NodeManager.Client
         public const string Release = "ClusterKit.NodeManager.Release";
 
         /// <summary>
-        /// The privilege to set <see cref="ORM.Release.EnState.Ready"/> state for draft releases
+        /// The privilege to set <see cref="EnReleaseState.Ready"/> state for draft releases
         /// </summary>
         [PrivilegeDescription("The privilege to set ready state for draft releases", Target = EnPrivilegeTarget.User)]
         public const string ReleaseFinish = "ClusterKit.NodeManager.ReleaseFinish";
@@ -106,5 +107,11 @@ namespace ClusterKit.NodeManager.Client
         /// </summary>
         [PrivilegeDescription("Gets the configuration for the new empty node", Target = EnPrivilegeTarget.Client)]
         public const string GetConfiguration = "ClusterKit.NodeManager.GetConfiguration";
+
+        /// <summary>
+        /// View the migration history and its log
+        /// </summary>
+        [PrivilegeDescription("View the migration history and its log", "Get", "Query", Target = EnPrivilegeTarget.User)]
+        public const string ClusterMigration = "ClusterKit.NodeManager.Migration";
     }
 }

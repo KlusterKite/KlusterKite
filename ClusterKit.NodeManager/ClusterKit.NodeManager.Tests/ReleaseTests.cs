@@ -53,7 +53,7 @@ namespace ClusterKit.NodeManager.Tests
                                   {
                                       MinorVersion = 1,
                                       Name = "1",
-                                      State = Release.EnState.Active,
+                                      State = EnReleaseState.Active,
                                       Configuration =
                                           new ReleaseConfiguration
                                               {
@@ -110,7 +110,7 @@ namespace ClusterKit.NodeManager.Tests
                                   {
                                       MinorVersion = 1,
                                       Name = "1",
-                                      State = Release.EnState.Active,
+                                      State = EnReleaseState.Active,
                                       Configuration =
                                           new ReleaseConfiguration
                                               {
@@ -167,7 +167,7 @@ namespace ClusterKit.NodeManager.Tests
                                   {
                                       MinorVersion = 1,
                                       Name = "1",
-                                      State = Release.EnState.Active,
+                                      State = EnReleaseState.Active,
                                       Configuration =
                                           new ReleaseConfiguration
                                               {
@@ -222,7 +222,7 @@ namespace ClusterKit.NodeManager.Tests
                                    {
                                        MinorVersion = 1,
                                        Name = "1",
-                                       State = Release.EnState.Obsolete,
+                                       State = EnReleaseState.Obsolete,
                                        Configuration =
                                            new ReleaseConfiguration
                                                {
@@ -245,7 +245,7 @@ namespace ClusterKit.NodeManager.Tests
                                         {
                                             MinorVersion = 2,
                                             Name = "active",
-                                            State = Release.EnState.Active,
+                                            State = EnReleaseState.Active,
                                             Configuration =
                                                 new ReleaseConfiguration
                                                     {

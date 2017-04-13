@@ -102,24 +102,42 @@ namespace ClusterKit.NodeManager.ConfigurationSource {
         
         /// <summary>
         ///   Looks up a localized string similar to {
+        ///	ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = &quot;User ID=postgres;Host=configDb;Port=5432;Pooling=true&quot;	  
+        ///}
+        ///.
+        /// </summary>
+        public static string Migrator {
+            get {
+                return ResourceManager.GetString("Migrator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
         ///  ClusterKit {
-        ///	  Web {
-        ///		  Nginx {
-        ///			PathToConfig = &quot;/etc/nginx/sites-enabled/clusterkit.config&quot;
-        ///			ReloadCommand {
-        ///			  Command = /etc/init.d/nginx
-        ///			  Arguments = reload
-        ///			} 
-        ///			Configuration {
-        ///			  default {
-        ///				&quot;location /&quot; { // you can define static content. This part will be just inserted into nginx config
-        ///				  root = /opt/web/monitoring/
-        ///				  index = index.html
-        ///				}
+        ///    Web {
+        ///      Nginx {
+        ///        PathToConfig = &quot;/etc/nginx/sites-enabled/clusterkit.config&quot;
+        ///        ReloadCommand {
+        ///          Command = /etc/init.d/nginx
+        ///          Arguments = reload
+        ///        } 
+        ///        Configuration {
+        ///          default {
+        ///            &quot;location /clusterkit&quot; { 
+        ///              proxy_pass = &quot;http://monitoringUI/clusterkit&quot;
+        ///            }
+        ///          }
+        ///        }
+        ///      }
+        ///    }
+        ///  }
         ///
-        ///				&quot;location /signalr&quot; {
-        ///					proxy_set_header = [&quot;Upgrade $http_upgrade&quot;, &quot;Connection \&quot;upgrade\&quot;&quot;]
-        ///				}        /// [rest of string was truncated]&quot;;.
+        ///  akka {
+        ///    remote {
+        ///      helios {
+        ///        tcp {
+        ///          hostname = 0.0.0.0        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string Publisher {
             get {

@@ -37,8 +37,8 @@ namespace ClusterKit.Data
         Task<TContext> CreateAndUpgradeContext(string connectionString, string databaseName);
 
         /// <summary>
-        /// Creates context attached to datasource.
-        /// Datasource will be used as is.
+        /// Creates context attached to data source.
+        /// Data source will be used as is.
         /// </summary>
         /// <param name="connectionString">
         /// The connection String.

@@ -122,7 +122,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
             var currentRelease =
                 context.Releases.Include(nameof(Release.CompatibleTemplates))
-                    .FirstOrDefault(r => r.State == Release.EnState.Active);
+                    .FirstOrDefault(r => r.State == EnReleaseState.Active);
 
             if (currentRelease?.Configuration?.NodeTemplates == null)
             {
