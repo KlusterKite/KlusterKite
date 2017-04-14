@@ -315,7 +315,7 @@ namespace ClusterKit.NodeManager
         /// <param name="containerType">The type of container</param>
         /// <param name="frameworkType">The type of framework on the container</param>
         /// <returns>The list of available templates</returns>
-        private List<Template> GetPossibleTemplatesForContainer(string containerType, string frameworkType)
+        private List<NodeTemplate> GetPossibleTemplatesForContainer(string containerType, string frameworkType)
         {
             var availableTemplates =
                 this.currentRelease.Configuration
@@ -343,7 +343,7 @@ namespace ClusterKit.NodeManager
                         this.GetType().Name,
                         containerType,
                         frameworkType);
-                return new List<Template>();
+                return new List<NodeTemplate>();
             }
 
             // first we choose among templates that have nodes less then minimum required
@@ -389,7 +389,7 @@ namespace ClusterKit.NodeManager
 
             using (
                 var context =
-                    this.contextFactory.CreateAndUpgradeContext(this.connectionString, this.databaseName).Result)
+                    this.contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
             {
                 var releases =
                     context.Releases.Include(nameof(Release.CompatibleTemplates))
@@ -484,43 +484,43 @@ namespace ClusterKit.NodeManager
             var sumWeight = templates.Sum(t => t.Priority);
 
             var check = 0.0;
-            Template selectedTemplate = null;
+            NodeTemplate selectedNodeTemplate = null;
             foreach (var template in templates)
             {
                 check += template.Priority / sumWeight;
                 if (dice <= check)
                 {
-                    selectedTemplate = template;
+                    selectedNodeTemplate = template;
                     break;
                 }
             }
 
             // this could never happen, but code analyzers can't understand it
-            if (selectedTemplate == null)
+            if (selectedNodeTemplate == null)
             {
-                Context.GetLogger().Warning("{Type}: Failed to select template with dice", this.GetType().Name);
-                selectedTemplate = templates.Last();
+                Context.GetLogger().Warning("{Type}: Failed to select nodeTemplate with dice", this.GetType().Name);
+                selectedNodeTemplate = templates.Last();
             }
 
             this.Sender.Tell(
                 new NodeStartUpConfiguration
                     {
-                        NodeTemplate = selectedTemplate.Code,
+                        NodeTemplate = selectedNodeTemplate.Code,
                         ReleaseId = this.currentRelease.Id,
-                        Configuration = selectedTemplate.Configuration,
+                        Configuration = selectedNodeTemplate.Configuration,
                         Seeds =
                             this.currentRelease.Configuration.SeedAddresses
                                 .OrderBy(s => this.random.NextDouble())
                                 .ToList(),
-                        Packages = selectedTemplate.PackagesToInstall[request.FrameworkRuntimeType],
+                        Packages = selectedNodeTemplate.PackagesToInstall[request.FrameworkRuntimeType],
                         PackageSources = this.currentRelease.Configuration.NugetFeeds.Select(f => f.Address).ToList()
                     });
 
             List<Guid> requests;
-            if (!this.awaitingRequestsByTemplate.TryGetValue(selectedTemplate.Code, out requests))
+            if (!this.awaitingRequestsByTemplate.TryGetValue(selectedNodeTemplate.Code, out requests))
             {
                 requests = new List<Guid>();
-                this.awaitingRequestsByTemplate[selectedTemplate.Code] = requests;
+                this.awaitingRequestsByTemplate[selectedNodeTemplate.Code] = requests;
             }
 
             requests.Add(request.NodeUid);
@@ -528,7 +528,7 @@ namespace ClusterKit.NodeManager
             Context.System.Scheduler.ScheduleTellOnce(
                 this.newNodeJoinTimeout,
                 this.Self,
-                new RequestTimeOut { NodeId = request.NodeUid, TemplateCode = selectedTemplate.Code },
+                new RequestTimeOut { NodeId = request.NodeUid, TemplateCode = selectedNodeTemplate.Code },
                 this.Self);
         }
 
@@ -865,7 +865,7 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void OnTemplatesStatisticsRequest()
         {
-            Func<Template, TemplatesUsageStatistics.Data> selector =
+            Func<NodeTemplate, TemplatesUsageStatistics.Data> selector =
                 t =>
                     new TemplatesUsageStatistics.Data
                         {

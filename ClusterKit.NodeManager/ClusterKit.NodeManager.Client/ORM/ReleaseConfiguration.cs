@@ -30,7 +30,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the list of configured node templates
         /// </summary>
         [DeclareField("the list of configured node templates")]
-        public List<Template> NodeTemplates { get; set; }
+        public List<NodeTemplate> NodeTemplates { get; set; }
 
         /// <summary>
         /// Gets or sets the list of configured cluster migrator templates

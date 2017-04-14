@@ -37,7 +37,6 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.ConfigurationSource.Migrations;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
 
@@ -388,7 +387,7 @@ namespace ClusterKit.NodeManager.Tests
 
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
 
-            var templates = await testActor.Ask<List<Template>>(
+            var templates = await testActor.Ask<List<NodeTemplate>>(
                                 new AvailableTemplatesRequest
                                     {
                                         ContainerType = "test",
@@ -419,7 +418,7 @@ namespace ClusterKit.NodeManager.Tests
             var config = this.Sys.Settings.Config;
             var connectionString = config.GetString("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString");
             return this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>()
-                .CreateAndUpgradeContext(connectionString, string.Empty)
+                .CreateContext(connectionString, string.Empty)
                 .Result;
         }
 
@@ -442,7 +441,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         ///     A <see cref="ConfigurationContext" /> factory with test seeding
         /// </summary>
-        private class ContextFactory : EffortContextFactory<ConfigurationContext, Configuration>
+        private class ContextFactory : EffortContextFactory<ConfigurationContext>
         {
             /// <inheritdoc />
             public ContextFactory([NotNull] BaseConnectionManager connectionManager)
@@ -451,11 +450,11 @@ namespace ClusterKit.NodeManager.Tests
             }
 
             /// <inheritdoc />
-            public override async Task<ConfigurationContext> CreateAndUpgradeContext(
+            public override async Task<ConfigurationContext> CreateContext(
                 string connectionString,
                 string databaseName)
             {
-                var context = await base.CreateAndUpgradeContext(connectionString, databaseName);
+                var context = await base.CreateContext(connectionString, databaseName);
                 if (!context.Releases.Any())
                 {
                     var release = ReleaseCheckTestsBase.CreateRelease();

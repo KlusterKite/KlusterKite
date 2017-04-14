@@ -58,9 +58,10 @@ namespace ClusterKit.NodeManager.WebApi
             this.AkkaTimeout = ConfigurationUtils.GetRestTimeout(actorSystem);
         }
 
+        // todo: put converter 
+
         /// <summary>
         /// Gets the list of defined system privileges
-        /// todo: put converter 
         /// </summary>
         [UsedImplicitly]
         [RequirePrivilege(

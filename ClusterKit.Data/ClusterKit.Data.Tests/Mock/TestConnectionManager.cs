@@ -35,6 +35,12 @@ namespace ClusterKit.Data.Tests.Mock
         }
 
         /// <inheritdoc />
+        public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
+        {
+            return true;
+        }
+
+        /// <inheritdoc />
         public override void CheckCreateDatabase(DbConnection connection, string databaseName)
         {
         }

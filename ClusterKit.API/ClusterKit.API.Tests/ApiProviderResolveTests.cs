@@ -915,12 +915,12 @@ namespace ClusterKit.API.Tests
 
             var context = new RequestContext();
 
-            const string methodParameters = "{ \"name\": \"new name\"}";
+            const string MethodParameters = "{ \"name\": \"new name\"}";
 
             var request = new ApiRequest
                               {
                                   FieldName = "nestedSync.setName",
-                                  Arguments = (JObject)JsonConvert.DeserializeObject(methodParameters),
+                                  Arguments = (JObject)JsonConvert.DeserializeObject(MethodParameters),
                                   Fields =
                                       new List<ApiRequest>
                                           {

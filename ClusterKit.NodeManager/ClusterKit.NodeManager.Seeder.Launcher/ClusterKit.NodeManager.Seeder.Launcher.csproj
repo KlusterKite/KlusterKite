@@ -71,6 +71,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeederConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

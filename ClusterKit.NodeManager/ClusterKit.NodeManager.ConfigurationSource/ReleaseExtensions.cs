@@ -194,7 +194,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <summary>
-        /// Checks the <see cref="Release"/> data and sets the <see cref="Template.PackagesToInstall"/>
+        /// Checks the <see cref="Release"/> data and sets the <see cref="NodeTemplate.PackagesToInstall"/>
         /// </summary>
         /// <param name="release">
         /// The object to update
@@ -331,7 +331,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <summary>
-        /// Checks package requirements in release templates and fills the <see cref="Template.PackagesToInstall"/> field in templates
+        /// Checks package requirements in release templates and fills the <see cref="NodeTemplate.PackagesToInstall"/> field in templates
         /// </summary>
         /// <param name="release">
         /// The release.
@@ -473,7 +473,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <summary>
-        /// Fills the provided dictionary with packages directly linked in template requirements
+        /// Fills the provided dictionary with packages directly linked in nodeTemplate requirements
         /// </summary>
         /// <param name="definedPackages">
         /// The list defined packages defined in release.
@@ -481,8 +481,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="nugetRepository">
         /// The nuget repository.
         /// </param>
-        /// <param name="template">
-        /// The template.
+        /// <param name="nodeTemplate">
+        /// The nodeTemplate.
         /// </param>
         /// <param name="templateField">
         /// The prefix for error field name.
@@ -496,11 +496,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         private static IEnumerable<ErrorDescription> GetTemplateDirectPackages(
             Dictionary<string, IPackage> definedPackages,
             IPackageRepository nugetRepository,
-            Template template,
+            NodeTemplate nodeTemplate,
             string templateField,
             Dictionary<string, IPackage> directPackagesToFill)
         {
-            foreach (var requirement in template.PackageRequirements)
+            foreach (var requirement in nodeTemplate.PackageRequirements)
             {
                 var requirementField = $"{templateField}.packageRequirements[\"{requirement.Id}\"]";
                 IPackage package;

@@ -11,8 +11,6 @@ namespace ClusterKit.NodeManager.DbTests.Context
 {
     using System.ComponentModel.DataAnnotations;
 
-    using JetBrains.Annotations;
-
     /// <summary>
     /// The test database object
     /// </summary>
@@ -32,6 +30,6 @@ namespace ClusterKit.NodeManager.DbTests.Context
         /// <summary>
         /// Gets or sets the object value
         /// </summary>
-        //public decimal Value { get; set; }
+        public decimal Value { get; set; }
     }
 }

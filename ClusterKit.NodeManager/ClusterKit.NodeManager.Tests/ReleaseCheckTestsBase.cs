@@ -104,13 +104,13 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>
         /// The list of package requirements.
         /// </returns>
-        internal static List<Template.PackageRequirement> CreatePackageRequirement(params string[] packages)
+        internal static List<NodeTemplate.PackageRequirement> CreatePackageRequirement(params string[] packages)
         {
             return packages.Select(
                 p =>
                     {
                         var parts = p.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        return new Template.PackageRequirement(parts[0], parts.Length > 1 ? parts[1] : null);
+                        return new NodeTemplate.PackageRequirement(parts[0], parts.Length > 1 ? parts[1] : null);
                     }).ToList();
         }
 
@@ -134,8 +134,8 @@ namespace ClusterKit.NodeManager.Tests
 
             var packageDescriptions = new List<PackageDescription>(CreatePackageDescriptions(packages));
 
-            var nodeTemplates = new List<Template>();
-            var t1 = new Template
+            var nodeTemplates = new List<NodeTemplate>();
+            var t1 = new NodeTemplate
                          {
                              Code = "t1",
                              Configuration = "t1",

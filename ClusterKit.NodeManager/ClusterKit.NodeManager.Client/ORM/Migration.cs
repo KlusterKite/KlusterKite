@@ -37,14 +37,14 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the migration state
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the migration state", IsKey = true)]
+        [DeclareField("the migration state")]
         public EnMigrationState State { get; set; }
 
         /// <summary>
         /// Gets or sets the migration direction
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the migration direction", IsKey = true)]
+        [DeclareField("the migration direction")]
         public EnMigrationDirection? Direction { get; set; }
 
         /// <summary>

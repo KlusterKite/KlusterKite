@@ -21,22 +21,6 @@ namespace ClusterKit.Data
     public interface IContextFactory<TContext>
     {
         /// <summary>
-        /// Creates context attached to datasource.
-        /// Datasource will be modified (database will be created, migrations will be run).
-        /// </summary>
-        /// <param name="connectionString">
-        /// The connection String.
-        /// </param>
-        /// <param name="databaseName">
-        /// The database Name.
-        /// </param>
-        /// <returns>
-        /// The data context
-        /// </returns>
-        [UsedImplicitly]
-        Task<TContext> CreateAndUpgradeContext(string connectionString, string databaseName);
-
-        /// <summary>
         /// Creates context attached to data source.
         /// Data source will be used as is.
         /// </summary>

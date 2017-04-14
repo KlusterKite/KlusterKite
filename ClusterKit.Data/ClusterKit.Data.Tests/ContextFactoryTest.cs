@@ -14,17 +14,17 @@ namespace ClusterKit.Data.Tests
     using Xunit;
 
     /// <summary>
-    /// Tests <see cref="BaseContextFactory{TContext,TMigrationConfiguration}"/>
+    /// Tests <see cref="BaseContextFactory{TContext}"/>
     /// </summary>
     public class ContextFactoryTest
     {
         /// <summary>
-        /// Tests that <see cref="BaseContextFactory{TContext,TMigrationConfiguration}"/> can create contexts
+        /// Tests that <see cref="BaseContextFactory{TContext}"/> can create contexts
         /// </summary>
         [Fact]
         public void CreatorTest()
         {
-            var creator = BaseContextFactory<TestDataContext, TestDataContextMigrationConfiguration>.Creator;
+            var creator = BaseContextFactory<TestDataContext>.Creator;
             Assert.NotNull(creator);
 
             var context = creator(null, true);

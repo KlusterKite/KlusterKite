@@ -20,7 +20,7 @@ namespace ClusterKit.Data.Tests.Mock
     /// <summary>
     /// The test context factory
     /// </summary>
-    public class TestContextFactory : BaseContextFactory<TestDataContext, TestDataContextMigrationConfiguration>
+    public class TestContextFactory : BaseContextFactory<TestDataContext>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TestContextFactory"/> class.
@@ -33,8 +33,13 @@ namespace ClusterKit.Data.Tests.Mock
         {
         }
 
-        /// <inheritdoc />
-        public override async Task<TestDataContext> CreateAndUpgradeContext(
+        /// <summary>
+        /// Creates the context and mocks it with data
+        /// </summary>
+        /// <param name="connectionString">The connection string</param>
+        /// <param name="databaseName">The database name</param>
+        /// <returns>The new context</returns>
+        public async Task<TestDataContext> CreateAndUpgradeContext(
             string connectionString,
             string databaseName)
         {
@@ -64,7 +69,7 @@ namespace ClusterKit.Data.Tests.Mock
 
             return context;
         }
-
+        
         /// <inheritdoc />
         public override async Task<TestDataContext> CreateContext(string connectionString, string databaseName)
         {

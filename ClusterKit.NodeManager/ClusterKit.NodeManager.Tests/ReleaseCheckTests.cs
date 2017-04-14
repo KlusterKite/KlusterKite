@@ -157,7 +157,7 @@ namespace ClusterKit.NodeManager.Tests
         public void ReleaseTemplateNoPackagesError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates.Add(new Template { Code = "t2" });
+            release.Configuration.NodeTemplates.Add(new NodeTemplate { Code = "t2" });
             var errors =
                 release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
             this.WriteErrors(errors);
@@ -174,7 +174,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             var release = CreateRelease();
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
-                new Template.PackageRequirement("p3", "1.0.0"));
+                new NodeTemplate.PackageRequirement("p3", "1.0.0"));
             var errors =
                 release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
             this.WriteErrors(errors);
@@ -191,15 +191,15 @@ namespace ClusterKit.NodeManager.Tests
         {
             var release = CreateRelease();
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
-                new Template.PackageRequirement("p3", "1.0.0"));
+                new NodeTemplate.PackageRequirement("p3", "1.0.0"));
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
-                new Template.PackageRequirement("dp3", "1.0.0"));
+                new NodeTemplate.PackageRequirement("dp3", "1.0.0"));
             var errors =
                 release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"p3\"]", errors[0].Field);
-            Assert.Equal($"Package dependency for {Net45} dp3 doesn't satisify version requirements", errors[0].Message);
+            Assert.Equal($"Package dependency for {Net45} dp3 doesn't satisfy version requirements", errors[0].Message);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             var release = CreateRelease();
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
-                new Template.PackageRequirement("test", "strange-version"));
+                new NodeTemplate.PackageRequirement("test", "strange-version"));
             var errors =
                 release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
             this.WriteErrors(errors);
@@ -227,7 +227,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             var release = CreateRelease();
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
-                new Template.PackageRequirement("test", null));
+                new NodeTemplate.PackageRequirement("test", null));
             var errors =
                 release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
             this.WriteErrors(errors);
@@ -244,7 +244,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             var release = CreateRelease();
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
-                new Template.PackageRequirement("test", "1.0.0"));
+                new NodeTemplate.PackageRequirement("test", "1.0.0"));
             var errors =
                 release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
             this.WriteErrors(errors);

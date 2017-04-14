@@ -16,6 +16,12 @@ namespace ClusterKit.Data.EF.Effort
     /// </summary>
     public class ConnectionManager : BaseConnectionManager
     {
+        /// <inheritdoc />
+        public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
+        {
+            return true;
+        }
+
         /// <summary>
         /// Checks for database existence. In case it is not - creates it
         /// </summary>

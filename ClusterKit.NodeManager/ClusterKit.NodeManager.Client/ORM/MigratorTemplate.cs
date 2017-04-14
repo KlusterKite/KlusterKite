@@ -24,7 +24,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// Used to define code-base to handle non-code cluster upgrade such as database updates and so on.
     /// </remarks>
     [UsedImplicitly]
-    [ApiDescription("A cluster migrator template definition", Name = "Template")]
+    [ApiDescription("A cluster migrator template definition", Name = "NodeTemplate")]
     public class MigratorTemplate 
     {
         /// <summary>
@@ -70,7 +70,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [UsedImplicitly]
         [DeclareField("The list of package requirements")]
-        public List<Template.PackageRequirement> PackageRequirements { get; set; } = new List<Template.PackageRequirement>();  
+        public List<NodeTemplate.PackageRequirement> PackageRequirements { get; set; } = new List<NodeTemplate.PackageRequirement>();  
 
         /// <summary>
         /// Gets or sets the list of packages to install for current template

@@ -9,8 +9,6 @@
 
 namespace ClusterKit.NodeManager.Migrator
 {
-    using Akka.Configuration;
-
     /// <summary>
     /// Creates the initial resources for cluster to run new configuration
     /// </summary>
@@ -20,19 +18,8 @@ namespace ClusterKit.NodeManager.Migrator
     public abstract class BaseSeeder
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseSeeder"/> class.
+        /// Performs seeding
         /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        protected BaseSeeder(Config config)
-        {
-            this.Config = config;
-        }
-
-        /// <summary>
-        /// Gets the overall seeding config
-        /// </summary>
-        protected Config Config { get; }
+        public abstract void Seed();
     }
 }

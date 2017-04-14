@@ -20,6 +20,14 @@ namespace ClusterKit.Data.EF
     public abstract class BaseConnectionManager
     {
         /// <summary>
+        ///  Checks for database existence.
+        /// </summary>
+        /// <param name="connection">Opened database connection</param>
+        /// <param name="databaseName">Database name to check</param>
+        /// <returns>A value indicating whether the database is already exists</returns>
+        public abstract bool CheckDatabaseExistence(DbConnection connection, string databaseName);
+
+        /// <summary>
         /// Checks for database existence. In case it is not - creates it
         /// </summary>
         /// <param name="connection">Opened database connection</param>

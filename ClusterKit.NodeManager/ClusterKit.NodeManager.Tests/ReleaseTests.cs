@@ -35,14 +35,14 @@ namespace ClusterKit.NodeManager.Tests
             {
                 this.CreateTestDatabase(connection);
 
-                var template1 = new Template
+                var template1 = new NodeTemplate
                                     {
                                         Code = "template1",
                                         Configuration = "1",
                                         PackageRequirements = this.GetPackageRequirements("p1; p2")
                                     };
 
-                var template2 = new Template
+                var template2 = new NodeTemplate
                                     {
                                         Code = "template2",
                                         Configuration = "2",
@@ -92,14 +92,14 @@ namespace ClusterKit.NodeManager.Tests
             {
                 this.CreateTestDatabase(connection);
 
-                var template1 = new Template
+                var template1 = new NodeTemplate
                                     {
                                         Code = "template1",
                                         Configuration = "1",
                                         PackageRequirements = this.GetPackageRequirements("p1; p2")
                                     };
 
-                var template2 = new Template
+                var template2 = new NodeTemplate
                                     {
                                         Code = "template2",
                                         Configuration = "2",
@@ -149,14 +149,14 @@ namespace ClusterKit.NodeManager.Tests
             {
                 this.CreateTestDatabase(connection);
 
-                var template1 = new Template
+                var template1 = new NodeTemplate
                                     {
                                         Code = "template1",
                                         Configuration = "1",
                                         PackageRequirements = this.GetPackageRequirements("p1; p2")
                                     };
 
-                var template2 = new Template
+                var template2 = new NodeTemplate
                                     {
                                         Code = "template2",
                                         Configuration = "2",
@@ -202,14 +202,14 @@ namespace ClusterKit.NodeManager.Tests
         /// <param name="connection">The database connection</param>
         private void CreateTestDatabase(DbConnection connection)
         {
-            var template1 = new Template
+            var template1 = new NodeTemplate
             {
                 Code = "template1",
                 Configuration = "1",
                 PackageRequirements = this.GetPackageRequirements("p1; p2")
             };
 
-            var template2 = new Template
+            var template2 = new NodeTemplate
             {
                 Code = "template2",
                 Configuration = "1",
@@ -306,14 +306,14 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         /// <param name="description">The requirements description</param>
         /// <returns>The list of requirements</returns>
-        private List<Template.PackageRequirement> GetPackageRequirements(string description)
+        private List<NodeTemplate.PackageRequirement> GetPackageRequirements(string description)
         {
             var packages = description.Split(new[] { "; " }, StringSplitOptions.RemoveEmptyEntries);
             return packages.Select(
                 p =>
                     {
                         var parts = p.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        return new Template.PackageRequirement(parts[0], parts.Skip(1).FirstOrDefault());
+                        return new NodeTemplate.PackageRequirement(parts[0], parts.Skip(1).FirstOrDefault());
                     }).ToList();
         }
     }

@@ -36,23 +36,18 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
         public Config Config { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of required packages
-        /// </summary>
-        public IList<string> RequiredPackages { get; set; }
-
-        /// <summary>
         /// Gets or sets the nuget server address
         /// </summary>
         public string Nuget { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of seeders
-        /// </summary>
-        public IList<string> Seeders { get; set; }
-
-        /// <summary>
         /// Gets or sets the nuget check period
         /// </summary>
         public TimeSpan NugetCheckPeriod { get; set; }
+
+        /// <summary>
+        /// Gets or sets the seeder configuration
+        /// </summary>
+        public List<SeederConfiguration> Configurations { get; set; }
     }
 }

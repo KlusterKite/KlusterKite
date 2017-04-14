@@ -19,6 +19,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using ClusterKit.Core;
     using ClusterKit.Data;
+    using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
@@ -55,7 +56,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
             container.Register(
                 Component.For<IContextFactory<ConfigurationContext>>()
-                    .ImplementedBy<ConfigurationContextFactory>()
+                    .ImplementedBy<BaseContextFactory<ConfigurationContext>>()
                     .LifestyleTransient());
         }
     }

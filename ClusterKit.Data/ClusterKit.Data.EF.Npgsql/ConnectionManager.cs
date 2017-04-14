@@ -22,12 +22,8 @@ namespace ClusterKit.Data.EF.Npgsql
     /// </summary>
     public class ConnectionManager : BaseConnectionManager
     {
-        /// <summary>
-        /// Checks for database existence. In case it is not - creates it
-        /// </summary>
-        /// <param name="connection">Opened database connection</param>
-        /// <param name="databaseName">Database name to check</param>
-        public override void CheckCreateDatabase(DbConnection connection, string databaseName)
+        /// <inheritdoc />
+        public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
         {
             var npgsqlConnection = connection as NpgsqlConnection;
 
@@ -53,14 +49,31 @@ namespace ClusterKit.Data.EF.Npgsql
             }
 
             var count = (long)scalar;
+            return count != 0;
+        }
 
-            if (count == 0)
+        /// <summary>
+        /// Checks for database existence. In case it is not - creates it
+        /// </summary>
+        /// <param name="connection">Opened database connection</param>
+        /// <param name="databaseName">Database name to check</param>
+        public override void CheckCreateDatabase(DbConnection connection, string databaseName)
+        {
+            if (this.CheckDatabaseExistence(connection, databaseName))
             {
-                Log.Logger.Debug("{Type}: Creating database \"{DatabaseName}\"", this.GetType().FullName, databaseName);
-                command = npgsqlConnection.CreateCommand();
-                command.CommandText = $"CREATE DATABASE \"{databaseName}\"";
-                command.ExecuteNonQuery();
+                return;
             }
+
+            var npgsqlConnection = connection as NpgsqlConnection;
+            if (npgsqlConnection == null)
+            {
+                throw new ArgumentException("connection should be NpgsqlConnection");
+            }
+
+            Log.Logger.Debug("{Type}: Creating database \"{DatabaseName}\"", this.GetType().FullName, databaseName);
+            var command = npgsqlConnection.CreateCommand();
+            command.CommandText = $"CREATE DATABASE \"{databaseName}\"";
+            command.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -71,7 +84,8 @@ namespace ClusterKit.Data.EF.Npgsql
         /// <remarks>Don't forget to dispose it</remarks>
         public override DbConnection CreateConnection(string connectionString)
         {
-            return new NpgsqlConnection(connectionString);
+            var connection = new NpgsqlConnection(connectionString);
+            return connection;
         }
     }
 }

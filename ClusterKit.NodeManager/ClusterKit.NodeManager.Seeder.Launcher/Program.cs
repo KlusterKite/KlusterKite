@@ -46,6 +46,19 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                 return;
             }
 
+            foreach (var seederConfiguration in configuration.Configurations)
+            {
+                RunSeederConfiguration(configuration, seederConfiguration);
+            }
+        }
+
+        /// <summary>
+        /// Runs seeder configuration
+        /// </summary>
+        /// <param name="configuration">The global configuration</param>
+        /// <param name="seederConfiguration">The seeder configuration</param>
+        private static void RunSeederConfiguration(Configuration configuration, SeederConfiguration seederConfiguration)
+        {
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             var executionDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             var tempDirectoryInfo = Directory.CreateDirectory(tempDir);
@@ -57,10 +70,12 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                 {
                     try
                     {
-                        var requiredPackages = configuration.RequiredPackages.Select(
-                            name => repository.Search(name, true)
-                                .ToList()
-                                .FirstOrDefault(p => p.Id == name && p.IsLatestVersion)).ToList();
+                        var requiredPackages = seederConfiguration.RequiredPackages
+                            .Select(
+                                name => repository.Search(name, true)
+                                    .ToList()
+                                    .FirstOrDefault(p => p.Id == name && p.IsLatestVersion))
+                            .ToList();
 
                         if (requiredPackages.Any(p => p == null))
                         {
@@ -92,7 +107,8 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                             continue;
                         }
 
-                        foreach (var package in requiredPackages.Union(dependencies.Where(d => requiredPackages.All(rp => rp.Id != d.Id))))
+                        foreach (var package in requiredPackages.Union(
+                            dependencies.Where(d => requiredPackages.All(rp => rp.Id != d.Id))))
                         {
                             ExtractPackage(package, configuration.ExecutionFramework, tempDir, executionDir);
                         }
@@ -115,7 +131,10 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                                                   {
                                                       UseShellExecute = false,
                                                       WorkingDirectory = executionDir,
-                                                      FileName = Path.Combine(executionDir, "ClusterKit.NodeManager.Seeder.exe")
+                                                      FileName = Path.Combine(
+                                                          executionDir,
+                                                          "ClusterKit.NodeManager.Seeder.exe"),
+                                                      Arguments = seederConfiguration.Name
                                                   }
                                           };
                         process.Start();
@@ -225,15 +244,6 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
             }
 
             configuration.Config = ConfigurationFactory.ParseString(File.ReadAllText(configuration.ConfigFile));
-            configuration.RequiredPackages = configuration.Config.GetStringList("RequiredPackages");
-
-            if (configuration.RequiredPackages == null || configuration.RequiredPackages.Count == 0
-                || configuration.RequiredPackages.All(p => p != "ClusterKit.NodeManager.Seeder"))
-            {
-                Console.WriteLine("RequiredPackages is not properly defined");
-                return null;
-            }
-
             configuration.Nuget = configuration.Config.GetString("Nuget");
             if (string.IsNullOrWhiteSpace(configuration.Nuget))
             {
@@ -241,15 +251,42 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                 return null;
             }
 
-            configuration.Seeders = configuration.Config.GetStringList("Seeders");
-            if (configuration.Seeders == null || configuration.Seeders.Count == 0)
+            configuration.NugetCheckPeriod =
+                configuration.Config.GetTimeSpan("NugetCheckPeriod", TimeSpan.FromMinutes(1));
+            configuration.ExecutionFramework = new FrameworkName(configuration.Config.GetString("ExecutionFramework"));
+
+            configuration.Configurations = new List<SeederConfiguration>();
+            foreach (var subConfig in configuration.Config.GetStringList("SeederConfigurations"))
             {
-                Console.WriteLine("Seeders is not properly defined");
+                var seederConfig = configuration.Config.GetConfig(subConfig);
+                if (seederConfig == null)
+                {
+                    Console.WriteLine($"SeederConfiguration {subConfig} was not found in the config");
+                    return null;
+                }
+
+                var seederConfiguration = new SeederConfiguration(subConfig, seederConfig);
+                if (seederConfiguration.RequiredPackages == null || seederConfiguration.RequiredPackages.Count == 0)
+                {
+                    Console.WriteLine($"SeederConfiguration {subConfig} misses the RequiredPackages property");
+                    return null;
+                }
+
+                if (seederConfiguration.Seeders == null || seederConfiguration.Seeders.Count == 0)
+                {
+                    Console.WriteLine($"SeederConfiguration {subConfig} misses the Seeders property");
+                    return null;
+                }
+
+                configuration.Configurations.Add(seederConfiguration);
+            }
+
+            if (configuration.Configurations.Count == 0)
+            {
+                Console.WriteLine("SeederConfiguration is empty");
                 return null;
             }
 
-            configuration.NugetCheckPeriod = configuration.Config.GetTimeSpan("NugetCheckPeriod", TimeSpan.FromMinutes(1));
-            configuration.ExecutionFramework = new FrameworkName(configuration.Config.GetString("ExecutionFramework"));
             return configuration;
         }
 

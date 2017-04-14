@@ -255,7 +255,7 @@ namespace ClusterKit.Data.Tests
         private async Task<IActorRef> InitContext()
         {
             var contextFactory = this.WindsorContainer.Resolve<IContextFactory<TestDataContext>>();
-            await contextFactory.CreateAndUpgradeContext(null, null);
+            await contextFactory.CreateContext(null, null);
             var actor = this.Sys.ActorOf(this.Sys.DI().Props<TestDataActor>(), "data");
             this.ExpectNoMsg();
             return actor;
@@ -276,6 +276,8 @@ namespace ClusterKit.Data.Tests
                                            {
                                                new Core.Installer(),
                                                new Core.TestKit.Installer(),
+                                               new EF.Installer(),
+                                               new EF.Effort.Installer(),
                                                new TestInstaller()
                                            };
                 return pluginInstallers;

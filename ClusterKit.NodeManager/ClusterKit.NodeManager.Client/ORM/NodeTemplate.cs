@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Template.cs" company="ClusterKit">
+// <copyright file="NodeTemplate.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -22,8 +22,8 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// A cluster node template description
     /// </summary>
     [UsedImplicitly]
-    [ApiDescription("Node template description", Name = "Template")]
-    public class Template
+    [ApiDescription("Node template description", Name = "NodeTemplate")]
+    public class NodeTemplate
     {
         /// <summary>
         /// Gets or sets the program readable node template name
@@ -132,10 +132,10 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// the list of package requirements
         /// </param>
         /// <returns>
-        /// The new instance of <see cref="Template"/>.
+        /// The new instance of <see cref="NodeTemplate"/>.
         /// </returns>
         [UsedImplicitly]
-        public Template Clone(
+        public NodeTemplate Clone(
             string configuration = null,
             string code = null,
             List<string> containerTypes = null,
@@ -146,7 +146,7 @@ namespace ClusterKit.NodeManager.Client.ORM
             int? priority = null,
             List<PackageRequirement> packageRequirements = null)
         {
-            return new Template
+            return new NodeTemplate
                        {
                            Configuration = configuration ?? this.Configuration,
                            Code = code ?? this.Code,
