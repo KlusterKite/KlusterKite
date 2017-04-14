@@ -38,4 +38,8 @@
                } 
 	
 	}
+
+	ClusterKit.NodeManager.SupportedFrameworks = [
+		".NET Framework,Version=v4.5"
+	]
 }

@@ -96,11 +96,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                     migrator.InitializeDatabase(context);
 
                     this.SetupUsers(context);
+                    var repository = PackageRepositoryFactory.Default.CreateRepository(this.config.GetString("Nuget"));
                     var configuration = new ReleaseConfiguration
                                             {
                                                 NodeTemplates = this.GetNodeTemplates().ToList(),
                                                 MigratorTemplates = this.GetMigratorTemplates().ToList(),
-                                                Packages = this.GetPackageDescriptions().ToList(),
+                                                Packages = this.GetPackageDescriptions(repository).ToList(),
                                                 SeedAddresses = this.GetSeeds().ToList(),
                                                 NugetFeeds = this.GetNugetFeeds().ToList()
                                             };
@@ -112,6 +113,17 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                                  Started = DateTimeOffset.Now,
                                                  Configuration = configuration
                                              };
+
+                    var supportedFrameworks = this.config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                    var initialErrors = initialRelease.SetPackagesDescriptionsForTemplates(
+                        repository,
+                        supportedFrameworks.ToList());
+
+                    foreach (var errorDescription in initialErrors)
+                    {
+                        Console.WriteLine($@"error in {errorDescription.Field} - {errorDescription.Message}");
+                    }
+
                     context.Releases.Add(initialRelease);
                     context.SaveChanges();
                 }
@@ -229,10 +241,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// <summary>
         /// Get the list of package descriptions
         /// </summary>
+        /// <param name="repository">The package repository</param>
         /// <returns>The list of package descriptions</returns>
-        protected virtual IEnumerable<PackageDescription> GetPackageDescriptions()
+        protected virtual IEnumerable<PackageDescription> GetPackageDescriptions(IPackageRepository repository)
         {
-            var repository = PackageRepositoryFactory.Default.CreateRepository(this.config.GetString("Nuget"));
+            
             return repository.Search(string.Empty, true)
                 .Where(p => p.IsLatestVersion)
                 .ToList()
