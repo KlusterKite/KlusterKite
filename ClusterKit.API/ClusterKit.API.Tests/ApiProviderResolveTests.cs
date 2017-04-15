@@ -864,15 +864,24 @@ namespace ClusterKit.API.Tests
             var query = new List<ApiRequest>
                             {
                                 new ApiRequest { FieldName = "syncEnumField" },
-                                new ApiRequest { FieldName = "syncFlagsField" }
+                                new ApiRequest { FieldName = "syncFlagsField" },
+                                new ApiRequest { FieldName = "syncEnumNullableField" },
+                                new ApiRequest { FieldName = "syncEnumNullableNullField" }
                             };
 
             var result = await this.Query(provider, query, context);
             Assert.NotNull(result);
             Assert.NotNull(result.Property("syncEnumField"));
             Assert.Equal("EnumItem1", result.Property("syncEnumField").ToObject<string>());
+
             Assert.NotNull(result.Property("syncFlagsField"));
             Assert.Equal(1, result.Property("syncFlagsField").ToObject<int>());
+
+            Assert.NotNull(result.Property("syncEnumNullableField"));
+            Assert.Equal("EnumItem1", result.Property("syncEnumNullableField").ToObject<string>());
+
+            Assert.NotNull(result.Property("syncEnumNullableNullField"));
+            Assert.Equal(JValue.CreateNull(), result.Property("syncEnumNullableNullField").Value);
         }
 
         /// <summary>

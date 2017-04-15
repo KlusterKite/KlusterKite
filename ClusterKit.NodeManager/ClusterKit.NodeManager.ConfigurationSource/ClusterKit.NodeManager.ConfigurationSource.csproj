@@ -243,11 +243,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationContext.cs" />
-    <Compile Include="Configurations.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Configurations.resx</DependentUpon>
-    </Compile>
     <Compile Include="Installer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReleaseDataFactory.cs" />
@@ -259,20 +254,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Resources\migrator.hocon" />
-    <None Include="Resources\empty.hocon" />
-    <None Include="Resources\clusterManager.hocon" />
-    <None Include="Resources\publisher.hocon" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Configurations.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Configurations.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="AddMigrationCommands.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -71,12 +71,11 @@ namespace ClusterKit.Data.Tests.Mock
         }
         
         /// <inheritdoc />
-        public override async Task<TestDataContext> CreateContext(string connectionString, string databaseName)
+        public override Task<TestDataContext> CreateContext(string connectionString, string databaseName)
         {
             var connection = this.ConnectionManager.CreateConnection(connectionString);
-            await connection.OpenAsync();
             var context = Creator(connection, true);
-            return context;
+            return Task.FromResult(context);
         }
     }
 }

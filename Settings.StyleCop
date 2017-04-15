@@ -30,6 +30,7 @@
       <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>nuspec</Value>
+      <Value>nullable</Value>
       <Value>migratable</Value>
       <Value>ui</Value>
       <Value>uid</Value>

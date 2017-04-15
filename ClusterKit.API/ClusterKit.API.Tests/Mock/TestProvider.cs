@@ -186,14 +186,28 @@ namespace ClusterKit.API.Tests.Mock
         public int[] SyncArrayOfScalarField => new[] { 1, 2, 3 };
 
         /// <summary>
-        /// Sync scalar field
+        /// Sync enum field
         /// </summary>
         [DeclareField]
         [UsedImplicitly]
         public EnTest SyncEnumField => EnTest.EnumItem1;
 
         /// <summary>
-        /// Sync scalar field
+        /// Sync nullable enum field with enum value
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public EnTest? SyncEnumNullableField => EnTest.EnumItem1;
+
+        /// <summary>
+        /// Sync nullable enum field with null value
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public EnTest? SyncEnumNullableNullField => null;
+
+        /// <summary>
+        /// Sync enum flags field
         /// </summary>
         [DeclareField]
         [UsedImplicitly]

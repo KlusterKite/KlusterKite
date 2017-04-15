@@ -106,12 +106,6 @@ namespace ClusterKit.API.Provider
         /// <returns>The corresponding scalar type</returns>
         public static EnScalarType CheckScalarType(Type type)
         {
-            var nullable = ApiDescriptionAttribute.CheckType(type, typeof(Nullable<>));
-            if (nullable != null)
-            {
-                type = nullable.GenericTypeArguments[0];
-            }
-
             if (type == typeof(string))
             {
                 return EnScalarType.String;
@@ -188,6 +182,12 @@ namespace ClusterKit.API.Provider
 
                 type = valueConverter.GenericTypeArguments[0];
                 metadata.ConverterType = converter;
+            }
+
+            var nullable = ApiDescriptionAttribute.CheckType(type, typeof(Nullable<>));
+            if (nullable != null)
+            {
+                type = nullable.GenericTypeArguments[0];
             }
 
             var scalarType = CheckScalarType(type);

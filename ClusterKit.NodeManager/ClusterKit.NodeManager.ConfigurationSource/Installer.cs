@@ -10,6 +10,7 @@
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
+    using System.Data.Entity;
 
     using Akka.Configuration;
 
@@ -49,6 +50,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
+            Database.SetInitializer(new NullDatabaseInitializer<ConfigurationContext>());
             container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactoryByLogin>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, Guid>>().ImplementedBy<UserFactoryByUid>().LifestyleTransient());
