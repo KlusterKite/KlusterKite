@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.MigrationStates
+namespace ClusterKit.NodeManager.Client.MigrationStates
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,6 @@ namespace ClusterKit.NodeManager.MigrationStates
 
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Migrator;
-    using ClusterKit.NodeManager.RemoteDomain;
 
     /// <summary>
     /// The migrator state according to the migration

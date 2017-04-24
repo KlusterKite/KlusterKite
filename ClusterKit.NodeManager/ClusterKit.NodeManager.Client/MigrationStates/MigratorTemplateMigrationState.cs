@@ -7,14 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.MigrationStates
+namespace ClusterKit.NodeManager.Client.MigrationStates
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.RemoteDomain;
 
     /// <summary>
     /// The migrator template state according to the migration

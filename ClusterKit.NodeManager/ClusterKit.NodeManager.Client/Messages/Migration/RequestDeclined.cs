@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationActorInitializationFailed.cs" company="ClusterKit">
+// <copyright file="RequestDeclined.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The notification of current migration check complete
+//   The response from the <see cref="MigrationActor" /> that request was declined
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages.Migration
+namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
     using System.Collections.Generic;
 
     using ClusterKit.NodeManager.Client.ORM;
 
     /// <summary>
-    /// The notification of resource migration state check failed
+    /// The response from the MigrationActor that request was declined
     /// </summary>
-    public class MigrationActorInitializationFailed
+    public class RequestDeclined
     {
         /// <summary>
-        /// Gets or sets the initialization errors
+        /// Gets or sets the list of errors
         /// </summary>
         public List<MigrationError> Errors { get; set; }
     }

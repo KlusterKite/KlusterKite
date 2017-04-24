@@ -7,10 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.MigrationStates
+namespace ClusterKit.NodeManager.Client.MigrationStates
 {
-    using ClusterKit.NodeManager.RemoteDomain;
-
     /// <summary>
     /// The resource state according to the migration
     /// </summary>

@@ -303,15 +303,6 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="Messages\ActiveNodeDescriptionsRequest.cs" />
-    <Compile Include="Messages\Migration\EnMigrationActorMigrationPosition.cs" />
-    <Compile Include="Messages\Migration\MigrationActorInitializationFailed.cs" />
-    <Compile Include="Messages\Migration\MigrationActorMigrationState.cs" />
-    <Compile Include="Messages\Migration\MigrationActorReleaseState.cs" />
-    <Compile Include="Messages\Migration\ProcessingTheRequest.cs" />
-    <Compile Include="Messages\Migration\RecheckState.cs" />
-    <Compile Include="Messages\Migration\RequestAcknowledged.cs" />
-    <Compile Include="Messages\Migration\RequestDeclined.cs" />
-    <Compile Include="Messages\Migration\ResourceUpgrade.cs" />
     <Compile Include="Messages\ReleaseCheckRequest.cs" />
     <Compile Include="Messages\ReleaseSetObsoleteRequest.cs" />
     <Compile Include="Messages\UserChangePasswordRequest.cs" />
@@ -327,23 +318,14 @@
     <Compile Include="Messages\UserRoleChangeRequest.cs" />
     <Compile Include="Messages\UserRoleRemoveRequest.cs" />
     <Compile Include="MigrationActor.cs" />
-    <Compile Include="MigrationStates\EnMigrationSide.cs" />
-    <Compile Include="MigrationStates\EnMigratorPosition.cs" />
-    <Compile Include="MigrationStates\EnResourcePosition.cs" />
-    <Compile Include="MigrationStates\MigratorMigrationState.cs" />
-    <Compile Include="MigrationStates\ResourceMigrationState.cs" />
-    <Compile Include="MigrationStates\MigratorTemplateMigrationState.cs" />
     <Compile Include="NodeManagerActor.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="NugetPackagesFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteDomain\MigratorMigrationsCommand.cs" />
-    <Compile Include="MigrationStates\ResourceReleaseState.cs" />
     <Compile Include="RemoteDomain\MigrationCollector.cs" />
     <Compile Include="RemoteDomain\MigrationExecutor.cs" />
-    <Compile Include="MigrationStates\MigratorReleaseState.cs" />
     <Compile Include="RemoteDomain\ReleaseStateCollector.cs" />
-    <Compile Include="MigrationStates\MigratorTemplateReleaseState.cs" />
     <Compile Include="WebApi\AuthenticationController.cs" />
     <Compile Include="WebApi\CurrentUserApi.cs" />
     <Compile Include="WebApi\MigrationConnection.cs" />

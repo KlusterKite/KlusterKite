@@ -7,10 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages.Migration
+namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
+    using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.MigrationStates;
     using ClusterKit.NodeManager.Migrator;
 
     /// <summary>

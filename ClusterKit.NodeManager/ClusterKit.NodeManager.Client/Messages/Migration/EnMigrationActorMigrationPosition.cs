@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages.Migration
+namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
     /// <summary>
     /// The list of possible resource migration position according to cluster migration

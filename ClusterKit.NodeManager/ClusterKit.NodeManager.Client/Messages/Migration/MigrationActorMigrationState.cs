@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages.Migration
+namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
     using System.Collections.Generic;
 
-    using ClusterKit.NodeManager.MigrationStates;
+    using ClusterKit.NodeManager.Client.MigrationStates;
 
     /// <summary>
     /// The notification of current migration check complete

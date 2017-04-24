@@ -13,8 +13,8 @@ namespace ClusterKit.NodeManager.RemoteDomain
     using System.Collections.Generic;
     using System.Linq;
 
+    using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.MigrationStates;
     using ClusterKit.NodeManager.Migrator;
 
     /// <summary>

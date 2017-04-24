@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.MigrationStates
+namespace ClusterKit.NodeManager.Client.MigrationStates
 {
     using System.Collections.Generic;
 

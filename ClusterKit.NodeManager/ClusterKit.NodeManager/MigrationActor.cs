@@ -20,10 +20,10 @@ namespace ClusterKit.NodeManager
     using Akka.Event;
 
     using ClusterKit.Data;
+    using ClusterKit.NodeManager.Client.Messages.Migration;
+    using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Messages.Migration;
-    using ClusterKit.NodeManager.MigrationStates;
     using ClusterKit.NodeManager.RemoteDomain;
 
     using JetBrains.Annotations;

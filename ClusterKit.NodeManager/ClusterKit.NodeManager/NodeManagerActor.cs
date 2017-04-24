@@ -28,11 +28,11 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.Client.Messages.Migration;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
-    using ClusterKit.NodeManager.Messages.Migration;
     using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 

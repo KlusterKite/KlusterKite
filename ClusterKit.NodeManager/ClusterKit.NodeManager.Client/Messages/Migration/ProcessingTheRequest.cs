@@ -7,10 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages.Migration
+namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
     /// <summary>
-    /// The notification from <see cref="MigrationActor"/> that it started the request process
+    /// The notification from MigrationActor that it started the request process
     /// </summary>
     public class ProcessingTheRequest
     {

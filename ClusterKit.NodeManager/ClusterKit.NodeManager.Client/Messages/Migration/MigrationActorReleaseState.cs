@@ -7,15 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages.Migration
+namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
     using System.Collections.Generic;
 
-    using ClusterKit.NodeManager.MigrationStates;
-    using ClusterKit.NodeManager.RemoteDomain;
+    using ClusterKit.NodeManager.Client.MigrationStates;
 
     /// <summary>
-    /// The <see cref="MigrationActor"/> state with no active migration
+    /// The MigrationActor state with no active migration
     /// </summary> 
     public class MigrationActorReleaseState
     {

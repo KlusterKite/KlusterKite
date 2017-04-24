@@ -7,10 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages.Migration
+namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
     /// <summary>
-    /// An order to the <see cref="MigrationActor"/> to recheck it's current state
+    /// An order to the MigrationActor to recheck it's current state
     /// </summary>
     public class RecheckState
     {

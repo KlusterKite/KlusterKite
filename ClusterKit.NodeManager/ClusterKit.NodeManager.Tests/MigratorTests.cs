@@ -27,11 +27,11 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Data;
     using ClusterKit.Data.EF;
     using ClusterKit.Data.EF.Effort;
+    using ClusterKit.NodeManager.Client.Messages.Migration;
+    using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Messages.Migration;
-    using ClusterKit.NodeManager.MigrationStates;
     using ClusterKit.NodeManager.Tests.Migrations;
 
     using NuGet;
