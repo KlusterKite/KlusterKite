@@ -1,21 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ResourceId.cs" company="ClusterKit">
+// <copyright file="ResourceReleaseState.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The description of some migratable resource
+//   The resource description
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Migrator
+namespace ClusterKit.NodeManager.MigrationStates
 {
     using System;
 
     /// <summary>
-    /// The description of some migratable resource
+    /// The resource description
     /// </summary>
-    [Serializable]
-    public class ResourceId
+    public class ResourceReleaseState : MarshalByRefObject
     {
         /// <summary>
         /// Gets or sets the human readable resource name
@@ -28,8 +27,8 @@ namespace ClusterKit.NodeManager.Migrator
         public string Code { get; set; }
 
         /// <summary>
-        /// Gets or sets the resource connection string (or some identification to help connect to such resource)
+        /// Gets or sets the current migration point of the resource
         /// </summary>
-        public string ConnectionString { get; set; }
+        public string CurrentPoint { get; set; }
     }
 }

@@ -22,6 +22,11 @@ namespace ClusterKit.NodeManager.Migrator
         string LatestPoint { get; }
 
         /// <summary>
+        /// Gets the human-readable migrator name
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Gets the list of cluster resources that this migrator can migrate
         /// </summary>
         /// <returns>The list of migratable resources</returns>

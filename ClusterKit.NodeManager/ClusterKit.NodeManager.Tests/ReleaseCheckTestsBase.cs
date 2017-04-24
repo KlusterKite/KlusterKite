@@ -107,11 +107,12 @@ namespace ClusterKit.NodeManager.Tests
         internal static List<NodeTemplate.PackageRequirement> CreatePackageRequirement(params string[] packages)
         {
             return packages.Select(
-                p =>
-                    {
-                        var parts = p.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        return new NodeTemplate.PackageRequirement(parts[0], parts.Length > 1 ? parts[1] : null);
-                    }).ToList();
+                    p =>
+                        {
+                            var parts = p.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            return new NodeTemplate.PackageRequirement(parts[0], parts.Length > 1 ? parts[1] : null);
+                        })
+                .ToList();
         }
 
         /// <summary>
@@ -144,11 +145,8 @@ namespace ClusterKit.NodeManager.Tests
                          };
             nodeTemplates.Add(t1);
 
-            var releaseConfiguration = new ReleaseConfiguration
-                                           {
-                                               Packages = packageDescriptions,
-                                               NodeTemplates = nodeTemplates
-                                           };
+            var releaseConfiguration =
+                new ReleaseConfiguration { Packages = packageDescriptions, NodeTemplates = nodeTemplates };
 
             return new Release { Configuration = releaseConfiguration };
         }
@@ -256,8 +254,28 @@ namespace ClusterKit.NodeManager.Tests
             /// <inheritdoc />
             public int DownloadCount { get; set; }
 
+            /// <summary>
+            /// Gets or sets a delegate to implement <see cref="IPackage.ExtractContents"/>
+            /// </summary>
+            public Action<IFileSystem, string> ExtractContentsAction { get; set; }
+
             /// <inheritdoc />
             public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies { get; set; }
+
+            /// <summary>
+            /// Gets or sets a delegate to implement <see cref="IPackage.GetFiles"/>
+            /// </summary>
+            public Func<IEnumerable<IPackageFile>> GetFilesAction { get; set; }
+
+            /// <summary>
+            /// Gets or sets a delegate to implement <see cref="IPackage.ExtractContents"/>
+            /// </summary>
+            public Func<Stream> GetStreamAction { get; set; }
+
+            /// <summary>
+            /// Gets or sets a delegate to implement <see cref="IPackage.ExtractContents"/>
+            /// </summary>
+            public Func<IEnumerable<FrameworkName>> GetSupportedFrameworksAction { get; set; }
 
             /// <inheritdoc />
             public Uri IconUrl { get; set; }
@@ -319,25 +337,79 @@ namespace ClusterKit.NodeManager.Tests
             /// <inheritdoc />
             public void ExtractContents(IFileSystem fileSystem, string extractPath)
             {
-                throw new InvalidOperationException();
+                if (this.ExtractContentsAction == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                this.ExtractContentsAction(fileSystem, extractPath);
             }
 
             /// <inheritdoc />
             public IEnumerable<IPackageFile> GetFiles()
             {
-                throw new InvalidOperationException();
+                if (this.GetFilesAction == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return this.GetFilesAction();
             }
 
             /// <inheritdoc />
             public Stream GetStream()
             {
-                throw new InvalidOperationException();
+                if (this.GetStreamAction == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return this.GetStreamAction();
             }
 
             /// <inheritdoc />
             public IEnumerable<FrameworkName> GetSupportedFrameworks()
             {
-                throw new InvalidOperationException();
+                if (this.GetSupportedFrameworksAction == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return this.GetSupportedFrameworksAction();
+            }
+        }
+
+        /// <summary>
+        /// The test package file  representation
+        /// </summary>
+        internal class TestPackageFile : IPackageFile
+        {
+            /// <inheritdoc />
+            public string EffectivePath { get; set; }
+
+            /// <inheritdoc />
+            public string Path { get; set; }
+
+            /// <inheritdoc />
+            public IEnumerable<FrameworkName> SupportedFrameworks { get; set; }
+
+            /// <inheritdoc />
+            public FrameworkName TargetFramework { get; set; }
+
+            /// <summary>
+            /// Gets or sets a delegate for <see cref="IPackageFile.GetStream"/>
+            /// </summary>
+            public Func<Stream> GetStreamAction { get; set; }
+
+            /// <inheritdoc />
+            public Stream GetStream()
+            {
+                if (this.GetStreamAction == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return this.GetStreamAction();
             }
         }
 

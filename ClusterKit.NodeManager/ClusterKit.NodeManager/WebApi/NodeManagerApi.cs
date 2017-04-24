@@ -20,7 +20,6 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
     using ClusterKit.Core;
-    using ClusterKit.Data.CRUD;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
@@ -127,16 +126,17 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <param name="context">The request context</param>
         /// <returns>the history of migrations</returns>
-        [DeclareConnection("the history of migrations")]
+        [UsedImplicitly]
+        [DeclareConnection("the cluster migration management")]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(
             Privileges.ClusterMigration,
             Scope = EnPrivilegeScope.User,
             AddActionNameToRequiredPrivilege = true)]
-        public Connection<Migration, int> Migrations(RequestContext context)
+        public MigrationConnection Migrations(RequestContext context)
         {
-            return new Connection<Migration, int>(
+            return new MigrationConnection(
                 this.actorSystem,
                 GetManagerActorProxyPath(),
                 this.AkkaTimeout,

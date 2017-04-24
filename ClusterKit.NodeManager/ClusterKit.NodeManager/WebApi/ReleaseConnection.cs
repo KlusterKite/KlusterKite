@@ -89,7 +89,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <param name="id">The id of release draft</param>
         /// <returns>The mutation result</returns>
-        [DeclareMutation("checks the draft releas if it can be moved to ready state.")]
+        [DeclareMutation("checks the draft release if it can be moved to ready state.")]
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
@@ -193,35 +193,6 @@ namespace ClusterKit.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on SetStable", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
-            }
-        }
-
-        /// <summary>
-        /// Initiates cluster upgrade procedure. The previous active release will be marked as <see cref="EnReleaseState.Obsolete"/>
-        /// </summary>
-        /// <param name="id">The id of release that will be applied</param>
-        /// <returns>The mutation result</returns>
-        [UsedImplicitly]
-        [RequireSession]
-        [RequireUser]
-        [RequireUserPrivilege(Privileges.ClusterUpdate)]
-        [DeclareMutation("Initiates cluster upgrade procedure. The previous active release will be marked as obsolete")]
-        public async Task<MutationResult<Release>> UpdateCluster(
-            [ApiDescription("The id of release that will be applied")] int id)
-        {
-            try
-            {
-                var response =
-                    await this.System.ActorSelection(this.DataActorPath)
-                        .Ask<CrudActionResponse<Release>>(
-                            new UpdateClusterRequest { Id = id, Context = this.Context, CurrentReleaseState = EnReleaseState.Obsolete },
-                            this.Timeout);
-                return CreateResponse(response);
-            }
-            catch (Exception exception)
-            {
-                this.System.Log.Error(exception, "{Type}: error on ClusterUpdate", this.GetType().Name);
                 return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
             }
         }

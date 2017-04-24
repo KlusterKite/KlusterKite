@@ -75,12 +75,15 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     "Nuget feeds list is empty");
             }
 
-            if (release?.Configuration?.NodeTemplates == null || release.Configuration.NodeTemplates.Count == 0)
+            if (release?.Configuration?.NodeTemplates == null 
+                || release.Configuration.NodeTemplates.Count == 0
+                || release.Configuration.MigratorTemplates == null
+                || release.Configuration.MigratorTemplates.Count == 0)
             {
                 yield break;
             }
 
-            foreach (var template in release.Configuration.NodeTemplates)
+            foreach (var template in release.Configuration.GetAllTemplates())
             {
                 try
                 {
@@ -92,9 +95,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     // ignored
                 }
 
+                var fieldName = template is NodeTemplate 
+                    ? $"configuration.nodeTemplates[\"{template.Code}\"].configuration"
+                    : $"configuration.migratorTemplates[\"{template.Code}\"].configuration";
                 yield return
                     new ErrorDescription(
-                        $"configuration.nodeTemplates[\"{template.Code}\"].configuration",
+                        fieldName,
                         "Configuration could not be parsed");
             }
         }
@@ -219,6 +225,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 yield break;
             }
 
+            if (release.Configuration?.MigratorTemplates == null || release.Configuration.MigratorTemplates.Count == 0)
+            {
+                yield return new ErrorDescription("configuration.migratorTemplates", "Migrator templates are not initialized");
+                yield break;
+            }
+
             if (release.Configuration.Packages == null || release.Configuration.Packages.Count == 0)
             {
                 yield return new ErrorDescription("configuration.packages", "Packages are not initialized");
@@ -232,10 +244,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 yield return errorDescription;
             }
 
-            foreach (var errorDescription1 in
+            foreach (var errorDescription in
                 CheckTemplatesPackages(release, supportedFrameworks, definedPackages, nugetRepository))
             {
-                yield return errorDescription1;
+                yield return errorDescription;
             }
         }
 
@@ -384,14 +396,16 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 throw new ArgumentNullException(nameof(nugetRepository));
             }
 
-            foreach (var template in release.Configuration.NodeTemplates)
+            foreach (var template in release.Configuration.GetAllTemplates())
             {
                if (template == null)
                 {
                     continue;
                 }
 
-                var templateField = $"configuration.nodeTemplates[\"{template.Code}\"]";
+                var templateField = template is NodeTemplate 
+                    ? $"configuration.nodeTemplates[\"{template.Code}\"]"
+                    : $"configuration.migratorTemplates[\"{template.Code}\"]";
 
                 if (template.PackageRequirements == null || template.PackageRequirements.Count == 0)
                 {
@@ -496,7 +510,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         private static IEnumerable<ErrorDescription> GetTemplateDirectPackages(
             Dictionary<string, IPackage> definedPackages,
             IPackageRepository nugetRepository,
-            NodeTemplate nodeTemplate,
+            ITemplate nodeTemplate,
             string templateField,
             Dictionary<string, IPackage> directPackagesToFill)
         {

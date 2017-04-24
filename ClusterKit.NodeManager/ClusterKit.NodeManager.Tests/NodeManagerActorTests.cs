@@ -185,6 +185,18 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
+        /// Checking the resource states
+        /// </summary>
+        /// <returns>The resource states</returns>
+        [Fact]
+        public async Task ResourecReleaseStateTest()
+        {
+            this.ActorOf(() => new TestActorForwarder(this.TestActor), "migrationActor");
+            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+            this.ExpectNoMsg();
+        }
+
+        /// <summary>
         ///     Node description collection test
         /// </summary>
         /// <returns>
@@ -493,6 +505,7 @@ namespace ClusterKit.NodeManager.Tests
             {{
                 ClusterKit.NodeManager.ConfigurationDatabaseName = """"
                 ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = ""{Guid.NewGuid():N}""
+                ClusterKit.NodeManager.MigrationActorSubstitute = ""/user/migrationActor""
 
                 akka : {{
                   actor: {{

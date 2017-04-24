@@ -204,7 +204,10 @@
     <Compile Include="Messages\ShutdownMessage.cs" />
     <Compile Include="Navigation.cs" />
     <Compile Include="NodeManagerReceiverActor.cs" />
+    <Compile Include="ORM\ITemplate.cs" />
     <Compile Include="ORM\Migration.cs" />
+    <Compile Include="ORM\MigrationError.cs" />
+    <Compile Include="ORM\MigrationLogRecord.cs" />
     <Compile Include="ORM\MigrationOperation.cs" />
     <Compile Include="ORM\CompatibleTemplate.cs" />
     <Compile Include="ORM\EnClusterMigrationOperationState.cs" />

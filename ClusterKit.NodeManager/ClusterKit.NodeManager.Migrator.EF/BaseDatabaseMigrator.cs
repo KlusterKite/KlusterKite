@@ -30,6 +30,9 @@ namespace ClusterKit.NodeManager.Migrator.EF
         public string LatestPoint => new DbMigrator(new TMigrationConfiguration()).GetLocalMigrations().Last();
 
         /// <inheritdoc />
+        public string Name => "ClusterKit configuration database";
+
+        /// <inheritdoc />
         public abstract IEnumerable<ResourceId> GetMigratableResources();
 
         /// <inheritdoc />

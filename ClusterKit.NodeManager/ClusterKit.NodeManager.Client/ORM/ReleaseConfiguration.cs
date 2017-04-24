@@ -10,6 +10,7 @@
 namespace ClusterKit.NodeManager.Client.ORM
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using ClusterKit.API.Attributes;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -49,5 +50,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [DeclareField("the list of nuget feeds")]
         public List<NugetFeed> NugetFeeds { get; set; }
+
+        /// <summary>
+        /// Get the united list of <see cref="NodeTemplates"/> and <see cref="MigratorTemplates"/>
+        /// </summary>
+        /// <returns>The list of templates</returns>
+        public IEnumerable<ITemplate> GetAllTemplates() => this.NodeTemplates.Cast<ITemplate>().Union(this.MigratorTemplates);
     }
 }

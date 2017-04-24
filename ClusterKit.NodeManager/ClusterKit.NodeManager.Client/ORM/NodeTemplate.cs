@@ -23,7 +23,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [UsedImplicitly]
     [ApiDescription("Node template description", Name = "NodeTemplate")]
-    public class NodeTemplate
+    public class NodeTemplate : ITemplate
     {
         /// <summary>
         /// Gets or sets the program readable node template name

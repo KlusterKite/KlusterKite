@@ -34,6 +34,13 @@ namespace ClusterKit.NodeManager.Client.ORM
         public int Id { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether current migration is in process
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("a value indicating that current migration is in process")]
+        public bool IsActive { get; set; }
+
+        /// <summary>
         /// Gets or sets the migration state
         /// </summary>
         [UsedImplicitly]
@@ -67,6 +74,13 @@ namespace ClusterKit.NodeManager.Client.ORM
         [UsedImplicitly]
         [DeclareField("the list of migration operations")]
         public List<MigrationOperation> Operations { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of migration errors
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the list of migration errors")]
+        public List<MigrationError> Errors { get; set; }
 
         /// <summary>
         /// Gets or sets the previous release id

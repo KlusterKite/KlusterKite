@@ -65,5 +65,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         [UsedImplicitly]
         public DbSet<Release> Releases { get; set; }
+
+        /// <summary>
+        /// Gets or sets the global resource migration log
+        /// </summary>
+        [UsedImplicitly]
+        public DbSet<MigrationLogRecord> MigrationLogs { get; set; }
     }
 }

@@ -33,6 +33,10 @@
     <DocumentationFile>bin\Release\ClusterKit.NodeManager.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ClusterKit.NodeManager.Migrator\ClusterKit.NodeManager.Migrator.csproj">
+      <Project>{D85A8D83-3C7D-4CC9-A2B8-6597D2AB8FB2}</Project>
+      <Name>ClusterKit.NodeManager.Migrator</Name>
+    </ProjectReference>
     <Reference Include="Akka, Version=1.1.3.344, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Akka.1.1.3.344-beta\lib\net45\Akka.dll</HintPath>
@@ -84,6 +88,10 @@
     <Reference Include="Castle.Windsor, Version=3.4.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Castle.Windsor.3.4.0\lib\net45\Castle.Windsor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CommonServiceLocator.WindsorAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CommonServiceLocator.WindsorAdapter.1.0\lib\NET35\CommonServiceLocator.WindsorAdapter.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DotNetty.Buffers">
@@ -217,75 +225,75 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects.Client/ClusterKit.LargeObjects.Client.csproj">
       <Project>{7DE19EFC-58C5-4DBF-8A2A-E81E54AF5623}</Project>
       <Name>ClusterKit.LargeObjects.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.LargeObjects/ClusterKit.LargeObjects/ClusterKit.LargeObjects.csproj">
       <Project>{261DFDC5-5107-41B5-A8F4-A34F84D22931}</Project>
       <Name>ClusterKit.LargeObjects</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.EF/ClusterKit.Data.EF.csproj">
       <Project>{17C1FC2C-F8E3-4D0C-9446-5FA6E4F4D71F}</Project>
       <Name>ClusterKit.Data.EF</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data/ClusterKit.Data.csproj">
       <Project>{0D6871D1-5A69-4533-BA4B-073B876232C5}</Project>
       <Name>ClusterKit.Data</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj">
       <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
       <Name>ClusterKit.Data.CRUD</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Client/ClusterKit.Web.Client.csproj">
       <Project>{8E543EA4-65DE-475F-8045-C094CDE58E29}</Project>
       <Name>ClusterKit.Web.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Descriptor/ClusterKit.Web.Descriptor.csproj">
       <Project>{39CA45B9-B12C-48C6-B2F6-1355F151BDCC}</Project>
       <Name>ClusterKit.Web.Descriptor</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web/ClusterKit.Web.csproj">
       <Project>{477B201A-A30C-4360-B56A-6F61C049BB04}</Project>
       <Name>ClusterKit.Web</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Rest/ClusterKit.Web.Rest.csproj">
       <Project>{9D6ED24B-FEC7-48CE-9BD2-51CA4434DA6F}</Project>
       <Name>ClusterKit.Web.Rest</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
       <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
       <Name>ClusterKit.Security.Attributes</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Authorization/ClusterKit.Web.Authorization.csproj">
       <Project>{6ADFBDDF-E452-46FC-A037-6D57300BE561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Swagger.Messages/ClusterKit.Web.Swagger.Messages.csproj">
       <Project>{D80F5923-CD1B-4376-BAB5-1785EA4395A9}</Project>
       <Name>ClusterKit.Web.Swagger.Messages</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj">
       <Project>{F3216B61-26C8-4AD6-84DF-4531D4C568A2}</Project>
       <Name>ClusterKit.Monitoring.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
       <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
       <Name>ClusterKit.API.Client</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Attributes/ClusterKit.API.Attributes.csproj">
       <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
       <Name>ClusterKit.API.Attributes</Name>
-</ProjectReference>
+    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Provider/ClusterKit.API.Provider.csproj">
       <Project>{DDC4B9D1-49AC-4CD6-9FC5-FE4A02C54871}</Project>
       <Name>ClusterKit.API.Provider</Name>
-</ProjectReference>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiProvider.cs" />
@@ -295,6 +303,15 @@
       <DependentUpon>Configuration.resx</DependentUpon>
     </Compile>
     <Compile Include="Messages\ActiveNodeDescriptionsRequest.cs" />
+    <Compile Include="Messages\Migration\EnMigrationActorMigrationPosition.cs" />
+    <Compile Include="Messages\Migration\MigrationActorInitializationFailed.cs" />
+    <Compile Include="Messages\Migration\MigrationActorMigrationState.cs" />
+    <Compile Include="Messages\Migration\MigrationActorReleaseState.cs" />
+    <Compile Include="Messages\Migration\ProcessingTheRequest.cs" />
+    <Compile Include="Messages\Migration\RecheckState.cs" />
+    <Compile Include="Messages\Migration\RequestAcknowledged.cs" />
+    <Compile Include="Messages\Migration\RequestDeclined.cs" />
+    <Compile Include="Messages\Migration\ResourceUpgrade.cs" />
     <Compile Include="Messages\ReleaseCheckRequest.cs" />
     <Compile Include="Messages\ReleaseSetObsoleteRequest.cs" />
     <Compile Include="Messages\UserChangePasswordRequest.cs" />
@@ -310,12 +327,26 @@
     <Compile Include="Messages\UserRoleChangeRequest.cs" />
     <Compile Include="Messages\UserRoleRemoveRequest.cs" />
     <Compile Include="MigrationActor.cs" />
+    <Compile Include="MigrationStates\EnMigrationSide.cs" />
+    <Compile Include="MigrationStates\EnMigratorPosition.cs" />
+    <Compile Include="MigrationStates\EnResourcePosition.cs" />
+    <Compile Include="MigrationStates\MigratorMigrationState.cs" />
+    <Compile Include="MigrationStates\ResourceMigrationState.cs" />
+    <Compile Include="MigrationStates\MigratorTemplateMigrationState.cs" />
     <Compile Include="NodeManagerActor.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="NugetPackagesFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteDomain\MigratorMigrationsCommand.cs" />
+    <Compile Include="MigrationStates\ResourceReleaseState.cs" />
+    <Compile Include="RemoteDomain\MigrationCollector.cs" />
+    <Compile Include="RemoteDomain\MigrationExecutor.cs" />
+    <Compile Include="MigrationStates\MigratorReleaseState.cs" />
+    <Compile Include="RemoteDomain\ReleaseStateCollector.cs" />
+    <Compile Include="MigrationStates\MigratorTemplateReleaseState.cs" />
     <Compile Include="WebApi\AuthenticationController.cs" />
     <Compile Include="WebApi\CurrentUserApi.cs" />
+    <Compile Include="WebApi\MigrationConnection.cs" />
     <Compile Include="WebApi\NodeManagerApi.cs" />
     <Compile Include="WebApi\NodeManagerController.cs" />
     <Compile Include="WebApi\NugetPackagesConnection.cs" />
@@ -348,9 +379,7 @@
       <Name>ClusterKit.NodeManager.Launcher.Messages</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Db\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="LICENSE.txt" />
   </ItemGroup>

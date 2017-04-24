@@ -13,7 +13,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201704130958264_Init"; }
+            get { return "201704211334033_Init"; }
         }
         
         string IMigrationMetadata.Source

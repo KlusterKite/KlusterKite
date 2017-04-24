@@ -22,6 +22,16 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <summary>
         /// The cluster is downgrading
         /// </summary>
-        Downgrade
+        Downgrade,
+
+        /// <summary>
+        /// The cluster resources don't need upgrade. They are up to date.
+        /// </summary>
+        Stay,
+
+        /// <summary>
+        /// The migration direction can-not be evaluated. The migration is corrupted.
+        /// </summary>
+        Undefined
     }
 }

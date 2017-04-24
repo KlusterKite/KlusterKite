@@ -25,7 +25,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </remarks>
     [UsedImplicitly]
     [ApiDescription("A cluster migrator template definition", Name = "NodeTemplate")]
-    public class MigratorTemplate 
+    public class MigratorTemplate : ITemplate
     {
         /// <summary>
         /// Gets or sets the program readable migrator template name

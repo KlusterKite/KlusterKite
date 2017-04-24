@@ -16,6 +16,7 @@ namespace ClusterKit.NodeManager
 
     using Akka.Actor;
     using Akka.Cluster;
+    using Akka.DI.Core;
     using Akka.Event;
     using Akka.Util.Internal;
 
@@ -31,6 +32,7 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Messages;
+    using ClusterKit.NodeManager.Messages.Migration;
     using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
@@ -103,6 +105,11 @@ namespace ClusterKit.NodeManager
             new Dictionary<Address, NodeDescription>();
 
         /// <summary>
+        /// The nuget repository
+        /// </summary>
+        private readonly IPackageRepository nugetRepository;
+
+        /// <summary>
         /// Random number generator
         /// </summary>
         private readonly Random random = new Random();
@@ -122,11 +129,6 @@ namespace ClusterKit.NodeManager
         /// The node message router
         /// </summary>
         private readonly IMessageRouter router;
-
-        /// <summary>
-        /// The nuget repository
-        /// </summary>
-        private readonly IPackageRepository nugetRepository;
 
         /// <summary>
         /// Part of currently active nodes, that could be sent to upgrade at once. 1.0M - all active nodes (above minimum required) could be sent to upgrade.
@@ -149,9 +151,39 @@ namespace ClusterKit.NodeManager
         private string connectionString;
 
         /// <summary>
+        /// The current active cluster configuration
+        /// </summary>
+        private Release currentRelease;
+
+        /// <summary>
+        /// The current active cluster migration
+        /// </summary>
+        private Migration currentMigration;
+
+        /// <summary>
         /// The database name
         /// </summary>
         private string databaseName;
+
+        /// <summary>
+        /// Gets the current release resource states
+        /// </summary>
+        private MigrationActorReleaseState resourceReleaseState;
+
+        /// <summary>
+        /// Gets a value indicating that resource manager is in the process state
+        /// </summary>
+        private bool resourceMigrationIsProcessing = true;
+
+        /// <summary>
+        /// Gets the current migration resource states
+        /// </summary>
+        private MigrationActorMigrationState resourceMigrationState;
+
+        /// <summary>
+        /// The resource migrator
+        /// </summary>
+        private ICanTell resourceMigrator;
 
         /// <summary>
         /// Handle to prevent excess upgrade messages
@@ -162,11 +194,6 @@ namespace ClusterKit.NodeManager
         /// Child actor workers
         /// </summary>
         private IActorRef workers;
-
-        /// <summary>
-        /// The current active cluster configuration
-        /// </summary>
-        private Release currentRelease;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
@@ -180,35 +207,33 @@ namespace ClusterKit.NodeManager
         /// <param name="nugetRepository">
         /// The nuget repository
         /// </param>
-        public NodeManagerActor(IContextFactory<ConfigurationContext> contextFactory, IMessageRouter router, IPackageRepository nugetRepository)
+        public NodeManagerActor(
+            IContextFactory<ConfigurationContext> contextFactory,
+            IMessageRouter router,
+            IPackageRepository nugetRepository)
         {
             this.contextFactory = contextFactory;
             this.router = router;
             this.nugetRepository = nugetRepository;
 
-            this.fullClusterWaitTimeout =
-                Context.System.Settings.Config.GetTimeSpan(
-                    "ClusterKit.NodeManager.FullClusterWaitTimeout",
-                    TimeSpan.FromSeconds(60),
-                    false);
-            this.newNodeJoinTimeout =
-                Context.System.Settings.Config.GetTimeSpan(
-                    "ClusterKit.NodeManager.NewNodeJoinTimeout",
-                    TimeSpan.FromSeconds(30),
-                    false);
-            this.newNodeRequestDescriptionNotificationTimeout =
-                Context.System.Settings.Config.GetTimeSpan(
-                    "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationTimeout",
-                    TimeSpan.FromSeconds(10),
-                    false);
-            this.newNodeRequestDescriptionNotificationMaxRequests =
-                Context.System.Settings.Config.GetInt(
-                    "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
-                    10);
-            this.upgradablePart =
-                Context.System.Settings.Config.GetDecimal(
-                    "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
-                    10);
+            this.fullClusterWaitTimeout = Context.System.Settings.Config.GetTimeSpan(
+                "ClusterKit.NodeManager.FullClusterWaitTimeout",
+                TimeSpan.FromSeconds(60),
+                false);
+            this.newNodeJoinTimeout = Context.System.Settings.Config.GetTimeSpan(
+                "ClusterKit.NodeManager.NewNodeJoinTimeout",
+                TimeSpan.FromSeconds(30),
+                false);
+            this.newNodeRequestDescriptionNotificationTimeout = Context.System.Settings.Config.GetTimeSpan(
+                "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationTimeout",
+                TimeSpan.FromSeconds(10),
+                false);
+            this.newNodeRequestDescriptionNotificationMaxRequests = Context.System.Settings.Config.GetInt(
+                "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
+                10);
+            this.upgradablePart = Context.System.Settings.Config.GetDecimal(
+                "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
+                10);
 
             this.Receive<InitializationMessage>(m => this.Initialize());
             this.Receive<object>(m => this.Stash.Stash());
@@ -230,6 +255,35 @@ namespace ClusterKit.NodeManager
         /// The stash.
         /// </value>
         public IStash Stash { get; set; }
+
+        /// <summary>
+        /// Method called before object modification in database
+        /// </summary>
+        /// <typeparam name="TObject">The type of object</typeparam>
+        /// <param name="newObject">The new Object.</param>
+        /// <param name="oldObject">The old Object.</param>
+        /// <returns>
+        /// The new version of object or null to prevent update
+        /// </returns>
+        protected override TObject BeforeUpdate<TObject>(TObject newObject, TObject oldObject)
+        {
+            if (typeof(TObject) == typeof(Release))
+            {
+                if (((Release)(object)oldObject).State != EnReleaseState.Draft)
+                {
+                    throw new Exception("Only draft releases can be updated");
+                }
+            }
+
+            // ReSharper disable once RedundantTypeArgumentsOfMethod
+            return base.BeforeUpdate<TObject>(newObject, oldObject);
+        }
+
+        /// <inheritdoc />
+        protected override Task<ConfigurationContext> GetContext()
+        {
+            return this.contextFactory.CreateContext(this.connectionString, this.databaseName);
+        }
 
         /// <summary>
         /// Is called when a message isn't handled by the current behavior of the actor
@@ -261,35 +315,6 @@ namespace ClusterKit.NodeManager
             base.Unhandled(message);
         }
 
-        /// <inheritdoc />
-        protected override Task<ConfigurationContext> GetContext()
-        {
-            return this.contextFactory.CreateContext(this.connectionString, this.databaseName);
-        }
-
-        /// <summary>
-        /// Method called before object modification in database
-        /// </summary>
-        /// <typeparam name="TObject">The type of object</typeparam>
-        /// <param name="newObject">The new Object.</param>
-        /// <param name="oldObject">The old Object.</param>
-        /// <returns>
-        /// The new version of object or null to prevent update
-        /// </returns>
-        protected override TObject BeforeUpdate<TObject>(TObject newObject, TObject oldObject)
-        {
-            if (typeof(TObject) == typeof(Release))
-            {
-                if (((Release)(object)oldObject).State != EnReleaseState.Draft)
-                {
-                    throw new Exception("Only draft releases can be updated");
-                }
-            }
-
-            // ReSharper disable once RedundantTypeArgumentsOfMethod
-            return base.BeforeUpdate<TObject>(newObject, oldObject);
-        }
-
         /// <summary>
         /// Checks node for available upgrades
         /// </summary>
@@ -304,9 +329,8 @@ namespace ClusterKit.NodeManager
 
             nodeDescription.IsObsolete = nodeDescription.ReleaseId != this.currentRelease.Id
                                          && this.currentRelease.CompatibleTemplates.All(
-                                             ct =>
-                                                 ct.TemplateCode != nodeDescription.NodeTemplate
-                                                 || ct.CompatibleReleaseId != nodeDescription.ReleaseId);
+                                             ct => ct.TemplateCode != nodeDescription.NodeTemplate
+                                                   || ct.CompatibleReleaseId != nodeDescription.ReleaseId);
         }
 
         /// <summary>
@@ -317,23 +341,20 @@ namespace ClusterKit.NodeManager
         /// <returns>The list of available templates</returns>
         private List<NodeTemplate> GetPossibleTemplatesForContainer(string containerType, string frameworkType)
         {
-            var availableTemplates =
-                this.currentRelease.Configuration
-                .NodeTemplates.Where(t => t.ContainerTypes.Contains(containerType) && t.PackagesToInstall.ContainsKey(frameworkType))
-                    .Select(
-                        t =>
-                            new
-                                {
-                                    Template = t,
-                                    NodesCount =
-                                    (this.activeNodesByTemplate.ContainsKey(t.Code)
-                                         ? this.activeNodesByTemplate[t.Code].Count
-                                         : 0)
-                                    + (this.awaitingRequestsByTemplate.ContainsKey(t.Code)
-                                           ? this.awaitingRequestsByTemplate[t.Code].Count
-                                           : 0)
-                                })
-                    .ToList();
+            var availableTemplates = this.currentRelease.Configuration.NodeTemplates
+                .Where(t => t.ContainerTypes.Contains(containerType) && t.PackagesToInstall.ContainsKey(frameworkType))
+                .Select(
+                    t => new
+                             {
+                                 Template = t,
+                                 NodesCount =
+                                 (this.activeNodesByTemplate.ContainsKey(t.Code)
+                                      ? this.activeNodesByTemplate[t.Code].Count
+                                      : 0) + (this.awaitingRequestsByTemplate.ContainsKey(t.Code)
+                                                  ? this.awaitingRequestsByTemplate[t.Code].Count
+                                                  : 0)
+                             })
+                .ToList();
 
             if (availableTemplates.Count == 0)
             {
@@ -347,23 +368,22 @@ namespace ClusterKit.NodeManager
             }
 
             // first we choose among templates that have nodes less then minimum required
-            var templates =
-                availableTemplates.Where(
-                        t => t.Template.MinimumRequiredInstances > 0 && t.NodesCount < t.Template.MinimumRequiredInstances)
-                    .Select(t => t.Template)
-                    .ToList();
+            var templates = availableTemplates
+                .Where(
+                    t => t.Template.MinimumRequiredInstances > 0 && t.NodesCount < t.Template.MinimumRequiredInstances)
+                .Select(t => t.Template)
+                .ToList();
 
             if (templates.Count == 0)
             {
                 // if all node templates has at least minimum required node quantity, we will use node template, until it has maximum needed quantity
-                templates =
-                    availableTemplates.Where(
-                            t =>
-                                !t.Template.MaximumNeededInstances.HasValue
-                                || (t.Template.MaximumNeededInstances.Value > 0
-                                    && t.NodesCount < t.Template.MaximumNeededInstances.Value))
-                        .Select(t => t.Template)
-                        .ToList();
+                templates = availableTemplates
+                    .Where(
+                        t => !t.Template.MaximumNeededInstances.HasValue
+                             || (t.Template.MaximumNeededInstances.Value > 0
+                                 && t.NodesCount < t.Template.MaximumNeededInstances.Value))
+                    .Select(t => t.Template)
+                    .ToList();
             }
 
             if (templates.Count == 0)
@@ -387,13 +407,11 @@ namespace ClusterKit.NodeManager
             this.connectionString = Context.System.Settings.Config.GetString(ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(ConfigDatabaseNamePath);
 
-            using (
-                var context =
-                    this.contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
             {
-                var releases =
-                    context.Releases.Include(nameof(Release.CompatibleTemplates))
-                        .Where(r => r.State == EnReleaseState.Active).ToList();
+                var releases = context.Releases.Include(nameof(Release.CompatibleTemplates))
+                    .Where(r => r.State == EnReleaseState.Active)
+                    .ToList();
                 this.currentRelease = releases.SingleOrDefault();
             }
         }
@@ -421,12 +439,18 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            this.workers =
-                Context.ActorOf(
-                    Props.Create(
-                            () => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
-                        .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
-                    "workers");
+            this.workers = Context.ActorOf(
+                Props.Create(() => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
+                    .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
+                "workers");
+
+
+            var migrationActorSubstitute =
+                Context.System.Settings.Config.GetString("ClusterKit.NodeManager.MigrationActorSubstitute");
+
+            this.resourceMigrator = string.IsNullOrWhiteSpace(migrationActorSubstitute) 
+                ? (ICanTell)Context.ActorOf(Context.System.DI().Props<MigrationActor>(), "resourceMigrator")
+                : Context.System.ActorSelection(migrationActorSubstitute);
 
             this.Become(this.Start);
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
@@ -512,8 +536,12 @@ namespace ClusterKit.NodeManager
                             this.currentRelease.Configuration.SeedAddresses
                                 .OrderBy(s => this.random.NextDouble())
                                 .ToList(),
-                        Packages = selectedNodeTemplate.PackagesToInstall[request.FrameworkRuntimeType],
-                        PackageSources = this.currentRelease.Configuration.NugetFeeds.Select(f => f.Address).ToList()
+                        Packages =
+                            selectedNodeTemplate.PackagesToInstall[
+                                request.FrameworkRuntimeType],
+                        PackageSources =
+                            this.currentRelease.Configuration.NugetFeeds.Select(f => f.Address)
+                                .ToList()
                     });
 
             List<Guid> requests;
@@ -713,9 +741,9 @@ namespace ClusterKit.NodeManager
             var upgradeTimeOut = this.newNodeJoinTimeout + this.newNodeRequestDescriptionNotificationTimeout;
 
             // removing lost nodes
-            var obsoleteUpgrades =
-                this.upgradingNodes.Values.Where(u => DateTimeOffset.Now - u.UpgradeStartTime >= upgradeTimeOut)
-                    .ToList();
+            var obsoleteUpgrades = this.upgradingNodes.Values
+                .Where(u => DateTimeOffset.Now - u.UpgradeStartTime >= upgradeTimeOut)
+                .ToList();
 
             obsoleteUpgrades.ForEach(u => this.upgradingNodes.Remove(u.NodeId));
             var isUpgrading = false;
@@ -749,7 +777,7 @@ namespace ClusterKit.NodeManager
                     var nodesInUpgrade = this.upgradingNodes.Values.Count(u => u.NodeTemplate == nodeGroup.Key);
 
                     nodesToUpgradeCount = (int)Math.Ceiling(nodeGroup.Count() * this.upgradablePart / 100.0M)
-                                              - nodesInUpgrade;
+                                          - nodesInUpgrade;
 
                     if (nodesToUpgradeCount <= 0)
                     {
@@ -761,12 +789,13 @@ namespace ClusterKit.NodeManager
                 isUpgrading = true;
                 foreach (var node in nodes)
                 {
-                    this.upgradingNodes[node.NodeId] = new UpgradeData
-                                                           {
-                                                               NodeId = node.NodeId,
-                                                               NodeTemplate = node.NodeTemplate,
-                                                               UpgradeStartTime = DateTimeOffset.Now
-                                                           };
+                    this.upgradingNodes[node.NodeId] =
+                        new UpgradeData
+                            {
+                                NodeId = node.NodeId,
+                                NodeTemplate = node.NodeTemplate,
+                                UpgradeStartTime = DateTimeOffset.Now
+                            };
                     this.OnNodeUpdateRequest(node.NodeAddress, false);
                 }
             }
@@ -784,264 +813,47 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// Sends new description request to foreign node
-        /// </summary>
-        /// <param name="message">Notification message</param>
-        private void OnRequestDescriptionNotification(RequestDescriptionNotification message)
-        {
-            Cancelable cancelable;
-            if (!this.requestDescriptionNotifications.TryGetValue(message.Address, out cancelable))
-            {
-                return;
-            }
-
-            this.router.Tell(message.Address, "/user/NodeManager/Receiver", new Identify("receiver"), this.Self);
-
-            if (message.Attempt >= this.newNodeRequestDescriptionNotificationMaxRequests)
-            {
-                return;
-            }
-
-            var notification = new RequestDescriptionNotification
-                                   {
-                                       Address = message.Address,
-                                       Attempt = message.Attempt + 1
-                                   };
-
-            Context.System.Scheduler.ScheduleTellOnce(
-                this.newNodeRequestDescriptionNotificationTimeout,
-                this.Self,
-                notification,
-                this.Self,
-                cancelable);
-        }
-
-        /// <summary>
-        /// Process the event of <seealso cref="NodeStartUpConfiguration"/> time out
-        /// </summary>
-        /// <param name="requestTimeOut">The timeout notification</param>
-        private void OnRequestTimeOut(RequestTimeOut requestTimeOut)
-        {
-            List<Guid> requests;
-            if (this.awaitingRequestsByTemplate.TryGetValue(requestTimeOut.TemplateCode, out requests))
-            {
-                requests.Remove(requestTimeOut.NodeId);
-            }
-        }
-
-        /// <summary>
-        /// The role leader has been changed
-        /// </summary>
-        /// <param name="message">The notification message</param>
-        private void OnRoleLeaderChanged(ClusterEvent.RoleLeaderChanged message)
-        {
-            if (string.IsNullOrWhiteSpace(message.Role))
-            {
-                Context.GetLogger()
-                    .Warning("{Type}: received RoleLeaderChanged message with empty role", this.GetType().ToString());
-                return;
-            }
-
-            var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.LeaderInRoles.Contains(message.Role));
-            formerLeader?.LeaderInRoles.Remove(message.Role);
-
-            if (message.Leader == null)
-            {
-                this.roleLeaders.Remove(message.Role);
-            }
-            else
-            {
-                this.roleLeaders[message.Role] = message.Leader;
-                NodeDescription leader;
-                if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
-                {
-                    leader.LeaderInRoles.Add(message.Role);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Process the <seealso cref="TemplatesStatisticsRequest"/> request
-        /// </summary>
-        private void OnTemplatesStatisticsRequest()
-        {
-            Func<NodeTemplate, TemplatesUsageStatistics.Data> selector =
-                t =>
-                    new TemplatesUsageStatistics.Data
-                        {
-                            MaximumRequiredNodes = t.MaximumNeededInstances,
-                            MinimumRequiredNodes = t.MinimumRequiredInstances,
-                            Name = t.Code,
-                            ActiveNodes =
-                                this.activeNodesByTemplate.ContainsKey(t.Code)
-                                    ? this.activeNodesByTemplate[t.Code].Count
-                                    : 0,
-                            ObsoleteNodes =
-                                this.activeNodesByTemplate.ContainsKey(t.Code)
-                                    ? this.activeNodesByTemplate[t.Code].Count(
-                                        a => this.nodeDescriptions[a].IsObsolete)
-                                    : 0,
-                            UpgradingNodes =
-                                this.upgradingNodes.Values.Count(
-                                    d => d.NodeTemplate == t.Code),
-                            StartingNodes =
-                                this.awaitingRequestsByTemplate.ContainsKey(t.Code)
-                                    ? this.awaitingRequestsByTemplate[t.Code].Count
-                                    : 0,
-                        };
-            var stats = new TemplatesUsageStatistics
-                            {
-                                Templates =
-                                    this.currentRelease.Configuration.NodeTemplates.Select(
-                                        selector).ToList()
-                            };
-
-            this.Sender.Tell(stats, this.Self);
-        }
-
-        /// <summary>
-        /// Initializes normal actor work
-        /// </summary>
-        private void Start()
-        {
-            Cluster.Get(Context.System)
-                .Subscribe(
-                    this.Self,
-                    ClusterEvent.InitialStateAsEvents,
-                    typeof(ClusterEvent.MemberRemoved),
-                    typeof(ClusterEvent.MemberUp),
-                    typeof(ClusterEvent.LeaderChanged),
-                    typeof(ClusterEvent.RoleLeaderChanged));
-
-            // ping message will indicate that actor started and ready to work
-            this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
-
-            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member));
-            this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member));
-
-            this.Receive<ClusterEvent.LeaderChanged>(m => this.OnLeaderChanged(m));
-            this.Receive<ClusterEvent.RoleLeaderChanged>(m => this.OnRoleLeaderChanged(m));
-
-            this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
-            this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
-            this.Receive<ActiveNodeDescriptionsRequest>(
-                m => { this.Sender.Tell(this.nodeDescriptions.Values.ToList()); });
-            this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
-            this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m.Address, true));
-
-            this.Receive<NewNodeTemplateRequest>(m => this.OnNewNodeTemplateRequest(m));
-            this.Receive<RequestTimeOut>(m => this.OnRequestTimeOut(m));
-
-            this.Receive<UpgradeMessage>(m => this.OnNodeUpgrade());
-            this.Receive<AvailableTemplatesRequest>(
-                m => this.Sender.Tell(this.GetPossibleTemplatesForContainer(m.ContainerType, m.FrameworkRuntimeType)));
-            this.Receive<TemplatesStatisticsRequest>(m => this.OnTemplatesStatisticsRequest());
-
-            this.Receive<AuthenticateUserWithCredentials>(m => this.workers.Forward(m));
-            this.Receive<AuthenticateUserWithUid>(m => this.workers.Forward(m));
-            this.Receive<CollectionRequest<User>>(m => this.workers.Forward(m));
-            this.Receive<CrudActionMessage<User, Guid>>(m => this.workers.Forward(m));
-            this.Receive<CollectionRequest<Role>>(m => this.workers.Forward(m));
-            this.Receive<CrudActionMessage<Role, Guid>>(m => this.workers.Forward(m));
-            this.Receive<UserChangePasswordRequest>(m => this.workers.Forward(m));
-            this.Receive<UserResetPasswordRequest>(m => this.workers.Forward(m));
-            this.Receive<UserRoleAddRequest>(m => this.workers.Forward(m));
-            this.Receive<UserRoleRemoveRequest>(m => this.workers.Forward(m));
-
-            this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
-            this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
-            this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
-            this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
-            this.ReceiveAsync<ReleaseSetObsoleteRequest>(this.OnReleaseSetObsolete);
-            this.ReceiveAsync<ReleaseSetStableRequest>(this.OnReleaseSetStable);
-            this.ReceiveAsync<UpdateClusterRequest>(this.OnUpdateCluster);
-        }
-
-        /// <summary>
-        /// Process the <see cref="UpdateClusterRequest"/>
+        /// Process the <see cref="ReleaseSetReadyRequest"/>
         /// </summary>
         /// <param name="request">The request</param>
         /// <returns>The async task</returns>
-        private async Task OnUpdateCluster(UpdateClusterRequest request)
-        {
-            var release = await this.OnUpdateClusterUpdateDatabase(request);
-            if (release == null)
-            {
-                return;
-            }
-
-            this.currentRelease = release;
-            foreach (var nodeDescription in this.nodeDescriptions.Values)
-            {
-               this.CheckNodeIsObsolete(nodeDescription); 
-            }
-
-            this.OnNodeUpgrade();
-        }
-
-        /// <summary>
-        /// Updates the database as part of cluster update process
-        /// </summary>
-        /// <param name="request">The request to update cluster</param>
-        /// <returns>The new active release</returns>
-        private async Task<Release> OnUpdateClusterUpdateDatabase(UpdateClusterRequest request)
+        private async Task OnReleaseCheck(ReleaseCheckRequest request)
         {
             try
             {
                 using (var ds = await this.GetContext())
                 {
-                    var release = ds.Releases.Include(nameof(Release.CompatibleTemplates)).FirstOrDefault(r => r.Id == request.Id);
+                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
-                        return null;
+                        return;
                     }
 
-                    if (release.State == EnReleaseState.Active)
+                    if (release.State != EnReleaseState.Draft)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
-                                new Exception("This release is already marked as active"),
+                                new Exception("Only draft releases can be checked"),
                                 null));
-                        return null;
+                        return;
                     }
 
-                    var now = DateTimeOffset.Now;
-                    var currentActiveRelease = ds.Releases.FirstOrDefault(r => r.State == EnReleaseState.Active);
-                    if (currentActiveRelease != null)
+                    var supportedFrameworks =
+                        Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                    var errors = release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList()).ToArray();
+                    if (errors.Length > 0)
                     {
-                        currentActiveRelease.State = request.CurrentReleaseState != EnReleaseState.Active
-                            ? request.CurrentReleaseState
-                            : EnReleaseState.Obsolete;
-                        currentActiveRelease.Finished = now;
+                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors), null));
+                        return;
                     }
 
-                    release.State = EnReleaseState.Active;
-                    if (release.Started == null)
-                    {
-                        release.Started = now;
-                    }
-
-                    release.Finished = null;
-                    ds.SaveChanges();
                     this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
-                    const string SecurityMessage = "Cluster upgrade with release {ReleaseId} initiated. "
-                                                   + "Previous release {PreviousReleaseId} marked as {PreviousReleaseState}";
-                    SecurityLog.CreateRecord(
-                        EnSecurityLogType.OperationGranted,
-                        EnSeverity.Crucial,
-                        request.Context,
-                        SecurityMessage,
-                        release.Id,
-                        currentActiveRelease?.Id,
-                        request.CurrentReleaseState.ToString());
-                    return release;
                 }
             }
             catch (Exception exception)
             {
                 this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
-                return null;
             }
         }
 
@@ -1120,62 +932,8 @@ namespace ClusterKit.NodeManager
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Release>.Error(
-                                new Exception("There is an already defined ready release. Please remove the previous one."),
-                                null));
-                        return;
-                    }
-
-                    var supportedFrameworks = Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var errors = release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList()).ToArray();
-                    if (errors.Length > 0)
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new MutationException(errors),
-                                null));
-                        return;
-                    }
-
-                    release.State = EnReleaseState.Ready;
-                    ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
-                    SecurityLog.CreateRecord(
-                        EnSecurityLogType.OperationGranted,
-                        EnSeverity.Crucial,
-                        request.Context,
-                        "Release {ReleaseId} marked as Ready",
-                        release.Id);
-                }
-            }
-            catch (Exception exception)
-            {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
-            }
-        }
-
-        /// <summary>
-        /// Process the <see cref="ReleaseSetReadyRequest"/>
-        /// </summary>
-        /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
-        private async Task OnReleaseCheck(ReleaseCheckRequest request)
-        {
-            try
-            {
-                using (var ds = await this.GetContext())
-                {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
-                        return;
-                    }
-
-                    if (release.State != EnReleaseState.Draft)
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception("Only draft releases can be checked"),
+                                new Exception(
+                                    "There is an already defined ready release. Please remove the previous one."),
                                 null));
                         return;
                     }
@@ -1189,7 +947,15 @@ namespace ClusterKit.NodeManager
                         return;
                     }
 
+                    release.State = EnReleaseState.Ready;
+                    ds.SaveChanges();
                     this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    SecurityLog.CreateRecord(
+                        EnSecurityLogType.OperationGranted,
+                        EnSeverity.Crucial,
+                        request.Context,
+                        "Release {ReleaseId} marked as Ready",
+                        release.Id);
                 }
             }
             catch (Exception exception)
@@ -1242,6 +1008,409 @@ namespace ClusterKit.NodeManager
             {
                 this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
             }
+        }
+
+        /// <summary>
+        /// Sends new description request to foreign node
+        /// </summary>
+        /// <param name="message">Notification message</param>
+        private void OnRequestDescriptionNotification(RequestDescriptionNotification message)
+        {
+            Cancelable cancelable;
+            if (!this.requestDescriptionNotifications.TryGetValue(message.Address, out cancelable))
+            {
+                return;
+            }
+
+            this.router.Tell(message.Address, "/user/NodeManager/Receiver", new Identify("receiver"), this.Self);
+
+            if (message.Attempt >= this.newNodeRequestDescriptionNotificationMaxRequests)
+            {
+                return;
+            }
+
+            var notification =
+                new RequestDescriptionNotification { Address = message.Address, Attempt = message.Attempt + 1 };
+
+            Context.System.Scheduler.ScheduleTellOnce(
+                this.newNodeRequestDescriptionNotificationTimeout,
+                this.Self,
+                notification,
+                this.Self,
+                cancelable);
+        }
+
+        /// <summary>
+        /// Process the event of <seealso cref="NodeStartUpConfiguration"/> time out
+        /// </summary>
+        /// <param name="requestTimeOut">The timeout notification</param>
+        private void OnRequestTimeOut(RequestTimeOut requestTimeOut)
+        {
+            List<Guid> requests;
+            if (this.awaitingRequestsByTemplate.TryGetValue(requestTimeOut.TemplateCode, out requests))
+            {
+                requests.Remove(requestTimeOut.NodeId);
+            }
+        }
+
+        /// <summary>
+        /// A notification from <see cref="MigrationActor"/> of error in state checks
+        /// </summary>
+        /// <param name="state">The check failed notification</param>
+        /// <returns>The async task</returns>
+        private Task OnResourceCheckFailed(MigrationActorInitializationFailed state)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// The new resource migration log records to save to database
+        /// </summary>
+        /// <param name="logRecords">
+        /// The log records.
+        /// </param>
+        /// <returns>The async task</returns>
+        private Task OnResourceMigrationLogs(List<MigrationLogRecord> logRecords)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// The updated resource states with active migration
+        /// </summary>
+        /// <param name="state">
+        /// The resources state.
+        /// </param>
+        /// <returns>The async task</returns>
+        private Task OnResourceMigrationState(MigrationActorMigrationState state)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// The updated resource states without active migration
+        /// </summary>
+        /// <param name="state">
+        /// The resources state.
+        /// </param>
+        /// <returns>The async task</returns>
+        private Task OnResourceReleaseState(MigrationActorReleaseState state)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// The role leader has been changed
+        /// </summary>
+        /// <param name="message">The notification message</param>
+        private void OnRoleLeaderChanged(ClusterEvent.RoleLeaderChanged message)
+        {
+            if (string.IsNullOrWhiteSpace(message.Role))
+            {
+                Context.GetLogger()
+                    .Warning("{Type}: received RoleLeaderChanged message with empty role", this.GetType().ToString());
+                return;
+            }
+
+            var formerLeader = this.nodeDescriptions.Values.FirstOrDefault(d => d.LeaderInRoles.Contains(message.Role));
+            formerLeader?.LeaderInRoles.Remove(message.Role);
+
+            if (message.Leader == null)
+            {
+                this.roleLeaders.Remove(message.Role);
+            }
+            else
+            {
+                this.roleLeaders[message.Role] = message.Leader;
+                NodeDescription leader;
+                if (this.nodeDescriptions.TryGetValue(message.Leader, out leader))
+                {
+                    leader.LeaderInRoles.Add(message.Role);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process the <seealso cref="TemplatesStatisticsRequest"/> request
+        /// </summary>
+        private void OnTemplatesStatisticsRequest()
+        {
+            Func<NodeTemplate, TemplatesUsageStatistics.Data> selector =
+                t => new TemplatesUsageStatistics.Data
+                         {
+                             MaximumRequiredNodes = t.MaximumNeededInstances,
+                             MinimumRequiredNodes = t.MinimumRequiredInstances,
+                             Name = t.Code,
+                             ActiveNodes =
+                                 this.activeNodesByTemplate.ContainsKey(t.Code)
+                                     ? this.activeNodesByTemplate[t.Code].Count
+                                     : 0,
+                             ObsoleteNodes =
+                                 this.activeNodesByTemplate.ContainsKey(t.Code)
+                                     ? this.activeNodesByTemplate[t.Code]
+                                         .Count(a => this.nodeDescriptions[a].IsObsolete)
+                                     : 0,
+                             UpgradingNodes =
+                                 this.upgradingNodes.Values.Count(
+                                     d => d.NodeTemplate == t.Code),
+                             StartingNodes =
+                                 this.awaitingRequestsByTemplate.ContainsKey(t.Code)
+                                     ? this.awaitingRequestsByTemplate[t.Code].Count
+                                     : 0,
+                         };
+            var stats = new TemplatesUsageStatistics
+                            {
+                                Templates =
+                                    this.currentRelease.Configuration.NodeTemplates
+                                        .Select(selector)
+                                        .ToList()
+                            };
+
+            this.Sender.Tell(stats, this.Self);
+        }
+
+        /// <summary>
+        /// Initiates the cluster migration process to the new release
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>The async task</returns>
+        private async Task OnUpdateCluster(UpdateClusterRequest request)
+        {
+            if (this.resourceMigrationIsProcessing)
+            {
+                this.Sender.Tell(CrudActionResponse<Migration>.Error(new Exception("Resources are still checking"), null));
+                return;
+            }
+
+            if (this.resourceReleaseState == null)
+            {
+                this.Sender.Tell(CrudActionResponse<Migration>.Error(new Exception("Resources state is unknown"), null));
+                return;
+            }
+
+            // todo: move check on resource state receive 
+            var resourcesAreReady = this.resourceReleaseState.States.SelectMany(s => s.MigratorsStates)
+                .SelectMany(m => m.Resources.Select(r => r.CurrentPoint == m.LastDefinedPoint))
+                .All(r => r);
+
+            if (!resourcesAreReady)
+            {
+                this.Sender.Tell(CrudActionResponse<Migration>.Error(new Exception("Cluster cannot be migrated. Resources are not ready"), null));
+                return;
+            }
+
+            try
+            {
+                using (var ds = await this.GetContext())
+                {
+                    var activeMigration = ds.Migrations.FirstOrDefault(m => m.IsActive);
+                    if (activeMigration != null)
+                    {
+                        this.Sender.Tell(
+                            CrudActionResponse<Migration>.Error(
+                                new Exception("There is already a pending migration"),
+                                null));
+                        return;
+                    }
+
+                    if (request.Id == this.currentRelease.Id)
+                    {
+                        this.Sender.Tell(
+                            CrudActionResponse<Migration>.Error(new Exception("This release is already set"), null));
+                        return;
+                    }
+
+                    var newRelease = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                    if (newRelease == null)
+                    {
+                        this.Sender.Tell(CrudActionResponse<Migration>.Error(new EntityNotFoundException(), null));
+                        return;
+                    }
+
+                    if (newRelease.State == EnReleaseState.Draft)
+                    {
+                        this.Sender.Tell(
+                            CrudActionResponse<Migration>.Error(
+                                new Exception("cluster cannot be migrated to draft release"),
+                                null));
+                        return;
+                    }
+
+                    var migration = new Migration
+                                        {
+                                            State = EnMigrationState.Preparing,
+                                            Started = DateTimeOffset.Now,
+                                            IsActive = true,
+                                            FromReleaseId = this.currentRelease.Id,
+                                            ToReleaseId = newRelease.Id
+                                        };
+                    ds.Migrations.Add(migration);
+                    ds.SaveChanges();
+                    this.currentMigration = migration;
+                    this.resourceMigrationIsProcessing = true;
+                    this.resourceMigrationState = null;
+                    this.resourceReleaseState = null;
+                    this.resourceMigrator.Tell(new RecheckState(), this.Self);
+                    this.Sender.Tell(CrudActionResponse<Migration>.Success(migration, null));
+                }
+            }
+            catch (Exception exception)
+            {
+                this.Sender.Tell(CrudActionResponse<Migration>.Error(exception, null));
+            }
+        }
+
+        /// <summary>
+        /// Initializes normal actor work
+        /// </summary>
+        private void Start()
+        {
+            Cluster.Get(Context.System)
+                .Subscribe(
+                    this.Self,
+                    ClusterEvent.InitialStateAsEvents,
+                    typeof(ClusterEvent.MemberRemoved),
+                    typeof(ClusterEvent.MemberUp),
+                    typeof(ClusterEvent.LeaderChanged),
+                    typeof(ClusterEvent.RoleLeaderChanged));
+
+            // ping message will indicate that actor started and ready to work
+            this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
+
+            this.Receive<ClusterEvent.MemberUp>(m => this.OnNodeUp(m.Member));
+            this.Receive<ClusterEvent.MemberRemoved>(m => this.OnNodeDown(m.Member));
+
+            this.Receive<ClusterEvent.LeaderChanged>(m => this.OnLeaderChanged(m));
+            this.Receive<ClusterEvent.RoleLeaderChanged>(m => this.OnRoleLeaderChanged(m));
+
+            this.Receive<RequestDescriptionNotification>(m => this.OnRequestDescriptionNotification(m));
+            this.Receive<NodeDescription>(m => this.OnNodeDescription(m));
+            this.Receive<ActiveNodeDescriptionsRequest>(
+                m => { this.Sender.Tell(this.nodeDescriptions.Values.ToList()); });
+            this.Receive<ActorIdentity>(m => this.OnActorIdentity(m));
+            this.Receive<NodeUpgradeRequest>(m => this.OnNodeUpdateRequest(m.Address, true));
+
+            this.Receive<NewNodeTemplateRequest>(m => this.OnNewNodeTemplateRequest(m));
+            this.Receive<RequestTimeOut>(m => this.OnRequestTimeOut(m));
+
+            this.Receive<UpgradeMessage>(m => this.OnNodeUpgrade());
+            this.Receive<AvailableTemplatesRequest>(
+                m => this.Sender.Tell(this.GetPossibleTemplatesForContainer(m.ContainerType, m.FrameworkRuntimeType)));
+            this.Receive<TemplatesStatisticsRequest>(m => this.OnTemplatesStatisticsRequest());
+
+            this.Receive<AuthenticateUserWithCredentials>(m => this.workers.Forward(m));
+            this.Receive<AuthenticateUserWithUid>(m => this.workers.Forward(m));
+            this.Receive<CollectionRequest<User>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<User, Guid>>(m => this.workers.Forward(m));
+            this.Receive<CollectionRequest<Role>>(m => this.workers.Forward(m));
+            this.Receive<CrudActionMessage<Role, Guid>>(m => this.workers.Forward(m));
+            this.Receive<UserChangePasswordRequest>(m => this.workers.Forward(m));
+            this.Receive<UserResetPasswordRequest>(m => this.workers.Forward(m));
+            this.Receive<UserRoleAddRequest>(m => this.workers.Forward(m));
+            this.Receive<UserRoleRemoveRequest>(m => this.workers.Forward(m));
+
+            this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
+            this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
+            this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
+            this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
+            this.ReceiveAsync<ReleaseSetObsoleteRequest>(this.OnReleaseSetObsolete);
+            this.ReceiveAsync<ReleaseSetStableRequest>(this.OnReleaseSetStable);
+            this.ReceiveAsync<UpdateClusterRequest>(this.OnUpdateCluster);
+
+            this.Receive<ProcessingTheRequest>(m => this.resourceMigrationIsProcessing = true);
+            this.ReceiveAsync<MigrationActorMigrationState>(this.OnResourceMigrationState);
+            this.ReceiveAsync<MigrationActorReleaseState>(this.OnResourceReleaseState);
+            this.ReceiveAsync<MigrationActorInitializationFailed>(this.OnResourceCheckFailed);
+            this.ReceiveAsync<List<MigrationLogRecord>>(this.OnResourceMigrationLogs);
+        }
+
+        /// <summary>
+        /// Updates the database as part of cluster update process. Changes the flags for releases.
+        /// </summary>
+        /// <param name="request">The request to update cluster</param>
+        /// <returns>The new active release</returns>
+        private async Task<Release> StoreNewActiveRelease(UpdateClusterRequest request)
+        {
+            try
+            {
+                using (var ds = await this.GetContext())
+                {
+                    var release = ds.Releases.Include(nameof(Release.CompatibleTemplates))
+                        .FirstOrDefault(r => r.Id == request.Id);
+                    if (release == null)
+                    {
+                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                        return null;
+                    }
+
+                    if (release.State == EnReleaseState.Active)
+                    {
+                        this.Sender.Tell(
+                            CrudActionResponse<Release>.Error(
+                                new Exception("This release is already marked as active"),
+                                null));
+                        return null;
+                    }
+
+                    var now = DateTimeOffset.Now;
+                    var currentActiveRelease = ds.Releases.FirstOrDefault(r => r.State == EnReleaseState.Active);
+                    if (currentActiveRelease != null)
+                    {
+                        currentActiveRelease.State = request.CurrentReleaseState != EnReleaseState.Active
+                                                         ? request.CurrentReleaseState
+                                                         : EnReleaseState.Obsolete;
+                        currentActiveRelease.Finished = now;
+                    }
+
+                    release.State = EnReleaseState.Active;
+                    if (release.Started == null)
+                    {
+                        release.Started = now;
+                    }
+
+                    release.Finished = null;
+                    ds.SaveChanges();
+                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    const string SecurityMessage = "Cluster upgrade with release {ReleaseId} initiated. "
+                                                   + "Previous release {PreviousReleaseId} marked as {PreviousReleaseState}";
+                    SecurityLog.CreateRecord(
+                        EnSecurityLogType.OperationGranted,
+                        EnSeverity.Crucial,
+                        request.Context,
+                        SecurityMessage,
+                        release.Id,
+                        currentActiveRelease?.Id,
+                        request.CurrentReleaseState.ToString());
+                    return release;
+                }
+            }
+            catch (Exception exception)
+            {
+                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Initiates the cluster nodes update process as part of migration routine
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>The async task</returns>
+        private async Task UpdateNodes(UpdateClusterRequest request)
+        {
+            var release = await this.StoreNewActiveRelease(request);
+            if (release == null)
+            {
+                return;
+            }
+
+            this.currentRelease = release;
+            foreach (var nodeDescription in this.nodeDescriptions.Values)
+            {
+                this.CheckNodeIsObsolete(nodeDescription);
+            }
+
+            this.OnNodeUpgrade();
         }
 
         /// <summary>
@@ -1555,8 +1724,9 @@ namespace ClusterKit.NodeManager
                         {
                             this.Sender.Tell(
                                 request.ReturnUser
-                                    ? (object)
-                                    CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
+                                    ? (object)CrudActionResponse<User>.Error(
+                                        new EntityNotFoundException(),
+                                        request.ExtraData)
                                     : CrudActionResponse<Role>.Error(new EntityNotFoundException(), request.ExtraData));
                             return;
                         }
@@ -1589,8 +1759,7 @@ namespace ClusterKit.NodeManager
                     {
                         this.Sender.Tell(
                             request.ReturnUser
-                                ? (object)
-                                CrudActionResponse<User>.Success(
+                                ? (object)CrudActionResponse<User>.Success(
                                     ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid),
                                     request.ExtraData)
                                 : CrudActionResponse<Role>.Success(
@@ -1625,15 +1794,17 @@ namespace ClusterKit.NodeManager
                         {
                             this.Sender.Tell(
                                 request.ReturnUser
-                                    ? (object)
-                                    CrudActionResponse<User>.Error(new EntityNotFoundException(), request.ExtraData)
+                                    ? (object)CrudActionResponse<User>.Error(
+                                        new EntityNotFoundException(),
+                                        request.ExtraData)
                                     : CrudActionResponse<Role>.Error(new EntityNotFoundException(), request.ExtraData));
                             return;
                         }
 
                         if (user.Roles.All(r => r.Uid != role.Uid))
                         {
-                            var exception = new MutationException(new ErrorDescription(null, "The role is not granted"));
+                            var exception =
+                                new MutationException(new ErrorDescription(null, "The role is not granted"));
                             this.Sender.Tell(
                                 request.ReturnUser
                                     ? (object)CrudActionResponse<User>.Error(exception, request.ExtraData)
@@ -1658,8 +1829,7 @@ namespace ClusterKit.NodeManager
                     {
                         this.Sender.Tell(
                             request.ReturnUser
-                                ? (object)
-                                CrudActionResponse<User>.Success(
+                                ? (object)CrudActionResponse<User>.Success(
                                     ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid),
                                     request.ExtraData)
                                 : CrudActionResponse<Role>.Success(

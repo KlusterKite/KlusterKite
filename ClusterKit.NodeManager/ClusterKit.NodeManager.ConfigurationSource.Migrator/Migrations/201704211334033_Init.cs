@@ -1,9 +1,9 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="201704130958264_Init.cs" company="ClusterKit">
+// <copyright file="201704211334033_Init.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The initial database creation
+//   The initial database configuration
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,35 +12,53 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations
     using System.Data.Entity.Migrations;
 
     /// <summary>
-    /// The initial database creation
+    /// The initial database configuration
     /// </summary>
     public partial class Init : DbMigration
     {
         /// <inheritdoc />
         public override void Down()
         {
+            this.DropForeignKey("dbo.MigrationOperations", "ErrorId", "dbo.MigrationErrors");
+            this.DropForeignKey("dbo.MigrationOperations", "Migration_Id", "dbo.Migrations");
+            this.DropForeignKey("dbo.MigrationOperations", "Release_Id", "dbo.Releases");
+            this.DropForeignKey("dbo.MigrationOperations", "Id", "dbo.MigrationLogRecords");
+            this.DropForeignKey("dbo.MigrationErrors", "Migration_Id", "dbo.Migrations");
+            this.DropForeignKey("dbo.MigrationErrors", "Release_Id", "dbo.Releases");
+            this.DropForeignKey("dbo.MigrationErrors", "Id", "dbo.MigrationLogRecords");
             this.DropForeignKey("dbo.UserRoles", "Role_Uid", "dbo.Roles");
             this.DropForeignKey("dbo.UserRoles", "User_Uid", "dbo.Users");
+            this.DropForeignKey("dbo.MigrationLogRecords", "ReleaseId", "dbo.Releases");
+            this.DropForeignKey("dbo.MigrationLogRecords", "MigrationId", "dbo.Migrations");
             this.DropForeignKey("dbo.Migrations", "ToReleaseId", "dbo.Releases");
-            this.DropForeignKey("dbo.MigrationOperations", "ClusterMigrationId", "dbo.Migrations");
             this.DropForeignKey("dbo.Migrations", "FromReleaseId", "dbo.Releases");
             this.DropForeignKey("dbo.CompatibleTemplates", "ReleaseId", "dbo.Releases");
             this.DropForeignKey("dbo.CompatibleTemplates", "CompatibleReleaseId", "dbo.Releases");
+            this.DropIndex("dbo.MigrationOperations", new[] { "ErrorId" });
+            this.DropIndex("dbo.MigrationOperations", new[] { "Migration_Id" });
+            this.DropIndex("dbo.MigrationOperations", new[] { "Release_Id" });
+            this.DropIndex("dbo.MigrationOperations", new[] { "Id" });
+            this.DropIndex("dbo.MigrationErrors", new[] { "Migration_Id" });
+            this.DropIndex("dbo.MigrationErrors", new[] { "Release_Id" });
+            this.DropIndex("dbo.MigrationErrors", new[] { "Id" });
             this.DropIndex("dbo.UserRoles", new[] { "Role_Uid" });
             this.DropIndex("dbo.UserRoles", new[] { "User_Uid" });
             this.DropIndex("dbo.Users", new[] { "Login" });
-            this.DropIndex("dbo.MigrationOperations", new[] { "ClusterMigrationId" });
             this.DropIndex("dbo.CompatibleTemplates", new[] { "ReleaseId" });
             this.DropIndex("dbo.CompatibleTemplates", new[] { "CompatibleReleaseId" });
             this.DropIndex("dbo.Migrations", new[] { "ToReleaseId" });
             this.DropIndex("dbo.Migrations", new[] { "FromReleaseId" });
+            this.DropIndex("dbo.MigrationLogRecords", new[] { "ReleaseId" });
+            this.DropIndex("dbo.MigrationLogRecords", new[] { "MigrationId" });
+            this.DropTable("dbo.MigrationOperations");
+            this.DropTable("dbo.MigrationErrors");
             this.DropTable("dbo.UserRoles");
             this.DropTable("dbo.Users");
             this.DropTable("dbo.Roles");
-            this.DropTable("dbo.MigrationOperations");
             this.DropTable("dbo.CompatibleTemplates");
             this.DropTable("dbo.Releases");
             this.DropTable("dbo.Migrations");
+            this.DropTable("dbo.MigrationLogRecords");
         }
 
         /// <inheritdoc />
@@ -48,10 +66,32 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations
         {
             this
                 .CreateTable(
+                    "dbo.MigrationLogRecords",
+                    c => new
+                             {
+                                 Id = c.Int(nullable: false, identity: true),
+                                 MigrationId = c.Int(),
+                                 ReleaseId = c.Int(nullable: false),
+                                 MigratorTemplateCode = c.String(),
+                                 MigratorTemplateName = c.String(),
+                                 MigratorTypeName = c.String(),
+                                 MigratorName = c.String(),
+                                 ResourceCode = c.String(),
+                                 ResourceName = c.String(),
+                             })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Migrations", t => t.MigrationId)
+                .ForeignKey("dbo.Releases", t => t.ReleaseId, cascadeDelete: true)
+                .Index(t => t.MigrationId)
+                .Index(t => t.ReleaseId);
+
+            this
+                .CreateTable(
                     "dbo.Migrations",
                     c => new
                              {
                                  Id = c.Int(nullable: false, identity: true),
+                                 IsActive = c.Boolean(nullable: false),
                                  State = c.Int(nullable: false),
                                  Direction = c.Int(),
                                  Started = c.DateTimeOffset(nullable: false, precision: 7),
@@ -99,26 +139,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations
                 .Index(t => t.CompatibleReleaseId)
                 .Index(t => t.ReleaseId);
 
-            this
-                .CreateTable(
-                    "dbo.MigrationOperations",
-                    c => new
-                             {
-                                 Id = c.Int(nullable: false, identity: true),
-                                 ClusterMigrationId = c.Int(nullable: false),
-                                 State = c.Int(nullable: false),
-                                 Name = c.String(),
-                                 ConnectionString = c.String(),
-                                 MigratorName = c.String(),
-                                 MigratorTemplate = c.String(),
-                                 Order = c.Int(nullable: false),
-                                 Started = c.DateTimeOffset(precision: 7),
-                                 Finished = c.DateTimeOffset(precision: 7),
-                             })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Migrations", t => t.ClusterMigrationId, cascadeDelete: true)
-                .Index(t => t.ClusterMigrationId);
-
             this.CreateTable(
                     "dbo.Roles",
                     c => new
@@ -154,6 +174,50 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations
                 .ForeignKey("dbo.Roles", t => t.Role_Uid, cascadeDelete: true)
                 .Index(t => t.User_Uid)
                 .Index(t => t.Role_Uid);
+
+            this
+                .CreateTable(
+                    "dbo.MigrationErrors",
+                    c => new
+                             {
+                                 Id = c.Int(nullable: false),
+                                 Release_Id = c.Int(),
+                                 Migration_Id = c.Int(),
+                                 Created = c.DateTimeOffset(nullable: false, precision: 7),
+                                 ErrorMessage = c.String(),
+                                 ErrorStackTrace = c.String(),
+                             })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.MigrationLogRecords", t => t.Id)
+                .ForeignKey("dbo.Releases", t => t.Release_Id)
+                .ForeignKey("dbo.Migrations", t => t.Migration_Id)
+                .Index(t => t.Id)
+                .Index(t => t.Release_Id)
+                .Index(t => t.Migration_Id);
+
+            this
+                .CreateTable(
+                    "dbo.MigrationOperations",
+                    c => new
+                             {
+                                 Id = c.Int(nullable: false),
+                                 Release_Id = c.Int(),
+                                 Migration_Id = c.Int(),
+                                 Started = c.DateTimeOffset(nullable: false, precision: 7),
+                                 Finished = c.DateTimeOffset(nullable: false, precision: 7),
+                                 SourcePoint = c.String(),
+                                 DestinationPoint = c.String(),
+                                 ErrorId = c.Int(),
+                             })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.MigrationLogRecords", t => t.Id)
+                .ForeignKey("dbo.Releases", t => t.Release_Id)
+                .ForeignKey("dbo.Migrations", t => t.Migration_Id)
+                .ForeignKey("dbo.MigrationErrors", t => t.ErrorId)
+                .Index(t => t.Id)
+                .Index(t => t.Release_Id)
+                .Index(t => t.Migration_Id)
+                .Index(t => t.ErrorId);
         }
     }
 }

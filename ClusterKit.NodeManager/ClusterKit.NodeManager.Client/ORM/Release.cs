@@ -112,6 +112,20 @@ namespace ClusterKit.NodeManager.Client.ORM
         [DeclareField("the list of compatible node templates", Access = EnAccessFlag.Queryable)]
         [ForeignKey(nameof(CompatibleTemplate.ReleaseId))]
         public List<CompatibleTemplate> CompatibleTemplates { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the list of migration operations
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the list of migration operations")]
+        public List<MigrationOperation> Operations { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of migration errors
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the list of migration errors")]
+        public List<MigrationError> Errors { get; set; }
 
         /// <summary>
         ///  Gets or sets the release configuration as json to store in database
