@@ -2,7 +2,7 @@ import React from 'react';
 import { Input, Textarea } from 'formsy-react-components';
 
 import Form from '../Form/Form';
-import Row from '../Form/Row';
+import RowText from '../Form/RowText';
 
 export default class ReleaseForm extends React.Component {
   constructor(props) {
@@ -68,8 +68,8 @@ export default class ReleaseForm extends React.Component {
                    validations={{isNumeric:true}}
                    validationErrors={{isNumeric: 'You have to type a number'}}
                    elementWrapperClassName="col-sm-2" />
-            <Row label="Is stable" text={(initialValues && initialValues.isStable.toString()) || "false"} />
-            <Row label="State" text={(initialValues && initialValues.state) || "Draft"} />
+            <RowText label="Is stable" text={(initialValues && initialValues.isStable.toString()) || "false"} />
+            <RowText label="State" text={(initialValues && initialValues.state) || "Draft"} />
           </fieldset>
         </Form>
       </div>

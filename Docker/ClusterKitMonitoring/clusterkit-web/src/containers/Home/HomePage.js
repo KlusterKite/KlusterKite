@@ -3,7 +3,6 @@ import Relay from 'react-relay'
 
 import delay from 'lodash/delay'
 
-import ReloadPackages from '../../components/ReloadPackages/ReloadPackages';
 import NodesList from '../../components/NodesList/NodesList';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 
@@ -31,9 +30,6 @@ class HomePage extends React.Component {
     return (
       <div>
         <h1>Monitoring</h1>
-        {hasPrivilege('ClusterKit.NodeManager.ReloadPackages') &&
-          <ReloadPackages />
-        }
         {hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics') && this.props.api.clusterKitNodesApi &&
           <NodesWithTemplates data={this.props.api.clusterKitNodesApi}/>
         }

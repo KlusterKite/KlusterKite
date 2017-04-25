@@ -3,7 +3,7 @@ import { Row } from 'formsy-react-components';
 
 import './styles.css';
 
-export default class Form extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class RowText extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     label: React.PropTypes.string.isRequired,
     text: React.PropTypes.string.isRequired,

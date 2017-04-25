@@ -16,6 +16,10 @@ import NotFoundPage from './containers/NotFoundPage/NotFoundPage';
 import ReleaseConfigCopyPage from './containers/ConfigCopyPage/ReleaseConfigCopyPage';
 import ReleasesListPage from './containers/ReleasesListPage/ReleasesListPage';
 import ReleasePage from './containers/ReleasePage/ReleasePage';
+import RolesListPage from './containers/RolesListPage/RolesListPage';
+import RolePage from './containers/RolePage/RolePage';
+import UsersListPage from './containers/UsersListPage/UsersListPage';
+import UserPage from './containers/UserPage/UserPage';
 import SeedPage from './containers/SeedPage/SeedPage';
 import TemplatePage from './containers/TemplatePage/TemplatePage';
 
@@ -39,9 +43,15 @@ export default class RoutesList extends React.Component {
           <Route path='/clusterkit/Releases' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Releases/create' component={ReleasePage} queries={ApiQueries} render={({ props }) => props ? <ReleasePage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Releases/:id' component={ReleasePage} queries={ApiQueries} render={({ props }) => props ? <ReleasePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Roles' component={RolesListPage} queries={ApiQueries} render={({ props }) => props ? <RolesListPage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Roles/create' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Roles/:id' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Seeds/:releaseId' component={SeedPage} queries={ApiQueries} render={({ props }) => props ? <SeedPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Templates/:releaseId/create' component={TemplatePage} queries={ApiQueries} render={({ props }) => props ? <TemplatePage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Templates/:releaseId/:id' component={TemplatePage} queries={ApiQueries} render={({ props }) => props ? <TemplatePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Users' component={UsersListPage} queries={ApiQueries} render={({ props }) => props ? <UsersListPage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Users/create' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/Users/:id' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
           <Route path='*' components={NotFoundPage} />
         </Route>
         <Redirect from="/" to="clusterkit/" />
