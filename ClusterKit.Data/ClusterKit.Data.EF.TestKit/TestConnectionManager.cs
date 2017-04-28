@@ -17,6 +17,9 @@ namespace ClusterKit.Data.EF.TestKit
     public class TestConnectionManager : BaseConnectionManager
     {
         /// <inheritdoc />
+        public override string ProviderInvariantName => "Test";
+
+        /// <inheritdoc />
         public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
         {
             return true;

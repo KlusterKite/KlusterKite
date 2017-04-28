@@ -9,34 +9,42 @@
 
 namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
+    using ClusterKit.API.Attributes;
+
     /// <summary>
     /// The list of possible resource migration position according to cluster migration
     /// </summary>
+    [ApiDescription("The list of possible resource migration position according to cluster migration")]
     public enum EnMigrationActorMigrationPosition
     {
         /// <summary>
         /// All resources are at the source release position
         /// </summary>
+        [ApiDescription("All resources are at the source release position")]
         Source = 1,
 
         /// <summary>
         /// All resources are at the destination release position
         /// </summary>
+        [ApiDescription("All resources are at the destination release position")]
         Destination = 2,
 
         /// <summary>
         /// Some resources are at the source position, others are at destination. Also some resource can be between source and destination positions and can be migrated.
         /// </summary>
+        [ApiDescription("Some resources are at the source position, others are at destination. Also some resource can be between source and destination positions and can be migrated.")]
         PartiallyMigrated,
 
         /// <summary>
         /// The two releases doesn't require resource migration
         /// </summary>
+        [ApiDescription("The two releases doesn't require resource migration")]
         NoMigrationNeeded,
 
         /// <summary>
         /// There are resources that neither in source nor in destination position and can't be migrated automatically
         /// </summary>
+        [ApiDescription("There are resources that neither in source nor in destination position and can't be migrated automatically")]
         Broken
     }
 }

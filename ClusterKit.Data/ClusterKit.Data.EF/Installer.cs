@@ -101,7 +101,7 @@ namespace ClusterKit.Data.EF
 
                     if (installerTypes.Count == 0)
                     {
-                        throw new ConfigurationException($"There is no BaseEntityFrameworkInstaller");
+                        throw new ConfigurationException("There is no BaseEntityFrameworkInstaller");
                     }
 
                     this.installer =

@@ -13,37 +13,44 @@ namespace ClusterKit.NodeManager.Client.MigrationStates
     using System.Collections.Generic;
     using System.Linq;
 
+    using ClusterKit.API.Attributes;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Migrator;
 
     /// <summary>
     /// The migrator state according to the migration
     /// </summary>
+    [ApiDescription("The migrator state according to the migration", Name = "MigratorMigrationState")]
     public class MigratorMigrationState
     {
         /// <summary>
         /// Gets or sets the migrator type name
         /// </summary>
+        [DeclareField("the migrator type name", IsKey = true)]
         public string TypeName { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IMigrator.Name"/>
         /// </summary>
+        [DeclareField("the migrator name")]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the current migrator position
         /// </summary>
+        [DeclareField("the current migrator position")]
         public EnMigratorPosition Position { get; set; }
 
         /// <summary>
         /// Gets or sets the list of resources states
         /// </summary>
+        [DeclareField("the list of resources states")]
         public List<ResourceMigrationState> Resources { get; set; }
 
         /// <summary>
         /// Gets or sets the migration direction
         /// </summary>
+        [DeclareField("the migration direction")]
         public EnMigrationDirection Direction { get; set; }
 
         /// <summary>

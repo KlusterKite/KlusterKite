@@ -25,7 +25,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// Initializes a new instance of the <see cref="ReleaseDataFactory"/> class.
         /// </summary>
         /// <param name="context">
-        /// The current datasource context
+        /// The current data source context
         /// </param>
         public ReleaseDataFactory(ConfigurationContext context)
             : base(context)

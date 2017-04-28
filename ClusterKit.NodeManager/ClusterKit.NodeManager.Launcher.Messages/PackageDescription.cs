@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     using ClusterKit.API.Attributes;
@@ -17,6 +18,7 @@ namespace ClusterKit.NodeManager.Launcher.Messages
     /// Short description of NuGet package
     /// </summary>
     [ApiDescription("Short description of NuGet package", Name = "PackageDescription")]
+    [Serializable]
     public class PackageDescription
     {
         /// <summary>

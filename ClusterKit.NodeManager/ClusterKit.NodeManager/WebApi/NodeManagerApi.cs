@@ -55,6 +55,7 @@ namespace ClusterKit.NodeManager.WebApi
             this.actorSystem = actorSystem;
             this.feedUrl = actorSystem.Settings.Config.GetString(NodeManagerActor.PackageRepositoryUrlPath);
             this.AkkaTimeout = ConfigurationUtils.GetRestTimeout(actorSystem);
+            this.ClusterManagement = new ClusterManagement(this.actorSystem);
         }
 
         // todo: put converter 
@@ -68,6 +69,13 @@ namespace ClusterKit.NodeManager.WebApi
             Scope = EnPrivilegeScope.User,
             AddActionNameToRequiredPrivilege = true)]
         public List<PrivilegeDescription> DefinedPrivilegeDescriptions => Utils.DefinedPrivileges.ToList();
+
+        /// <summary>
+        /// Gets the cluster management
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the cluster management")]
+        public ClusterManagement ClusterManagement { get; }
 
         /// <summary>
         /// Gets the list of packages in the nuget repository

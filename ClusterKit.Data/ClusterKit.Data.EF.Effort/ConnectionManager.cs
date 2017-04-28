@@ -17,6 +17,10 @@ namespace ClusterKit.Data.EF.Effort
     public class ConnectionManager : BaseConnectionManager
     {
         /// <inheritdoc />
+        public override string ProviderInvariantName 
+            => global::Effort.Provider.EffortProviderInvariantName.Instance.Name;
+
+        /// <inheritdoc />
         public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
         {
             return true;

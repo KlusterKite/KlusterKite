@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Client.ORM
 {
+    using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,6 +19,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The compatible node template
     /// </summary>
     [ApiDescription("The compatible node template", Name = "CompatibleTemplate")]
+    [Serializable]
     public class CompatibleTemplate
     {
         /// <summary>

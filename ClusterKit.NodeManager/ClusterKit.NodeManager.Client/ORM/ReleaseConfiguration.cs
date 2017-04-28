@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Client.ORM
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -19,6 +20,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The release configuration description
     /// </summary>
     [ApiDescription("The release configuration description", Name = "ReleaseConfiguration")]
+    [Serializable]
     public class ReleaseConfiguration
     { 
         /// <summary>

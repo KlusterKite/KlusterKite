@@ -165,27 +165,27 @@
     <ProjectReference Include="../.././ClusterKit.Core/ClusterKit.Core/ClusterKit.Core.csproj">
       <Project>{BA97BEED-B078-499D-8C00-6A3D4A0635F2}</Project>
       <Name>ClusterKit.Core</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Client/ClusterKit.Security.Client.csproj">
       <Project>{25E3B4DC-717E-4ECA-A756-3112E2093CFF}</Project>
       <Name>ClusterKit.Security.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Security/ClusterKit.Security.Attributes/ClusterKit.Security.Attributes.csproj">
       <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
       <Name>ClusterKit.Security.Attributes</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Client/ClusterKit.API.Client.csproj">
       <Project>{2A6EDCC4-C729-4BEE-9BB5-AC6F76B3BAC8}</Project>
       <Name>ClusterKit.API.Client</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.API/ClusterKit.API.Attributes/ClusterKit.API.Attributes.csproj">
       <Project>{7654B200-7C4F-450C-8013-C59D7B6CE8B7}</Project>
       <Name>ClusterKit.API.Attributes</Name>
-    </ProjectReference>
+</ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Data/ClusterKit.Data.CRUD/ClusterKit.Data.CRUD.csproj">
       <Project>{FDA59712-9625-4CDF-B8FD-6DF19960C8C0}</Project>
       <Name>ClusterKit.Data.CRUD</Name>
-    </ProjectReference>
+</ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiSurrogates\AkkaAddressSurrogate.cs" />
@@ -207,6 +207,8 @@
     <Compile Include="Messages\Migration\RecheckState.cs" />
     <Compile Include="Messages\Migration\RequestAcknowledged.cs" />
     <Compile Include="Messages\Migration\RequestDeclined.cs" />
+    <Compile Include="Messages\Migration\ResourceState.cs" />
+    <Compile Include="Messages\Migration\ResourceStateRequest.cs" />
     <Compile Include="Messages\Migration\ResourceUpgrade.cs" />
     <Compile Include="Messages\NodeDescription.cs" />
     <Compile Include="Messages\NodeDescriptionRequest.cs" />

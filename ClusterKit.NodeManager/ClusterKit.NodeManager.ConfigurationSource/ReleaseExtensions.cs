@@ -428,9 +428,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 foreach (var supportedFramework in supportedFrameworks)
                 {
                     var packagesToInstall = new List<IPackage>();
-                    foreach (var package in directPackages.Values)
+                    var queue = new Queue<IPackage>(directPackages.Values);
+
+                    while (queue.Count > 0)
                     {
-                        if (package == null)
+                        var package = queue.Dequeue();
+                        if (package == null || packagesToInstall.Any(p => p.Id == package.Id))
                         {
                             continue;
                         }
@@ -469,12 +472,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                             {
                                 yield return new ErrorDescription(
                                     requirementField,
-                                    $"Package dependency for {supportedFramework} {dependency.Id} doesn't satisfy version requirements");
+                                    $"Package dependency for {supportedFramework} {dependency.Id} {dependentPackage.Version} doesn't satisfy version requirements {dependency.VersionSpec}.");
                             }
 
                             if (packagesToInstall.All(p => p.Id != dependentPackage.Id))
                             {
-                                packagesToInstall.Add(dependentPackage);
+                                // packagesToInstall.Add(dependentPackage);
+                                queue.Enqueue(dependentPackage);
                             }
                         }
                     }

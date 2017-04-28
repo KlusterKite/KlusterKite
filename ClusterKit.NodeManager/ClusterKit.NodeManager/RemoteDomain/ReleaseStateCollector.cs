@@ -42,7 +42,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                 MigratorName = migrator.Name,
                                 ErrorMessage =
                                     $"Error on requesting migratable resources: {exception.Message}",
-                                ErrorStackTrace = exception.StackTrace
+                                Exception = exception
                             });
                     continue;
                 }
@@ -61,7 +61,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                 MigratorName = migrator.Name,
                                 ErrorMessage =
                                     $"Error on requesting available migration points: {exception.Message}",
-                                ErrorStackTrace = exception.StackTrace
+                                Exception = exception
                             });
                     continue;
                 }
@@ -90,7 +90,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                     ResourceName = resource.Name,
                                     ErrorMessage =
                                         $"Error on requesting resource current point: {exception.Message}",
-                                    ErrorStackTrace = exception.StackTrace
+                                    Exception = exception
                                 });
                     }
                 }

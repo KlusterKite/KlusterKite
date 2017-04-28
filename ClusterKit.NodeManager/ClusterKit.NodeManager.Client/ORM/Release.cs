@@ -25,6 +25,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The cluster configuration with all program modules versions, node templates and configurations
     /// </summary>
     [ApiDescription("The cluster configuration with all program modules versions, node templates and configurations", Name = "Release")]
+    [Serializable]
     public class Release : IObjectWithId<int>
     {
         /// <summary>

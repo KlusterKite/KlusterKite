@@ -15,7 +15,8 @@ namespace ClusterKit.NodeManager.RemoteDomain
     /// <summary>
     /// The description of migrator action to migrate resources
     /// </summary>
-    public class MigratorMigrationsCommand : MarshalByRefObject
+    [Serializable]
+    public class MigratorMigrationsCommand 
     {
         /// <summary>
         /// Gets or sets the migrator type name

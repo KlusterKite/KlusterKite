@@ -20,6 +20,11 @@ namespace ClusterKit.Data.EF
     public abstract class BaseConnectionManager
     {
         /// <summary>
+        /// Gets the invariant name of the provider
+        /// </summary>
+        public abstract string ProviderInvariantName { get; }
+
+        /// <summary>
         ///  Checks for database existence.
         /// </summary>
         /// <param name="connection">Opened database connection</param>

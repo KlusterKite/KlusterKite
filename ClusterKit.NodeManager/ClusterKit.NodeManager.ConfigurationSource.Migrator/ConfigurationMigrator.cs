@@ -13,13 +13,17 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator
 
     using Akka.Configuration;
 
+    using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations;
     using ClusterKit.NodeManager.Migrator;
     using ClusterKit.NodeManager.Migrator.EF;
-    
+
+    using JetBrains.Annotations;
+
     /// <summary>
     /// The migrator for configuration database
     /// </summary>
+    [UsedImplicitly]
     public class ConfigurationMigrator : BaseDatabaseMigrator<ConfigurationContext, Configuration>
     {
         /// <summary>
@@ -38,7 +42,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator
         /// <param name="config">
         /// The migrator config.
         /// </param>
-        public ConfigurationMigrator(Config config)
+        /// <param name="connectionManager">
+        /// The connection Manager.
+        /// </param>
+        public ConfigurationMigrator(Config config, BaseConnectionManager connectionManager) : base(connectionManager)
         {
             this.config = config;
         }
@@ -50,7 +57,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator
             yield return new ResourceId
                              {
                                  Name = "ClusterKit configuration database",
-                                 ConnectionString = connectionString
+                                 ConnectionString = connectionString,
+                                 Code = "configDB"
                              };
         }
     }

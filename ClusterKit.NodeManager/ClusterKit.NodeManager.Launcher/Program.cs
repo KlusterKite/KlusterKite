@@ -375,7 +375,7 @@ namespace ClusterKit.NodeManager.Launcher
                     return true;
                 }
 
-                Console.WriteLine($@"!!!Failed to authenticate. Respones status is {result.StatusCode}. Retrying in 60s");
+                Console.WriteLine($@"!!!Failed to authenticate. Response status is {result.StatusCode}. Retrying in 60s");
                 Thread.Sleep(TimeSpan.FromSeconds(60));
             }
         }

@@ -12,62 +12,50 @@
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Monitoring.Client",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Monitoring",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.NodeManager",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Data.EF.Npgsql",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Web.Swagger.Monitor",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Web.Swagger",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Log.Console",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Log.ElasticSearch",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Web.Authentication",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Security.SessionRedis",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.API.Endpoint",
       "Version": "0.0.0-local"
     },
     {
-
       "Id": "ClusterKit.Web.GraphQL.Publisher",
       "Version": "0.0.0-local"
     },

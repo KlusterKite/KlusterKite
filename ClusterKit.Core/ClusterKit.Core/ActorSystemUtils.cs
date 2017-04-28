@@ -27,16 +27,24 @@ namespace ClusterKit.Core
         /// <summary>
         /// Scans main application directory for libraries and windsor installers in them and installs them
         /// </summary>
-        /// <param name="container">Current windsor container</param>
-        public static void RegisterWindsorInstallers(this IWindsorContainer container)
+        /// <param name="container">
+        /// Current windsor container
+        /// </param>
+        /// <param name="installAssemblies">
+        /// A value indicating whether this should scan current directory and load assemblies
+        /// </param>
+        public static void RegisterWindsorInstallers(this IWindsorContainer container, bool installAssemblies = true)
         {
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (!string.IsNullOrWhiteSpace(dir))
+            if (installAssemblies)
             {
-                var libs = Directory.GetFiles(dir, "*.dll");
-                foreach (var lib in libs)
+                var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (!string.IsNullOrWhiteSpace(dir))
                 {
-                    Assembly.LoadFrom(lib);
+                    var files = Directory.GetFiles(dir, "*.dll");
+                    foreach (var file in files)
+                    {
+                        Assembly.LoadFrom(file);
+                    }
                 }
             }
 
@@ -46,9 +54,9 @@ namespace ClusterKit.Core
                 {
                     container.Install(FromAssembly.Instance(assembly));
                 }
-                // ReSharper disable once EmptyGeneralCatchClause
                 catch (Exception)
                 {
+                    // ignore
                 }
             }
         }

@@ -113,5 +113,11 @@ namespace ClusterKit.NodeManager.Client
         /// </summary>
         [PrivilegeDescription("View the migration history and its log", "Get", "Query", Target = EnPrivilegeTarget.User)]
         public const string ClusterMigration = "ClusterKit.NodeManager.Migration";
+
+        /// <summary>
+        /// Get the current cluster resources states
+        /// </summary>
+        [PrivilegeDescription("Get the current cluster resources states", Target = EnPrivilegeTarget.User)]
+        public const string GetResourceState = "ClusterKit.NodeManager.GetResourceState";
     }
 }

@@ -89,7 +89,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                     ResourceCode = pair.Key,
                                     ErrorMessage =
                                         $"Exception while checking resource current point: {exception.Message}",
-                                    ErrorStackTrace = exception.StackTrace
+                                    Exception = exception
                                 };
                         continue;
                     }
@@ -123,7 +123,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                     ResourceCode = pair.Key,
                                     ErrorMessage =
                                         $"Exception while migrating resource: {exception.Message}",
-                                    ErrorStackTrace = exception.StackTrace
+                                    Exception = exception
                                 };
                     }
 

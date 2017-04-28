@@ -88,13 +88,15 @@ let projects = [|
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Security.Attributes"; "ClusterKit.API.Attributes";"ClusterKit.NodeManager.Launcher.Messages"|]))
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.FallbackPackageDependencyFixer/ClusterKit.NodeManager.FallbackPackageDependencyFixer.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Security.Attributes"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"|]))
 
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Migrator/ClusterKit.NodeManager.Migrator.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Security.Attributes";  "ClusterKit.API.Attributes"; |]))
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Migrator.EF/ClusterKit.NodeManager.Migrator.EF.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Security.Attributes";  "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Migrator";|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Migrator/ClusterKit.NodeManager.Migrator.csproj", ProjectDescription.EnProjectType.NugetPackage, ([||]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Migrator.EF/ClusterKit.NodeManager.Migrator.EF.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.NodeManager.Migrator";"ClusterKit.Core"; "ClusterKit.Data.CRUD"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";"ClusterKit.Data.EF"; |]))
     
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Seeder.Launcher/ClusterKit.NodeManager.Seeder.Launcher.csproj", ProjectDescription.EnProjectType.NugetPackage, ([||]))
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Seeder/ClusterKit.NodeManager.Seeder.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Security.Attributes";  "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Migrator";"ClusterKit.Core";|]))
 
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.Data.CRUD"|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.AppDomainHelper/ClusterKit.NodeManager.AppDomainHelper.csproj", ProjectDescription.EnProjectType.NugetPackage, ([||]))
+
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.Data.CRUD"; "ClusterKit.NodeManager.Migrator"|]))
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Authentication/ClusterKit.NodeManager.Authentication.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Client"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.Data.CRUD"|]))
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"|]))
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource.Migrator/ClusterKit.NodeManager.ConfigurationSource.Migrator.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Migrator"; "ClusterKit.NodeManager.Migrator.EF"; "ClusterKit.NodeManager.ConfigurationSource"|]))
@@ -128,6 +130,8 @@ let projects = [|
             "ClusterKit.API.Attributes"; 
             "ClusterKit.API.Provider";
             "ClusterKit.NodeManager.Migrator";
+            "ClusterKit.NodeManager.AppDomainHelper";
+            "ClusterKit.NodeManager.Migrator.EF";
             |]))
     new ProjectDescription(
         "ClusterKit.NodeManager",
@@ -164,7 +168,8 @@ let projects = [|
             "ClusterKit.API.Attributes"; 
             "ClusterKit.API.Provider";
             "ClusterKit.NodeManager.Migrator";
-            "ClusterKit.NodeManager.Migrator.EF";
+            "ClusterKit.NodeManager.Migrator.CodeFirst";
+            "ClusterKit.NodeManager.AppDomainHelper";
           |]))
 
 |]

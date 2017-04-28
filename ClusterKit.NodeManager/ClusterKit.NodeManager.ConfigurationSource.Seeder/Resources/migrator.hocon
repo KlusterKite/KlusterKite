@@ -1,3 +1,6 @@
 ﻿{
 	ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true;Database=ClusterKit.NodeManagerConfiguration"	  
+    ClusterKit.NodeManager.Migrators = [
+        "ClusterKit.NodeManager.ConfigurationSource.Migrator.ConfigurationMigrator, ClusterKit.NodeManager.ConfigurationSource.Migrator"
+    ]
 }

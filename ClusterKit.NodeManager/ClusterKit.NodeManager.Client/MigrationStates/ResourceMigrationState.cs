@@ -9,24 +9,30 @@
 
 namespace ClusterKit.NodeManager.Client.MigrationStates
 {
+    using ClusterKit.API.Attributes;
+
     /// <summary>
     /// The resource state according to the migration
     /// </summary>
+    [ApiDescription("The resource state according to the migration", Name = "ResourceMigrationState")]
     public class ResourceMigrationState : ResourceReleaseState
     {
         /// <summary>
         /// Gets or sets the migration source position for this resource type
         /// </summary>
+        [DeclareField("the migration source position for this resource type")]
         public string SourcePoint { get; set; }
 
         /// <summary>
         /// Gets or sets the migration destination position for this resource type
         /// </summary>
+        [DeclareField("the migration destination position for this resource type")]
         public string DestinationPoint { get; set; }
 
         /// <summary>
         /// Gets the resource current position
         /// </summary>
+        [DeclareField("the resource current position")]
         public EnResourcePosition Position
         {
             get
@@ -63,11 +69,13 @@ namespace ClusterKit.NodeManager.Client.MigrationStates
         /// <summary>
         /// Gets or sets a value indicating what release can execute migration to source release point
         /// </summary>
+        [DeclareField("a value indicating what release can execute migration to source release point")]
         public EnMigrationSide? MigrationToSourceExecutor { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating what release can execute migration to destination release point
         /// </summary>
+        [DeclareField("a value indicating what release can execute migration to destination release point")]
         public EnMigrationSide? MigrationToDestinationExecutor { get; set; }
 
         /// <summary>

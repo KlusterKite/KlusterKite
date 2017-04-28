@@ -34,7 +34,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// The .NET Framework 4.5 name
         /// </summary> 
-        public const string Net45 = ".NET Framework,Version=v4.5";
+        public const string Net45 = ".NETFramework,Version=v4.5";
 
         /// <summary>
         /// The .NET Standard 1.1 name
@@ -377,7 +377,14 @@ namespace ClusterKit.NodeManager.Tests
 
                 return this.GetSupportedFrameworksAction();
             }
+
+            /// <inheritdoc />
+            public override string ToString()
+            {
+                return this.Id ?? base.ToString();
+            }
         }
+
 
         /// <summary>
         /// The test package file  representation

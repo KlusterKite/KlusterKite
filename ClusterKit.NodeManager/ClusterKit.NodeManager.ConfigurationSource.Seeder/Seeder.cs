@@ -232,7 +232,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                          {
                                              new NodeTemplate.PackageRequirement(
                                                  "ClusterKit.NodeManager.ConfigurationSource.Migrator",
-                                                 null)
+                                                 null),
+                                            new NodeTemplate.PackageRequirement(
+                                                 "ClusterKit.NodeManager",
+                                                 null),
+                                             new NodeTemplate.PackageRequirement(
+                                                 "ClusterKit.Data.EF.Npgsql",
+                                                 null),
                                          }.ToList(),
                                  Priority = 1d
                              };
@@ -245,7 +251,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// <returns>The list of package descriptions</returns>
         protected virtual IEnumerable<PackageDescription> GetPackageDescriptions(IPackageRepository repository)
         {
-            
             return repository.Search(string.Empty, true)
                 .Where(p => p.IsLatestVersion)
                 .ToList()

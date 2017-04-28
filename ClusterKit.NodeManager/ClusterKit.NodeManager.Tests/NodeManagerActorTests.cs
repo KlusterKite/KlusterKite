@@ -23,6 +23,7 @@ namespace ClusterKit.NodeManager.Tests
     using Akka.Event;
     using Akka.TestKit;
 
+    using Castle.Components.DictionaryAdapter;
     using Castle.MicroKernel.Registration;
     using Castle.MicroKernel.SubSystems.Configuration;
     using Castle.Windsor;
@@ -35,6 +36,8 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Data.EF;
     using ClusterKit.Data.EF.Effort;
     using ClusterKit.NodeManager.Client.Messages;
+    using ClusterKit.NodeManager.Client.Messages.Migration;
+    using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -189,11 +192,51 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourecReleaseStateTest()
+        public async Task ResourceReleaseStateTest()
         {
             this.ActorOf(() => new TestActorForwarder(this.TestActor), "migrationActor");
-            var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
+            var actor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
             this.ExpectNoMsg();
+            var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
+            Assert.Null(state.MigrationState);
+            Assert.Null(state.ReleaseState);
+            Assert.True(state.OperationIsInProgress);
+
+            var resources = new[] { new ResourceReleaseState { Code = "test", CurrentPoint = "first", Name = "test" } }
+                .ToList();
+            var migratorsStates = new[]
+                                      {
+                                          new MigratorReleaseState
+                                              {
+                                                  LastDefinedPoint = "first",
+                                                  Name = "test migrator",
+                                                  MigrationPoints = new[] { "first" }.ToList(),
+                                                  TypeName = "TestMigrator",
+                                                  Resources = resources
+                                              }
+                                      }.ToList();
+
+            var templateStates = new[]
+                                     {
+                                         new MigratorTemplateReleaseState
+                                             {
+                                                 Code = "test",
+                                                 Template =
+                                                     new MigratorTemplate
+                                                         {
+                                                             Code =
+                                                                 "test"
+                                                         },
+                                                 MigratorsStates = migratorsStates
+                                             }
+                                     }.ToList();
+
+            actor.Tell(new MigrationActorReleaseState { States = templateStates });
+            this.ExpectNoMsg();
+            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ReleaseState);
+            Assert.False(state.OperationIsInProgress);
         }
 
         /// <summary>

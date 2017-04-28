@@ -35,6 +35,9 @@ namespace ClusterKit.Data.Tests.Mock
         }
 
         /// <inheritdoc />
+        public override string ProviderInvariantName => "Test";
+
+        /// <inheritdoc />
         public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
         {
             return true;

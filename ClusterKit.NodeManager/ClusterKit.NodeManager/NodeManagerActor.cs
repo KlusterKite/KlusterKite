@@ -38,6 +38,8 @@ namespace ClusterKit.NodeManager
 
     using JetBrains.Annotations;
 
+    using Newtonsoft.Json;
+
     using NuGet;
 
     /// <summary>
@@ -121,6 +123,11 @@ namespace ClusterKit.NodeManager
             new Dictionary<Address, Cancelable>();
 
         /// <summary>
+        /// the current resource state
+        /// </summary>
+        private readonly ResourceState resourceState = new ResourceState { OperationIsInProgress = true };
+
+        /// <summary>
         /// Roles leaders
         /// </summary>
         private readonly Dictionary<string, Address> roleLeaders = new Dictionary<string, Address>();
@@ -151,34 +158,19 @@ namespace ClusterKit.NodeManager
         private string connectionString;
 
         /// <summary>
-        /// The current active cluster configuration
-        /// </summary>
-        private Release currentRelease;
-
-        /// <summary>
         /// The current active cluster migration
         /// </summary>
         private Migration currentMigration;
 
         /// <summary>
+        /// The current active cluster configuration
+        /// </summary>
+        private Release currentRelease;
+
+        /// <summary>
         /// The database name
         /// </summary>
         private string databaseName;
-
-        /// <summary>
-        /// Gets the current release resource states
-        /// </summary>
-        private MigrationActorReleaseState resourceReleaseState;
-
-        /// <summary>
-        /// Gets a value indicating that resource manager is in the process state
-        /// </summary>
-        private bool resourceMigrationIsProcessing = true;
-
-        /// <summary>
-        /// Gets the current migration resource states
-        /// </summary>
-        private MigrationActorMigrationState resourceMigrationState;
 
         /// <summary>
         /// The resource migrator
@@ -409,10 +401,20 @@ namespace ClusterKit.NodeManager
 
             using (var context = this.contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
             {
-                var releases = context.Releases.Include(nameof(Release.CompatibleTemplates))
+                var releases = context.Releases
+                    .Include(nameof(Release.CompatibleTemplates))
+                    .Include($"{nameof(Release.Operations)}.{nameof(MigrationOperation.Error)}")
+                    .Include(nameof(Release.Errors))
                     .Where(r => r.State == EnReleaseState.Active)
                     .ToList();
                 this.currentRelease = releases.SingleOrDefault();
+
+                this.currentMigration = context.Migrations
+                    .Include(nameof(Migration.FromRelease))
+                    .Include(nameof(Migration.ToRelease))
+                    .Include($"{nameof(Migration.Operations)}.{nameof(MigrationOperation.Error)}")
+                    .Include(nameof(Migration.Errors))
+                    .FirstOrDefault(m => m.IsActive);
             }
         }
 
@@ -444,13 +446,14 @@ namespace ClusterKit.NodeManager
                     .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                 "workers");
 
-
             var migrationActorSubstitute =
                 Context.System.Settings.Config.GetString("ClusterKit.NodeManager.MigrationActorSubstitute");
 
-            this.resourceMigrator = string.IsNullOrWhiteSpace(migrationActorSubstitute) 
-                ? (ICanTell)Context.ActorOf(Context.System.DI().Props<MigrationActor>(), "resourceMigrator")
-                : Context.System.ActorSelection(migrationActorSubstitute);
+            this.resourceMigrator = string.IsNullOrWhiteSpace(migrationActorSubstitute)
+                                        ? (ICanTell)Context.ActorOf(
+                                            Context.System.DI().Props<MigrationActor>(),
+                                            "resourceMigrator")
+                                        : Context.System.ActorSelection(migrationActorSubstitute);
 
             this.Become(this.Start);
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
@@ -486,6 +489,93 @@ namespace ClusterKit.NodeManager
             if (message.Leader != null && this.nodeDescriptions.TryGetValue(message.Leader, out leader))
             {
                 leader.IsClusterLeader = true;
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="MigrationActor"/> encountered errors on resource check state
+        /// </summary>
+        /// <param name="state">The initialization error</param>
+        /// <returns>The async task</returns>
+        private async Task OnMigrationActorInitializationFailed(MigrationActorInitializationFailed state)
+        {
+            Context.GetLogger().Error("{Type}: MigrationActor failed to initialize", this.GetType().Name);
+            foreach (var error in state.Errors)
+            {
+                Context.GetLogger()
+                    .Error(
+                        "{Type}: MigrationActor error - {ErrorMessage}\n{ErrorStackTrace}",
+                        this.GetType().Name,
+                        error.ErrorMessage,
+                        error.ErrorStackTrace);
+            }
+
+            await this.OnMigrationLogRecords(state.Errors.Cast<MigrationLogRecord>().ToList());
+            this.resourceState.OperationIsInProgress = false;
+            this.resourceState.ReleaseState = null;
+            this.resourceState.MigrationState = null;
+            this.InitDatabase();
+        }
+
+        /// <summary>
+        /// The <see cref="MigrationActor"/> updated resource state during active migration
+        /// </summary>
+        /// <param name="state">The initialization error</param>
+        private void OnMigrationActorMigrationState(MigrationActorMigrationState state)
+        {
+            this.resourceState.OperationIsInProgress = false;
+            if (this.currentMigration == null)
+            {
+                Context.GetLogger()
+                    .Error(
+                        "{Type}: received an MigrationActorMigrationState without active migration",
+                        this.GetType().Name);
+                return;
+            }
+
+            Context.GetLogger().Info("{Type}: received a MigrationActorMigrationState", this.GetType().Name);
+            this.resourceState.ReleaseState = null;
+            this.resourceState.MigrationState = state;
+            this.InitDatabase();
+        }
+
+        /// <summary>
+        /// The <see cref="MigrationActor"/> updated resource state without active migration
+        /// </summary>
+        /// <param name="state">The initialization error</param>
+        private void OnMigrationActorReleaseState(MigrationActorReleaseState state)
+        {
+            this.resourceState.OperationIsInProgress = false;
+            if (this.currentMigration != null)
+            {
+
+                Context.GetLogger()
+                    .Error(
+                        "{Type}: received a MigrationActorReleaseState with active migration in progress",
+                        this.GetType().Name);
+                return;
+            }
+
+            this.resourceState.ReleaseState = state;
+            this.resourceState.MigrationState = null;
+            Context.GetLogger().Info("{Type}: received a MigrationActorReleaseState {JSON}", this.GetType().Name, JsonConvert.SerializeObject(state));
+            this.InitDatabase();
+        }
+
+        /// <summary>
+        /// Received a number of log records to store
+        /// </summary>
+        /// <param name="records">The records to store</param>
+        /// <returns>The async task</returns>
+        private async Task OnMigrationLogRecords(List<MigrationLogRecord> records)
+        {
+            using (var ds = await this.contextFactory.CreateContext(this.connectionString, this.databaseName))
+            {
+                foreach (var record in records)
+                {
+                    ds.MigrationLogs.Add(record);
+                    await ds.SaveChangesAsync();
+                }
             }
         }
 
@@ -1054,52 +1144,6 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// A notification from <see cref="MigrationActor"/> of error in state checks
-        /// </summary>
-        /// <param name="state">The check failed notification</param>
-        /// <returns>The async task</returns>
-        private Task OnResourceCheckFailed(MigrationActorInitializationFailed state)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// The new resource migration log records to save to database
-        /// </summary>
-        /// <param name="logRecords">
-        /// The log records.
-        /// </param>
-        /// <returns>The async task</returns>
-        private Task OnResourceMigrationLogs(List<MigrationLogRecord> logRecords)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// The updated resource states with active migration
-        /// </summary>
-        /// <param name="state">
-        /// The resources state.
-        /// </param>
-        /// <returns>The async task</returns>
-        private Task OnResourceMigrationState(MigrationActorMigrationState state)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// The updated resource states without active migration
-        /// </summary>
-        /// <param name="state">
-        /// The resources state.
-        /// </param>
-        /// <returns>The async task</returns>
-        private Task OnResourceReleaseState(MigrationActorReleaseState state)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// The role leader has been changed
         /// </summary>
         /// <param name="message">The notification message</param>
@@ -1176,26 +1220,31 @@ namespace ClusterKit.NodeManager
         /// <returns>The async task</returns>
         private async Task OnUpdateCluster(UpdateClusterRequest request)
         {
-            if (this.resourceMigrationIsProcessing)
+            if (this.resourceState.OperationIsInProgress)
             {
-                this.Sender.Tell(CrudActionResponse<Migration>.Error(new Exception("Resources are still checking"), null));
+                this.Sender.Tell(
+                    CrudActionResponse<Migration>.Error(new Exception("Resources are still checking"), null));
                 return;
             }
 
-            if (this.resourceReleaseState == null)
+            if (this.resourceState.ReleaseState == null)
             {
-                this.Sender.Tell(CrudActionResponse<Migration>.Error(new Exception("Resources state is unknown"), null));
+                this.Sender.Tell(
+                    CrudActionResponse<Migration>.Error(new Exception("Resources state is unknown"), null));
                 return;
             }
 
             // todo: move check on resource state receive 
-            var resourcesAreReady = this.resourceReleaseState.States.SelectMany(s => s.MigratorsStates)
+            var resourcesAreReady = this.resourceState.ReleaseState.States.SelectMany(s => s.MigratorsStates)
                 .SelectMany(m => m.Resources.Select(r => r.CurrentPoint == m.LastDefinedPoint))
                 .All(r => r);
 
             if (!resourcesAreReady)
             {
-                this.Sender.Tell(CrudActionResponse<Migration>.Error(new Exception("Cluster cannot be migrated. Resources are not ready"), null));
+                this.Sender.Tell(
+                    CrudActionResponse<Migration>.Error(
+                        new Exception("Cluster cannot be migrated. Resources are not ready"),
+                        null));
                 return;
             }
 
@@ -1247,9 +1296,9 @@ namespace ClusterKit.NodeManager
                     ds.Migrations.Add(migration);
                     ds.SaveChanges();
                     this.currentMigration = migration;
-                    this.resourceMigrationIsProcessing = true;
-                    this.resourceMigrationState = null;
-                    this.resourceReleaseState = null;
+                    this.resourceState.OperationIsInProgress = true;
+                    this.resourceState.ReleaseState = null;
+                    this.resourceState.MigrationState = null;
                     this.resourceMigrator.Tell(new RecheckState(), this.Self);
                     this.Sender.Tell(CrudActionResponse<Migration>.Success(migration, null));
                 }
@@ -1317,11 +1366,15 @@ namespace ClusterKit.NodeManager
             this.ReceiveAsync<ReleaseSetStableRequest>(this.OnReleaseSetStable);
             this.ReceiveAsync<UpdateClusterRequest>(this.OnUpdateCluster);
 
-            this.Receive<ProcessingTheRequest>(m => this.resourceMigrationIsProcessing = true);
-            this.ReceiveAsync<MigrationActorMigrationState>(this.OnResourceMigrationState);
-            this.ReceiveAsync<MigrationActorReleaseState>(this.OnResourceReleaseState);
-            this.ReceiveAsync<MigrationActorInitializationFailed>(this.OnResourceCheckFailed);
-            this.ReceiveAsync<List<MigrationLogRecord>>(this.OnResourceMigrationLogs);
+            this.Receive<CollectionRequest<Migration>>(m => this.workers.Forward(m));
+
+            this.Receive<ProcessingTheRequest>(m => this.resourceState.OperationIsInProgress = true);
+            this.Receive<MigrationActorMigrationState>(s => this.OnMigrationActorMigrationState(s));
+            this.Receive<MigrationActorReleaseState>(s => this.OnMigrationActorReleaseState(s));
+            this.ReceiveAsync<MigrationActorInitializationFailed>(this.OnMigrationActorInitializationFailed);
+            this.ReceiveAsync<List<MigrationLogRecord>>(this.OnMigrationLogRecords);
+
+            this.Receive<ResourceStateRequest>(r => this.Sender.Tell(this.resourceState));
         }
 
         /// <summary>
@@ -1537,6 +1590,7 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CollectionRequest<User>>(this.OnCollectionRequest<User, Guid>);
                 this.ReceiveAsync<CollectionRequest<Role>>(this.OnCollectionRequest<Role, Guid>);
                 this.ReceiveAsync<CollectionRequest<Release>>(this.OnCollectionRequest<Release, int>);
+                this.ReceiveAsync<CollectionRequest<Migration>>(this.OnCollectionRequest<Migration, int>);
 
                 this.ReceiveAsync<UserChangePasswordRequest>(this.OnUserChangePassword);
                 this.ReceiveAsync<UserResetPasswordRequest>(this.OnUserResetPassword);

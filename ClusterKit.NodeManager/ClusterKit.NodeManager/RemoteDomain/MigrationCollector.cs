@@ -11,7 +11,10 @@ namespace ClusterKit.NodeManager.RemoteDomain
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
+    using System.Runtime.InteropServices;
 
     using Akka.Configuration;
 
@@ -62,7 +65,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
             }
             catch (Exception e)
             {
-                this.Errors.Add(new MigrationError { ErrorMessage = e.Message, ErrorStackTrace = e.StackTrace });
+                this.Errors.Add(new MigrationError { ErrorMessage = e.Message, Exception = e });
             }
         }
 
@@ -123,11 +126,29 @@ namespace ClusterKit.NodeManager.RemoteDomain
         /// <returns>The DI container</returns>
         protected virtual IWindsorContainer Initialize()
         {
+            foreach (var file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
+            {
+                try
+                {
+                    var name = AssemblyName.GetAssemblyName(file);
+                    Assembly.Load(name);
+                }
+                catch (Exception exception)
+                {
+                    this.Errors.Add(
+                        new MigrationError
+                            {
+                                ErrorMessage = $"Error while loading assembly for domain {AppDomain.CurrentDomain.FriendlyName} in {AppDomain.CurrentDomain.BaseDirectory}",
+                                Exception = exception
+                            });
+                }
+            }
+
             var container = new WindsorContainer();
             container.AddFacility<TypedFactoryFacility>();
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
             container.Register(Component.For<IWindsorContainer>().Instance(container));
-            container.RegisterWindsorInstallers();
+            container.RegisterWindsorInstallers(false);
             var config = BaseInstaller.GetStackedConfig(
                 container,
                 ConfigurationFactory.ParseString(this.Configuration));

@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Client.ORM
 {
+    using System;
     using System.Collections.Generic;
 
     using ClusterKit.API.Attributes;
@@ -25,6 +26,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </remarks>
     [UsedImplicitly]
     [ApiDescription("A cluster migrator template definition", Name = "NodeTemplate")]
+    [Serializable]
     public class MigratorTemplate : ITemplate
     {
         /// <summary>

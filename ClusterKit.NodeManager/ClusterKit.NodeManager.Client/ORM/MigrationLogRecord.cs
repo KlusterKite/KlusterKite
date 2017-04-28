@@ -21,7 +21,8 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The base class for migration log records
     /// </summary>
     [Table("MigrationLogRecords")]
-    public abstract class MigrationLogRecord : MarshalByRefObject
+    [Serializable]
+    public abstract class MigrationLogRecord
     {
         /// <summary>
         /// Gets or sets the error id

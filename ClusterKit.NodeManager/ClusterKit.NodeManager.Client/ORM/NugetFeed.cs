@@ -9,6 +9,8 @@
 
 namespace ClusterKit.NodeManager.Client.ORM
 {
+    using System;
+
     using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
@@ -17,6 +19,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// Link to the nuget feed to download updates
     /// </summary>
     [ApiDescription("The link to the nuget feed to download updates", Name = "NugetFeed")]
+    [Serializable]
     public class NugetFeed
     {
         /// <summary>

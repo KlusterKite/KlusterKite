@@ -23,6 +23,9 @@ namespace ClusterKit.Data.EF.Npgsql
     public class ConnectionManager : BaseConnectionManager
     {
         /// <inheritdoc />
+        public override string ProviderInvariantName => "Npgsql";
+
+        /// <inheritdoc />
         public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
         {
             var npgsqlConnection = connection as NpgsqlConnection;

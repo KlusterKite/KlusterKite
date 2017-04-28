@@ -64,8 +64,6 @@ services:
      - SELF_JOIN=true
     logging:
         driver: json-file
-        options:
-            max-size: "1m"
     networks:
       default:
         ipv4_address: 172.18.0.6               
@@ -76,8 +74,6 @@ services:
      - NETWORK_NAME=publisher1
     logging:
         driver: json-file
-        options:
-            max-size: "1m"
     networks:
       default:
         ipv4_address: 172.18.0.7               
@@ -89,14 +85,14 @@ services:
      - NETWORK_NAME=publisher2
     logging:
         driver: json-file
-        options:
-            max-size: "1m"
     networks:
       default:
         ipv4_address: 172.18.0.8             
 
   manager:
     image: clusterkit/manager
+#    environment:
+#     - MONO_LOG_LEVEL=info
     links:
      - "seed"
      - "configDb"
@@ -104,8 +100,6 @@ services:
      - "entry"
     logging:
         driver: json-file
-        options:
-            max-size: "1m"
 
   monitoringUI:
     image: clusterkit/monitoring-ui
@@ -113,8 +107,6 @@ services:
      - "82:8080"
     logging:
         driver: json-file
-        options:
-            max-size: "1m"
     networks:
       default:
         ipv4_address: 172.18.0.9 
@@ -123,8 +115,6 @@ services:
     image: clusterkit/elk
     logging:
         driver: json-file
-        options:
-            max-size: "1m"
     networks:
       default:
         ipv4_address: 172.18.0.12
@@ -133,8 +123,6 @@ services:
     image: clusterkit/seeder
     logging:
         driver: json-file
-        options:
-            max-size: "1m"
     networks:
       default:
         ipv4_address: 172.18.0.13
@@ -150,5 +138,3 @@ services:
      - "entry"
     logging:
         driver: json-file
-        options:
-            max-size: "1m"

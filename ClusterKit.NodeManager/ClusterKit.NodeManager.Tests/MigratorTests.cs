@@ -11,8 +11,12 @@ namespace ClusterKit.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.Entity;
+    using System.Data.Entity.Migrations;
     using System.IO;
     using System.Linq;
+    using System.Net;
+    using System.Net.Http;
     using System.Reflection;
 
     using Akka.Actor;
@@ -32,6 +36,7 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
+    //using ClusterKit.NodeManager.Migrator.EF;
     using ClusterKit.NodeManager.Tests.Migrations;
 
     using NuGet;
@@ -468,7 +473,7 @@ namespace ClusterKit.NodeManager.Tests
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
-                var state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(10));
+                var state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
                 Assert.Equal(1, state.States.Count);
                 Assert.Equal(1, state.States[0].MigratorsStates.Count);
@@ -831,7 +836,7 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        ///     Replaces production data sources with the test ones
+        /// Replaces production data sources with the test ones
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
@@ -952,7 +957,7 @@ namespace ClusterKit.NodeManager.Tests
                                           Path.GetFileName(fs.Name) ?? fs.Name)
                                   });
 
-                var dependencies = assembly.GetReferencedAssemblies()
+                 var dependencies = assembly.GetReferencedAssemblies()
                     .Where(
                         d =>
                             {
@@ -963,7 +968,7 @@ namespace ClusterKit.NodeManager.Tests
                     .Select(
                         d => new PackageDependency(
                             d.Name,
-                            new VersionSpec(SemanticVersion.Parse(d.Version.ToString()))));
+                            new VersionSpec { MinVersion = SemanticVersion.Parse(d.Version.ToString()), IsMinInclusive = true }));
 
                 return new ReleaseCheckTestsBase.TestPackage
                            {
@@ -990,10 +995,40 @@ namespace ClusterKit.NodeManager.Tests
             /// <returns>The test repository</returns>
             private IPackageRepository CreateTestRepository()
             {
+                while (true)
+                {
+                    var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+                    var assembliesToLoad = loadedAssemblies
+                        .SelectMany(a => a.GetReferencedAssemblies().Select(r => new { r, a }))
+                        .GroupBy(a => a.r.Name)
+                        .Select(g => g.OrderByDescending(a => a.r.Version).First())
+                        .OrderBy(p => p.r.Name)
+                        .Select(p => p.r)
+                        .Distinct()
+                        .Where(a => loadedAssemblies.All(l => l.GetName().Name != a.Name))
+                        .ToList();
+
+                    if (assembliesToLoad.Count == 0)
+                    {
+                        break;
+                    }
+                    
+
+                    foreach (var assemblyName in assembliesToLoad)
+                    {
+                        AppDomain.CurrentDomain.Load(assemblyName);
+                    }
+                }
+                
+
                 var packages = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.GlobalAssemblyCache && !a.IsDynamic)
-                    .Select(p => this.CreateTestPackage(p, AppDomain.CurrentDomain.GetAssemblies()));
-                return new ReleaseCheckTestsBase.TestRepository(packages.Cast<IPackage>().ToArray());
+                    .Select(p => this.CreateTestPackage(p, AppDomain.CurrentDomain.GetAssemblies()))
+                    .GroupBy(a => a.Id)
+                    .Select(g => g.OrderByDescending(a => a.Version).First())
+                    .Cast<IPackage>().ToArray();
+                return new ReleaseCheckTestsBase.TestRepository(packages);
             }
         }
     }

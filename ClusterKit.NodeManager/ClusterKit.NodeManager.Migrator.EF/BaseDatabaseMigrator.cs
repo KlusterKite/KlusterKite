@@ -15,6 +15,8 @@ namespace ClusterKit.NodeManager.Migrator.EF
     using System.Data.Entity.Migrations;
     using System.Linq;
 
+    using ClusterKit.Data.EF;
+
     /// <summary>
     /// The base class for Entity Framework Code-first migrations
     /// </summary>
@@ -26,6 +28,22 @@ namespace ClusterKit.NodeManager.Migrator.EF
         where TMigrationConfiguration : DbMigrationsConfiguration<TContext>, new()
         where TContext : DbContext
     {
+        /// <summary>
+        /// The connection manager
+        /// </summary>
+        private readonly BaseConnectionManager connectionManager;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseDatabaseMigrator{TContext,TMigrationConfiguration}"/> class.
+        /// </summary>
+        /// <param name="connectionManager">
+        /// The connection manager.
+        /// </param>
+        protected BaseDatabaseMigrator(BaseConnectionManager connectionManager)
+        {
+            this.connectionManager = connectionManager;
+        }
+
         /// <inheritdoc />
         public string LatestPoint => new DbMigrator(new TMigrationConfiguration()).GetLocalMigrations().Last();
 
@@ -38,8 +56,12 @@ namespace ClusterKit.NodeManager.Migrator.EF
         /// <inheritdoc />
         public string GetCurrentPoint(ResourceId resourceId)
         {
-            var configuration =
-                new TMigrationConfiguration { TargetDatabase = new DbConnectionInfo(resourceId.ConnectionString) };
+            var configuration = new TMigrationConfiguration
+                                    {
+                                        TargetDatabase = new DbConnectionInfo(
+                                            resourceId.ConnectionString,
+                                            this.connectionManager.ProviderInvariantName)
+                                    };
             var migrator = new DbMigrator(configuration);
             return migrator.GetDatabaseMigrations().Last();
         }
@@ -47,8 +69,12 @@ namespace ClusterKit.NodeManager.Migrator.EF
         /// <inheritdoc />
         public void Migrate(ResourceId resourceId, string pointToMigrate)
         {
-            var configuration =
-                new TMigrationConfiguration { TargetDatabase = new DbConnectionInfo(resourceId.ConnectionString) };
+            var configuration = new TMigrationConfiguration
+                                    {
+                                        TargetDatabase = new DbConnectionInfo(
+                                            resourceId.ConnectionString,
+                                            this.connectionManager.ProviderInvariantName)
+                                    };
             var migrator = new DbMigrator(configuration);
             migrator.Update(pointToMigrate);
         }

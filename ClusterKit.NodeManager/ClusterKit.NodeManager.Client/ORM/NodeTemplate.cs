@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Client.ORM
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -23,6 +24,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [UsedImplicitly]
     [ApiDescription("Node template description", Name = "NodeTemplate")]
+    [Serializable]
     public class NodeTemplate : ITemplate
     {
         /// <summary>

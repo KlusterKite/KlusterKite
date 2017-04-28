@@ -21,6 +21,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [ApiDescription("The error description during the resource check and/or migration", Name = "MigrationError")]
     [Table("MigrationErrors")]
+    [Serializable]
     public class MigrationError : MigrationLogRecord
     {
         /// <summary>
@@ -43,5 +44,32 @@ namespace ClusterKit.NodeManager.Client.ORM
         [DeclareField("the error stack trace")]
         [UsedImplicitly]
         public string ErrorStackTrace { get; set; }
+
+        /// <summary>
+        /// Sets the description from exception
+        /// </summary>
+        public Exception Exception
+        {
+            set
+            {
+                this.ErrorStackTrace = string.Empty;
+                this.AddExceptionToStackTrace(value);
+            }
+        }
+
+        /// <summary>
+        /// Adds exception description to <see cref="ErrorStackTrace"/>
+        /// </summary>
+        /// <param name="value">The exception</param>
+        private void AddExceptionToStackTrace(Exception value)
+        {
+            this.ErrorStackTrace += $"{value.GetType().Name}: {value.Message}\n{value.StackTrace}\n{(value as System.IO.FileNotFoundException)?.FusionLog}";
+
+            if (value.InnerException != null)
+            {
+                this.ErrorStackTrace += "\n---------------------\n";
+                this.AddExceptionToStackTrace(value.InnerException);
+            }
+        }
     }
 }
