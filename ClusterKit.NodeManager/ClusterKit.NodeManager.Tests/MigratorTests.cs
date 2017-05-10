@@ -11,12 +11,8 @@ namespace ClusterKit.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
-    using System.Data.Entity.Migrations;
     using System.IO;
     using System.Linq;
-    using System.Net;
-    using System.Net.Http;
     using System.Reflection;
 
     using Akka.Actor;
@@ -36,7 +32,6 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
-    //using ClusterKit.NodeManager.Migrator.EF;
     using ClusterKit.NodeManager.Tests.Migrations;
 
     using NuGet;
@@ -72,6 +67,74 @@ namespace ClusterKit.NodeManager.Tests
         {
             this.connectionString = this.Sys.Settings.Config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             this.databaseName = this.Sys.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
+        }
+
+        /// <summary>
+        /// <see cref="MigrationActor"/> fails on get state request
+        /// </summary>
+        [Fact]
+        public void MigrationCheckFailed()
+        {
+            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
+            this.CreateReleases();
+            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
+            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            {
+                var activeRelease = context.Releases.First(r => r.Id == 1);
+                var nextRelease = context.Releases.First(r => r.Id == 2);
+
+                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                {{
+                    TestMigrator.DefinedMigrationPoints = [
+                        ""first""
+                    ]
+                    TestMigrator.Resources = [
+                        ""{resourceName.Replace("\\", "\\\\")}""
+                    ]
+                    ClusterKit.NodeManager.Migrators = [
+                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    ]
+                }}
+                ";
+
+                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                {{
+                    TestMigrator.DefinedMigrationPoints = [
+                        ""first"",
+                    ]
+                    TestMigrator.Resources = [
+                        ""{resourceName.Replace("\\", "\\\\")}""
+                    ]
+                    ClusterKit.NodeManager.Migrators = [
+                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    ]
+
+                    TestMigrator.ThrowOnGetMigratableResources = true
+                }}
+                ";
+                context.SaveChanges();
+            }
+
+            try
+            {
+                TestMigrator.SetMigrationPoint(resourceName, "first");
+                this.CreateMigration();
+
+                this.ActorOf(
+                    () => new MigratorForwarder(
+                        this.TestActor,
+                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                    "migrationActor");
+                this.ExpectMsg<ProcessingTheRequest>();
+
+                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(30));
+                this.ExpectNoMsg();
+            }
+            finally
+            {
+                File.Delete(resourceName);
+            }
         }
 
         /// <summary>
@@ -131,7 +194,7 @@ namespace ClusterKit.NodeManager.Tests
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
                 Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
@@ -173,7 +236,9 @@ namespace ClusterKit.NodeManager.Tests
                 Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Downgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
-                Assert.Equal(EnResourcePosition.Destination, state.TemplateStates[0].Migrators[0].Resources[0].Position);
+                Assert.Equal(
+                    EnResourcePosition.Destination,
+                    state.TemplateStates[0].Migrators[0].Resources[0].Position);
             }
             finally
             {
@@ -238,7 +303,7 @@ namespace ClusterKit.NodeManager.Tests
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
                 Assert.Equal(EnMigrationActorMigrationPosition.NoMigrationNeeded, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
@@ -250,74 +315,6 @@ namespace ClusterKit.NodeManager.Tests
                 Assert.Equal(
                     EnResourcePosition.SourceAndDestination,
                     state.TemplateStates[0].Migrators[0].Resources[0].Position);
-            }
-            finally
-            {
-                File.Delete(resourceName);
-            }
-        }
-        
-        /// <summary>
-        /// <see cref="MigrationActor"/> fails on get state request
-        /// </summary>
-        [Fact]
-        public void MigrationCheckFailed()
-        {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
-            this.CreateReleases();
-            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
-            {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                var nextRelease = context.Releases.First(r => r.Id == 2);
-
-                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
-                {{
-                    TestMigrator.DefinedMigrationPoints = [
-                        ""first""
-                    ]
-                    TestMigrator.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
-                    ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
-                    ]
-                }}
-                ";
-
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
-                {{
-                    TestMigrator.DefinedMigrationPoints = [
-                        ""first"",
-                    ]
-                    TestMigrator.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
-                    ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
-                    ]
-
-                    TestMigrator.ThrowOnGetMigratableResources = true
-                }}
-                ";
-                context.SaveChanges();
-            }
-
-            try
-            {
-                TestMigrator.SetMigrationPoint(resourceName, "first");
-                this.CreateMigration();
-
-                this.ActorOf(
-                    () => new MigratorForwarder(
-                        this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
-                    "migrationActor");
-                this.ExpectMsg<ProcessingTheRequest>();
-
-                var state = this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(5));
-                this.ExpectNoMsg();
             }
             finally
             {
@@ -383,7 +380,7 @@ namespace ClusterKit.NodeManager.Tests
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(10));
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
                 Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
@@ -403,7 +400,7 @@ namespace ClusterKit.NodeManager.Tests
                                               Target = EnMigrationSide.Destination
                                           };
 
-                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1)); 
+                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
                 this.ExpectMsg<ProcessingTheRequest>();
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
@@ -425,7 +422,124 @@ namespace ClusterKit.NodeManager.Tests
                 Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
-                Assert.Equal(EnResourcePosition.Destination, state.TemplateStates[0].Migrators[0].Resources[0].Position);
+                Assert.Equal(
+                    EnResourcePosition.Destination,
+                    state.TemplateStates[0].Migrators[0].Resources[0].Position);
+            }
+            finally
+            {
+                File.Delete(resourceName);
+            }
+        }
+
+        /// <summary>
+        /// <see cref="MigrationActor"/> checks the upgrade migration with failed migration
+        /// </summary>
+        [Fact]
+        public void MigrationUpgradeMigrationFailedTest()
+        {
+            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
+            this.CreateReleases();
+            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
+            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            {
+                var activeRelease = context.Releases.First(r => r.Id == 1);
+                var nextRelease = context.Releases.First(r => r.Id == 2);
+
+                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                {{
+                    TestMigrator.DefinedMigrationPoints = [
+                        ""first""
+                    ]
+                    TestMigrator.Resources = [
+                        ""{resourceName.Replace("\\", "\\\\")}""
+                    ]
+                    ClusterKit.NodeManager.Migrators = [
+                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    ]
+                }}
+                ";
+
+                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                {{
+                    TestMigrator.DefinedMigrationPoints = [
+                        ""first"",
+                        ""second"",
+                    ]
+
+                    TestMigrator.Resources = [
+                        ""{resourceName.Replace("\\", "\\\\")}""
+                    ]
+                    ClusterKit.NodeManager.Migrators = [
+                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    ]
+
+                    TestMigrator.ThrowOnMigrate = true
+                }}
+                ";
+                context.SaveChanges();
+            }
+
+            try
+            {
+                TestMigrator.SetMigrationPoint(resourceName, "first");
+                this.CreateMigration();
+
+                var actor = this.ActorOf(
+                    () => new MigratorForwarder(
+                        this.TestActor,
+                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                    "migrationActor");
+                this.ExpectMsg<ProcessingTheRequest>();
+
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
+                this.ExpectNoMsg();
+                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
+                Assert.Equal(1, state.TemplateStates.Count);
+                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
+                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
+                Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
+                Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
+
+                var resourceUpgrade = new ResourceUpgrade
+                                          {
+                                              TemplateCode = "migrator",
+                                              MigratorTypeName =
+                                                  "ClusterKit.NodeManager.Tests.Migrations.TestMigrator",
+                                              ResourceCode = Path.GetFileName(resourceName),
+                                              Target = EnMigrationSide.Destination
+                                          };
+
+                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
+                this.ExpectMsg<ProcessingTheRequest>();
+                var log = this.ExpectMsg<List<MigrationLogRecord>>();
+                Assert.Equal(1, log.Count);
+                var record = log[0] as MigrationOperation;
+                Assert.NotNull(record);
+                Assert.Equal(1, record.MigrationId);
+                Assert.Equal(2, record.ReleaseId);
+                Assert.Equal("migrator", record.MigratorTemplateCode);
+                Assert.Equal("first", record.SourcePoint);
+                Assert.Equal("second", record.DestinationPoint);
+                Assert.NotNull(record.Error);
+                Assert.Equal(1, record.Error.MigrationId);
+                Assert.Equal(2, record.Error.ReleaseId);
+                Assert.Equal("migrator", record.Error.MigratorTemplateCode);
+                Assert.Equal("Exception while migrating resource: Migrate failed", record.Error.ErrorMessage);
+
+                state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
+                this.ExpectNoMsg();
+                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
+                Assert.Equal(1, state.TemplateStates.Count);
+                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
+                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
+                Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
+                Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
             }
             finally
             {
@@ -437,7 +551,58 @@ namespace ClusterKit.NodeManager.Tests
         /// <see cref="MigrationActor"/> checks the upgrade migration
         /// </summary>
         [Fact]
-        public void  ReleaseUpgradeCheckTest()
+        public void ReleaseCheckFailedTest()
+        {
+            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
+            this.CreateReleases();
+            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
+            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            {
+                var activeRelease = context.Releases.First(r => r.Id == 1);
+                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                {{
+                    TestMigrator.DefinedMigrationPoints = [
+                        ""first"",
+                        ""second"",
+                    ]
+                    TestMigrator.Resources = [
+                        ""{resourceName.Replace("\\", "\\\\")}""
+                    ]
+                    ClusterKit.NodeManager.Migrators = [
+                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    ]
+
+                    TestMigrator.ThrowOnGetMigratableResources = true
+                }}
+                ";
+                context.SaveChanges();
+            }
+
+            try
+            {
+                TestMigrator.SetMigrationPoint(resourceName, "first");
+
+                this.ActorOf(
+                    () => new MigratorForwarder(
+                        this.TestActor,
+                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                    "migrationActor");
+                this.ExpectMsg<ProcessingTheRequest>();
+                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(10));
+                this.ExpectNoMsg();
+            }
+            finally
+            {
+                File.Delete(resourceName);
+            }
+        }
+
+        /// <summary>
+        /// <see cref="MigrationActor"/> checks the upgrade migration
+        /// </summary>
+        [Fact]
+        public void ReleaseUpgradeCheckTest()
         {
             var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
@@ -516,172 +681,6 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// <see cref="MigrationActor"/> checks the upgrade migration
-        /// </summary>
-        [Fact]
-        public void ReleaseCheckFailedTest()
-        {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
-            this.CreateReleases();
-            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
-            {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
-                {{
-                    TestMigrator.DefinedMigrationPoints = [
-                        ""first"",
-                        ""second"",
-                    ]
-                    TestMigrator.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
-                    ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
-                    ]
-
-                    TestMigrator.ThrowOnGetMigratableResources = true
-                }}
-                ";
-                context.SaveChanges();
-            }
-
-            try
-            {
-                TestMigrator.SetMigrationPoint(resourceName, "first");
-
-                this.ActorOf(
-                    () => new MigratorForwarder(
-                        this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
-                    "migrationActor");
-                this.ExpectMsg<ProcessingTheRequest>();
-                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(10));
-                this.ExpectNoMsg();
-            }
-            finally
-            {
-                File.Delete(resourceName);
-            }
-        }
-
-        /// <summary>
-        /// <see cref="MigrationActor"/> checks the upgrade migration with failed migration
-        /// </summary>
-        [Fact]
-        public void MigrationUpgradeMigrationFailedTest()
-        {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
-            this.CreateReleases();
-            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
-            {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                var nextRelease = context.Releases.First(r => r.Id == 2);
-
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
-                {{
-                    TestMigrator.DefinedMigrationPoints = [
-                        ""first""
-                    ]
-                    TestMigrator.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
-                    ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
-                    ]
-                }}
-                ";
-
-                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
-                {{
-                    TestMigrator.DefinedMigrationPoints = [
-                        ""first"",
-                        ""second"",
-                    ]
-
-                    TestMigrator.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
-                    ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
-                    ]
-
-                    TestMigrator.ThrowOnMigrate = true
-                }}
-                ";
-                context.SaveChanges();
-            }
-
-            try
-            {
-                TestMigrator.SetMigrationPoint(resourceName, "first");
-                this.CreateMigration();
-
-                var actor = this.ActorOf(
-                    () => new MigratorForwarder(
-                        this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
-                    "migrationActor");
-                this.ExpectMsg<ProcessingTheRequest>();
-
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(10));
-                this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
-                Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
-                Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
-                Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
-                Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
-                Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
-
-                var resourceUpgrade = new ResourceUpgrade
-                                          {
-                                              TemplateCode = "migrator",
-                                              MigratorTypeName =
-                                                  "ClusterKit.NodeManager.Tests.Migrations.TestMigrator",
-                                              ResourceCode = Path.GetFileName(resourceName),
-                                              Target = EnMigrationSide.Destination
-                                          };
-
-                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
-                this.ExpectMsg<ProcessingTheRequest>();
-                var log = this.ExpectMsg<List<MigrationLogRecord>>();
-                Assert.Equal(1, log.Count);
-                var record = log[0] as MigrationOperation;
-                Assert.NotNull(record);
-                Assert.Equal(1, record.MigrationId);
-                Assert.Equal(2, record.ReleaseId);
-                Assert.Equal("migrator", record.MigratorTemplateCode);
-                Assert.Equal("first", record.SourcePoint);
-                Assert.Equal("second", record.DestinationPoint);
-                Assert.NotNull(record.Error);
-                Assert.Equal(1, record.Error.MigrationId);
-                Assert.Equal(2, record.Error.ReleaseId);
-                Assert.Equal("migrator", record.Error.MigratorTemplateCode);
-                Assert.Equal("Exception while migrating resource: Migrate failed", record.Error.ErrorMessage);
-
-                state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
-                this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
-                Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
-                Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
-                Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
-                Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
-                Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
-            }
-            finally
-            {
-                File.Delete(resourceName);
-            }
-        }
-
-        /// <summary>
         /// Creates the new migration in database
         /// </summary>
         private void CreateMigration()
@@ -747,9 +746,7 @@ namespace ClusterKit.NodeManager.Tests
                                                     p => new PackageDescription
                                                              {
                                                                  Id = p.Id,
-                                                                 Version =
-                                                                     p.Version
-                                                                         .ToString()
+                                                                 Version = p.Version.ToString()
                                                              })
                                                 .ToList(),
                                         NugetFeeds = new[] { new NugetFeed() }.ToList(),
@@ -822,6 +819,12 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         public class MigratorForwarder : MigrationActor
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MigratorForwarder"/> class.
+            /// </summary>
+            /// <param name="testActor">The test actor reference</param>
+            /// <param name="contextFactory">The context factory</param>
+            /// <param name="nugetRepository">The nuget repository</param>
             public MigratorForwarder(
                 IActorRef testActor,
                 IContextFactory<ConfigurationContext> contextFactory,
@@ -957,7 +960,7 @@ namespace ClusterKit.NodeManager.Tests
                                           Path.GetFileName(fs.Name) ?? fs.Name)
                                   });
 
-                 var dependencies = assembly.GetReferencedAssemblies()
+                var dependencies = assembly.GetReferencedAssemblies()
                     .Where(
                         d =>
                             {
@@ -968,7 +971,11 @@ namespace ClusterKit.NodeManager.Tests
                     .Select(
                         d => new PackageDependency(
                             d.Name,
-                            new VersionSpec { MinVersion = SemanticVersion.Parse(d.Version.ToString()), IsMinInclusive = true }));
+                            new VersionSpec
+                                {
+                                    MinVersion = SemanticVersion.Parse(d.Version.ToString()),
+                                    IsMinInclusive = true
+                                }));
 
                 return new ReleaseCheckTestsBase.TestPackage
                            {
@@ -1013,21 +1020,20 @@ namespace ClusterKit.NodeManager.Tests
                     {
                         break;
                     }
-                    
 
                     foreach (var assemblyName in assembliesToLoad)
                     {
                         AppDomain.CurrentDomain.Load(assemblyName);
                     }
                 }
-                
 
                 var packages = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.GlobalAssemblyCache && !a.IsDynamic)
                     .Select(p => this.CreateTestPackage(p, AppDomain.CurrentDomain.GetAssemblies()))
                     .GroupBy(a => a.Id)
                     .Select(g => g.OrderByDescending(a => a.Version).First())
-                    .Cast<IPackage>().ToArray();
+                    .Cast<IPackage>()
+                    .ToArray();
                 return new ReleaseCheckTestsBase.TestRepository(packages);
             }
         }

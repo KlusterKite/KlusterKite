@@ -29,6 +29,7 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.Messages.Migration;
+    using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -37,8 +38,6 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
-
-    using Newtonsoft.Json;
 
     using NuGet;
 
@@ -401,21 +400,29 @@ namespace ClusterKit.NodeManager
 
             using (var context = this.contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
             {
-                var releases = context.Releases
-                    .Include(nameof(Release.CompatibleTemplates))
-                    .Include($"{nameof(Release.Operations)}.{nameof(MigrationOperation.Error)}")
-                    .Include(nameof(Release.Errors))
-                    .Where(r => r.State == EnReleaseState.Active)
-                    .ToList();
-                this.currentRelease = releases.SingleOrDefault();
-
-                this.currentMigration = context.Migrations
-                    .Include(nameof(Migration.FromRelease))
+                this.GetCurrentRelease(context);
+                this.currentMigration = context.Migrations.Include(nameof(Migration.FromRelease))
                     .Include(nameof(Migration.ToRelease))
                     .Include($"{nameof(Migration.Operations)}.{nameof(MigrationOperation.Error)}")
                     .Include(nameof(Migration.Errors))
                     .FirstOrDefault(m => m.IsActive);
             }
+
+            this.InitResourceState();
+        }
+
+        /// <summary>
+        /// Gets the active release from data source
+        /// </summary>
+        /// <param name="context">The data context</param>
+        private void GetCurrentRelease(ConfigurationContext context)
+        {
+            var releases = context.Releases.Include(nameof(Release.CompatibleTemplates))
+                .Include($"{nameof(Release.Operations)}.{nameof(MigrationOperation.Error)}")
+                .Include(nameof(Release.Errors))
+                .Where(r => r.State == EnReleaseState.Active)
+                .ToList();
+            this.currentRelease = releases.SingleOrDefault();
         }
 
         /// <summary>
@@ -458,6 +465,203 @@ namespace ClusterKit.NodeManager
             this.Become(this.Start);
             Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
             this.Stash.UnstashAll();
+        }
+
+        /// <summary>
+        /// Initializes migration with resource data
+        /// </summary>
+        private void InitMigration()
+        {
+            var hasUpgradingResources = this.resourceState.MigrationState.TemplateStates.Any(
+                t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Upgrade));
+            var hasDowngradingResources = this.resourceState.MigrationState.TemplateStates.Any(
+                t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Downgrade));
+            var hasBrokenResources = this.resourceState.MigrationState.TemplateStates.Any(
+                t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Undefined));
+
+            if ((hasUpgradingResources && hasDowngradingResources) || hasBrokenResources)
+            {
+                this.resourceState.CanCancelMigration = true;
+                this.resourceState.CanFinishMigration = false;
+                this.resourceState.CanMigrateResources = false;
+                this.resourceState.CanUpdateNodesToDestination = false;
+                this.resourceState.CanUpdateNodesToSource = false;
+                return;
+            }
+
+            var direction = hasUpgradingResources
+                                ? EnMigrationDirection.Upgrade
+                                : hasDowngradingResources
+                                    ? EnMigrationDirection.Downgrade
+                                    : EnMigrationDirection.Stay;
+            using (var ds = this.GetContext().Result)
+            {
+                var migration = ds.Migrations.FirstOrDefault(m => m.IsActive);
+                if (migration == null || migration.Id != this.currentMigration.Id)
+                {
+                    throw new Exception("Database synchronization failed for active migration");
+                }
+
+                migration.State = EnMigrationState.Ready;
+                migration.Direction = direction;
+                ds.SaveChanges();
+            }
+
+            this.InitDatabase();
+        }
+
+        /// <summary>
+        /// Checks current resource state with active migration and without resource operation in progress
+        /// </summary>
+        private void InitResourceMigrationState()
+        {
+            this.resourceState.ReleaseState = null;
+            this.resourceState.CanCreateMigration = false;
+
+            if (this.resourceState.MigrationState == null)
+            {
+                this.resourceState.CanCancelMigration = this.currentMigration.State == EnMigrationState.Preparing;
+                this.resourceState.CanFinishMigration = false;
+                this.resourceState.CanMigrateResources = false;
+                this.resourceState.CanUpdateNodesToDestination = false;
+                this.resourceState.CanUpdateNodesToSource = false;
+                return;
+            }
+
+            if (this.currentMigration.State == EnMigrationState.Preparing)
+            {
+                this.InitMigration();
+                return;
+            }
+
+            // checking for broken migration record
+            if (!this.currentMigration.Direction.HasValue
+                || this.currentMigration.Direction == EnMigrationDirection.Undefined)
+            {
+                Context.GetLogger()
+                    .Error(
+                        "{Type}: current migration is marked ready but has invalid direction value",
+                        this.GetType().Name);
+                this.resourceState.CanCancelMigration = false;
+                this.resourceState.CanFinishMigration = false;
+                this.resourceState.CanMigrateResources = false;
+                this.resourceState.CanUpdateNodesToDestination = false;
+                this.resourceState.CanUpdateNodesToSource = false;
+                return;
+            }
+
+            this.resourceState.CanCancelMigration =
+                (this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.Source
+                 || this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.NoMigrationNeeded)
+                && this.currentRelease.Id == this.currentMigration.FromReleaseId
+                && this.nodeDescriptions.Values.All(n => !n.IsObsolete);
+
+            this.resourceState.CanFinishMigration =
+                (this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.Destination
+                 || this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.NoMigrationNeeded)
+                && this.currentRelease.Id == this.currentMigration.ToReleaseId
+                && this.nodeDescriptions.Values.All(n => !n.IsObsolete);
+
+            // we cannot migrate resources in 3 cases:
+            // 1. Resources does not need migration
+            // 2. We are upgrading and already migrated resources and nodes
+            // 3. We are downgrading and nodes not yet migrated
+            // 4. This is bad idea to upgrade nodes and resources simultaneously
+            var cannotMigrateResources = this.currentMigration.Direction == EnMigrationDirection.Stay
+                                         || (this.currentMigration.Direction == EnMigrationDirection.Upgrade
+                                             && this.resourceState.MigrationState.Position
+                                             == EnMigrationActorMigrationPosition.Destination
+                                             && this.currentRelease.Id == this.currentMigration.ToReleaseId)
+                                         || (this.currentMigration.Direction == EnMigrationDirection.Downgrade
+                                             && this.resourceState.MigrationState.Position
+                                             == EnMigrationActorMigrationPosition.Source
+                                             && this.currentRelease.Id == this.currentMigration.FromReleaseId)
+                                         || this.nodeDescriptions.Values.Any(n => n.IsObsolete);
+
+            this.resourceState.CanMigrateResources = !cannotMigrateResources;
+
+            this.resourceState.CanUpdateNodesToDestination =
+                this.currentRelease.Id == this.currentMigration.FromReleaseId
+                && (this.currentMigration.Direction == EnMigrationDirection.Stay
+                    || (this.currentMigration.Direction == EnMigrationDirection.Upgrade
+                        && this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.Destination)
+                    || this.currentMigration.Direction == EnMigrationDirection.Downgrade);
+
+            this.resourceState.CanUpdateNodesToSource = this.currentRelease.Id == this.currentMigration.ToReleaseId
+                                                        && (this.currentMigration.Direction == EnMigrationDirection.Stay
+                                                            || (this.currentMigration.Direction == EnMigrationDirection
+                                                                    .Downgrade
+                                                                && this.resourceState.MigrationState.Position
+                                                                == EnMigrationActorMigrationPosition.Source)
+                                                            || this.currentMigration.Direction == EnMigrationDirection
+                                                                .Upgrade);
+        }
+
+        /// <summary>
+        /// Checks current resource state without active migration and/or some resource operation in progress
+        /// </summary>
+        private void InitResourceReleaseState()
+        {
+            this.resourceState.MigrationState = null;
+
+            this.resourceState.CanUpdateNodesToDestination = false;
+            this.resourceState.CanUpdateNodesToSource = false;
+            this.resourceState.CanCancelMigration = false;
+            this.resourceState.CanFinishMigration = false;
+
+            this.resourceState.CanCreateMigration = true;
+            this.resourceState.CanMigrateResources = false;
+
+            if (this.nodeDescriptions.Values.Any(n => n.IsObsolete))
+            {
+                this.resourceState.CanCreateMigration = false;
+            }
+
+            if (this.resourceState.ReleaseState == null)
+            {
+                this.resourceState.CanCreateMigration = false;
+                return;
+            }
+
+            // checking if there is any resource that is not of the current release state
+            var unmigratedTemplates = this.resourceState.ReleaseState.States
+                .Where(t => t.MigratorsStates.Any(m => m.Resources.Any(r => r.CurrentPoint != m.LastDefinedPoint)))
+                .ToList();
+
+            if (!unmigratedTemplates.Any())
+            {
+                return;
+            }
+
+            this.resourceState.CanCreateMigration = false;
+            this.resourceState.CanMigrateResources = this.resourceState.ReleaseState.States.All(
+                t => t.MigratorsStates.All(m => m.Resources.All(r => m.MigrationPoints.Contains(r.CurrentPoint))));
+        }
+
+        /// <summary>
+        /// Checks current resource state
+        /// </summary>
+        private void InitResourceState()
+        {
+            if (this.resourceState.OperationIsInProgress)
+            {
+                this.resourceState.CanCancelMigration = false;
+                this.resourceState.CanCreateMigration = false;
+                this.resourceState.CanFinishMigration = false;
+                this.resourceState.CanMigrateResources = false;
+                this.resourceState.CanUpdateNodesToDestination = false;
+                this.resourceState.CanUpdateNodesToSource = false;
+                return;
+            }
+
+            if (this.currentMigration != null)
+            {
+                this.InitResourceMigrationState();
+            }
+            else
+            {
+                this.InitResourceReleaseState();
+            }
         }
 
         /// <summary>
@@ -548,7 +752,6 @@ namespace ClusterKit.NodeManager
             this.resourceState.OperationIsInProgress = false;
             if (this.currentMigration != null)
             {
-
                 Context.GetLogger()
                     .Error(
                         "{Type}: received a MigrationActorReleaseState with active migration in progress",
@@ -558,8 +761,114 @@ namespace ClusterKit.NodeManager
 
             this.resourceState.ReleaseState = state;
             this.resourceState.MigrationState = null;
-            Context.GetLogger().Info("{Type}: received a MigrationActorReleaseState {JSON}", this.GetType().Name, JsonConvert.SerializeObject(state));
+            Context.GetLogger().Info("{Type}: received a MigrationActorReleaseState", this.GetType().Name);
             this.InitDatabase();
+        }
+
+        /// <summary>
+        /// Processes the cancel migration request
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>The async task</returns>
+        private async Task OnMigrationCancel(MigrationCancel request)
+        {
+            if (this.resourceState.OperationIsInProgress || this.currentMigration == null
+                || !this.resourceState.CanCancelMigration)
+            {
+                Context.GetLogger()
+                    .Warning("{Type}: received MigrationCancel request in inappropriate state", this.GetType().Name);
+                this.Sender.Tell(false);
+                return;
+            }
+
+            using (var ds = await this.GetContext())
+            {
+                var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
+                if (migration == null)
+                {
+                    this.Sender.Tell(false);
+                    throw new InvalidOperationException(
+                        "while processing MigrationCancel request could not find current migration in database");
+                }
+
+                if (!migration.IsActive)
+                {
+                    this.Sender.Tell(false);
+                    throw new InvalidOperationException(
+                        "while processing MigrationCancel request current was already not active in database");
+                }
+
+                migration.Finished = DateTimeOffset.Now;
+                migration.State = EnMigrationState.Failed;
+                migration.IsActive = false;
+                ds.SaveChanges();
+            }
+
+            this.Sender.Tell(true);
+            this.currentMigration = null;
+            this.resourceMigrator.Tell(new RecheckState(), this.Self);
+            this.resourceState.MigrationState = null;
+            this.resourceState.ReleaseState = null;
+            this.resourceState.OperationIsInProgress = true;
+            this.resourceState.CanCreateMigration = false;
+            this.resourceState.CanCancelMigration = false;
+            this.resourceState.CanFinishMigration = false;
+            this.resourceState.CanMigrateResources = false;
+            this.resourceState.CanUpdateNodesToDestination = false;
+            this.resourceState.CanUpdateNodesToSource = false;
+        }
+
+        /// <summary>
+        /// Processes the finish migration request
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>The async task</returns>
+        private async Task OnMigrationFinish(MigrationFinish request)
+        {
+            if (this.resourceState.OperationIsInProgress || this.currentMigration == null
+                || !this.resourceState.CanFinishMigration)
+            {
+                Context.GetLogger()
+                    .Warning("{Type}: received MigrationFinish request in inappropriate state", this.GetType().Name);
+                this.Sender.Tell(false);
+                return;
+            }
+
+            using (var ds = await this.GetContext())
+            {
+                var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
+                if (migration == null)
+                {
+                    this.Sender.Tell(false);
+                    throw new InvalidOperationException(
+                        "while processing MigrationFinish request could not find current migration in database");
+                }
+
+                if (!migration.IsActive)
+                {
+                    this.Sender.Tell(false);
+                    throw new InvalidOperationException(
+                        "while processing MigrationFinish request current was already not active in database");
+                }
+
+                migration.Finished = DateTimeOffset.Now;
+                migration.State = EnMigrationState.Completed;
+                migration.IsActive = false;
+                ds.SaveChanges();
+            }
+
+            this.Sender.Tell(true);
+            this.currentMigration = null;
+            this.resourceMigrator.Tell(new RecheckState(), this.Self);
+            this.resourceState.MigrationState = null;
+            this.resourceState.ReleaseState = null;
+            this.resourceState.OperationIsInProgress = true;
+            this.resourceState.CanCreateMigration = false;
+            this.resourceState.CanCancelMigration = false;
+            this.resourceState.CanFinishMigration = false;
+            this.resourceState.CanMigrateResources = false;
+            this.resourceState.CanUpdateNodesToDestination = false;
+            this.resourceState.CanUpdateNodesToSource = false;
         }
 
         /// <summary>
@@ -577,6 +886,105 @@ namespace ClusterKit.NodeManager
                     await ds.SaveChangesAsync();
                 }
             }
+        }
+
+        /// <summary>
+        /// Processes the request to update cluster nodes during migration process
+        /// </summary>
+        /// <param name="request">The update request</param>
+        /// <returns>The async task</returns>
+        private async Task OnMigrationNodesUpgrade(NodesUpgrade request)
+        {
+            if (this.resourceState.OperationIsInProgress 
+                || this.currentMigration == null
+                || (request.Target == EnMigrationSide.Source && !this.resourceState.CanUpdateNodesToSource)
+                || (request.Target == EnMigrationSide.Destination && !this.resourceState.CanUpdateNodesToDestination))
+            {
+                Context.GetLogger()
+                    .Warning("{Type}: received NodesUpgrade request in inappropriate state", this.GetType().Name);
+                this.Sender.Tell(false);
+                return;
+            }
+
+            using (var ds = await this.GetContext())
+            {
+                var sourceRelease = ds.Releases.First(r => r.Id == this.currentMigration.FromReleaseId);
+                var destinationRelease = ds.Releases.First(r => r.Id == this.currentMigration.ToReleaseId);
+
+                if (request.Target == EnMigrationSide.Source)
+                {
+                    destinationRelease.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
+                                                   ? EnReleaseState.Obsolete
+                                                   : EnReleaseState.Faulted;
+                    sourceRelease.State = EnReleaseState.Active;
+                }
+                else
+                {
+                    destinationRelease.State = EnReleaseState.Active;
+                    sourceRelease.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
+                                              ? EnReleaseState.Faulted
+                                              : EnReleaseState.Obsolete;
+                }
+
+                ds.SaveChanges();
+                this.GetCurrentRelease(ds);
+            }
+
+            this.Sender.Tell(true);
+            foreach (var nodeDescription in this.nodeDescriptions.Values)
+            {
+                this.CheckNodeIsObsolete(nodeDescription);
+            }
+
+            this.OnNodeUpgrade();
+            this.InitResourceState();
+        }
+
+        /// <summary>
+        /// Processes the request to upgrade resources during migration
+        /// </summary>
+        /// <param name="request">The request</param>
+        private void OnMigrationResourceUpgrade(List<ResourceUpgrade> request)
+        {
+            if (this.resourceState.OperationIsInProgress || this.currentMigration == null
+                || !this.resourceState.CanMigrateResources || this.resourceState.MigrationState == null)
+            {
+                Context.GetLogger()
+                    .Warning("{Type}: received ResourceUpgrade request in inappropriate state", this.GetType().Name);
+                this.Sender.Tell(false);
+                return;
+            }
+
+            foreach (var upgrade in request)
+            {
+                var template =
+                    this.resourceState.MigrationState.TemplateStates
+                        .FirstOrDefault(t => t.Code == upgrade.TemplateCode);
+                var migrator = template?.Migrators.FirstOrDefault(m => m.TypeName == upgrade.MigratorTypeName);
+                var resource = migrator?.Resources.FirstOrDefault(r => r.Code == upgrade.ResourceCode);
+                if (resource == null)
+                {
+                    Context.GetLogger()
+                        .Warning(
+                            "{Type}: received ResourceUpgrade request with unknown resource {TemplateCode} {MigratorTypeName} {ResourceCode}",
+                            this.GetType().Name,
+                            upgrade.TemplateCode,
+                            upgrade.MigratorTypeName,
+                            upgrade.ResourceCode);
+                    this.Sender.Tell(false);
+                    return;
+                }
+            }
+
+            this.Sender.Tell(true);
+            this.resourceMigrator.Tell(request, this.Self);
+            this.resourceState.OperationIsInProgress = true;
+            this.resourceState.CanCreateMigration = false;
+            this.resourceState.CanCancelMigration = false;
+            this.resourceState.CanFinishMigration = false;
+            this.resourceState.CanMigrateResources = false;
+            this.resourceState.CanUpdateNodesToDestination = false;
+            this.resourceState.CanUpdateNodesToSource = false;
         }
 
         /// <summary>
@@ -627,8 +1035,7 @@ namespace ClusterKit.NodeManager
                                 .OrderBy(s => this.random.NextDouble())
                                 .ToList(),
                         Packages =
-                            selectedNodeTemplate.PackagesToInstall[
-                                request.FrameworkRuntimeType],
+                            selectedNodeTemplate.PackagesToInstall[request.FrameworkRuntimeType],
                         PackageSources =
                             this.currentRelease.Configuration.NugetFeeds.Select(f => f.Address)
                                 .ToList()
@@ -726,6 +1133,7 @@ namespace ClusterKit.NodeManager
             }
 
             this.Self.Tell(new UpgradeMessage());
+            this.InitResourceState();
         }
 
         /// <summary>
@@ -1234,16 +1642,11 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            // todo: move check on resource state receive 
-            var resourcesAreReady = this.resourceState.ReleaseState.States.SelectMany(s => s.MigratorsStates)
-                .SelectMany(m => m.Resources.Select(r => r.CurrentPoint == m.LastDefinedPoint))
-                .All(r => r);
-
-            if (!resourcesAreReady)
+            if (!this.resourceState.CanCreateMigration)
             {
                 this.Sender.Tell(
                     CrudActionResponse<Migration>.Error(
-                        new Exception("Cluster cannot be migrated. Resources are not ready"),
+                        new Exception("The migration cannot be created at this time"),
                         null));
                 return;
             }
@@ -1297,6 +1700,12 @@ namespace ClusterKit.NodeManager
                     ds.SaveChanges();
                     this.currentMigration = migration;
                     this.resourceState.OperationIsInProgress = true;
+                    this.resourceState.CanCancelMigration = false;
+                    this.resourceState.CanCreateMigration = false;
+                    this.resourceState.CanFinishMigration = false;
+                    this.resourceState.CanMigrateResources = false;
+                    this.resourceState.CanUpdateNodesToDestination = false;
+                    this.resourceState.CanUpdateNodesToSource = false;
                     this.resourceState.ReleaseState = null;
                     this.resourceState.MigrationState = null;
                     this.resourceMigrator.Tell(new RecheckState(), this.Self);
@@ -1373,6 +1782,10 @@ namespace ClusterKit.NodeManager
             this.Receive<MigrationActorReleaseState>(s => this.OnMigrationActorReleaseState(s));
             this.ReceiveAsync<MigrationActorInitializationFailed>(this.OnMigrationActorInitializationFailed);
             this.ReceiveAsync<List<MigrationLogRecord>>(this.OnMigrationLogRecords);
+            this.ReceiveAsync<MigrationCancel>(this.OnMigrationCancel);
+            this.ReceiveAsync<MigrationFinish>(this.OnMigrationFinish);
+            this.Receive<List<ResourceUpgrade>>(r => this.OnMigrationResourceUpgrade(r));
+            this.ReceiveAsync<NodesUpgrade>(this.OnMigrationNodesUpgrade);
 
             this.Receive<ResourceStateRequest>(r => this.Sender.Tell(this.resourceState));
         }
@@ -1442,28 +1855,6 @@ namespace ClusterKit.NodeManager
                 this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Initiates the cluster nodes update process as part of migration routine
-        /// </summary>
-        /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
-        private async Task UpdateNodes(UpdateClusterRequest request)
-        {
-            var release = await this.StoreNewActiveRelease(request);
-            if (release == null)
-            {
-                return;
-            }
-
-            this.currentRelease = release;
-            foreach (var nodeDescription in this.nodeDescriptions.Values)
-            {
-                this.CheckNodeIsObsolete(nodeDescription);
-            }
-
-            this.OnNodeUpgrade();
         }
 
         /// <summary>

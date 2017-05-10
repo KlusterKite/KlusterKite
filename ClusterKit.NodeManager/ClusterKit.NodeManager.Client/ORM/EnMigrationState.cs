@@ -25,24 +25,9 @@ namespace ClusterKit.NodeManager.Client.ORM
         Ready,
 
         /// <summary>
-        /// The migrator operations are running
+        /// The migration failed
         /// </summary>
-        MigratingResources,
-
-        /// <summary>
-        /// The cluster nodes upgrade is in process
-        /// </summary>
-        MigratingNodes,
-
-        /// <summary>
-        /// The migrator operations are rollbacked
-        /// </summary>
-        RollbackingResources,
-
-        /// <summary>
-        /// The cluster node downgrade is in process
-        /// </summary>
-        RollbackingNodes,
+        Failed,
 
         /// <summary>
         /// The migration is completed

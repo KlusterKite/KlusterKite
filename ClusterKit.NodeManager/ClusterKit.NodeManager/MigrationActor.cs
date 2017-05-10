@@ -11,12 +11,10 @@ namespace ClusterKit.NodeManager
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.Remoting;
     using System.Runtime.Versioning;
     using System.Security.Policy;
     using System.Xml;
@@ -26,7 +24,6 @@ namespace ClusterKit.NodeManager
     using Akka.Event;
 
     using ClusterKit.Data;
-    using ClusterKit.NodeManager.AppDomainHelper;
     using ClusterKit.NodeManager.Client.Messages.Migration;
     using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
@@ -34,8 +31,6 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.RemoteDomain;
 
     using JetBrains.Annotations;
-
-    using Newtonsoft.Json;
 
     using NuGet;
 
@@ -487,22 +482,16 @@ namespace ClusterKit.NodeManager
                                 ? this.StateData.Migration.FromRelease.Id
                                 : this.StateData.Migration.ToReleaseId;
 
-            var domainSetup = new AppDomainSetup { ApplicationBase = releaseDir };
-            var evidence = AppDomain.CurrentDomain.Evidence;
-            var appDomain = AppDomain.CreateDomain("ReleaseMigratorDomain", evidence, domainSetup);
+            var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
+            var appDomain = AppDomain.CreateDomain("MigratorDomain", new Evidence(), appDomainSetup);
+
             try
             {
-                foreach (var lib in Directory.GetFiles(releaseDir, "*.dll"))
-                {
-                    appDomain.Load(File.ReadAllBytes(lib));
-                }
-
-                var collector = new MigrationExecutor
-                                    {
-                                        Configuration = plan.Template.Configuration,
-                                        Commands = plan.MigratorPlans.Values.ToList()
-                                    };
-
+                var collector = (MigrationExecutor)appDomain.CreateInstanceAndUnwrap(
+                    "ClusterKit.NodeManager",
+                    "ClusterKit.NodeManager.RemoteDomain.MigrationExecutor");
+                collector.Configuration = plan.Template.Configuration;
+                collector.Commands = plan.MigratorPlans.Values.ToList();
                 appDomain.DoCallBack(collector.Execute);
 
                 var operations = collector.Result;
@@ -595,22 +584,16 @@ namespace ClusterKit.NodeManager
             var log = new List<MigrationLogRecord>();
             var releaseDir = Path.Combine(this.StateData.ReleaseExecutionDir, plan.Template.Code);
 
-            var domainSetup = new AppDomainSetup { ApplicationBase = releaseDir };
-            var evidence = AppDomain.CurrentDomain.Evidence;
-            var appDomain = AppDomain.CreateDomain("ReleaseMigratorDomain", evidence, domainSetup);
+            var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
+            var appDomain = AppDomain.CreateDomain("MigratorDomain", new Evidence(), appDomainSetup);
+
             try
             {
-                foreach (var lib in Directory.GetFiles(releaseDir, "*.dll"))
-                {
-                    appDomain.Load(File.ReadAllBytes(lib));
-                }
-
-                var collector = new MigrationExecutor
-                                    {
-                                        Configuration = plan.Template.Configuration,
-                                        Commands = plan.MigratorPlans.Values.ToList()
-                                    };
-
+                var collector = (MigrationExecutor)appDomain.CreateInstanceAndUnwrap(
+                    "ClusterKit.NodeManager",
+                    "ClusterKit.NodeManager.RemoteDomain.MigrationExecutor");
+                collector.Configuration = plan.Template.Configuration;
+                collector.Commands = plan.MigratorPlans.Values.ToList();
                 appDomain.DoCallBack(collector.Execute);
                 var operations = collector.Result;
                 if (operations != null)
@@ -757,96 +740,14 @@ namespace ClusterKit.NodeManager
                 {
                     try
                     {
-                        var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
-                        if (Directory.Exists(migratorExecutionDirectory))
-                        {
-                            if (forceExtract)
-                            {
-                                Directory.Delete(migratorExecutionDirectory, true);
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-
-                        var migratorTempDirectory = Path.Combine(tempDir, migratorTemplate.Code);
-                        Directory.CreateDirectory(migratorExecutionDirectory);
-                        Directory.CreateDirectory(migratorTempDirectory);
-                        var packageDescriptions = migratorTemplate.PackagesToInstall[this.frameworkName];
-                        Context.GetLogger().Info(
-                            "{Type}: extracting packages for {MigratorTemplateCode} {FrameworkName}.\n{PackageList}", 
-                            this.GetType().Name,
-                            migratorTemplate.Code,
-                            this.frameworkName,
-                            string.Join("\n", packageDescriptions.OrderBy(p => p.Id).Select(p => p.Id)));
-
-                        foreach (var packageDescription in packageDescriptions)
-                        {
-                            var package = this.nugetRepository.Search(packageDescription.Id, true)
-                                .ToList()
-                                .FirstOrDefault(
-                                    p => p.Id == packageDescription.Id
-                                         && p.Version == SemanticVersion.Parse(packageDescription.Version));
-
-                            if (package == null)
-                            {
-                                Directory.Delete(executionDirectory, true);
-                                Context.GetLogger()
-                                    .Error(
-                                        "{Type} could not find package {PackageName} {PackageVersion} for migrator template {MigratorTemplateCode} of release {ReleaseId}",
-                                        this.GetType().Name,
-                                        packageDescription.Id,
-                                        packageDescription.Version,
-                                        migratorTemplate.Code,
-                                        release.Id);
-                                errors.Add(
-                                    new MigrationError
-                                        {
-                                            ReleaseId = release.Id,
-                                            MigrationId = migrationId,
-                                            MigratorTemplateCode = migratorTemplate.Code,
-                                            MigratorTemplateName = migratorTemplate.Name,
-                                            ErrorMessage =
-                                                $"could not find package {packageDescription.Id} {packageDescription.Version}"
-                                        });
-                                continue;
-                            }
-
-                            try
-                            {
-                                this.ExtractPackage(package, migratorTempDirectory, migratorExecutionDirectory);
-                            }
-                            catch (Exception exception)
-                            {
-                                Directory.Delete(executionDirectory, true);
-                                Context.GetLogger()
-                                    .Error(
-                                        exception,
-                                        "{Type} Error on extracting package {PackageName} {PackageVersion} for migrator template {MigratorTemplateCode} of release {ReleaseId}",
-                                        this.GetType().Name,
-                                        packageDescription.Id,
-                                        packageDescription.Version,
-                                        migratorTemplate.Code,
-                                        release.Id);
-                                errors.Add(
-                                    new MigrationError
-                                        {
-                                            ReleaseId = release.Id,
-                                            MigrationId = migrationId,
-                                            MigratorTemplateCode = migratorTemplate.Code,
-                                            MigratorTemplateName = migratorTemplate.Name,
-                                            ErrorMessage =
-                                                $"error on extracting package {packageDescription.Id} {packageDescription.Version}: {exception.Message}",
-                                            Exception = exception
-                                        });
-                            }
-                        }
-
-                        if (errors.Any())
-                        {
-                            Directory.Delete(migratorExecutionDirectory, true);
-                        }
+                        this.ExtractReleaseMigrationTemplate(
+                            release,
+                            migrationId,
+                            migratorTemplate,
+                            executionDirectory,
+                            forceExtract,
+                            tempDir,
+                            errors);
                     }
                     catch (Exception exception)
                     {
@@ -868,6 +769,161 @@ namespace ClusterKit.NodeManager
             finally
             {
                 Directory.Delete(tempDir, true);
+            }
+        }
+
+        /// <summary>
+        /// Extracts packages for the <see cref="MigratorTemplate"/>
+        /// </summary>
+        /// <param name="release">The release</param>
+        /// <param name="migrationId">The possible migration id</param>
+        /// <param name="migratorTemplate">The migrator template to extract</param>
+        /// <param name="executionDirectory">The execution directory</param>
+        /// <param name="forceExtract">Whether to overwrite previous extraction</param>
+        /// <param name="tempDir">The temporary data directory</param>
+        /// <param name="errors">The list of errors to fill</param>
+        private void ExtractReleaseMigrationTemplate(Release release, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationError> errors)
+        {
+            var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
+            if (Directory.Exists(migratorExecutionDirectory))
+            {
+                if (forceExtract)
+                {
+                    Directory.Delete(migratorExecutionDirectory, true);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            var migratorTempDirectory = Path.Combine(tempDir, migratorTemplate.Code);
+            Directory.CreateDirectory(migratorExecutionDirectory);
+            Directory.CreateDirectory(migratorTempDirectory);
+            var packageDescriptions = migratorTemplate.PackagesToInstall[this.frameworkName];
+           
+            foreach (var packageDescription in packageDescriptions)
+            {
+                var package = this.nugetRepository.Search(packageDescription.Id, true)
+                    .ToList()
+                    .FirstOrDefault(
+                        p => p.Id == packageDescription.Id && p.Version == SemanticVersion.Parse(packageDescription.Version));
+
+                if (package == null)
+                {
+                    Directory.Delete(executionDirectory, true);
+                    Context.GetLogger()
+                        .Error(
+                            "{Type} could not find package {PackageName} {PackageVersion} for migrator template {MigratorTemplateCode} of release {ReleaseId}",
+                            this.GetType().Name,
+                            packageDescription.Id,
+                            packageDescription.Version,
+                            migratorTemplate.Code,
+                            release.Id);
+                    errors.Add(
+                        new MigrationError
+                            {
+                                ReleaseId = release.Id,
+                                MigrationId = migrationId,
+                                MigratorTemplateCode = migratorTemplate.Code,
+                                MigratorTemplateName = migratorTemplate.Name,
+                                ErrorMessage =
+                                    $"could not find package {packageDescription.Id} {packageDescription.Version}"
+                            });
+                    continue;
+                }
+
+                try
+                {
+                    this.ExtractPackage(package, migratorTempDirectory, migratorExecutionDirectory);
+                }
+                catch (Exception exception)
+                {
+                    Directory.Delete(executionDirectory, true);
+                    Context.GetLogger()
+                        .Error(
+                            exception,
+                            "{Type} Error on extracting package {PackageName} {PackageVersion} for migrator template {MigratorTemplateCode} of release {ReleaseId}",
+                            this.GetType().Name,
+                            packageDescription.Id,
+                            packageDescription.Version,
+                            migratorTemplate.Code,
+                            release.Id);
+                    errors.Add(
+                        new MigrationError
+                            {
+                                ReleaseId = release.Id,
+                                MigrationId = migrationId,
+                                MigratorTemplateCode = migratorTemplate.Code,
+                                MigratorTemplateName = migratorTemplate.Name,
+                                ErrorMessage =
+                                    $"error on extracting package {packageDescription.Id} {packageDescription.Version}: {exception.Message}",
+                                Exception = exception
+                            });
+                }
+            }
+
+            if (errors.Any())
+            {
+                Directory.Delete(migratorExecutionDirectory, true);
+                return;
+            }
+
+            this.CreateApplicationConfig(migratorExecutionDirectory);
+        }
+
+        /// <summary>
+        /// Creates application config for the extracted application
+        /// </summary>
+        /// <param name="appDirectory">The application directory</param>
+        private void CreateApplicationConfig(string appDirectory)
+        {
+            var configDoc = new XmlDocument();
+            configDoc.LoadXml(
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                            <configuration>
+                               <runtime>
+                                <assemblyBinding xmlns=""urn:schemas-microsoft-com:asm.v1"">
+                                </assemblyBinding>
+                              </runtime>
+                            </configuration>
+                        ");
+
+            var nameTable = configDoc.NameTable;
+            var namespaceManager = new XmlNamespaceManager(nameTable);
+            const string Uri = "urn:schemas-microsoft-com:asm.v1";
+            namespaceManager.AddNamespace("urn", Uri);
+            var files = Directory.GetFiles(appDirectory, "*.dll");
+            var assemblyBindingNode = configDoc.DocumentElement?.SelectSingleNode(
+                "/configuration/runtime/urn:assemblyBinding",
+                namespaceManager);
+            if (assemblyBindingNode == null)
+            {
+                return;
+            }
+
+            foreach (var file in files)
+            {
+                var assemblyName = AssemblyName.GetAssemblyName(file);
+                var dependentNode = assemblyBindingNode.AppendChild(configDoc.CreateElement("dependentAssembly", Uri));
+                var assemblyIdentityNode =
+                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("assemblyIdentity", Uri));
+                assemblyIdentityNode.SetAttribute("name", assemblyName.Name);
+                var publicKeyToken = BitConverter.ToString(assemblyName.GetPublicKeyToken())
+                    .Replace("-", string.Empty)
+                    .ToLower(CultureInfo.InvariantCulture);
+                assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
+                var bindingRedirectNode =
+                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("bindingRedirect", Uri));
+                bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{assemblyName.Version}");
+                bindingRedirectNode.SetAttribute("newVersion", assemblyName.Version.ToString());
+            }
+
+            var filename = Path.Combine(appDirectory, "app.config");
+            configDoc.Save(filename);
+            foreach (var file in files)
+            {
+                File.Copy(filename, $"{file}.config", true);
             }
         }
 
@@ -996,71 +1052,20 @@ namespace ClusterKit.NodeManager
                 mt => mt.Priority))
             {
                 var state = new MigratorTemplateReleaseState { Code = migratorTemplate.Code, Template = migratorTemplate };
-
                 var releaseDir = Path.Combine(executionDirectory, migratorTemplate.Code);
-
-                var configDoc = new XmlDocument();
-                configDoc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
-                    <configuration>
-                       <runtime>
-                        <assemblyBinding xmlns=""urn:schemas-microsoft-com:asm.v1"">
-                        </assemblyBinding>
-                      </runtime>
-                    </configuration>
-                ");
-
-                var nameTable = configDoc.NameTable;
-                var namespaceManager = new XmlNamespaceManager(nameTable);
-                const string Uri = "urn:schemas-microsoft-com:asm.v1";
-                namespaceManager.AddNamespace("urn", Uri);
-                var files = Directory.GetFiles(releaseDir, "*.dll");
-                var assemblyBindingNode = configDoc.DocumentElement.SelectSingleNode("/configuration/runtime/urn:assemblyBinding", namespaceManager);
-                foreach (var file in files)
-                {
-                    var assemblyName = AssemblyName.GetAssemblyName(file);
-                    var dependentNode = assemblyBindingNode.AppendChild(configDoc.CreateElement("dependentAssembly", Uri));
-                    var assemblyIdentityNode =
-                        (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("assemblyIdentity", Uri));
-                    assemblyIdentityNode.SetAttribute("name", assemblyName.Name);
-                    var publicKeyToken =
-                        BitConverter.ToString(assemblyName.GetPublicKeyToken())
-                            .Replace("-", string.Empty)
-                            .ToLower(CultureInfo.InvariantCulture);
-                    assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
-                    var bindingRedirectNode =
-                        (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("bindingRedirect", Uri));
-                    bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{assemblyName.Version}");
-                    bindingRedirectNode.SetAttribute("newVersion", assemblyName.Version.ToString());
-                }
-
-                var filename = Path.Combine(releaseDir, "app.config");
-                configDoc.Save(filename);
-                foreach (var file in files)
-                {
-                    File.Copy(filename, $"{file}.config", true);
-                }
-
-
                 var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
                 var appDomain = AppDomain.CreateDomain("ReleaseMigratorDomain", new Evidence(), appDomainSetup);
 
                 try
                 {
-                    Context.GetLogger().Info("{Type}: creating AppDomain from {ReleaseDir} with config {ConfigFileName}", this.GetType().Name, releaseDir, filename);
                     var collector = (ReleaseStateCollector)appDomain.CreateInstanceAndUnwrap(
                         "ClusterKit.NodeManager",
                         "ClusterKit.NodeManager.RemoteDomain.ReleaseStateCollector");
                     collector.Configuration = migratorTemplate.Configuration;
-
-                    Context.GetLogger().Info("{Type}: executing ReleaseStateCollector", this.GetType().Name);
                     appDomain.DoCallBack(collector.Execute);
-                    Context.GetLogger().Info("{Type}: ReleaseStateCollector executed", this.GetType().Name);
-                   
-                    Context.GetLogger().Info("{Type}: ReleaseStateCollector results collected", this.GetType().Name);
                     var collectorErrors = collector.Errors;
                     var migratorReleaseStates = collector.Result;
                     
-
                     if (collectorErrors.Any())
                     {
                         foreach (var error in collector.Errors)
@@ -1240,13 +1245,13 @@ namespace ClusterKit.NodeManager
                     .Include(nameof(Migration.ToRelease))
                     .FirstOrDefault(m => m.IsActive);
 
-                if (currentMigration == null)
+                if (currentMigration != null)
                 {
-                    var release = ds.Releases.First(r => r.State == EnReleaseState.Active);
-                    return this.LoadReleaseState(release, forceExtract, data);
+                    return this.LoadMigrationState(currentMigration, forceExtract, data);
                 }
 
-                return this.LoadMigrationState(currentMigration, forceExtract, data);
+                var release = ds.Releases.First(r => r.State == EnReleaseState.Active);
+                return this.LoadReleaseState(release, forceExtract, data);
             }
         }
 
