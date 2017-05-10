@@ -25,7 +25,7 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// Used to define code-base to handle non-code cluster upgrade such as database updates and so on.
     /// </remarks>
     [UsedImplicitly]
-    [ApiDescription("A cluster migrator template definition", Name = "NodeTemplate")]
+    [ApiDescription("A cluster migrator template definition", Name = "MigratorTemplate")]
     [Serializable]
     public class MigratorTemplate : ITemplate
     {
