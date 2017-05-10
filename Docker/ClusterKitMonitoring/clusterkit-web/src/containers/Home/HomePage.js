@@ -3,8 +3,7 @@ import Relay from 'react-relay'
 
 import delay from 'lodash/delay'
 
-import ReloadPackages from '../../components/ReloadPackages/index';
-import NodesList from '../../components/NodesList/index';
+import NodesList from '../../components/NodesList/NodesList';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 
 import { hasPrivilege } from '../../utils/privileges';
@@ -31,9 +30,6 @@ class HomePage extends React.Component {
     return (
       <div>
         <h1>Monitoring</h1>
-        {hasPrivilege('ClusterKit.NodeManager.ReloadPackages') &&
-          <ReloadPackages />
-        }
         {hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics') && this.props.api.clusterKitNodesApi &&
           <NodesWithTemplates data={this.props.api.clusterKitNodesApi}/>
         }
@@ -53,6 +49,7 @@ export default Relay.createContainer(
       api: () => Relay.QL`fragment on IClusterKitNodeApi {
         __typename
         clusterKitNodesApi {
+          id
           ${NodesWithTemplates.getFragment('data')},
           ${NodesList.getFragment('nodeDescriptions')},
         }

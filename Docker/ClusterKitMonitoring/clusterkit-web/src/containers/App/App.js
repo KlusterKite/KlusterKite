@@ -40,17 +40,17 @@ export default class App extends React.Component {
               }
             </Nav>
             <Nav navbar>
-              {hasPrivilege('ClusterKit.NodeManager.NodeTemplate.Query') &&
-                <LinkContainer to="/clusterkit/Templates">
-                  <NavItem>Templates</NavItem>
-                </LinkContainer>
+              {false && hasPrivilege('ClusterKit.NodeManager.User.GetList') &&
+              <LinkContainer to="/clusterkit/Users">
+                <NavItem>Users</NavItem>
+              </LinkContainer>
               }
             </Nav>
             <Nav navbar>
-              {hasPrivilege('ClusterKit.NodeManager.NugetFeed.Query') &&
-                <LinkContainer to="/clusterkit/NugetFeeds">
-                  <NavItem>Nuget Feeds</NavItem>
-                </LinkContainer>
+              {false && hasPrivilege('ClusterKit.NodeManager.Role.GetList') &&
+              <LinkContainer to="/clusterkit/Roles">
+                <NavItem>Roles</NavItem>
+              </LinkContainer>
               }
             </Nav>
             <Nav navbar>

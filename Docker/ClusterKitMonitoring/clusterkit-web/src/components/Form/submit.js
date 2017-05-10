@@ -19,6 +19,14 @@ export default class Submit extends React.Component { // eslint-disable-line rea
     onDelete: React.PropTypes.func,
   };
 
+  onSubmit() {
+    // This clutch is needed to prevent submitting on enter
+    // Another possible hack with preventDefault on keyPress affects textareas and makes editing hard
+    this.refs.submitButton.removeAttribute('disabled');
+    this.refs.submitButton.click();
+    this.refs.submitButton.setAttribute('disabled', true);
+  }
+
   render() {
     let saveClassName = '';
     if (this.props.saving) {
@@ -77,7 +85,7 @@ export default class Submit extends React.Component { // eslint-disable-line rea
           </div>
           }
 
-          <button className="btn btn-primary" disabled={disabled} type="submit">
+          <button className="btn btn-primary" disabled={disabled} type="button" onClick={this.onSubmit.bind(this)}>
             <Icon name="pencil" className={saveClassName} /> {' '} {text}
           </button>
 
@@ -92,6 +100,10 @@ export default class Submit extends React.Component { // eslint-disable-line rea
               <Icon name="remove" className={deleteClassName}/> {' '} {deleteText}
             </button>
           }
+
+          <button type="submit" ref="submitButton" disabled={!this.props.submitOnEnter} className="hidden">
+            Submit
+          </button>
         </Row>
       </fieldset>
     );

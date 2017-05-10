@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@kadira/storybook';
 import StubContainer from 'react-storybooks-relay-container';
 
-import TemplatesList from './index';
+import TemplatesList from './TemplatesList';
 
 storiesOf('Templates')
   .add('list, full access', () => {

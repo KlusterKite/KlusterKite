@@ -1,7 +1,7 @@
 import React from 'react'
 import Relay from 'react-relay'
 
-import ReleasesList from '../../components/ReleasesList/index';
+import ReleasesList from '../../components/ReleasesList/ReleasesList';
 
 class ReleasesListPage extends React.Component {
   static propTypes = {

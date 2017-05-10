@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 // import StubContainer from 'react-storybooks-relay-container';
 
-import AuthForm from './index';
+import AuthForm from './AuthForm';
 
 storiesOf('Authorization')
   .add('login form', () => {

@@ -21,14 +21,35 @@ export default class UpdateReleaseMutation extends Relay.Mutation {
     `
   }
 
-  getConfigs () {
+  getConfigs() {
     return [{
-      type: 'FIELDS_CHANGE',
-      fieldIDs: {
-        node: this.props.nodeId,
-      },
-    }]
+      type: 'REQUIRED_CHILDREN',
+      children: [
+        Relay.QL`
+          fragment on ClusterKitNodeApi_Release_NodeMutationPayload {
+            errors {
+              edges {
+                node {
+                  field
+                  message
+                }
+              }
+            }
+            node
+          }
+        `,
+      ],
+    }];
   }
+
+  // getConfigs () {
+  //   return [{
+  //     type: 'FIELDS_CHANGE',
+  //     fieldIDs: {
+  //       node: this.props.nodeId,
+  //     },
+  //   }]
+  // }
 
   getVariables () {
     return {

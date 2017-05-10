@@ -6,7 +6,7 @@ import { browserHistory } from 'react-router'
 import UpdateFeedMutation from './mutations/UpdateFeedMutation'
 // import DeleteFeedMutation from './mutations/DeleteFeedMutation'
 
-import FeedForm from '../../components/FeedForm/index'
+import FeedForm from '../../components/FeedForm/FeedForm'
 
 class FeedPage extends React.Component {
 
@@ -67,7 +67,7 @@ class FeedPage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
+            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -109,7 +109,7 @@ class FeedPage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Releases/${this.props.api.release.__id}`);
+            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
