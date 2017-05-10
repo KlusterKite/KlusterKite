@@ -17,7 +17,7 @@ namespace ClusterKit.NodeManager.Client.Messages.Migration
     /// <summary>
     ///  The MigrationActor state with active migration
     /// </summary>
-    [ApiDescription("The MigrationActor state with active migration")]
+    [ApiDescription("The MigrationActor state with active migration", Name = "MigrationActorMigrationState")]
     public class MigrationActorMigrationState
     {
         /// <summary>

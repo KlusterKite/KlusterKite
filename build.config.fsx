@@ -128,8 +128,6 @@ let projects = [|
             "ClusterKit.API.Attributes"; 
             "ClusterKit.API.Provider";
             "ClusterKit.NodeManager.Migrator";
-            "ClusterKit.NodeManager.AppDomainHelper";
-            "ClusterKit.NodeManager.Migrator.EF";
             |]))
     new ProjectDescription(
         "ClusterKit.NodeManager",
@@ -166,8 +164,7 @@ let projects = [|
             "ClusterKit.API.Attributes"; 
             "ClusterKit.API.Provider";
             "ClusterKit.NodeManager.Migrator";
-            "ClusterKit.NodeManager.Migrator.CodeFirst";
-            "ClusterKit.NodeManager.AppDomainHelper";
+            "ClusterKit.NodeManager.Migrator.CodeFirst";            
           |]))
 
 |]

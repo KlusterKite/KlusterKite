@@ -14,8 +14,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.InteropServices;
-
+    
     using Akka.Configuration;
 
     using Castle.Facilities.TypedFactory;

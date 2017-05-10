@@ -119,5 +119,11 @@ namespace ClusterKit.NodeManager.Client
         /// </summary>
         [PrivilegeDescription("Get the current cluster resources states", Target = EnPrivilegeTarget.User)]
         public const string GetResourceState = "ClusterKit.NodeManager.GetResourceState";
+
+        /// <summary>
+        /// Perform cluster migration operations
+        /// </summary>
+        [PrivilegeDescription("Perform cluster migration operations", Target = EnPrivilegeTarget.User)]
+        public const string MigrateCluster = "ClusterKit.NodeManager.GetResourceState";
     }
 }

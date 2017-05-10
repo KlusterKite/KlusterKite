@@ -421,7 +421,7 @@ namespace ClusterKit.NodeManager.Tests
             {
                 var sourceRelease = ds.Releases.First(r => r.Id == 1);
                 var destinationRelease = ds.Releases.First(r => r.Id == 2);
-                Assert.Equal(EnReleaseState.Active, sourceRelease .State);
+                Assert.Equal(EnReleaseState.Active, sourceRelease.State);
                 Assert.Equal(EnReleaseState.Obsolete, destinationRelease.State);
             }
 

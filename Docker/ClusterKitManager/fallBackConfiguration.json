@@ -148,10 +148,6 @@
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.AppDomainHelper",
-      "Version": "0.0.0-local"
-    },
-    {
       "Id": "ClusterKit.NodeManager.Authentication",
       "Version": "0.0.0-local"
     },
@@ -165,10 +161,6 @@
     },
     {
       "Id": "ClusterKit.NodeManager.Migrator",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.NodeManager.Migrator.EF",
       "Version": "0.0.0-local"
     },
     {

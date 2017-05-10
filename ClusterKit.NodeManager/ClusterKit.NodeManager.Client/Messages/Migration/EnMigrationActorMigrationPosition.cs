@@ -14,7 +14,7 @@ namespace ClusterKit.NodeManager.Client.Messages.Migration
     /// <summary>
     /// The list of possible resource migration position according to cluster migration
     /// </summary>
-    [ApiDescription("The list of possible resource migration position according to cluster migration")]
+    [ApiDescription("The list of possible resource migration position according to cluster migration", Name = "EnMigrationActorMigrationPosition")]
     public enum EnMigrationActorMigrationPosition
     {
         /// <summary>

@@ -385,7 +385,6 @@ namespace ClusterKit.NodeManager.Tests
             }
         }
 
-
         /// <summary>
         /// The test package file  representation
         /// </summary>

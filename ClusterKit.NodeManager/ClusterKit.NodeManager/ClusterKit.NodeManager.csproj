@@ -306,6 +306,7 @@
     <Compile Include="Messages\ActiveNodeDescriptionsRequest.cs" />
     <Compile Include="Messages\ReleaseCheckRequest.cs" />
     <Compile Include="Messages\ReleaseSetObsoleteRequest.cs" />
+    <Compile Include="Messages\ResourceUpgradeRequest.cs" />
     <Compile Include="Messages\UserChangePasswordRequest.cs" />
     <Compile Include="Messages\UserResetPasswordRequest.cs" />
     <Compile Include="Messages\UserRoleAddRequest.cs" />

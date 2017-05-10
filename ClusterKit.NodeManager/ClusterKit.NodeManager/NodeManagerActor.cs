@@ -22,6 +22,7 @@ namespace ClusterKit.NodeManager
 
     using ClusterKit.API.Client;
     using ClusterKit.Core;
+    using ClusterKit.Core.Monads;
     using ClusterKit.Core.Ping;
     using ClusterKit.Core.Utils;
     using ClusterKit.Data;
@@ -1788,73 +1789,8 @@ namespace ClusterKit.NodeManager
             this.ReceiveAsync<NodesUpgrade>(this.OnMigrationNodesUpgrade);
 
             this.Receive<ResourceStateRequest>(r => this.Sender.Tell(this.resourceState));
-        }
-
-        /// <summary>
-        /// Updates the database as part of cluster update process. Changes the flags for releases.
-        /// </summary>
-        /// <param name="request">The request to update cluster</param>
-        /// <returns>The new active release</returns>
-        private async Task<Release> StoreNewActiveRelease(UpdateClusterRequest request)
-        {
-            try
-            {
-                using (var ds = await this.GetContext())
-                {
-                    var release = ds.Releases.Include(nameof(Release.CompatibleTemplates))
-                        .FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
-                        return null;
-                    }
-
-                    if (release.State == EnReleaseState.Active)
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception("This release is already marked as active"),
-                                null));
-                        return null;
-                    }
-
-                    var now = DateTimeOffset.Now;
-                    var currentActiveRelease = ds.Releases.FirstOrDefault(r => r.State == EnReleaseState.Active);
-                    if (currentActiveRelease != null)
-                    {
-                        currentActiveRelease.State = request.CurrentReleaseState != EnReleaseState.Active
-                                                         ? request.CurrentReleaseState
-                                                         : EnReleaseState.Obsolete;
-                        currentActiveRelease.Finished = now;
-                    }
-
-                    release.State = EnReleaseState.Active;
-                    if (release.Started == null)
-                    {
-                        release.Started = now;
-                    }
-
-                    release.Finished = null;
-                    ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
-                    const string SecurityMessage = "Cluster upgrade with release {ReleaseId} initiated. "
-                                                   + "Previous release {PreviousReleaseId} marked as {PreviousReleaseState}";
-                    SecurityLog.CreateRecord(
-                        EnSecurityLogType.OperationGranted,
-                        EnSeverity.Crucial,
-                        request.Context,
-                        SecurityMessage,
-                        release.Id,
-                        currentActiveRelease?.Id,
-                        request.CurrentReleaseState.ToString());
-                    return release;
-                }
-            }
-            catch (Exception exception)
-            {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
-                return null;
-            }
+            this.Receive<CurrentReleaseRequest>(r => this.Sender.Tell(this.currentRelease));
+            this.Receive<CurrentMigrationRequest>(r => this.Sender.Tell(new Maybe<Migration>(this.currentMigration)));
         }
 
         /// <summary>

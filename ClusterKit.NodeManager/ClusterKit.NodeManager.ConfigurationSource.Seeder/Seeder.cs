@@ -128,6 +128,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                     context.SaveChanges();
                 }
             }
+
             Console.WriteLine(@"ClusterKit configuration database created");
         }
 

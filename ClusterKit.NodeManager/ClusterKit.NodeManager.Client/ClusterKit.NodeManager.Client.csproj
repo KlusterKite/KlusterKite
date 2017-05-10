@@ -199,6 +199,8 @@
     <Compile Include="LoggerConfigurator.cs" />
     <Compile Include="Messages\AuthenticateUserWithCredentials.cs" />
     <Compile Include="Messages\AuthenticateUserWithUid.cs" />
+    <Compile Include="Messages\Migration\CurrentMigrationRequest.cs" />
+    <Compile Include="Messages\Migration\CurrentReleaseRequest.cs" />
     <Compile Include="Messages\Migration\EnMigrationActorMigrationPosition.cs" />
     <Compile Include="Messages\Migration\MigrationActorInitializationFailed.cs" />
     <Compile Include="Messages\Migration\MigrationActorMigrationState.cs" />

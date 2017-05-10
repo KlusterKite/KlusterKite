@@ -56,35 +56,6 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Initiates cluster upgrade procedure. The previous active release will be marked as <see cref="EnReleaseState.Obsolete"/>
-        /// </summary>
-        /// <param name="id">The id of release that will be applied</param>
-        /// <returns>The mutation result</returns>
-        [UsedImplicitly]
-        [RequireSession]
-        [RequireUser]
-        [RequireUserPrivilege(Privileges.ClusterUpdate)]
-        [DeclareMutation("Initiates cluster upgrade procedure. The previous active release will be marked as failed")]
-        public async Task<MutationResult<Release>> RollbackCluster(
-            [ApiDescription(Description = "The id of release that will be applied")] int id)
-        {
-            try
-            {
-                var response =
-                    await this.System.ActorSelection(this.DataActorPath)
-                        .Ask<CrudActionResponse<Release>>(
-                            new UpdateClusterRequest { Id = id, Context = this.Context, CurrentReleaseState = EnReleaseState.Faulted },
-                            this.Timeout);
-                return CreateResponse(response);
-            }
-            catch (Exception exception)
-            {
-                this.System.Log.Error(exception, "{Type}: error on RollbackCluster", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
-            }
-        }
-
-        /// <summary>
         /// Checks the draft release if it can be moved to ready state.
         /// </summary>
         /// <param name="id">The id of release draft</param>

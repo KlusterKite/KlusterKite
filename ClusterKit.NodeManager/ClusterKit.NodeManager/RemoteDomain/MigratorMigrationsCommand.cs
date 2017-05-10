@@ -23,7 +23,6 @@ namespace ClusterKit.NodeManager.RemoteDomain
         /// </summary>
         public string TypeName { get; set; }
 
-
         /// <summary>
         /// Gets or sets the list of resources to migrate (pair of resource code and desired migration point)
         /// </summary>
