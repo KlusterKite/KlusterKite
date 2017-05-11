@@ -62,7 +62,7 @@ export default class CloneConfigMutation extends Relay.Mutation {
       const keys = Object.keys(node);
       let newNode = {};
       keys.forEach(key => {
-        if (key !== '__id' && key !== '__dataID__' && key !== 'id'){
+        if (key !== '__id' && key !== '__dataID__' && key !== 'id' && key !== 'packagesToInstall'){
           if (typeof(node[key]) === 'object' && node[key] && node[key].edges) {
             newNode[key] = this.convertEdgesToArray(node[key].edges, key);
           } else {
@@ -84,6 +84,10 @@ export default class CloneConfigMutation extends Relay.Mutation {
       }
     });
 
+    if (type === 'migrationTemplates') {
+      console.log('migrator templates', nodes);
+    }
+
     return nodes;
   }
 
@@ -93,6 +97,7 @@ export default class CloneConfigMutation extends Relay.Mutation {
       newNode: {
         id: this.props.releaseId,
         configuration: {
+          migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migrationTemplates'),
           nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
           nugetFeeds: this.convertEdgesToArray(this.props.configuration.nugetFeeds.edges, 'nugetFeeds'),
           packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
@@ -107,6 +112,7 @@ export default class CloneConfigMutation extends Relay.Mutation {
       model: {
         id: this.props.nodeId,
         configuration: {
+          migratorTemplates: this.props.configuration.migratorTemplates,
           nodeTemplates: this.props.configuration.nodeTemplates,
           nugetFeeds: this.props.configuration.nugetFeeds,
           packages: this.props.configuration.packages,

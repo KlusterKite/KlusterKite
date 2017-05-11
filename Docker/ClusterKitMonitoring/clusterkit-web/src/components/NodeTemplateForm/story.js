@@ -2,32 +2,32 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 // import StubContainer from 'react-storybooks-relay-container';
 
-import TemplateForm from './TemplateForm';
+import NodeTemplateForm from './NodeTemplateForm';
 
 storiesOf('Templates')
   .add('edit', () => {
     const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
-    return <TemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} />;
+    return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} />;
   })
   .add('edit saving', () => {
     const template = getTemplate();
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
-    return <TemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saving={true} />;
+    return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saving={true} />;
   })
   .add('edit saved', () => {
     const template = getTemplate();
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
-    return <TemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saved={true} />;
+    return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saved={true} />;
   })
   .add('edit save error', () => {
     const template = getTemplate();
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
-    return <TemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saveError="Cannot update this record!" />;
+    return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saveError="Cannot update this record!" />;
   })
   .add('create', () => {
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
-    return <TemplateForm onSubmit={action('submitted')} packagesList={packages} />;
+    return <NodeTemplateForm onSubmit={action('submitted')} packagesList={packages} />;
   })
 ;
 

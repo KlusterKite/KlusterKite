@@ -21,7 +21,8 @@ import RolePage from './containers/RolePage/RolePage';
 import UsersListPage from './containers/UsersListPage/UsersListPage';
 import UserPage from './containers/UserPage/UserPage';
 import SeedPage from './containers/SeedPage/SeedPage';
-import TemplatePage from './containers/TemplatePage/TemplatePage';
+import MigratorTemplatePage from './containers/MigratorTemplatePage/TemplatePage';
+import NodeTemplatePage from './containers/NodeTemplatePage/TemplatePage';
 
 export default class RoutesList extends React.Component {
   render () {
@@ -47,8 +48,10 @@ export default class RoutesList extends React.Component {
           <Route path='/clusterkit/Roles/create' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Roles/:id' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Seeds/:releaseId' component={SeedPage} queries={ApiQueries} render={({ props }) => props ? <SeedPage {...props} /> : <Loading />} />
-          <Route path='/clusterkit/Templates/:releaseId/create' component={TemplatePage} queries={ApiQueries} render={({ props }) => props ? <TemplatePage {...props} /> : <Loading />} />
-          <Route path='/clusterkit/Templates/:releaseId/:id' component={TemplatePage} queries={ApiQueries} render={({ props }) => props ? <TemplatePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/NodeTemplates/:releaseId/create' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/NodeTemplates/:releaseId/:id' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/MigratorTemplates/:releaseId/create' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/MigratorTemplates/:releaseId/:id' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Users' component={UsersListPage} queries={ApiQueries} render={({ props }) => props ? <UsersListPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Users/create' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Users/:id' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />

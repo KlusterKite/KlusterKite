@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 
 import { Link } from 'react-router';
 
-class TemplatesList extends React.Component {
+class NodeTemplatesList extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
@@ -13,19 +13,19 @@ class TemplatesList extends React.Component {
   static propTypes = {
     releaseId: React.PropTypes.string,
     configuration: React.PropTypes.object,
-    createNodeTemplatePrivilege: React.PropTypes.bool.isRequired,
-    getNodeTemplatePrivilege: React.PropTypes.bool.isRequired,
+    createMigratorTemplatePrivilege: React.PropTypes.bool.isRequired,
+    getMigratorTemplatePrivilege: React.PropTypes.bool.isRequired,
     canEdit: React.PropTypes.bool
   };
 
   render() {
-    const templates = this.props.configuration && this.props.configuration.nodeTemplates && this.props.configuration.nodeTemplates.edges;
+    const templates = this.props.configuration && this.props.configuration.migratorTemplates && this.props.configuration.migratorTemplates.edges;
 
     return (
       <div>
-        <h3>Templates list</h3>
+        <h3>Migrator templates list</h3>
         {this.props.canEdit &&
-          <Link to={`/clusterkit/Templates/${this.props.releaseId}/create`} className="btn btn-primary" role="button">Add a new template</Link>
+          <Link to={`/clusterkit/MigratorTemplates/${this.props.releaseId}/create`} className="btn btn-primary" role="button">Add a new template</Link>
         }
         {templates && templates.length > 0 &&
         <table className="table table-hover">
@@ -34,8 +34,6 @@ class TemplatesList extends React.Component {
             <th>Code</th>
             <th>Name</th>
             <th>Packages</th>
-            <th>Min</th>
-            <th>Max</th>
             <th>Priority</th>
           </tr>
           </thead>
@@ -44,17 +42,12 @@ class TemplatesList extends React.Component {
             <tr key={item.node.id}>
               <td>
                 {this.props.canEdit &&
-                <Link to={`/clusterkit/Templates/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
+                <Link to={`/clusterkit/MigratorTemplates/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
                   {item.node.code}
                 </Link>
                 }
-                {false && this.props.canEdit &&
-                <a onClick={() => this.showEditForm(item.node)} className="pointer">
-                  {item.node.code}
-                </a>
-                }
-                {!this.props.getNodeTemplatePrivilege &&
-                <span>{item.node.code}</span>
+                {!this.props.canEdit &&
+                  <span>{item.node.code}</span>
                 }
               </td>
               <td>{item.node.name}</td>
@@ -66,8 +59,6 @@ class TemplatesList extends React.Component {
                 )
                 }
               </td>
-              <td>{item.node.minimumRequiredInstances}</td>
-              <td>{item.node.maximumNeededInstances}</td>
               <td>{item.node.priority}</td>
             </tr>
           )
@@ -81,20 +72,18 @@ class TemplatesList extends React.Component {
 }
 
 export default Relay.createContainer(
-  TemplatesList,
+  NodeTemplatesList,
   {
     fragments: {
       configuration: () => Relay.QL`fragment on IClusterKitNodeApi_ReleaseConfiguration {
-        nodeTemplates {
+        migratorTemplates {
           edges {
             node {
               id
               code
               configuration
-              containerTypes
-              minimumRequiredInstances
-              maximumNeededInstances
               name
+              notes
               packageRequirements {
                 edges {
                   node {
@@ -112,3 +101,21 @@ export default Relay.createContainer(
     },
   },
 )
+
+/*
+packagesToInstall {
+  edges {
+    node {
+      key
+      value {
+        edges {
+          node {
+            __id
+            version
+          }
+        }
+      }
+    }
+  }
+}
+*/

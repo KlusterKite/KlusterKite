@@ -1,12 +1,11 @@
 import React from 'react';
-import Formsy from 'formsy-react';
 import { Input, Textarea } from 'formsy-react-components';
 import isEqual from 'lodash/isEqual';
 
 import Form from '../Form/Form';
 import PackagesMultiSelector from '../PackageSelector/multiselector';
 
-export default class TemplateForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class MigratorTemplateForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.submit = this.submit.bind(this);
@@ -14,18 +13,6 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
     this.state = {
       packagesList: []
     };
-
-    Formsy.addValidationRule('isLessOrEqualThan', function (values, value, otherField) {
-      if (isNaN(Number(value))) return true;
-      if (isNaN(Number(otherField))) return true;
-      return Number(value) <= Number(values[otherField]);
-    });
-
-    Formsy.addValidationRule('isMoreOrEqualThan', function (values, value, otherField) {
-      if (isNaN(Number(value))) return true;
-      if (isNaN(Number(otherField))) return true;
-      return Number(value) >= Number(values[otherField]);
-    });
   }
 
   static propTypes = {
@@ -84,9 +71,6 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
 
   submit(model) {
     model.packageRequirements = this.state.packageRequirements;
-    model.containerTypes = this.stringToArray(model.containerTypes);
-    model.maximumNeededInstances = Number.parseInt(model.maximumNeededInstances, 10);
-    model.minimumRequiredInstances = model.minimumRequiredInstances ? Number.parseInt(model.minimumRequiredInstances, 10) : 0;
     model.priority = model.priority ? Number.parseInt(model.priority, 10) : 0;
     this.props.onSubmit(model);
   }
@@ -120,27 +104,11 @@ export default class TemplateForm extends React.Component { // eslint-disable-li
           <fieldset>
             <Input name="code" label="Code" value={(initialValues && initialValues.code) || ""} required />
             <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />
-            <Input
-              name="minimumRequiredInstances"
-              label="Minimum Required Instances"
-              value={(initialValues && initialValues.minimumRequiredInstances) || ""}
-              validations={{isNumeric:true,isLessOrEqualThan:'maximumNeededInstances'}}
-              validationErrors={{isNumeric: 'You have to type a number', isLessOrEqualThan: 'Cannot exceed Maximum Needed Instances'}}
-              elementWrapperClassName="col-sm-2"
-            />
-            <Input
-              name="maximumNeededInstances"
-              label="Maximum Needed Instances"
-              value={(initialValues && initialValues.maximumNeededInstances) || ""}
-              validations={{isNumeric:true,isMoreOrEqualThan:'minimumRequiredInstances'}}
-              validationErrors={{isNumeric: 'You have to type a number', isMoreOrEqualThan: 'Cannot be less than Minimum Required Instances'}}
-              elementWrapperClassName="col-sm-2"
-            />
             {this.props.packagesList &&
               <PackagesMultiSelector packages={this.props.packagesList} values={this.state.packageRequirements} onChange={this.onPackageRequirementsChange.bind(this)} />
             }
             <Input name="priority" label="Priority" value={(initialValues && initialValues.priority) || ""} validations="isNumeric" validationError="Must be numeric" elementWrapperClassName="col-sm-2" />
-            <Textarea name="containerTypes" label="Container Types" value={(initialValues && this.arrayToString(initialValues.containerTypes)) || ""} rows={3} />
+            <Textarea name="notes" label="Notes" value={(initialValues && initialValues.notes) || ""} rows={3} />
             <Textarea name="configuration" label="Configuration" value={(initialValues && initialValues.configuration) || ""} rows={10} />
           </fieldset>
         </Form>

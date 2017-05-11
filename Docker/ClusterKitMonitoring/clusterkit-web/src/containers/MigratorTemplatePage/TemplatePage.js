@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import UpdateFeedMutation from './../FeedPage/mutations/UpdateFeedMutation'
 
-import TemplateForm from '../../components/TemplateForm/TemplateForm'
+import MigratorTemplateForm from '../../components/MigratorTemplateForm/MigratorTemplateForm'
 
 class TemplatePage extends React.Component {
 
@@ -46,8 +46,8 @@ class TemplatePage extends React.Component {
           nodeId: this.props.params.releaseId,
           releaseId: this.props.api.release.__id,
           configuration: this.props.api.release.configuration,
-          nodeTemplateId: editId,
-          nodeTemplate: model
+          migratorTemplateId: editId,
+          migratorTemplate: model
         }),
       {
         onSuccess: (response) => {
@@ -87,9 +87,9 @@ class TemplatePage extends React.Component {
           nodeId: this.props.params.releaseId,
           releaseId: this.props.api.release.__id,
           configuration: this.props.api.release.configuration,
-          nodeTemplateId: this.props.api.release.id,
-          nodeTemplate: {},
-          nodeTemplateDeleteId: this.props.api.release.id,
+          migratorTemplateId: this.props.api.release.id,
+          migratorTemplate: {},
+          migratorTemplateDeleteId: this.props.params.id,
         }),
       {
         onSuccess: (response) => {
@@ -123,7 +123,7 @@ class TemplatePage extends React.Component {
     const packages = this.props.api.clusterKitNodesApi.nugetPackages;
     return (
       <div>
-        <TemplateForm
+        <MigratorTemplateForm
           onSubmit={this.onSubmit}
           onDelete={this.onDelete}
           onCancel={this.onCancel}
@@ -174,14 +174,12 @@ export default Relay.createContainer(
             }
           }
           template:__node(id: $id) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_Template {
+            ...on IClusterKitNodeApi_MigratorTemplate {
               id
               code
               configuration
-              containerTypes
-              maximumNeededInstances
-              minimumRequiredInstances
               name
+              notes
               packageRequirements {
                 edges {
                   node {

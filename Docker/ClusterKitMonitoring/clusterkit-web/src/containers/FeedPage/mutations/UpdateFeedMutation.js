@@ -26,6 +26,26 @@ export default class UpdateFeedMutation extends Relay.Mutation {
             }
           }
         }
+        migratorTemplates {
+          edges {
+            node {
+              id
+              code
+              configuration
+              name
+              notes
+              packageRequirements {
+                edges {
+                  node {
+                    __id
+                    specificVersion
+                  }
+                }
+              }
+              priority
+            }
+          }
+        }
         nugetFeeds {
           edges {
             node {
@@ -114,7 +134,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
       const keys = Object.keys(node);
       let newNode = {};
       keys.forEach(key => {
-        if (key !== '__id' && key !== '__dataID__' && key !== 'id'){
+        if (key !== '__id' && key !== '__dataID__' && key !== 'id' && key !== 'packagesToInstall'){
           if (typeof(node[key]) === 'object' && node[key] && node[key].edges) {
             newNode[key] = this.convertEdgesToArray(node[key].edges, key);
           } else {
@@ -139,6 +159,10 @@ export default class UpdateFeedMutation extends Relay.Mutation {
       // Delete a record
       if (this.props[typeSingular] && this.props[`${typeSingular}DeleteId`] === node.id) {
         newNode = null
+      }
+
+      if (this.props['migratorTemplateDeleteId'] === node.id) {
+        console.log('trying to delete ', this.props['migratorTemplateDeleteId']);
       }
 
       if (newNode) {
@@ -184,6 +208,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         id: this.props.releaseId,
         configuration: {
           nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
+          migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migratorTemplates'),
           nugetFeeds: this.convertEdgesToArray(this.props.configuration.nugetFeeds.edges, 'nugetFeeds'),
           packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
           seedAddresses: this.updateSeedAddresses(this.props.configuration.seedAddresses),
@@ -198,6 +223,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         id: this.props.nodeId,
         configuration: {
           nodeTemplates: this.props.configuration.nodeTemplates,
+          migratorTemplates: this.props.configuration.migratorTemplates,
           nugetFeeds: this.props.configuration.nugetFeeds,
           packages: this.props.configuration.packages,
           seedAddresses: this.props.configuration.seedAddresses,

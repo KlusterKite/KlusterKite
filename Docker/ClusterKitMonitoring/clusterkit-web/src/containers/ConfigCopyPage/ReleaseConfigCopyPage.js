@@ -165,6 +165,41 @@ export default Relay.createContainer(
                         }
                       }
                     }
+                    migratorTemplates {
+                      edges {
+                        node {
+                          id
+                          code
+                          configuration
+                          name
+                          notes
+                          packageRequirements {
+                            edges {
+                              node {
+                                __id
+                                specificVersion
+                              }
+                            }
+                          }
+                          packagesToInstall {
+                            edges {
+                              node {
+                                key
+                                value {
+                                  edges {
+                                    node {
+                                      __id
+                                      version
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          priority
+                        }
+                      }
+                    }
                     packages {
                       edges {
                         node {

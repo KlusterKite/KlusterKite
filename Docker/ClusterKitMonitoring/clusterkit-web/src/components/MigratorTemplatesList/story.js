@@ -2,44 +2,44 @@ import React from 'react';
 import { storiesOf } from '@kadira/storybook';
 import StubContainer from 'react-storybooks-relay-container';
 
-import TemplatesList from './TemplatesList';
+import MigratorTemplatesList from './MigratorTemplatesList';
 
-storiesOf('Templates')
+storiesOf('Migrator Templates')
   .add('list, full access', () => {
     const nodes = getTemplatesListRelay();
     const props = {
       templates: nodes.data.api.clusterKitNodesApi,
-      createNodeTemplatePrivilege: true,
-      getNodeTemplatePrivilege: true,
+      createMigratorTemplatePrivilege: true,
+      getMigratorTemplatePrivilege: true,
     };
-    return <StubContainer Component={TemplatesList} props={props} />;
+    return <StubContainer Component={MigratorTemplatesList} props={props} />;
   })
   .add('list, no access to create', () => {
     const nodes = getTemplatesListRelay();
     const props = {
       templates: nodes.data.api.clusterKitNodesApi,
-      createNodeTemplatePrivilege: false,
-      getNodeTemplatePrivilege: true,
+      createMigratorTemplatePrivilege: false,
+      getMigratorTemplatePrivilege: true,
     };
-    return <StubContainer Component={TemplatesList} props={props} />;
+    return <StubContainer Component={MigratorTemplatesList} props={props} />;
   })
   .add('list, no access to edit', () => {
     const nodes = getTemplatesListRelay();
     const props = {
       templates: nodes.data.api.clusterKitNodesApi,
-      createNodeTemplatePrivilege: true,
-      getNodeTemplatePrivilege: false,
+      createMigratorTemplatePrivilege: true,
+      getMigratorTemplatePrivilege: false,
     };
-    return <StubContainer Component={TemplatesList} props={props} />;
+    return <StubContainer Component={MigratorTemplatesList} props={props} />;
   })
   .add('list, no access to create/edit', () => {
     const nodes = getTemplatesListRelay();
     const props = {
       templates: nodes.data.api.clusterKitNodesApi,
-      createNodeTemplatePrivilege: false,
-      getNodeTemplatePrivilege: false,
+      createMigratorTemplatePrivilege: false,
+      getMigratorTemplatePrivilege: false,
     };
-    return <StubContainer Component={TemplatesList} props={props} />;
+    return <StubContainer Component={MigratorTemplatesList} props={props} />;
   })
 ;
 

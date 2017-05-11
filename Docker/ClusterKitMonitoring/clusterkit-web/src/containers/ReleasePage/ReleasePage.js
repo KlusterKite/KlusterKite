@@ -5,9 +5,10 @@ import { browserHistory } from 'react-router'
 import ReleaseOperations from '../../components/ReleaseOperations/ReleaseOperations';
 import ReleaseForm from '../../components/ReleaseForm/ReleaseForm'
 import FeedsList from '../../components/FeedsList/FeedList'
+import MigratorTemplatesList from '../../components/MigratorTemplatesList/MigratorTemplatesList'
+import NodeTemplatesList from '../../components/NodeTemplatesList/NodeTemplatesList'
 import PackagesList from '../../components/PackagesList/PackagesList'
 import SeedsList from '../../components/SeedsList/SeedsList'
-import TemplatesList from '../../components/TemplatesList/TemplatesList'
 
 import CreateReleaseMutation from './mutations/CreateReleaseMutation'
 import UpdateReleaseMutation from './mutations/UpdateReleaseMutation'
@@ -170,11 +171,17 @@ class ReleasePage extends React.Component {
             releaseId={this.props.params.id}
             canEdit={canEdit}
           />
-          <TemplatesList
+          <NodeTemplatesList
             configuration={model.configuration}
-            nodeTemplates={model.configuration && model.configuration.nodeTemplates}
             createNodeTemplatePrivilege={true}
             getNodeTemplatePrivilege={true}
+            releaseId={this.props.params.id}
+            canEdit={canEdit}
+          />
+          <MigratorTemplatesList
+            configuration={model.configuration}
+            createMigratorTemplatePrivilege={true}
+            getMigratorTemplatePrivilege={true}
             releaseId={this.props.params.id}
             canEdit={canEdit}
           />
@@ -219,7 +226,8 @@ export default Relay.createContainer(
               isStable
               configuration {
                 ${FeedsList.getFragment('configuration')},
-                ${TemplatesList.getFragment('configuration')}
+                ${MigratorTemplatesList.getFragment('configuration')}
+                ${NodeTemplatesList.getFragment('configuration')}
                 ${PackagesList.getFragment('configuration')}
                 ${SeedsList.getFragment('configuration')}
                 ${ReleaseOperations.getFragment('configuration')}
