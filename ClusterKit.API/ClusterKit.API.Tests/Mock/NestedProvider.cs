@@ -41,8 +41,8 @@ namespace ClusterKit.API.Tests.Mock
         /// </param>
         public NestedProvider(List<TestObject> objects)
         {
-            this.Connection =
-                new TestObjectConnection(objects?.ToDictionary(o => o.Id) ?? new Dictionary<Guid, TestObject>());
+            this.Connection = new TestObjectConnection(
+                objects?.ToDictionary(o => o.Id) ?? new Dictionary<Guid, TestObject>());
         }
 
         /// <summary>
@@ -115,6 +115,48 @@ namespace ClusterKit.API.Tests.Mock
         public TestObject SetName(string name)
         {
             return new TestObject { Name = name };
+        }
+
+        /// <summary>
+        /// Tests the object updater mutation
+        /// </summary>
+        /// <param name="input">The input object</param>
+        /// <param name="request">The request</param>
+        /// <returns>The output object</returns>
+        [DeclareMutation]
+        [UsedImplicitly]
+        public TestObject SetObject(TestObject input, ApiRequest request)
+        {
+            var initialObject = new TestObject
+                                    {
+                                        Name = "SourceName",
+                                        Type = TestObject.EnObjectType.Good,
+                                        Value = 1M,
+                                        Recursion =
+                                            new TestObject
+                                                {
+                                                    Name = "NestedSourceName",
+                                                    Type = TestObject.EnObjectType.Good,
+                                                    Value = 10M,
+                                                },
+                                        RecursionArray =
+                                            new List<TestObject>
+                                                {
+                                                    new TestObject
+                                                        {
+                                                            Name =
+                                                                "NestedListedSourceName",
+                                                            Type =
+                                                                TestObject
+                                                                    .EnObjectType
+                                                                    .Good,
+                                                            Value = 100M,
+                                                        }
+                                                }
+                                    };
+
+            DataUpdater<TestObject>.Update(initialObject, input, request, "input");
+            return initialObject;
         }
     }
 }

@@ -10,6 +10,7 @@
 namespace ClusterKit.API.Tests.Mock
 {
     using System;
+    using System.Collections.Generic;
 
     using ClusterKit.API.Attributes;
 
@@ -65,5 +66,19 @@ namespace ClusterKit.API.Tests.Mock
         [DeclareField]
         [UsedImplicitly]
         public EnObjectType Type { get; set; } = EnObjectType.Good;
+
+        /// <summary>
+        /// Gets or sets the nested object
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public TestObject Recursion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of nested object
+        /// </summary>
+        [DeclareField]
+        [UsedImplicitly]
+        public List<TestObject> RecursionArray { get; set; }
     }
 }

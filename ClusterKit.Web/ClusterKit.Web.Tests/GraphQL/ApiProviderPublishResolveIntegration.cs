@@ -1928,7 +1928,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// <summary>
         /// Testing node requests from <see cref="ApiDescription"/>
         /// </summary>
-        /// <returns>Async task</returns>
+        /// <returns>
+        /// Async task
+        /// </returns>
         [Fact]
         public async Task NodeQuerySimpleObjectTest()
         {
@@ -2362,6 +2364,93 @@ namespace ClusterKit.Web.Tests.GraphQL
                         }";
 
             Assert.Equal(CleanResponse(expectedResult), CleanResponse(response));
+        }
+
+        /// <summary>
+        /// Testing call of simple mutation
+        /// </summary>
+        /// <param name="input">The mutation input</param>
+        /// <param name="name">The expected returned test object name</param>
+        /// <param name="type">The expected returned test object type</param>
+        /// <param name="value">The expected returned test object value</param>
+        /// <param name="hasRecursive">A value indicating whether to expect nested object</param>
+        /// <param name="recursiveName">The expected returned nested object name</param>
+        /// <param name="recursiveType">The expected returned nested object type</param>
+        /// <param name="recursiveValue">The expected returned nested object value</param>
+        /// <param name="recursionArrayElementsCount">The expected returned nested objects array length</param>
+        /// <returns>Async task</returns>
+        [Theory]
+        [InlineData("{ name: \"destination\" }", "destination", "Good", 1, true, "NestedSourceName", "Good", 10, 1)]
+        [InlineData("{ recursion: { type: Bad } }", "SourceName", "Good", 1, true, "NestedSourceName", "Bad", 10, 1)]
+        [InlineData("{ recursion: { value: 20 } }", "SourceName", "Good", 1, true, "NestedSourceName", "Good", 20, 1)]
+        [InlineData("{ recursionArray: [] }", "SourceName", "Good", 1, true, "NestedSourceName", "Good", 10, 0)]
+        public async Task MutationObjectUpdaterTest(
+            string input,
+            string name,
+            string type,
+            decimal value,
+            bool hasRecursive,
+            string recursiveName,
+            string recursiveType,
+            decimal recursiveValue,
+            int recursionArrayElementsCount)
+        {
+            var internalApiProvider = new TestProvider();
+            var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
+            var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
+
+            var query = $@"                          
+            mutation M {{
+                    call: TestApi_nestedAsync_setObject(input: {{ input:  {input}}}) {{
+                        result {{
+                            name,
+                            type,
+                            value,
+                            recursion {{
+                                name,
+                                type,
+                                value
+                            }},
+                            recursionArray {{
+                                count,
+                                edges {{
+                                    node {{
+                                        name,
+                                        type,
+                                        value
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+            }}            
+            ";
+
+            var result = await new DocumentExecuter().ExecuteAsync(
+                             r =>
+                                 {
+                                     r.Schema = schema;
+                                     r.Query = query;
+                                     r.UserContext = new RequestContext();
+                                 }).ConfigureAwait(true);
+            var response = new DocumentWriter(true).Write(result);
+            this.output.WriteLine(response);
+            var json = JObject.Parse(response);
+            Assert.Equal(name, json.SelectToken("data.call.result.name")?.Value<string>());
+            Assert.Equal(type, json.SelectToken("data.call.result.type")?.Value<string>());
+            Assert.Equal(value, json.SelectToken("data.call.result.value")?.Value<decimal>());
+            if (hasRecursive)
+            {
+                Assert.Equal(recursiveName, json.SelectToken("data.call.result.recursion.name")?.Value<string>());
+                Assert.Equal(recursiveType, json.SelectToken("data.call.result.recursion.type")?.Value<string>());
+                Assert.Equal(recursiveValue, json.SelectToken("data.call.result.recursion.value")?.Value<decimal>());
+            }
+            else
+            {
+                Assert.Equal(JValue.CreateNull(), json.SelectToken("data.call.result.recursion"));
+            }
+
+            Assert.Equal(recursionArrayElementsCount, json.SelectToken("data.call.result.recursionArray.count")?.Value<int>());
         }
 
         /// <summary>
