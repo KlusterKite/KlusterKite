@@ -48,7 +48,8 @@ namespace ClusterKit.NodeManager.Migrator
         /// <param name="pointToMigrate">
         /// The point to migrate.
         /// </param>
-        void Migrate(ResourceId resourceId, string pointToMigrate);
+        /// <returns>The list of log messages</returns>
+        IEnumerable<string> Migrate(ResourceId resourceId, string pointToMigrate);
 
         /// <summary>
         /// Gets all possible migration points defined in this assembly

@@ -131,7 +131,17 @@ namespace ClusterKit.NodeManager
             this.WhenUnhandled(
                 command => command.FsmEvent.Match<State<EnState, Data>>()
                     .With<RecheckState>(m => this.LoadState())
-                    .ResultOrDefault(o => null));
+                    .ResultOrDefault(
+                        o =>
+                            {
+                                Context.GetLogger()
+                                    .Warning(
+                                    "{Type}: received unsupported message {MessageType} in state {StateName}",
+                                    this.GetType().Name,
+                                    o.GetType().Name,
+                                    this.StateName.ToString());
+                                return this.Stay();
+                            }));
 
             this.Parent.Tell(new ProcessingTheRequest());
             var startState = this.LoadState(new Data(), true);
@@ -482,6 +492,14 @@ namespace ClusterKit.NodeManager
                                 ? this.StateData.Migration.FromRelease.Id
                                 : this.StateData.Migration.ToReleaseId;
 
+            Context.GetLogger().Info(
+                "{Type}: preparing for migration resources of {MigratorTemplateCode} of release {ReleaseId}. {ResourceCount} resources will be migrated",
+                this.GetType().Name,
+                plan.Template.Code,
+                releaseId,
+                plan.MigratorPlans.Values.SelectMany(m => m.Resources.Values).Count());
+
+
             var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
             var appDomain = AppDomain.CreateDomain("MigratorDomain", new Evidence(), appDomainSetup);
 
@@ -492,9 +510,30 @@ namespace ClusterKit.NodeManager
                     "ClusterKit.NodeManager.RemoteDomain.MigrationExecutor");
                 collector.Configuration = plan.Template.Configuration;
                 collector.Commands = plan.MigratorPlans.Values.ToList();
-                appDomain.DoCallBack(collector.Execute);
 
+                Context.GetLogger().Info(
+                    "{Type}: {MigratorTemplateCode} of release {ReleaseId} migration executor was created",
+                    this.GetType().Name,
+                    plan.Template.Code,
+                    releaseId);
+
+                appDomain.DoCallBack(collector.Execute);
                 var operations = collector.Result;
+                foreach (var logMessage in collector.Logs)
+                {
+                    Context.GetLogger().Info(
+                        "{Type}: migration log - {LogMessage}",
+                        this.GetType().Name,
+                        logMessage);
+                }
+
+
+                Context.GetLogger().Info(
+                    "{Type}: {MigratorTemplateCode} of release {ReleaseId} migration executor was executed",
+                    this.GetType().Name,
+                    plan.Template.Code,
+                    releaseId);
+
                 if (operations != null)
                 {
                     foreach (var operation in operations)
@@ -519,6 +558,18 @@ namespace ClusterKit.NodeManager
                                     releaseId,
                                     operation.Error.ErrorMessage,
                                     operation.Error.ErrorStackTrace);
+                        }
+                        else
+                        {
+                            Context.GetLogger()
+                                .Info(
+                                    "{Type}: Migration for template {MigratorTemplateCode} of release {ReleaseId} {ResourceCode} was successfully migrated from {SourcePoint} to {DestinationPoint}",
+                                    this.GetType().Name,
+                                    plan.Template.Code,
+                                    releaseId,
+                                    operation.ResourceCode,
+                                    operation.SourcePoint,
+                                    operation.DestinationPoint);
                         }
                     }
 
@@ -1293,12 +1344,13 @@ namespace ClusterKit.NodeManager
 
             if (errors.Count != 0 || this.StateData.MigrationState == null)
             {
-                this.Sender.Tell(new RequestDeclined { Errors = errors });
+                Context.GetLogger()
+                    .Error(
+                        "{Type}: Failed to fulfill migration request. Could not create migration plan.",
+                        this.GetType().Name);
+                this.Parent.Tell(errors.Cast<MigrationLogRecord>().ToList());
                 return this.Stay();
             }
-
-            this.Sender.Tell(new RequestAcknowledged());
-            this.Parent.Tell(new ProcessingTheRequest());
 
             var sourceLog = plan.SourceExecution.Values.Aggregate(
                 (IEnumerable<MigrationLogRecord>)new List<MigrationLogRecord>(),

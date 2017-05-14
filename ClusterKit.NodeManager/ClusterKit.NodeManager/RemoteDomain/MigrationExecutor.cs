@@ -15,6 +15,8 @@ namespace ClusterKit.NodeManager.RemoteDomain
 
     using ClusterKit.NodeManager.Client.ORM;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Executes migrations for the specified resources
     /// </summary>
@@ -25,13 +27,21 @@ namespace ClusterKit.NodeManager.RemoteDomain
         /// </summary>
         public List<MigratorMigrationsCommand> Commands { get; set; }
 
+        /// <summary>
+        /// Gets or sets the additional execution logs
+        /// </summary>
+        [UsedImplicitly]
+        public List<string> Logs { get; set; } = new List<string>();
+
         /// <inheritdoc />
         protected override List<MigrationOperation> GetResult()
         {
+            this.Logs.Add("Started");
             var result = new List<MigrationOperation>();
             var migrators = this.GetMigrators().ToList();
             foreach (var command in this.Commands)
             {
+                this.Logs.Add($"Executing migrator {command.TypeName}");
                 var migrator = migrators.FirstOrDefault(m => m.GetType().FullName == command.TypeName);
                 if (migrator == null)
                 {
@@ -41,8 +51,11 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                 MigratorTypeName = command.TypeName,
                                 ErrorMessage = "Migrator is not defined"
                             });
+                    this.Logs.Add($"Migrator {command.TypeName} was not found");
                     continue;
                 }
+                
+                this.Logs.Add($"Migrator {command.TypeName} found");
 
                 var resources = migrator.GetMigratableResources().ToList();
                 var points = migrator.GetAllPoints().ToList();
@@ -70,6 +83,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                     ResourceCode = pair.Key,
                                     ErrorMessage = "Resource is not defined in the migrator"
                                 };
+                        this.Logs.Add($"Resource {pair.Key} is not defined in the migrator");
                         continue;
                     }
 
@@ -91,6 +105,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                         $"Exception while checking resource current point: {exception.Message}",
                                     Exception = exception
                                 };
+                        this.Logs.Add($"Exception while checking resource {pair.Key} current point: {exception.Message}");
                         continue;
                     }
 
@@ -105,12 +120,13 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                     ResourceCode = pair.Key,
                                     ErrorMessage = "Resource cannot migrate to point"
                                 };
+                        this.Logs.Add($"Resource {pair.Key} cannot migrate to point");
                         continue;
                     }
 
                     try
                     {
-                        migrator.Migrate(resource, pair.Value);
+                        this.Logs.AddRange(migrator.Migrate(resource, pair.Value));
                     }
                     catch (Exception exception)
                     {
@@ -125,9 +141,11 @@ namespace ClusterKit.NodeManager.RemoteDomain
                                         $"Exception while migrating resource: {exception.Message}",
                                     Exception = exception
                                 };
+                        this.Logs.Add($"Exception while migrating resource {pair.Key}: {exception.Message}");
                     }
 
                     operation.Finished = DateTimeOffset.Now;
+                    this.Logs.Add($"Resource {pair.Key} was migrated successfully");
                 }
             }
 

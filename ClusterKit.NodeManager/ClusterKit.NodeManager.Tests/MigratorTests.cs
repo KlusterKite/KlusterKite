@@ -214,8 +214,7 @@ namespace ClusterKit.NodeManager.Tests
                                               Target = EnMigrationSide.Destination
                                           };
 
-                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
-                this.ExpectMsg<ProcessingTheRequest>();
+                actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
                 var record = log[0] as MigrationOperation;
@@ -400,8 +399,7 @@ namespace ClusterKit.NodeManager.Tests
                                               Target = EnMigrationSide.Destination
                                           };
 
-                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
-                this.ExpectMsg<ProcessingTheRequest>();
+                actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
                 var record = log[0] as MigrationOperation;
@@ -513,8 +511,7 @@ namespace ClusterKit.NodeManager.Tests
                                               Target = EnMigrationSide.Destination
                                           };
 
-                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
-                this.ExpectMsg<ProcessingTheRequest>();
+                actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
                 var record = log[0] as MigrationOperation;

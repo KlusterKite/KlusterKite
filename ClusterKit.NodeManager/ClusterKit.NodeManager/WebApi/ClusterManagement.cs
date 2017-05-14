@@ -10,13 +10,18 @@
 namespace ClusterKit.NodeManager.WebApi
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using Akka.Actor;
 
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Attributes.Authorization;
+    using ClusterKit.API.Client;
     using ClusterKit.Core;
+    using ClusterKit.Core.Monads;
+    using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.Data.CRUD.Exceptions;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages.Migration;
     using ClusterKit.NodeManager.Client.MigrationStates;
@@ -50,6 +55,16 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Gets the current cluster release
+        /// </summary>
+        [DeclareField("The current cluster release")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetResourceState)]
+        [UsedImplicitly]
+        public Task<Release> CurrentRelease => this.Actor.Ask<Release>(new CurrentReleaseRequest(), this.AkkaTimeout);
+
+        /// <summary>
         /// Gets current cluster resources state
         /// </summary>
         [DeclareField("The current cluster resources state")]
@@ -62,30 +77,6 @@ namespace ClusterKit.NodeManager.WebApi
             this.AkkaTimeout);
 
         /// <summary>
-        /// Gets the current cluster release
-        /// </summary>
-        [DeclareField("The current cluster release")]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.GetResourceState)]
-        [UsedImplicitly]
-        public Task<Release> CurrentRelease => this.Actor.Ask<Release>(
-            new CurrentReleaseRequest(),
-            this.AkkaTimeout);
-
-        /// <summary>
-        /// Gets the current cluster release
-        /// </summary>
-        [DeclareField("The current cluster release")]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.GetResourceState)]
-        [UsedImplicitly]
-        public Task<Migration> CurrentMigration => this.Actor.Ask<Migration>(
-            new CurrentMigrationRequest(),
-            this.AkkaTimeout);
-
-        /// <summary>
         /// The node management actor
         /// </summary>
         private ActorSelection Actor => this.actorSystem.ActorSelection(NodeManagerApi.GetManagerActorProxyPath());
@@ -94,6 +85,19 @@ namespace ClusterKit.NodeManager.WebApi
         /// Gets timeout for actor system requests
         /// </summary>
         private TimeSpan AkkaTimeout { get; }
+
+        /// <summary>
+        /// Gets the current cluster release
+        /// </summary>
+        [DeclareField("The current cluster release")]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.GetResourceState)]
+        [UsedImplicitly]
+        public async Task<Migration> CurrentMigration()
+        {
+            return await this.Actor.Ask<Maybe<Migration>>(new CurrentMigrationRequest(), this.AkkaTimeout);
+        }
 
         /// <summary>
         /// Cancels the current migration
@@ -111,6 +115,51 @@ namespace ClusterKit.NodeManager.WebApi
         }
 
         /// <summary>
+        /// Creates a new cluster migration
+        /// </summary>
+        /// <param name="newReleaseId">
+        /// The destination release id
+        /// </param>
+        /// <returns>
+        /// The result of operation
+        /// </returns>
+        [UsedImplicitly]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.MigrateCluster)]
+        [LogAccess(Severity = EnSeverity.Crucial, LogMessage = "A new cluster migration created")]
+        [DeclareMutation("Creates a new migration")]
+        public async Task<MutationResult<Migration>> MigrationCreate(int newReleaseId)
+        {
+            var result = await this.Actor.Ask<CrudActionResponse<Migration>>(
+                             new UpdateClusterRequest { Id = newReleaseId },
+                             this.AkkaTimeout);
+
+            var mutationException = result.Exception as MutationException;
+            if (mutationException != null)
+            {
+                return new MutationResult<Migration> { Errors = mutationException.Errors };
+            }
+
+            if (result.Exception != null)
+            {
+                return new MutationResult<Migration>
+                           {
+                               Result = result.Data,
+                               Errors =
+                                   new List<ErrorDescription>
+                                       {
+                                           new ErrorDescription(
+                                               null,
+                                               result.Exception.Message)
+                                       }
+                           };
+            }
+
+            return new MutationResult<Migration> { Result = result.Data };
+        }
+
+        /// <summary>
         /// Finishes the current migration
         /// </summary>
         /// <returns>The result of operation</returns>
@@ -123,26 +172,6 @@ namespace ClusterKit.NodeManager.WebApi
         public Task<bool> MigrationFinish()
         {
             return this.Actor.Ask<bool>(new MigrationFinish(), this.AkkaTimeout);
-        }
-
-        /// <summary>
-        /// Updates resources in the cluster
-        /// </summary>
-        /// <param name="request">
-        /// The resource update commands.
-        /// </param>
-        /// <returns>
-        /// The result of operation
-        /// </returns>
-        [UsedImplicitly]
-        [RequireSession]
-        [RequireUser]
-        [RequirePrivilege(Privileges.MigrateCluster)]
-        [LogAccess(Severity = EnSeverity.Crucial, LogMessage = "Resources were updated")]
-        [DeclareMutation("Updates resources in the cluster")]
-        public Task<bool> MigrationResourceUpdate([ApiDescription("The list of resources to update")] ResourceUpgradeRequest request)
-        {
-            return this.Actor.Ask<bool>(request.Resources, this.AkkaTimeout);
         }
 
         /// <summary>
@@ -163,6 +192,27 @@ namespace ClusterKit.NodeManager.WebApi
         public Task<bool> MigrationNodesUpdate([ApiDescription("The update direction")] EnMigrationSide target)
         {
             return this.Actor.Ask<bool>(new NodesUpgrade { Target = target }, this.AkkaTimeout);
+        }
+
+        /// <summary>
+        /// Updates resources in the cluster
+        /// </summary>
+        /// <param name="request">
+        /// The resource update commands.
+        /// </param>
+        /// <returns>
+        /// The result of operation
+        /// </returns>
+        [UsedImplicitly]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.MigrateCluster)]
+        [LogAccess(Severity = EnSeverity.Crucial, LogMessage = "Resources were updated")]
+        [DeclareMutation("Updates resources in the cluster")]
+        public Task<bool> MigrationResourceUpdate(
+            [ApiDescription("The list of resources to update")] ResourceUpgradeRequest request)
+        {
+            return this.Actor.Ask<bool>(request.Resources, this.AkkaTimeout);
         }
     }
 }

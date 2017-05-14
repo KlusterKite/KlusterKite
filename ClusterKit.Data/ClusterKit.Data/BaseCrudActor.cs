@@ -297,6 +297,13 @@ namespace ClusterKit.Data
             }
             catch (Exception exception)
             {
+                Context.GetLogger()
+                    .Error(
+                        exception,
+                        "{Type}: Error while processing {ActionType} for {EntityType}",
+                        this.GetType().Name,
+                        request.ActionType,
+                        typeof(TObject).Name);
                 response = new CrudActionResponse<TObject> { Exception = exception, ExtraData = request.ExtraData };
             }
 

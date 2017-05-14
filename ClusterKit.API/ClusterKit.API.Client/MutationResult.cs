@@ -38,7 +38,7 @@ namespace ClusterKit.API.Client
         /// </summary>
         [UsedImplicitly]
         [DeclareField("The list of mutation errors")]
-        public IEnumerable<ErrorDescription> Errors
+        public List<ErrorDescription> Errors
         {
             get
             {
@@ -48,6 +48,11 @@ namespace ClusterKit.API.Client
             set
             {
                 var errorList = new List<ErrorDescription>();
+                if (value == null)
+                {
+                    return;
+                }
+
                 foreach (var errorDescription in value)
                 {
                     errorDescription.Number = errorList.Count + 1;

@@ -116,7 +116,7 @@ namespace ClusterKit.NodeManager.Tests.Migrations
         }
 
         /// <inheritdoc />
-        public void Migrate(ResourceId resourceId, string pointToMigrate)
+        public IEnumerable<string> Migrate(ResourceId resourceId, string pointToMigrate)
         {
             if (this.config.GetBoolean("TestMigrator.ThrowOnMigrate"))
             {
@@ -134,6 +134,7 @@ namespace ClusterKit.NodeManager.Tests.Migrations
             }
 
             SetMigrationPoint(resourceId.ConnectionString, pointToMigrate);
+            yield return "success";
         }
     }
 }

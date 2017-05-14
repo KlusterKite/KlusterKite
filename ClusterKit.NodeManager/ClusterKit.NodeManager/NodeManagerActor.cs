@@ -879,6 +879,7 @@ namespace ClusterKit.NodeManager
         /// <returns>The async task</returns>
         private async Task OnMigrationLogRecords(List<MigrationLogRecord> records)
         {
+            Context.GetLogger().Info("{Type}: received new MigrationLogRecords", this.GetType().Name);
             using (var ds = await this.contextFactory.CreateContext(this.connectionString, this.databaseName))
             {
                 foreach (var record in records)

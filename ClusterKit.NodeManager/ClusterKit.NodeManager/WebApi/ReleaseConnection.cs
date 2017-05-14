@@ -10,6 +10,7 @@
 namespace ClusterKit.NodeManager.WebApi
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -79,7 +80,7 @@ namespace ClusterKit.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on check", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
+                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
 
@@ -107,7 +108,7 @@ namespace ClusterKit.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on SetReady", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
+                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
 
@@ -135,7 +136,7 @@ namespace ClusterKit.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on SetObsolete", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
+                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
 
@@ -144,7 +145,7 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         /// <param name="id">The id of release draft</param>
         /// <param name="isStable">A value indicating the new <see cref="Release.IsStable"/> value</param>
-        /// <returns>The mutation result</returns>
+        /// <returns>The mutation result</returns>-
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
@@ -164,7 +165,7 @@ namespace ClusterKit.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on SetStable", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) } };
+                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
     }

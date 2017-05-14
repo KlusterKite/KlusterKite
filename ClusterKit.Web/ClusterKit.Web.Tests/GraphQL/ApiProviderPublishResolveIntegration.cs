@@ -2383,6 +2383,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [InlineData("{ name: \"destination\" }", "destination", "Good", 1, true, "NestedSourceName", "Good", 10, 1)]
         [InlineData("{ recursion: { type: Bad } }", "SourceName", "Good", 1, true, "NestedSourceName", "Bad", 10, 1)]
         [InlineData("{ recursion: { value: 20 } }", "SourceName", "Good", 1, true, "NestedSourceName", "Good", 20, 1)]
+        [InlineData("{ recursion: { recursion: { name: \"recursion\" } } }", "SourceName", "Good", 1, true, "NestedSourceName", "Good", 10, 1)]
         [InlineData("{ recursionArray: [] }", "SourceName", "Good", 1, true, "NestedSourceName", "Good", 10, 0)]
         public async Task MutationObjectUpdaterTest(
             string input,
@@ -2399,7 +2400,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
-            var query = $@"                          
+            var query = $@"                           
             mutation M {{
                     call: TestApi_nestedAsync_setObject(input: {{ input:  {input}}}) {{
                         result {{
@@ -2409,7 +2410,12 @@ namespace ClusterKit.Web.Tests.GraphQL
                             recursion {{
                                 name,
                                 type,
-                                value
+                                value,
+                                recursion {{
+                                    name,
+                                    type,
+                                    value,
+                                }}
                             }},
                             recursionArray {{
                                 count,

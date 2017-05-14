@@ -1,0 +1,206 @@
+﻿-- Create migration
+
+mutation newMigration {
+  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate(input: {newReleaseId: 2}) {
+    result {
+      result {
+        state,
+        direction,
+        started,
+        finished
+      }
+      errors {
+        count,
+        edges {
+          node {
+            number,
+            field,
+            message
+          }
+        }
+      }
+    }
+  }
+}
+
+
+--- Migration state
+query { 
+  api {
+    clusterKitNodesApi {
+      clusterManagement {
+        currentRelease {
+          __id
+        }
+        currentMigration {
+          state,
+          direction,
+          started,
+          finished,          
+        },
+        resourceState {
+          operationIsInProgress,
+          canCreateMigration,
+          canMigrateResources,
+          canUpdateNodesToDestination,
+          canUpdateNodesToSource,
+          canCancelMigration,   
+          canFinishMigration,
+          migrationState {
+            position,
+            templateStates {
+              edges {
+                node {
+                  code,
+                  position,
+                  migrators {
+                    edges {
+                      node {
+                        typeName,
+                        name,
+                        position,
+                        direction,
+                        resources {
+                          edges {
+                            node {
+                              sourcePoint,
+                              destinationPoint,
+                              position,
+                              migrationToSourceExecutor,
+                              migrationToDestinationExecutor,
+                              name,
+                              code,
+                              currentPoint
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          releaseState {
+            states {
+              edges {
+                node {
+                  code,
+                  template {
+                    id
+                  },
+                  migratorsStates {
+                    edges {
+                      node {
+                        typeName,
+                        name,
+                        migrationPoints,
+                        lastDefinedPoint,
+                        resources {
+                          edges {
+                            node {
+                              name,
+                              code,
+                              currentPoint
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+        }
+      }
+    }
+  }
+}
+
+
+-- Update nodes
+mutation {
+  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationNodesUpdate(input: {target: Destination}) {
+    result
+  }
+}
+
+-- Update resources 
+mutation {
+  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "ClusterKit", migratorTypeName: "ClusterKit.NodeManager.ConfigurationSource.Migrator.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
+    result 
+  }
+}
+
+-- finish migration
+mutation {
+  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationFinish {
+    result
+  }
+}
+
+-- cancel migration
+mutation {
+  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel {
+    result
+  }
+}
+
+-- migrations data
+{
+  api {
+    clusterKitNodesApi {
+      migrations {
+        count
+        edges {
+          node {
+            isActive
+            state
+            direction
+            started
+            finished
+            operations {
+              edges {
+                node {
+                  started
+                  finished
+                  sourcePoint
+                  destinationPoint
+                  error {
+                    created
+                    errorMessage
+                    errorStackTrace
+                    migratorTemplateCode
+                    migratorTemplateName
+                    migratorTypeName
+                    migratorName
+                    resourceCode
+                    resourceName
+                  }
+                }
+              }
+            }
+            errors {
+              edges {
+                node {
+                  created
+                  errorMessage
+                  errorStackTrace
+                  migratorTemplateCode
+                  migratorTemplateName
+                  migratorTypeName
+                  migratorName
+                  resourceCode
+                  resourceName
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

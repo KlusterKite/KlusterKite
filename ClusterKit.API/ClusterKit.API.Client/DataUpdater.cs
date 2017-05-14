@@ -30,7 +30,8 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// The initialization lock
         /// </summary>
-        private static readonly object lockObject = new object();
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly object LockObject = new object();
 
         /// <summary>
         /// The list of discovered property copiers
@@ -41,7 +42,7 @@ namespace ClusterKit.API.Client
         /// <summary>
         /// A value indicating whether type initialization was completed
         /// </summary>
-        private static bool isInitializaed = false;
+        private static bool isInitialized = false;
 
         /// <summary>
         /// Performs data copy from source to destination fields
@@ -77,8 +78,18 @@ namespace ClusterKit.API.Client
         /// The json object definition
         /// </param>
         [UsedImplicitly]
-        public static void Update(TObject destination, TObject source, JObject objectJson)
+        public static void Update([NotNull] TObject destination, [NotNull] TObject source, JObject objectJson)
         {
+            if (destination == null)
+            {
+                throw new ArgumentNullException(nameof(destination));
+            }
+
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
             CheckInitialization();
             var fieldsModified = objectJson?.Properties();
             if (fieldsModified == null)
@@ -102,14 +113,14 @@ namespace ClusterKit.API.Client
         /// </summary>
         private static void CheckInitialization()
         {
-            if (isInitializaed)
+            if (isInitialized)
             {
                 return;
             }
 
-            lock (lockObject)
+            lock (LockObject)
             {
-                if (isInitializaed)
+                if (isInitialized)
                 {
                     return;
                 }
@@ -160,12 +171,21 @@ namespace ClusterKit.API.Client
                         nameof(Update),
                         new[] { property.PropertyType, property.PropertyType, typeof(JObject) });
 
-                    var copy = Expression.Call(
+                    var recursiveCopy = Expression.Call(
                         null,
                         method,
                         Expression.Property(destination, property),
                         Expression.Property(source, property),
                         json);
+
+                    var assign = Expression.Assign(
+                        Expression.Property(destination, property),
+                        Expression.Property(source, property));
+
+                    var copy = Expression.IfThenElse(
+                        Expression.Equal(Expression.Property(destination, property), Expression.Constant(null)),
+                        assign,
+                        recursiveCopy);
 
                     var lambda = Expression.Lambda<Action<TObject, TObject, JObject>>(copy, destination, source, json);
                     PropertyCopiers[propertyName] = lambda.Compile();

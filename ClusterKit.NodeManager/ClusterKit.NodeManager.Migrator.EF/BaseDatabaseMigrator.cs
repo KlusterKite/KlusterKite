@@ -9,6 +9,7 @@
 
 namespace ClusterKit.NodeManager.Migrator.EF
 {
+    using System;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
@@ -63,11 +64,11 @@ namespace ClusterKit.NodeManager.Migrator.EF
                                             this.connectionManager.ProviderInvariantName)
                                     };
             var migrator = new DbMigrator(configuration);
-            return migrator.GetDatabaseMigrations().Last();
+            return migrator.GetDatabaseMigrations().OrderBy(t => t).Last();
         }
 
         /// <inheritdoc />
-        public void Migrate(ResourceId resourceId, string pointToMigrate)
+        public IEnumerable<string> Migrate(ResourceId resourceId, string pointToMigrate)
         {
             var configuration = new TMigrationConfiguration
                                     {
@@ -76,13 +77,21 @@ namespace ClusterKit.NodeManager.Migrator.EF
                                             this.connectionManager.ProviderInvariantName)
                                     };
             var migrator = new DbMigrator(configuration);
+            yield return $"Updating database on connection {resourceId.ConnectionString} to {pointToMigrate}";
             migrator.Update(pointToMigrate);
+            var point = migrator.GetDatabaseMigrations().OrderBy(t => t).Last();
+            if (point != pointToMigrate)
+            {
+                throw new Exception("Database migration was ignored");
+            }
+
+            yield return $"Database on connection {resourceId.ConnectionString} to {pointToMigrate} was updated";
         }
 
         /// <inheritdoc />
         public IEnumerable<string> GetAllPoints()
         {
-            return new DbMigrator(new TMigrationConfiguration()).GetLocalMigrations();
+            return new DbMigrator(new TMigrationConfiguration()).GetLocalMigrations().OrderBy(p => p);
         }
     }
 }
