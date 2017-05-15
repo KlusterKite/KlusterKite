@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class CheckReleaseMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_check}`
+    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_releases_check}`
   }
 
   getFatQuery () {

@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class CreateRoleMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_roles_create}`
+    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_roles_create}`
   }
 
   getFatQuery () {
