@@ -31,11 +31,6 @@ namespace ClusterKit.Web
     public class WebTracer : IOwinStartupConfigurator
     {
         /// <summary>
-        /// The system configuration
-        /// </summary>
-        private readonly Config config;
-
-        /// <summary>
         /// The actor system
         /// </summary>
         /// <remarks>Just for debugging</remarks>
@@ -50,7 +45,6 @@ namespace ClusterKit.Web
         public WebTracer(ActorSystem system, Config config)
         {
             this.system = system;
-            this.config = config;
         }
 
         /// <summary>
@@ -67,10 +61,7 @@ namespace ClusterKit.Web
         /// <param name="appBuilder">The builder</param>
         public void ConfigureApp(IAppBuilder appBuilder)
         {
-            if (this.config.GetBoolean("ClusterKit.Web.Debug.Trace"))
-            {
-                appBuilder.Use<TraceMiddleware>(this.system);
-            }
+            appBuilder.Use<TraceMiddleware>(this.system);
         }
 
         /// <summary>
@@ -90,6 +81,11 @@ namespace ClusterKit.Web
             private ActorSystem system;
 
             /// <summary>
+            /// A value indicating whether all requests should be logged
+            /// </summary>
+            private bool traceRequests;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="TraceMiddleware"/> class.
             /// </summary>
             /// <param name="next">
@@ -102,6 +98,7 @@ namespace ClusterKit.Web
                 : base(next)
             {
                 this.system = system;
+                this.traceRequests = system.Settings.Config.GetBoolean("ClusterKit.Web.Debug.Trace");
             }
 
             /// <summary>Process an individual request.</summary>
@@ -109,16 +106,37 @@ namespace ClusterKit.Web
             /// <returns>The async process task</returns>
             public override async Task Invoke(IOwinContext context)
             {
-                var n = Interlocked.Increment(ref requestNumber);
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
+                if (this.traceRequests)
+                {
+                    var n = Interlocked.Increment(ref requestNumber);
+                    var stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                    this.system.Log.Info(
+                        "{Type}: started Request {RequestNumber} {RequestPath}",
+                        this.GetType().Name,
+                        n,
+                        context.Request.Path);
 
-                this.system.Log.Info(
-                    "{Type}: started Request {RequestNumber} {RequestPath}",
-                    this.GetType().Name,
-                    n,
-                    context.Request.Path);
+                    await this.ProcessRequest(context);
 
+                    this.system.Log.Info(
+                        "{Type}: finished Request {RequestNumber} {RequestPath} in {ElapsedMilliseconds}ms",
+                        this.GetType().Name,
+                        n,
+                        context.Request.Path,
+                        stopwatch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    await this.ProcessRequest(context);
+                }
+            }
+
+            /// <summary>Process an individual request.</summary>
+            /// <param name="context">The request context</param>
+            /// <returns>The async process task</returns>
+            private async Task ProcessRequest(IOwinContext context)
+            {
                 try
                 {
                     await this.Next.Invoke(context);
@@ -129,19 +147,11 @@ namespace ClusterKit.Web
 
                     this.system.Log.Error(
                         exception,
-                        "{Type}: error resolving {RequestNumber} {RequestPath}",
+                        "{Type}: error resolving {RequestPath}",
                         this.GetType().Name,
-                        n,
                         context.Request.Path);
                     throw;
                 }
-
-                this.system.Log.Info(
-                    "{Type}: finished Request {RequestNumber} {RequestPath} in {ElapsedMilliseconds}ms",
-                    this.GetType().Name,
-                    n,
-                    context.Request.Path,
-                    stopwatch.ElapsedMilliseconds);
             }
         }
     }

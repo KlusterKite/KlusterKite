@@ -29,19 +29,19 @@
     },
     {
       "Id": "Akka",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0"
     },
     {
       "Id": "Akka.Cluster",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0"
     },
     {
       "Id": "Akka.Cluster.Sharding",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0.36-beta"
     },
     {
       "Id": "Akka.Cluster.Tools",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0"
     },
     {
       "Id": "Akka.DI.CastleWindsor",
@@ -49,23 +49,23 @@
     },
     {
       "Id": "Akka.DI.Core",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0"
     },
     {
       "Id": "Akka.Logger.Serilog",
-      "Version": "1.1.3.12-beta"
+      "Version": "1.2.0"
     },
     {
       "Id": "Akka.Persistence",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0.36-beta"
     },
     {
       "Id": "Akka.Remote",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0"
     },
     {
       "Id": "Akka.Serialization.Hyperion",
-      "Version": "1.1.3.344-beta"
+      "Version": "1.2.0.36-beta"
     },
     {
       "Id": "BCrypt-Official",
@@ -137,27 +137,27 @@
     },
     {
       "Id": "DotNetty.Buffers",
-      "Version": "0.3.2"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Codecs",
-      "Version": "0.3.2"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Common",
-      "Version": "0.3.2"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Handlers",
-      "Version": "0.3.2"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Transport",
-      "Version": "0.3.2"
+      "Version": "0.4.4"
     },
     {
       "Id": "Elasticsearch.Net",
-      "Version": "5.0.1"
+      "Version": "6.0.0-alpha1"
     },
     {
       "Id": "EntityFramework",
@@ -177,7 +177,7 @@
     },
     {
       "Id": "JetBrains.Annotations",
-      "Version": "10.2.1"
+      "Version": "10.4.0"
     },
     {
       "Id": "Microsoft.AspNet.Cors",
@@ -228,32 +228,56 @@
       "Version": "1.0.34"
     },
     {
+      "Id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+      "Version": "1.1.0"
+    },
+    {
+      "Id": "Microsoft.Extensions.Logging",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.Logging.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.NETCore.Platforms",
+      "Version": "1.1.0"
+    },
+    {
       "Id": "Microsoft.Owin",
-      "Version": "3.0.1"
+      "Version": "3.1.0"
     },
     {
       "Id": "Microsoft.Owin.Cors",
-      "Version": "3.0.1"
+      "Version": "3.1.0"
     },
     {
       "Id": "Microsoft.Owin.Host.HttpListener",
-      "Version": "3.0.1"
+      "Version": "3.1.0"
     },
     {
       "Id": "Microsoft.Owin.Hosting",
-      "Version": "3.0.1"
+      "Version": "3.1.0"
     },
     {
       "Id": "Microsoft.Owin.Security",
-      "Version": "3.0.1"
+      "Version": "3.1.0"
     },
     {
       "Id": "Microsoft.Web.Infrastructure",
       "Version": "1.0.0"
     },
     {
+      "Id": "Microsoft.Win32.Primitives",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "NETStandard.Library",
+      "Version": "1.6.1"
+    },
+    {
       "Id": "Newtonsoft.Json",
-      "Version": "9.0.1"
+      "Version": "10.0.2"
     },
     {
       "Id": "Owin",
@@ -288,7 +312,15 @@
       "Version": "2.1.0"
     },
     {
+      "Id": "System.AppContext",
+      "Version": "4.3.0"
+    },
+    {
       "Id": "System.Collections",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Collections.Concurrent",
       "Version": "4.3.0"
     },
     {
@@ -296,7 +328,27 @@
       "Version": "1.3.1"
     },
     {
+      "Id": "System.ComponentModel",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Console",
+      "Version": "4.3.0"
+    },
+    {
       "Id": "System.Diagnostics.Debug",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Diagnostics.DiagnosticSource",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Diagnostics.Tools",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Diagnostics.Tracing",
       "Version": "4.3.0"
     },
     {
@@ -304,7 +356,63 @@
       "Version": "4.3.0"
     },
     {
+      "Id": "System.Globalization.Calendars",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.IO",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.IO.Compression",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.IO.Compression.ZipFile",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.IO.FileSystem",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.IO.FileSystem.Primitives",
+      "Version": "4.3.0"
+    },
+    {
       "Id": "System.Linq",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Linq.Expressions",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Net.Http",
+      "Version": "4.3.2"
+    },
+    {
+      "Id": "System.Net.Primitives",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Net.Sockets",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.ObjectModel",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Reflection",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Reflection.Extensions",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Reflection.Primitives",
       "Version": "4.3.0"
     },
     {
@@ -320,11 +428,67 @@
       "Version": "4.3.0"
     },
     {
+      "Id": "System.Runtime.Handles",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Runtime.InteropServices",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Runtime.InteropServices.RuntimeInformation",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Runtime.Numerics",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Security.Cryptography.Algorithms",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Security.Cryptography.Encoding",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Security.Cryptography.Primitives",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Security.Cryptography.X509Certificates",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Text.Encoding",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Text.Encoding.Extensions",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Text.RegularExpressions",
+      "Version": "4.3.0"
+    },
+    {
       "Id": "System.Threading",
       "Version": "4.3.0"
     },
     {
       "Id": "System.Threading.Tasks",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Threading.Timer",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Xml.ReaderWriter",
+      "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Xml.XDocument",
       "Version": "4.3.0"
     }
   ],

@@ -181,6 +181,8 @@ namespace ClusterKit.Core
 
             RegisteredInstallers[container].Add(this);
             this.RegisterWindsorComponents(container, store);
+
+            
         }
 
         /// <summary>

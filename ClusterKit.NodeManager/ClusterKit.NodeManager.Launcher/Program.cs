@@ -112,7 +112,7 @@ namespace ClusterKit.NodeManager.Launcher
             if (!string.IsNullOrWhiteSpace(this.WorkingDirectory) && Directory.Exists(this.WorkingDirectory)
                 && !CheckDirectoryAccess(this.WorkingDirectory))
             {
-                Console.WriteLine(@"workingDirectory is not accessable");
+                Console.WriteLine(@"workingDirectory is not accessible");
                 this.IsValid = false;
             }
 
@@ -396,7 +396,7 @@ namespace ClusterKit.NodeManager.Launcher
             var packages = packageReader.GetPackages(NullLogger.Instance, CancellationToken.None);
 
             var targetFramework = NuGetFramework.ParseFrameworkName(
-                ".NETFramework,Version=v4.5",
+                ConfigurationManager.AppSettings["frameworkRuntimeType"],
                 new DefaultFrameworkNameProvider());
 
             foreach (var localPackageInfo in packages)
@@ -406,6 +406,7 @@ namespace ClusterKit.NodeManager.Launcher
                     var specificGroup = NuGetFrameworkUtility.GetNearest(reader.GetLibItems(), targetFramework);
                     if (specificGroup == null || specificGroup.HasEmptyFolder)
                     {
+                        Console.WriteLine($@"!!Package {localPackageInfo.Identity.Id} is empty");
                         continue;
                     }
 

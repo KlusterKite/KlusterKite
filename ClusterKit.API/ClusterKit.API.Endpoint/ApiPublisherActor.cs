@@ -9,6 +9,7 @@
 
 namespace ClusterKit.API.Endpoint
 {
+    using System;
     using System.Collections.Generic;
 
     using Akka.Actor;
@@ -42,11 +43,18 @@ namespace ClusterKit.API.Endpoint
             var providers = container.ResolveAll<ApiProvider>();
             foreach (var apiProvider in providers)
             {
-                var actor = Context.ActorOf(
-                    Props.Create(() => new ApiHandlerActor(apiProvider)),
-                    apiProvider.ApiDescription.ApiName);
-                this.apiHandlers.Add(
-                    new ApiDiscoverResponse { Description = apiProvider.ApiDescription, Handler = actor });
+                var props = Props.Create(() => new ApiHandlerActor(apiProvider));
+                try
+                {
+                    var actor = Context.ActorOf(props, apiProvider.ApiDescription.ApiName);
+                    this.apiHandlers.Add(
+                        new ApiDiscoverResponse { Description = apiProvider.ApiDescription, Handler = actor });
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                    throw;
+                }
             }
 
             this.Receive<ApiDiscoverRequest>(r => this.Sender.Tell(this.apiHandlers));

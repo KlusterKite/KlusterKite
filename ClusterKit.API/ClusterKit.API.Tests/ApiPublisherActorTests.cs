@@ -59,7 +59,7 @@ namespace ClusterKit.API.Tests
 
             var descriptions =
                 await this.Sys.ActorSelection("/user/ClusterKit/API/Publisher")
-                    .Ask<List<ApiDiscoverResponse>>(new ApiDiscoverRequest(), TimeSpan.FromSeconds(1));
+                    .Ask<List<ApiDiscoverResponse>>(new ApiDiscoverRequest(), TimeSpan.FromSeconds(5));
 
             Assert.NotNull(descriptions);
             Assert.Equal(1, descriptions.Count);

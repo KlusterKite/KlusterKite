@@ -1,5 +1,5 @@
 ﻿{
-	ExecutionFramework = ".NETFramework,Version=v4.5"
+	ExecutionFramework = ".NETFramework,Version=v4.6"
 
 	Nuget = "http://nuget/"
 	NugetCheckPeriod = 30s
@@ -40,6 +40,6 @@
 	}
 
 	ClusterKit.NodeManager.SupportedFrameworks = [
-		".NETFramework,Version=v4.5"
+		".NETFramework,Version=v4.6"
 	]
 }

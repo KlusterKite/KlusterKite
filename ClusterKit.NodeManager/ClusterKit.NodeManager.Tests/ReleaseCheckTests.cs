@@ -43,14 +43,14 @@ namespace ClusterKit.NodeManager.Tests
         {
             var release = CreateRelease();
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(0, errors.Count);
 
             var template = release.Configuration.NodeTemplates.First();
             Assert.NotNull(template.PackagesToInstall);
-            Assert.True(template.PackagesToInstall.ContainsKey(Net45));
-            var packagesToInstall = template.PackagesToInstall[Net45];
+            Assert.True(template.PackagesToInstall.ContainsKey(Net46));
+            var packagesToInstall = template.PackagesToInstall[Net46];
             Assert.Equal(
                 "dp1 1.0.0; dp2 1.0.0; p1 1.0.0; p2 1.0.0",
                 string.Join("; ", packagesToInstall.OrderBy(p => p.Id).Select(p => $"{p.Id} {p.Version}")));
@@ -64,7 +64,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             var release = CreateRelease(new string[0]);
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.packages", errors[0].Field);
@@ -79,7 +79,7 @@ namespace ClusterKit.NodeManager.Tests
             var release = CreateRelease();
             release.Configuration.NodeTemplates.Clear();
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates", errors[0].Field);
@@ -95,11 +95,11 @@ namespace ClusterKit.NodeManager.Tests
             release.Configuration.Packages.Add(new PackageDescription("p3", "1.0.0"));
             release.Configuration.Packages.Add(new PackageDescription("dp3", "1.0.0"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.packages[\"p3\"]", errors[0].Field);
-            Assert.Equal($"Package dependency for {Net45} dp3 doesn't satisify version requirements", errors[0].Message);
+            Assert.Equal($"Package dependency for {Net46} dp3 doesn't satisify version requirements", errors[0].Message);
         }
 
         /// <summary>
@@ -111,11 +111,11 @@ namespace ClusterKit.NodeManager.Tests
             var release = CreateRelease();
             release.Configuration.Packages.Add(new PackageDescription("p3", "1.0.0"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.packages[\"p3\"]", errors[0].Field);
-            Assert.Equal($"Package dependency for {Net45} dp3 is not defined", errors[0].Message);
+            Assert.Equal($"Package dependency for {Net46} dp3 is not defined", errors[0].Message);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace ClusterKit.NodeManager.Tests
             var release = CreateRelease();
             release.Configuration.Packages.Add(new PackageDescription("test", "1.0.0"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.packages[\"test\"]", errors[0].Field);
@@ -143,7 +143,7 @@ namespace ClusterKit.NodeManager.Tests
             var release = CreateRelease();
             release.Configuration.Packages.Add(new PackageDescription("test", "strange-version"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.packages[\"test\"]", errors[0].Field);
@@ -159,7 +159,7 @@ namespace ClusterKit.NodeManager.Tests
             var release = CreateRelease();
             release.Configuration.NodeTemplates.Add(new NodeTemplate { Code = "t2" });
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t2\"]", errors[0].Field);
@@ -176,11 +176,11 @@ namespace ClusterKit.NodeManager.Tests
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("p3", "1.0.0"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"p3\"]", errors[0].Field);
-            Assert.Equal($"Package dependency for {Net45} dp3 is not defined", errors[0].Message);
+            Assert.Equal($"Package dependency for {Net46} dp3 is not defined", errors[0].Message);
         }
 
         /// <summary>
@@ -195,11 +195,11 @@ namespace ClusterKit.NodeManager.Tests
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("dp3", "1.0.0"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"p3\"]", errors[0].Field);
-            Assert.Equal($"Package dependency for {Net45} dp3 doesn't satisfy version requirements", errors[0].Message);
+            Assert.Equal($"Package dependency for {Net46} dp3 1.0.0 doesn't satisfy version requirements 2.0.0.", errors[0].Message);
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace ClusterKit.NodeManager.Tests
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("test", "strange-version"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"test\"]", errors[0].Field);
@@ -229,7 +229,7 @@ namespace ClusterKit.NodeManager.Tests
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("test", null));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"test\"]", errors[0].Field);
@@ -246,7 +246,7 @@ namespace ClusterKit.NodeManager.Tests
             release.Configuration.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("test", "1.0.0"));
             var errors =
-                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net45 }).ToList();
+                release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46 }).ToList();
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"test\"]", errors[0].Field);
