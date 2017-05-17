@@ -554,6 +554,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseWebHostingConfigurator.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="IWebHostingConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -10,56 +10,40 @@
 namespace ClusterKit.Web.Authorization.Attributes
 {
     using System;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Web.Http.Filters;
-    using System.Web.Http.Results;
 
     using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
+
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Filters;
 
     /// <summary>
     /// Marks api method to check for user authentication
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class RequireUserAttribute : Attribute, IAuthenticationFilter
+    public class RequireUserAttribute : Attribute, IAuthorizationFilter
     {
-        /// <inheritdoc />
-        public bool AllowMultiple => false;
-
         /// <summary>
         /// Gets or sets the severity of action
         /// </summary>
         public EnSeverity Severity { get; set; } = EnSeverity.Trivial;
 
         /// <inheritdoc />
-        public Task AuthenticateAsync(HttpAuthenticationContext context, CancellationToken cancellationToken)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
-            return Task.CompletedTask;
-        }
-
-        /// <inheritdoc />
-        public Task ChallengeAsync(HttpAuthenticationChallengeContext context, CancellationToken cancellationToken)
-        {
-            /*
-            var userSession = context.Request.GetOwinContext().GetSession();
-            if (userSession?.User != null)
+            var session = context.HttpContext.GetSession();
+            if (session?.User == null)
             {
-                return Task.CompletedTask;
+                SecurityLog.CreateRecord(
+                    EnSecurityLogType.OperationDenied,
+                    this.Severity,
+                    context.HttpContext.GetRequestDescription(),
+                    "Attempt to access {ControllerName} action {ActionName} without authenticated user",
+                    (context.ActionDescriptor as ControllerActionDescriptor)?.ActionName,
+                    (context.ActionDescriptor as ControllerActionDescriptor)?.ControllerName);
+                context.Result = new StatusCodeResult(401);
             }
-
-            SecurityLog.CreateRecord(
-                EnSecurityLogType.OperationDenied, 
-                this.Severity,
-                context.Request.GetOwinContext().GetRequestDescription(),
-                "Attempt to access {ControllerName} action {ActionName} without authenticated user",
-                context.ActionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
-                context.ActionContext.ActionDescriptor.ActionName);
-            context.Result = new UnauthorizedResult(new AuthenticationHeaderValue[0], context.Request);
-            */
-            return Task.CompletedTask;
         }
     }
 }

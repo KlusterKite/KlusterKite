@@ -11,19 +11,20 @@ namespace ClusterKit.Web.Authorization.Attributes
 {
     using System;
     using System.Linq;
-    using System.Net.Http;
-    using System.Web.Http;
-    using System.Web.Http.Controllers;
-
+    
     using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
+
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Filters;
 
     /// <summary>
     /// Checks session for action authorization
     /// </summary>
     /// <remarks>The authentication should be required in separate attribute.</remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class RequireClientPrivilegeAttribute : AuthorizeAttribute
+    public class RequireClientPrivilegeAttribute : Attribute, IAuthorizationFilter
     {
         /// <summary>
         /// The required privilege
@@ -60,32 +61,31 @@ namespace ClusterKit.Web.Authorization.Attributes
         public bool CombinePrivilegeWithActionName { get; set; }
 
         /// <inheritdoc />
-        protected override bool IsAuthorized(HttpActionContext actionContext)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
+            var controllerContext = context.ActionDescriptor as ControllerActionDescriptor;
             var requiredPrivilege = this.CombinePrivilegeWithActionName
-                                        ? $"{this.privilege}.{actionContext.ActionDescriptor.ActionName}"
+                                        ? $"{this.privilege}.{controllerContext?.ActionName}"
                                         : this.privilege;
 
-            /*
-            var session = actionContext.Request.GetSession();
-            var isAuthorized = session == null || (session.User != null && this.IgnoreOnUserPresent)
-                               || session.ClientScope.Contains(requiredPrivilege);
+
+            var session = context.HttpContext.GetSession();
+            var isAuthorized = session == null 
+                || (session.User != null && this.IgnoreOnUserPresent)
+                || session.ClientScope.Contains(requiredPrivilege);
 
             if (!isAuthorized)
             {
                 SecurityLog.CreateRecord(
                     EnSecurityLogType.OperationDenied,
                     this.Severity,
-                    actionContext.Request.GetOwinContext().GetRequestDescription(),
+                    context.HttpContext.GetRequestDescription(),
                     "Attempt to access {ControllerName} action {ActionName} without required client privilege {Privilege}",
-                    actionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
-                    actionContext.ActionDescriptor.ActionName,
+                    controllerContext?.ControllerName,
+                    controllerContext?.ActionName,
                     this.privilege);
+                context.Result = new StatusCodeResult(401);
             }
-
-            return isAuthorized;
-            */
-            return false;
         }
     }
 }

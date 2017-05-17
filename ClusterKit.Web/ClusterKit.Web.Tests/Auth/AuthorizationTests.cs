@@ -24,10 +24,7 @@ namespace ClusterKit.Web.Tests.Auth
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
     using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.Authorization;
-    using ClusterKit.Web.Authorization.Attributes;
-
-    using Microsoft.AspNetCore.Mvc;
+    using ClusterKit.Web.Tests.Controllers;
 
     using RestSharp;
     using RestSharp.Authenticators;
@@ -75,7 +72,7 @@ namespace ClusterKit.Web.Tests.Auth
         /// <summary>
         /// Current owin bind port
         /// </summary>
-        private int OwinPort => this.Sys.Settings.Config.GetInt("ClusterKit.Web.OwinPort");
+        private int Port => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
 
         /// <summary>
         /// Checks various authorization combinations
@@ -91,21 +88,21 @@ namespace ClusterKit.Web.Tests.Auth
         [InlineData(EnAuthenticationType.None, "user", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.User, "user", HttpStatusCode.OK)]
         [InlineData(EnAuthenticationType.Client, "user", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "AuthorizedUserAction", HttpStatusCode.NoContent)]
+        [InlineData(EnAuthenticationType.User, "AuthorizedUserAction", HttpStatusCode.OK)]
         [InlineData(EnAuthenticationType.Client, "AuthorizedUserAction", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.User, "UnauthorizedUserAction", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.Client, "UnauthorizedUserAction", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.User, "UnauthorizedClientUserAction", HttpStatusCode.Unauthorized)]
         [InlineData(EnAuthenticationType.Client, "UnauthorizedClientUserAction", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
-        [InlineData(EnAuthenticationType.Client, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
-        [InlineData(EnAuthenticationType.User, "authorizedUserExactAction", HttpStatusCode.NoContent)]
+        [InlineData(EnAuthenticationType.User, "AuthorizedEitherClientUserAction", HttpStatusCode.OK)]
+        [InlineData(EnAuthenticationType.Client, "AuthorizedEitherClientUserAction", HttpStatusCode.OK)]
+        [InlineData(EnAuthenticationType.User, "authorizedUserExactAction", HttpStatusCode.OK)]
         [InlineData(EnAuthenticationType.User, "unauthorizedUserExactAction", HttpStatusCode.Unauthorized)]
         public async Task CheckAuthorization(EnAuthenticationType authenticationType, string method, HttpStatusCode expectedResult) 
         {
             this.ExpectNoMsg();
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}/test") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}/authorization/test") { Timeout = 5000 };
             switch (authenticationType)
             {
                 case EnAuthenticationType.User:
@@ -131,7 +128,7 @@ namespace ClusterKit.Web.Tests.Auth
         public async Task ForbiddenOnInvalidToken()
         {
             this.ExpectNoMsg();
-            var client = new RestClient($"http://localhost:{this.OwinPort}/public") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}/authorization/public") { Timeout = 5000 };
             client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(
                 Guid.NewGuid().ToString("N"),
                 "Bearer");
@@ -151,7 +148,7 @@ namespace ClusterKit.Web.Tests.Auth
         public async Task ValidOnNoToken()
         {
             this.ExpectNoMsg();
-            var client = new RestClient($"http://localhost:{this.OwinPort}/public") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}/authorization/public") { Timeout = 5000 };
            
             var request = new RestRequest { Method = Method.GET, Resource = "test" };
             request.AddHeader("Accept", "application/json, text/json");
@@ -228,8 +225,8 @@ namespace ClusterKit.Web.Tests.Auth
  		                Web {{
                             Authentication.RedisConnection = ""{ConfigurationManager.ConnectionStrings["redis"]
                     .ConnectionString}""
-                            OwinPort = {port},
- 			                OwinBindAddress = ""http://*:{port}"",
+                            WebHostPort = {port},
+ 			                BindAddress = ""http://*:{port}"",
                             Debug.Trace = true
                         }}
                     }}
@@ -249,128 +246,6 @@ namespace ClusterKit.Web.Tests.Auth
                 installers.Add(new Web.Authorization.Installer());
                 installers.Add(new TestInstaller());
                 return installers;
-            }
-        }
-
-        /// <summary>
-        /// The testing web api controller
-        /// </summary>
-        [Route("test")]
-        [RequireSession]
-        public class TestController : Controller
-        {
-            /// <summary>
-            /// Tests user authentication
-            /// </summary>
-            /// <returns>The user name</returns>
-            [HttpGet]
-            [Route("session")]
-            public string GetUserSession()
-            {
-                var session = this.GetSession();
-                return session.User?.UserId ?? session.ClientId;
-            }
-
-            /// <summary>
-            /// Tests user authentication
-            /// </summary>
-            /// <returns>The user name</returns>
-            [HttpGet]
-            [RequireUser]
-            [Route("user")]
-            public string GetUser()
-            {
-                var session = this.GetSession();
-                if (session.User == null)
-                {
-                    throw new ArgumentNullException(nameof(AccessTicket.User));
-                }
-
-                return session.User.UserId;
-            }
-
-            /// <summary>
-            /// User action authorized for default user on default client
-            /// </summary>
-            [HttpGet]
-            [Route("AuthorizedUserAction")]
-            [RequireUserPrivilege("User1")]
-            [RequireClientPrivilege("Client1")]
-            public void AuthorizedUserAction()
-            {
-            }
-
-            /// <summary>
-            /// User action unauthorized for default user, but authorized for default client
-            /// </summary>
-            [HttpGet]
-            [Route("UnauthorizedUserAction")]
-            [RequireUserPrivilege("User2")]
-            [RequireClientPrivilege("Client1")]
-            public void UnauthorizedUserAction()
-            {
-            }
-
-            /// <summary>
-            /// User action authorized for default user, but unauthorized for default client
-            /// </summary>
-            [HttpGet]
-            [Route("UnauthorizedClientUserAction")]
-            [RequireUserPrivilege("User1")]
-            [RequireClientPrivilege("Client1-2")]
-            public void UnauthorizedClientUserAction()
-            {
-            }
-
-            /// <summary>
-            /// User action authorized for either client or user
-            /// </summary>
-            [HttpGet]
-            [Route("AuthorizedEitherClientUserAction")]
-            [RequireUserPrivilege("User1", IgnoreOnClientOwnBehalf = true)]
-            [RequireClientPrivilege("Client1-2", IgnoreOnUserPresent = true)]
-            public void AuthorizedEitherClientUserAction()
-            {
-            }
-
-            /// <summary>
-            /// User action authorized with action name
-            /// </summary>
-            [HttpGet]
-            [Route("authorizedUserExactAction")]
-            [RequireUserPrivilege("User", CombinePrivilegeWithActionName = true)]
-            [RequireClientPrivilege("Client", CombinePrivilegeWithActionName = true)]
-            public void AuthorizedUserExactAction()
-            {
-            }
-
-            /// <summary>
-            /// User action authorized with action name
-            /// </summary>
-            [HttpGet]
-            [Route("unauthorizedUserExactAction")]
-            [RequireUserPrivilege("User1", CombinePrivilegeWithActionName = true)]
-            [RequireClientPrivilege("Client1", CombinePrivilegeWithActionName = true)]
-            public void UnauthorizedUserExactAction()
-            {
-            }
-        }
-
-        /// <summary>
-        /// The testing web api controller
-        /// </summary>
-        [Route("public")]
-        public class PublicTestController : Controller
-        {
-            /// <summary>
-            /// Tests user authentication
-            /// </summary>
-            /// <returns>The user name</returns>
-            [System.Web.Http.HttpGet]
-            [System.Web.Http.Route("test")]
-            public string GetUserSession()
-            {
-                return "Hello world";
             }
         }
 

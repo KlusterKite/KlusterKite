@@ -10,6 +10,7 @@
 namespace ClusterKit.Web
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using Castle.Windsor;
@@ -35,6 +36,20 @@ namespace ClusterKit.Web
     public class Startup
     {
         /// <summary>
+        /// The list of startup configurators
+        /// </summary>
+        private List<IWebHostingConfigurator> startupConfigurators;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        public Startup()
+        {
+            var windsorContainer = ServiceLocator.Current.GetInstance<IWindsorContainer>();
+            this.startupConfigurators = windsorContainer.ResolveAll<IWebHostingConfigurator>().ToList();
+        }
+
+        /// <summary>
         /// The services configuration
         /// </summary>
         /// <param name="services">The list of services</param>
@@ -43,8 +58,13 @@ namespace ClusterKit.Web
         {
             services.AddSingleton<IControllerFactory, ControllerFactory>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            var builder = services.AddMvc();
 
+            foreach (var configurator in this.startupConfigurators)
+            {
+                configurator.ConfigureServices(services);
+            }
+
+            var builder = services.AddMvc();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 builder.AddApplicationPart(assembly);
@@ -69,25 +89,12 @@ namespace ClusterKit.Web
         public void Configure(IApplicationBuilder appBuilder, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddSerilog();
-            var configurators = ServiceLocator.Current.GetAllInstances<IWebHostingConfigurator>().ToList();
-
-
-            // Configure Web API for self-host.
-            /*
-            var config = new HttpConfiguration();
-            config.MapHttpAttributeRoutes(new CustomDirectRouteProvider());
-            config.Formatters.Clear();
-            config.Formatters.Add(new XmlMediaTypeFormatter { UseXmlSerializer = true });
-            config.Formatters.Add(new JsonMediaTypeFormatter());
-            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
-            */
-            
-            appBuilder.UseMvc();
-
-            foreach (var configurator in configurators)
+            foreach (var configurator in this.startupConfigurators)
             {
-                configurator.Configure(appBuilder);
+                appBuilder = configurator.ConfigureApplication(appBuilder);
             }
+
+            appBuilder.UseMvc();
         }
 
         /// <summary>

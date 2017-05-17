@@ -20,14 +20,13 @@ namespace ClusterKit.Web
     using JetBrains.Annotations;
 
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
 
     /// <summary>
     /// Debug configuration
     /// </summary>
     [UsedImplicitly]
-    public class WebTracer : IWebHostingConfigurator
+    public class WebTracer : BaseWebHostingConfigurator
     {
         /// <summary>
         /// The actor system
@@ -47,15 +46,9 @@ namespace ClusterKit.Web
         }
 
         /// <inheritdoc />
-        public void Configure(IApplicationBuilder app)
+        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
         {
-            app.UseMiddleware<TraceMiddleware>(this.system);
-        }
-
-        /// <inheritdoc />
-        public IWebHostBuilder ConfigureApp(IWebHostBuilder appBuilder)
-        {
-            return appBuilder;
+            return app.UseMiddleware<TraceMiddleware>(this.system);
         }
 
         /// <summary>

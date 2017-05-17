@@ -557,7 +557,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Installer.cs" />
-    <Compile Include="OwinConfigurator.cs" />
+    <Compile Include="WebHostingConfigurator.cs" />
     <Compile Include="Privileges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

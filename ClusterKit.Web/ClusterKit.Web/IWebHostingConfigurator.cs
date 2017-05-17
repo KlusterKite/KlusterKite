@@ -10,10 +10,8 @@
 
 namespace ClusterKit.Web
 {
-    using System.Web.Http;
-
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// External additional web hosting configuration.
@@ -22,20 +20,16 @@ namespace ClusterKit.Web
     public interface IWebHostingConfigurator
     {
         /// <summary>
-        /// Add additional host configuration
-        /// </summary>
-        /// <param name="hostBuilder">
-        /// The builder
-        /// </param>
-        /// <returns>
-        /// The <see cref="IWebHostBuilder"/>.
-        /// </returns>
-        IWebHostBuilder ConfigureApp(IWebHostBuilder hostBuilder);
-
-        /// <summary>
         /// Add additional application configuration
         /// </summary>
         /// <param name="app">The application </param>
-        void Configure(IApplicationBuilder app);
+        /// <returns>The modified application</returns>
+        IApplicationBuilder ConfigureApplication(IApplicationBuilder app);
+
+        /// <summary>
+        /// Configures services list
+        /// </summary>
+        /// <param name="services">The services list</param>
+        void ConfigureServices(IServiceCollection services);
     }
 }

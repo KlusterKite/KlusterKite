@@ -624,6 +624,8 @@
   <ItemGroup>
     <Compile Include="Auth\AuthenticationTests.cs" />
     <Compile Include="Auth\AuthorizationTests.cs" />
+    <Compile Include="Controllers\PublicTestController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="ControllerTests.cs" />
     <Compile Include="GraphQL\ApiBrowserActorTest.cs" />
     <Compile Include="GraphQL\ApiProviderPublishResolveIntegration.cs" />

@@ -81,8 +81,6 @@ namespace ClusterKit.Web
 
             var system = this.currentContainer.Resolve<ActorSystem>();
             var bindUrl = GetWebHostingBindUrl(system.Settings.Config);
-
-            var startupConfigurators = this.currentContainer.ResolveAll<IWebHostingConfigurator>().ToList();
             system.Log.Info("Starting web server on {Url}", bindUrl);
             try
             {
@@ -90,15 +88,7 @@ namespace ClusterKit.Web
                     .CaptureStartupErrors(true)
                     .UseUrls(bindUrl)
                     .UseKestrel();
-
-                foreach (var configurator in startupConfigurators)
-                {
-                    host = configurator.ConfigureApp(host);
-                }
-
-                var server = host
-                    .UseStartup<Startup>()
-                    .Build();
+                var server = host.UseStartup<Startup>().Build();
 
                 Task.Run(() =>
                 {

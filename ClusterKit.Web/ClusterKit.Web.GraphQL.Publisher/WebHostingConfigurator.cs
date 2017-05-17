@@ -10,30 +10,20 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
-    using System.Web.Http;
-
     using ClusterKit.Web;
 
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Cors.Infrastructure;
-    using Microsoft.AspNetCore.Hosting;
 
     /// <summary>
     /// External additional configuration.
     /// Should be registered in DI resolver
     /// </summary>
-    public class WebHostingConfigurator : IWebHostingConfigurator
+    public class WebHostingConfigurator : BaseWebHostingConfigurator
     {
         /// <inheritdoc />
-        public IWebHostBuilder ConfigureApp(IWebHostBuilder hostBuilder)
+        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
         {
-            return hostBuilder;
-        }
-
-        /// <inheritdoc />
-        public void Configure(IApplicationBuilder app)
-        {
-            app.UseCors(builder => { builder.AllowAnyOrigin(); });
+            return app.UseCors(builder => { builder.AllowAnyOrigin(); });
         }
     }
 }

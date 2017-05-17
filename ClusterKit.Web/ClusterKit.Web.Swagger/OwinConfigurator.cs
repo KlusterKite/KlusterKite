@@ -28,7 +28,7 @@ namespace ClusterKit.Web.Swagger
     /// External additional configuration.
     /// Should be registered in DI resolver
     /// </summary>
-    public class OwinConfigurator : IWebHostingConfigurator
+    public class OwinConfigurator : BaseWebHostingConfigurator
     {
         /// <summary>
         /// Add additional http configuration

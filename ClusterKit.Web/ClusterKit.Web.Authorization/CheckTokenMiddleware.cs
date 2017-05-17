@@ -9,37 +9,69 @@
 
 namespace ClusterKit.Web.Authorization
 {
+    using System;
     using System.Threading.Tasks;
+
+    using ClusterKit.Security.Attributes;
+
+    using JetBrains.Annotations;
+
+    using Microsoft.AspNetCore.Http;
 
     /// <summary>
     /// Checks request for the invalid token to return proper result
     /// </summary>
-    public class CheckTokenMiddleware //: OwinMiddleware
+    public class CheckTokenMiddleware
     {
+        /// <summary>
+        /// The next request processor in the request processing pipeline
+        /// </summary>
+        private readonly RequestDelegate next;
 
-        /*
+        /// <summary>
+        /// The token manager.
+        /// </summary>
+        private readonly ITokenManager tokenManager;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckTokenMiddleware"/> class.
         /// </summary>
         /// <param name="next">
-        /// The next.
+        /// The next request processor in the request processing pipeline
         /// </param>
-        public CheckTokenMiddleware(OwinMiddleware next)
-            : base(next)
+        /// <param name="tokenManager">
+        /// The token Manager.
+        /// </param>
+        public CheckTokenMiddleware(RequestDelegate next, ITokenManager tokenManager)
         {
+            this.next = next;
+            this.tokenManager = tokenManager;
         }
 
-        /// <inheritdoc />
-        public override Task Invoke(IOwinContext context)
+
+        /// <summary>Process an individual request.</summary>
+        /// <param name="context">The request context</param>
+        /// <returns>The async process task</returns>
+        [UsedImplicitly]
+        public async Task Invoke(HttpContext context)
         {
-            if (context.Get<bool>("InvalidToken"))
+            var header = context.Request.Headers["Authorization"].ToString();
+            if (!string.IsNullOrWhiteSpace(header)
+                && header.IndexOf("bearer ", StringComparison.InvariantCultureIgnoreCase) == 0)
             {
-                context.Response.StatusCode = 401;
-                return Task.CompletedTask;
-            }
+                var token = header.Substring(7);
+                var ticket = await this.tokenManager.ValidateAccessToken(token);
+                if (ticket == null)
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Invalid token");
+                    return;
+                }
 
-            return this.Next.Invoke(context);
+                context.Items["AccessTicket"] = ticket;
+            }
+           
+            await this.next.Invoke(context);
         }
-        */
     }
 }
