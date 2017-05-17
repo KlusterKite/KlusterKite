@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Row } from 'formsy-react-components';
 import Icon from 'react-fa';
 
@@ -16,6 +17,7 @@ export default class Submit extends React.Component { // eslint-disable-line rea
     saveError: React.PropTypes.string,
     disabled: React.PropTypes.bool,
     onCancel: React.PropTypes.func,
+    onSubmit: React.PropTypes.func,
     onDelete: React.PropTypes.func,
   };
 
@@ -48,8 +50,8 @@ export default class Submit extends React.Component { // eslint-disable-line rea
       savedText = this.props.savedText;
     }
 
-    let disabled = !this.props.canSubmit;
-    if (this.props.disabled || this.props.saving || this.props.deleting){
+    let disabled = false;
+    if (this.props.saving || this.props.deleting){
       disabled = true;
     }
 
@@ -85,7 +87,7 @@ export default class Submit extends React.Component { // eslint-disable-line rea
           </div>
           }
 
-          <button className="btn btn-primary" disabled={disabled} type="button" onClick={this.onSubmit.bind(this)}>
+          <button className="btn btn-primary" disabled={disabled} type={this.props.submitOnEnter ? 'submit' : 'button'} onClick={this.props.onSubmit}>
             <Icon name="pencil" className={saveClassName} /> {' '} {text}
           </button>
 
@@ -100,10 +102,6 @@ export default class Submit extends React.Component { // eslint-disable-line rea
               <Icon name="remove" className={deleteClassName}/> {' '} {deleteText}
             </button>
           }
-
-          <button type="submit" ref="submitButton" disabled={!this.props.submitOnEnter} className="hidden">
-            Submit
-          </button>
         </Row>
       </fieldset>
     );

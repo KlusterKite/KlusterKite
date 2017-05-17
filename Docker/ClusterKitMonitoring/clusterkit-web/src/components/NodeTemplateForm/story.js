@@ -4,24 +4,24 @@ import { storiesOf, action } from '@kadira/storybook';
 
 import NodeTemplateForm from './NodeTemplateForm';
 
-storiesOf('Templates')
+storiesOf('Node Templates')
   .add('edit', () => {
     const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} />;
   })
   .add('edit saving', () => {
-    const template = getTemplate();
+    const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saving={true} />;
   })
   .add('edit saved', () => {
-    const template = getTemplate();
+    const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saved={true} />;
   })
   .add('edit save error', () => {
-    const template = getTemplate();
+    const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <NodeTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saveError="Cannot update this record!" />;
   })
