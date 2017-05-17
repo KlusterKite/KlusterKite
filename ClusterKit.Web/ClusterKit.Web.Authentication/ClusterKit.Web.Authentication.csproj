@@ -575,13 +575,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GrantTokenResponse.cs" />
+    <Compile Include="AuthenticationProvider.cs" />
     <Compile Include="RefreshTokenProvider.cs" />
     <Compile Include="AuthenticationExtensionsController.cs" />
     <Compile Include="AccessTokenProvider.cs" />
     <Compile Include="AuthorizationServerProvider.cs" />
     <Compile Include="DataNoProtectionProvider.cs" />
     <Compile Include="Installer.cs" />
-    <Compile Include="OwinConfigurator.cs" />
+    <Compile Include="TokenController.cs" />
+    <Compile Include="WebHostingConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configuration.Designer.cs">
       <AutoGen>True</AutoGen>

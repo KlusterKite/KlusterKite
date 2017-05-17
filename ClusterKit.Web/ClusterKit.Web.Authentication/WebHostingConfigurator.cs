@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OwinConfigurator.cs" company="ClusterKit">
+// <copyright file="WebHostingConfigurator.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Defines the OwinConfigurator type.
+//   Defines the WebHostingConfigurator type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace ClusterKit.Web.Authentication
     /// <summary>
     /// Configures current web-api server to act as OAuth2 authorization server
     /// </summary>
-    public class OwinConfigurator : IWebHostingConfigurator
+    public class WebHostingConfigurator : IWebHostingConfigurator
     {
         /// <summary>
         /// The windsor container
@@ -31,12 +31,12 @@ namespace ClusterKit.Web.Authentication
         private readonly IWindsorContainer container;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OwinConfigurator"/> class.
+        /// Initializes a new instance of the <see cref="WebHostingConfigurator"/> class.
         /// </summary>
         /// <param name="container">
         /// The container.
         /// </param>
-        public OwinConfigurator(IWindsorContainer container)
+        public WebHostingConfigurator(IWindsorContainer container)
         {
             this.container = container;
         }
@@ -93,8 +93,9 @@ namespace ClusterKit.Web.Authentication
         /// <inheritdoc />
         public void Configure(IApplicationBuilder app)
         {
-
+            app.UseCors(builder => { builder.AllowAnyOrigin(); });
             Serilog.Log.Logger.Information("------------ Setting up authorization server -------------");
+            /*
             var config = this.container.Resolve<Config>();
 
             var authorizeEndpointPath = config.GetString(
@@ -104,11 +105,8 @@ namespace ClusterKit.Web.Authentication
                 "ClusterKit.Web.AuthenticationTokenEndpointPath",
                 "/api/1.x/security/token");
 
-            //appBuilder.SetDataProtectionProvider(new DataNoProtectionProvider());
             var tokenProvider = this.container.Resolve<ITokenManager>();
-
-            app.UseOAuthAuthentication(
-                new OAuthOptions { AuthenticationScheme = "bearer", AuthorizationEndpoint = authorizeEndpointPath });
+            */
         }
     }
 }

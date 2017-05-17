@@ -54,7 +54,7 @@ namespace ClusterKit.Web.Tests.Auth
         /// <summary>
         /// Current owin bind port
         /// </summary>
-        private int OwinPort => this.Sys.Settings.Config.GetInt("ClusterKit.Web.OwinPort");
+        private int Port => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
 
         /// <summary>
         /// Basic authorization test
@@ -97,7 +97,7 @@ namespace ClusterKit.Web.Tests.Auth
         {
             this.ExpectNoMsg();
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST, Resource = "/api/1.x/security/token" };
             request.AddParameter("grant_type", "password");
@@ -114,6 +114,7 @@ namespace ClusterKit.Web.Tests.Auth
 
             if (expectedResult == HttpStatusCode.OK)
             {
+                this.Sys.Log.Info("Response: {Response}", result.Content);
                 var tokenDescription = result.Data;
                 var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
                 var accessTicket = await tokenManager.ValidateAccessToken(tokenDescription.AccessToken);
@@ -168,7 +169,7 @@ namespace ClusterKit.Web.Tests.Auth
                                       DateTimeOffset.Now.AddMinutes(1)))
                             : Guid.NewGuid().ToString("N");
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST, Resource = "/api/1.x/security/token" };
             request.AddParameter("grant_type", "refresh_token");
@@ -224,8 +225,8 @@ namespace ClusterKit.Web.Tests.Auth
                 {{
                     ClusterKit {{
  		                Web {{
-                            OwinPort = {port},
- 			                OwinBindAddress = ""http://*:{port}"",
+                            WebHostPort = {port},
+ 			                BindAddress = ""http://*:{port}"",
                             Debug.Trace = true
                         }}
                     }}

@@ -392,7 +392,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 installers.Add(new Descriptor.Installer());
                 installers.Add(new Web.Installer());
                 
-                // todo: installers.Add(new Authentication.Installer());
+                installers.Add(new Authentication.Installer());
                 installers.Add(new Web.GraphQL.Publisher.Installer());
                 installers.Add(new TestInstaller());
                 return installers;

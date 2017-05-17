@@ -23,7 +23,7 @@ namespace ClusterKit.Web.Authentication
     /// <summary>
     /// Authorization provider
     /// </summary>
-    public class AuthorizationServerProvider //: OAuthAuthorizationServerProvider
+    public class AuthorizationServerProvider
     {
         /// <summary>
         /// The key to store current client in the context
