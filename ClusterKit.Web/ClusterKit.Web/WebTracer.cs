@@ -13,22 +13,21 @@ namespace ClusterKit.Web
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using Akka.Actor;
     using Akka.Configuration;
 
     using JetBrains.Annotations;
 
-    using Microsoft.Owin;
-
-    using Owin;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
 
     /// <summary>
     /// Debug configuration
     /// </summary>
     [UsedImplicitly]
-    public class WebTracer : IOwinStartupConfigurator
+    public class WebTracer : IWebHostingConfigurator
     {
         /// <summary>
         /// The actor system
@@ -47,28 +46,23 @@ namespace ClusterKit.Web
             this.system = system;
         }
 
-        /// <summary>
-        /// Add additional http configuration
-        /// </summary>
-        /// <param name="httpConfiguration">The configuration</param>
-        public void ConfigureApi(HttpConfiguration httpConfiguration)
+        /// <inheritdoc />
+        public void Configure(IApplicationBuilder app)
         {
+            app.UseMiddleware<TraceMiddleware>(this.system);
         }
 
-        /// <summary>
-        /// Add additional owin configuration
-        /// </summary>
-        /// <param name="appBuilder">The builder</param>
-        public void ConfigureApp(IAppBuilder appBuilder)
+        /// <inheritdoc />
+        public IWebHostBuilder ConfigureApp(IWebHostBuilder appBuilder)
         {
-            appBuilder.Use<TraceMiddleware>(this.system);
+            return appBuilder;
         }
 
         /// <summary>
         /// Request process logging. Used to catch request loss
         /// </summary>
         [UsedImplicitly]
-        public class TraceMiddleware : OwinMiddleware
+        public class TraceMiddleware
         {
             /// <summary>
             /// The current request number
@@ -76,14 +70,19 @@ namespace ClusterKit.Web
             private static long requestNumber;
 
             /// <summary>
-            /// The actor system
-            /// </summary>
-            private ActorSystem system;
-
-            /// <summary>
             /// A value indicating whether all requests should be logged
             /// </summary>
-            private bool traceRequests;
+            private readonly bool traceRequests;
+
+            /// <summary>
+            /// The next request processor in the request processing pipeline
+            /// </summary>
+            private readonly RequestDelegate next;
+
+            /// <summary>
+            /// The actor system
+            /// </summary>
+            private readonly ActorSystem system;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="TraceMiddleware"/> class.
@@ -94,9 +93,9 @@ namespace ClusterKit.Web
             /// <param name="system">
             /// The system.
             /// </param>
-            public TraceMiddleware(OwinMiddleware next, ActorSystem system)
-                : base(next)
+            public TraceMiddleware(RequestDelegate next, ActorSystem system)
             {
+                this.next = next;
                 this.system = system;
                 this.traceRequests = system.Settings.Config.GetBoolean("ClusterKit.Web.Debug.Trace");
             }
@@ -104,7 +103,8 @@ namespace ClusterKit.Web
             /// <summary>Process an individual request.</summary>
             /// <param name="context">The request context</param>
             /// <returns>The async process task</returns>
-            public override async Task Invoke(IOwinContext context)
+            [UsedImplicitly]
+            public async Task Invoke(HttpContext context)
             {
                 if (this.traceRequests)
                 {
@@ -135,16 +135,15 @@ namespace ClusterKit.Web
             /// <summary>Process an individual request.</summary>
             /// <param name="context">The request context</param>
             /// <returns>The async process task</returns>
-            private async Task ProcessRequest(IOwinContext context)
+            private async Task ProcessRequest(HttpContext context)
             {
                 try
                 {
-                    await this.Next.Invoke(context);
+                    await this.next.Invoke(context);
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
-
                     this.system.Log.Error(
                         exception,
                         "{Type}: error resolving {RequestPath}",

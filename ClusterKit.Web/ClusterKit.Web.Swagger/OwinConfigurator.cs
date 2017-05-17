@@ -17,19 +17,18 @@ namespace ClusterKit.Web.Swagger
 
     using Akka.Configuration;
 
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Practices.ServiceLocation;
-
-    using Owin;
-
     using Serilog;
 
     using Swashbuckle.Application;
 
     /// <summary>
-    /// External additional owin configuration.
+    /// External additional configuration.
     /// Should be registered in DI resolver
     /// </summary>
-    public class OwinConfigurator : IOwinStartupConfigurator
+    public class OwinConfigurator : IWebHostingConfigurator
     {
         /// <summary>
         /// Add additional http configuration
@@ -37,6 +36,7 @@ namespace ClusterKit.Web.Swagger
         /// <param name="config">The configuration</param>
         public void ConfigureApi(HttpConfiguration config)
         {
+            /*
             var akkaConfig = ServiceLocator.Current.GetInstance<Config>();
             if (akkaConfig == null)
             {
@@ -76,14 +76,20 @@ namespace ClusterKit.Web.Swagger
                             });
 
             Log.Information("Swagger was set up successfully");
+            */
         }
 
-        /// <summary>
-        /// Add additional owin configuration
-        /// </summary>
-        /// <param name="appBuilder">The builder</param>
-        public void ConfigureApp(IAppBuilder appBuilder)
+        /// <inheritdoc />
+        public IWebHostBuilder ConfigureApp(IWebHostBuilder hostBuilder)
         {
+            return hostBuilder;
+        }
+
+        /// <inheritdoc />
+        public void Configure(IApplicationBuilder app)
+        {
+            // todo: enable swagger
+            //app.
         }
     }
 }

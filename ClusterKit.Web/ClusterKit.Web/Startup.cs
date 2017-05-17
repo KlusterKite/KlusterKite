@@ -9,53 +9,127 @@
 
 namespace ClusterKit.Web
 {
-    using System.Collections.Generic;
+    using System;
     using System.Linq;
-    using System.Net.Http.Formatting;
-    using System.Web.Http;
-    using System.Web.Http.Controllers;
-    using System.Web.Http.Routing;
 
     using Castle.Windsor;
 
     using JetBrains.Annotations;
+
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Microsoft.Extensions.Logging;
     using Microsoft.Practices.ServiceLocation;
-    using Owin;
+
+    using Serilog;
 
     /// <summary>
-    /// The OWIN startup class.
+    /// The web hosting startup class.
     /// </summary>
     [UsedImplicitly]
     public class Startup
     {
         /// <summary>
-        /// The Owin service configuration
+        /// The services configuration
         /// </summary>
-        /// <param name="appBuilder">The builder</param>
+        /// <param name="services">The list of services</param>
         [UsedImplicitly]
-        public void Configuration(IAppBuilder appBuilder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            var owinStartupConfigurators = ServiceLocator.Current.GetAllInstances<IOwinStartupConfigurator>().ToList();
+            services.AddSingleton<IControllerFactory, ControllerFactory>();
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            var builder = services.AddMvc();
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                builder.AddApplicationPart(assembly);
+            }
+
+            builder.AddControllersAsServices();
+        }
+
+        /// <summary>
+        /// The application configuration
+        /// </summary>
+        /// <param name="appBuilder">
+        /// The builder
+        /// </param>
+        /// <param name="env">
+        /// The env.
+        /// </param>
+        /// <param name="loggerFactory">
+        /// The logger Factory.
+        /// </param>
+        [UsedImplicitly]
+        public void Configure(IApplicationBuilder appBuilder, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddSerilog();
+            var configurators = ServiceLocator.Current.GetAllInstances<IWebHostingConfigurator>().ToList();
+
 
             // Configure Web API for self-host.
+            /*
             var config = new HttpConfiguration();
             config.MapHttpAttributeRoutes(new CustomDirectRouteProvider());
             config.Formatters.Clear();
             config.Formatters.Add(new XmlMediaTypeFormatter { UseXmlSerializer = true });
             config.Formatters.Add(new JsonMediaTypeFormatter());
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
-
-            owinStartupConfigurators.ForEach(c => c.ConfigureApi(config));
-
-            var dependencyResolver = new WindsorDependencyResolver(ServiceLocator.Current.GetInstance<IWindsorContainer>());
-            config.DependencyResolver = dependencyResolver;
+            */
             
-            config.EnsureInitialized();
+            appBuilder.UseMvc();
 
-            owinStartupConfigurators.ForEach(c => c.ConfigureApp(appBuilder));
-            appBuilder.UseWebApi(config);
+            foreach (var configurator in configurators)
+            {
+                configurator.Configure(appBuilder);
+            }
         }
 
+        /// <summary>
+        /// The controller factory
+        /// </summary>
+        private class ControllerFactory : IControllerFactory
+        {
+            /// <summary>
+            /// The windsor container
+            /// </summary>
+            private IWindsorContainer windsorContainer;
+
+            /// <inheritdoc />
+            public ControllerFactory()
+            {
+                this.windsorContainer = ServiceLocator.Current.GetInstance<IWindsorContainer>();
+            }
+
+            /// <inheritdoc />
+            public object CreateController(ControllerContext context)
+            {
+                var controllerType = context.ActionDescriptor.ControllerTypeInfo.AsType();
+                var controller = this.windsorContainer.Resolve(controllerType) as Controller;
+                if (controller == null)
+                {
+                    return null;
+                }
+
+                controller.ControllerContext = context;
+                return controller;
+            }
+
+            /// <inheritdoc />
+            public void ReleaseController(ControllerContext context, object controller)
+            {
+                var disposable = controller as IDisposable;
+                disposable?.Dispose();
+            }
+        }
+
+
+        /*
         /// <summary>
         /// Workaround to handle inherited routes
         /// </summary>
@@ -74,5 +148,6 @@ namespace ClusterKit.Web
                 return actionDescriptor.GetCustomAttributes<IDirectRouteFactory>(inherit: true);
             }
         }
+        */
     }
 }

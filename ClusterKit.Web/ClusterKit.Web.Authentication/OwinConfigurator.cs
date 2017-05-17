@@ -17,17 +17,13 @@ namespace ClusterKit.Web.Authentication
 
     using ClusterKit.Security.Attributes;
 
-    using Microsoft.Owin;
-    using Microsoft.Owin.Cors;
-    using Microsoft.Owin.Security.DataProtection;
-    using Microsoft.Owin.Security.OAuth;
-
-    using Owin;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
 
     /// <summary>
     /// Configures current web-api server to act as OAuth2 authorization server
     /// </summary>
-    public class OwinConfigurator : IOwinStartupConfigurator
+    public class OwinConfigurator : IWebHostingConfigurator
     {
         /// <summary>
         /// The windsor container
@@ -50,6 +46,7 @@ namespace ClusterKit.Web.Authentication
         {
         }
 
+        /*
         /// <inheritdoc />
         public void ConfigureApp(IAppBuilder appBuilder)
         {
@@ -84,6 +81,34 @@ namespace ClusterKit.Web.Authentication
                               };
 
             appBuilder.UseOAuthAuthorizationServer(options);
+        }
+        */
+
+        /// <inheritdoc />
+        public IWebHostBuilder ConfigureApp(IWebHostBuilder hostBuilder)
+        {
+            return hostBuilder;
+        }
+
+        /// <inheritdoc />
+        public void Configure(IApplicationBuilder app)
+        {
+
+            Serilog.Log.Logger.Information("------------ Setting up authorization server -------------");
+            var config = this.container.Resolve<Config>();
+
+            var authorizeEndpointPath = config.GetString(
+                "ClusterKit.Web.Authentication.AuthorizeEndpointPath",
+                "/api/1.x/security/authorization");
+            var tokenEndpointPath = config.GetString(
+                "ClusterKit.Web.AuthenticationTokenEndpointPath",
+                "/api/1.x/security/token");
+
+            //appBuilder.SetDataProtectionProvider(new DataNoProtectionProvider());
+            var tokenProvider = this.container.Resolve<ITokenManager>();
+
+            app.UseOAuthAuthentication(
+                new OAuthOptions { AuthenticationScheme = "bearer", AuthorizationEndpoint = authorizeEndpointPath });
         }
     }
 }

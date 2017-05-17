@@ -302,6 +302,7 @@ namespace ClusterKit.NodeManager.Launcher
                 var authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(
                     this.CurrentApiToken.AccessToken,
                     "Bearer");
+
                 var client = new RestClient(this.ConfigurationUrl) { Timeout = 5000, Authenticator = authenticator };
 
                 var request = new RestRequest { Method = Method.POST };

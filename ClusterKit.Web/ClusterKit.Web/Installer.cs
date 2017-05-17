@@ -11,6 +11,7 @@ namespace ClusterKit.Web
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Web.Http;
 
     using Akka.Actor;
@@ -22,7 +23,8 @@ namespace ClusterKit.Web
 
     using ClusterKit.Core;
 
-    using Microsoft.Owin.Hosting;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// Installing components from current library
@@ -78,15 +80,41 @@ namespace ClusterKit.Web
             }
 
             var system = this.currentContainer.Resolve<ActorSystem>();
-            var bindUrl = GetOwinBindUrl(system.Settings.Config);
+            var bindUrl = GetWebHostingBindUrl(system.Settings.Config);
+
+            var startupConfigurators = this.currentContainer.ResolveAll<IWebHostingConfigurator>().ToList();
             system.Log.Info("Starting web server on {Url}", bindUrl);
             try
             {
-                WebApp.Start<Startup>(bindUrl);
+                var host = new WebHostBuilder()
+                    .CaptureStartupErrors(true)
+                    .UseUrls(bindUrl)
+                    .UseKestrel();
+
+                foreach (var configurator in startupConfigurators)
+                {
+                    host = configurator.ConfigureApp(host);
+                }
+
+                var server = host
+                    .UseStartup<Startup>()
+                    .Build();
+
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        server.Run();
+                    }
+                    catch (Exception exception)
+                    {
+                        system.Log.Error(exception, "Web server stopped");
+                    }
+                });
             }
             catch (Exception exception)
             {
-                system.Log.Error(exception, "Could not start owin server");
+                system.Log.Error(exception, "Could not start web server");
             }
         }
 
@@ -102,17 +130,22 @@ namespace ClusterKit.Web
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
 
             container.Register(
-                Component.For<IOwinStartupConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
+                Component.For<IWebHostingConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic))
+            {
+                container.Register(Classes.FromAssembly(assembly).Where(t => t.IsSubclassOf(typeof(Controller))).LifestyleTransient());
+            }
         }
 
         /// <summary>
-        /// Reads owin bind url from configuration
+        /// Reads bind url from configuration
         /// </summary>
         /// <param name="config">The akka config</param>
-        /// <returns>The Url to bind Owin</returns>
-        private static string GetOwinBindUrl(Config config)
+        /// <returns>The Url to bind web hosting</returns>
+        private static string GetWebHostingBindUrl(Config config)
         {
-            return config.GetString("ClusterKit.Web.OwinBindAddress", "http://*:80");
+            return config.GetString("ClusterKit.Web.BindAddress", "http://*:80");
         }
     }
 }

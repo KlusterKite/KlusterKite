@@ -14,13 +14,10 @@ namespace ClusterKit.Web.Authentication
 
     using ClusterKit.Security.Attributes;
 
-    using Microsoft.Owin.Security;
-    using Microsoft.Owin.Security.Infrastructure;
-
     /// <summary>
     /// Creates authentication tokens
     /// </summary>
-    public class AccessTokenProvider : AuthenticationTokenProvider
+    public class AccessTokenProvider //: AuthenticationTokenProvider
     {
         /// <summary>
         /// The token manager
@@ -38,6 +35,7 @@ namespace ClusterKit.Web.Authentication
             this.tokenManager = tokenManager;
         }
 
+        /*
         /// <inheritdoc />
         public override async Task CreateAsync(AuthenticationTokenCreateContext context)
         {
@@ -59,5 +57,6 @@ namespace ClusterKit.Web.Authentication
                         new AuthenticationProperties { ExpiresUtc = session.Expiring, IssuedUtc = session.Created }));
             }
         }
+        */
     }
 }

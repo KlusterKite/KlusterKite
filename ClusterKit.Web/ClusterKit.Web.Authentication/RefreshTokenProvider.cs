@@ -14,13 +14,11 @@ namespace ClusterKit.Web.Authentication
 
     using ClusterKit.Security.Attributes;
 
-    using Microsoft.Owin.Security;
-    using Microsoft.Owin.Security.Infrastructure;
 
     /// <summary>
     /// Creates authentication tokens
     /// </summary>
-    public class RefreshTokenProvider : AuthenticationTokenProvider
+    public class RefreshTokenProvider //: AuthenticationTokenProvider
     {
         /// <summary>
         /// The token manager
@@ -39,6 +37,7 @@ namespace ClusterKit.Web.Authentication
         }
 
         /// <inheritdoc />
+        /*
         public override async Task CreateAsync(AuthenticationTokenCreateContext context)
         {
             var authenticationResult = context.OwinContext.Get<AuthenticationResult>(AuthorizationServerProvider.OwinContextAuthenticationResultKey);
@@ -47,9 +46,10 @@ namespace ClusterKit.Web.Authentication
                 var token = await this.tokenManager.CreateRefreshToken(authenticationResult.RefreshTicket);
                 context.SetToken(token);
             }
-        }
+        }*/
 
         /// <inheritdoc />
+        /*
         public override async Task ReceiveAsync(AuthenticationTokenReceiveContext context)
         {
             var tokenValue = context.Token;
@@ -63,5 +63,6 @@ namespace ClusterKit.Web.Authentication
                         new AuthenticationProperties { ExpiresUtc = identity.Expiring, IssuedUtc = identity.Created }));
             }
         }
+        */
     }
 }

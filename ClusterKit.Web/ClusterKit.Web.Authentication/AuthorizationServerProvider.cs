@@ -19,12 +19,11 @@ namespace ClusterKit.Web.Authentication
     using ClusterKit.Security.Client;
     using ClusterKit.Web.Authorization;
 
-    using Microsoft.Owin.Security.OAuth;
 
     /// <summary>
     /// Authorization provider
     /// </summary>
-    public class AuthorizationServerProvider : OAuthAuthorizationServerProvider
+    public class AuthorizationServerProvider //: OAuthAuthorizationServerProvider
     {
         /// <summary>
         /// The key to store current client in the context
@@ -67,6 +66,7 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
+        /*
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
             string clientId;
@@ -101,6 +101,7 @@ namespace ClusterKit.Web.Authentication
                     clientId);
             }
         }
+        */
 
         /// <summary>
         /// Called when a request to the Token endpoint arrives with a "grant_type" of "password". This occurs when the user has provided name and password
@@ -114,6 +115,7 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
+        /*
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var client = context.OwinContext.Get<IClient>(OwinContextClientKey);
@@ -152,7 +154,7 @@ namespace ClusterKit.Web.Authentication
                 "Grant password was successfull for user {UserName} with client {ClientId}",
                 context.UserName,
                 client.ClientId);
-        }
+        }*/
 
         /// <summary>
         /// Called when a request to the Token endpoint arrives with a "grant_type" of "client_credentials". This occurs when a registered client
@@ -165,6 +167,7 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
+        /*
         public override async Task GrantClientCredentials(OAuthGrantClientCredentialsContext context)
         {
             var client = context.OwinContext.Get<IClient>(OwinContextClientKey);
@@ -200,7 +203,7 @@ namespace ClusterKit.Web.Authentication
                 context.OwinContext.GetRequestDescription(),
                 "Grant client_credentials was successfull for client {ClientId}",
                 client.ClientId);
-        }
+        }*/
 
         /// <summary>
         /// Called when a request to the Token endpoint arrives with a "grant_type" of "refresh_token". This occurs if your application has issued a "refresh_token"
@@ -215,6 +218,7 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
+        /*
         public override async Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)
         {
             var refreshTicket = context.OwinContext.Get<RefreshTicket>(OwinContextRefreshTicketKey);
@@ -303,6 +307,7 @@ namespace ClusterKit.Web.Authentication
                     client.ClientId);
             }
         }
+        */
 
         /// <summary>
         /// Called at the final stage of a successful Token endpoint request. An application may implement this call in order to do any final
@@ -311,12 +316,14 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
+        /*
         public override Task TokenEndpoint(OAuthTokenEndpointContext context)
         {
             var authenticationResult = context.OwinContext.Get<AuthenticationResult>(OwinContextAuthenticationResultKey);
             context.Properties.ExpiresUtc = authenticationResult.AccessTicket.Expiring;
             return base.TokenEndpoint(context);
         }
+        */
 
         /// <summary>
         /// Called when a request to the Token endpoint arrives with a "grant_type" of any other value. If the application supports custom grant types
@@ -327,10 +334,12 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
+        /*
         public override Task GrantCustomExtension(OAuthGrantCustomExtensionContext context)
         {
             // todo: implement custom extensions
             return Task.CompletedTask;
         }
+        */
     }
 }

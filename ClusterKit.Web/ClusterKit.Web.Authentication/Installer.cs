@@ -54,7 +54,7 @@ namespace ClusterKit.Web.Authentication
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-            container.Register(Component.For<IOwinStartupConfigurator>().ImplementedBy(typeof(OwinConfigurator)));
+            container.Register(Component.For<IWebHostingConfigurator>().ImplementedBy(typeof(OwinConfigurator)));
         }
     }
 }

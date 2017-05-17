@@ -43,6 +43,7 @@ namespace ClusterKit.Web.Authorization.Attributes
         /// <inheritdoc />
         public Task ChallengeAsync(HttpAuthenticationChallengeContext context, CancellationToken cancellationToken)
         {
+            /*
             if (context.Request.GetOwinContext().GetSession() != null)
             {
                 return Task.CompletedTask;
@@ -56,7 +57,7 @@ namespace ClusterKit.Web.Authorization.Attributes
                 context.ActionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
                 context.ActionContext.ActionDescriptor.ActionName);
             context.Result = new UnauthorizedResult(new AuthenticationHeaderValue[0],  context.Request);
-
+            */
             return Task.CompletedTask;
         }
     }

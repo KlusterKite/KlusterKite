@@ -11,13 +11,13 @@ namespace ClusterKit.Web.Authorization
 {
     using System.Threading.Tasks;
 
-    using Microsoft.Owin;
-
     /// <summary>
     /// Checks request for the invalid token to return proper result
     /// </summary>
-    public class CheckTokenMiddleware : OwinMiddleware
+    public class CheckTokenMiddleware //: OwinMiddleware
     {
+
+        /*
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckTokenMiddleware"/> class.
         /// </summary>
@@ -40,5 +40,6 @@ namespace ClusterKit.Web.Authorization
 
             return this.Next.Invoke(context);
         }
+        */
     }
 }

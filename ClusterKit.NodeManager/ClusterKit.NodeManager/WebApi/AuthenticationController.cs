@@ -10,20 +10,20 @@
 namespace ClusterKit.NodeManager.WebApi
 {
     using System.Collections.Generic;
-    using System.Net;
-    using System.Web.Http;
-
+    
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization;
     using ClusterKit.Web.Authorization.Attributes;
 
+    using Microsoft.AspNetCore.Mvc;
+
     /// <summary>
     /// Authenticate web api users
     /// </summary>
-    [RoutePrefix("api/1.x/clusterkit/nodemanager/authentication")]
+    [Route("api/1.x/clusterkit/nodemanager/authentication")]
     [RequireUser]
-    public class AuthenticationController : ApiController
+    public class AuthenticationController : Controller
     {
         /// <summary>
         /// Gets the currently authenticated user name
@@ -31,17 +31,17 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>The user name</returns>
         [Route("user")]
         [HttpGet]
-        public UserDescription GetUser()
+        public IActionResult GetUser()
         {
             var session = this.GetSession();
             var description = session.User as UserDescription;
 
             if (description == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                this.NotFound();
             }
 
-            return description;
+            return this.Ok(description);
         }
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace ClusterKit.NodeManager.WebApi
         /// <returns>The user name</returns>
         [Route("userScope")]
         [HttpGet]
-        public IEnumerable<string> GetMyScope()
+        public IActionResult GetMyScope()
         {
             var session = this.GetSession();
-            return session.UserScope;
+            return this.Ok(session.UserScope);
         }
 
         /// <summary>

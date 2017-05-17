@@ -64,7 +64,7 @@ namespace ClusterKit.Web.Authorization.Attributes
             var requiredPrivilege = this.CombinePrivilegeWithActionName
                                         ? $"{this.privilege}.{actionContext.ActionDescriptor.ActionName}"
                                         : this.privilege;
-
+            /*
             var session = actionContext.Request.GetOwinContext().GetSession();
             var isAuthorized = session == null 
                 || (session.User == null && this.IgnoreOnClientOwnBehalf)
@@ -83,6 +83,9 @@ namespace ClusterKit.Web.Authorization.Attributes
             }
 
             return isAuthorized;
+            */
+
+            return false;
         }
     }
 }

@@ -10,17 +10,18 @@
 namespace ClusterKit.Web.Authentication
 {
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization;
     using ClusterKit.Web.Authorization.Attributes;
 
+    using Microsoft.AspNetCore.Mvc;
+
     /// <summary>
     /// Extensions to the standard OAuth2 methods
     /// </summary>
-    [RoutePrefix("api/1.x/security/extensions")]
-    public class AuthenticationExtensionsController : ApiController
+    [Route("api/1.x/security/extensions")]
+    public class AuthenticationExtensionsController : Controller
     {
         /// <summary>
         /// Current token manager

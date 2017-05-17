@@ -14,7 +14,6 @@ namespace ClusterKit.Web.Tests.Auth
     using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using Akka.Configuration;
 
@@ -27,6 +26,8 @@ namespace ClusterKit.Web.Tests.Auth
     using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization;
     using ClusterKit.Web.Authorization.Attributes;
+
+    using Microsoft.AspNetCore.Mvc;
 
     using RestSharp;
     using RestSharp.Authenticators;
@@ -254,9 +255,9 @@ namespace ClusterKit.Web.Tests.Auth
         /// <summary>
         /// The testing web api controller
         /// </summary>
-        [RoutePrefix("test")]
+        [Route("test")]
         [RequireSession]
-        public class TestController : ApiController
+        public class TestController : Controller
         {
             /// <summary>
             /// Tests user authentication
@@ -358,15 +359,15 @@ namespace ClusterKit.Web.Tests.Auth
         /// <summary>
         /// The testing web api controller
         /// </summary>
-        [RoutePrefix("public")]
-        public class PublicTestController : ApiController
+        [Route("public")]
+        public class PublicTestController : Controller
         {
             /// <summary>
             /// Tests user authentication
             /// </summary>
             /// <returns>The user name</returns>
-            [HttpGet]
-            [Route("test")]
+            [System.Web.Http.HttpGet]
+            [System.Web.Http.Route("test")]
             public string GetUserSession()
             {
                 return "Hello world";

@@ -13,12 +13,13 @@ namespace ClusterKit.Web.Authorization
 
     using ClusterKit.Security.Attributes;
 
-    using Owin;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
 
     /// <summary>
     /// Configures current web-api server to act as OAuth2 authorization server
     /// </summary>
-    public class OwinConfigurator : IOwinStartupConfigurator
+    public class OwinConfigurator : IWebHostingConfigurator
     {
         /// <summary>
         /// The token manager
@@ -41,11 +42,19 @@ namespace ClusterKit.Web.Authorization
         {
         }
 
+
+
         /// <inheritdoc />
-        public void ConfigureApp(IAppBuilder appBuilder)
+        public IWebHostBuilder ConfigureApp(IWebHostBuilder hostBuilder)
         {
-            appBuilder.Use<Authorizer>(new Authorizer.AuthorizerOptions("Bearer", this.tokenManager));
-            appBuilder.Use<CheckTokenMiddleware>();
+            throw new System.NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public void Configure(IApplicationBuilder app)
+        {
+            // app.UseMiddleware<Authorizer>(new Authorizer.AuthorizerOptions("Bearer", this.tokenManager));
+            app.UseMiddleware<CheckTokenMiddleware>();
         }
     }
 }
