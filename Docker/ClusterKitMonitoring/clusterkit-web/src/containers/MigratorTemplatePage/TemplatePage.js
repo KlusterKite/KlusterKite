@@ -60,7 +60,7 @@ class TemplatePage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
+            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -102,7 +102,7 @@ class TemplatePage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
+            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -115,7 +115,7 @@ class TemplatePage extends React.Component {
   };
 
   onCancel = () => {
-    browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`)
+    browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`)
   };
 
   render () {

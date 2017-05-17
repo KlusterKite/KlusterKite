@@ -1,8 +1,10 @@
 import React from 'react';
 import Relay from 'react-relay'
+import { browserHistory } from 'react-router'
 
 import { Link } from 'react-router';
 
+import Paginator from '../Paginator/Paginator';
 import DateFormat from '../../utils/date';
 
 export class ReleasesList extends React.Component {
@@ -13,7 +15,13 @@ export class ReleasesList extends React.Component {
 
   static propTypes = {
     clusterKitNodesApi: React.PropTypes.object,
+    itemsPerPage: React.PropTypes.number,
+    currentPage: React.PropTypes.number,
   };
+
+  onPageChange(page) {
+    browserHistory.push(`/clusterkit/Releases/${page}`);
+  }
 
   render() {
     if (!this.props.clusterKitNodesApi.releases){
@@ -24,7 +32,7 @@ export class ReleasesList extends React.Component {
     return (
       <div>
         <h3>Releases list</h3>
-        <Link to={`/clusterkit/Releases/create`} className="btn btn-primary" role="button">Add a new release</Link>
+        <Link to={`/clusterkit/Release/create`} className="btn btn-primary" role="button">Add a new release</Link>
         <table className="table table-hover">
           <thead>
             <tr>
@@ -44,7 +52,7 @@ export class ReleasesList extends React.Component {
             return (
               <tr key={`${node.id}`}>
                 <td>
-                  <Link to={`/clusterkit/Releases/${encodeURIComponent(node.id)}`}>
+                  <Link to={`/clusterkit/Release/${encodeURIComponent(node.id)}`}>
                     {node.name}
                   </Link>
                 </td>
@@ -58,6 +66,12 @@ export class ReleasesList extends React.Component {
           }
           </tbody>
         </table>
+        <Paginator
+          totalItems={this.props.clusterKitNodesApi.releases.count}
+          currentPage={this.props.currentPage}
+          itemsPerPage={this.props.itemsPerPage}
+          onSelect={this.onPageChange}
+        />
 
       </div>
     );
@@ -67,9 +81,13 @@ export class ReleasesList extends React.Component {
 export default Relay.createContainer(
   ReleasesList,
   {
+    initialVariables: {
+      itemsPerPage: null,
+      offset: null,
+    },
     fragments: {
-      clusterKitNodesApi: () => Relay.QL`fragment on IClusterKitNodeApi_Root {
-        releases(sort: created_asc) {
+      clusterKitNodesApi: (variables) => Relay.QL`fragment on IClusterKitNodeApi_Root {
+        releases(sort: created_desc, limit: $itemsPerPage, offset: $offset) {
           edges {
             node {
               id
@@ -84,6 +102,7 @@ export default Relay.createContainer(
               isStable
             }
           }
+          count
         }
       }
       `,
