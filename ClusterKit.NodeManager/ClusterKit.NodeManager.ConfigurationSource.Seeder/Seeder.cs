@@ -298,7 +298,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
             var adminPrivileges = new List<IEnumerable<PrivilegeDescription>>
                                       {
                                           Utils.GetDefinedPrivileges(typeof(Privileges)),
-                                          Utils.GetDefinedPrivileges(typeof(Web.Swagger.Messages.Privileges)),
                                           Utils.GetDefinedPrivileges(typeof(Monitoring.Client.Privileges))
                                       };
 

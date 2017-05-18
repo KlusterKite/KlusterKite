@@ -9,12 +9,9 @@
 
 namespace ClusterKit.Web.Authorization
 {
-    using System.Web.Http;
-
     using ClusterKit.Security.Attributes;
 
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
 
     /// <summary>
     /// Configures current web-api server to act as OAuth2 authorization server

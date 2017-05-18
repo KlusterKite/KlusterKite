@@ -12,8 +12,7 @@ namespace ClusterKit.Web
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Web.Http;
-
+    
     using Akka.Actor;
     using Akka.Configuration;
 
@@ -76,7 +75,7 @@ namespace ClusterKit.Web
             foreach (var registeredAssembly in registeredAssemblies)
             {
                 this.currentContainer.Register(
-                    Classes.FromAssembly(registeredAssembly).BasedOn<ApiController>().LifestyleScoped());
+                    Classes.FromAssembly(registeredAssembly).BasedOn<Controller>().LifestyleTransient());
             }
 
             var system = this.currentContainer.Resolve<ActorSystem>();
@@ -88,8 +87,8 @@ namespace ClusterKit.Web
                     .CaptureStartupErrors(true)
                     .UseUrls(bindUrl)
                     .UseKestrel();
-                var server = host.UseStartup<Startup>().Build();
 
+                var server = host.UseStartup<Startup>().Build();
                 Task.Run(() =>
                 {
                     try
@@ -121,11 +120,6 @@ namespace ClusterKit.Web
 
             container.Register(
                 Component.For<IWebHostingConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
-
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic))
-            {
-                container.Register(Classes.FromAssembly(assembly).Where(t => t.IsSubclassOf(typeof(Controller))).LifestyleTransient());
-            }
         }
 
         /// <summary>

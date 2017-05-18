@@ -624,6 +624,7 @@
   <ItemGroup>
     <Compile Include="Auth\AuthenticationTests.cs" />
     <Compile Include="Auth\AuthorizationTests.cs" />
+    <Compile Include="Controllers\HelloWorldController.cs" />
     <Compile Include="Controllers\PublicTestController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="ControllerTests.cs" />
@@ -639,8 +640,6 @@
     <Compile Include="GraphQL\SchemeGeneratorTests.cs" />
     <Compile Include="NginxConfiguratorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwaggerDescriptorTest.cs" />
-    <Compile Include="SwaggerMonitorTests.cs" />
     <Compile Include="WebDescriptorTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -671,18 +670,6 @@
     <ProjectReference Include="..\ClusterKit.Web.NginxConfigurator\ClusterKit.Web.NginxConfigurator.csproj">
       <Project>{81cb9b1a-25b1-46a8-8806-0bcf5595386e}</Project>
       <Name>ClusterKit.Web.NginxConfigurator</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.Swagger.Messages\ClusterKit.Web.Swagger.Messages.csproj">
-      <Project>{d80f5923-cd1b-4376-bab5-1785ea4395a9}</Project>
-      <Name>ClusterKit.Web.Swagger.Messages</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.Swagger.Monitor\ClusterKit.Web.Swagger.Monitor.csproj">
-      <Project>{061cc7cb-942a-47d0-8ac9-3ad9ca4a98e8}</Project>
-      <Name>ClusterKit.Web.Swagger.Monitor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ClusterKit.Web.Swagger\ClusterKit.Web.Swagger.csproj">
-      <Project>{c483b28a-cdfd-4569-a8f3-cb979fa83e31}</Project>
-      <Name>ClusterKit.Web.Swagger</Name>
     </ProjectReference>
     <ProjectReference Include="..\ClusterKit.Web\ClusterKit.Web.csproj">
       <Project>{477b201a-a30c-4360-b56a-6f61c049bb04}</Project>

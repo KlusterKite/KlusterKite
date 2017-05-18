@@ -100,12 +100,13 @@ namespace ClusterKit.Web
         /// <summary>
         /// The controller factory
         /// </summary>
+        [UsedImplicitly]
         private class ControllerFactory : IControllerFactory
         {
             /// <summary>
             /// The windsor container
             /// </summary>
-            private IWindsorContainer windsorContainer;
+            private readonly IWindsorContainer windsorContainer;
 
             /// <inheritdoc />
             public ControllerFactory()
@@ -134,27 +135,5 @@ namespace ClusterKit.Web
                 disposable?.Dispose();
             }
         }
-
-
-        /*
-        /// <summary>
-        /// Workaround to handle inherited routes
-        /// </summary>
-        private class CustomDirectRouteProvider : DefaultDirectRouteProvider
-        {
-            /// <summary>
-            /// Gets a set of route factories for the given action descriptor.
-            /// </summary>
-            /// <returns>
-            /// A set of route factories.
-            /// </returns>
-            /// <param name="actionDescriptor">The action descriptor.</param>
-            protected override IReadOnlyList<IDirectRouteFactory> GetActionRouteFactories(HttpActionDescriptor actionDescriptor)
-            {
-                // inherit route attributes decorated on base class controller's actions
-                return actionDescriptor.GetCustomAttributes<IDirectRouteFactory>(inherit: true);
-            }
-        }
-        */
     }
 }

@@ -22,8 +22,6 @@ namespace ClusterKit.Web.Tests
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
 
-    using Microsoft.AspNetCore.Mvc;
-
     using RestSharp;
     
     using Xunit;
@@ -60,6 +58,7 @@ namespace ClusterKit.Web.Tests
             var result = await client.ExecuteTaskAsync(request);
 
             Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
+            this.Sys.Log.Info("Response: {Response}", result.Content);
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             Assert.Equal("Hello world", result.Content);
         }
@@ -134,25 +133,6 @@ namespace ClusterKit.Web.Tests
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
             }
-        }
-    }
-
-    /// <summary>
-    /// The testing web api controller
-    /// </summary>
-    [Route("testController")]
-    // ReSharper disable once StyleCop.SA1402
-    public class PublicTestController : Controller
-    {
-        /// <summary>
-        /// Tests simple string method
-        /// </summary>
-        /// <returns>The test string</returns>
-        [HttpGet]
-        [Route("method")]
-        public IActionResult HelloWorld()
-        {
-            return this.Ok("Hello world");
         }
     }
 }

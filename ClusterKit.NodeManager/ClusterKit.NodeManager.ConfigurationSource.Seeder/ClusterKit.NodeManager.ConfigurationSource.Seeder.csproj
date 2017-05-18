@@ -366,10 +366,6 @@
       <Project>{42524C94-892D-4258-BD2C-D6F24D7BFABB}</Project>
       <Name>ClusterKit.Security.Attributes</Name>
     </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Swagger.Messages/ClusterKit.Web.Swagger.Messages.csproj">
-      <Project>{D80F5923-CD1B-4376-BAB5-1785EA4395A9}</Project>
-      <Name>ClusterKit.Web.Swagger.Messages</Name>
-    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj">
       <Project>{F3216B61-26C8-4AD6-84DF-4531D4C568A2}</Project>
       <Name>ClusterKit.Monitoring.Client</Name>

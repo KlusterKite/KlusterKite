@@ -565,8 +565,6 @@
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="WebTracer.cs" />
-    <Compile Include="WindsorDependencyResolver.cs" />
-    <Compile Include="WindsorDependencyScope.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

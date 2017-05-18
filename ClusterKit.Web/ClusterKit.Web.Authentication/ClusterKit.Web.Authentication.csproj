@@ -577,10 +577,7 @@
   <ItemGroup>
     <Compile Include="GrantTokenResponse.cs" />
     <Compile Include="AuthenticationProvider.cs" />
-    <Compile Include="RefreshTokenProvider.cs" />
     <Compile Include="AuthenticationExtensionsController.cs" />
-    <Compile Include="AccessTokenProvider.cs" />
-    <Compile Include="AuthorizationServerProvider.cs" />
     <Compile Include="DataNoProtectionProvider.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="TokenController.cs" />

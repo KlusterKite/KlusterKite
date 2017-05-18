@@ -10,7 +10,6 @@ namespace ClusterKit.Web.Authorization.Attributes
 {
     using System;
     using System.Linq;
-    using System.Web.Http.Controllers;
 
     using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;

@@ -48,7 +48,9 @@ namespace ClusterKit.Web
         /// <inheritdoc />
         public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
         {
-            return app.UseMiddleware<TraceMiddleware>(this.system);
+            app = app.UseMiddleware<TraceMiddleware>(this.system);
+            this.system.Log.Info("{Type}: installed TraceMiddleware to web server", this.GetType().Name);
+            return app;
         }
 
         /// <summary>

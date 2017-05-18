@@ -685,10 +685,6 @@
       <Project>{6ADFBDDF-E452-46FC-A037-6D57300BE561}</Project>
       <Name>ClusterKit.Web.Authorization</Name>
     </ProjectReference>
-    <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.Swagger.Messages/ClusterKit.Web.Swagger.Messages.csproj">
-      <Project>{D80F5923-CD1B-4376-BAB5-1785EA4395A9}</Project>
-      <Name>ClusterKit.Web.Swagger.Messages</Name>
-    </ProjectReference>
     <ProjectReference Include="../.././ClusterKit.Web/ClusterKit.Web.GraphQL.Publisher/ClusterKit.Web.GraphQL.Publisher.csproj">
       <Project>{45219CB4-7189-49C6-A95B-AEBBAED4645E}</Project>
       <Name>ClusterKit.Web.GraphQL.Publisher</Name>
