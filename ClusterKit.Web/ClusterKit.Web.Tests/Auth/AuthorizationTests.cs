@@ -70,7 +70,7 @@ namespace ClusterKit.Web.Tests.Auth
         }
 
         /// <summary>
-        /// Current owin bind port
+        /// Current server bind port
         /// </summary>
         private int Port => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
 

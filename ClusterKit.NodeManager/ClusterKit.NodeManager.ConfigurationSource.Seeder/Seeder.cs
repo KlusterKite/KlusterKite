@@ -186,8 +186,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.Monitoring",
                                              "ClusterKit.NodeManager",
                                              "ClusterKit.Data.EF.Npgsql",
-                                             "ClusterKit.Web.Swagger.Monitor",
-                                             "ClusterKit.Web.Swagger",
                                              "ClusterKit.Log.Console",
                                              "ClusterKit.Log.ElasticSearch",
                                              "ClusterKit.Web.Authentication",

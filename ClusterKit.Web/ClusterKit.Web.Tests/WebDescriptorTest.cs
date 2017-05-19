@@ -61,7 +61,6 @@ namespace ClusterKit.Web.Tests
                     .Ask<WebDescriptionResponse>(new WebDescriptionRequest(), TimeSpan.FromMilliseconds(500))
                     .Result;
 
-            Assert.NotNull(response);
             Assert.True(response.Services.Any(s => s.Route == "firstServiceRoot"));
             Assert.True(response.Services.Any(s => s.Route == "secondServiceRoot/secondServiceBranch"));
             Assert.True(response.Services.Any(s => s.Route == "thirdServiceRoot"));

@@ -178,11 +178,9 @@ namespace ClusterKit.NodeManager.Tests
                                    TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(2, descriptions.Count);
-            Assert.Equal(
-                false,
+            Assert.False(
                 descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
-            Assert.Equal(
-                true,
+            Assert.True(
                 descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
         }
 
@@ -247,11 +245,9 @@ namespace ClusterKit.NodeManager.Tests
                                    TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(2, descriptions.Count);
-            Assert.Equal(
-                false,
+            Assert.False(
                 descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
-            Assert.Equal(
-                false,
+            Assert.False(
                 descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
         }
 
@@ -1584,7 +1580,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(1, migration.FromReleaseId);
             Assert.Equal(2, migration.ToReleaseId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
-            Assert.Equal(null, migration.Direction);
+            Assert.Null(migration.Direction);
         }
 
         /// <summary>
@@ -1651,7 +1647,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(1, migration.FromReleaseId);
             Assert.Equal(2, migration.ToReleaseId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
-            Assert.Equal(null, migration.Direction);
+            Assert.Null(migration.Direction);
         }
 
         /// <summary>

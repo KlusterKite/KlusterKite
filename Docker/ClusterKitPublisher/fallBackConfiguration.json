@@ -1,5 +1,5 @@
 {
-  "Configuration": "{\n   ClusterKit {\n     Web {\n       Nginx {\n         PathToConfig = \"/etc/nginx/sites-enabled/clusterkit.config\"\n         ReloadCommand {\n           Command = /etc/init.d/nginx\n           Arguments = reload\n         } \n         Configuration {\n           default {\n             \"location /clusterkit\" { \n               proxy_pass = \"http://monitoringUI/clusterkit\"\n             }\n           }\n         }\n       }\n     }\n   }\n \n   akka {\n     remote {\n       helios {\n         tcp {\n           hostname = 0.0.0.0\n           port = 0\n         }\n       }\n     }\n     cluster {\n       seed-nodes = []\n     }\n   }\n }\n",
+  "Configuration": "{\n   ClusterKit {\n     Web {\n       Nginx {\n         PathToConfig = \"/etc/nginx/sites-enabled/clusterkit.config\"\n         ReloadCommand {\n           Command = /etc/init.d/nginx\n           Arguments = reload\n         } \n         Configuration {\n           default {\n             \"location /clusterkit\" { \n               proxy_pass = \"http://monitoringUI/clusterkit\"\n             }\n           }\n         }\n       }\n     }\n   }\n}",
   "NodeTemplate": "publisher",
   "ReleaseId": 1,
   "Packages": [
@@ -192,34 +192,6 @@
       "Version": "3.2.3"
     },
     {
-      "Id": "Microsoft.AspNet.SignalR.Core",
-      "Version": "2.2.1"
-    },
-    {
-      "Id": "Microsoft.AspNet.SignalR.Utils",
-      "Version": "2.2.1"
-    },
-    {
-      "Id": "Microsoft.AspNet.WebApi.Client",
-      "Version": "5.2.3"
-    },
-    {
-      "Id": "Microsoft.AspNet.WebApi.Core",
-      "Version": "5.2.3"
-    },
-    {
-      "Id": "Microsoft.AspNet.WebApi.Cors",
-      "Version": "5.2.3"
-    },
-    {
-      "Id": "Microsoft.AspNet.WebApi.Owin",
-      "Version": "5.2.3"
-    },
-    {
-      "Id": "Microsoft.AspNet.WebApi.OwinSelfHost",
-      "Version": "5.2.3"
-    },
-    {
       "Id": "Microsoft.AspNet.WebPages",
       "Version": "3.2.3"
     },
@@ -229,39 +201,19 @@
     },
     {
       "Id": "Microsoft.Extensions.DependencyInjection.Abstractions",
-      "Version": "1.1.0"
+      "Version": "1.1.1"
     },
     {
       "Id": "Microsoft.Extensions.Logging",
-      "Version": "1.1.1"
+      "Version": "1.1.2"
     },
     {
       "Id": "Microsoft.Extensions.Logging.Abstractions",
-      "Version": "1.1.1"
+      "Version": "1.1.2"
     },
     {
       "Id": "Microsoft.NETCore.Platforms",
       "Version": "1.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin",
-      "Version": "3.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin.Cors",
-      "Version": "3.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin.Host.HttpListener",
-      "Version": "3.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin.Hosting",
-      "Version": "3.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin.Security",
-      "Version": "3.1.0"
     },
     {
       "Id": "Microsoft.Web.Infrastructure",
@@ -278,10 +230,6 @@
     {
       "Id": "Newtonsoft.Json",
       "Version": "10.0.2"
-    },
-    {
-      "Id": "Owin",
-      "Version": "1.0.0"
     },
     {
       "Id": "Serilog",
@@ -341,7 +289,7 @@
     },
     {
       "Id": "System.Diagnostics.DiagnosticSource",
-      "Version": "4.3.0"
+      "Version": "4.3.1"
     },
     {
       "Id": "System.Diagnostics.Tools",

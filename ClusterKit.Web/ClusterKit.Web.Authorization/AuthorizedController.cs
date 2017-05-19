@@ -26,7 +26,7 @@ namespace ClusterKit.Web.Authorization
         /// <summary>
         /// Gets security request description
         /// </summary>
-        /// <param name="context">The owin context</param>
+        /// <param name="context">The http context</param>
         /// <returns>The security request description</returns>
         [UsedImplicitly]
         public static RequestContext GetRequestDescription(this HttpContext context)
@@ -82,7 +82,7 @@ namespace ClusterKit.Web.Authorization
         /// <summary>
         /// Gets authenticated user session or null
         /// </summary>
-        /// <param name="context">The owin context</param>
+        /// <param name="context">The http context</param>
         /// <returns>The user session</returns>
         [UsedImplicitly]
         public static string GetAuthenticationToken(this HttpContext context)

@@ -61,9 +61,6 @@ let projects = [|
              "ClusterKit.Web.NginxConfigurator"; 
              "ClusterKit.Web.SignalR"; 
              "ClusterKit.Web.Descriptor"; 
-             "ClusterKit.Web.Swagger.Messages"; 
-             "ClusterKit.Web.Swagger.Monitor"; 
-             "ClusterKit.Web.Swagger"; 
              "ClusterKit.Web"; 
              "ClusterKit.Web.Authentication"; 
              "ClusterKit.Security.Client"; 
@@ -92,9 +89,9 @@ let projects = [|
 
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Client/ClusterKit.NodeManager.Client.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.Data.CRUD"; "ClusterKit.NodeManager.Migrator"|]))
     new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.Authentication/ClusterKit.NodeManager.Authentication.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Client"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.Data.CRUD"|]))
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"|]))
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource.Migrator/ClusterKit.NodeManager.ConfigurationSource.Migrator.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Migrator"; "ClusterKit.NodeManager.Migrator.EF"; "ClusterKit.NodeManager.ConfigurationSource"|]))
-    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource.Seeder/ClusterKit.NodeManager.ConfigurationSource.Seeder.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Web.Swagger.Messages"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Migrator"; "ClusterKit.NodeManager.Migrator.EF"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.NodeManager.ConfigurationSource.Migrator"|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ClusterKit.NodeManager.ConfigurationSource.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource.Migrator/ClusterKit.NodeManager.ConfigurationSource.Migrator.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Migrator"; "ClusterKit.NodeManager.Migrator.EF"; "ClusterKit.NodeManager.ConfigurationSource"|]))
+    new ProjectDescription("ClusterKit.NodeManager", "./ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource.Seeder/ClusterKit.NodeManager.ConfigurationSource.Seeder.csproj", ProjectDescription.EnProjectType.NugetPackage, ([|"ClusterKit.Core"; "ClusterKit.Data.EF"; "ClusterKit.Data"; "ClusterKit.LargeObjects.Client"; "ClusterKit.LargeObjects"; "ClusterKit.Data.CRUD"; "ClusterKit.Security.Client"; "ClusterKit.Security.Attributes";  "ClusterKit.NodeManager.Client"; "ClusterKit.Monitoring.Client"; "ClusterKit.API.Client"; "ClusterKit.API.Attributes"; "ClusterKit.NodeManager.Launcher.Messages"; "ClusterKit.NodeManager.Migrator"; "ClusterKit.NodeManager.Migrator.EF"; "ClusterKit.NodeManager.ConfigurationSource"; "ClusterKit.NodeManager.ConfigurationSource.Migrator"|]))
 
     new ProjectDescription(
         "ClusterKit.NodeManager",
@@ -118,7 +115,6 @@ let projects = [|
             "ClusterKit.Security.Client"; 
             "ClusterKit.Security.Attributes"; 
             "ClusterKit.Web.Authorization";           
-            "ClusterKit.Web.Swagger.Messages"; 
             "ClusterKit.Monitoring.Client";
             "ClusterKit.API.Client"; 
             "ClusterKit.API.Attributes"; 
@@ -153,7 +149,6 @@ let projects = [|
             "ClusterKit.Security.Client"; 
             "ClusterKit.Security.Attributes"; 
             "ClusterKit.Web.Authorization";
-            "ClusterKit.Web.Swagger.Messages"; 
             "ClusterKit.Web.GraphQL.Publisher";
             "ClusterKit.Monitoring.Client";
             "ClusterKit.API.Client"; 

@@ -27,7 +27,7 @@ namespace ClusterKit.Core
         /// <summary>
         /// Scans main application directory for libraries and windsor installers in them and installs them
         /// </summary>
-        /// <param name="container">
+        /// <param name="container"> 
         /// Current windsor container
         /// </param>
         /// <param name="installAssemblies">
@@ -41,10 +41,46 @@ namespace ClusterKit.Core
                 if (!string.IsNullOrWhiteSpace(dir))
                 {
                     var files = Directory.GetFiles(dir, "*.dll");
+                    ResolveEventHandler handler = (sender, args) => Assembly.ReflectionOnlyLoad(args.Name);
+                    AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += handler;
+
+                    string[] stopList = new[] { "System.Runtime.InteropServices.RuntimeInformation" };
+                    
                     foreach (var file in files)
                     {
-                        Assembly.LoadFrom(file);
+                        try
+                        {
+                            var assemblyName = AssemblyName.GetAssemblyName(file);
+                            if (stopList.Contains(assemblyName.FullName))
+                            {
+                                continue;
+                            }
+
+                            if (assemblyName != null)
+                            {
+                                // workaround of https://github.com/dotnet/corefx/pull/18307 and https://github.com/dotnet/corefx/issues/15112
+                                if (Type.GetType("Mono.Runtime") != null)
+                                {
+                                    var assembly = Assembly.ReflectionOnlyLoadFrom(file);
+                                    var preferInbox = assembly.GetCustomAttributes(typeof(AssemblyMetadataAttribute))
+                                        .OfType<AssemblyMetadataAttribute>()
+                                        .FirstOrDefault(a => a.Key == "PreferInbox");
+                                    if (preferInbox?.Value.ToLower() == "true")
+                                    {
+                                        continue;
+                                    }
+                                }
+                                
+                                Assembly.LoadFrom(file);
+                            }
+                        }
+                        catch 
+                        {
+                            // ignore
+                        }
                     }
+
+                    AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= handler;
                 }
             }
 

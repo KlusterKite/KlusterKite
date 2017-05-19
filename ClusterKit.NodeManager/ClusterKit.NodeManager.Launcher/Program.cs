@@ -10,6 +10,7 @@
 namespace ClusterKit.NodeManager.Launcher
 {
     using System;
+    using System.Collections.Generic;
     using System.Configuration;
     using System.Diagnostics;
     using System.Globalization;
@@ -27,6 +28,7 @@ namespace ClusterKit.NodeManager.Launcher
 
     using NuGet.Common;
     using NuGet.Frameworks;
+    using NuGet.Packaging;
 
     using RestSharp;
     using RestSharp.Authenticators;
@@ -400,18 +402,43 @@ namespace ClusterKit.NodeManager.Launcher
                 ConfigurationManager.AppSettings["frameworkRuntimeType"],
                 new DefaultFrameworkNameProvider());
 
+            var runtime = ConfigurationManager.AppSettings["runtime"];
+
             foreach (var localPackageInfo in packages)
             {
                 using (var reader = localPackageInfo.GetReader())
                 {
-                    var specificGroup = NuGetFrameworkUtility.GetNearest(reader.GetLibItems(), targetFramework);
-                    if (specificGroup == null || specificGroup.HasEmptyFolder)
+                    var runtimeSpecific = reader.GetFiles($"runtimes/{runtime}")
+                        .Select(
+                            f =>
+                                {
+                                    var pathParts = f.Split('/');
+                                    return new
+                                               {
+                                                   Runtime = pathParts[1],
+                                                   Framework = NuGetFramework.ParseFolder(pathParts[2]),
+                                                   File = f
+                                               };
+                                })
+                        .GroupBy(f => f.Framework)
+                        .Select(g => new FrameworkSpecificGroup(g.Key, g.Select(f => f.File)))
+                        .ToList();
+                    var additionalFiles = NuGetFrameworkUtility.GetNearest(runtimeSpecific, targetFramework)?.Items.ToList()
+                                          ?? new List<string>();
+                    var nativeFiles = runtimeSpecific
+                                          .FirstOrDefault(f => f.TargetFramework.GetShortFolderName() == "native")
+                                          ?.Items.ToList() ?? new List<string>();
+
+                    var specificGroup = NuGetFrameworkUtility.GetNearest(reader.GetLibItems(), targetFramework)?.Items ?? new List<string>();
+                    var files = specificGroup.Union(nativeFiles).Union(additionalFiles).ToList();
+
+                    if (files.Count == 0)
                     {
                         Console.WriteLine($@"!!Package {localPackageInfo.Identity.Id} is empty");
                         continue;
                     }
 
-                    foreach (var item in specificGroup.Items)
+                    foreach (var item in files)
                     {
                         Console.WriteLine($@"Installing {localPackageInfo.Identity.Id} {item}");
                         var fileName = item.Split('/').Last();
@@ -478,34 +505,40 @@ namespace ClusterKit.NodeManager.Launcher
 
             foreach (var lib in Directory.GetFiles(dirName, "*.dll"))
             {
-                var parameters = AssemblyName.GetAssemblyName(lib);
-                var dependentNode =
-                    assemblyBindingNode?.SelectSingleNode(
-                        $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
-                        namespaceManager)
-                    ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
-
-                if (dependentNode == null)
+                try
                 {
-                    continue;
-                }
+                    var parameters = AssemblyName.GetAssemblyName(lib);
+                    var dependentNode =
+                        assemblyBindingNode?.SelectSingleNode(
+                            $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
+                            namespaceManager)
+                        ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
 
-                dependentNode.RemoveAll();
-                var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
-                assemblyIdentityNode.SetAttribute("name", parameters.Name);
-                var publicKeyToken =
-                    BitConverter.ToString(parameters.GetPublicKeyToken())
+                    if (dependentNode == null)
+                    {
+                        continue;
+                    }
+
+                    dependentNode.RemoveAll();
+                    var assemblyIdentityNode =
+                        (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
+                    assemblyIdentityNode.SetAttribute("name", parameters.Name);
+                    var publicKeyToken = BitConverter.ToString(parameters.GetPublicKeyToken())
                         .Replace("-", string.Empty)
                         .ToLower(CultureInfo.InvariantCulture);
-                assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
-                var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
-                bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
-                bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
+                    assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
+                    var bindingRedirectNode =
+                        (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
+                    bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
+                    bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
 
-                // Console.WriteLine($"{parameters.Name} {parameters.Version} {BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", "").ToLower(CultureInfo.InvariantCulture)}");
-                Console.WriteLine($@"{parameters.Name} {parameters.Version}");
+                    // Console.WriteLine($"{parameters.Name} {parameters.Version} {BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", "").ToLower(CultureInfo.InvariantCulture)}");
+                    Console.WriteLine($@"{parameters.Name} {parameters.Version}");
+                }
+                catch
+                {
+                    Console.WriteLine($@"Could not check version of {lib}");
+                }
             }
 
             confDoc.Save(configName);
