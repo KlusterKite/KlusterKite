@@ -61,31 +61,19 @@ namespace ClusterKit.Monitoring.Client {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to  {
-        /// 	ClusterKit {
-        /// 		Web {
-        ///            Services {
-        ///               /MonitoringApi = Monitoring
-        ///               /signalr = Monitoring
-        ///            }
-        /// 		}
+        ///   Looks up a localized string similar to {
+        ///    ClusterKit.Monitoring.ScanMemoize = 10s
+        ///	akka.actor.deployment {
         ///
-        /// 		Monitoring {
-        /// 			PingFrequency = 2s
-        /// 			PingTimeout = 2s,
-        /// 			BroadcastClientFrequency = 5s,
-        /// 			RemoveMemberTimeout = 1h
-        /// 		}
-        /// 	}
+        ///		/Monitoring {
+        ///			IsNameSpace = true
+        ///		}
         ///
-        /// 	akka.actor.deployment {
-        /// 		 /Monitoring {
-        ///            IsNameSpace = true
+        ///		/Monitoring/Scanner {
+        ///            type = &quot;ClusterKit.Monitoring.Client.ScanActor, ClusterKit.Monitoring.Client&quot;
         ///        }
-        ///
-        ///        /Monitoring/Watcher {
-        ///            type = &quot;ClusterKit.Monitoring.Actors.WatcherActor, ClusterKit.Monitoring&quot;
-        ///  [rest of string was truncated]&quot;;.
+        ///	}
+        ///}.
         /// </summary>
         internal static string AkkaConfig {
             get {

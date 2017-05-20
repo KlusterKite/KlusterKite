@@ -499,7 +499,6 @@ namespace ClusterKit.NodeManager
                 releaseId,
                 plan.MigratorPlans.Values.SelectMany(m => m.Resources.Values).Count());
 
-
             var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
             var appDomain = AppDomain.CreateDomain("MigratorDomain", new Evidence(), appDomainSetup);
 
@@ -526,7 +525,6 @@ namespace ClusterKit.NodeManager
                         this.GetType().Name,
                         logMessage);
                 }
-
 
                 Context.GetLogger().Info(
                     "{Type}: {MigratorTemplateCode} of release {ReleaseId} migration executor was executed",

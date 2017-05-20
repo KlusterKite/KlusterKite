@@ -66,22 +66,21 @@ namespace ClusterKit.Core {
         ///      
         ///      stdout-loglevel : INFO
         ///      loggers : [&quot;Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog&quot;]
-        ///      log-config-on-start : on
+        ///      log-config-on-start : off
         ///      loglevel : INFO
         ///
         ///      actor : {
-        ///        provider = &quot;Akka.Cluster.ClusterActorRefProvider, Akka.Cluster&quot;
-        ///        default-dispatcher {
-        ///          type = TaskDispatcher
+        ///
+        ///        serializers {
+        ///          hyperion = &quot;Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion&quot;
+        ///          json = &quot;Akka.Serialization.NewtonSoftJsonSerializer&quot;
         ///        }
         ///
-        ///        deployment {
-        ///          /Core {
-        ///            IsNameSpace = true
-        ///          }
+        ///        serialization-bindings {
+        ///           &quot;System.Object&quot; = hyperion
+        ///        } 
         ///
-        ///          /Core/Ping {
-        ///            type = &quot;ClusterKit.Core.Ping.PingA [rest of string was truncated]&quot;;.
+        ///        provider = &quot;Akka.C [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AkkaConfig {
             get {

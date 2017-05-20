@@ -733,19 +733,20 @@ namespace ClusterKit.NodeManager.Tests
                                            }.ToList()
                                };
 
+            var packageDescriptions = repo.Search(string.Empty, true)
+                .Select(
+                    p => new PackageDescription
+                             {
+                                 Id = p.Id,
+                                 Version = p.Version.ToString()
+                             })
+                .ToList();
+
             var configuration = new ReleaseConfiguration
                                     {
                                         NodeTemplates = new[] { template }.ToList(),
                                         MigratorTemplates = new[] { migrator }.ToList(),
-                                        Packages =
-                                            repo.Search(string.Empty, true)
-                                                .Select(
-                                                    p => new PackageDescription
-                                                             {
-                                                                 Id = p.Id,
-                                                                 Version = p.Version.ToString()
-                                                             })
-                                                .ToList(),
+                                        Packages = packageDescriptions,
                                         NugetFeeds = new[] { new NugetFeed() }.ToList(),
                                         SeedAddresses = new[] { "http://seed" }.ToList()
                                     };

@@ -89,6 +89,9 @@ namespace ClusterKit.NodeManager.WebApi
         /// <summary>
         /// Gets the current cluster release
         /// </summary>
+        /// <returns>
+        /// The current migration
+        /// </returns>
         [DeclareField("The current cluster release")]
         [RequireSession]
         [RequireUser]

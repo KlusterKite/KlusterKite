@@ -39,7 +39,7 @@ namespace ClusterKit.Core.TestKit
             var config = ConfigurationFactory.ParseString(
                 @"
                 akka.actor.serialize-messages = on
-                akka.actor.serialize-creators = on
+                akka.actor.serialize-creators = off
             ");
 
             return BaseInstaller.GetStackedConfig(windsorContainer, config);

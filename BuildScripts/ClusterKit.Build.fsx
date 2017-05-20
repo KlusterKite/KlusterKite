@@ -65,27 +65,26 @@ Target "RefreshLocalDependencies" (fun _ ->
 )
 
 // runs all xunit tests
-Target "Test" (fun _ ->
-   
-   
-    let testAssemblies = (BuildUtils.GetProjects() 
-        |> Seq.where (fun p -> p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests))
-        |> Seq.map(fun project -> Path.Combine(project.TempBuildDirectory, project.ProjectName + ".dll")))
+Target "Test" (fun _ ->      
+    let testAssemblies = (BuildUtils.GetProjects()
+                            |> Seq.where(fun p -> p.ProjectType.HasFlag(ProjectDescription.EnProjectType.XUnitTests))
+                            |> Seq.map(fun project -> Path.Combine(project.TempBuildDirectory, project.ProjectName + ".dll")))
 
-    let runnerLocation = (Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages")) 
-        |> Seq.filter(fun d -> d.IndexOf("xunit.runner.console") > 0)
-        |> Seq.sortByDescending (fun d -> d) 
-        |> Seq.head)
+    let runnerLocation = (
+        Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "packages")) 
+            |> Seq.filter( fun d -> d.IndexOf("xunit.runner.console") > 0)
+            |> Seq.sortByDescending (fun d -> d) 
+            |> Seq.head)
 
     
-    ensureDirectory Path.Combine(buildDir, "testResults")
+    ensureDirectory(Path.Combine(buildDir, "testResults"))
 
-    testAssemblies |> Fake.Testing.XUnit2.xUnit2 ( fun p -> {p with
-                                                      ForceTeamCity = true;
-                                                      ToolPath = Path.Combine(runnerLocation, "tools", "xunit.console.exe");
-                                                      TimeOut = TimeSpan.FromHours(1.0);
-                                                      Parallel =  Fake.Testing.XUnit2.ParallelMode.NoParallelization;
-                                                      HtmlOutputPath = Some Path.Combine(buildDir, "testResults", "result.html");
+    testAssemblies |> Fake.Testing.XUnit2.xUnit2 (fun p -> { p with
+                                                                ForceTeamCity = true;
+                                                                ToolPath = Path.Combine(runnerLocation, "tools", "xunit.console.exe");
+                                                                TimeOut = TimeSpan.FromHours(1.0);
+                                                                Parallel =  Fake.Testing.XUnit2.ParallelMode.NoParallelization;
+                                                                HtmlOutputPath = Some (Path.Combine(buildDir, "testResults", "result.html"));
                                                       } )
                                                       
 
