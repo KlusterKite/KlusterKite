@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
-    <PackageId>ClusterKit.Data.EF.Npgsql</PackageId>
+    <PackageId>ClusterKit.Data.CRUD</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
     <Description>Bundle of utils to create scalable and redundant services</Description>
@@ -9,11 +9,4 @@
     <Product>ClusterKit</Product>
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="EntityFramework6.Npgsql" Version="3.1.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data.EF\ClusterKit.Data.EF.csproj" />
-  </ItemGroup>
 </Project>
