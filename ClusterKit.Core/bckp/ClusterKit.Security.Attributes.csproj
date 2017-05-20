@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
-    <PackageId>ClusterKit.Security.Client</PackageId>
+    <PackageId>ClusterKit.Security.Attributes</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
     <Description>Bundle of utils to create scalable and redundant services</Description>
@@ -9,8 +9,4 @@
     <Product>ClusterKit</Product>
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
-    <ProjectReference Include="..\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj" />
-  </ItemGroup>
 </Project>
