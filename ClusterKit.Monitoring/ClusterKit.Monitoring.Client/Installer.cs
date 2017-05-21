@@ -10,7 +10,6 @@
 namespace ClusterKit.Monitoring.Client
 {
     using System.Collections.Generic;
-    using System.Web.Http;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -54,7 +53,6 @@ namespace ClusterKit.Monitoring.Client
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-            container.Register(Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ApiController))).LifestyleTransient());
         }
     }
 }

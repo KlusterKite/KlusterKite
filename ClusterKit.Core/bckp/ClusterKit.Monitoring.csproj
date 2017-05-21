@@ -9,10 +9,4 @@
     <Product>ClusterKit</Product>
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web\ClusterKit.Web.csproj" />
-    <ProjectReference Include="..\ClusterKit.Monitoring.Client\ClusterKit.Monitoring.Client.csproj" />
-  </ItemGroup>
 </Project>
