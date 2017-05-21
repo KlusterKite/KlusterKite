@@ -1,4 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
     <PackageId>ClusterKit.Core.Service</PackageId>
@@ -8,6 +11,9 @@
     <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
     <Product>ClusterKit</Product>
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
+    <ApplicationIcon />
+    <OutputTypeEx>library</OutputTypeEx>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="docopt.net" Version="0.6.1.9" />
