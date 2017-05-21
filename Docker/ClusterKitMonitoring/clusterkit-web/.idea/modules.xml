@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/clusterkit-boilerplate.iml" filepath="$PROJECT_DIR$/.idea/clusterkit-boilerplate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/clusterkit-web.iml" filepath="$PROJECT_DIR$/.idea/clusterkit-web.iml" />
     </modules>
   </component>
 </project>
