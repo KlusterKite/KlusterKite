@@ -468,11 +468,11 @@ namespace ClusterKit.NodeManager.Launcher
 
             var nameTable = confDoc.NameTable;
             var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string Uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", Uri);
+            const string uri = "urn:schemas-microsoft-com:asm.v1";
+            namespaceManager.AddNamespace("urn", uri);
 
             var assemblyBindingNode = runTimeNode.SelectSingleNode("./urn:assemblyBinding", namespaceManager)
-                                      ?? runTimeNode.AppendChild(confDoc.CreateElement("assemblyBinding", Uri));
+                                      ?? runTimeNode.AppendChild(confDoc.CreateElement("assemblyBinding", uri));
 
             foreach (var lib in Directory.GetFiles(dirName, "*.dll"))
             {
@@ -481,7 +481,7 @@ namespace ClusterKit.NodeManager.Launcher
                     assemblyBindingNode?.SelectSingleNode(
                         $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
                         namespaceManager)
-                    ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
+                    ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", uri));
 
                 if (dependentNode == null)
                 {
@@ -490,7 +490,7 @@ namespace ClusterKit.NodeManager.Launcher
 
                 dependentNode.RemoveAll();
                 var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
+                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);
                 var publicKeyToken =
                     BitConverter.ToString(parameters.GetPublicKeyToken())
@@ -498,7 +498,7 @@ namespace ClusterKit.NodeManager.Launcher
                         .ToLower(CultureInfo.InvariantCulture);
                 assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
                 var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
+                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
 

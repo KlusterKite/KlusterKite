@@ -940,8 +940,8 @@ namespace ClusterKit.NodeManager
 
             var nameTable = configDoc.NameTable;
             var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string Uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", Uri);
+            const string uri = "urn:schemas-microsoft-com:asm.v1";
+            namespaceManager.AddNamespace("urn", uri);
             var files = Directory.GetFiles(appDirectory, "*.dll");
             var assemblyBindingNode = configDoc.DocumentElement?.SelectSingleNode(
                 "/configuration/runtime/urn:assemblyBinding",
@@ -954,16 +954,16 @@ namespace ClusterKit.NodeManager
             foreach (var file in files)
             {
                 var assemblyName = AssemblyName.GetAssemblyName(file);
-                var dependentNode = assemblyBindingNode.AppendChild(configDoc.CreateElement("dependentAssembly", Uri));
+                var dependentNode = assemblyBindingNode.AppendChild(configDoc.CreateElement("dependentAssembly", uri));
                 var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("assemblyIdentity", Uri));
+                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("assemblyIdentity", uri));
                 assemblyIdentityNode.SetAttribute("name", assemblyName.Name);
                 var publicKeyToken = BitConverter.ToString(assemblyName.GetPublicKeyToken())
                     .Replace("-", string.Empty)
                     .ToLower(CultureInfo.InvariantCulture);
                 assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
                 var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("bindingRedirect", Uri));
+                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("bindingRedirect", uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{assemblyName.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", assemblyName.Version.ToString());
             }

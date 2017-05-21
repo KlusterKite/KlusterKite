@@ -7,8 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using Castle.Components.DictionaryAdapter;
-
 namespace ClusterKit.NodeManager.Client.ORM
 {
     using System;

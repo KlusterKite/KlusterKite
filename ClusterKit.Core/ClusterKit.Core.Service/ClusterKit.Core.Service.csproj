@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
-    <OutputType>Library</OutputType>
+    <OutputType>exe</OutputType>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
@@ -12,7 +12,7 @@
     <Product>ClusterKit</Product>
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <ApplicationIcon />
-    <OutputTypeEx>library</OutputTypeEx>
+    <OutputTypeEx>exe</OutputTypeEx>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>

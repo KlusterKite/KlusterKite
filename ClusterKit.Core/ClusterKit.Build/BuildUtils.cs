@@ -807,11 +807,11 @@ EndGlobal
             XmlDocument nuspecData,
             XmlElement filesRootElement)
         {
-            const string TargetFramework = "net45";
+            const string targetFramework = "net45";
 
             var fileElement = (XmlElement)filesRootElement.AppendChild(nuspecData.CreateElement("file"));
             fileElement.SetAttribute("src", "**/*.*");
-            fileElement.SetAttribute("target", $"lib/{TargetFramework}");
+            fileElement.SetAttribute("target", $"lib/{targetFramework}");
             fileElement.SetAttribute("exclude", "tools/**/*.*");
 
             var assemblies = Directory.GetFiles(project.CleanBuildDirectory, "*.dll");
@@ -821,7 +821,7 @@ EndGlobal
                 var referencesRootElement = metaData.AppendChild(nuspecData.CreateElement("references"));
                 var referenceGroupElement =
                     (XmlElement)referencesRootElement.AppendChild(nuspecData.CreateElement("group"));
-                referenceGroupElement.SetAttribute("targetFramework", TargetFramework);
+                referenceGroupElement.SetAttribute("targetFramework", targetFramework);
 
                 foreach (var file in assemblies)
                 {
