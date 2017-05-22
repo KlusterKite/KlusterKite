@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.Monitoring.Tests</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -15,10 +15,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.GraphQL.Publisher\ClusterKit.Web.GraphQL.Publisher.csproj" />
-    <ProjectReference Include="..\ClusterKit.Monitoring.Client\ClusterKit.Monitoring.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.Monitoring\ClusterKit.Monitoring.csproj" />
   </ItemGroup>
 </Project>

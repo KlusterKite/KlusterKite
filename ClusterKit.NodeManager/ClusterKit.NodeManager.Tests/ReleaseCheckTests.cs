@@ -199,7 +199,7 @@ namespace ClusterKit.NodeManager.Tests
             this.WriteErrors(errors);
             Assert.Equal(1, errors.Count);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"p3\"]", errors[0].Field);
-            Assert.Equal($"Package dependency for {Net45} dp3 doesn't satisfy version requirements", errors[0].Message);
+            Assert.Equal($"Package dependency for {Net45} dp3 1.0.0 doesn't satisfy version requirements 2.0.0.", errors[0].Message);
         }
 
         /// <summary>

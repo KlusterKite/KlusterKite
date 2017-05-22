@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.Data.Tests</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -10,6 +10,8 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CommonServiceLocator" Version="1.3.0" />
+    <PackageReference Include="Effort" Version="1.3.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.console" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
@@ -17,9 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
     <ProjectReference Include="..\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data.EF.Effort\ClusterKit.Data.EF.Effort.csproj" />
     <ProjectReference Include="..\ClusterKit.Data.EF\ClusterKit.Data.EF.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data.TestKit\ClusterKit.Data.TestKit.csproj" />
     <ProjectReference Include="..\ClusterKit.Data\ClusterKit.Data.csproj" />
   </ItemGroup>
 </Project>

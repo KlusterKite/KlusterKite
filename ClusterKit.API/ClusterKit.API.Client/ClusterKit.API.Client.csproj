@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.API.Client</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -10,9 +10,10 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
+    <PackageReference Include="Akka" Version="1.2.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Client\ClusterKit.Security.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj" />
   </ItemGroup>
 </Project>

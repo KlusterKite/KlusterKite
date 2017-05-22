@@ -34,7 +34,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// The .NET Framework 4.5 name
         /// </summary> 
-        public const string Net45 = ".NETFramework,Version=v4.5";
+        public const string Net45 = ".NETFramework,Version=v4.6";
 
         /// <summary>
         /// The .NET Standard 1.1 name
@@ -145,8 +145,23 @@ namespace ClusterKit.NodeManager.Tests
                          };
             nodeTemplates.Add(t1);
 
+            var migratorTemplates = new List<MigratorTemplate>();
+            var m1 = new MigratorTemplate
+                         {
+                             Code = "t1",
+                             Configuration = "t1",
+                             PackageRequirements =
+                                 CreatePackageRequirement(templatePackageRequirements),
+                         };
+            migratorTemplates.Add(m1);
+
             var releaseConfiguration =
-                new ReleaseConfiguration { Packages = packageDescriptions, NodeTemplates = nodeTemplates };
+                new ReleaseConfiguration
+                    {
+                        Packages = packageDescriptions,
+                        NodeTemplates = nodeTemplates,
+                        MigratorTemplates = migratorTemplates
+                    };
 
             return new Release { Configuration = releaseConfiguration };
         }

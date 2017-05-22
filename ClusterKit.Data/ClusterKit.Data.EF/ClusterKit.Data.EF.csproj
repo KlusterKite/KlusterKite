@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.Data.EF</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -15,10 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj" />
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Client\ClusterKit.Security.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
     <ProjectReference Include="..\ClusterKit.Data\ClusterKit.Data.csproj" />
   </ItemGroup>

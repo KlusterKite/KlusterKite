@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.Data.EF.Npgsql</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>

@@ -731,7 +731,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_create(input: {newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId""}) {
+                    call: testApi_connection_create(input: {newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId""}) {
                     clientMutationId,
                     node {
                         id,
@@ -880,7 +880,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_create(input: {newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId""}) {
+                    call: testApi_connection_create(input: {newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world"", value: 13}, clientMutationId: ""testClientMutationId""}) {
                     mutationId: clientMutationId,
                     nodeElement: node {
                         globalId: id,
@@ -1067,7 +1067,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_delete(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110""}) {
+                    call: testApi_connection_delete(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110""}) {
                     node {
                         id,
                         __id,
@@ -1208,7 +1208,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_typedMutation(input: {uid: ""3BEEE369-11DF-4A30-BF11-1D8465C87110""}) {
+                    call: testApi_connection_typedMutation(input: {uid: ""3BEEE369-11DF-4A30-BF11-1D8465C87110""}) {
                     node {
                         id,
                         __id,
@@ -1358,7 +1358,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}}) {
+                    call: testApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}}) {
                     node {
                         id,
                         __id,
@@ -1511,7 +1511,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_nestedSync_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}}) {
+                    call: testApi_nestedSync_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87110"", newNode: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", name: ""hello world"", value: 13}}) {
                     node {
                         id,
                         __id,
@@ -1656,7 +1656,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", newNode: { name: ""hello world"", value: 13}}) {
+                    call: testApi_connection_update(input: {id: ""3BEEE369-11DF-4A30-BF11-1D8465C87111"", newNode: { name: ""hello world"", value: 13}}) {
                     errors {                        
                         count,
                         edges {
@@ -2326,7 +2326,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_nestedAsync_setName(input: {name: ""hello world"", clientMutationId: ""test client id""}) {
+                    call: testApi_nestedAsync_setName(input: {name: ""hello world"", clientMutationId: ""test client id""}) {
                         result {
                             name
                         },
@@ -2402,7 +2402,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = $@"                           
             mutation M {{
-                    call: TestApi_nestedAsync_setObject(input: {{ input:  {input}}}) {{
+                    call: testApi_nestedAsync_setObject(input: {{ input:  {input}}}) {{
                         result {{
                             name,
                             type,
@@ -2472,7 +2472,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_boolMutation {
+                    call: testApi_boolMutation {
                         result
                     }
             }            
@@ -2513,7 +2513,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_connection_untypedMutation(input: {uid: ""2ECCD307-8BF5-464D-97B3-D56A9944C2E0""}) {
+                    call: testApi_connection_untypedMutation(input: {uid: ""2ECCD307-8BF5-464D-97B3-D56A9944C2E0""}) {
                         result,
                         api {
                            syncScalarField
@@ -2825,7 +2825,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
             var query = @"
             mutation M {                
-                TestApi_authorizedMutation(input: {clientMutationId: ""test""}) {
+                testApi_authorizedMutation(input: {clientMutationId: ""test""}) {
                     result,
                     clientMutationId,
                     api {
@@ -2977,20 +2977,20 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"
             mutation {                
-                untyped: TestApi_loggedMutation {
+                untyped: testApi_loggedMutation {
                     result
                 },
-                create: TestApi_loggedConnection_create(input: { newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world""} }) {
+                create: testApi_loggedConnection_create(input: { newNode: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", name: ""hello world""} }) {
                     node {
                         name
                     }
                 },
-                update: TestApi_loggedConnection_update(input: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", newNode: { name: ""updated world""} }) {
+                update: testApi_loggedConnection_update(input: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"", newNode: { name: ""updated world""} }) {
                     node {
                         name
                     }
                 },
-                delete: TestApi_loggedConnection_delete(input: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"" }) {
+                delete: testApi_loggedConnection_delete(input: {id: ""251FEEA8-D3AC-461D-A385-0CF2BA7A74E8"" }) {
                     node {
                         name
                     }
@@ -3231,7 +3231,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = $@"
             mutation M {{        
-                m: TestApi_{mutationName}({arguments}) {{
+                m: testApi_{mutationName}({arguments}) {{
                     node {{
                         name
                     }}
@@ -3338,8 +3338,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                               ""message"": ""Error trying to resolve api."",
                               ""locations"": [
                                 {
-                                  ""line"": 3,
-                                  ""column"": 17
+                                  ""Line"": 3,
+                                  ""Column"": 17
                                 }
                               ]
                             }
@@ -3420,7 +3420,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = @"                          
             mutation M {
-                    call: TestApi_asyncObjectMethodAsField_setName(input: {name: ""hello world"", clientMutationId: ""test client id""}) {
+                    call: testApi_asyncObjectMethodAsField_setName(input: {name: ""hello world"", clientMutationId: ""test client id""}) {
                         result {
                             name
                         },

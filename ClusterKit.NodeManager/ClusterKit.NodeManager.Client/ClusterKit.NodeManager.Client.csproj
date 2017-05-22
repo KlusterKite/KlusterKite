@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager.Client</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -18,7 +18,6 @@
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Client\ClusterKit.Security.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.Migrator\ClusterKit.NodeManager.Migrator.csproj" />
   </ItemGroup>

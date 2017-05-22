@@ -4,7 +4,7 @@
 		NodeManager {
 			PackageRepository = "http://nuget/"
 			SupportedFrameworks = [
-				".NETFramework,Version=v4.5"
+				".NETFramework,Version=v4.6"
 			]
 
 			//ConfigurationDatabaseConnectionString = ""

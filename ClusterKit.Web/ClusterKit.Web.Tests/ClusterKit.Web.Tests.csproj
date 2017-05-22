@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.Web.Tests</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -10,9 +10,11 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CommonServiceLocator" Version="1.3.0" />
+    <PackageReference Include="Microsoft.AspNet.Cors" Version="5.2.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
     <PackageReference Include="RestSharp" Version="105.2.3" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.console" Version="2.2.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
@@ -26,7 +28,6 @@
     <ProjectReference Include="..\ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.GraphQL.Publisher\ClusterKit.Web.GraphQL.Publisher.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.NginxConfigurator\ClusterKit.Web.NginxConfigurator.csproj" />
-    <ProjectReference Include="..\ClusterKit.Web.Rest\ClusterKit.Web.Rest.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.Swagger.Messages\ClusterKit.Web.Swagger.Messages.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.Swagger.Monitor\ClusterKit.Web.Swagger.Monitor.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.Swagger\ClusterKit.Web.Swagger.csproj" />

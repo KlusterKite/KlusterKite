@@ -396,7 +396,7 @@ namespace ClusterKit.NodeManager.Launcher
             var packages = packageReader.GetPackages(NullLogger.Instance, CancellationToken.None);
 
             var targetFramework = NuGetFramework.ParseFrameworkName(
-                ".NETFramework,Version=v4.5",
+                ".NETFramework,Version=v4.6",
                 new DefaultFrameworkNameProvider());
 
             foreach (var localPackageInfo in packages)

@@ -11,6 +11,7 @@ namespace ClusterKit.Web.Authorization
 {
     using System.Linq;
     using System.Net.Http;
+    using System.Reflection;
     using System.Web.Http;
 
     using ClusterKit.Security.Attributes;

@@ -90,34 +90,31 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <summary>
         /// Processes the GraphQL post request
         /// </summary>
-        /// <param name="request">The request</param>
         /// <param name="query">The query data</param>
         /// <returns>GraphQL response</returns>
         [HttpPost]
         [Route]
-        public async Task<HttpResponseMessage> Post(HttpRequestMessage request, JObject query)
+        public async Task<HttpResponseMessage> Post(JObject query)
         {
-            var queryToExecute =
-                (string)
-                (query.Properties()
-                         .FirstOrDefault(p => p.Name.Equals("query", StringComparison.InvariantCultureIgnoreCase))
-                         ?.Value as JValue);
+            var queryToExecute = (string)(query.Properties()
+                                              .FirstOrDefault(
+                                                  p => p.Name.Equals(
+                                                      "query",
+                                                      StringComparison.InvariantCultureIgnoreCase))?.Value as JValue);
 
             if (string.IsNullOrWhiteSpace(queryToExecute))
             {
-                return request.CreateResponse(HttpStatusCode.BadRequest);
+                return new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest };
             }
 
-            var operationName =
-                (string)
-                (query.Properties()
-                     .FirstOrDefault(p => p.Name.Equals("OperationName", StringComparison.InvariantCultureIgnoreCase))
-                     ?.Value as JValue);
+            var operationName = (string)(query.Properties()
+                                             .FirstOrDefault(
+                                                 p => p.Name.Equals(
+                                                     "OperationName",
+                                                     StringComparison.InvariantCultureIgnoreCase))?.Value as JValue);
 
-            var variablesToken =
-                query.Properties()
-                    .FirstOrDefault(
-                        p => p.Name.Equals("variables", StringComparison.InvariantCultureIgnoreCase))?.Value;
+            var variablesToken = query.Properties()
+                .FirstOrDefault(p => p.Name.Equals("variables", StringComparison.InvariantCultureIgnoreCase))?.Value;
 
             Inputs inputs = null;
             if (variablesToken is JObject)
@@ -133,7 +130,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var schema = this.schemaProvider.CurrentSchema;
             if (schema == null)
             {
-                return request.CreateResponse(HttpStatusCode.ServiceUnavailable);
+                return new HttpResponseMessage { StatusCode = HttpStatusCode.ServiceUnavailable };
             }
 
             var result = await this.executor.ExecuteAsync(
@@ -153,8 +150,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
             var json = this.writer.Write(result);
 
-            var response = request.CreateResponse(httpResult);
-            response.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = new HttpResponseMessage { StatusCode = httpResult, Content = content };
 
             return response;
         }

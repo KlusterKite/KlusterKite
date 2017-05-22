@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.Monitoring</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -12,7 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web\ClusterKit.Web.csproj" />
     <ProjectReference Include="..\ClusterKit.Monitoring.Client\ClusterKit.Monitoring.Client.csproj" />
   </ItemGroup>
 </Project>

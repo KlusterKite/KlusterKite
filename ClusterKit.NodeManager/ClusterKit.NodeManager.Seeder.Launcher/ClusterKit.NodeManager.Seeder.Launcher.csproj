@@ -3,7 +3,7 @@
     <OutputType>exe</OutputType>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager.Seeder.Launcher</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>

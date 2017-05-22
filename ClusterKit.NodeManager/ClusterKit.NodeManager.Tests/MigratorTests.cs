@@ -1000,6 +1000,7 @@ namespace ClusterKit.NodeManager.Tests
             /// <returns>The test repository</returns>
             private IPackageRepository CreateTestRepository()
             {
+                var ignoredAssemblies = new List<string>();
                 while (true)
                 {
                     var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -1011,7 +1012,7 @@ namespace ClusterKit.NodeManager.Tests
                         .OrderBy(p => p.r.Name)
                         .Select(p => p.r)
                         .Distinct()
-                        .Where(a => loadedAssemblies.All(l => l.GetName().Name != a.Name))
+                        .Where(a => loadedAssemblies.All(l => l.GetName().Name != a.Name) && !ignoredAssemblies.Contains(a.Name))
                         .ToList();
 
                     if (assembliesToLoad.Count == 0)
@@ -1021,7 +1022,15 @@ namespace ClusterKit.NodeManager.Tests
 
                     foreach (var assemblyName in assembliesToLoad)
                     {
-                        AppDomain.CurrentDomain.Load(assemblyName);
+                        try
+                        {
+                            AppDomain.CurrentDomain.Load(assemblyName);
+                        }
+                        catch 
+                        {
+                            ignoredAssemblies.Add(assemblyName.Name);
+                            // ignore
+                        }
                     }
                 }
 

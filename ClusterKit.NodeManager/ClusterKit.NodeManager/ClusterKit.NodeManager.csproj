@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
@@ -15,9 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.EF\ClusterKit.Data.EF.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.Authentication\ClusterKit.NodeManager.Authentication.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource\ClusterKit.NodeManager.ConfigurationSource.csproj" />
   </ItemGroup>

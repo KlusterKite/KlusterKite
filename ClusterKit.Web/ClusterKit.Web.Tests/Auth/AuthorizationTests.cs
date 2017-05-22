@@ -24,6 +24,7 @@ namespace ClusterKit.Web.Tests.Auth
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
+    using ClusterKit.Core.Utils;
     using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization;
     using ClusterKit.Web.Authorization.Attributes;
@@ -79,29 +80,32 @@ namespace ClusterKit.Web.Tests.Auth
         /// <summary>
         /// Checks various authorization combinations
         /// </summary>
-        /// <param name="authenticationType">The authentication type</param>
+        /// <param name="authenticationTypeString">The authentication type</param>
         /// <param name="method">The requested method</param>
         /// <param name="expectedResult">The expected response code</param>
         /// <returns>The async task</returns>
         [Theory]
-        [InlineData(EnAuthenticationType.None, "session", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "session", HttpStatusCode.OK)]
-        [InlineData(EnAuthenticationType.Client, "session", HttpStatusCode.OK)]
-        [InlineData(EnAuthenticationType.None, "user", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "user", HttpStatusCode.OK)]
-        [InlineData(EnAuthenticationType.Client, "user", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "AuthorizedUserAction", HttpStatusCode.NoContent)]
-        [InlineData(EnAuthenticationType.Client, "AuthorizedUserAction", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "UnauthorizedUserAction", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.Client, "UnauthorizedUserAction", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "UnauthorizedClientUserAction", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.Client, "UnauthorizedClientUserAction", HttpStatusCode.Unauthorized)]
-        [InlineData(EnAuthenticationType.User, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
-        [InlineData(EnAuthenticationType.Client, "AuthorizedEitherClientUserAction", HttpStatusCode.NoContent)]
-        [InlineData(EnAuthenticationType.User, "authorizedUserExactAction", HttpStatusCode.NoContent)]
-        [InlineData(EnAuthenticationType.User, "unauthorizedUserExactAction", HttpStatusCode.Unauthorized)]
-        public async Task CheckAuthorization(EnAuthenticationType authenticationType, string method, HttpStatusCode expectedResult) 
+        [InlineData("None", "session", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("User", "session", (int)HttpStatusCode.OK)]
+        [InlineData("Client", "session", (int)HttpStatusCode.OK)]
+        [InlineData("None", "user", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("User", "user", (int)HttpStatusCode.OK)]
+        [InlineData("Client", "user", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("User", "AuthorizedUserAction", (int)HttpStatusCode.NoContent)]
+        [InlineData("Client", "AuthorizedUserAction", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("User", "UnauthorizedUserAction", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("Client", "UnauthorizedUserAction", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("User", "UnauthorizedClientUserAction", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("Client", "UnauthorizedClientUserAction", (int)HttpStatusCode.Unauthorized)]
+        [InlineData("User", "AuthorizedEitherClientUserAction", (int)HttpStatusCode.NoContent)]
+        [InlineData("Client", "AuthorizedEitherClientUserAction", (int)HttpStatusCode.NoContent)]
+        [InlineData("User", "authorizedUserExactAction", (int)HttpStatusCode.NoContent)]
+        [InlineData("User", "unauthorizedUserExactAction", (int)HttpStatusCode.Unauthorized)]
+        public async Task CheckAuthorization(string authenticationTypeString, string method, HttpStatusCode expectedResult)
         {
+            EnAuthenticationType authenticationType =
+                (EnAuthenticationType)Enum.Parse(typeof(EnAuthenticationType), authenticationTypeString);
+
             this.ExpectNoMsg();
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/test") { Timeout = 5000 };
@@ -118,7 +122,7 @@ namespace ClusterKit.Web.Tests.Auth
             var request = new RestRequest { Method = Method.GET, Resource = method };
             request.AddHeader("Accept", "application/json, text/json");
             var result = await client.ExecuteTaskAsync(request);
-
+            this.Sys.Log.Info("Result: {Result}", result.Content);
             Assert.Equal(expectedResult, result.StatusCode);
         }
 

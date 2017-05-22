@@ -127,7 +127,7 @@ namespace ClusterKit.Data.EF
         }
 
         /// <summary>
-        /// Adds an object to datasource
+        /// Adds an object to data source
         /// </summary>
         /// <param name="obj">The object to add</param>
         /// <returns>Async execution task</returns>
@@ -139,7 +139,7 @@ namespace ClusterKit.Data.EF
         }
 
         /// <summary>
-        /// Updates an object in datasource
+        /// Updates an object in data source
         /// </summary>
         /// <param name="newData">The new object's data</param>
         /// <param name="oldData">The old object's data</param>
@@ -158,9 +158,9 @@ namespace ClusterKit.Data.EF
         protected virtual DbQuery<TObject> GetDbQuery() => this.GetDbSet();
 
         /// <summary>
-        /// Gets the dataset from current context
+        /// Gets the data set from current context
         /// </summary>
-        /// <returns>The dataset</returns>
+        /// <returns>The data set</returns>
         protected abstract DbSet<TObject> GetDbSet();
     }
 }

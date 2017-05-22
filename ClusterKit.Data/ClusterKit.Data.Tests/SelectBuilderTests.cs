@@ -77,10 +77,11 @@ namespace ClusterKit.Data.Tests
         /// <returns>The test context</returns>
         private TestDataContext CreateContext()
         {
+            Effort.Provider.EffortProviderConfiguration.RegisterProvider();
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDataContext(connection, false);
-            context.Database.Delete();
-
+            
+            // context.Database.Delete();
             var users =
                 Enumerable.Range(1, 100).Select(n => new User { Login = $"user{n:####}", Uid = Guid.NewGuid(), Roles = new List<Role>() }).ToList();
             var roles =
