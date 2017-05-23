@@ -8,6 +8,7 @@
     <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
     <Product>ClusterKit</Product>
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="3.4.0" />

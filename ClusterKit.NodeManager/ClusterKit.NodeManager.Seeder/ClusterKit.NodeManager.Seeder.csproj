@@ -1,10 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
-    <OutputType>exe</OutputType>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
-    <OutputType>exe</OutputType>
-  </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager.Seeder</PackageId>
@@ -16,7 +10,10 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
+    <OutputType>exe</OutputType>
+    <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
     <StartupObject />
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />

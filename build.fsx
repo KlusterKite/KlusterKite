@@ -112,16 +112,14 @@ Target "DockerContainers" (fun _ ->
 )
 
 
-//"DockerBase" ?=> "CleanDockerImages"
-//"DockerContainers" ?=> "CleanDockerImages"
-//"DockerBase" ?=> "DockerContainers"
+"DockerBase" ?=> "CleanDockerImages"
+"DockerContainers" ?=> "CleanDockerImages"
+"DockerBase" ?=> "DockerContainers"
 
 // prepares docker images
-//Target "FinalBuildDocker" (fun _ -> ())
-//"CleanPackageCache" ==> "FinalBuildDocker"
-//"DockerBase" ==> "FinalBuildDocker"
-//"DockerContainers" ==> "FinalBuildDocker"
-//"CleanDockerImages" ==> "FinalBuildDocker"
+Target "FinalBuildDocker" (fun _ -> ())
+"DockerBase" ==> "FinalBuildDocker"
+"DockerContainers" ==> "FinalBuildDocker"
+"CleanDockerImages" ==> "FinalBuildDocker"
 
-//RunTargetOrDefault "FinalRefreshLocalDependencies"
-RunTargetOrDefault "Build"
+RunTargetOrDefault "Nuget"

@@ -6,13 +6,16 @@
 open Fake
 open System
 open System.IO
+open System.Text.RegularExpressions
 
+let testPackageName = "ClusterKit.Core"
 let buildDir = Path.GetFullPath("./build")
 let packageOutDir = Path.GetFullPath("./packageOut")
 let packagePushDir = Path.GetFullPath("./packagePush")
+let packageThirdPartyDir = Path.GetFullPath("./packageThirdPartyDir")
 let envVersion = environVar "version"
 let packageDir = if envVersion <> null then packagePushDir else packageOutDir
-let version = if envVersion <> null then envVersion else "0.0.0-local"
+let mutable version = if envVersion <> null then envVersion else "0.0.0-local"
 
 let currentTarget = getBuildParam "target"
 
@@ -34,63 +37,100 @@ let pushPackage (package:string) =
 
 Target "Clean" (fun _ ->
     trace "PreClean..."
-    CleanDirs [|
-        packageDir
-        buildDir        
-        |]
-    )
-
-Target "Build" (fun _ ->
-    trace "Build..."
-    let projects = filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo("."))
-    Seq.iter (fun (file:FileInfo) -> 
-        trace file.FullName
-        let setParams defaults = { 
-            defaults with
-                Verbosity = Some(Minimal)
-                Targets = ["Build"]
-                RestorePackagesFlag = true
-                Properties = 
-                [
-                    "Optimize", "True"
-                    "DebugSymbols", "True"
-                    "Configuration", "Release"
-                    "OutputPath", Path.Combine(buildDir, "bin", Path.GetFileNameWithoutExtension(file.Name))
-                ]
-        }
-        build setParams file.FullName
-    ) projects
+    CleanDir buildDir
 )
 
-//---------------------------------------
-//Nuget creation
-//---------------------------------------
- 
-Target "Nuget" (fun _ ->
+// switches nuget and build version from init one, to latest posible on docker nuget server
+Target "SetVersion" (fun _ ->
+    let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://docker:81" testPackageName
+    if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
+    version <- Regex.Replace((if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"), "((\\d+\\.?)+)(.*)", "$1-local")
+    tracef "New version is %s \n" version
+)    
+
+Target "PrepareSources" (fun _ ->
     trace "Creating a sources copy..."
     let sourcesDir = Path.Combine(buildDir, "src")
     ensureDirectory sourcesDir
     CleanDir sourcesDir
-    Seq.iter 
-        (fun (dir:string) -> 
-                let fullDir = Path.GetFullPath(dir)
-                let destinationDir = Path.Combine(sourcesDir, Path.GetFileName(fullDir), ".")
-                CleanDir (Path.Combine(fullDir, "bin"))
-                CopyDir destinationDir fullDir (fun _ -> true))
-        (Seq.filter 
-            (fun (dir:string) -> not (Seq.isEmpty (filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(dir))))) 
-            (Directory.GetDirectories(".")))
-    Seq.iter
-        (fun (file:FileInfo) ->
-                CopyFile sourcesDir file.FullName)
-        (filesInDirMatching "*.sln" (new DirectoryInfo(".")))
+    
+    Directory.GetDirectories "."
+        |> Seq.filter (fun (dir:string) -> not (Seq.isEmpty (filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(dir))))) 
+        |> Seq.iter (fun (dir:string) ->
         
+                filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(dir))
+                |> Seq.iter
+                    (fun (file:FileInfo) -> 
+                        let projectDir = Path.GetDirectoryName(file.FullName)
+                        CleanDir (Path.Combine(projectDir, "bin")))
+
+                let fullDir = Path.GetFullPath(dir)
+                let destinationDir = Path.Combine(sourcesDir, Path.GetFileName(fullDir), ".")                
+                CopyDir destinationDir fullDir (fun _ -> true))
+
+    filesInDirMatching "*.sln" (new DirectoryInfo("."))
+        |> Seq.iter (fun (file:FileInfo) -> CopyFile sourcesDir file.FullName)
+       
 
     let projects = filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
-    Seq.iter (fun (file:FileInfo) -> 
-        RegexReplaceInFileWithEncoding  "<Version>(.*)</Version>" version Text.Encoding.UTF8 file.FullName 
-    ) projects
+    projects 
+    |> Seq.iter (fun (file:FileInfo) -> 
+        let projectDir = Path.GetDirectoryName(file.FullName)
+        CleanDir (Path.Combine(projectDir, "obj"))
+        RegexReplaceInFileWithEncoding  "<Version>(.*)</Version>" (sprintf "<Version>%s</Version>" version) Text.Encoding.UTF8 file.FullName) 
+)
 
+"SetVersion" ?=> "PrepareSources"
+
+Target "Restore" (fun _ ->
+    trace "Restoring packages..."
+    let sourcesDir = Path.Combine(buildDir, "src")  
+    filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir))
+    |> Seq.iter
+        (fun (file:FileInfo) ->
+            let setParams defaults = { 
+                defaults with
+                    Verbosity = Some(Minimal)
+                    Targets = ["Restore"]
+                    RestorePackagesFlag = true
+                    Properties = 
+                    [
+                        "Optimize", "True"
+                        "DebugSymbols", "True"
+                        "Configuration", "Release"                        
+                    ]
+            }
+            build setParams file.FullName)        
+)
+
+"PrepareSources" ==> "Restore"
+
+Target "Build" (fun _ ->
+    trace "Build..."
+    let sourcesDir = Path.Combine(buildDir, "src")  
+    Seq.iter
+        (fun (file:FileInfo) ->
+            let setParams defaults = { 
+                defaults with
+                    Verbosity = Some(Minimal)
+                    Targets = ["Restore"; "Build"]
+                    RestorePackagesFlag = true
+                    Properties = 
+                    [
+                        "Optimize", "True"
+                        "DebugSymbols", "True"
+                        "Configuration", "Release"                        
+                    ]
+            }
+            build setParams file.FullName)
+        (filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir)))
+)
+
+"Restore" ==> "Build"
+
+Target "Nuget" (fun _ ->
+    trace "Packing nuget..."
+    let sourcesDir = Path.Combine(buildDir, "src")  
     Seq.iter
         (fun (file:FileInfo) ->
             let setParams defaults = { 
@@ -110,6 +150,85 @@ Target "Nuget" (fun _ ->
     CleanDir packageDir
     Seq.iter
         (fun (file:FileInfo) ->
+                trace (Path.GetFileName file.FullName)
                 CopyFile packageDir file.FullName)
-        (filesInDirMatching "*.nupkg" (new DirectoryInfo(sourcesDir)))
+        (filesInDirMatchingRecursive "*.nupkg" (new DirectoryInfo(sourcesDir)))
 )
+
+"Build" ==> "Nuget"
+
+
+Target "CleanDockerImages" (fun _ ->
+    let outputProcess line =
+        let parts = Regex.Split(line, "[\t ]+")
+        if ("<none>".Equals(parts.[0]) && parts.Length >= 3) then
+            let args = sprintf "rmi %s" parts.[2]
+            ExecProcess (fun info -> info.FileName <- "docker"; info.Arguments <- args) (TimeSpan.FromMinutes 30.0)
+                |> ignore
+
+    let lines = new ResizeArray<String>();
+    ExecProcessWithLambdas
+        (fun info -> info.FileName <- "docker"; info.Arguments <- "images")
+        (TimeSpan.FromMinutes 30.0)
+        true
+        (fun e -> failwith e)
+        (fun l -> lines.Add(l))
+        |> ignore
+
+    lines |> Seq.iter outputProcess
+)
+
+Target "PushLocalPackages" (fun _ ->
+    Directory.GetFiles(packagePushDir)
+        |> Seq.filter (hasExt ".nupkg")
+        |> Seq.iter pushPackage
+)
+"Nuget" ?=> "PushLocalPackages"
+
+Target "FinalPushLocalPackages" (fun _ -> ())
+"SetVersion" ==> "FinalPushLocalPackages"
+"Nuget" ==> "FinalPushLocalPackages"
+"PushLocalPackages" ==> "FinalPushLocalPackages"
+
+Target "RestoreThirdPartyPackages" (fun _ ->
+    ensureDirectory packageThirdPartyDir
+    CleanDir packageThirdPartyDir
+    let sourcesDir = Path.Combine(buildDir, "src") 
+    filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
+    |> Seq.collect (fun (file:FileInfo) -> 
+            let xml = File.ReadAllText(file.FullName) |> XMLDoc
+            xml.SelectNodes("/Project/ItemGroup/PackageReference")
+            |> Seq.cast<System.Xml.XmlElement>
+            |> Seq.map (fun (node:System.Xml.XmlElement) -> ((node.GetAttribute("Include"), (node.GetAttribute("Version"))))))
+    |> Seq.distinct
+    |> Seq.sortBy (fun (id, version) -> id)
+    |> Seq.iter (fun (id, version) -> 
+        tracef "%s %s\n" id version
+        ExecProcess (fun info ->
+            info.FileName <- "nuget.exe";
+            info.Arguments <- sprintf "install %s -Version %s -OutputDirectory %s" id version packageThirdPartyDir)
+            (TimeSpan.FromMinutes 30.0)
+            |> ignore
+    )
+)
+
+"PrepareSources" ==> "RestoreThirdPartyPackages"
+
+Target "PushThirdPartyPackages" (fun _ ->
+    filesInDirMatchingRecursive "*.nupkg" (new DirectoryInfo(packageThirdPartyDir))
+        |> Seq.map (fun (file:FileInfo) -> file.FullName)
+        |> Seq.iter pushPackage
+)
+
+"PushThirdPartyPackages" <=? "PushLocalPackages"
+
+"RestoreThirdPartyPackages" ?=> "PushThirdPartyPackages"
+
+Target "FinalPushThirdPartyPackages" (fun _ -> ())
+"RestoreThirdPartyPackages" ==> "FinalPushThirdPartyPackages"
+"PushThirdPartyPackages" ==> "FinalPushThirdPartyPackages"
+
+Target "FinalPushAllPackages" (fun _ -> ())
+"FinalPushThirdPartyPackages" ==> "FinalPushAllPackages"
+"FinalPushLocalPackages" ==> "FinalPushAllPackages"
+
