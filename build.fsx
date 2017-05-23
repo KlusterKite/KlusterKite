@@ -1,12 +1,20 @@
-#r @"BuildScripts/FakeLib.dll" // include Fake lib
-#r @"BuildScripts/ClusterKit.Build.dll" // include budle of build utils // include budle of build utils
+// #r @"BuildScripts/FakeLib.dll" // include Fake lib
+// #r @"BuildScripts/ClusterKit.Build.dll" // include budle of build utils // include budle of build utils
+#I @"packages/FAKE/tools"
+#r @"packages/FAKE/tools/FakeLib.dll"
+
 open Fake
 open System
 open System.IO
-open System.Text.RegularExpressions
 
-#load "./build.config.fsx"
-#load "./BuildScripts/ClusterKit.Build.fsx"
+let buildDir = Path.GetFullPath("./build")
+let packageDir = Path.GetFullPath("./packageOut")
+let packagePushDir = Path.GetFullPath("./packagePush")
+let ver = environVar "version"
+
+let currentTarget = getBuildParam "target"
+
+#load "./build.base.fsx"
 
 let buildDocker (containerName:string) (path:string) =
     if (ExecProcess (fun info ->
@@ -103,15 +111,17 @@ Target "DockerContainers" (fun _ ->
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local"
 )
 
-"DockerBase" ?=> "CleanDockerImages"
-"DockerContainers" ?=> "CleanDockerImages"
-"DockerBase" ?=> "DockerContainers"
+
+//"DockerBase" ?=> "CleanDockerImages"
+//"DockerContainers" ?=> "CleanDockerImages"
+//"DockerBase" ?=> "DockerContainers"
 
 // prepares docker images
-Target "FinalBuildDocker" (fun _ -> ())
-"CleanPackageCache" ==> "FinalBuildDocker"
-"DockerBase" ==> "FinalBuildDocker"
-"DockerContainers" ==> "FinalBuildDocker"
-"CleanDockerImages" ==> "FinalBuildDocker"
+//Target "FinalBuildDocker" (fun _ -> ())
+//"CleanPackageCache" ==> "FinalBuildDocker"
+//"DockerBase" ==> "FinalBuildDocker"
+//"DockerContainers" ==> "FinalBuildDocker"
+//"CleanDockerImages" ==> "FinalBuildDocker"
 
-RunTargetOrDefault "FinalRefreshLocalDependencies"
+//RunTargetOrDefault "FinalRefreshLocalDependencies"
+RunTargetOrDefault "Build"

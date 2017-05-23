@@ -2,6 +2,9 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
     <OutputType>exe</OutputType>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
+    <OutputType>exe</OutputType>
+  </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager.Seeder.Launcher</PackageId>
