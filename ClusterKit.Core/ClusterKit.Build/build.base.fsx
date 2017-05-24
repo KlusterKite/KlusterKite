@@ -224,12 +224,8 @@ Target "FinalPushLocalPackages" (fun _ -> ())
 "PushLocalPackages" ==> "FinalPushLocalPackages"
 
 Target "RestoreThirdPartyPackages" (fun _ ->
-    trace "Restoring packages"
     ensureDirectory packageThirdPartyDir
     CleanDir packageThirdPartyDir
-    let tmpDir = Path.Combine(Path.GetTempPath(), (Guid.NewGuid().ToString("N")))
-    trace tmpDir
-    ensureDirectory tmpDir
     let sourcesDir = Path.Combine(buildDir, "src") 
     filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
     |> Seq.collect (fun (file:FileInfo) -> 
@@ -243,16 +239,10 @@ Target "RestoreThirdPartyPackages" (fun _ ->
         tracef "%s %s\n" id version
         ExecProcess (fun info ->
             info.FileName <- "nuget.exe";
-            info.Arguments <- sprintf "install %s -Version %s -OutputDirectory %s" id version tmpDir)
+            info.Arguments <- sprintf "install %s -Version %s -OutputDirectory %s" id version packageThirdPartyDir)
             (TimeSpan.FromMinutes 30.0)
             |> ignore
     )
-
-    filesInDirMatchingRecursive "*.nupkg" (new DirectoryInfo(tmpDir))
-    |> Seq.map (fun (file:FileInfo) -> file.FullName)
-    |> Copy packageThirdPartyDir
-
-    Directory.Delete(tmpDir, true)    
 )
 
 "PrepareSources" ==> "RestoreThirdPartyPackages"

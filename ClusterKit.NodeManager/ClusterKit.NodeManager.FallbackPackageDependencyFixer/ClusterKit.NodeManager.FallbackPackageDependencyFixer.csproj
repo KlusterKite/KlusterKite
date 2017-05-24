@@ -16,12 +16,17 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NuGet.Core" Version="2.14.0" />
+    <PackageReference Include="NuGet.Packaging" Version="4.0.0" />
+    <PackageReference Include="NuGet.Protocol.Core.Types" Version="4.0.0" />
+    <PackageReference Include="NuGet.Versioning" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj" Pack="true"/>
+    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj" Pack="true" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="NuGet.Protocol.Core.v3">
+      <HintPath>..\..\..\..\..\..\Users\kanto\.nuget\packages\nuget.protocol.core.v3\4.0.0\lib\net45\NuGet.Protocol.Core.v3.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.IO.Compression" />
   </ItemGroup>

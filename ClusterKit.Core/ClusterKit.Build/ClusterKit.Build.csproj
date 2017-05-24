@@ -15,4 +15,9 @@
     <PackageReference Include="FSharp.Core" Version="4.1.17" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="build.base.fsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

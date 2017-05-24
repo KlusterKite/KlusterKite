@@ -3,28 +3,31 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Fixes the list of packages for dependenceis in fall-back files
+//   Fixes the list of packages for dependencies in fall-back files
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
-    using System.IO.Compression;
     using System.Linq;
 
     using ClusterKit.NodeManager.Launcher.Messages;
 
+    using JetBrains.Annotations;
+
     using Newtonsoft.Json;
 
-    using NuGet;
-
-    using Formatting = Newtonsoft.Json.Formatting;
+    using NuGet.Common;
+    using NuGet.Packaging;
+    using NuGet.Protocol;
 
     /// <summary>
     /// Fixes the list of packages for dependencies in fall-back files
     /// </summary>
+    [UsedImplicitly]
     public class Program
     {
         /// <summary>
@@ -42,6 +45,7 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
             var fileName = args[0];
             if (!File.Exists(fileName))
             {
+                Console.WriteLine(Path.GetFullPath(fileName));
                 Console.WriteLine($"Could not find file {fileName}");
                 return;
             }
@@ -54,79 +58,59 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
 
             var description = JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(fileName));
 
-            var installedMetadata = 
-                args
-                .Skip(1)
-                .SelectMany(d => Directory.GetFiles(d, "*.nupkg", SearchOption.AllDirectories))
-                .Select(GetMetadata)
-                .Where(m => m != null).ToList();
+            var installedMetadata = args.Skip(1).SelectMany(
+                d => LocalFolderUtility.GetPackagesV2(Path.GetFullPath(d), NullLogger.Instance).Select(p => p.Nuspec))
+                .ToList();
+
+            Console.WriteLine("Installed packages: ");
+            foreach (var package in installedMetadata)
+            {
+                Console.WriteLine($"\t{package.GetId()} {package.GetVersion()}");
+            }
 
             var localPackages = installedMetadata
-                .Where(rp => description.Packages.Any(lp => lp.Id == rp.Id))
-                .Where(rp => rp.Version == installedMetadata.Where(p => p.Id == rp.Id).Max(p => p.Version))
+                .Where(rp => description.Packages.Any(lp => lp.Id == rp.GetId()))
+                .GroupBy(p => p.GetId()).Select(g => g.OrderByDescending(p => p.GetVersion()).First())
                 .ToList();
 
             Console.WriteLine("Packages found: ");
             foreach (var package in localPackages)
             {
-                Console.WriteLine($"\t{package.Id} {package.Version}");
+                Console.WriteLine($"\t{package.GetId()} {package.GetVersion()}");
             }
 
             Console.WriteLine(string.Empty);
+            var packagesList = new List<NuspecReader>(localPackages);
 
-            var allDependencies = localPackages
-                .SelectMany(p => p.DependencySets)
-                .SelectMany(p => p.Dependencies)
-                .ToList();
-            var dependencies = allDependencies
-                .Select(d => d.Id)
-                .Where(id => localPackages.All(p => p.Id != id))
-                .OrderBy(id => id)
-                .Distinct()
-                .Select(id => new PackageDescription
+            while (true)
+            {
+                var allDependencies = packagesList.SelectMany(p => p.GetDependencyGroups()).SelectMany(p => p.Packages)
+                    .OrderBy(d => d.Id).ToList();
+
+                var additionalPackages = allDependencies
+                    .SelectMany(d => installedMetadata.Where(p => p.GetId() == d.Id && d.VersionRange.Satisfies(p.GetVersion())))
+                    .GroupBy(p => p.GetId()).Select(g => g.OrderByDescending(p => p.GetVersion()).First())
+                    .Where(np => packagesList.All(p => p.GetId() != np.GetId())).ToList();
+
+                packagesList.AddRange(additionalPackages);
+                if (additionalPackages.Count == 0)
                 {
-                    Id = id,
-                    Version = allDependencies.Where(dd => dd.Id == id).Max(dd => SemanticVersion.Parse(dd.Version)).ToString()
-                }).ToList();
+                    break;
+                }
+            }
 
-            var result = localPackages
-                .Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() })
+            var result = packagesList
+                .Select(p => new PackageDescription { Id = p.GetId(), Version = p.GetVersion().ToString() })
                 .OrderBy(p => p.Id)
-                .Union(dependencies)
-                .Distinct()
                 .ToList();
+
+            description.Packages = result;
+            File.WriteAllText(fileName, JsonConvert.SerializeObject(description, Formatting.Indented));
 
             Console.WriteLine("Packages: ");
             foreach (var package in result)
             {
                 Console.WriteLine($"\t{package.Id} {package.Version}");
-            }
-
-            description.Packages = result;
-            File.WriteAllText(fileName, JsonConvert.SerializeObject(description, Formatting.Indented));
-        }
-
-        /// <summary>
-        /// Gets the package metadata
-        /// </summary>
-        /// <param name="packageName">The package name</param>
-        /// <returns>The package metadata</returns>
-        private static ManifestMetadata GetMetadata(string packageName)
-        {
-            using (var file = File.OpenRead(packageName))
-            using (var zip = new ZipArchive(file, ZipArchiveMode.Read))
-            {
-                var nuspecFile = zip.Entries.FirstOrDefault(e => e.Name.EndsWith(".nuspec"));
-                if (nuspecFile == null)
-                {
-                    Console.WriteLine($"Could not find metadata for package {packageName}");
-                    return null;
-                }
-
-                using (var stream = nuspecFile.Open())
-                {
-                    return Manifest.ReadFrom(stream, false).Metadata;
-                }
             }
         }
     }

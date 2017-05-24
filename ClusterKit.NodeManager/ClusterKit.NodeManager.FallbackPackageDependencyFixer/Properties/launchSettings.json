@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "ClusterKit.NodeManager.FallbackPackageDependencyFixer": {
+      "commandName": "Project"
+    }
+  }
+}
