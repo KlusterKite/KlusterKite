@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net46</TargetFrameworks>
-    <PackageId>ClusterKit.NodeManager.FallbackPackageDependencyFixer</PackageId>
+    <PackageId>ClusterKit.NodeManager.FallbackPackageFixer</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>
     <Description>Bundle of utils to create scalable and redundant services</Description>
@@ -18,15 +18,13 @@
   <ItemGroup>
     <PackageReference Include="NuGet.Packaging" Version="4.0.0" />
     <PackageReference Include="NuGet.Protocol.Core.Types" Version="4.0.0" />
+    <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.0.0" />
     <PackageReference Include="NuGet.Versioning" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj" Pack="true" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="NuGet.Protocol.Core.v3">
-      <HintPath>..\..\..\..\..\..\Users\kanto\.nuget\packages\nuget.protocol.core.v3\4.0.0\lib\net45\NuGet.Protocol.Core.v3.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.IO.Compression" />
   </ItemGroup>

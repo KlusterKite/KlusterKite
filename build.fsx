@@ -10,6 +10,8 @@ open System.IO
 let buildDir = Path.GetFullPath("./build")
 let packageDir = Path.GetFullPath("./packageOut")
 let packagePushDir = Path.GetFullPath("./packagePush")
+let packageThirdPartyDir = Path.GetFullPath("./packageThirdPartyDir")
+
 let ver = environVar "version"
 
 let currentTarget = getBuildParam "target"
@@ -55,9 +57,10 @@ Target "DockerContainers" (fun _ ->
         let buildDir = Path.Combine ([|fullPath; "build"|])
         let packageCacheDir = Path.Combine ([|fullPath; "packageCache"|])
 
-        Fake.FileHelper.CleanDirs [|buildDir; packageCacheDir|]
-        Fake.FileHelper.CopyDir buildDir "./build/launcher" (fun file -> true)
-        Fake.FileHelper.CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
+        CleanDirs [|buildDir; packageCacheDir|]
+        CopyDir buildDir "./build/launcher" (fun file -> true)
+        CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
+        CopyTo buildDir [|"./nuget.exe"|]
 
         let copyThirdPartyPackage (f: FileInfo) =
             if (hasExt ".nupkg" f.FullName) then
@@ -67,7 +70,7 @@ Target "DockerContainers" (fun _ ->
         Fake.FileHelper.recursively
             (fun d -> ())
             copyThirdPartyPackage
-            (new DirectoryInfo(Path.GetFullPath("./packages")))
+            (new DirectoryInfo(packageThirdPartyDir))
 
     Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeed/build"|]
     Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seed" (fun file -> true)

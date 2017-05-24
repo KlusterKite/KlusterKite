@@ -126,8 +126,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager.Laun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager.Launcher", "ClusterKit.NodeManager\ClusterKit.NodeManager.Launcher\ClusterKit.NodeManager.Launcher.csproj", "{9D7A1D84-13F2-41DF-8A46-5CBAB54F5083}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager.FallbackPackageDependencyFixer", "ClusterKit.NodeManager\ClusterKit.NodeManager.FallbackPackageDependencyFixer\ClusterKit.NodeManager.FallbackPackageDependencyFixer.csproj", "{D5BB0845-92B6-452E-A19A-05D0EB82B4F5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager.Migrator", "ClusterKit.NodeManager\ClusterKit.NodeManager.Migrator\ClusterKit.NodeManager.Migrator.csproj", "{D85A8D83-3C7D-4CC9-A2B8-6597D2AB8FB2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager.Migrator.EF", "ClusterKit.NodeManager\ClusterKit.NodeManager.Migrator.EF\ClusterKit.NodeManager.Migrator.EF.csproj", "{BB3525CB-2D71-45C8-A8F3-FBC2AE6C189B}"
@@ -149,6 +147,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager", "ClusterKit.NodeManager\ClusterKit.NodeManager\ClusterKit.NodeManager.csproj", "{9104E55C-4166-480A-ADD2-593807A00761}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager.Tests", "ClusterKit.NodeManager\ClusterKit.NodeManager.Tests\ClusterKit.NodeManager.Tests.csproj", "{311B4929-896C-4392-A53E-9581EE2CCE12}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClusterKit.NodeManager.FallbackPackageFixer", "ClusterKit.NodeManager\ClusterKit.NodeManager.FallbackPackageFixer\ClusterKit.NodeManager.FallbackPackageFixer.csproj", "{84F1628B-87A7-497E-8000-46AD3B6BB61C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -328,10 +328,6 @@ Global
 		{9D7A1D84-13F2-41DF-8A46-5CBAB54F5083}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D7A1D84-13F2-41DF-8A46-5CBAB54F5083}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D7A1D84-13F2-41DF-8A46-5CBAB54F5083}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5BB0845-92B6-452E-A19A-05D0EB82B4F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5BB0845-92B6-452E-A19A-05D0EB82B4F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5BB0845-92B6-452E-A19A-05D0EB82B4F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5BB0845-92B6-452E-A19A-05D0EB82B4F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D85A8D83-3C7D-4CC9-A2B8-6597D2AB8FB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D85A8D83-3C7D-4CC9-A2B8-6597D2AB8FB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D85A8D83-3C7D-4CC9-A2B8-6597D2AB8FB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -376,6 +372,10 @@ Global
 		{311B4929-896C-4392-A53E-9581EE2CCE12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{311B4929-896C-4392-A53E-9581EE2CCE12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{311B4929-896C-4392-A53E-9581EE2CCE12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84F1628B-87A7-497E-8000-46AD3B6BB61C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84F1628B-87A7-497E-8000-46AD3B6BB61C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84F1628B-87A7-497E-8000-46AD3B6BB61C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84F1628B-87A7-497E-8000-46AD3B6BB61C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -424,7 +424,6 @@ Global
 		{B6CABDB0-C94F-429A-9C3E-7F0A01E218BF} = {30994E29-1A66-4F4A-9D4D-FFBB282BC9EE}
 		{874AC41B-A084-4EED-9B7F-6B82EFC416EE} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{9D7A1D84-13F2-41DF-8A46-5CBAB54F5083} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
-		{D5BB0845-92B6-452E-A19A-05D0EB82B4F5} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{D85A8D83-3C7D-4CC9-A2B8-6597D2AB8FB2} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{BB3525CB-2D71-45C8-A8F3-FBC2AE6C189B} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{57742B7B-14DA-4B8D-B870-86A2BBE0394F} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
@@ -436,5 +435,6 @@ Global
 		{DFB029EB-86DD-40C3-95CC-414978CA5987} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{9104E55C-4166-480A-ADD2-593807A00761} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{311B4929-896C-4392-A53E-9581EE2CCE12} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
+		{84F1628B-87A7-497E-8000-46AD3B6BB61C} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 	EndGlobalSection
 EndGlobal

@@ -15,7 +15,7 @@ let packageOutDir = Path.GetFullPath("./packageOut")
 let packagePushDir = Path.GetFullPath("./packagePush")
 let packageThirdPartyDir = Path.GetFullPath("./packageThirdPartyDir")
 let envVersion = environVar "version"
-let packageDir = if envVersion <> null then packagePushDir else packageOutDir
+let mutable packageDir = packageOutDir
 let mutable version = if envVersion <> null then envVersion else "0.0.0-local"
 
 let currentTarget = getBuildParam "target"
@@ -46,6 +46,7 @@ Target "SetVersion" (fun _ ->
     let nugetVersion = Fake.NuGetVersion.getLastNuGetVersion "http://docker:81" testPackageName
     if nugetVersion.IsSome then tracef "Current version is %s \n" (nugetVersion.ToString()) else trace "Repository is empty"
     version <- Regex.Replace((if nugetVersion.IsSome then ((Fake.NuGetVersion.IncPatch nugetVersion.Value).ToString()) else "0.0.0-local"), "((\\d+\\.?)+)(.*)", "$1-local")
+    packageDir <- packagePushDir
     tracef "New version is %s \n" version
 )    
 
@@ -263,7 +264,7 @@ Target "PushThirdPartyPackages" (fun _ ->
         |> Seq.iter pushPackage
 )
 
-"PushThirdPartyPackages" <=? "PushLocalPackages"
+"PushThirdPartyPackages" ?=> "PushLocalPackages"
 
 "RestoreThirdPartyPackages" ?=> "PushThirdPartyPackages"
 

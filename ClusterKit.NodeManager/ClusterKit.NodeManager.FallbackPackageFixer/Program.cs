@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
+namespace ClusterKit.NodeManager.FallbackPackageFixer
 {
     using System;
     using System.Collections.Generic;
@@ -22,7 +22,6 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
 
     using NuGet.Common;
     using NuGet.Packaging;
-    using NuGet.Protocol;
 
     /// <summary>
     /// Fixes the list of packages for dependencies in fall-back files
@@ -59,7 +58,7 @@ namespace ClusterKit.NodeManager.FallbackPackageDependencyFixer
             var description = JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(fileName));
 
             var installedMetadata = args.Skip(1).SelectMany(
-                d => LocalFolderUtility.GetPackagesV2(Path.GetFullPath(d), NullLogger.Instance).Select(p => p.Nuspec))
+                d => NuGet.Protocol.LocalFolderUtility.GetPackagesV2(Path.GetFullPath(d), NullLogger.Instance).Select(p => p.Nuspec))
                 .ToList();
 
             Console.WriteLine("Installed packages: ");
