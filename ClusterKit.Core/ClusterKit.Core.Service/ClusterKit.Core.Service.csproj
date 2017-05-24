@@ -11,7 +11,7 @@
     <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>exe</OutputType>
-    <BuildOutputTargetFolder>tools</BuildOutputTargetFolder>
+    <IsTool>true</IsTool>
     <StartupObject />
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

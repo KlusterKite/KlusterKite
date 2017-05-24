@@ -7,6 +7,7 @@ open Fake
 open System
 open System.IO
 open System.Text.RegularExpressions
+open System.Xml
 
 let testPackageName = "ClusterKit.Core"
 let buildDir = Path.GetFullPath("./build")
@@ -131,7 +132,8 @@ Target "Build" (fun _ ->
 Target "Nuget" (fun _ ->
     trace "Packing nuget..."
     let sourcesDir = Path.Combine(buildDir, "src")  
-    Seq.iter
+    filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir))
+    |> Seq.iter
         (fun (file:FileInfo) ->
             let setParams defaults = { 
                 defaults with
@@ -146,13 +148,44 @@ Target "Nuget" (fun _ ->
                     ]
             }
             build setParams file.FullName)
-        (filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir)))
+
     CleanDir packageDir
-    Seq.iter
+    filesInDirMatchingRecursive "*.nupkg" (new DirectoryInfo(sourcesDir))
+    |> Seq.iter
         (fun (file:FileInfo) ->
                 trace (Path.GetFileName file.FullName)
                 CopyFile packageDir file.FullName)
-        (filesInDirMatchingRecursive "*.nupkg" (new DirectoryInfo(sourcesDir)))
+
+    // workaround of https://github.com/NuGet/Home/issues/4360
+    filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
+    |> Seq.filter (fun (file:FileInfo) -> Regex.IsMatch(File.ReadAllText(file.FullName), "<IsTool>true</IsTool>", (RegexOptions.CultureInvariant ||| RegexOptions.IgnoreCase)))
+    |> Seq.iter (fun (file:FileInfo) -> 
+        tracef "Repacking tool: %s\n" (Path.GetFileName file.FullName)
+        let projectDir = Path.GetDirectoryName file.FullName
+        let nuspecName = filesInDirMatchingRecursive "*.nuspec" (new DirectoryInfo(projectDir)) |> Seq.head
+        let nuspec = XMLDoc (File.ReadAllText(nuspecName.FullName))
+        let namespaceManager = new XmlNamespaceManager(nuspec.NameTable);
+        namespaceManager.AddNamespace("n", "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd");
+        let filesNode = nuspec.SelectSingleNode("/n:package/n:files", namespaceManager)
+        filesNode.InnerXml <- ""
+        let buildFilesPath = Path.Combine(projectDir, "bin", "Release")
+        
+        filesInDirMatchingRecursive "*.*" (new DirectoryInfo(buildFilesPath))
+        |> Seq.filter (fun (file:FileInfo) -> not(Regex.IsMatch(file.FullName, "\\.nupkg$")))
+        |> Seq.iter (fun (file:FileInfo) -> 
+            let fileElement = filesNode.AppendChild(nuspec.CreateElement("file", "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd")) :?> XmlElement
+            let relativeFileName = file.FullName.Substring(buildFilesPath.Length)
+            fileElement.SetAttribute("src", file.FullName);
+            fileElement.SetAttribute("target", (sprintf "tools%s" relativeFileName))
+        )
+        
+        nuspec.Save(nuspecName.FullName)     
+        ExecProcess (fun info ->
+            info.FileName <- "nuget.exe";
+            info.Arguments <- sprintf "pack \"%s\" -OutputDirectory \"%s\"" nuspecName.FullName packageDir)
+            (TimeSpan.FromMinutes 30.0)
+            |> ignore       
+    )
 )
 
 "Build" ==> "Nuget"
