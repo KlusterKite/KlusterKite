@@ -17,8 +17,7 @@ namespace ClusterKit.Data.EF.Effort
     public class ConnectionManager : BaseConnectionManager
     {
         /// <inheritdoc />
-        public override string ProviderInvariantName 
-            => global::Effort.Provider.EffortProviderInvariantName.Instance.Name;
+        public override string ProviderInvariantName => "InMemory";
 
         /// <inheritdoc />
         public override bool CheckDatabaseExistence(DbConnection connection, string databaseName)
@@ -43,7 +42,8 @@ namespace ClusterKit.Data.EF.Effort
         /// <remarks>Don't forget to dispose it</remarks>
         public override DbConnection CreateConnection(string connectionString)
         {
-            return global::Effort.DbConnectionFactory.CreatePersistent(connectionString);
+            // return Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase()
+            return null;
         }
 
         /// <inheritdoc />

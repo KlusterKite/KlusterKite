@@ -44,8 +44,7 @@ namespace ClusterKit.Data.Tests.Mock
             string databaseName)
         {
             var context = await this.CreateContext(connectionString, databaseName);
-            context.Database.Delete();
-
+            
             if (!context.Users.Any())
              {
                 var user1 = new User

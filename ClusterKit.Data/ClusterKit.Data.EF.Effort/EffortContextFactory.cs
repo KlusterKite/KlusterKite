@@ -9,10 +9,11 @@
 
 namespace ClusterKit.Data.EF.Effort
 {
-    using System.Data.Entity;
     using System.Threading.Tasks;
 
     using JetBrains.Annotations;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     ///  Base factory to create entity framework contexts respecting Effort database engine

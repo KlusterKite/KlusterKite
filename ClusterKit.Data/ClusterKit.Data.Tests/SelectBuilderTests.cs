@@ -17,6 +17,8 @@ namespace ClusterKit.Data.Tests
     using ClusterKit.Data.EF;
     using ClusterKit.Data.Tests.Mock;
 
+    using Microsoft.EntityFrameworkCore;
+
     using Xunit;
 
     /// <summary>
@@ -39,6 +41,7 @@ namespace ClusterKit.Data.Tests
                                            new ApiRequest
                                                {
                                                    FieldName = "users",
+                                                   Fields = new[] { new ApiRequest { FieldName = "user" } }.ToList()
                                                }
                                        };
 
@@ -48,7 +51,7 @@ namespace ClusterKit.Data.Tests
                                            new ApiRequest
                                                {
                                                    FieldName = "roles",
-                                                   Fields = level2Fields
+                                                   Fields = new[] { new ApiRequest { FieldName = "role", Fields = level2Fields } }.ToList()
                                                }
                                        };
                 
@@ -57,15 +60,17 @@ namespace ClusterKit.Data.Tests
                     Fields = level1Fields
                 };
 
-                query = query.SetIncludes(apiRequest);
+                query = query.SetIncludes(context, apiRequest);
                 var user = query.FirstOrDefault();
                 Assert.NotNull(user);
                 Assert.NotNull(user.Roles);
                 Assert.NotEmpty(user.Roles);
-                var role = user.Roles.First();
+                var role = user.Roles.First().Role;
+                Assert.NotNull(role);
                 Assert.NotNull(role.Users);
                 Assert.NotEmpty(role.Users);
-                var subUser = role.Users.First();
+                var subUser = role.Users.First().User;
+                Assert.NotNull(subUser);
                 Assert.NotNull(subUser.Roles);
                 Assert.NotEmpty(subUser.Roles);
             }
@@ -77,15 +82,17 @@ namespace ClusterKit.Data.Tests
         /// <returns>The test context</returns>
         private TestDataContext CreateContext()
         {
-            Effort.Provider.EffortProviderConfiguration.RegisterProvider();
-            var connection = Effort.DbConnectionFactory.CreateTransient();
-            var context = new TestDataContext(connection, false);
+            var name = Guid.NewGuid().ToString("N");
+            var optionsBuilder = new DbContextOptionsBuilder<TestDataContext>();
+            optionsBuilder.UseInMemoryDatabase(name);
+
+            var context = new TestDataContext(optionsBuilder.Options);
             
             // context.Database.Delete();
             var users =
-                Enumerable.Range(1, 100).Select(n => new User { Login = $"user{n:####}", Uid = Guid.NewGuid(), Roles = new List<Role>() }).ToList();
+                Enumerable.Range(1, 100).Select(n => new User { Login = $"user{n:####}", Uid = Guid.NewGuid(), Roles = new List<RoleUser>() }).ToList();
             var roles =
-                Enumerable.Range(1, 10).Select(n => new Role { Name = $"role{n:###}", Uid = Guid.NewGuid(), Users = new List<User>() }).ToList();
+                Enumerable.Range(1, 10).Select(n => new Role { Name = $"role{n:###}", Uid = Guid.NewGuid(), Users = new List<RoleUser>() }).ToList();
 
             for (var roleNum = 1; roleNum <= roles.Count; roleNum++)
             {
@@ -95,8 +102,7 @@ namespace ClusterKit.Data.Tests
                     var user = users[userNum - 1];
                     if (userNum % roleNum == 0)
                     {
-                        role.Users.Add(user);
-                        user.Roles.Add(role);
+                        role.Users.Add(new RoleUser { User = user });
                     }
 
                     context.Users.Add(user);
@@ -106,7 +112,7 @@ namespace ClusterKit.Data.Tests
             }
 
             context.SaveChanges();
-            return new TestDataContext(connection);
+            return new TestDataContext(optionsBuilder.Options);
         }
     }
 }

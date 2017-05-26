@@ -11,14 +11,14 @@ namespace ClusterKit.Data.EF
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
 
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Creates a EF query based on <see cref="ApiRequest"/>
@@ -29,77 +29,58 @@ namespace ClusterKit.Data.EF
         /// Creates includes to the query according to the api request fields
         /// </summary>
         /// <typeparam name="T">The type of queried object</typeparam>
+        /// <typeparam name="TContext">The type of context</typeparam>
         /// <param name="query">The original query</param>
+        /// <param name="context">The data context</param>
         /// <param name="request">The request</param>
         /// <returns>Modified query</returns>
-        public static IQueryable<T> SetIncludes<T>(this IQueryable<T> query, ApiRequest request)
+        public static IQueryable<T> SetIncludes<T, TContext>(
+            this IQueryable<T> query,
+            TContext context,
+            ApiRequest request)
+            where T : class where TContext : DbContext
         {
-            var paths = PathCreator<T>.CreatePaths(null, request).Distinct().ToList();
+            var paths = PathCreator<T, TContext>.CreatePaths(null, context, request).Distinct().ToList();
             var reducedPaths = paths.Where(p => !paths.Any(op => op.StartsWith(p) && op != p)).ToList();
 
-            foreach (var reducedPath in reducedPaths)
-            {
-                query = query.Include(reducedPath);
-            }
-
-            return query;
+            return reducedPaths.Aggregate(query, (current, reducedPath) => current.Include(reducedPath));
         }
 
         /// <summary>
-        /// Creates paths for type
+        /// Creates paths for type 
         /// </summary>
         /// <typeparam name="T">The type of an object</typeparam>
-        private static class PathCreator<T>
+        /// <typeparam name="TContext">The type of context</typeparam>
+        [SuppressMessage("ReSharper", "StaticMemberInGenericType", Justification = "Making use of static generic classes")]
+        private static class PathCreator<T, TContext> where TContext : DbContext
         {
+            /// <summary>
+            /// The internal lock
+            /// </summary>
+            private static readonly object LockObject = new object();
+
             /// <summary>
             /// The list of cached helpers
             /// </summary>
-            [SuppressMessage("ReSharper", "StaticMemberInGenericType", Justification = "Making use of static fields of generic classes")]
-            private static readonly Dictionary<string, PropertyDescription> CollectionProperties
-                = new Dictionary<string, PropertyDescription>();
+            private static readonly Dictionary<string, PropertyDescription<TContext>> NavigationProperties
+                = new Dictionary<string, PropertyDescription<TContext>>();
 
             /// <summary>
-            /// Initializes static members of the <see cref="PathCreator{T}"/> class.
+            /// A value indicating whether the type was initialized
             /// </summary>
-            static PathCreator()
-            {
-                var collectionProperties =
-                    typeof(T).GetProperties(
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty
-                        | BindingFlags.SetProperty)
-                        .Where(p =>
-                            p.PropertyType.GetInterfaces()
-                                .Any(
-                                    i =>
-                                        i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                                        && i.GetGenericArguments()[0].IsClass))
-                        .Where(p => p.GetCustomAttribute<DeclareFieldAttribute>() != null 
-                        && p.GetCustomAttribute<NotMappedAttribute>() == null).ToList();
-
-                foreach (var propertyInfo in collectionProperties)
-                {
-                    var declareFieldAttribute = propertyInfo.GetCustomAttribute<DeclareFieldAttribute>();
-                    var propertyName = declareFieldAttribute.Name
-                                       ?? ApiDescriptionAttribute.ToCamelCase(propertyInfo.Name);
-
-                    var propertyType =
-                        propertyInfo.PropertyType.GetInterfaces()
-                            .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                            .GetGenericArguments()[0];
-
-                    var description = new PropertyDescription(propertyInfo.Name, propertyType);
-                    CollectionProperties[propertyName] = description;
-                }
-            }
+            private static bool isInitialized;
 
             /// <summary>
             /// Creates the list of paths
             /// </summary>
             /// <param name="prefix">The path prefix</param>
+            /// <param name="context">The data context</param>
             /// <param name="request">The api request</param>
             /// <returns>The list of paths</returns>
-            public static IEnumerable<string> CreatePaths(string prefix, ApiRequest request)
+            public static IEnumerable<string> CreatePaths(string prefix, TContext context, ApiRequest request)
             {
+                Initialize(context);
+
                 if (request?.Fields == null)
                 {
                     yield break;
@@ -107,8 +88,8 @@ namespace ClusterKit.Data.EF
 
                 foreach (var field in request.Fields)
                 {
-                    PropertyDescription description;
-                    if (!CollectionProperties.TryGetValue(field.FieldName, out description))
+                    PropertyDescription<TContext> description;
+                    if (!NavigationProperties.TryGetValue(field.FieldName, out description))
                     {
                         continue;
                     }
@@ -118,9 +99,52 @@ namespace ClusterKit.Data.EF
                                           : $"{prefix}.{description.PropertyName}";
 
                     yield return currentPath;
-                    foreach (var nestedPath in description.CreatePaths(currentPath, field))
+                    foreach (var nestedPath in description.CreatePaths(currentPath, context, field))
                     {
                         yield return nestedPath;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Initializes static members of the <see cref="PathCreator{T, TContext}"/> class.
+            /// </summary>
+            /// <param name="context">
+            /// The data context.
+            /// </param>
+            private static void Initialize(TContext context)
+            {
+                if (isInitialized)
+                {
+                    return;
+                }
+
+                lock (LockObject)
+                {
+                    if (isInitialized)
+                    {
+                        return;
+                    }
+
+                    isInitialized = true;
+
+                    var entityType = context.Model.FindEntityType(typeof(T));
+                    if (entityType == null)
+                    {
+                        return;
+                    }
+
+                    foreach (var navigation in entityType.GetNavigations())
+                    {
+                        var declareFieldAttribute = navigation.PropertyInfo.GetCustomAttribute<DeclareFieldAttribute>();
+                        var propertyName = declareFieldAttribute?.Name
+                                           ?? ApiDescriptionAttribute.ToCamelCase(navigation.PropertyInfo.Name);
+
+                        var propertyType = navigation.PropertyInfo.PropertyType.GetInterfaces()
+                                               .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                                               ?.GetGenericArguments()[0] ?? navigation.PropertyInfo.PropertyType;
+
+                        NavigationProperties[propertyName] = new PropertyDescription<TContext>(navigation.Name, propertyType);
                     }
                 }
             }
@@ -129,7 +153,8 @@ namespace ClusterKit.Data.EF
         /// <summary>
         /// The property description
         /// </summary>
-        private class PropertyDescription
+        /// <typeparam name="TContext">The type of data context</typeparam>
+        private class PropertyDescription<TContext> where TContext : DbContext
         {
             /// <summary>
             /// the property type
@@ -144,10 +169,10 @@ namespace ClusterKit.Data.EF
             /// <summary>
             /// The resolved path creation function
             /// </summary>
-            private Func<string, ApiRequest, IEnumerable<string>> createPathsFunc;
+            private Func<string, TContext, ApiRequest, IEnumerable<string>> createPathsFunc;
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="PropertyDescription"/> class.
+            /// Initializes a new instance of the <see cref="PropertyDescription{TContext}"/> class.
             /// </summary>
             /// <param name="propertyName">
             /// The property name.
@@ -169,10 +194,19 @@ namespace ClusterKit.Data.EF
             /// <summary>
             /// Calls the create path function for current property
             /// </summary>
-            /// <param name="prefix">The path prefix</param>
-            /// <param name="request">The api request</param>
-            /// <returns>The list of discovered includes</returns>
-            public IEnumerable<string> CreatePaths(string prefix, ApiRequest request)
+            /// <param name="prefix">
+            /// The path prefix
+            /// </param>
+            /// <param name="context">
+            /// The context.
+            /// </param>
+            /// <param name="request">
+            /// The api request
+            /// </param>
+            /// <returns>
+            /// The list of discovered includes
+            /// </returns>
+            public IEnumerable<string> CreatePaths(string prefix, TContext context, ApiRequest request)
             {
                 if (this.createPathsFunc == null)
                 {
@@ -180,16 +214,16 @@ namespace ClusterKit.Data.EF
                     {
                         if (this.createPathsFunc == null)
                         {
-                            var creatorType = typeof(PathCreator<>).MakeGenericType(this.propertyType);
+                            var creatorType = typeof(PathCreator<,>).MakeGenericType(this.propertyType, typeof(TContext));
                             var func = creatorType.GetMethod("CreatePaths", BindingFlags.Static | BindingFlags.Public);
                             this.createPathsFunc =
-                                (Func<string, ApiRequest, IEnumerable<string>>)
-                                func.CreateDelegate(typeof(Func<string, ApiRequest, IEnumerable<string>>));
+                                (Func<string, TContext, ApiRequest, IEnumerable<string>>)
+                                func.CreateDelegate(typeof(Func<string, TContext, ApiRequest, IEnumerable<string>>));
                         }
                     }
                 }
 
-                return this.createPathsFunc(prefix, request);
+                return this.createPathsFunc(prefix, context, request);
             }
         }
     }

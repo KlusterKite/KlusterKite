@@ -11,11 +11,12 @@ namespace ClusterKit.Data.EF
 {
     using System;
     using System.Data.Common;
-    using System.Data.Entity;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     using JetBrains.Annotations;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Base factory to create entity framework contexts

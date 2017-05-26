@@ -10,7 +10,6 @@
 namespace ClusterKit.Data.EF
 {
     using System;
-    using System.Data.Entity;
     using System.Linq;
     using System.Reflection;
 
@@ -125,7 +124,7 @@ namespace ClusterKit.Data.EF
 
             if (this.installer != null)
             {
-                DbConfiguration.SetConfiguration(this.installer.GetConfiguration());
+                // DbConfiguration.SetConfiguration(this.installer.GetConfiguration());
                 var baseConnectionManager = this.installer.CreateConnectionManager();
 
                 container.Register(

@@ -51,7 +51,8 @@ namespace ClusterKit.Data.Tests.Mock
         /// <inheritdoc />
         public override DbConnection CreateConnection(string connectionString)
         {
-            return Effort.DbConnectionFactory.CreatePersistent(this.instanceName.Name);
+            return null;
+            // return Effort.DbConnectionFactory.CreatePersistent(this.instanceName.Name);
         }
 
         /// <inheritdoc />

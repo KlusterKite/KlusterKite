@@ -9,7 +9,7 @@
 
 namespace ClusterKit.Data.EF
 {
-    using System.Data.Entity;
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Base class to configure Entity Framework
@@ -22,10 +22,12 @@ namespace ClusterKit.Data.EF
         /// <returns>Instance of connection manager</returns>
         public abstract BaseConnectionManager CreateConnectionManager();
 
+        /*
         /// <summary>
         /// Gets the configuration for entity framework
         /// </summary>
         /// <returns>EF configuration</returns>
         public abstract DbConfiguration GetConfiguration();
+        */
     }
 }

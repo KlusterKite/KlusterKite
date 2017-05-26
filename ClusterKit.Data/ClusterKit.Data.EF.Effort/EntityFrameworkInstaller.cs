@@ -9,9 +9,6 @@
 
 namespace ClusterKit.Data.EF.Effort
 {
-    using System.Data.Entity;
-    using System.Data.Entity.Infrastructure;
-
     using ClusterKit.Data.EF;
 
     using JetBrains.Annotations;
@@ -28,6 +25,7 @@ namespace ClusterKit.Data.EF.Effort
         /// <returns>Instance of connection manager</returns>
         public override BaseConnectionManager CreateConnectionManager() => new ConnectionManager();
 
+        /*
         /// <summary>
         /// Gets the configuration for entity framework
         /// </summary>
@@ -56,5 +54,6 @@ namespace ClusterKit.Data.EF.Effort
                     global::Effort.Provider.EffortProviderServices.Instance);
             }
         }
+        */
     }
 }

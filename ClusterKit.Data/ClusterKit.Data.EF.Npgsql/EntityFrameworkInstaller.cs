@@ -9,9 +9,6 @@
 
 namespace ClusterKit.Data.EF.Npgsql
 {
-    using System.Data.Entity;
-    using System.Data.Entity.Infrastructure;
-
     using ClusterKit.Data.EF;
 
     using JetBrains.Annotations;
@@ -28,6 +25,7 @@ namespace ClusterKit.Data.EF.Npgsql
         /// <returns>Instance of connection manager</returns>
         public override BaseConnectionManager CreateConnectionManager() => new ConnectionManager();
 
+        /*
         /// <summary>
         /// Gets the configuration for entity framework
         /// </summary>
@@ -52,5 +50,6 @@ namespace ClusterKit.Data.EF.Npgsql
                 this.SetProviderServices("Npgsql", global::Npgsql.NpgsqlServices.Instance);
             }
         }
+        */
     }
 }
