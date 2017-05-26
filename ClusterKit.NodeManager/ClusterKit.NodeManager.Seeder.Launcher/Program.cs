@@ -66,6 +66,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
             try
             {
                 var repository = PackageRepositoryFactory.Default.CreateRepository(configuration.Nuget);
+
                 while (true)
                 {
                     try
@@ -84,31 +85,47 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                             continue;
                         }
 
-                        var dependencies = requiredPackages
-                            .Select(
-                                p => p.DependencySets.FirstOrDefault(
-                                    s => s.SupportedFrameworks == null || !s.SupportedFrameworks.Any()
-                                         || s.SupportedFrameworks.Any(f => f == configuration.ExecutionFramework)))
-                            .Where(ds => ds != null)
-                            .SelectMany(ds => ds.Dependencies)
-                            .GroupBy(d => d.Id)
-                            .Select(
-                                g => repository.Search(g.Key, true)
-                                    .ToList()
-                                    .Where(p => p.Id == g.Key && g.All(pd => pd.VersionSpec.Satisfies(p.Version)))
-                                    .OrderByDescending(p => p.Version)
-                                    .FirstOrDefault())
-                            .ToList();
-
-                        if (dependencies.Any(d => d == null))
+                        while (true)
                         {
-                            Console.WriteLine("Could not find required package dependencies in repository... Retrying...");
+                            var dependencies = requiredPackages
+                                .Select(
+                                    p => p.DependencySets.FirstOrDefault(
+                                        s => s.SupportedFrameworks == null || !s.SupportedFrameworks.Any()
+                                             || s.SupportedFrameworks.Any(f => f == configuration.ExecutionFramework)))
+                                .Where(ds => ds != null)
+                                .SelectMany(ds => ds.Dependencies)
+                                .GroupBy(d => d.Id)
+                                .Where(d => requiredPackages.All(r => r.Id != d.Key))
+                                .Select(
+                                    g => repository.Search(g.Key, true)
+                                        .ToList()
+                                        .Where(p => p.Id == g.Key && g.All(pd => pd.VersionSpec.Satisfies(p.Version)))
+                                        .OrderBy(p => p.Version)
+                                        .FirstOrDefault())
+                                .ToList();
+
+                            if (dependencies.Count == 0)
+                            {
+                                break;
+                            }
+
+                            if (dependencies.Any(d => d == null))
+                            {
+                                Console.WriteLine("Could not find required dependencies in repository... Retrying...");
+                                requiredPackages = null;
+                                break;
+                            }
+
+                            requiredPackages.AddRange(dependencies);
+                        }
+
+                        if (requiredPackages == null)
+                        {
                             Thread.Sleep(configuration.NugetCheckPeriod);
                             continue;
                         }
 
-                        foreach (var package in requiredPackages.Union(
-                            dependencies.Where(d => requiredPackages.All(rp => rp.Id != d.Id))))
+                        foreach (var package in requiredPackages)
                         {
                             ExtractPackage(package, configuration.ExecutionFramework, tempDir, executionDir);
                         }
@@ -190,11 +207,11 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
             var nameTable = document.NameTable;
             var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", uri);
+            const string Uri = "urn:schemas-microsoft-com:asm.v1";
+            namespaceManager.AddNamespace("urn", Uri);
 
             var assemblyBindingNode = runTimeNode.SelectSingleNode("./urn:assemblyBinding", namespaceManager)
-                                      ?? runTimeNode.AppendChild(document.CreateElement("assemblyBinding", uri));
+                                      ?? runTimeNode.AppendChild(document.CreateElement("assemblyBinding", Uri));
 
             foreach (var lib in Directory.GetFiles(executionDirectory, "*.dll"))
             {
@@ -203,7 +220,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                     assemblyBindingNode?.SelectSingleNode(
                         $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
                         namespaceManager)
-                    ?? assemblyBindingNode?.AppendChild(document.CreateElement("dependentAssembly", uri));
+                    ?? assemblyBindingNode?.AppendChild(document.CreateElement("dependentAssembly", Uri));
 
                 if (dependentNode == null)
                 {
@@ -212,7 +229,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
                 dependentNode.RemoveAll();
                 var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(document.CreateElement("assemblyIdentity", uri));
+                    (XmlElement)dependentNode.AppendChild(document.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", parameters.Name);
                 var publicKeyToken =
                     BitConverter.ToString(parameters.GetPublicKeyToken())
@@ -220,7 +237,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                         .ToLower(CultureInfo.InvariantCulture);
                 assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
                 var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(document.CreateElement("bindingRedirect", uri));
+                    (XmlElement)dependentNode.AppendChild(document.CreateElement("bindingRedirect", Uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
             }
@@ -306,6 +323,24 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
             IEnumerable<IPackageFile> compatibleFiles;
             if (VersionUtility.TryGetCompatibleItems(frameworkName, package.GetLibFiles(), out compatibleFiles))
             {
+                var hasFiles = false;
+                foreach (var compatibleFile in compatibleFiles)
+                {
+                    hasFiles = true;
+                    File.Copy(
+                        Path.Combine(tmpDir, package.Id, compatibleFile.Path),
+                        Path.Combine(executionDir, Path.GetFileName(compatibleFile.Path)),
+                        true);
+                }
+
+                if (hasFiles)
+                {
+                    return;
+                }
+            }
+           
+            if (VersionUtility.TryGetCompatibleItems(frameworkName, package.GetToolFiles(), out compatibleFiles))
+            {
                 foreach (var compatibleFile in compatibleFiles)
                 {
                     File.Copy(
@@ -313,6 +348,10 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                         Path.Combine(executionDir, Path.GetFileName(compatibleFile.Path)),
                         true);
                 }
+            }
+            else
+            {
+                Console.WriteLine($"Error: No items found for {package.Id} {package.Version}");
             }
         } 
     }

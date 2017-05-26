@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
+    <ProjectReference Include="..\ClusterKit.Web.Descriptor\ClusterKit.Web.Descriptor.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" />

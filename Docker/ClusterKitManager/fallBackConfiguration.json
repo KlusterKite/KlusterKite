@@ -164,6 +164,14 @@
       "Version": "0.0.0-local"
     },
     {
+      "Id": "ClusterKit.Web.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Web.Descriptor",
+      "Version": "0.0.0-local"
+    },
+    {
       "Id": "ClusterKit.Web.GraphQL.Publisher",
       "Version": "0.0.0-local"
     },

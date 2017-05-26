@@ -1,5 +1,5 @@
 ﻿{
-	ExecutionFramework = ".NETFramework,Version=v4.5"
+	ExecutionFramework = ".NETFramework,Version=v4.6"
 
 	Nuget = "http://nuget/"
 	NugetCheckPeriod = 30s

@@ -86,13 +86,13 @@ Target "DockerContainers" (fun _ ->
     buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
 
     buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
-    
+    (*
     if not (directoryExists "./packages/Npm.js") then
         "Npm.js" |> RestorePackageId(fun p-> 
             { p with
                 OutputPath = "./packages"
                 ExcludeVersion = true})
-
+    
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build"
 
@@ -112,6 +112,7 @@ Target "DockerContainers" (fun _ ->
 
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local"
+    *)
 )
 
 
