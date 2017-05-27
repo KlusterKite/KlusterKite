@@ -13,6 +13,7 @@ namespace ClusterKit.Data.Tests.Mock
     using System.Threading.Tasks;
 
     using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.Data.EF;
 
     using JetBrains.Annotations;
 
@@ -25,10 +26,10 @@ namespace ClusterKit.Data.Tests.Mock
         /// <summary>
         /// The mocked data context
         /// </summary>
-        private readonly IContextFactory<TestDataContext> contextFactory;
+        private readonly UniversalContextFactory contextFactory;
 
         /// <inheritdoc />
-        public TestDataActor(IContextFactory<TestDataContext> contextFactory)
+        public TestDataActor(UniversalContextFactory contextFactory)
         {
             this.contextFactory = contextFactory;
 
@@ -41,7 +42,7 @@ namespace ClusterKit.Data.Tests.Mock
         /// <inheritdoc />
         protected override Task<TestDataContext> GetContext()
         {
-            return this.contextFactory.CreateContext(null, "test");
+            return Task.FromResult(this.contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"));
         }
     }
 }

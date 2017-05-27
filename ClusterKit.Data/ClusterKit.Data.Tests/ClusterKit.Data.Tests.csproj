@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
     <ProjectReference Include="..\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
+    <ProjectReference Include="..\ClusterKit.Data.EF.InMemory\ClusterKit.Data.EF.InMemory.csproj" />
     <ProjectReference Include="..\ClusterKit.Data.EF\ClusterKit.Data.EF.csproj" />
     <ProjectReference Include="..\ClusterKit.Data\ClusterKit.Data.csproj" />
   </ItemGroup>

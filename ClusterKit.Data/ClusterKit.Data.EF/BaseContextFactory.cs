@@ -12,7 +12,6 @@ namespace ClusterKit.Data.EF
     using System;
     using System.Data.Common;
     using System.Linq.Expressions;
-    using System.Threading.Tasks;
 
     using JetBrains.Annotations;
 
@@ -21,87 +20,113 @@ namespace ClusterKit.Data.EF
     /// <summary>
     /// Base factory to create entity framework contexts
     /// </summary>
-    /// <typeparam name="TContext">The type of context</typeparam>
     /// <remarks>
     /// Expected that TContext has a public constructor with <see cref="DbConnection"/> and <see cref="bool"/> arguments
     /// </remarks>
     [UsedImplicitly]
-    public class BaseContextFactory<TContext> : IContextFactory<TContext> where TContext : DbContext
+    public abstract class BaseContextFactory : IContextFactory
     {
         /// <summary>
-        /// Pre-compiled activator to create data context
+        /// Gets a unique provider name
         /// </summary>
-        public static readonly Func<DbConnection, bool, TContext> Creator;
+        public abstract string ProviderName { get; }
 
         /// <summary>
-        /// Initializes static members of the <see cref="BaseContextFactory{TContext}"/> class.
+        /// Creates a new instance of context class
         /// </summary>
-        static BaseContextFactory()
-        {
-            var constructor = typeof(TContext).GetConstructor(new[] { typeof(DbConnection), typeof(bool) });
-
-            if (constructor == null)
-            {
-                return;
-            }
-
-            var existingConnectionParameter = Expression.Parameter(typeof(DbConnection), "existingConnection");
-            var contextOwnsConnectionParameter = Expression.Parameter(typeof(bool), "contextOwnsConnection");
-
-            var newExp = Expression.New(constructor, existingConnectionParameter, contextOwnsConnectionParameter);
-
-            var lambda = Expression.Lambda(
-                typeof(Func<DbConnection, bool, TContext>),
-                newExp,
-                existingConnectionParameter,
-                contextOwnsConnectionParameter);
-            Creator = (Func<DbConnection, bool, TContext>)lambda.Compile();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BaseContextFactory{TContext}"/> class.
-        /// </summary>
-        /// <param name="connectionManager">
-        /// The connection manager.
-        /// </param>
-        public BaseContextFactory([NotNull] BaseConnectionManager connectionManager)
-        {
-            if (connectionManager == null)
-            {
-                throw new ArgumentNullException(nameof(connectionManager));
-            }
-
-            this.ConnectionManager = connectionManager;
-        }
-
-        /// <summary>
-        ///  Gets the connection manager.
-        /// </summary>
-        protected BaseConnectionManager ConnectionManager { get; }
-
-        /// <summary>
-        /// Creates context attached to data source.
-        /// Data source will be used as is.
-        /// </summary>
-        /// <param name="connectionString">
-        /// The connection String.
-        /// </param>
-        /// <param name="databaseName">
-        /// The database Name.
+        /// <typeparam name="TContext">The type of context</typeparam>
+        /// <param name="options">
+        /// The context options.
         /// </param>
         /// <returns>
-        /// The data context
+        /// The new context
         /// </returns>
-        public virtual async Task<TContext> CreateContext(string connectionString, string databaseName)
+        /// <exception cref="InvalidOperationException">
+        /// The context class must have a public constructor that accepts <see cref="DbContextOptions{TContext}"/> as single parameter
+        /// </exception>
+        [UsedImplicitly]
+        public static TContext CreateContext<TContext>(DbContextOptions<TContext> options)
+            where TContext : DbContext
         {
-            databaseName = this.ConnectionManager.EscapeDatabaseName(databaseName);
-            var connection = this.ConnectionManager.CreateConnection(connectionString);
-            await connection.OpenAsync();
+            return ContextCreator<TContext>.Create(options);
+        }
 
-            this.ConnectionManager.SwitchDatabase(connection, databaseName);
+        /// <inheritdoc />
+        public TContext CreateContext<TContext>(string connectionString, string databaseName = null)
+            where TContext : DbContext
+        {
+            var options = this.GetContextOptions<TContext>(connectionString, databaseName);
+            return CreateContext(options);
+        }
 
-            var context = Creator(connection, true);
-            return context;
+        /// <summary>
+        /// Creates a context options for a given data
+        /// </summary>
+        /// <typeparam name="TContext">The type of context</typeparam>
+        /// <param name="connectionString">The connection string</param>
+        /// <param name="databaseName">The database name</param>
+        /// <returns>The context</returns>
+        protected abstract DbContextOptions<TContext> GetContextOptions<TContext>(
+            string connectionString,
+            string databaseName) where TContext : DbContext;
+
+        /// <summary>
+        /// Helper to create new context instances
+        /// </summary>
+        /// <typeparam name="TContext">The type of context</typeparam>
+        private static class ContextCreator<TContext>
+            where TContext : DbContext
+        {
+            /// <summary>
+            /// The pre-compiled creator method
+            /// </summary>
+            private static readonly Func<DbContextOptions<TContext>, TContext> Creator;
+
+            /// <summary>
+            /// Initializes static members of the <see cref="ContextCreator{TContext}"/> class.
+            /// </summary>
+            static ContextCreator()
+            {
+                var constructor = typeof(TContext).GetConstructor(new[] { typeof(DbContextOptions<TContext>) });
+                if (constructor == null)
+                {
+                    return;
+                }
+
+                var optionsParameter = Expression.Parameter(typeof(DbContextOptions<TContext>), "options");
+                var newExp = Expression.New(constructor, optionsParameter);
+
+                var lambda = Expression.Lambda(
+                    typeof(Func<DbContextOptions<TContext>, TContext>),
+                    newExp,
+                    optionsParameter);
+
+                Creator = (Func<DbContextOptions<TContext>, TContext>)lambda.Compile();
+            }
+
+            /// <summary>
+            /// Creates a new instance of context class
+            /// </summary>
+            /// <param name="options">
+            /// The context options.
+            /// </param>
+            /// <returns>
+            /// The new context
+            /// </returns>
+            /// <exception cref="InvalidOperationException">
+            /// The context class must have a public constructor that accepts <see cref="DbContextOptions{TContext}"/> as single parameter
+            /// </exception>
+            public static TContext Create(DbContextOptions<TContext> options)
+            {
+                if (Creator == null)
+                {
+                    throw new InvalidOperationException(
+                        $"{typeof(TContext).FullName} does not have a public constructor "
+                        + $"with single parameter of type DbContextOptions<{typeof(TContext).FullName}>");
+                }
+
+                return Creator(options);
+            }
         }
     }
 }

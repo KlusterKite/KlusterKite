@@ -7,23 +7,28 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data
+namespace ClusterKit.Data.EF
 {
-    using System.Threading.Tasks;
-
     using JetBrains.Annotations;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Data context creation factory contract
     /// </summary>
-    /// <typeparam name="TContext">Type of context to create</typeparam>
     [UsedImplicitly]
-    public interface IContextFactory<TContext>
+    public interface IContextFactory
     {
+        /// <summary>
+        /// Gets a unique provider name
+        /// </summary>
+        string ProviderName { get; }
+
         /// <summary>
         /// Creates context attached to data source.
         /// Data source will be used as is.
         /// </summary>
+        /// <typeparam name="TContext">Type of context to create</typeparam>
         /// <param name="connectionString">
         /// The connection String.
         /// </param>
@@ -34,6 +39,6 @@ namespace ClusterKit.Data
         /// The data context
         /// </returns>
         [UsedImplicitly]
-        Task<TContext> CreateContext(string connectionString, string databaseName);
+        TContext CreateContext<TContext>(string connectionString, string databaseName = null) where TContext : DbContext;
     }
 }
