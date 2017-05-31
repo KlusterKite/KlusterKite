@@ -15,6 +15,8 @@ namespace ClusterKit.NodeManager.Client.ORM
 
     using ClusterKit.API.Attributes;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// The compatible node template
     /// </summary>
@@ -26,39 +28,46 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the relation id
         /// </summary>
         [Key]
+        [UsedImplicitly]
         [DeclareField("the relation id", IsKey = true)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the compatible release id
         /// </summary>
+        [UsedImplicitly]
         [DeclareField("the compatible release id")]
-        [ForeignKey(nameof(CompatibleRelease))]
         public int CompatibleReleaseId { get; set; }
 
         /// <summary>
         /// Gets or sets the parent release id
         /// </summary>
+        [UsedImplicitly]
         [DeclareField("the parent release id")]
-        [ForeignKey(nameof(Release))]
         public int ReleaseId { get; set; }
 
         /// <summary>
         /// Gets or sets the template code
         /// </summary>
+        [UsedImplicitly]
         [DeclareField("the template code")]
         public string TemplateCode { get; set; }
 
         /// <summary>
         /// Gets or sets the compatible release
         /// </summary>
+        [UsedImplicitly]
         [DeclareField("the compatible release")]
+        [ForeignKey(nameof(CompatibleReleaseId))]
         public Release CompatibleRelease { get; set; }
 
         /// <summary>
         /// Gets or sets the parent release
         /// </summary>
+        [UsedImplicitly]
         [DeclareField("the parent release")]
+        [ForeignKey(nameof(ReleaseId))]
         public Release Release { get; set; }
     }
 }

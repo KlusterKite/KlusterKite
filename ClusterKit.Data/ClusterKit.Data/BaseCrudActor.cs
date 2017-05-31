@@ -168,7 +168,7 @@ namespace ClusterKit.Data
         /// Gets current data context
         /// </summary>
         /// <returns>The data context</returns>
-        protected abstract Task<TContext> GetContext();
+        protected abstract TContext GetContext();
 
         /// <summary>
         /// Process collection requests
@@ -186,7 +186,7 @@ namespace ClusterKit.Data
         {
             try
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
                     int maxLimit;
                     if (!this.classQueryLimits.TryGetValue(
@@ -349,7 +349,7 @@ namespace ClusterKit.Data
         protected virtual async Task<CrudActionResponse<TObject>> ProcessRequest<TObject, TId>(
             CrudActionMessage<TObject, TId> request) where TObject : class
         {
-            using (var ds = await this.GetContext())
+            using (var ds = this.GetContext())
             {
                 var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
                 switch (request.ActionType)

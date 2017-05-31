@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RoleUser.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.Tests.Mock
+namespace ClusterKit.NodeManager.Client.ORM
 {
     using System;
     using System.ComponentModel.DataAnnotations.Schema;

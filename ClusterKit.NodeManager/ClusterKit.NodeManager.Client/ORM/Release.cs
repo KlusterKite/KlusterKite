@@ -34,6 +34,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         [DeclareField("The release id", IsKey = true)]
         [Key]
         [UsedImplicitly]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         /// <summary>
@@ -107,26 +108,27 @@ namespace ClusterKit.NodeManager.Client.ORM
         public ReleaseConfiguration Configuration { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of compatible node templates
+        /// Gets or sets the list of backward-compatible node templates
         /// </summary>
         [UsedImplicitly]
         [DeclareField("the list of compatible node templates", Access = EnAccessFlag.Queryable)]
         [ForeignKey(nameof(CompatibleTemplate.ReleaseId))]
-        public List<CompatibleTemplate> CompatibleTemplates { get; set; }
-        
+        public List<CompatibleTemplate> CompatibleTemplatesBackward { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of node templates compatible with future releases
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the list of compatible node templates", Access = EnAccessFlag.Queryable)]
+        [ForeignKey(nameof(CompatibleTemplate.CompatibleReleaseId))]
+        public List<CompatibleTemplate> CompatibleTemplatesForward { get; set; }
+
         /// <summary>
         /// Gets or sets the list of migration operations
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the list of migration operations")]
-        public List<MigrationOperation> Operations { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of migration errors
-        /// </summary>
-        [UsedImplicitly]
-        [DeclareField("the list of migration errors")]
-        public List<MigrationError> Errors { get; set; }
+        [DeclareField("the list of migration logs")]
+        public List<MigrationLogRecord> MigrationLogs { get; set; }
 
         /// <summary>
         ///  Gets or sets the release configuration as json to store in database
@@ -134,17 +136,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         [UsedImplicitly]
         public string ConfigurationJson
         {
-            get
-            {
-                return this.Configuration != null
-                           ? JsonConvert.SerializeObject(this.Configuration, Formatting.None)
-                           : null;
-            }
+            get => this.Configuration != null ? JsonConvert.SerializeObject(this.Configuration, Formatting.None) : null;
 
-            set
-            {
-                this.Configuration = value == null ? null : JsonConvert.DeserializeObject<ReleaseConfiguration>(value);
-            }
+            set => this.Configuration = value == null
+                                            ? null
+                                            : JsonConvert.DeserializeObject<ReleaseConfiguration>(value);
         }
 
         /// <inheritdoc />

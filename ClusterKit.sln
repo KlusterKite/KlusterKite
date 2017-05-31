@@ -148,6 +148,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClusterKit.NodeManager.Fall
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClusterKit.Data.EF.InMemory", "ClusterKit.Data\ClusterKit.Data.EF.InMemory\ClusterKit.Data.EF.InMemory.csproj", "{66880A7D-FF32-44F4-A2EF-402BC77B92A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterKit.NodeManager.Launcher.Utils", "ClusterKit.NodeManager\ClusterKit.NodeManager.Launcher.Utils\ClusterKit.NodeManager.Launcher.Utils.csproj", "{E8AE4D03-2C3E-4F9D-865D-FDC57DE3F30C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -370,6 +372,10 @@ Global
 		{66880A7D-FF32-44F4-A2EF-402BC77B92A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66880A7D-FF32-44F4-A2EF-402BC77B92A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66880A7D-FF32-44F4-A2EF-402BC77B92A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8AE4D03-2C3E-4F9D-865D-FDC57DE3F30C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8AE4D03-2C3E-4F9D-865D-FDC57DE3F30C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8AE4D03-2C3E-4F9D-865D-FDC57DE3F30C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8AE4D03-2C3E-4F9D-865D-FDC57DE3F30C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -429,5 +435,6 @@ Global
 		{311B4929-896C-4392-A53E-9581EE2CCE12} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{84F1628B-87A7-497E-8000-46AD3B6BB61C} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 		{66880A7D-FF32-44F4-A2EF-402BC77B92A2} = {C88A5B7F-0B1E-4533-9D25-D6654C8D3EB6}
+		{E8AE4D03-2C3E-4F9D-865D-FDC57DE3F30C} = {998201C9-A0EF-4A81-B8BE-58DDC29D1DB9}
 	EndGlobalSection
 EndGlobal

@@ -20,9 +20,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using ClusterKit.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
-
+    using Microsoft.EntityFrameworkCore;
     using NuGet;
-
+    
     /// <summary>
     /// Extending the work with <see cref="Release"/>
     /// </summary>
@@ -42,7 +42,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             IPackageRepository nugetRepository,
             List<string> supportedFrameworks)
         {
-            release.CompatibleTemplates = release.GetCompatibleTemplates(context).ToList();
+            release.CompatibleTemplatesBackward = release.GetCompatibleTemplates(context).ToList();
             foreach (var error in release.SetPackagesDescriptionsForTemplates(nugetRepository, supportedFrameworks))
             {
                 yield return error;
@@ -127,7 +127,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             }
 
             var currentRelease =
-                context.Releases.Include(nameof(Release.CompatibleTemplates))
+                context.Releases.Include(nameof(Release.CompatibleTemplatesBackward))
                     .FirstOrDefault(r => r.State == EnReleaseState.Active);
 
             if (currentRelease?.Configuration?.NodeTemplates == null)
@@ -186,7 +186,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                         };
 
                 foreach (
-                    var compatible in currentRelease.CompatibleTemplates.Where(ct => ct.TemplateCode == template.Code))
+                    var compatible in currentRelease.CompatibleTemplatesBackward.Where(ct => ct.TemplateCode == template.Code))
                 {
                     yield return
                         new CompatibleTemplate
@@ -335,7 +335,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                             yield return
                                 new ErrorDescription(
                                     packageField,
-                                    $"Package dependency for {dependencySet.TargetFramework.FullName} {dependency.Id} doesn't satisify version requirements");
+                                    $"Package dependency for {dependencySet.TargetFramework.FullName} {dependency.Id} doesn't satisfy version requirements");
                         }
                     }
                 }

@@ -11,74 +11,99 @@ namespace ClusterKit.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Common;
     using System.Linq;
 
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
 
+    using Microsoft.EntityFrameworkCore;
+
     using Xunit;
-    
+    using Xunit.Abstractions;
+
     /// <summary>
     /// Testing basic work with <see cref="Release"/>
     /// </summary>
-    public class ReleaseTests
+    public class ReleaseTests : IDisposable
     {
         /// <summary>
-        /// Tests the release compatibility set-up - templates with changed modules versions are incompatible
+        /// The output.
+        /// </summary>
+        private readonly ITestOutputHelper output;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReleaseTests"/> class.
+        /// </summary>
+        /// <param name="output">
+        /// The output.
+        /// </param>
+        public ReleaseTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            this.CreateContext().Database.EnsureDeleted();
+        }
+
+        /// <summary>
+        /// Tests the release compatibility set-up - templates with changed configurations are in compatible
         /// </summary>
         [Fact]
-        public void TestReleaseCompatibilityModuleVersionSet()
+        public void TestReleaseCompatibilityConfigurationsSet()
         {
-            using (var connection = Effort.DbConnectionFactory.CreatePersistent(Guid.NewGuid().ToString("N")))
+            this.CreateTestDatabase();
+
+            var template1 = new NodeTemplate
+                                {
+                                    Code = "template1",
+                                    Configuration = "1",
+                                    PackageRequirements = this.GetPackageRequirements("p1; p2")
+                                };
+
+            var template2 = new NodeTemplate
+                                {
+                                    Code = "template2",
+                                    Configuration = "2",
+                                    PackageRequirements = this.GetPackageRequirements("p2; p3")
+                                };
+
+            var release = new Release
+                              {
+                                  MinorVersion = 1,
+                                  Name = "1",
+                                  State = EnReleaseState.Active,
+                                  Configuration =
+                                      new ReleaseConfiguration
+                                          {
+                                              NodeTemplates =
+                                                  this.GetList(template1, template2),
+                                              Packages = this.CreatePackages(
+                                                  "p1;0.0.1",
+                                                  "p2;0.0.1",
+                                                  "p3;0.0.1")
+                                          }
+                              };
+
+            using (var context = this.CreateContext())
             {
-                this.CreateTestDatabase(connection);
+                // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
+                var ids = context.Releases.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
-                var template1 = new NodeTemplate
-                                    {
-                                        Code = "template1",
-                                        Configuration = "1",
-                                        PackageRequirements = this.GetPackageRequirements("p1; p2")
-                                    };
+                var compatibleTemplates = release.GetCompatibleTemplates(context)
+                    .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
+                Assert.Equal(2, compatibleTemplates.Count);
+                Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
 
-                var template2 = new NodeTemplate
-                                    {
-                                        Code = "template2",
-                                        Configuration = "2",
-                                        PackageRequirements = this.GetPackageRequirements("p2; p3")
-                                    };
+                this.output.WriteLine($"Database release ids: {string.Join(", ", ids)}");
+                this.output.WriteLine(
+                    $"Compatible templates release ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleReleaseId))}");
 
-                var release = new Release
-                                  {
-                                      MinorVersion = 1,
-                                      Name = "1",
-                                      State = EnReleaseState.Active,
-                                      Configuration =
-                                          new ReleaseConfiguration
-                                              {
-                                                  NodeTemplates =
-                                                      this.GetList(template1, template2),
-                                                  Packages =
-                                                      this.CreatePackages(
-                                                          "p1;0.0.1",
-                                                          "p2;0.0.1",
-                                                          "p3;0.0.2")
-                                              }
-                                  };
-
-                using (var context = new ConfigurationContext(connection, false))
-                {
-                    var compatibleTemplates =
-                        release.GetCompatibleTemplates(context)
-                            .OrderByDescending(t => t.CompatibleReleaseId)
-                            .ThenBy(o => o.TemplateCode)
-                            .ToList();
-                    Assert.Equal(2, compatibleTemplates.Count);
-                    Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
-                    Assert.Equal(2, compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
-                    Assert.Equal(1, compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
-                }
+                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
+                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
             }
         }
 
@@ -88,198 +113,125 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void TestReleaseCompatibilityModuleListSet()
         {
-            using (var connection = Effort.DbConnectionFactory.CreatePersistent(Guid.NewGuid().ToString("N")))
-            {
-                this.CreateTestDatabase(connection);
+            this.CreateTestDatabase();
 
-                var template1 = new NodeTemplate
-                                    {
-                                        Code = "template1",
-                                        Configuration = "1",
-                                        PackageRequirements = this.GetPackageRequirements("p1; p2")
-                                    };
-
-                var template2 = new NodeTemplate
-                                    {
-                                        Code = "template2",
-                                        Configuration = "2",
-                                        PackageRequirements = this.GetPackageRequirements("p1; p2; p3")
-                                    };
-
-                var release = new Release
-                                  {
-                                      MinorVersion = 1,
-                                      Name = "1",
-                                      State = EnReleaseState.Active,
-                                      Configuration =
-                                          new ReleaseConfiguration
-                                              {
-                                                  NodeTemplates =
-                                                      this.GetList(template1, template2),
-                                                  Packages =
-                                                      this.CreatePackages(
-                                                          "p1;0.0.1",
-                                                          "p2;0.0.1",
-                                                          "p3;0.0.1")
-                                              }
-                                  };
-
-                using (var context = new ConfigurationContext(connection, false))
-                {
-                    var compatibleTemplates =
-                        release.GetCompatibleTemplates(context)
-                            .OrderByDescending(t => t.CompatibleReleaseId)
-                            .ThenBy(o => o.TemplateCode)
-                            .ToList();
-                    Assert.Equal(2, compatibleTemplates.Count);
-                    Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
-                    Assert.Equal(2, compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
-                    Assert.Equal(1, compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
-                }
-            }
-        }
-
-        /// <summary>
-        /// Tests the release compatibility set-up - templates with changed configurations are in compatible
-        /// </summary>
-        [Fact]
-        public void TestReleaseCompatibilityConfigurationsSet()
-        {
-            using (var connection = Effort.DbConnectionFactory.CreatePersistent(Guid.NewGuid().ToString("N")))
-            {
-                this.CreateTestDatabase(connection);
-
-                var template1 = new NodeTemplate
-                                    {
-                                        Code = "template1",
-                                        Configuration = "1",
-                                        PackageRequirements = this.GetPackageRequirements("p1; p2")
-                                    };
-
-                var template2 = new NodeTemplate
-                                    {
-                                        Code = "template2",
-                                        Configuration = "2",
-                                        PackageRequirements = this.GetPackageRequirements("p2; p3")
-                                    };
-
-                var release = new Release
-                                  {
-                                      MinorVersion = 1,
-                                      Name = "1",
-                                      State = EnReleaseState.Active,
-                                      Configuration =
-                                          new ReleaseConfiguration
-                                              {
-                                                  NodeTemplates =
-                                                      this.GetList(template1, template2),
-                                                  Packages =
-                                                      this.CreatePackages(
-                                                          "p1;0.0.1",
-                                                          "p2;0.0.1",
-                                                          "p3;0.0.1")
-                                              }
-                                  };
-
-                using (var context = new ConfigurationContext(connection, false))
-                {
-                    var compatibleTemplates =
-                        release.GetCompatibleTemplates(context)
-                            .OrderByDescending(t => t.CompatibleReleaseId)
-                            .ThenBy(o => o.TemplateCode)
-                            .ToList();
-                    Assert.Equal(2, compatibleTemplates.Count);
-                    Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
-                    Assert.Equal(2, compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
-                    Assert.Equal(1, compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
-                }
-            }
-        }
-
-        /// <summary>
-        /// Creates the database with test data
-        /// </summary>
-        /// <param name="connection">The database connection</param>
-        private void CreateTestDatabase(DbConnection connection)
-        {
             var template1 = new NodeTemplate
-            {
-                Code = "template1",
-                Configuration = "1",
-                PackageRequirements = this.GetPackageRequirements("p1; p2")
-            };
+                                {
+                                    Code = "template1",
+                                    Configuration = "1",
+                                    PackageRequirements = this.GetPackageRequirements("p1; p2")
+                                };
 
             var template2 = new NodeTemplate
-            {
-                Code = "template2",
-                Configuration = "1",
-                PackageRequirements = this.GetPackageRequirements("p2; p3")
-            };
+                                {
+                                    Code = "template2",
+                                    Configuration = "2",
+                                    PackageRequirements = this.GetPackageRequirements("p1; p2; p3")
+                                };
 
-            using (var context = new ConfigurationContext(connection, false))
-            {
-                var release1 = new Release
-                                   {
-                                       MinorVersion = 1,
-                                       Name = "1",
-                                       State = EnReleaseState.Obsolete,
-                                       Configuration =
-                                           new ReleaseConfiguration
-                                               {
-                                                   NodeTemplates =
-                                                       this.GetList(template1, template2),
-                                                   Packages =
-                                                       this.CreatePackages(
-                                                           "p1;0.0.1",
-                                                           "p2;0.0.1",
-                                                           "p3;0.0.1")
-                                               }
-                                   };
-                context.Releases.Add(release1);
-                context.SaveChanges();
-            }
+            var release = new Release
+                              {
+                                  MinorVersion = 1,
+                                  Name = "1",
+                                  State = EnReleaseState.Active,
+                                  Configuration =
+                                      new ReleaseConfiguration
+                                          {
+                                              NodeTemplates =
+                                                  this.GetList(template1, template2),
+                                              Packages = this.CreatePackages(
+                                                  "p1;0.0.1",
+                                                  "p2;0.0.1",
+                                                  "p3;0.0.1")
+                                          }
+                              };
 
-            using (var context = new ConfigurationContext(connection, false))
+            using (var context = this.CreateContext())
             {
-                var activeRelease = new Release
-                                        {
-                                            MinorVersion = 2,
-                                            Name = "active",
-                                            State = EnReleaseState.Active,
-                                            Configuration =
-                                                new ReleaseConfiguration
-                                                    {
-                                                        NodeTemplates =
-                                                            this.GetList(
-                                                                template1,
-                                                                template2),
-                                                        Packages =
-                                                            this.CreatePackages(
-                                                                "p1;0.0.1",
-                                                                "p2;0.0.1",
-                                                                "p3;0.0.1")
-                                                    }
-                                        };
+                // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
+                var ids = context.Releases.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
-                context.Releases.Add(activeRelease);
-                activeRelease.CompatibleTemplates = new List<CompatibleTemplate>();
-                activeRelease.CompatibleTemplates.Add(
-                    new CompatibleTemplate { CompatibleReleaseId = 1, TemplateCode = template1.Code });
-                activeRelease.CompatibleTemplates.Add(
-                    new CompatibleTemplate { CompatibleReleaseId = 1, TemplateCode = template2.Code });
-                context.SaveChanges();
+                var compatibleTemplates = release.GetCompatibleTemplates(context)
+                    .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
+                Assert.Equal(2, compatibleTemplates.Count);
+                Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
+
+                this.output.WriteLine($"Database release ids: {string.Join(", ", ids)}");
+                this.output.WriteLine(
+                    $"Compatible templates release ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleReleaseId))}");
+
+                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
+                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
             }
         }
 
         /// <summary>
-        /// Creates a list of objects from an array
+        /// Tests the release compatibility set-up - templates with changed modules versions are incompatible
         /// </summary>
-        /// <typeparam name="T">The type of objects</typeparam>
-        /// <param name="objects">The array of objects</param>
-        /// <returns>The list of objects</returns>
-        private List<T> GetList<T>(params T[] objects)
+        [Fact]
+        public void TestReleaseCompatibilityModuleVersionSet()
         {
-            return objects.ToList();
+            this.CreateTestDatabase();
+
+            var template1 = new NodeTemplate
+                                {
+                                    Code = "template1",
+                                    Configuration = "1",
+                                    PackageRequirements = this.GetPackageRequirements("p1; p2")
+                                };
+
+            var template2 = new NodeTemplate
+                                {
+                                    Code = "template2",
+                                    Configuration = "2",
+                                    PackageRequirements = this.GetPackageRequirements("p2; p3")
+                                };
+
+            var release = new Release
+                              {
+                                  MinorVersion = 1,
+                                  Name = "1",
+                                  State = EnReleaseState.Active,
+                                  Configuration =
+                                      new ReleaseConfiguration
+                                          {
+                                              NodeTemplates =
+                                                  this.GetList(template1, template2),
+                                              Packages = this.CreatePackages(
+                                                  "p1;0.0.1",
+                                                  "p2;0.0.1",
+                                                  "p3;0.0.2")
+                                          }
+                              };
+
+            using (var context = this.CreateContext())
+            {
+                // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
+                var ids = context.Releases.Select(r => r.Id).OrderByDescending(id => id).ToList();
+
+                var compatibleTemplates = release.GetCompatibleTemplates(context)
+                    .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
+                Assert.Equal(2, compatibleTemplates.Count);
+                Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
+
+                this.output.WriteLine($"Database release ids: {string.Join(", ", ids)}");
+                this.output.WriteLine(
+                    $"Compatible templates release ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleReleaseId))}");
+
+                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
+                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
+            }
+        }
+
+        /// <summary>
+        /// Creates a new data context
+        /// </summary>
+        /// <returns>The data context</returns>
+        private ConfigurationContext CreateContext()
+        {
+            var builder = new DbContextOptionsBuilder<ConfigurationContext>();
+            builder.UseInMemoryDatabase("ClusterKit.NodeManager.Tests.ReleaseTests");
+            return new ConfigurationContext(builder.Options);
         }
 
         /// <summary>
@@ -299,6 +251,91 @@ namespace ClusterKit.NodeManager.Tests
                         var split = v.Split(new[] { ";" }, StringSplitOptions.None);
                         return new PackageDescription(split[0], split[1]);
                     }).ToList();
+        }
+
+        /// <summary>
+        /// Creates the database with test data
+        /// </summary>
+        private void CreateTestDatabase()
+        {
+            this.CreateContext().Database.EnsureDeleted();
+            var template1 = new NodeTemplate
+                                {
+                                    Code = "template1",
+                                    Configuration = "1",
+                                    PackageRequirements = this.GetPackageRequirements("p1; p2")
+                                };
+
+            var template2 = new NodeTemplate
+                                {
+                                    Code = "template2",
+                                    Configuration = "1",
+                                    PackageRequirements = this.GetPackageRequirements("p2; p3")
+                                };
+
+            using (var context = this.CreateContext())
+            {
+                var release1 = new Release
+                                   {
+                                       MinorVersion = 1,
+                                       Name = "1",
+                                       State = EnReleaseState.Obsolete,
+                                       Configuration =
+                                           new ReleaseConfiguration
+                                               {
+                                                   NodeTemplates =
+                                                       this.GetList(template1, template2),
+                                                   Packages = this.CreatePackages(
+                                                       "p1;0.0.1",
+                                                       "p2;0.0.1",
+                                                       "p3;0.0.1")
+                                               }
+                                   };
+                context.Releases.Add(release1);
+                context.SaveChanges();
+            }
+
+            using (var context = this.CreateContext())
+            {
+                var oldRelease = context.Releases.First();
+                var activeRelease = new Release
+                                        {
+                                            MinorVersion = 2,
+                                            Name = "active",
+                                            State = EnReleaseState.Active,
+                                            Configuration =
+                                                new ReleaseConfiguration
+                                                    {
+                                                        NodeTemplates =
+                                                            this.GetList(
+                                                                template1,
+                                                                template2),
+                                                        Packages = this.CreatePackages(
+                                                            "p1;0.0.1",
+                                                            "p2;0.0.1",
+                                                            "p3;0.0.1")
+                                                    }
+                                        };
+
+                context.Releases.Add(activeRelease);
+                activeRelease.CompatibleTemplatesBackward = new List<CompatibleTemplate>();
+                activeRelease.CompatibleTemplatesBackward.Add(
+                    new CompatibleTemplate { CompatibleReleaseId = oldRelease.Id, TemplateCode = template1.Code });
+                activeRelease.CompatibleTemplatesBackward.Add(
+                    new CompatibleTemplate { CompatibleReleaseId = oldRelease.Id, TemplateCode = template2.Code });
+                context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Creates a list of objects from an array
+        /// </summary>
+        /// <typeparam name="T">The type of objects</typeparam>
+        /// <param name="objects">The array of objects</param>
+        /// <returns>The list of objects</returns>
+        private List<T> GetList<T>(params T[] objects)
+        {
+            return objects.ToList();
         }
 
         /// <summary>

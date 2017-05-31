@@ -20,7 +20,9 @@ namespace ClusterKit.Data.EF.InMemory
         public override string ProviderName => "InMemory";
 
         /// <inheritdoc />
-        protected override DbContextOptions<TContext> GetContextOptions<TContext>(string connectionString, string databaseName)
+        protected override DbContextOptions<TContext> GetContextOptions<TContext>(
+            string connectionString,
+            string databaseName)
         {
             var optionsBuilder = new DbContextOptionsBuilder<TContext>();
             optionsBuilder.UseInMemoryDatabase(databaseName);

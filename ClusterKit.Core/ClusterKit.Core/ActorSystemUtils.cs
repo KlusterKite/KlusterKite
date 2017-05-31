@@ -43,10 +43,23 @@ namespace ClusterKit.Core
                     var files = Directory.GetFiles(dir, "*.dll");
                     foreach (var file in files)
                     {
-                        Assembly.LoadFrom(file);
+                        try
+                        {
+                            var assemblyName = AssemblyName.GetAssemblyName(file);
+                            if (assemblyName != null)
+                            {
+                                Assembly.LoadFrom(file);
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            throw new Exception($"Error loading assembly {Path.GetFileName(file)}", exception);
+                        }
                     }
                 }
             }
+
+            Console.WriteLine(@"Assemblies loaded");
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic))
             {
@@ -59,6 +72,8 @@ namespace ClusterKit.Core
                     // ignore
                 }
             }
+
+            Console.WriteLine(@"Assemblies installed");
         }
 
         /// <summary>

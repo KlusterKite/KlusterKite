@@ -33,7 +33,7 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Data;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.EF;
-    using ClusterKit.Data.EF.Effort;
+    using ClusterKit.Data.EF.InMemory;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.Messages.Migration;
     using ClusterKit.NodeManager.Client.MigrationStates;
@@ -119,11 +119,9 @@ namespace ClusterKit.NodeManager.Tests
                                                             PackageDescription
                                                                 {
                                                                     Id
-                                                                        =
-                                                                        "TestModule",
+                                                                        = "TestModule",
                                                                     Version
-                                                                        =
-                                                                        "0.1.0"
+                                                                        = "0.1.0"
                                                                 }
                                                     },
                                             NodeAddress = nodeAddress.Address,
@@ -171,19 +169,15 @@ namespace ClusterKit.NodeManager.Tests
             router.RegisterVirtualNode(obsoleteNode.Address.Address, obsoleteNode.Client);
             activeNode.GoUp();
             obsoleteNode.GoUp();
-            this.ExpectNoMsg();
+            this.ExpectNoMsg(TimeSpan.FromSeconds(1));
 
             var descriptions = await testActor.Ask<List<NodeDescription>>(
                                    new ActiveNodeDescriptionsRequest(),
                                    TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(2, descriptions.Count);
-            Assert.Equal(
-                false,
-                descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
-            Assert.Equal(
-                true,
-                descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
+            Assert.False(descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
+            Assert.True(descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
         }
 
         /// <summary>
@@ -214,7 +208,7 @@ namespace ClusterKit.NodeManager.Tests
                                 newRelease.Configuration.Packages)
                         };
 
-                newRelease.CompatibleTemplates =
+                newRelease.CompatibleTemplatesBackward =
                     new List<CompatibleTemplate>
                         {
                             new CompatibleTemplate
@@ -404,7 +398,8 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
 
-            Assert.True(await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
+            Assert.True(
+                await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
@@ -485,7 +480,10 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.True(await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Destination }, TimeSpan.FromSeconds(1)));
+            Assert.True(
+                await actor.Ask<bool>(
+                    new NodesUpgrade { Target = EnMigrationSide.Destination },
+                    TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
@@ -848,7 +846,8 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
 
-            Assert.True(await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
+            Assert.True(
+                await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
@@ -929,7 +928,10 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.True(await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Destination }, TimeSpan.FromSeconds(1)));
+            Assert.True(
+                await actor.Ask<bool>(
+                    new NodesUpgrade { Target = EnMigrationSide.Destination },
+                    TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
@@ -1114,7 +1116,8 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
 
-            Assert.True(await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
+            Assert.True(
+                await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
@@ -1195,7 +1198,10 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.True(await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Destination }, TimeSpan.FromSeconds(1)));
+            Assert.True(
+                await actor.Ask<bool>(
+                    new NodesUpgrade { Target = EnMigrationSide.Destination },
+                    TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
@@ -1446,76 +1452,6 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
-        /// Checking the migration downgrade creation
-        /// </summary>
-        /// <returns>The resource states</returns>
-        [Fact]
-        public async Task ResourceReleaseStateMigrationCreateDowngradeTest()
-        {
-            var actor = this.CreateActor(1);
-
-            var migrationActorReleaseState =
-                this.CreateMigrationActorReleaseState("second", new[] { "first", "second" });
-            actor.Tell(migrationActorReleaseState);
-            this.ExpectNoMsg();
-
-            var migration = (await actor.Ask<CrudActionResponse<Migration>>(
-                                 new UpdateClusterRequest { Id = 2 },
-                                 TimeSpan.FromSeconds(1))).Data;
-
-            Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
-            Assert.Equal(EnMigrationState.Preparing, migration.State);
-            this.ExpectMsg<RecheckState>("/user/migrationActor");
-            this.ExpectNoMsg();
-
-            var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
-            Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
-            Assert.True(state.OperationIsInProgress);
-            Assert.False(state.CanCancelMigration);
-             Assert.False(state.CanCreateMigration);
-            Assert.False(state.CanFinishMigration);
-            Assert.False(state.CanMigrateResources);
-            Assert.False(state.CanUpdateNodesToDestination);
-            Assert.False(state.CanUpdateNodesToSource);
-
-            migration = this.GetActiveMigrationFromDatabase();
-            Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
-            Assert.Equal(EnMigrationState.Preparing, migration.State);
-            var migrationId = migration.Id;
-
-            var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
-
-            actor.Tell(migrationState);
-            this.ExpectNoMsg();
-            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
-            Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
-            Assert.False(state.OperationIsInProgress);
-            Assert.True(state.CanCancelMigration);
-            Assert.False(state.CanCreateMigration);
-            Assert.False(state.CanFinishMigration);
-            Assert.False(state.CanMigrateResources);
-            Assert.True(state.CanUpdateNodesToDestination);
-            Assert.False(state.CanUpdateNodesToSource);
-
-            migration = this.GetMigrationFromDatabase(migrationId);
-            Assert.NotNull(migration);
-            Assert.True(migration.IsActive);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
-            Assert.Equal(EnMigrationState.Ready, migration.State);
-            Assert.Equal(EnMigrationDirection.Downgrade, migration.Direction);
-        }
-
-        /// <summary>
         /// Checking the resource states
         /// </summary>
         /// <returns>The resource states</returns>
@@ -1531,9 +1467,10 @@ namespace ClusterKit.NodeManager.Tests
             actor.Tell(migrationActorReleaseState);
             this.ExpectNoMsg();
 
-            var migration = (await actor.Ask<CrudActionResponse<Migration>>(
-                                 new UpdateClusterRequest { Id = 2 },
-                                 TimeSpan.FromSeconds(1))).Data;
+            var migration =
+                (await actor.Ask<CrudActionResponse<Migration>>(
+                     new UpdateClusterRequest { Id = 2 },
+                     TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
             Assert.Equal(1, migration.FromReleaseId);
@@ -1588,6 +1525,77 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
+        /// Checking the migration downgrade creation
+        /// </summary>
+        /// <returns>The resource states</returns>
+        [Fact]
+        public async Task ResourceReleaseStateMigrationCreateDowngradeTest()
+        {
+            var actor = this.CreateActor(1);
+
+            var migrationActorReleaseState =
+                this.CreateMigrationActorReleaseState("second", new[] { "first", "second" });
+            actor.Tell(migrationActorReleaseState);
+            this.ExpectNoMsg();
+
+            var migration =
+                (await actor.Ask<CrudActionResponse<Migration>>(
+                     new UpdateClusterRequest { Id = 2 },
+                     TimeSpan.FromSeconds(1))).Data;
+
+            Assert.NotNull(migration);
+            Assert.Equal(1, migration.FromReleaseId);
+            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(EnMigrationState.Preparing, migration.State);
+            this.ExpectMsg<RecheckState>("/user/migrationActor");
+            this.ExpectNoMsg();
+
+            var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
+            Assert.Null(state.MigrationState);
+            Assert.Null(state.ReleaseState);
+            Assert.True(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            migration = this.GetActiveMigrationFromDatabase();
+            Assert.NotNull(migration);
+            Assert.Equal(1, migration.FromReleaseId);
+            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(EnMigrationState.Preparing, migration.State);
+            var migrationId = migration.Id;
+
+            var migrationState = this.CreateMigrationActorMigrationState(
+                new[] { "second" },
+                new[] { new[] { "first", "second" } },
+                new[] { new[] { "first" } });
+
+            actor.Tell(migrationState);
+            this.ExpectNoMsg();
+            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
+            Assert.NotNull(state.MigrationState);
+            Assert.Null(state.ReleaseState);
+            Assert.False(state.OperationIsInProgress);
+            Assert.True(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.True(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            migration = this.GetMigrationFromDatabase(migrationId);
+            Assert.NotNull(migration);
+            Assert.True(migration.IsActive);
+            Assert.Equal(1, migration.FromReleaseId);
+            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(EnMigrationState.Ready, migration.State);
+            Assert.Equal(EnMigrationDirection.Downgrade, migration.Direction);
+        }
+
+        /// <summary>
         /// Checking the resource states
         /// </summary>
         /// <returns>The resource states</returns>
@@ -1603,9 +1611,10 @@ namespace ClusterKit.NodeManager.Tests
             actor.Tell(migrationActorReleaseState);
             this.ExpectNoMsg();
 
-            var migration = (await actor.Ask<CrudActionResponse<Migration>>(
-                                 new UpdateClusterRequest { Id = 2 },
-                                 TimeSpan.FromSeconds(1))).Data;
+            var migration =
+                (await actor.Ask<CrudActionResponse<Migration>>(
+                     new UpdateClusterRequest { Id = 2 },
+                     TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
             Assert.Equal(1, migration.FromReleaseId);
@@ -1632,7 +1641,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(2, migration.ToReleaseId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
 
-           actor.Tell(new MigrationActorInitializationFailed { Errors = new List<MigrationError>() });
+            actor.Tell(new MigrationActorInitializationFailed { Errors = new List<MigrationError>() });
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
@@ -1667,9 +1676,10 @@ namespace ClusterKit.NodeManager.Tests
             actor.Tell(migrationActorReleaseState);
             this.ExpectNoMsg();
 
-            var migration = (await actor.Ask<CrudActionResponse<Migration>>(
-                                 new UpdateClusterRequest { Id = 2 },
-                                 TimeSpan.FromSeconds(1))).Data;
+            var migration =
+                (await actor.Ask<CrudActionResponse<Migration>>(
+                     new UpdateClusterRequest { Id = 2 },
+                     TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
             Assert.Equal(1, migration.FromReleaseId);
@@ -1735,9 +1745,10 @@ namespace ClusterKit.NodeManager.Tests
             actor.Tell(migrationActorReleaseState);
             this.ExpectNoMsg();
 
-            var migration = (await actor.Ask<CrudActionResponse<Migration>>(
-                                 new UpdateClusterRequest { Id = 2 },
-                                 TimeSpan.FromSeconds(1))).Data;
+            var migration =
+                (await actor.Ask<CrudActionResponse<Migration>>(
+                     new UpdateClusterRequest { Id = 2 },
+                     TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
             Assert.Equal(1, migration.FromReleaseId);
@@ -1941,6 +1952,13 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal("t2", description.NodeTemplate); // we have 1 in million chance of false failure
         }
 
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            this.GetContext().Database.EnsureDeleted();
+            base.Dispose(disposing);
+        }
+
         /// <summary>
         /// Check the node upgrade process
         /// </summary>
@@ -2095,7 +2113,7 @@ namespace ClusterKit.NodeManager.Tests
                 {
                 }
                 else if (sourcePoints[i].Contains(resourcePoints[i])
-                    && sourcePoints[i].Contains(destinationPoints[i].Last()))
+                         && sourcePoints[i].Contains(destinationPoints[i].Last()))
                 {
                     switch (direction)
                     {
@@ -2120,7 +2138,7 @@ namespace ClusterKit.NodeManager.Tests
                             break;
                     }
                 }
-                else 
+                else
                 {
                     direction = EnMigrationDirection.Undefined;
                 }
@@ -2237,11 +2255,12 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>The database context</returns>
         private ConfigurationContext GetContext()
         {
-            var config = this.Sys.Settings.Config;
-            var connectionString = config.GetString("ClusterKit.NodeManager.ConfigurationDatabaseConnectionString");
-            return this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>()
-                .CreateContext(connectionString, string.Empty)
-                .Result;
+            var connectionString = this.WindsorContainer.Resolve<Config>()
+                .GetString(NodeManagerActor.ConfigConnectionStringPath);
+            var databaseName = this.WindsorContainer.Resolve<Config>()
+                .GetString(NodeManagerActor.ConfigDatabaseNamePath);
+            return this.WindsorContainer.Resolve<UniversalContextFactory>()
+                .CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName);
         }
 
         /// <summary>
@@ -2266,63 +2285,25 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         public class Configurator : TestConfigurator
         {
+            /// <inheritdoc />
+            public override bool RunPostStart => true;
+
             /// <summary>
             ///     Gets list of all used plugin installers
             /// </summary>
             /// <returns>The list of installers</returns>
             public override List<BaseInstaller> GetPluginInstallers()
             {
-                var pluginInstallers = new List<BaseInstaller> { new Installer(), new TestInstaller() };
-                return pluginInstallers;
-            }
-        }
-
-        /// <summary>
-        ///     A <see cref="ConfigurationContext" /> factory with test seeding
-        /// </summary>
-        private class ContextFactory : EffortContextFactory<ConfigurationContext>
-        {
-            /// <inheritdoc />
-            public ContextFactory([NotNull] BaseConnectionManager connectionManager)
-                : base(connectionManager)
-            {
-            }
-
-            /// <inheritdoc />
-            public override async Task<ConfigurationContext> CreateContext(string connectionString, string databaseName)
-            {
-                var context = await base.CreateContext(connectionString, databaseName);
-                if (!context.Releases.Any())
-                {
-                    context.Releases.Add(CreateRelease());
-                    var release = CreateRelease();
-                    release.State = EnReleaseState.Ready;
-                    context.Releases.Add(release);
-                    context.SaveChanges();
-                }
-
-                return context;
-            }
-
-            /// <summary>
-            /// Creates a new release object
-            /// </summary>
-            /// <returns>The release object</returns>
-            private static Release CreateRelease()
-            {
-                var release = ReleaseCheckTestsBase.CreateRelease();
-                release.State = EnReleaseState.Active;
-                release.Configuration.SeedAddresses = new List<string>();
-                release.Configuration.NugetFeeds = new List<NugetFeed>();
-                release.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
-                release.Configuration.NodeTemplates[0].PackagesToInstall =
-                    new Dictionary<string, List<PackageDescription>>
+                var pluginInstallers =
+                    new List<BaseInstaller>
                         {
-                            [ReleaseCheckTestsBase.Net45] =
-                            new List<PackageDescription>(
-                                release.Configuration.Packages)
+                            new Installer(),
+                            new TestInstaller(),
+                            new Data.Installer(),
+                            new Data.EF.Installer(),
+                            new Data.EF.InMemory.Installer(),
                         };
-                return release;
+                return pluginInstallers;
             }
         }
 
@@ -2331,6 +2312,11 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
+            /// <summary>
+            /// The di container
+            /// </summary>
+            private IWindsorContainer windsorContainer;
+
             /// <inheritdoc />
             protected override decimal AkkaConfigLoadPriority => -1M;
 
@@ -2340,8 +2326,9 @@ namespace ClusterKit.NodeManager.Tests
                 return ConfigurationFactory.ParseString(
                     $@"
             {{
-                ClusterKit.NodeManager.ConfigurationDatabaseName = """"
-                ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = ""{Guid.NewGuid():N}""
+                ClusterKit.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
+                ClusterKit.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
+                ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = """"
                 ClusterKit.NodeManager.MigrationActorSubstitute = ""/user/migrationActor""
 
                 akka : {{
@@ -2391,25 +2378,17 @@ namespace ClusterKit.NodeManager.Tests
             /// <inheritdoc />
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
+                this.windsorContainer = container;
+
                 container.Register(
-                    Classes.FromAssemblyContaining<NodeManagerActor>()
-                        .Where(t => t.IsSubclassOf(typeof(ActorBase)))
+                    Classes.FromAssemblyContaining<NodeManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
                         .LifestyleTransient());
                 container.Register(
-                    Classes.FromAssemblyContaining<Core.Installer>()
-                        .Where(t => t.IsSubclassOf(typeof(ActorBase)))
+                    Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
                         .LifestyleTransient());
 
                 container.Register(
-                    Component.For<BaseConnectionManager>().Instance(new ConnectionManager()).LifestyleSingleton());
-                container.Register(
-                    Component.For<IContextFactory<ConfigurationContext>>()
-                        .ImplementedBy<ContextFactory>()
-                        .LifestyleTransient());
-
-                container.Register(
-                    Component.For<DataFactory<ConfigurationContext, Release, int>>()
-                        .ImplementedBy<ReleaseDataFactory>()
+                    Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>()
                         .LifestyleTransient());
 
                 var packageRepository = this.CreateTestRepository();
@@ -2419,147 +2398,181 @@ namespace ClusterKit.NodeManager.Tests
                     Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
             }
 
+            /// <inheritdoc />
+            protected override void PostStart()
+            {
+                base.PostStart();
+                var contextManager = this.windsorContainer.Resolve<UniversalContextFactory>();
+                var config = this.windsorContainer.Resolve<Config>();
+                var connectionString = config.GetString(NodeManagerActor.ConfigConnectionStringPath);
+                var databaseName = config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
+                using (var context = contextManager.CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName))
+                {
+                    context.Database.EnsureDeleted();
+                    context.ResetValueGenerators();
+                    
+                    context.Releases.Add(CreateRelease());
+                    var release = CreateRelease();
+                    release.State = EnReleaseState.Ready;
+                    context.Releases.Add(release);
+                    context.SaveChanges();
+                    this.windsorContainer.Resolve<ActorSystem>().Log.Info(
+                        "!!! Created release with id {ReleaseId} in Database {ConnectionString}",
+                        release.Id,
+                        connectionString);
+                }
+            }
+
+            /// <summary>
+            /// Creates a new release object
+            /// </summary>
+            /// <returns>The release object</returns>
+            private static Release CreateRelease()
+            {
+                var release = ReleaseCheckTestsBase.CreateRelease();
+                release.State = EnReleaseState.Active;
+                release.Configuration.SeedAddresses = new List<string>();
+                release.Configuration.NugetFeeds = new List<NugetFeed>();
+                release.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
+                release.Configuration.NodeTemplates[0].PackagesToInstall =
+                    new Dictionary<string, List<PackageDescription>>
+                        {
+                            [ReleaseCheckTestsBase.Net45] =
+                            new List<PackageDescription>(
+                                release.Configuration.Packages)
+                        };
+                return release;
+            }
+
             /// <summary>
             ///     Creates the test repository
             /// </summary>
             /// <returns>The test repository</returns>
             private IPackageRepository CreateTestRepository()
             {
-                var p1 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "p1",
-                            Version = SemanticVersion.Parse("1.0.0"),
-                            DependencySets =
-                                new[]
-                                    {
-                                        ReleaseCheckTestsBase
-                                            .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net45,
-                                                "dp1 1.0.0")
-                                    }
-                        };
+                var p1 = new ReleaseCheckTestsBase.TestPackage
+                             {
+                                 Id = "p1",
+                                 Version = SemanticVersion.Parse("1.0.0"),
+                                 DependencySets =
+                                     new[]
+                                         {
+                                             ReleaseCheckTestsBase
+                                                 .CreatePackageDependencySet(
+                                                     ReleaseCheckTestsBase.Net45,
+                                                     "dp1 1.0.0")
+                                         }
+                             };
 
-                var p2 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "p2",
-                            Version = SemanticVersion.Parse("1.0.0"),
-                            DependencySets =
-                                new[]
-                                    {
-                                        ReleaseCheckTestsBase
-                                            .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net45,
-                                                "dp2 1.0.0")
-                                    }
-                        };
+                var p2 = new ReleaseCheckTestsBase.TestPackage
+                             {
+                                 Id = "p2",
+                                 Version = SemanticVersion.Parse("1.0.0"),
+                                 DependencySets =
+                                     new[]
+                                         {
+                                             ReleaseCheckTestsBase
+                                                 .CreatePackageDependencySet(
+                                                     ReleaseCheckTestsBase.Net45,
+                                                     "dp2 1.0.0")
+                                         }
+                             };
 
-                var p3 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "p3",
-                            Version = SemanticVersion.Parse("1.0.0"),
-                            DependencySets =
-                                new[]
-                                    {
-                                        ReleaseCheckTestsBase
-                                            .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net45,
-                                                "dp3 2.0.0")
-                                    }
-                        };
-                var dp1 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "dp1",
-                            Version = SemanticVersion.Parse("1.0.0"),
-                            DependencySets = new PackageDependencySet[0]
-                        };
+                var p3 = new ReleaseCheckTestsBase.TestPackage
+                             {
+                                 Id = "p3",
+                                 Version = SemanticVersion.Parse("1.0.0"),
+                                 DependencySets =
+                                     new[]
+                                         {
+                                             ReleaseCheckTestsBase
+                                                 .CreatePackageDependencySet(
+                                                     ReleaseCheckTestsBase.Net45,
+                                                     "dp3 2.0.0")
+                                         }
+                             };
+                var dp1 = new ReleaseCheckTestsBase.TestPackage
+                              {
+                                  Id = "dp1",
+                                  Version = SemanticVersion.Parse("1.0.0"),
+                                  DependencySets = new PackageDependencySet[0]
+                              };
 
-                var dp2 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "dp2",
-                            Version = SemanticVersion.Parse("1.0.0"),
-                            DependencySets = new PackageDependencySet[0]
-                        };
+                var dp2 = new ReleaseCheckTestsBase.TestPackage
+                              {
+                                  Id = "dp2",
+                                  Version = SemanticVersion.Parse("1.0.0"),
+                                  DependencySets = new PackageDependencySet[0]
+                              };
 
-                var dp3 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "dp3",
-                            Version = SemanticVersion.Parse("1.0.0"),
-                            DependencySets = new PackageDependencySet[0]
-                        };
+                var dp3 = new ReleaseCheckTestsBase.TestPackage
+                              {
+                                  Id = "dp3",
+                                  Version = SemanticVersion.Parse("1.0.0"),
+                                  DependencySets = new PackageDependencySet[0]
+                              };
 
-                var p12 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "p1",
-                            Version = SemanticVersion.Parse("2.0.0"),
-                            DependencySets =
-                                new[]
-                                    {
-                                        ReleaseCheckTestsBase
-                                            .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net45,
-                                                "dp1 2.0.0")
-                                    }
-                        };
+                var p12 = new ReleaseCheckTestsBase.TestPackage
+                              {
+                                  Id = "p1",
+                                  Version = SemanticVersion.Parse("2.0.0"),
+                                  DependencySets =
+                                      new[]
+                                          {
+                                              ReleaseCheckTestsBase
+                                                  .CreatePackageDependencySet(
+                                                      ReleaseCheckTestsBase.Net45,
+                                                      "dp1 2.0.0")
+                                          }
+                              };
 
-                var p22 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "p2",
-                            Version = SemanticVersion.Parse("2.0.0"),
-                            DependencySets =
-                                new[]
-                                    {
-                                        ReleaseCheckTestsBase
-                                            .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net45,
-                                                "dp2 2.0.0")
-                                    }
-                        };
+                var p22 = new ReleaseCheckTestsBase.TestPackage
+                              {
+                                  Id = "p2",
+                                  Version = SemanticVersion.Parse("2.0.0"),
+                                  DependencySets =
+                                      new[]
+                                          {
+                                              ReleaseCheckTestsBase
+                                                  .CreatePackageDependencySet(
+                                                      ReleaseCheckTestsBase.Net45,
+                                                      "dp2 2.0.0")
+                                          }
+                              };
 
-                var p32 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "p3",
-                            Version = SemanticVersion.Parse("2.0.0"),
-                            DependencySets =
-                                new[]
-                                    {
-                                        ReleaseCheckTestsBase
-                                            .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net45,
-                                                "dp3 2.0.0")
-                                    }
-                        };
-                var dp12 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "dp1",
-                            Version = SemanticVersion.Parse("2.0.0"),
-                            DependencySets = new PackageDependencySet[0]
-                        };
+                var p32 = new ReleaseCheckTestsBase.TestPackage
+                              {
+                                  Id = "p3",
+                                  Version = SemanticVersion.Parse("2.0.0"),
+                                  DependencySets =
+                                      new[]
+                                          {
+                                              ReleaseCheckTestsBase
+                                                  .CreatePackageDependencySet(
+                                                      ReleaseCheckTestsBase.Net45,
+                                                      "dp3 2.0.0")
+                                          }
+                              };
+                var dp12 = new ReleaseCheckTestsBase.TestPackage
+                               {
+                                   Id = "dp1",
+                                   Version = SemanticVersion.Parse("2.0.0"),
+                                   DependencySets = new PackageDependencySet[0]
+                               };
 
-                var dp22 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "dp2",
-                            Version = SemanticVersion.Parse("2.0.0"),
-                            DependencySets = new PackageDependencySet[0]
-                        };
+                var dp22 = new ReleaseCheckTestsBase.TestPackage
+                               {
+                                   Id = "dp2",
+                                   Version = SemanticVersion.Parse("2.0.0"),
+                                   DependencySets = new PackageDependencySet[0]
+                               };
 
-                var dp32 =
-                    new ReleaseCheckTestsBase.TestPackage
-                        {
-                            Id = "dp3",
-                            Version = SemanticVersion.Parse("2.0.0"),
-                            DependencySets = new PackageDependencySet[0]
-                        };
+                var dp32 = new ReleaseCheckTestsBase.TestPackage
+                               {
+                                   Id = "dp3",
+                                   Version = SemanticVersion.Parse("2.0.0"),
+                                   DependencySets = new PackageDependencySet[0]
+                               };
 
                 return new ReleaseCheckTestsBase.TestRepository(
                     p1,
@@ -2722,7 +2735,10 @@ namespace ClusterKit.NodeManager.Tests
                             MemberStatus.Up,
                             ImmutableHashSet<string>.Empty)));
                 this.IsUp = true;
-                this.system.Log.Info("## Node {NodeNumber} is up with release {ReleaseId}", this.Number, this.Description.ReleaseId);
+                this.system.Log.Info(
+                    "## Node {NodeNumber} is up with release {ReleaseId}",
+                    this.Number,
+                    this.Description.ReleaseId);
             }
 
             /// <summary>
@@ -2755,7 +2771,8 @@ namespace ClusterKit.NodeManager.Tests
                 /// <inheritdoc />
                 protected override void Unhandled(object message)
                 {
-                    Context.GetLogger().Error($"VirtualClient: Got unhandled message of type {message.GetType().FullName}");
+                    Context.GetLogger().Error(
+                        $"VirtualClient: Got unhandled message of type {message.GetType().FullName}");
                     base.Unhandled(message);
                 }
             }

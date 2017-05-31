@@ -10,7 +10,6 @@
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
-    using System.Data.Entity;
 
     using Akka.Configuration;
 
@@ -20,7 +19,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using ClusterKit.Core;
     using ClusterKit.Data;
-    using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
@@ -50,17 +48,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="store">The configuration store.</param>
         protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
         {
-            Database.SetInitializer(new NullDatabaseInitializer<ConfigurationContext>());
             container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactoryByLogin>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, Guid>>().ImplementedBy<UserFactoryByUid>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, Migration, int>>().ImplementedBy<MigrationDataFactory>().LifestyleTransient());
-
-            container.Register(
-                Component.For<IContextFactory<ConfigurationContext>>()
-                    .ImplementedBy<BaseContextFactory<ConfigurationContext>>()
-                    .LifestyleTransient());
         }
     }
 }

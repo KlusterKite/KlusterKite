@@ -10,8 +10,7 @@
 namespace ClusterKit.Data.Tests.Mock
 {
     using System;
-    using System.Threading.Tasks;
-
+    
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.EF;
 
@@ -40,9 +39,9 @@ namespace ClusterKit.Data.Tests.Mock
         }
 
         /// <inheritdoc />
-        protected override Task<TestDataContext> GetContext()
+        protected override TestDataContext GetContext()
         {
-            return Task.FromResult(this.contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"));
+            return this.contextFactory.CreateContext<TestDataContext>("InMemory", null, "test");
         }
     }
 }

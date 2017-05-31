@@ -10,11 +10,12 @@
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
-    using System.Data.Entity;
     using System.Linq.Expressions;
 
     using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client.ORM;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Data factory to work with <see cref="Release"/>
@@ -49,9 +50,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             => t => t.Id == id;
 
         /// <summary>
-        /// Gets the dataset from current context
+        /// Gets the data set from current context
         /// </summary>
-        /// <returns>The dataset</returns>
+        /// <returns>The data set</returns>
         protected override DbSet<Release> GetDbSet() => this.Context.Releases;
     }
 }

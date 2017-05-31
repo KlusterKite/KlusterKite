@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
+    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.EF.InMemory\ClusterKit.Data.EF.InMemory.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.GraphQL.Publisher\ClusterKit.Web.GraphQL.Publisher.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager\ClusterKit.NodeManager.csproj" />
   </ItemGroup>

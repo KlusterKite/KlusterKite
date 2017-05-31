@@ -18,7 +18,9 @@
   <ItemGroup>
     <PackageReference Include="Akka" Version="1.2.0" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
-    <PackageReference Include="NuGet.Core" Version="2.14.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Utils\ClusterKit.NodeManager.Launcher.Utils.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="seeder.hocon">

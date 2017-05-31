@@ -24,6 +24,7 @@
 
 	ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
 	ClusterKit.NodeManager.ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
+        ClusterKit.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"
 	ClusterKit.NodeManager.Seeds = [
 		"akka.tcp://ClusterKit@seed:3090"
 	]

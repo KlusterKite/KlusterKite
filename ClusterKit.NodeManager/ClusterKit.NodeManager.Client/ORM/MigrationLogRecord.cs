@@ -28,14 +28,14 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the error id
         /// </summary>
         [Key]
-        [DeclareField("the migration id", IsKey = true)]
+        [DeclareField("the log record id", IsKey = true)]
         [UsedImplicitly]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the migration id
         /// </summary>
-        [ForeignKey(nameof(Migration))]
         [DeclareField("the migration id")]
         [UsedImplicitly]
         public int? MigrationId { get; set; }
@@ -44,6 +44,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the migration
         /// </summary>
         [UsedImplicitly]
+        [ForeignKey(nameof(MigrationId))]
         public Migration Migration { get; set; }
 
         /// <summary>

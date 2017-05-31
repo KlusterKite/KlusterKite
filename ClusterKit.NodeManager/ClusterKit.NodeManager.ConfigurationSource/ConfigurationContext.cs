@@ -9,12 +9,11 @@
 
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
-    using System.Data.Common;
-    using System.Data.Entity;
-
     using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Configuration database context
@@ -24,14 +23,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationContext"/> class.
         /// </summary>
-        /// <param name="existingConnection">
-        /// The existing connection.
+        /// <param name="options">
+        /// The context options.
         /// </param>
-        /// <param name="contextOwnsConnection">
-        /// The context owns connection.
-        /// </param>
-        public ConfigurationContext(DbConnection existingConnection, bool contextOwnsConnection = true)
-            : base(existingConnection, contextOwnsConnection)
+        public ConfigurationContext(DbContextOptions<ConfigurationContext> options)
+            : base(options)
         {
         }
 
@@ -61,6 +57,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         public DbSet<Role> Roles { get; set; }
 
         /// <summary>
+        /// Gets or sets the list of role to user links
+        /// </summary>
+        [UsedImplicitly]
+        public DbSet<RoleUser> RoleUsers { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of releases
         /// </summary>
         [UsedImplicitly]
@@ -71,5 +73,28 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         [UsedImplicitly]
         public DbSet<MigrationLogRecord> MigrationLogs { get; set; }
+
+        /// <inheritdoc />
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().HasIndex(u => u.Login);
+
+            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.Release)
+                .WithMany(r => r.CompatibleTemplatesBackward).HasForeignKey(t => t.ReleaseId);
+
+            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.CompatibleRelease)
+                .WithMany(r => r.CompatibleTemplatesForward).HasForeignKey(t => t.CompatibleReleaseId);
+
+            modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Migration).WithMany(m => m.Logs)
+                .HasForeignKey(r => r.MigrationId);
+
+            modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Release).WithMany(m => m.MigrationLogs)
+                .HasForeignKey(r => r.ReleaseId);
+
+            modelBuilder.Entity<MigrationError>();
+            modelBuilder.Entity<MigrationOperation>();
+
+            modelBuilder.Entity<RoleUser>().HasKey(t => new { t.UserUid, t.RoleUid });
+        }
     }
 }

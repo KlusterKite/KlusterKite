@@ -26,7 +26,7 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.Core.TestKit;
     using ClusterKit.Data;
     using ClusterKit.Data.EF;
-    using ClusterKit.Data.EF.Effort;
+    using ClusterKit.Data.EF.InMemory;
     using ClusterKit.NodeManager.Client.Messages.Migration;
     using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
@@ -75,10 +75,9 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void MigrationCheckFailed()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
@@ -123,7 +122,7 @@ namespace ClusterKit.NodeManager.Tests
                 this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -143,10 +142,9 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void MigrationDownGradeCheckTest()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
@@ -190,7 +188,7 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -251,10 +249,9 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void MigrationNoChangeTest()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
@@ -297,7 +294,7 @@ namespace ClusterKit.NodeManager.Tests
                 this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -327,10 +324,9 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void MigrationUpgradeCheckTest()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
@@ -374,7 +370,7 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -436,10 +432,9 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void MigrationUpgradeMigrationFailedTest()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
@@ -486,7 +481,7 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -550,10 +545,9 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void ReleaseCheckFailedTest()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
@@ -582,7 +576,7 @@ namespace ClusterKit.NodeManager.Tests
                 this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -601,10 +595,9 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void ReleaseUpgradeCheckTest()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
             this.CreateReleases();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
@@ -631,7 +624,7 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>(),
+                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
                         this.WindsorContainer.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -682,8 +675,7 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private void CreateMigration()
         {
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
                 var migration = new Migration
                                     {
@@ -734,13 +726,7 @@ namespace ClusterKit.NodeManager.Tests
                                };
 
             var packageDescriptions = repo.Search(string.Empty, true)
-                .Select(
-                    p => new PackageDescription
-                             {
-                                 Id = p.Id,
-                                 Version = p.Version.ToString()
-                             })
-                .ToList();
+                .Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList();
 
             var configuration = new ReleaseConfiguration
                                     {
@@ -761,12 +747,9 @@ namespace ClusterKit.NodeManager.Tests
         private void CreateReleases()
         {
             var repo = this.WindsorContainer.Resolve<IPackageRepository>();
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<ConfigurationContext>>();
 
-            using (var context = contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.GetContext())
             {
-                context.Database.Delete();
-                context.Database.CreateIfNotExists();
                 var activeRelease = this.CreateRelease(repo);
                 context.Releases.Add(activeRelease);
                 context.SaveChanges();
@@ -797,17 +780,38 @@ namespace ClusterKit.NodeManager.Tests
         }
 
         /// <summary>
+        ///     Creates database context
+        /// </summary>
+        /// <returns>The database context</returns>
+        private ConfigurationContext GetContext()
+        {
+            return this.WindsorContainer.Resolve<UniversalContextFactory>()
+                .CreateContext<ConfigurationContext>("InMemory", this.connectionString, this.databaseName);
+        }
+
+        /// <summary>
         ///     Configures current test system
         /// </summary>
         public class Configurator : TestConfigurator
         {
+            /// <inheritdoc />
+            public override bool RunPostStart => true;
+
             /// <summary>
             ///     Gets list of all used plugin installers
             /// </summary>
             /// <returns>The list of installers</returns>
             public override List<BaseInstaller> GetPluginInstallers()
             {
-                var pluginInstallers = new List<BaseInstaller> { new Installer(), new TestInstaller() };
+                var pluginInstallers =
+                    new List<BaseInstaller>
+                        {
+                            new Installer(),
+                            new TestInstaller(),
+                            new Data.Installer(),
+                            new Data.EF.Installer(),
+                            new Data.EF.InMemory.Installer()
+                        };
                 return pluginInstallers;
             }
         }
@@ -815,7 +819,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// The overload for <see cref="MigrationActor"/>
         /// </summary>
-        public class MigratorForwarder : MigrationActor
+        private class MigratorForwarder : MigrationActor
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="MigratorForwarder"/> class.
@@ -825,7 +829,7 @@ namespace ClusterKit.NodeManager.Tests
             /// <param name="nugetRepository">The nuget repository</param>
             public MigratorForwarder(
                 IActorRef testActor,
-                IContextFactory<ConfigurationContext> contextFactory,
+                UniversalContextFactory contextFactory,
                 IPackageRepository nugetRepository)
                 : base(contextFactory, nugetRepository)
             {
@@ -841,6 +845,11 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
+            /// <summary>
+            /// The di container
+            /// </summary>
+            private IWindsorContainer windsorContainer;
+
             /// <inheritdoc />
             protected override decimal AkkaConfigLoadPriority => -1M;
 
@@ -850,8 +859,9 @@ namespace ClusterKit.NodeManager.Tests
                 return ConfigurationFactory.ParseString(
                     $@"
             {{
-                ClusterKit.NodeManager.ConfigurationDatabaseName = """"
-                ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = ""{Guid.NewGuid():N}""
+                ClusterKit.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
+                ClusterKit.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
+                ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = """"
                 ClusterKit.NodeManager.FrameworkType = ""{ReleaseCheckTestsBase.Net45}""
 
                 akka : {{
@@ -896,27 +906,34 @@ namespace ClusterKit.NodeManager.Tests
             }
 
             /// <inheritdoc />
+            protected override void PostStart()
+            {
+                base.PostStart();
+                var contextManager = this.windsorContainer.Resolve<UniversalContextFactory>();
+                var config = this.windsorContainer.Resolve<Config>();
+                var connectionString = config.GetString(NodeManagerActor.ConfigConnectionStringPath);
+                var databaseName = config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
+                using (var context =
+                    contextManager.CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName))
+                {
+                    context.Database.EnsureDeleted();
+                    context.ResetValueGenerators();
+                }
+            }
+
+            /// <inheritdoc />
             protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
             {
+                this.windsorContainer = container;
                 container.Register(
-                    Classes.FromAssemblyContaining<NodeManagerActor>()
-                        .Where(t => t.IsSubclassOf(typeof(ActorBase)))
+                    Classes.FromAssemblyContaining<NodeManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
                         .LifestyleTransient());
                 container.Register(
-                    Classes.FromAssemblyContaining<Core.Installer>()
-                        .Where(t => t.IsSubclassOf(typeof(ActorBase)))
-                        .LifestyleTransient());
-
-                container.Register(
-                    Component.For<BaseConnectionManager>().Instance(new ConnectionManager()).LifestyleSingleton());
-                container.Register(
-                    Component.For<IContextFactory<ConfigurationContext>>()
-                        .ImplementedBy<EffortContextFactory<ConfigurationContext>>()
+                    Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
                         .LifestyleTransient());
 
                 container.Register(
-                    Component.For<DataFactory<ConfigurationContext, Release, int>>()
-                        .ImplementedBy<ReleaseDataFactory>()
+                    Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>()
                         .LifestyleTransient());
 
                 var packageRepository = this.CreateTestRepository();
@@ -943,37 +960,33 @@ namespace ClusterKit.NodeManager.Tests
                         }
                     };
 
-                Func<IEnumerable<IPackageFile>> filesAction = () => assembly.GetFiles()
-                    .Select(
-                        fs => new ReleaseCheckTestsBase.TestPackageFile
-                                  {
-                                      EffectivePath =
-                                          Path.Combine(
-                                              "lib",
-                                              Path.GetFileName(fs.Name)
-                                              ?? fs.Name),
-                                      GetStreamAction = () => fs,
-                                      Path = Path.Combine(
+                Func<IEnumerable<IPackageFile>> filesAction = () => assembly.GetFiles().Select(
+                    fs => new ReleaseCheckTestsBase.TestPackageFile
+                              {
+                                  EffectivePath =
+                                      Path.Combine(
                                           "lib",
-                                          Path.GetFileName(fs.Name) ?? fs.Name)
-                                  });
+                                          Path.GetFileName(fs.Name) ?? fs.Name),
+                                  GetStreamAction = () => fs,
+                                  Path = Path.Combine(
+                                      "lib",
+                                      Path.GetFileName(fs.Name) ?? fs.Name)
+                              });
 
-                var dependencies = assembly.GetReferencedAssemblies()
-                    .Where(
-                        d =>
+                var dependencies = assembly.GetReferencedAssemblies().Select(
+                    d =>
+                        {
+                            var dependentAssembly = allAssemblies.FirstOrDefault(a => a.GetName().Name == d.Name);
+                            return dependentAssembly != null && !dependentAssembly.IsDynamic
+                                   && !dependentAssembly.GlobalAssemblyCache ? dependentAssembly : null;
+                        }).Where(d => d != null).Select(
+                    d => new PackageDependency(
+                        d.GetName().Name,
+                        new VersionSpec
                             {
-                                var dependentAssembly = allAssemblies.FirstOrDefault(a => a.GetName().Name == d.Name);
-                                return dependentAssembly != null && !dependentAssembly.IsDynamic
-                                       && !dependentAssembly.GlobalAssemblyCache;
-                            })
-                    .Select(
-                        d => new PackageDependency(
-                            d.Name,
-                            new VersionSpec
-                                {
-                                    MinVersion = SemanticVersion.Parse(d.Version.ToString()),
-                                    IsMinInclusive = true
-                                }));
+                                MinVersion = SemanticVersion.Parse(d.GetName().Version.ToString()),
+                                IsMinInclusive = true
+                            }));
 
                 return new ReleaseCheckTestsBase.TestPackage
                            {
@@ -1006,14 +1019,11 @@ namespace ClusterKit.NodeManager.Tests
                     var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
                     var assembliesToLoad = loadedAssemblies
-                        .SelectMany(a => a.GetReferencedAssemblies().Select(r => new { r, a }))
-                        .GroupBy(a => a.r.Name)
-                        .Select(g => g.OrderByDescending(a => a.r.Version).First())
-                        .OrderBy(p => p.r.Name)
-                        .Select(p => p.r)
-                        .Distinct()
-                        .Where(a => loadedAssemblies.All(l => l.GetName().Name != a.Name) && !ignoredAssemblies.Contains(a.Name))
-                        .ToList();
+                        .SelectMany(a => a.GetReferencedAssemblies().Select(r => new { r, a })).GroupBy(a => a.r.Name)
+                        .Select(g => g.OrderByDescending(a => a.r.Version).First()).OrderBy(p => p.r.Name)
+                        .Select(p => p.r).Distinct().Where(
+                            a => loadedAssemblies.All(l => l.GetName().Name != a.Name)
+                                 && !ignoredAssemblies.Contains(a.Name)).ToList();
 
                     if (assembliesToLoad.Count == 0)
                     {
@@ -1026,9 +1036,10 @@ namespace ClusterKit.NodeManager.Tests
                         {
                             AppDomain.CurrentDomain.Load(assemblyName);
                         }
-                        catch 
+                        catch
                         {
                             ignoredAssemblies.Add(assemblyName.Name);
+
                             // ignore
                         }
                     }
@@ -1036,11 +1047,8 @@ namespace ClusterKit.NodeManager.Tests
 
                 var packages = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.GlobalAssemblyCache && !a.IsDynamic)
-                    .Select(p => this.CreateTestPackage(p, AppDomain.CurrentDomain.GetAssemblies()))
-                    .GroupBy(a => a.Id)
-                    .Select(g => g.OrderByDescending(a => a.Version).First())
-                    .Cast<IPackage>()
-                    .ToArray();
+                    .Select(p => this.CreateTestPackage(p, AppDomain.CurrentDomain.GetAssemblies())).GroupBy(a => a.Id)
+                    .Select(g => g.OrderByDescending(a => a.Version).First()).Cast<IPackage>().ToArray();
                 return new ReleaseCheckTestsBase.TestRepository(packages);
             }
         }

@@ -57,15 +57,9 @@ namespace ClusterKit.NodeManager.Client.ORM
         [UsedImplicitly]
         public string AllowedScopeJson
         {
-            get
-            {
-                return JsonConvert.SerializeObject(this.AllowedScope);
-            }
+            get => JsonConvert.SerializeObject(this.AllowedScope);
 
-            set
-            {
-                this.AllowedScope = JsonConvert.DeserializeObject<List<string>>(value);
-            }
+            set => this.AllowedScope = JsonConvert.DeserializeObject<List<string>>(value);
         }
 
         /// <summary>
@@ -74,6 +68,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         [NotMapped]
         [NotNull]
         [DeclareField("The list of denied privileges (the user will not acquire this privileges, even if they will be granted via other roles)")]
+        [UsedImplicitly]
         public List<string> DeniedScope { get; set; } = new List<string>();
 
         /// <summary>
@@ -84,15 +79,9 @@ namespace ClusterKit.NodeManager.Client.ORM
         [UsedImplicitly]
         public string DeniedScopeJson
         {
-            get
-            {
-                return JsonConvert.SerializeObject(this.DeniedScope);
-            }
+            get => JsonConvert.SerializeObject(this.DeniedScope);
 
-            set
-            {
-                this.DeniedScope = JsonConvert.DeserializeObject<List<string>>(value);
-            }
+            set => this.DeniedScope = JsonConvert.DeserializeObject<List<string>>(value);
         }
 
         /// <summary>
@@ -100,7 +89,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// </summary>
         [UsedImplicitly]
         [DeclareField("The list of users assigned to this role", Access = EnAccessFlag.Queryable)]
-        public List<User> Users { get; set; }
+        public List<RoleUser> Users { get; set; }
 
         /// <inheritdoc />
         Guid IObjectWithId<Guid>.GetId()

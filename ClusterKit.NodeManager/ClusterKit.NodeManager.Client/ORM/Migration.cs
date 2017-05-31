@@ -32,6 +32,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         [Key]
         [UsedImplicitly]
         [DeclareField("The migration id", IsKey = true)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         /// <summary>
@@ -70,18 +71,11 @@ namespace ClusterKit.NodeManager.Client.ORM
         public DateTimeOffset? Finished { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of migration operations
+        /// Gets or sets the list of migration logs
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the list of migration operations")]
-        public List<MigrationOperation> Operations { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of migration errors
-        /// </summary>
-        [UsedImplicitly]
-        [DeclareField("the list of migration errors")]
-        public List<MigrationError> Errors { get; set; }
+        [DeclareField("the list of migration logs")]
+        public List<MigrationLogRecord> Logs { get; set; }
 
         /// <summary>
         /// Gets or sets the previous release id

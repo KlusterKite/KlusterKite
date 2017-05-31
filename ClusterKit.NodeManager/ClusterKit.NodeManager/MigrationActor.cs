@@ -23,7 +23,7 @@ namespace ClusterKit.NodeManager
     using Akka.Actor;
     using Akka.Event;
 
-    using ClusterKit.Data;
+    using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client.Messages.Migration;
     using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
@@ -31,6 +31,8 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.RemoteDomain;
 
     using JetBrains.Annotations;
+
+    using Microsoft.EntityFrameworkCore;
 
     using NuGet;
 
@@ -47,12 +49,17 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// The context factory
         /// </summary>
-        private readonly IContextFactory<ConfigurationContext> contextFactory;
+        private readonly UniversalContextFactory contextFactory;
 
         /// <summary>
         /// The configuration database name
         /// </summary>
         private readonly string databaseName;
+
+        /// <summary>
+        /// The configuration database provider name
+        /// </summary>
+        private readonly string databaseProviderName;
 
         /// <summary>
         /// The current environment framework name
@@ -74,7 +81,7 @@ namespace ClusterKit.NodeManager
         /// The nuget Repository.
         /// </param>
         [UsedImplicitly]
-        public MigrationActor(IContextFactory<ConfigurationContext> contextFactory, IPackageRepository nugetRepository)
+        public MigrationActor(UniversalContextFactory contextFactory, IPackageRepository nugetRepository)
         {
             this.Parent = Context.Parent;
             this.contextFactory = contextFactory;
@@ -82,6 +89,7 @@ namespace ClusterKit.NodeManager
             this.connectionString =
                 Context.System.Settings.Config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
+            this.databaseProviderName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
             this.frameworkName = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.FrameworkType");
         }
 
@@ -940,8 +948,8 @@ namespace ClusterKit.NodeManager
 
             var nameTable = configDoc.NameTable;
             var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", uri);
+            const string Uri = "urn:schemas-microsoft-com:asm.v1";
+            namespaceManager.AddNamespace("urn", Uri);
             var files = Directory.GetFiles(appDirectory, "*.dll");
             var assemblyBindingNode = configDoc.DocumentElement?.SelectSingleNode(
                 "/configuration/runtime/urn:assemblyBinding",
@@ -954,16 +962,16 @@ namespace ClusterKit.NodeManager
             foreach (var file in files)
             {
                 var assemblyName = AssemblyName.GetAssemblyName(file);
-                var dependentNode = assemblyBindingNode.AppendChild(configDoc.CreateElement("dependentAssembly", uri));
+                var dependentNode = assemblyBindingNode.AppendChild(configDoc.CreateElement("dependentAssembly", Uri));
                 var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("assemblyIdentity", uri));
+                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("assemblyIdentity", Uri));
                 assemblyIdentityNode.SetAttribute("name", assemblyName.Name);
                 var publicKeyToken = BitConverter.ToString(assemblyName.GetPublicKeyToken())
                     .Replace("-", string.Empty)
                     .ToLower(CultureInfo.InvariantCulture);
                 assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
                 var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("bindingRedirect", uri));
+                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("bindingRedirect", Uri));
                 bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{assemblyName.Version}");
                 bindingRedirectNode.SetAttribute("newVersion", assemblyName.Version.ToString());
             }
@@ -1288,11 +1296,13 @@ namespace ClusterKit.NodeManager
                 data = this.StateData;
             }
 
-            using (var ds = this.contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var ds = this.contextFactory.CreateContext<ConfigurationContext>(
+                this.databaseProviderName,
+                this.connectionString,
+                this.databaseName))
             {
                 var currentMigration = ds.Migrations.Include(nameof(Migration.FromRelease))
-                    .Include(nameof(Migration.ToRelease))
-                    .FirstOrDefault(m => m.IsActive);
+                    .Include(nameof(Migration.ToRelease)).FirstOrDefault(m => m.IsActive);
 
                 if (currentMigration != null)
                 {
