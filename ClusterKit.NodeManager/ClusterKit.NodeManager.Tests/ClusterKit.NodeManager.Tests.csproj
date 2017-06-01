@@ -11,6 +11,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="TempTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.0.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.console" Version="2.2.0" />
@@ -19,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.EF.InMemory\ClusterKit.Data.EF.InMemory.csproj" />
+    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.EF.Npgsql\ClusterKit.Data.EF.Npgsql.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.GraphQL.Publisher\ClusterKit.Web.GraphQL.Publisher.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager\ClusterKit.NodeManager.csproj" />
   </ItemGroup>

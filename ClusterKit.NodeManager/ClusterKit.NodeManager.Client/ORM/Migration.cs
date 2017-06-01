@@ -33,6 +33,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         [UsedImplicitly]
         [DeclareField("The migration id", IsKey = true)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column(TypeName = "serial")]  // TODO: check and remove that Npgsql.EntityFrameworkCore.PostgreSQL can generate serial columns on migration without this kludge
         public int Id { get; set; }
 
         /// <summary>

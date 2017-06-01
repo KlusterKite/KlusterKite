@@ -9,7 +9,7 @@ using ClusterKit.NodeManager.Client.ORM;
 namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 {
     [DbContext(typeof(ConfigurationContext))]
-    [Migration("20170531143428_Init")]
+    [Migration("20170601045606_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,6 +22,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
                     b.Property<int>("CompatibleReleaseId");
@@ -43,6 +44,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
                     b.Property<int?>("Direction");
@@ -72,6 +74,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
                     b.Property<string>("Discriminator")
@@ -108,6 +111,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
                     b.Property<string>("ConfigurationJson");

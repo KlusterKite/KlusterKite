@@ -77,6 +77,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Release>().Property(r => r.Id).ValueGeneratedOnAdd();
+
             modelBuilder.Entity<User>().HasIndex(u => u.Login);
 
             modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.Release)
