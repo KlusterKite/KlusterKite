@@ -201,6 +201,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.Log.Console",
                                              "ClusterKit.Log.ElasticSearch",
                                              "ClusterKit.Web.Authentication",
+                                             "ClusterKit.NodeManager.Authentication",
                                              "ClusterKit.Security.SessionRedis",
                                              "ClusterKit.API.Endpoint",
                                              "ClusterKit.Web.GraphQL.Publisher"

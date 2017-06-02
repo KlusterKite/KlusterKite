@@ -70,14 +70,15 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
                 while (true)
                 {
-                   try
+                    try
                     {
                         var requiredPackages =
                             seederConfiguration.RequiredPackages.SearchLatestPackagesWithDependencies(
                                 currentFramework,
                                 configuration.Nuget);
                         Console.WriteLine("Packages list created");
-                        requiredPackages.Select(p => p.Identity).Install(currentFramework, configuration.Nuget, executionDir);
+                        requiredPackages.Select(p => p.Identity)
+                            .Install(currentFramework, configuration.Nuget, executionDir);
                         Console.WriteLine("Packages installed");
                     }
                     catch (PackageNotFoundException packageNotFoundException)
@@ -86,10 +87,19 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                         Thread.Sleep(configuration.NugetCheckPeriod);
                         continue;
                     }
-                   catch (Exception exception)
+                    catch (AggregateException exception)
+                    {
+                        var e = exception.InnerExceptions?.FirstOrDefault() ?? exception;
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.StackTrace);
+                        Thread.Sleep(configuration.NugetCheckPeriod);
+                        continue;
+                    }
+                    catch (Exception exception)
                    {
                        Console.WriteLine(exception.Message);
-                       Thread.Sleep(configuration.NugetCheckPeriod);
+                       Console.WriteLine(exception.StackTrace);
+                        Thread.Sleep(configuration.NugetCheckPeriod);
                        continue;
                    }
 

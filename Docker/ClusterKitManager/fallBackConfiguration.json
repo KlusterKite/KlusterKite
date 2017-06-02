@@ -124,6 +124,10 @@
       "Version": "0.0.0-local"
     },
     {
+      "Id": "ClusterKit.NodeManager.Authentication",
+      "Version": "0.0.0-local"
+    },
+    {
       "Id": "ClusterKit.NodeManager.Client",
       "Version": "0.0.0-local"
     },

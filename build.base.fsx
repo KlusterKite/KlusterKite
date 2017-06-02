@@ -234,9 +234,12 @@ Target "CleanDockerImages" (fun _ ->
 )
 
 Target "PushLocalPackages" (fun _ ->
+    pushPackage (Path.Combine(packagePushDir, "*.nupkg"))
+    (*
     Directory.GetFiles(packagePushDir)
         |> Seq.filter (hasExt ".nupkg")
         |> Seq.iter pushPackage
+    *)
 )
 "Nuget" ?=> "PushLocalPackages"
 
@@ -357,9 +360,12 @@ Target "RestoreThirdPartyPackages" (fun _ ->
 "PrepareSources" ==> "RestoreThirdPartyPackages"
 
 Target "PushThirdPartyPackages" (fun _ ->
+    pushPackage (Path.Combine(packageThirdPartyDir, "*.nupkg"))
+    (*
     filesInDirMatchingRecursive "*.nupkg" (new DirectoryInfo(packageThirdPartyDir))
         |> Seq.map (fun (file:FileInfo) -> file.FullName)
         |> Seq.iter pushPackage
+    *)
 )
 
 "PushThirdPartyPackages" ?=> "PushLocalPackages"
