@@ -78,7 +78,7 @@ namespace ClusterKit.Data.Tests
             Assert.NotNull(result.Data);
             Assert.Equal("new_user", result.Data.Login);
 
-            var contextFactory = this.WindsorContainer.Resolve<UniversalContextFactory>();
+            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 Assert.Equal(3, context.Users.Count());
@@ -108,7 +108,7 @@ namespace ClusterKit.Data.Tests
             Assert.NotNull(result.Data);
             Assert.Equal("user1", result.Data.Login);
 
-            var contextFactory = this.WindsorContainer.Resolve<UniversalContextFactory>();
+            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 Assert.Equal(1, context.Users.Count());
@@ -178,7 +178,7 @@ namespace ClusterKit.Data.Tests
             Assert.Equal("new_user", result.Data.Login);
             Assert.Equal("456", result.Data.Password);
 
-            var contextFactory = this.WindsorContainer.Resolve<UniversalContextFactory>();
+            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 var user = context.Users.FirstOrDefault(u => u.Uid == uid);
@@ -234,7 +234,7 @@ namespace ClusterKit.Data.Tests
             Assert.Equal("new_user", result.Data.Login);
             Assert.Equal("123", result.Data.Password);
 
-            var contextFactory = this.WindsorContainer.Resolve<UniversalContextFactory>();
+            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 var user = context.Users.FirstOrDefault(u => u.Uid == uid);
@@ -249,7 +249,7 @@ namespace ClusterKit.Data.Tests
         {
             base.Dispose(disposing);
 
-            var contextFactory = this.WindsorContainer.Resolve<UniversalContextFactory>();
+            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 context.Database.EnsureDeleted();
@@ -262,7 +262,7 @@ namespace ClusterKit.Data.Tests
         /// <returns>The data actor</returns>
         private IActorRef InitContext()
         {
-            var contextFactory = this.WindsorContainer.Resolve<UniversalContextFactory>();
+            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 var user1 = new User
@@ -336,7 +336,7 @@ namespace ClusterKit.Data.Tests
             /// </summary>
             /// <param name="container">The container.</param>
             /// <param name="store">The configuration store.</param>
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
             {
                 container.Register(Component.For<DatabaseInstanceName>().Instance(new DatabaseInstanceName()));
                 container.Register(

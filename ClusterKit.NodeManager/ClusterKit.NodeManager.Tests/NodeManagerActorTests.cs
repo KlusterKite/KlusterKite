@@ -158,7 +158,7 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public async Task NodeIsObsoleteOnStartTest()
         {
-            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+            var router = (TestMessageRouter)this.ContainerBuilder.Resolve<IMessageRouter>();
 
             // ReSharper disable once StringLiteralTypo
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
@@ -223,7 +223,7 @@ namespace ClusterKit.NodeManager.Tests
                 newReleaseId = newRelease.Id;
             }
 
-            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+            var router = (TestMessageRouter)this.ContainerBuilder.Resolve<IMessageRouter>();
 
             // ReSharper disable once StringLiteralTypo
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
@@ -2032,7 +2032,7 @@ namespace ClusterKit.NodeManager.Tests
             out VirtualNode node2,
             out VirtualNode node3)
         {
-            var router = (TestMessageRouter)this.WindsorContainer.Resolve<IMessageRouter>();
+            var router = (TestMessageRouter)this.ContainerBuilder.Resolve<IMessageRouter>();
             this.ActorOf(() => new TestActorForwarder(this.TestActor), "migrationActor");
 
             // ReSharper disable once StringLiteralTypo
@@ -2255,11 +2255,11 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>The database context</returns>
         private ConfigurationContext GetContext()
         {
-            var connectionString = this.WindsorContainer.Resolve<Config>()
+            var connectionString = this.ContainerBuilder.Resolve<Config>()
                 .GetString(NodeManagerActor.ConfigConnectionStringPath);
-            var databaseName = this.WindsorContainer.Resolve<Config>()
+            var databaseName = this.ContainerBuilder.Resolve<Config>()
                 .GetString(NodeManagerActor.ConfigDatabaseNamePath);
-            return this.WindsorContainer.Resolve<UniversalContextFactory>()
+            return this.ContainerBuilder.Resolve<UniversalContextFactory>()
                 .CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName);
         }
 

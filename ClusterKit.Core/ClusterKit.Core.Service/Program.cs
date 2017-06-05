@@ -12,7 +12,7 @@ namespace ClusterKit.Core.Service
     using System;
     using System.Collections.Generic;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using DocoptNet;
 
@@ -37,7 +37,7 @@ namespace ClusterKit.Core.Service
         /// <summary>
         /// Gets or sets the dependency injection container
         /// </summary>
-        private static IWindsorContainer Container { get; set; }
+        private static ContainerBuilder Container { get; set; }
 
         /// <summary>
         /// Service main entry point
@@ -62,7 +62,7 @@ namespace ClusterKit.Core.Service
                 Console.WriteLine($@"Will use config from {config}");
             }
 
-            Container = new WindsorContainer();
+            Container = new ContainerBuilder();
 
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
                 {

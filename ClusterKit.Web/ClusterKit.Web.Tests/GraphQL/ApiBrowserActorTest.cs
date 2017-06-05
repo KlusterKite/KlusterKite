@@ -61,7 +61,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public void SimpleNodeLifeCycleTest()
         {
-            var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
+            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
             Assert.Null(schemaProvider.CurrentSchema);
             var browser = this.ActorOf(this.Sys.DI().Props<ApiBrowserActor>());
             this.ExpectNoMsg();

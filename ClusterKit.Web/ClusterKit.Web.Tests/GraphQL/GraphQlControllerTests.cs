@@ -128,7 +128,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.ExpectNoMsg();
             var internalApiProvider = new TestProvider();
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
+            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
@@ -204,7 +204,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var internalApiProvider = new TestProvider(initialObjects);
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
+            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
@@ -295,7 +295,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.ExpectNoMsg();
             var internalApiProvider = new TestProvider();
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schemaProvider = this.WindsorContainer.Resolve<SchemaProvider>();
+            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };

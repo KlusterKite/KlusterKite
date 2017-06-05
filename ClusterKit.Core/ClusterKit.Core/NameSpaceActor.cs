@@ -15,7 +15,7 @@ namespace ClusterKit.Core
     using Akka.DI.Core;
     using Akka.Event;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using JetBrains.Annotations;
 
@@ -26,19 +26,19 @@ namespace ClusterKit.Core
     public class NameSpaceActor : UntypedActor
     {
         /// <summary>
-        /// The dependency injection container
+        /// The component context
         /// </summary>
-        private readonly IWindsorContainer windsorContainer;
+        private IComponentContext componentContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NameSpaceActor"/> class.
         /// </summary>
-        /// <param name="windsorContainer">
+        /// <param name="componentContext">
         /// Dependency resolver
         /// </param>
-        public NameSpaceActor(IWindsorContainer windsorContainer)
+        public NameSpaceActor(IComponentContext componentContext)
         {
-            this.windsorContainer = windsorContainer;
+            this.componentContext = componentContext;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace ClusterKit.Core
         protected virtual void CreateShardingActor(
             IActorContext context,
             Config actorConfig,
-            IWindsorContainer container,
+            IComponentContext container,
             string pathName)
         {
             context.ActorOf(Props.Create(() => new ShardingWrappperActor(container, actorConfig)), pathName);
@@ -67,7 +67,7 @@ namespace ClusterKit.Core
         protected virtual void CreateShardingProxyActor(
             IActorContext context,
             Config actorConfig,
-            IWindsorContainer container,
+            IComponentContext container,
             string pathName)
         {
             context.ActorOf(Props.Create(() => new ShardingProxyWrappperActor(container, actorConfig)), pathName);
@@ -84,7 +84,7 @@ namespace ClusterKit.Core
         protected virtual void CreateSimpleActor(
             IActorContext context,
             Config actorConfig,
-            IWindsorContainer container,
+            IComponentContext container,
             string currentPath,
             string pathName)
         {
@@ -288,7 +288,7 @@ namespace ClusterKit.Core
         protected override void PreStart()
         {
             base.PreStart();
-            this.InitChildActorsFromConfig(ActorBase.Context, this.Self.Path, this.windsorContainer);
+            this.InitChildActorsFromConfig(ActorBase.Context, this.Self.Path, this.componentContext);
         }
 
         /// <summary>
@@ -297,7 +297,7 @@ namespace ClusterKit.Core
         /// <param name="context">Current actor's context</param>
         /// <param name="actorPath">Current actor's path</param>
         /// <param name="container">Dependency resolver</param>
-        private void InitChildActorsFromConfig(IActorContext context, ActorPath actorPath, IWindsorContainer container)
+        private void InitChildActorsFromConfig(IActorContext context, ActorPath actorPath, IComponentContext container)
         {
             var config = Context.System.Settings.Config.GetConfig("akka.actor.deployment");
             if (config == null)

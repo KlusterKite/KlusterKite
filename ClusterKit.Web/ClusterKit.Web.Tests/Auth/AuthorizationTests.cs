@@ -178,7 +178,7 @@ namespace ClusterKit.Web.Tests.Auth
                 DateTimeOffset.Now.AddMinutes(1),
                 "hello world");
 
-            return await this.WindsorContainer.Resolve<ITokenManager>().CreateAccessToken(session);
+            return await this.ContainerBuilder.Resolve<ITokenManager>().CreateAccessToken(session);
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace ClusterKit.Web.Tests.Auth
                 DateTimeOffset.Now.AddMinutes(1),
                 "hello world");
 
-            return await this.WindsorContainer.Resolve<ITokenManager>().CreateAccessToken(session);
+            return await this.ContainerBuilder.Resolve<ITokenManager>().CreateAccessToken(session);
         }
 
         /// <summary>

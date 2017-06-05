@@ -14,9 +14,7 @@ namespace ClusterKit.Core
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using JetBrains.Annotations;
 
@@ -24,7 +22,7 @@ namespace ClusterKit.Core
     /// Base class to install ClusterKit plugin components
     /// </summary>
     [UsedImplicitly]
-    public abstract class BaseInstaller : IWindsorInstaller
+    public abstract class BaseInstaller
     {
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles node role functionality
@@ -47,8 +45,8 @@ namespace ClusterKit.Core
         /// <summary>
         /// Every time <seealso cref="Install"/> called, installer register itself here
         /// </summary>
-        private static readonly Dictionary<IWindsorContainer, List<BaseInstaller>> RegisteredInstallers =
-            new Dictionary<IWindsorContainer, List<BaseInstaller>>();
+        private static readonly Dictionary<ContainerBuilder, List<BaseInstaller>> RegisteredInstallers =
+            new Dictionary<ContainerBuilder, List<BaseInstaller>>();
 
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
@@ -65,7 +63,7 @@ namespace ClusterKit.Core
         /// <returns>
         /// the list of all registered installers
         /// </returns>
-        public static IList<BaseInstaller> GetRegisteredBaseInstallers(IWindsorContainer container)
+        public static IList<BaseInstaller> GetRegisteredBaseInstallers(ContainerBuilder container)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -88,7 +86,7 @@ namespace ClusterKit.Core
         /// <returns>
         /// Akka and system configuration
         /// </returns>
-        public static Config GetStackedConfig(IWindsorContainer container, Config config)
+        public static Config GetStackedConfig(ContainerBuilder container, Config config)
         {
             Serilog.Log.Information("ClusterKit starting plugin manager");
 
@@ -122,7 +120,7 @@ namespace ClusterKit.Core
         /// <param name="container">
         /// The windsor container.
         /// </param>
-        public static void RunPostStart(IWindsorContainer container)
+        public static void RunPostStart(ContainerBuilder container)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -143,7 +141,7 @@ namespace ClusterKit.Core
         /// The windsor container.
         /// </param>
         /// <param name="config">Full akka config</param>
-        public static void RunPreCheck(IWindsorContainer container, Config config)
+        public static void RunPreCheck(ContainerBuilder container, Config config)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -161,8 +159,7 @@ namespace ClusterKit.Core
         /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
         /// </summary>
         /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        public void Install([NotNull] IWindsorContainer container, IConfigurationStore store)
+        public void Install([NotNull] ContainerBuilder container)
         {
             if (container == null)
             {
@@ -180,7 +177,7 @@ namespace ClusterKit.Core
             }
 
             RegisteredInstallers[container].Add(this);
-            this.RegisterWindsorComponents(container, store);
+            this.RegisterComponents(container);
         }
 
         /// <summary>
@@ -222,7 +219,6 @@ namespace ClusterKit.Core
         /// Registering DI components
         /// </summary>
         /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected abstract void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store);
+        protected abstract void RegisterComponents(ContainerBuilder container);
     }
 }

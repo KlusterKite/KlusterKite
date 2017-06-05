@@ -36,7 +36,7 @@ namespace ClusterKit.Core.Utils
         /// The original object type
         /// </typeparam>
         /// <returns>
-        /// The <see cref="T"/>.
+        /// The deserialized object
         /// </returns>
         [UsedImplicitly]
         public static T DeserializeFromAkka<T>(this byte[] serializedData, ActorSystem system)
@@ -57,7 +57,7 @@ namespace ClusterKit.Core.Utils
         /// The original object type
         /// </typeparam>
         /// <returns>
-        /// The <see cref="T"/>.
+        /// The deserialized object
         /// </returns>
         [UsedImplicitly]
         public static T DeserializeFromAkkaString<T>(this string serializedData, ActorSystem system)

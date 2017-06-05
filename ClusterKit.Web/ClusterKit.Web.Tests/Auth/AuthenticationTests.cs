@@ -115,7 +115,7 @@ namespace ClusterKit.Web.Tests.Auth
             if (expectedResult == HttpStatusCode.OK)
             {
                 var tokenDescription = result.Data;
-                var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
+                var tokenManager = this.ContainerBuilder.Resolve<ITokenManager>();
                 var accessTicket = await tokenManager.ValidateAccessToken(tokenDescription.AccessToken);
                 Assert.NotNull(accessTicket);
                 Assert.NotNull(accessTicket.User);
@@ -157,7 +157,7 @@ namespace ClusterKit.Web.Tests.Auth
             HttpStatusCode expectedResult)
         {
             this.ExpectNoMsg();
-            var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
+            var tokenManager = this.ContainerBuilder.Resolve<ITokenManager>();
             var token = createTicket
                             ? await tokenManager.CreateRefreshToken(
                                   new RefreshTicket(

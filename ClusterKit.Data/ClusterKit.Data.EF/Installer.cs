@@ -40,7 +40,7 @@ namespace ClusterKit.Data.EF
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(Component.For<UniversalContextFactory>().LifestyleSingleton());
         }

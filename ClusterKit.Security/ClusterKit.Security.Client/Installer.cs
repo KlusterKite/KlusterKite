@@ -39,7 +39,7 @@ namespace ClusterKit.Security.Client
         protected override IEnumerable<string> GetRoles() => new string[0];
 
         /// <inheritdoc />
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
         {
         }
     }

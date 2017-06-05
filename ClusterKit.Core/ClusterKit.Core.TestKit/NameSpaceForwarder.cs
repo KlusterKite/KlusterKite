@@ -16,7 +16,7 @@ namespace ClusterKit.Core.TestKit
     using Akka.DI.Core;
     using Akka.Event;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using JetBrains.Annotations;
 
@@ -34,10 +34,10 @@ namespace ClusterKit.Core.TestKit
         /// <summary>
         /// Initializes a new instance of the <see cref="NameSpaceForwarder"/> class.
         /// </summary>
-        /// <param name="windsorContainer">The access to dependency injection</param>
+        /// <param name="componentContext">The access to dependency injection</param>
         /// <param name="testActor">The test actor reference</param>
-        public NameSpaceForwarder(IWindsorContainer windsorContainer, IActorRef testActor)
-            : base(windsorContainer)
+        public NameSpaceForwarder(IComponentContext componentContext, IActorRef testActor)
+            : base(componentContext)
         {
             this.testActor = testActor;
 
@@ -51,13 +51,13 @@ namespace ClusterKit.Core.TestKit
         /// </summary>
         /// <param name="context">Current actor context (will create child actor)</param>
         /// <param name="actorConfig">Configuration to create from</param>
-        /// <param name="windsorContainer">Dependency resolver</param>
+        /// <param name="componentContext">Dependency resolver</param>
         /// <param name="currentPath">Parent (current) actor path</param>
         /// <param name="pathName">New actor's path name</param>
         protected override void CreateSimpleActor(
                     IActorContext context,
                     Config actorConfig,
-                    IWindsorContainer windsorContainer,
+                    IComponentContext componentContext,
                     string currentPath,
                     string pathName)
         {
@@ -83,7 +83,7 @@ namespace ClusterKit.Core.TestKit
                 if (type == typeof(NameSpaceActor) || type == typeof(NameSpaceForwarder))
                 {
                     // this is done for tests, otherwise it would lead to CircularDependencyException
-                    context.ActorOf(Props.Create(() => new NameSpaceForwarder(windsorContainer, this.testActor)), pathName);
+                    context.ActorOf(Props.Create(() => new NameSpaceForwarder(componentContext, this.testActor)), pathName);
                 }
                 else
                 {

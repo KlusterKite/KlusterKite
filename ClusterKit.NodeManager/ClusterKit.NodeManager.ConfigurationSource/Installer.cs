@@ -46,7 +46,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
             container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactoryByLogin>().LifestyleTransient());

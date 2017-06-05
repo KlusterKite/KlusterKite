@@ -14,13 +14,12 @@ namespace ClusterKit.Core.TestKit
 
     using Akka.Actor;
     using Akka.Configuration;
-    using Akka.DI.CastleWindsor;
+    using Akka.DI.AutoFac;
     using Akka.DI.Core;
     using Akka.TestKit;
-    using Castle.MicroKernel.Registration;
-    using Castle.Windsor;
 
-    using CommonServiceLocator.WindsorAdapter;
+    using Autofac;
+    using Autofac.Extras.CommonServiceLocator;
 
     using JetBrains.Annotations;
 
@@ -239,21 +238,6 @@ namespace ClusterKit.Core.TestKit
         }
 
         /// <summary>
-        /// Register dependency injection component
-        /// </summary>
-        /// <typeparam name="T">
-        /// Type of component
-        /// </typeparam>
-        /// <param name="generator">
-        /// Component generation factory
-        /// </param>
-        [UsedImplicitly]
-        protected void WinsorBind<T>(Func<T> generator)
-        {
-            this.WindsorContainer.Register(Component.For(typeof(T)).UsingFactoryMethod(generator).LifestyleTransient());
-        }
-
-        /// <summary>
         /// Creating actor system for test
         /// </summary>
         /// <param name="output">
@@ -268,32 +252,28 @@ namespace ClusterKit.Core.TestKit
                 new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(output));
             Serilog.Log.Logger = loggerConfig.CreateLogger();
 
-            var container = new WindsorContainer();
-            ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
+            var containerBuilder = new ContainerBuilder();
+            
 
             var configurator = new TConfigurator();
             foreach (var pluginInstaller in configurator.GetPluginInstallers())
             {
-                container.Install(pluginInstaller);
+                pluginInstaller.Install(containerBuilder);
             }
 
-            var config = configurator.GetAkkaConfig(container);
+            var config = configurator.GetAkkaConfig(containerBuilder);
 
             var testActorSystem = ActorSystem.Create("test", config);
-            testActorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, testActorSystem));
-            container.Register(Component.For<ActorSystem>().Instance(testActorSystem).LifestyleSingleton());
-            container.Register(Component.For<IWindsorContainer>().Instance(container).LifestyleSingleton());
-            container.Register(Component.For<Config>().Instance(testActorSystem.Settings.Config).LifestyleSingleton());
 
-            if (configurator.RunPostStart)
-            {
-                BaseInstaller.RunPostStart(container);
-            }
+            containerBuilder.RegisterInstance(testActorSystem).As<ActorSystem>();
+            containerBuilder.RegisterInstance(testActorSystem.Settings.Config).As<Config>();
+
 
             return new TestDescription
             {
                 System = testActorSystem,
-                Container = container
+                ContainerBuilder = containerBuilder,
+                Configurator = configurator
             };
         }
 

@@ -13,7 +13,7 @@ namespace ClusterKit.Core.TestKit
 
     using Akka.Configuration;
 
-    using Castle.Windsor;
+    using Autofac;
 
     /// <summary>
     /// Configures base data for tests. Such as Akka config and list of used WindsorInstallers
@@ -28,13 +28,13 @@ namespace ClusterKit.Core.TestKit
         /// <summary>
         /// Gets the akka system config
         /// </summary>
-        /// <param name="windsorContainer">
-        /// The windsor Container.
+        /// <param name="containerBuilder">
+        /// The container builder
         /// </param>
         /// <returns>
         /// The config
         /// </returns>
-        public virtual Config GetAkkaConfig(IWindsorContainer windsorContainer)
+        public virtual Config GetAkkaConfig(ContainerBuilder containerBuilder)
         {
             var config = ConfigurationFactory.ParseString(
                 @"
@@ -42,7 +42,7 @@ namespace ClusterKit.Core.TestKit
                 akka.actor.serialize-creators = off
             ");
 
-            return BaseInstaller.GetStackedConfig(windsorContainer, config);
+            return BaseInstaller.GetStackedConfig(containerBuilder, config);
         }
 
         /// <summary>

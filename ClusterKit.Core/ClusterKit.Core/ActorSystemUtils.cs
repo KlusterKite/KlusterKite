@@ -16,8 +16,8 @@ namespace ClusterKit.Core
 
     using Akka.Actor;
     using Akka.DI.Core;
-    using Castle.Windsor;
-    using Castle.Windsor.Installer;
+
+    using Autofac;
 
     /// <summary>
     /// Utilities to work with <seealso cref="ActorSystem"/>
@@ -25,7 +25,7 @@ namespace ClusterKit.Core
     public static class ActorSystemUtils
     {
         /// <summary>
-        /// Scans main application directory for libraries and windsor installers in them and installs them
+        /// Scans main application directory for libraries and <see cref="BaseInstaller"/> in them and installs them
         /// </summary>
         /// <param name="container">
         /// Current windsor container
@@ -33,7 +33,7 @@ namespace ClusterKit.Core
         /// <param name="installAssemblies">
         /// A value indicating whether this should scan current directory and load assemblies
         /// </param>
-        public static void RegisterWindsorInstallers(this IWindsorContainer container, bool installAssemblies = true)
+        public static void RegisterInstallers(this ContainerBuilder container, bool installAssemblies = true)
         {
             if (installAssemblies)
             {
@@ -61,11 +61,16 @@ namespace ClusterKit.Core
 
             Console.WriteLine(@"Assemblies loaded");
 
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic))
+            foreach (var type in AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic)
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.IsSubclassOf(typeof(BaseInstaller)))
+                .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition && t.GetConstructor(new Type[0]) != null))
             {
                 try
                 {
-                    container.Install(FromAssembly.Instance(assembly));
+                    var installer = (BaseInstaller)Activator.CreateInstance(type);
+                    installer.Install(container);
                 }
                 catch (Exception)
                 {

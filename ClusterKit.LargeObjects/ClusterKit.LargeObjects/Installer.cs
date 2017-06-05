@@ -40,7 +40,7 @@ namespace ClusterKit.LargeObjects
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
         {
             container.Register(
                 Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
