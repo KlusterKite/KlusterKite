@@ -18,9 +18,7 @@ namespace ClusterKit.LargeObjects.Tests
     using Akka.DI.Core;
     using Akka.TestKit;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -191,22 +189,14 @@ namespace ClusterKit.LargeObjects.Tests
 
                    }");
 
-            /// <summary>
-            /// Registering DI components
-            /// </summary>
-            /// <param name="container">The container.</param>
-            /// <param name="store">The configuration store.</param>
-            protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+            /// <inheritdoc />
+            protected override void RegisterComponents(ContainerBuilder container)
             {
-                container.Register(Classes.FromAssemblyContaining<ParcelManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-                container.Register(Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-                container.Register(
-                    Component.For<INotificationEnveloper>().ImplementedBy<TestIntEnveloper>().LifestyleTransient());
-                container.Register(
-                    Component.For<INotificationEnveloper>().ImplementedBy<TestInt2Enveloper>().LifestyleTransient());
-                container.Register(
-                    Component.For<INotificationEnveloper>().ImplementedBy<TestDoubleEnveloper>().LifestyleTransient());
+                container.RegisterAssemblyTypes(typeof(ParcelManagerActor).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(Core.Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+                container.RegisterType<TestIntEnveloper>().As<INotificationEnveloper>();
+                container.RegisterType<TestInt2Enveloper>().As<INotificationEnveloper>();
+                container.RegisterType<TestDoubleEnveloper>().As<INotificationEnveloper>();
             }
         }
 

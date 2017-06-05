@@ -11,6 +11,7 @@ namespace ClusterKit.Data.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -18,9 +19,7 @@ namespace ClusterKit.Data.Tests
     using Akka.Configuration;
     using Akka.DI.Core;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client;
     using ClusterKit.Core;
@@ -78,7 +77,7 @@ namespace ClusterKit.Data.Tests
             Assert.NotNull(result.Data);
             Assert.Equal("new_user", result.Data.Login);
 
-            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 Assert.Equal(3, context.Users.Count());
@@ -108,7 +107,7 @@ namespace ClusterKit.Data.Tests
             Assert.NotNull(result.Data);
             Assert.Equal("user1", result.Data.Login);
 
-            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 Assert.Equal(1, context.Users.Count());
@@ -178,7 +177,7 @@ namespace ClusterKit.Data.Tests
             Assert.Equal("new_user", result.Data.Login);
             Assert.Equal("456", result.Data.Password);
 
-            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 var user = context.Users.FirstOrDefault(u => u.Uid == uid);
@@ -234,7 +233,7 @@ namespace ClusterKit.Data.Tests
             Assert.Equal("new_user", result.Data.Login);
             Assert.Equal("123", result.Data.Password);
 
-            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 var user = context.Users.FirstOrDefault(u => u.Uid == uid);
@@ -249,7 +248,7 @@ namespace ClusterKit.Data.Tests
         {
             base.Dispose(disposing);
 
-            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 context.Database.EnsureDeleted();
@@ -262,7 +261,7 @@ namespace ClusterKit.Data.Tests
         /// <returns>The data actor</returns>
         private IActorRef InitContext()
         {
-            var contextFactory = this.ContainerBuilder.Resolve<UniversalContextFactory>();
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
             using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
                 var user1 = new User
@@ -331,23 +330,13 @@ namespace ClusterKit.Data.Tests
             /// <returns>Akka configuration</returns>
             protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
-            /// <summary>
-            /// Registering DI components
-            /// </summary>
-            /// <param name="container">The container.</param>
-            /// <param name="store">The configuration store.</param>
-            protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+            /// <inheritdoc />
+            protected override void RegisterComponents(ContainerBuilder container)
             {
-                container.Register(Component.For<DatabaseInstanceName>().Instance(new DatabaseInstanceName()));
-                container.Register(
-                    Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-                container.Register(
-                    Component.For<DataFactory<TestDataContext, User, Guid>>().ImplementedBy<TestUserFactory>()
-                        .LifestyleTransient());
-                container.Register(
-                    Component.For<DataFactory<TestDataContext, Role, Guid>>().ImplementedBy<TestRolesFactory>()
-                        .LifestyleTransient());
+                container.RegisterInstance(new DatabaseInstanceName());
+                container.RegisterAssemblyTypes(typeof(TestInstaller).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+                container.RegisterType<TestUserFactory>().As<DataFactory<TestDataContext, User, Guid>>();
+                container.RegisterType<TestRolesFactory>().As<DataFactory<TestDataContext, Role, Guid>>();
             }
         }
     }

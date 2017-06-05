@@ -11,9 +11,7 @@ namespace ClusterKit.Data.EF
 {
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
 
@@ -35,14 +33,10 @@ namespace ClusterKit.Data.EF
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(Component.For<UniversalContextFactory>().LifestyleSingleton());
+            container.RegisterType<UniversalContextFactory>().SingleInstance();
         }
     }
 }

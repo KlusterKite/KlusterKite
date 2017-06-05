@@ -10,9 +10,10 @@
 namespace ClusterKit.Data.EF
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using Microsoft.EntityFrameworkCore;
 
@@ -29,12 +30,12 @@ namespace ClusterKit.Data.EF
         /// <summary>
         /// Initializes a new instance of the <see cref="UniversalContextFactory"/> class.
         /// </summary>
-        /// <param name="windsorContainer">
+        /// <param name="componentContext">
         /// The windsor container.
         /// </param>
-        public UniversalContextFactory(IWindsorContainer windsorContainer)
+        public UniversalContextFactory(IComponentContext componentContext)
         {
-            this.factories = windsorContainer.ResolveAll<IContextFactory>().ToImmutableDictionary(f => f.ProviderName);
+            this.factories = componentContext.Resolve<IEnumerable<IContextFactory>>().ToImmutableDictionary(f => f.ProviderName);
         }
 
         /// <summary>

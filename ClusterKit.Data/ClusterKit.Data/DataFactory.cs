@@ -14,7 +14,7 @@ namespace ClusterKit.Data
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client;
     using ClusterKit.Core.Monads;
@@ -56,8 +56,8 @@ namespace ClusterKit.Data
         /// <returns>The new data factory</returns>
         public static DataFactory<TContext, TObject, TId> CreateFactory(TContext context)
         {
-            var container = ServiceLocator.Current.GetInstance<IWindsorContainer>();
-            return container.Resolve<DataFactory<TContext, TObject, TId>>(new { context });
+            var container = ServiceLocator.Current.GetInstance<IComponentContext>();
+            return container.Resolve<DataFactory<TContext, TObject, TId>>(new TypedParameter(typeof(TContext), context));
         }
 
         /// <summary>

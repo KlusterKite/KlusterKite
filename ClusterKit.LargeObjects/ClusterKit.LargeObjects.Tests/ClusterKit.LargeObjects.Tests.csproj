@@ -11,6 +11,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
     <ProjectReference Include="..\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj" />

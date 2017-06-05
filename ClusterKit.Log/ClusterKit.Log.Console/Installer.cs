@@ -9,11 +9,11 @@
 
 namespace ClusterKit.Log.Console
 {
+    using System.ComponentModel;
+
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.Log;
@@ -35,14 +35,10 @@ namespace ClusterKit.Log.Console
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(Component.For<ILoggerConfigurator>().ImplementedBy<Configurator>().LifestyleTransient());
+            container.RegisterType<Configurator>().As<ILoggerConfigurator>();
         }
     }
 }
