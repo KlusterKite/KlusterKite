@@ -14,9 +14,7 @@ namespace ClusterKit.Web.Swagger
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     
@@ -73,16 +71,11 @@ namespace ClusterKit.Web.Swagger
                                                                      "Web.Swagger.Publish"
                                                                  };
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(Component.For<IOwinStartupConfigurator>().ImplementedBy<OwinConfigurator>());
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterType<OwinConfigurator>().As<IOwinStartupConfigurator>();
         }
     }
 }

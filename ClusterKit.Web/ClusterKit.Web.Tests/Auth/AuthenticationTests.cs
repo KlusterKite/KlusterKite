@@ -16,9 +16,7 @@ namespace ClusterKit.Web.Tests.Auth
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -78,16 +76,16 @@ namespace ClusterKit.Web.Tests.Auth
         /// Task to enable asynchronous execution
         /// </returns>
         [Theory]
-        [InlineData("unknownClient", null, "testUser", "testPassword", HttpStatusCode.BadRequest)]
-        [InlineData("unit-test-nosecret", null, "testUser", "testPassword", HttpStatusCode.OK)]
-        [InlineData("unit-test-nosecret", "random", "testUser", "testPassword", HttpStatusCode.OK)]
-        [InlineData("unit-test-nosecret", null, "testUser1", "testPassword", HttpStatusCode.BadRequest)]
-        [InlineData("unit-test-nosecret", null, "testUser", "testPassword1", HttpStatusCode.BadRequest)]
-        [InlineData("unit-test-secret", null, "testUser", "testPassword", HttpStatusCode.BadRequest)]
-        [InlineData("unit-test-secret", "random", "testUser", "testPassword", HttpStatusCode.BadRequest)]
-        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword", HttpStatusCode.OK)]
-        [InlineData("unit-test-secret", "test-secret", "testUser1", "testPassword", HttpStatusCode.BadRequest)]
-        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword1", HttpStatusCode.BadRequest)]
+        [InlineData("unknownClient", null, "testUser", "testPassword", 400)]
+        [InlineData("unit-test-nosecret", null, "testUser", "testPassword", 200)]
+        [InlineData("unit-test-nosecret", "random", "testUser", "testPassword", 200)]
+        [InlineData("unit-test-nosecret", null, "testUser1", "testPassword", 400)]
+        [InlineData("unit-test-nosecret", null, "testUser", "testPassword1", 400)]
+        [InlineData("unit-test-secret", null, "testUser", "testPassword", 400)]
+        [InlineData("unit-test-secret", "random", "testUser", "testPassword", 400)]
+        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword", 200)]
+        [InlineData("unit-test-secret", "test-secret", "testUser1", "testPassword", 400)]
+        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword1", 400)]
         public async Task GrantPasswordTest(
             string clientId,
             string clientSecret,
@@ -110,12 +108,13 @@ namespace ClusterKit.Web.Tests.Auth
             }
 
             var result = await client.ExecuteTaskAsync<TokenResponse>(request);
+            Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
             Assert.Equal(expectedResult, result.StatusCode);
 
             if (expectedResult == HttpStatusCode.OK)
             {
                 var tokenDescription = result.Data;
-                var tokenManager = this.ContainerBuilder.Resolve<ITokenManager>();
+                var tokenManager = this.Container.Resolve<ITokenManager>();
                 var accessTicket = await tokenManager.ValidateAccessToken(tokenDescription.AccessToken);
                 Assert.NotNull(accessTicket);
                 Assert.NotNull(accessTicket.User);
@@ -139,15 +138,15 @@ namespace ClusterKit.Web.Tests.Auth
         /// <param name="expectedResult">The expected response code</param>
         /// <returns>Async task</returns>
         [Theory]
-        [InlineData(false, null, null, "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
-        [InlineData(false, null, null, "unit-test-nosecret", null, HttpStatusCode.BadRequest)]
-        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
-        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.OK)]
-        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "random", HttpStatusCode.BadRequest)]
-        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
-        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
-        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-nosecret", null, HttpStatusCode.OK)]
-        [InlineData(true, "testUser", "unit-test-secret", "unit-test-nosecret", null, HttpStatusCode.BadRequest)]
+        [InlineData(false, null, null, "unit-test-secret", "test-secret", 400)]
+        [InlineData(false, null, null, "unit-test-nosecret", null, 400)]
+        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", 400)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "test-secret", 200)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "random", 400)]
+        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-secret", "test-secret", 400)]
+        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", 400)]
+        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-nosecret", null, 200)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-nosecret", null, 400)]
         public async Task GrantRefreshToken(
             bool createTicket,
             string ticketUserId,
@@ -157,7 +156,7 @@ namespace ClusterKit.Web.Tests.Auth
             HttpStatusCode expectedResult)
         {
             this.ExpectNoMsg();
-            var tokenManager = this.ContainerBuilder.Resolve<ITokenManager>();
+            var tokenManager = this.Container.Resolve<ITokenManager>();
             var token = createTicket
                             ? await tokenManager.CreateRefreshToken(
                                   new RefreshTicket(
@@ -204,16 +203,8 @@ namespace ClusterKit.Web.Tests.Auth
             /// <inheritdoc />
             public override bool RunPostStart => true;
 
-            /// <summary>
-            /// Gets the akka system config
-            /// </summary>
-            /// <param name="windsorContainer">
-            /// The windsor Container.
-            /// </param>
-            /// <returns>
-            /// The config
-            /// </returns>
-            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            /// <inheritdoc />
+            public override Config GetAkkaConfig(ContainerBuilder containerBuilder)
             {
                 var listener = new TcpListener(IPAddress.Any, 0);
                 listener.Start();
@@ -230,7 +221,7 @@ namespace ClusterKit.Web.Tests.Auth
                         }}
                     }}
                 }}
-").WithFallback(base.GetAkkaConfig(windsorContainer));
+").WithFallback(base.GetAkkaConfig(containerBuilder));
             }
 
             /// <summary>
@@ -263,10 +254,10 @@ namespace ClusterKit.Web.Tests.Auth
             }
 
             /// <inheritdoc />
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(ContainerBuilder container)
             {
-                container.Register(Component.For<IClientProvider>().ImplementedBy<TestClientProvider>());
-                container.Register(Component.For<ITokenManager>().ImplementedBy<MoqTokenManager>().LifestyleSingleton());
+                container.RegisterType<TestClientProvider>().As<IClientProvider>();
+                container.RegisterType<MoqTokenManager>().As<ITokenManager>();
             }
         }
 

@@ -10,6 +10,7 @@ namespace ClusterKit.Web.Tests.Auth
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Configuration;
     using System.Net;
     using System.Net.Sockets;
@@ -18,9 +19,7 @@ namespace ClusterKit.Web.Tests.Auth
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -178,7 +177,7 @@ namespace ClusterKit.Web.Tests.Auth
                 DateTimeOffset.Now.AddMinutes(1),
                 "hello world");
 
-            return await this.ContainerBuilder.Resolve<ITokenManager>().CreateAccessToken(session);
+            return await this.Container.Resolve<ITokenManager>().CreateAccessToken(session);
         }
 
         /// <summary>
@@ -197,7 +196,7 @@ namespace ClusterKit.Web.Tests.Auth
                 DateTimeOffset.Now.AddMinutes(1),
                 "hello world");
 
-            return await this.ContainerBuilder.Resolve<ITokenManager>().CreateAccessToken(session);
+            return await this.Container.Resolve<ITokenManager>().CreateAccessToken(session);
         }
 
         /// <summary>
@@ -208,16 +207,8 @@ namespace ClusterKit.Web.Tests.Auth
             /// <inheritdoc />
             public override bool RunPostStart => true;
 
-            /// <summary>
-            /// Gets the akka system config
-            /// </summary>
-            /// <param name="windsorContainer">
-            /// The windsor Container.
-            /// </param>
-            /// <returns>
-            /// The config
-            /// </returns>
-            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            /// <inheritdoc />
+            public override Config GetAkkaConfig(ContainerBuilder containerBuilder)
             {
                 var listener = new TcpListener(IPAddress.Any, 0);
                 listener.Start();
@@ -236,7 +227,7 @@ namespace ClusterKit.Web.Tests.Auth
                         }}
                     }}
                 }}
-").WithFallback(base.GetAkkaConfig(windsorContainer));
+").WithFallback(base.GetAkkaConfig(containerBuilder));
             }
 
             /// <summary>
@@ -391,11 +382,11 @@ namespace ClusterKit.Web.Tests.Auth
             }
 
             /// <inheritdoc />
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(ContainerBuilder container)
             {
-                container.Register(Classes.From(typeof(TestController)));
-                container.Register(Classes.From(typeof(PublicTestController)));
-                container.Register(Component.For<ITokenManager>().ImplementedBy<MoqTokenManager>().LifestyleSingleton());
+                container.RegisterType<TestController>();
+                container.RegisterType<PublicTestController>();
+                container.RegisterType<MoqTokenManager>().As<ITokenManager>().SingleInstance();
             }
         }
 

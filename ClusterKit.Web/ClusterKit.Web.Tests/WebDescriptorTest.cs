@@ -16,8 +16,8 @@ namespace ClusterKit.Web.Tests
     using Akka.Actor;
     using Akka.Cluster;
     using Akka.Configuration;
-    
-    using Castle.Windsor;
+
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -76,16 +76,8 @@ namespace ClusterKit.Web.Tests
         /// </summary>
         public class Configurator : TestConfigurator
         {
-            /// <summary>
-            /// Gets the akka system config
-            /// </summary>
-            /// <param name="windsorContainer">
-            /// The windsor Container.
-            /// </param>
-            /// <returns>
-            /// The config
-            /// </returns>
-            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            /// <inheritdoc />
+            public override Config GetAkkaConfig(ContainerBuilder containerBuilder)
             {
                 return ConfigurationFactory.ParseString(@"
                 {
@@ -111,7 +103,7 @@ namespace ClusterKit.Web.Tests
                             }
                         }
                     }
-                }").WithFallback(base.GetAkkaConfig(windsorContainer));
+                }").WithFallback(base.GetAkkaConfig(containerBuilder));
             }
 
             /// <summary>

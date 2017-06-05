@@ -9,18 +9,17 @@
 
 namespace ClusterKit.Web.NginxConfigurator
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
+    using System.Security;
     using System.Security.Permissions;
 
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.Core.Internal;
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
 
@@ -69,15 +68,10 @@ namespace ClusterKit.Web.NginxConfigurator
             return new[] { "Web.Nginx" };
         }
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
         }
 
         /// <summary>
@@ -111,7 +105,8 @@ namespace ClusterKit.Web.NginxConfigurator
 
             var path = File.Exists(filePath) ? filePath : configDirectory;
             var permission = new FileIOPermission(permissionAccess, path);
-            if (!permission.IsGranted())
+            var permissionSet = new PermissionSet(PermissionState.None);
+            if (!permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
             {
                 throw new ConfigurationException($"Cannot access {path} for writing");
             }

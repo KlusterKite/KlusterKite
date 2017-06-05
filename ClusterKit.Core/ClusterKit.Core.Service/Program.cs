@@ -12,6 +12,8 @@ namespace ClusterKit.Core.Service
     using System;
     using System.Collections.Generic;
 
+    using Akka.Actor;
+
     using Autofac;
 
     using DocoptNet;
@@ -76,7 +78,8 @@ namespace ClusterKit.Core.Service
                         (eventArgs.ExceptionObject as Exception)?.StackTrace);
                 };
 
-            var system = Bootstrapper.ConfigureAndStart(Container, configurations.ToArray());
+            var container = Bootstrapper.ConfigureAndStart(Container, configurations.ToArray());
+            var system = container.Resolve<ActorSystem>();
             Log.Logger.Warning("{Type}: Started", "System");
             Console.CancelKeyPress += (sender, eventArgs) =>
                 {
@@ -99,7 +102,7 @@ namespace ClusterKit.Core.Service
                 };
 
             system.StartNameSpaceActorsFromConfiguration();
-            BaseInstaller.RunPostStart(Container);
+            BaseInstaller.RunPostStart(Container, container);
 
             var waitedTask = new System.Threading.Tasks.TaskCompletionSource<bool>();
             system.WhenTerminated.ContinueWith(task => waitedTask.SetResult(true));

@@ -115,12 +115,16 @@ namespace ClusterKit.Core
         }
 
         /// <summary>
-        /// Runs all registered installers <seealso cref="PostStart"/>
+        /// Runs all registered installers 
+        /// <seealso cref="PostStart"/>
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The container builder
         /// </param>
-        public static void RunPostStart(ContainerBuilder container)
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        public static void RunPostStart(ContainerBuilder container, IComponentContext context)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -130,7 +134,7 @@ namespace ClusterKit.Core
 
             foreach (var installer in list.OrderBy(l => l.AkkaConfigLoadPriority))
             {
-                installer.PostStart();
+                installer.PostStart(context);
             }
         }
 
@@ -209,9 +213,14 @@ namespace ClusterKit.Core
 
         /// <summary>
         /// This method will be run after service start.
-        /// Methods are run in <seealso cref="AkkaConfigLoadPriority"/> order.
+        /// Methods are run in 
+        /// <seealso cref="AkkaConfigLoadPriority"/>
+        /// order.
         /// </summary>
-        protected virtual void PostStart()
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        protected virtual void PostStart(IComponentContext context)
         {
         }
 

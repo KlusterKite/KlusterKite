@@ -18,9 +18,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Tests.Mock;
     using ClusterKit.Core;
@@ -128,7 +126,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.ExpectNoMsg();
             var internalApiProvider = new TestProvider();
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
+            var schemaProvider = this.Container.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
@@ -204,7 +202,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var internalApiProvider = new TestProvider(initialObjects);
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
+            var schemaProvider = this.Container.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
@@ -295,7 +293,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.ExpectNoMsg();
             var internalApiProvider = new TestProvider();
             var publishingProvider = new DirectProvider(internalApiProvider, this.output.WriteLine) { UseJsonRepack = true };
-            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
+            var schemaProvider = this.Container.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
             var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
@@ -399,16 +397,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                 return installers;
             }
 
-            /// <summary>
-            /// Gets the akka system config
-            /// </summary>
-            /// <param name="windsorContainer">
-            /// The windsor Container.
-            /// </param>
-            /// <returns>
-            /// The config
-            /// </returns>
-            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            /// <inheritdoc />
+            public override Config GetAkkaConfig(ContainerBuilder containerBuilder)
             {
                 var listener = new TcpListener(IPAddress.Any, 0);
                 listener.Start();
@@ -424,7 +414,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                             Debug.Trace = true
                         }}
                     }}
-                }}").WithFallback(base.GetAkkaConfig(windsorContainer));
+                }}").WithFallback(base.GetAkkaConfig(containerBuilder));
             }
         }
 
@@ -443,9 +433,9 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             /// <inheritdoc />
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(ContainerBuilder container)
             {
-                container.Register(Component.For<ITokenManager>().ImplementedBy<MoqTokenManager>().LifestyleSingleton());
+                container.RegisterType<MoqTokenManager>().As<ITokenManager>().SingleInstance();
             }
         }
     }

@@ -12,6 +12,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.ComponentModel;
 
     using Akka.Actor;
     using Akka.Cluster;
@@ -20,9 +21,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using Akka.TestKit;
     using Akka.Util;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client.Messages;
     using ClusterKit.Core;
@@ -61,7 +60,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         [Fact]
         public void SimpleNodeLifeCycleTest()
         {
-            var schemaProvider = this.ContainerBuilder.Resolve<SchemaProvider>();
+            var schemaProvider = this.Container.Resolve<SchemaProvider>();
             Assert.Null(schemaProvider.CurrentSchema);
             var browser = this.ActorOf(this.Sys.DI().Props<ApiBrowserActor>());
             this.ExpectNoMsg();
@@ -287,21 +286,12 @@ namespace ClusterKit.Web.Tests.GraphQL
                 }
             }");
 
-            /// <summary>
-            /// Registering DI components
-            /// </summary>
-            /// <param name="container">The container.</param>
-            /// <param name="store">The configuration store.</param>
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            /// <inheritdoc />
+            protected override void RegisterComponents(ContainerBuilder container)
             {
-                container.Register(
-                    Classes.FromAssemblyContaining(typeof(ApiBrowserActor))
-                        .Where(t => t.IsSubclassOf(typeof(ActorBase)))
-                        .LifestyleTransient());
-
-                container.Register(
-                    Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
-                container.Register(Component.For<SchemaProvider>().ImplementedBy<SchemaProvider>().LifestyleSingleton());
+                container.RegisterAssemblyTypes(typeof(ApiBrowserActor).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+                container.RegisterType<TestMessageRouter>().As<IMessageRouter>().SingleInstance();
+                container.RegisterType<SchemaProvider>().SingleInstance();
             }
         }
     }

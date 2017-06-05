@@ -16,7 +16,8 @@ namespace ClusterKit.Web
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
 
-    using Castle.Windsor;
+    using Autofac;
+    using Autofac.Integration.WebApi;
 
     using JetBrains.Annotations;
     using Microsoft.Practices.ServiceLocation;
@@ -45,11 +46,12 @@ namespace ClusterKit.Web
             config.Formatters.Add(new JsonMediaTypeFormatter());
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
-            owinStartupConfigurators.ForEach(c => c.ConfigureApi(config));
+            var lifetimeScope = ServiceLocator.Current.GetInstance<ILifetimeScope>();
+            appBuilder.UseAutofacMiddleware(lifetimeScope);
 
-            var dependencyResolver = new WindsorDependencyResolver(ServiceLocator.Current.GetInstance<IWindsorContainer>());
-            config.DependencyResolver = dependencyResolver;
-            
+            owinStartupConfigurators.ForEach(c => c.ConfigureApi(config));
+            config.DependencyResolver = new AutofacWebApiDependencyResolver(lifetimeScope);
+
             config.EnsureInitialized();
 
             owinStartupConfigurators.ForEach(c => c.ConfigureApp(appBuilder));

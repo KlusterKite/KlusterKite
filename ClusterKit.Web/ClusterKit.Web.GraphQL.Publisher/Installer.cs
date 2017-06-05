@@ -13,9 +13,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
 
@@ -48,24 +46,17 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                                                      "ClusterKit.Web.GraphQL.Publisher"
                                                                  };
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(Component.For<IOwinStartupConfigurator>().ImplementedBy(typeof(OwinConfigurator)));
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-            container.Register(Component.For<SchemaProvider>().ImplementedBy<SchemaProvider>().LifestyleSingleton());
+            container.RegisterType<OwinConfigurator>().As<IOwinStartupConfigurator>();
+            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterType<SchemaProvider>().SingleInstance();
 
             var documentExecuter = new DocumentExecuter();
             var writer = new DocumentWriter(false);
-
-            container.Register(Component.For<IDocumentExecuter>().Instance(documentExecuter));
-            container.Register(Component.For<IDocumentWriter>().Instance(writer));
+            container.RegisterInstance(documentExecuter).As<IDocumentExecuter>();
+            container.RegisterInstance(writer).As<IDocumentWriter>();
         }
     }
 }

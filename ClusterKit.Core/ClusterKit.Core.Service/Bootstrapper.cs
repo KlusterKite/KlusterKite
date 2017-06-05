@@ -47,8 +47,8 @@ namespace ClusterKit.Core.Service
         /// <param name="configurations">
         /// Startup parameters
         /// </param>
-        /// <returns>The actor system</returns>
-        public static ActorSystem ConfigureAndStart(ContainerBuilder containerBuilder, string[] configurations)
+        /// <returns>The DI container</returns>
+        public static IContainer ConfigureAndStart(ContainerBuilder containerBuilder, string[] configurations)
         {
             Console.WriteLine(@"Starting bootstrapper");
 
@@ -115,7 +115,7 @@ namespace ClusterKit.Core.Service
 
             Console.WriteLine(@"Bootstrapper start finished");
 
-            return actorSystem;
+            return container;
         }
 
         /// <summary>

@@ -9,11 +9,12 @@
 
 namespace ClusterKit.Web.Authentication
 {
+    using System.Collections.Generic;
     using System.Web.Http;
 
     using Akka.Configuration;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Security.Attributes;
 
@@ -32,7 +33,7 @@ namespace ClusterKit.Web.Authentication
         /// <summary>
         /// The windsor container
         /// </summary>
-        private readonly IWindsorContainer container;
+        private readonly IComponentContext container;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OwinConfigurator"/> class.
@@ -40,7 +41,7 @@ namespace ClusterKit.Web.Authentication
         /// <param name="container">
         /// The container.
         /// </param>
-        public OwinConfigurator(IWindsorContainer container)
+        public OwinConfigurator(IComponentContext container)
         {
             this.container = container;
         }
@@ -78,7 +79,7 @@ namespace ClusterKit.Web.Authentication
                                   AllowInsecureHttp = true,
                                   Provider =
                                       new AuthorizationServerProvider(
-                                          this.container.ResolveAll<IClientProvider>()),
+                                          this.container.Resolve<IEnumerable<IClientProvider>>()),
                                   RefreshTokenProvider = new RefreshTokenProvider(tokenProvider),
                                   AccessTokenProvider = new AccessTokenProvider(tokenProvider)
                               };

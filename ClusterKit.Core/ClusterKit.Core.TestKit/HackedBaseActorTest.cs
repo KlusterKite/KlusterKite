@@ -39,7 +39,7 @@ namespace ClusterKit.Core.TestKit
 
             if (description.Configurator.RunPostStart)
             {
-                BaseInstaller.RunPostStart(containerBuilder);
+                BaseInstaller.RunPostStart(containerBuilder, this.Container);
             }
 
             ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(this.Container));
