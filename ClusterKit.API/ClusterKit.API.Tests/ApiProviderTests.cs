@@ -15,8 +15,6 @@ namespace ClusterKit.API.Tests
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using Castle.Core.Internal;
-
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
     using ClusterKit.API.Provider;
@@ -59,7 +57,10 @@ namespace ClusterKit.API.Tests
         {
             var provider = new TestApi();
 
-            provider.GenerationErrors.ForEach(e => this.output.WriteLine($"Generation error: {e}"));
+            foreach (var e in provider.GenerationErrors)
+            {
+                this.output.WriteLine($"Generation error: {e}");
+            }
 
             Assert.Equal(0, provider.GenerationErrors.Count);
 

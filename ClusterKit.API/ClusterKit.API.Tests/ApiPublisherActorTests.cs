@@ -17,9 +17,7 @@ namespace ClusterKit.API.Tests
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client.Messages;
     using ClusterKit.API.Endpoint;
@@ -112,14 +110,10 @@ namespace ClusterKit.API.Tests
             /// <returns>Akka configuration</returns>
             protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
-            /// <summary>
-            /// Registering DI components
-            /// </summary>
-            /// <param name="container">The container.</param>
-            /// <param name="store">The configuration store.</param>
-            protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+            /// <inheritdoc />
+            protected override void RegisterComponents(ContainerBuilder builder)
             {
-                container.Register(Component.For<ApiProvider>().ImplementedBy<TestProvider>().LifestyleSingleton());
+                builder.RegisterType<TestProvider>().As<ApiProvider>();
             }
         }
     }

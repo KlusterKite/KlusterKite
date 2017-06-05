@@ -14,8 +14,6 @@ namespace ClusterKit.API.Provider
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Castle.Core.Internal;
-
     using ClusterKit.API.Client;
     using ClusterKit.API.Provider.Resolvers;
     using ClusterKit.Security.Attributes;
@@ -181,8 +179,8 @@ namespace ClusterKit.API.Provider
             this.ApiDescription.Types.Clear();
             this.ApiDescription.Mutations.Clear();
 
-            var rootResolver = typeof(ObjectResolver<>)
-                .MakeGenericType(this.GetType()).CreateInstance<ObjectResolver>();
+            var rootResolver = (ObjectResolver)Activator.CreateInstance(typeof(ObjectResolver<>)
+                .MakeGenericType(this.GetType()));
             this.resolver = rootResolver;
             var root = rootResolver.GetApiType();
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;

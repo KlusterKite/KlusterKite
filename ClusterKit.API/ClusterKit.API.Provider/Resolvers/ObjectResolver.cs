@@ -18,8 +18,6 @@ namespace ClusterKit.API.Provider.Resolvers
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using Castle.Core.Internal;
-
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
     using ClusterKit.Security.Attributes;
@@ -286,8 +284,15 @@ namespace ClusterKit.API.Provider.Resolvers
 
             var typeName = ApiDescriptionAttribute.GetTypeName(type);
 
-            GenerateTypeProperties().ForEach(f => Fields[f.Field.Name] = f);
-            GenerateTypeMethods().ForEach(f => Fields[f.Field.Name] = f);
+            foreach (var f in GenerateTypeProperties())
+            {
+                Fields[f.Field.Name] = f;
+            }
+
+            foreach (var f in GenerateTypeMethods())
+            {
+                Fields[f.Field.Name] = f;
+            }
 
             var apiObjectType = new ApiObjectType(typeName);
             apiObjectType.Fields.AddRange(Fields.Values.Where(f => !f.IsMutation).Select(f => f.Field));

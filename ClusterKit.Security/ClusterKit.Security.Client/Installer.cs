@@ -12,8 +12,7 @@ namespace ClusterKit.Security.Client
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Security.Attributes;
@@ -39,7 +38,7 @@ namespace ClusterKit.Security.Client
         protected override IEnumerable<string> GetRoles() => new string[0];
 
         /// <inheritdoc />
-        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+        protected override void RegisterComponents(ContainerBuilder container)
         {
         }
     }

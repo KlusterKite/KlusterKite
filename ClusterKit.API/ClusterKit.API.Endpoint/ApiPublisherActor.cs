@@ -13,7 +13,7 @@ namespace ClusterKit.API.Endpoint
 
     using Akka.Actor;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client.Messages;
     using ClusterKit.API.Provider;
@@ -34,12 +34,12 @@ namespace ClusterKit.API.Endpoint
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiPublisherActor"/> class.
         /// </summary>
-        /// <param name="container">
+        /// <param name="componentContext">
         /// The DI container.
         /// </param>
-        public ApiPublisherActor(IWindsorContainer container)
+        public ApiPublisherActor(IComponentContext componentContext)
         {
-            var providers = container.ResolveAll<ApiProvider>();
+            var providers = componentContext.Resolve<IEnumerable<ApiProvider>>();
             foreach (var apiProvider in providers)
             {
                 var actor = Context.ActorOf(
