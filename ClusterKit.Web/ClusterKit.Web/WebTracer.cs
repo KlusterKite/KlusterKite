@@ -31,16 +31,11 @@ namespace ClusterKit.Web
     public class WebTracer : IOwinStartupConfigurator
     {
         /// <summary>
-        /// The system configuration
-        /// </summary>
-        private readonly Config config;
-
-        /// <summary>
         /// The actor system
         /// </summary>
         /// <remarks>Just for debugging</remarks>
         // ReSharper disable once NotAccessedField.Local
-        private ActorSystem system;
+        private readonly ActorSystem system;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebTracer"/> class.
@@ -50,7 +45,6 @@ namespace ClusterKit.Web
         public WebTracer(ActorSystem system, Config config)
         {
             this.system = system;
-            this.config = config;
         }
 
         /// <summary>
@@ -67,10 +61,7 @@ namespace ClusterKit.Web
         /// <param name="appBuilder">The builder</param>
         public void ConfigureApp(IAppBuilder appBuilder)
         {
-            if (this.config.GetBoolean("ClusterKit.Web.Debug.Trace"))
-            {
-                appBuilder.Use<TraceMiddleware>(this.system);
-            }
+            appBuilder.Use<TraceMiddleware>(this.system);
         }
 
         /// <summary>
@@ -87,7 +78,12 @@ namespace ClusterKit.Web
             /// <summary>
             /// The actor system
             /// </summary>
-            private ActorSystem system;
+            private readonly ActorSystem system;
+
+            /// <summary>
+            /// A value to trace every web request
+            /// </summary>
+            private readonly bool trace;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="TraceMiddleware"/> class.
@@ -102,6 +98,7 @@ namespace ClusterKit.Web
                 : base(next)
             {
                 this.system = system;
+                this.trace = system.Settings.Config.GetBoolean("ClusterKit.Web.Debug.Trace");
             }
 
             /// <summary>Process an individual request.</summary>
@@ -109,39 +106,61 @@ namespace ClusterKit.Web
             /// <returns>The async process task</returns>
             public override async Task Invoke(IOwinContext context)
             {
-                var n = Interlocked.Increment(ref requestNumber);
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                this.system.Log.Info(
-                    "{Type}: started Request {RequestNumber} {RequestPath}",
-                    this.GetType().Name,
-                    n,
-                    context.Request.Path);
-
-                try
+                if (this.trace)
                 {
-                    await this.Next.Invoke(context);
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
+                    var n = Interlocked.Increment(ref requestNumber);
+                    var stopwatch = new Stopwatch();
+                    stopwatch.Start();
 
-                    this.system.Log.Error(
-                        exception,
-                        "{Type}: error resolving {RequestNumber} {RequestPath}",
+                    this.system.Log.Info(
+                        "{Type}: started Request {RequestNumber} {RequestPath}",
                         this.GetType().Name,
                         n,
                         context.Request.Path);
-                    throw;
-                }
 
-                this.system.Log.Info(
-                    "{Type}: finished Request {RequestNumber} {RequestPath} in {ElapsedMilliseconds}ms",
-                    this.GetType().Name,
-                    n,
-                    context.Request.Path,
-                    stopwatch.ElapsedMilliseconds);
+
+                    try
+                    {
+                        await this.Next.Invoke(context);
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
+
+                        this.system.Log.Error(
+                            exception,
+                            "{Type}: error resolving {RequestNumber} {RequestPath}",
+                            this.GetType().Name,
+                            n,
+                            context.Request.Path);
+                        throw;
+                    }
+
+                    this.system.Log.Info(
+                        "{Type}: finished Request {RequestNumber} {RequestPath} in {ElapsedMilliseconds}ms",
+                        this.GetType().Name,
+                        n,
+                        context.Request.Path,
+                        stopwatch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    try
+                    {
+                        await this.Next.Invoke(context);
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
+
+                        this.system.Log.Error(
+                            exception,
+                            "{Type}: error resolving {RequestPath}",
+                            this.GetType().Name,
+                            context.Request.Path);
+                        throw;
+                    }
+                }
             }
         }
     }

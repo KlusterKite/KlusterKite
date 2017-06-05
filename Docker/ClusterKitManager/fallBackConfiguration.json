@@ -140,6 +140,10 @@
       "Version": "0.0.0-local"
     },
     {
+      "Id": "ClusterKit.NodeManager.Launcher.Utils",
+      "Version": "0.0.0-local"
+    },
+    {
       "Id": "ClusterKit.NodeManager.Migrator",
       "Version": "0.0.0-local"
     },
@@ -372,6 +376,10 @@
       "Version": "4.3.0"
     },
     {
+      "Id": "Microsoft.Win32.Registry",
+      "Version": "4.0.0"
+    },
+    {
       "Id": "NETStandard.Library",
       "Version": "1.6.1"
     },
@@ -388,8 +396,44 @@
       "Version": "1.1.0"
     },
     {
+      "Id": "NuGet.Common",
+      "Version": "4.0.0"
+    },
+    {
+      "Id": "NuGet.Configuration",
+      "Version": "4.0.0"
+    },
+    {
       "Id": "NuGet.Core",
       "Version": "2.14.0"
+    },
+    {
+      "Id": "NuGet.Frameworks",
+      "Version": "4.0.0"
+    },
+    {
+      "Id": "NuGet.Packaging",
+      "Version": "4.0.0"
+    },
+    {
+      "Id": "NuGet.Packaging.Core",
+      "Version": "4.0.0"
+    },
+    {
+      "Id": "NuGet.Packaging.Core.Types",
+      "Version": "4.0.0"
+    },
+    {
+      "Id": "NuGet.Protocol.Core.Types",
+      "Version": "4.0.0"
+    },
+    {
+      "Id": "NuGet.Protocol.Core.v3",
+      "Version": "4.0.0"
+    },
+    {
+      "Id": "NuGet.Versioning",
+      "Version": "4.0.0"
     },
     {
       "Id": "Owin",
@@ -564,6 +608,10 @@
       "Version": "4.3.1"
     },
     {
+      "Id": "System.Diagnostics.Process",
+      "Version": "4.1.0"
+    },
+    {
       "Id": "System.Diagnostics.StackTrace",
       "Version": "4.3.0"
     },
@@ -629,7 +677,7 @@
     },
     {
       "Id": "System.Net.Http",
-      "Version": "4.3.2"
+      "Version": "4.3.0"
     },
     {
       "Id": "System.Net.NameResolution",
@@ -764,6 +812,10 @@
       "Version": "4.3.0"
     },
     {
+      "Id": "System.Security.Cryptography.ProtectedData",
+      "Version": "4.0.0"
+    },
+    {
       "Id": "System.Security.Cryptography.X509Certificates",
       "Version": "4.3.0"
     },
@@ -814,6 +866,10 @@
     {
       "Id": "System.Threading.Timer",
       "Version": "4.3.0"
+    },
+    {
+      "Id": "System.ValueTuple",
+      "Version": "4.3.1"
     },
     {
       "Id": "System.Xml.ReaderWriter",

@@ -116,7 +116,7 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// The nuget repository
         /// </summary>
-        private readonly IPackageRepository nugetRepository;
+        private readonly string nugetRepository;
 
         /// <summary>
         /// Random number generator
@@ -213,12 +213,12 @@ namespace ClusterKit.NodeManager
         /// </param>
         public NodeManagerActor(
             UniversalContextFactory contextFactory,
-            IMessageRouter router,
-            IPackageRepository nugetRepository)
+            IMessageRouter router /*,
+            IPackageRepository nugetRepository*/)
         {
             this.contextFactory = contextFactory;
             this.router = router;
-            this.nugetRepository = nugetRepository;
+            // this.nugetRepository = nugetRepository;
 
             this.fullClusterWaitTimeout = Context.System.Settings.Config.GetTimeSpan(
                 "ClusterKit.NodeManager.FullClusterWaitTimeout",
@@ -1316,8 +1316,13 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Process the <see cref="ReleaseSetReadyRequest"/>
         /// </summary>
-        /// <param name="request">The request</param>
-        private void OnReleaseCheck(ReleaseCheckRequest request)
+        /// <param name="request">
+        /// The request
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task OnReleaseCheck(ReleaseCheckRequest request)
         {
             try
             {
@@ -1341,10 +1346,10 @@ namespace ClusterKit.NodeManager
 
                     var supportedFrameworks =
                         Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var errors = release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList()).ToArray();
-                    if (errors.Length > 0)
+                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
+                    if (errors.Count > 0)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors), null));
+                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
                         return;
                     }
 
@@ -1403,8 +1408,13 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Process the <see cref="ReleaseSetReadyRequest"/>
         /// </summary>
-        /// <param name="request">The request</param>
-        private void OnReleaseSetReady(ReleaseSetReadyRequest request)
+        /// <param name="request">
+        /// The request
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task OnReleaseSetReady(ReleaseSetReadyRequest request)
         {
             try
             {
@@ -1438,10 +1448,10 @@ namespace ClusterKit.NodeManager
 
                     var supportedFrameworks =
                         Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var errors = release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList()).ToArray();
-                    if (errors.Length > 0)
+                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
+                    if (errors.Count > 0)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors), null));
+                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
                         return;
                     }
 
@@ -1765,8 +1775,8 @@ namespace ClusterKit.NodeManager
 
             this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
             this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
-            this.Receive<ReleaseCheckRequest>(r => this.OnReleaseCheck(r));
-            this.Receive<ReleaseSetReadyRequest>(r => this.OnReleaseSetReady(r));
+            this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
+            this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
             this.Receive<ReleaseSetObsoleteRequest>(r => this.OnReleaseSetObsolete(r));
             this.Receive<ReleaseSetStableRequest>(r => this.OnReleaseSetStable(r));
             this.Receive<UpdateClusterRequest>(r => this.OnUpdateCluster(r));

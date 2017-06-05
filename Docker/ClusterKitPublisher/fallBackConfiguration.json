@@ -449,7 +449,7 @@
     },
     {
       "Id": "System.Net.Http",
-      "Version": "4.3.2"
+      "Version": "4.3.0"
     },
     {
       "Id": "System.Net.NameResolution",

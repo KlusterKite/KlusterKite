@@ -12,17 +12,22 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Akka.Configuration;
 
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
-    using NuGet;
-    
+
+    using NuGet.Frameworks;
+    using NuGet.Protocol.Core.Types;
+    using NuGet.Versioning;
+
     /// <summary>
     /// Extending the work with <see cref="Release"/>
     /// </summary>
@@ -36,24 +41,19 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="nugetRepository">The access to the nuget repository</param>
         /// <param name="supportedFrameworks">The list of supported frameworks</param>
         /// <returns>The list of possible errors</returns>
-        public static IEnumerable<ErrorDescription> CheckAll(
+        public static async Task<List<ErrorDescription>> CheckAll(
             this Release release,
             ConfigurationContext context,
-            IPackageRepository nugetRepository,
+            string nugetRepository,
             List<string> supportedFrameworks)
         {
             release.CompatibleTemplatesBackward = release.GetCompatibleTemplates(context).ToList();
-            foreach (var error in release.SetPackagesDescriptionsForTemplates(nugetRepository, supportedFrameworks))
-            {
-                yield return error;
-            }
-
-            foreach (var error in release.CheckTemplatesConfigurations())
-            {
-                yield return error;
-            }
+            var errors = new List<ErrorDescription>();
+            errors.AddRange(await release.SetPackagesDescriptionsForTemplates(nugetRepository, supportedFrameworks));
+            errors.AddRange(release.CheckTemplatesConfigurations());
+            return errors;
         }
-
+         
         /// <summary>
         /// Checks release node templates for correct configuration sections
         /// </summary>
@@ -214,41 +214,34 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <returns>
         /// The list of possible errors
         /// </returns>
-        public static IEnumerable<ErrorDescription> SetPackagesDescriptionsForTemplates(
+        public static async Task<List<ErrorDescription>> SetPackagesDescriptionsForTemplates(
             this Release release,
-            IPackageRepository nugetRepository,
+            string nugetRepository,
             List<string> supportedFrameworks)
         {
+            var errors = new List<ErrorDescription>();
             if (release?.Configuration?.NodeTemplates == null || release.Configuration.NodeTemplates.Count == 0)
             {
-                yield return new ErrorDescription("configuration.nodeTemplates", "Node templates are not initialized");
-                yield break;
+                errors.Add(new ErrorDescription("configuration.nodeTemplates", "Node templates are not initialized"));
+                return errors;
             }
 
             if (release.Configuration?.MigratorTemplates == null || release.Configuration.MigratorTemplates.Count == 0)
             {
-                yield return new ErrorDescription("configuration.migratorTemplates", "Migrator templates are not initialized");
-                yield break;
+                errors.Add(new ErrorDescription("configuration.migratorTemplates", "Migrator templates are not initialized"));
+                return errors;
             }
 
             if (release.Configuration.Packages == null || release.Configuration.Packages.Count == 0)
             {
-                yield return new ErrorDescription("configuration.packages", "Packages are not initialized");
-                yield break;
+                errors.Add(new ErrorDescription("configuration.packages", "Packages are not initialized"));
+                return errors;
             }
 
-            Dictionary<string, IPackage> definedPackages = new Dictionary<string, IPackage>();
-            foreach (var errorDescription in
-                CheckPackages(release, supportedFrameworks, nugetRepository, definedPackages))
-            {
-                yield return errorDescription;
-            }
-
-            foreach (var errorDescription in
-                CheckTemplatesPackages(release, supportedFrameworks, definedPackages, nugetRepository))
-            {
-                yield return errorDescription;
-            }
+            var (packages, packagesErrors) = await CheckPackages(release, supportedFrameworks, nugetRepository);
+            errors.AddRange(packagesErrors);
+            errors.AddRange(await CheckTemplatesPackages(release, supportedFrameworks, packages, nugetRepository));
+            return errors;
         }
 
         /// <summary>
@@ -263,83 +256,70 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="nugetRepository">
         /// The nuget repository.
         /// </param>
-        /// <param name="definedPackagesToFill">
-        /// The dictionary to fill.
-        /// </param>
-        /// <returns>
-        /// The list of possible errors
-        /// </returns>
-        private static IEnumerable<ErrorDescription> CheckPackages(
-            Release release,
-            List<string> supportedFrameworks,
-            IPackageRepository nugetRepository,
-            Dictionary<string, IPackage> definedPackagesToFill)
+        private static async Task<(Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>)>
+            CheckPackages(Release release, List<string> supportedFrameworks, string nugetRepository)
         {
-            foreach (var description in release.Configuration.Packages)
+            var definedPackages = new Dictionary<string, IPackageSearchMetadata>();
+            var errors = new List<ErrorDescription>();
+
+            var packages = await Task.WhenAll(
+                               release.Configuration.Packages.Select(
+                                   async description => new
+                                                            {
+                                                                Description = description,
+                                                                Package = await PackageUtils.Search(
+                                                                              nugetRepository,
+                                                                              description.Id,
+                                                                              NuGetVersion.Parse(description.Version))
+                                                            }));
+
+            foreach (var package in packages)
             {
-                var packageField = $"configuration.packages[\"{description.Id}\"]";
-                SemanticVersion requiredVersion = null;
-                try
+                if (package.Package == null)
                 {
-                    requiredVersion = SemanticVersion.Parse(description.Version);
-                }
-                catch
-                {
-                    // set null
-                }
-
-                if (requiredVersion == null)
-                {
-                    yield return new ErrorDescription(packageField, "Package version could not be parsed");
-                    continue;
-                }
-
-                var package =
-                    nugetRepository.Search(description.Id, true)
-                        .ToList()
-                        .FirstOrDefault(p => p.Id == description.Id && p.Version == requiredVersion);
-
-                if (package == null)
-                {
-                    yield return
+                    errors.Add(
                         new ErrorDescription(
-                            packageField,
-                            "Package of specified version could not be found in the nuget repository");
-                    continue;
+                            $"configuration.packages[\"{package.Description.Id}\"]",
+                            "Package version could not be parsed"));
                 }
-
-                definedPackagesToFill[description.Id] = package;
-            }
-
-            foreach (var package in definedPackagesToFill.Values)
-            {
-                var packageField = $"configuration.packages[\"{package.Id}\"]";
-                foreach (var dependencySet in
-                    package.DependencySets.Where(
-                        s => s.SupportedFrameworks.Any(f => supportedFrameworks.Contains(f.FullName))))
+                else
                 {
-                    foreach (var dependency in dependencySet.Dependencies)
-                    {
-                        IPackage dependentPackage;
-                        if (!definedPackagesToFill.TryGetValue(dependency.Id, out dependentPackage))
-                        {
-                            yield return
-                                new ErrorDescription(
-                                    packageField,
-                                    $"Package dependency for {dependencySet.TargetFramework.FullName} {dependency.Id} is not defined");
-                            continue;
-                        }
-
-                        if (!dependency.VersionSpec.Satisfies(dependentPackage.Version))
-                        {
-                            yield return
-                                new ErrorDescription(
-                                    packageField,
-                                    $"Package dependency for {dependencySet.TargetFramework.FullName} {dependency.Id} doesn't satisfy version requirements");
-                        }
-                    }
+                    definedPackages[package.Description.Id] = package.Package;
                 }
             }
+
+            var frameworks = supportedFrameworks.Select(
+                f => NuGetFramework.ParseFrameworkName(f, new DefaultFrameworkNameProvider()))
+                .ToList();
+
+            errors.AddRange(definedPackages.Values
+                .SelectMany(
+                    p => p.DependencySets.Where(
+                        s => frameworks.Any(
+                            f => NuGetFrameworkUtility.IsCompatibleWithFallbackCheck(f, s.TargetFramework))))
+                .SelectMany(s => s.Packages).GroupBy(p => p.Id).Select(
+                    r =>
+                        {
+                            var packageField = $"configuration.packages[\"{r.Key}\"]";
+                            IPackageSearchMetadata definedPackage;
+                            if (!definedPackages.TryGetValue(r.Key, out definedPackage))
+                            {
+                                return new ErrorDescription(
+                                    packageField,
+                                    "Package is not defined");
+                            }
+
+                            if (r.Any(rc => !rc.VersionRange.Satisfies(definedPackage.Identity.Version)))
+                            {
+                                return new ErrorDescription(
+                                    packageField,
+                                    "Package doesn't satisfy other packages version requirements");
+                            }
+
+                            return null;
+                        })
+                 .Where(e => e != null));
+            return (definedPackages, errors);
         }
 
         /// <summary>
@@ -360,11 +340,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <returns>
         /// The list of possible errors
         /// </returns>
-        private static IEnumerable<ErrorDescription> CheckTemplatesPackages(
+        private static async Task<List<ErrorDescription>> CheckTemplatesPackages(
             [NotNull] Release release,
             [NotNull] List<string> supportedFrameworks,
-            [NotNull] Dictionary<string, IPackage> definedPackages,
-            [NotNull] IPackageRepository nugetRepository)
+            [NotNull] Dictionary<string, IPackageSearchMetadata> definedPackages,
+            [NotNull] string nugetRepository)
         {
             if (release == null)
             {
@@ -396,98 +376,98 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 throw new ArgumentNullException(nameof(nugetRepository));
             }
 
+            var errors = new List<ErrorDescription>();
+
             foreach (var template in release.Configuration.GetAllTemplates())
             {
-               if (template == null)
+                if (template == null)
                 {
                     continue;
                 }
 
-                var templateField = template is NodeTemplate 
-                    ? $"configuration.nodeTemplates[\"{template.Code}\"]"
-                    : $"configuration.migratorTemplates[\"{template.Code}\"]";
+                var templateField = template is NodeTemplate
+                                        ? $"configuration.nodeTemplates[\"{template.Code}\"]"
+                                        : $"configuration.migratorTemplates[\"{template.Code}\"]";
 
                 if (template.PackageRequirements == null || template.PackageRequirements.Count == 0)
                 {
-                    yield return new ErrorDescription(templateField, "Package requirements are not set");
+                    errors.Add(new ErrorDescription(templateField, "Package requirements are not set"));
                     continue;
                 }
 
-                Dictionary<string, IPackage> directPackages = new Dictionary<string, IPackage>();
-                foreach (var errorDescription in GetTemplateDirectPackages(
-                    definedPackages,
-                    nugetRepository,
-                    template,
-                    templateField,
-                    directPackages))
-                {
-                    yield return errorDescription;
-                }
+                var (templatePackages, templateErrors) =
+                    await GetTemplateDirectPackages(definedPackages, nugetRepository, template, templateField);
+
+                errors.AddRange(templateErrors);
 
                 template.PackagesToInstall = new Dictionary<string, List<PackageDescription>>();
-                foreach (var supportedFramework in supportedFrameworks)
+                foreach (var supportedFramework in supportedFrameworks.Select(
+                    f => NuGetFramework.ParseFrameworkName(f, new DefaultFrameworkNameProvider())))
                 {
-                    var packagesToInstall = new List<IPackage>();
-                    var queue = new Queue<IPackage>(directPackages.Values);
+                    var packagesToInstall = new Dictionary<string, IPackageSearchMetadata>();
+                    foreach (var package in templatePackages)
+                    {
+                        packagesToInstall.Add(package.Key, package.Value);
+                    }
+
+                    var queue = new Queue<IPackageSearchMetadata>(templatePackages.Values);
 
                     while (queue.Count > 0)
                     {
                         var package = queue.Dequeue();
-                        if (package == null || packagesToInstall.Any(p => p.Id == package.Id))
+                        if (!packagesToInstall.ContainsKey(package.Identity.Id))
+                        {
+                            packagesToInstall.Add(package.Identity.Id, package);
+                        }
+
+                        var requirementField = $"{templateField}.packageRequirements[\"{package.Identity.Id}\"]";
+                        var dependencySet =
+                            NuGetFrameworkUtility.GetNearest(package.DependencySets, supportedFramework);
+                        if (dependencySet == null || !NuGetFrameworkUtility.IsCompatibleWithFallbackCheck(
+                                supportedFramework,
+                                dependencySet.TargetFramework))
                         {
                             continue;
                         }
 
-                        packagesToInstall.Add(package);
-                        var requirementField = $"{templateField}.packageRequirements[\"{package.Id}\"]";
-                        var dependencySet = package.DependencySets?.FirstOrDefault(
-                            s => s.TargetFramework == null
-                                 || s.SupportedFrameworks.Any(f => f.FullName == supportedFramework));
-                        if (dependencySet?.Dependencies == null)
+                        foreach (var dependency in dependencySet.Packages)
                         {
-                            continue;
-                        }
-
-                        foreach (var dependency in dependencySet.Dependencies)
-                        {
-                            if (dependency?.VersionSpec == null)
+                            IPackageSearchMetadata packageToInstall;
+                            if (!packagesToInstall.TryGetValue(dependency.Id, out packageToInstall))
                             {
-                                yield return new ErrorDescription(
-                                    requirementField,
-                                    $"Package dependency for {supportedFramework} {dependency?.Id} is undefined of corrupted");
-                                continue;
+                                if (!definedPackages.TryGetValue(dependency.Id, out packageToInstall))
+                                {
+                                    errors.Add(
+                                        new ErrorDescription(
+                                            requirementField,
+                                            $"Package dependency {dependency.Id} {dependency.VersionRange} is missing"));
+                                    continue;
+                                }
+
+                                if (queue.All(p => p.Identity.Id != dependency.Id))
+                                {
+                                    queue.Enqueue(packageToInstall);
+                                }
                             }
 
-                            IPackage dependentPackage;
-                            if ((!directPackages.TryGetValue(dependency.Id, out dependentPackage)
-                                && !definedPackages.TryGetValue(dependency.Id, out dependentPackage)) || dependentPackage == null)
+                            if (!dependency.VersionRange.Satisfies(packageToInstall.Identity.Version))
                             {
-                                yield return new ErrorDescription(
-                                    requirementField,
-                                    $"Package dependency for {dependencySet.TargetFramework?.FullName} {dependency.Id} is not defined");
-                                continue;
-                            }
-
-                            if (!dependency.VersionSpec.Satisfies(dependentPackage.Version))
-                            {
-                                yield return new ErrorDescription(
-                                    requirementField,
-                                    $"Package dependency for {supportedFramework} {dependency.Id} {dependentPackage.Version} doesn't satisfy version requirements {dependency.VersionSpec}.");
-                            }
-
-                            if (packagesToInstall.All(p => p.Id != dependentPackage.Id))
-                            {
-                                // packagesToInstall.Add(dependentPackage);
-                                queue.Enqueue(dependentPackage);
+                                errors.Add(
+                                    new ErrorDescription(
+                                        requirementField,
+                                        $"Package dependency for {supportedFramework} {packageToInstall.Identity} doesn't satisfy version requirements {dependency.VersionRange}."));
                             }
                         }
                     }
 
-                    template.PackagesToInstall[supportedFramework] = packagesToInstall
-                        .Select(p => new PackageDescription { Id = p.Id, Version = p.Version?.ToString() })
+                    template.PackagesToInstall[supportedFramework.DotNetFrameworkName] = packagesToInstall.Values
+                        .Select(
+                            p => new PackageDescription { Id = p.Identity.Id, Version = p.Identity.Version.ToString() })
                         .ToList();
                 }
             }
+
+            return errors;
         }
 
         /// <summary>
@@ -505,68 +485,60 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="templateField">
         /// The prefix for error field name.
         /// </param>
-        /// <param name="directPackagesToFill">
-        /// The dictionary to fill with data
-        /// </param>
         /// <returns>
         ///  The list of possible errors
         /// </returns>
-        private static IEnumerable<ErrorDescription> GetTemplateDirectPackages(
-            Dictionary<string, IPackage> definedPackages,
-            IPackageRepository nugetRepository,
+        private static async Task<(Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>)> GetTemplateDirectPackages(
+            Dictionary<string, IPackageSearchMetadata> definedPackages,
+            string nugetRepository,
             ITemplate nodeTemplate,
-            string templateField,
-            Dictionary<string, IPackage> directPackagesToFill)
+            string templateField)
         {
-            foreach (var requirement in nodeTemplate.PackageRequirements)
+            var errors = new List<ErrorDescription>();
+            var directPackagesToFill = new Dictionary<string, IPackageSearchMetadata>();
+
+            foreach (var requirement in nodeTemplate.PackageRequirements.Where(r => r.SpecificVersion == null))
             {
-                var requirementField = $"{templateField}.packageRequirements[\"{requirement.Id}\"]";
-                IPackage package;
-                if (requirement.SpecificVersion == null)
+                IPackageSearchMetadata package;
+                if (!definedPackages.TryGetValue(requirement.Id, out package))
                 {
-                    if (!definedPackages.TryGetValue(requirement.Id, out package))
-                    {
-                        yield return
-                            new ErrorDescription(
-                                requirementField,
-                                "Package requirement is not defined in release packages");
-                        continue;
-                    }
-
-                    directPackagesToFill[package.Id] = package;
-                    continue;
+                    var requirementField = $"{templateField}.packageRequirements[\"{requirement.Id}\"]";
+                    errors.Add(
+                        new ErrorDescription(
+                            requirementField,
+                            "Package requirement is not defined in release packages"));
                 }
-
-                SemanticVersion requiredVersion = null;
-                try
+                else
                 {
-                    requiredVersion = SemanticVersion.Parse(requirement.SpecificVersion);
+                    directPackagesToFill[package.Identity.Id] = package;
                 }
-                catch
-                {
-                    // set null
-                }
-
-                if (requiredVersion == null)
-                {
-                    yield return new ErrorDescription(requirementField, "Package version could not be parsed");
-                    continue;
-                }
-
-                package =
-                    nugetRepository.Search(requirement.Id, true)
-                        .ToList()
-                        .FirstOrDefault(p => p.Id == requirement.Id && p.Version == requiredVersion);
-
-                if (package == null)
-                {
-                    yield return
-                        new ErrorDescription(requirementField, "Package could not be found in nuget repository");
-                    continue;
-                }
-
-                directPackagesToFill[package.Id] = package;
             }
+
+            var searchResults = await Task.WhenAll(nodeTemplate.PackageRequirements.Where(r => r.SpecificVersion != null).Select(
+                async r => new
+                               {
+                                   Requirement = r,
+                                   Package = await PackageUtils.Search(
+                                                 nugetRepository,
+                                                 r.Id,
+                                                 NuGetVersion.Parse(r.SpecificVersion))
+                               }));
+
+            foreach (var result in searchResults)
+            {
+                if (result.Package == null)
+                {
+                    var requirementField = $"{templateField}.packageRequirements[\"{result.Requirement.Id}\"]";
+                    errors.Add(
+                        new ErrorDescription(requirementField, "Package could not be found in nuget repository"));
+                }
+                else
+                {
+                    directPackagesToFill[result.Requirement.Id] = result.Package;
+                }
+            }
+
+            return (directPackagesToFill, errors);
         }
     }
 }

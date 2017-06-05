@@ -88,7 +88,7 @@ namespace ClusterKit.NodeManager.FallbackPackageFixer
 
                 var additionalPackages = allDependencies
                     .SelectMany(d => installedMetadata.Where(p => p.GetId() == d.Id && d.VersionRange.Satisfies(p.GetVersion())))
-                    .GroupBy(p => p.GetId()).Select(g => g.OrderByDescending(p => p.GetVersion()).First())
+                    .GroupBy(p => p.GetId()).Select(g => g.OrderBy(p => p.GetVersion()).First())
                     .Where(np => packagesList.All(p => p.GetId() != np.GetId())).ToList();
 
                 packagesList.AddRange(additionalPackages);

@@ -12,6 +12,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Akka.Configuration;
 
@@ -19,6 +21,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
     using ClusterKit.NodeManager.Migrator;
     using ClusterKit.Security.Attributes;
 
@@ -29,6 +32,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
     using Microsoft.EntityFrameworkCore.Storage;
 
     using NuGet;
+    using NuGet.Common;
+    using NuGet.Configuration;
+    using NuGet.Protocol;
+    using NuGet.Protocol.Core.Types;
 
     /// <summary>
     /// Seeds the <see cref="ConfigurationContext"/>
@@ -55,11 +62,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         protected const string ConfigDatabaseProviderNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseProviderName";
 
         /// <summary>
-        /// The seeder config
-        /// </summary>
-        private readonly Config config;
-
-        /// <summary>
         /// The context factory
         /// </summary>
         private readonly UniversalContextFactory contextFactory;
@@ -75,16 +77,21 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// </param>
         public Seeder(Config config, UniversalContextFactory contextFactory)
         {
-            this.config = config;
+            this.Config = config;
             this.contextFactory = contextFactory;
         }
+
+        /// <summary>
+        /// Gets the seeder configuration
+        /// </summary>
+        protected Config Config { get; }
 
         /// <inheritdoc />
         public override void Seed()
         {
-            var connectionString = this.config.GetString(ConfigConnectionStringPath);
-            var databaseName = this.config.GetString(ConfigDatabaseNamePath);
-            var databaseProviderName = this.config.GetString(ConfigDatabaseProviderNamePath);
+            var connectionString = this.Config.GetString(ConfigConnectionStringPath);
+            var databaseName = this.Config.GetString(ConfigDatabaseNamePath);
+            var databaseProviderName = this.Config.GetString(ConfigDatabaseProviderNamePath);
             using (var context =
                 this.contextFactory.CreateContext<ConfigurationContext>(
                     databaseProviderName,
@@ -107,13 +114,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                 context.Database.Migrate();
                 
                 this.SetupUsers(context);
-                var repository = PackageRepositoryFactory.Default.CreateRepository(this.config.GetString("Nuget"));
+                var repository = this.Config.GetString("Nuget");
                 var configuration =
                     new ReleaseConfiguration
                         {
                             NodeTemplates = this.GetNodeTemplates().ToList(),
                             MigratorTemplates = this.GetMigratorTemplates().ToList(),
-                            Packages = this.GetPackageDescriptions(repository).ToList(),
+                            Packages = this.GetPackageDescriptions(repository).GetAwaiter().GetResult(),
                             SeedAddresses = this.GetSeeds().ToList(),
                             NugetFeeds = this.GetNugetFeeds().ToList()
                         };
@@ -126,9 +133,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              Configuration = configuration
                                          };
 
-                var supportedFrameworks = this.config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                var supportedFrameworks = this.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
                 var initialErrors =
-                    initialRelease.SetPackagesDescriptionsForTemplates(repository, supportedFrameworks.ToList());
+                    initialRelease.SetPackagesDescriptionsForTemplates(repository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
 
                 foreach (var errorDescription in initialErrors)
                 {
@@ -149,7 +156,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         [UsedImplicitly]
         protected virtual IEnumerable<string> GetSeeds()
         {
-            return this.config.GetStringList("ClusterKit.NodeManager.Seeds");
+            return this.Config.GetStringList("ClusterKit.NodeManager.Seeds");
         }
 
         /// <summary>
@@ -258,12 +265,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// </summary>
         /// <param name="repository">The package repository</param>
         /// <returns>The list of package descriptions</returns>
-        protected virtual IEnumerable<PackageDescription> GetPackageDescriptions(IPackageRepository repository)
+        protected virtual async Task<List<PackageDescription>> GetPackageDescriptions(string repository)
         {
-            return repository.Search(string.Empty, true)
-                .Where(p => p.IsLatestVersion)
-                .ToList()
-                .Select(p => new PackageDescription(p.Id, p.Version.ToString()));
+            return (await PackageUtils.Search(repository, string.Empty))
+                .Select(p => new PackageDescription(p.Identity.Id, p.Identity.Version.ToString())).ToList();
         }
 
         /// <summary>
@@ -272,7 +277,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// <returns>The list of nuget feeds</returns>
         protected virtual IEnumerable<NugetFeed> GetNugetFeeds()
         {
-            var nugetFeedsConfig = this.config.GetConfig("ClusterKit.NodeManager.NugetFeeds");
+            var nugetFeedsConfig = this.Config.GetConfig("ClusterKit.NodeManager.NugetFeeds");
 
             if (nugetFeedsConfig != null)
             {
