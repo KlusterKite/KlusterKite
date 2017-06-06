@@ -47,9 +47,9 @@ namespace ClusterKit.Web.Authentication
         protected override void RegisterComponents(ContainerBuilder container)
         {
             container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
-            container.RegisterType<OwinConfigurator>().As<IOwinStartupConfigurator>();
-            container.Register(Component.For<IWebHostingConfigurator>().ImplementedBy(typeof(WebHostingConfigurator)));
-            container.Register(Component.For<AuthenticationProvider>().LifestyleSingleton());
+
+            container.RegisterType<WebHostingConfigurator>().As<IWebHostingConfigurator>();
+            container.RegisterType<AuthenticationProvider>().SingleInstance();
         }
     }
 }

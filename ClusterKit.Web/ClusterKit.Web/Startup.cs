@@ -13,15 +13,14 @@ namespace ClusterKit.Web
     using System.Collections.Generic;
     using System.Linq;
 
-    using Castle.Windsor;
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
 
     using JetBrains.Annotations;
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Logging;
@@ -45,18 +44,18 @@ namespace ClusterKit.Web
         /// </summary>
         public Startup()
         {
-            var windsorContainer = ServiceLocator.Current.GetInstance<IWindsorContainer>();
-            this.startupConfigurators = windsorContainer.ResolveAll<IWebHostingConfigurator>().ToList();
+            var componentContext = ServiceLocator.Current.GetInstance<IComponentContext>();
+            this.startupConfigurators = componentContext.Resolve<IEnumerable<IWebHostingConfigurator>>().ToList();
         }
 
         /// <summary>
         /// The services configuration
         /// </summary>
         /// <param name="services">The list of services</param>
+        /// <returns>Service provider</returns>
         [UsedImplicitly]
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IControllerFactory, ControllerFactory>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             foreach (var configurator in this.startupConfigurators)
@@ -64,13 +63,16 @@ namespace ClusterKit.Web
                 configurator.ConfigureServices(services);
             }
 
-            var builder = services.AddMvc();
+            var builder = services.AddMvcCore();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 builder.AddApplicationPart(assembly);
             }
 
             builder.AddControllersAsServices();
+
+            var componentContext = ServiceLocator.Current.GetInstance<IComponentContext>();
+            return new AutofacServiceProvider(componentContext);
         }
 
         /// <summary>
@@ -95,45 +97,6 @@ namespace ClusterKit.Web
             }
 
             appBuilder.UseMvc();
-        }
-
-        /// <summary>
-        /// The controller factory
-        /// </summary>
-        [UsedImplicitly]
-        private class ControllerFactory : IControllerFactory
-        {
-            /// <summary>
-            /// The windsor container
-            /// </summary>
-            private readonly IWindsorContainer windsorContainer;
-
-            /// <inheritdoc />
-            public ControllerFactory()
-            {
-                this.windsorContainer = ServiceLocator.Current.GetInstance<IWindsorContainer>();
-            }
-
-            /// <inheritdoc />
-            public object CreateController(ControllerContext context)
-            {
-                var controllerType = context.ActionDescriptor.ControllerTypeInfo.AsType();
-                var controller = this.windsorContainer.Resolve(controllerType) as Controller;
-                if (controller == null)
-                {
-                    return null;
-                }
-
-                controller.ControllerContext = context;
-                return controller;
-            }
-
-            /// <inheritdoc />
-            public void ReleaseController(ControllerContext context, object controller)
-            {
-                var disposable = controller as IDisposable;
-                disposable?.Dispose();
-            }
         }
     }
 }

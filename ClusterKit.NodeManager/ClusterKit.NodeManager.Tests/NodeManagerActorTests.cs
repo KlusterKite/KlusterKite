@@ -2418,7 +2418,7 @@ namespace ClusterKit.NodeManager.Tests
                 release.Configuration.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
-                            [ReleaseCheckTestsBase.Net45] =
+                            [ReleaseCheckTestsBase.Net46] =
                             new List<PackageDescription>(
                                 release.Configuration.Packages)
                         };

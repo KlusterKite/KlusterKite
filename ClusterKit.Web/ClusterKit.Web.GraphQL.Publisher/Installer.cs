@@ -49,7 +49,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(Component.For<IWebHostingConfigurator>().ImplementedBy(typeof(WebHostingConfigurator)));
+            container.RegisterType<WebHostingConfigurator>().As<IWebHostingConfigurator>();
             container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
             container.RegisterType<SchemaProvider>().SingleInstance();
 

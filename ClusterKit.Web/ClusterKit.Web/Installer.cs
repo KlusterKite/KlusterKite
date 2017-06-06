@@ -16,9 +16,7 @@ namespace ClusterKit.Web
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
 
@@ -30,11 +28,6 @@ namespace ClusterKit.Web
     /// </summary>
     public class Installer : BaseInstaller
     {
-        /// <summary>
-        /// Current windsor container
-        /// </summary>
-        private IWindsorContainer currentContainer;
-
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
@@ -56,29 +49,27 @@ namespace ClusterKit.Web
                                                                      "Web"
                                                                  };
 
-        /// <summary>
-        /// This method will be run after service start.
-        /// Methods are run in <seealso cref="BaseInstaller.AkkaConfigLoadPriority"/> order.
-        /// </summary>
-        protected override void PostStart()
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            if (this.currentContainer == null)
-            {
-                throw new InvalidOperationException("There is no registered windsor container");
-            }
+            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterType<WebTracer>().As<IWebHostingConfigurator>();
 
             var registeredAssemblies =
-                GetRegisteredBaseInstallers(this.currentContainer)
+                GetRegisteredBaseInstallers(container)
                     .Select(i => i.GetType().Assembly)
                     .Distinct();
 
             foreach (var registeredAssembly in registeredAssemblies)
             {
-                this.currentContainer.Register(
-                    Classes.FromAssembly(registeredAssembly).BasedOn<Controller>().LifestyleTransient());
+                container.RegisterAssemblyTypes(registeredAssembly).Where(t => t.IsSubclassOf(typeof(Controller)));
             }
+        }
 
-            var system = this.currentContainer.Resolve<ActorSystem>();
+        /// <inheritdoc />
+        protected override void PostStart(IComponentContext context)
+        {
+            var system = context.Resolve<ActorSystem>();
             var bindUrl = GetWebHostingBindUrl(system.Settings.Config);
             system.Log.Info("Starting web server on {Url}", bindUrl);
             try
@@ -105,21 +96,6 @@ namespace ClusterKit.Web
             {
                 system.Log.Error(exception, "Could not start web server");
             }
-        }
-
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
-        {
-            this.currentContainer = container;
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-            container.Register(
-                Component.For<IWebHostingConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
         }
 
         /// <summary>

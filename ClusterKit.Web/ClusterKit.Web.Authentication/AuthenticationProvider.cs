@@ -9,15 +9,14 @@
 
 namespace ClusterKit.Web.Authentication
 {
-    using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
 
@@ -38,9 +37,9 @@ namespace ClusterKit.Web.Authentication
         /// <param name="container">
         /// The container.
         /// </param>
-        public AuthenticationProvider(IWindsorContainer container)
+        public AuthenticationProvider(IComponentContext container)
         {
-            this.clientProviders = container.ResolveAll<IClientProvider>()
+            this.clientProviders = container.Resolve<IEnumerable<IClientProvider>>()
                 .OrderByDescending(c => c.Priority)
                 .ToImmutableList();
         }
