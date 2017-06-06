@@ -14,19 +14,15 @@ namespace ClusterKit.NodeManager.RemoteDomain
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    
+
     using Akka.Configuration;
 
-    using Castle.Facilities.TypedFactory;
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.Resolvers.SpecializedResolvers;
-    using Castle.Windsor;
+    using Autofac;
+    using Autofac.Extras.CommonServiceLocator;
 
     using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Migrator;
-
-    using CommonServiceLocator.WindsorAdapter;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -38,6 +34,11 @@ namespace ClusterKit.NodeManager.RemoteDomain
     /// </typeparam>
     public abstract class MigrationCollector<T> : MarshalByRefObject
     {
+        /// <summary>
+        /// Gets the DI container
+        /// </summary>
+        private IContainer container;
+
         /// <summary>
         /// Gets or sets the configuration
         /// </summary>
@@ -74,15 +75,51 @@ namespace ClusterKit.NodeManager.RemoteDomain
         /// <returns>The list of migrators</returns>
         protected IEnumerable<IMigrator> GetMigrators()
         {
-            var container = this.Initialize();
-            var config = container.Resolve<Config>();
-            var migratorTypeNames = config.GetStringList("ClusterKit.NodeManager.Migrators");
+            this.Initialize();
+            return this.container.Resolve<IEnumerable<IMigrator>>();
+        }
 
-            if (migratorTypeNames == null)
+        /// <summary>
+        /// Creates the result value
+        /// </summary>
+        /// <returns>The result</returns>
+        protected abstract T GetResult();
+
+        /// <summary>
+        /// Creates and initializes the <see cref="IContainer"/>
+        /// </summary>
+        protected virtual void Initialize()
+        {
+            if (this.container != null)
             {
-                yield break;
+                return;
             }
 
+            foreach (var file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
+            {
+                try
+                {
+                    var name = AssemblyName.GetAssemblyName(file);
+                    Assembly.Load(name);
+                }
+                catch (Exception exception)
+                {
+                    this.Errors.Add(
+                        new MigrationError
+                            {
+                                ErrorMessage =
+                                    $"Error while loading assembly for domain {AppDomain.CurrentDomain.FriendlyName} in {AppDomain.CurrentDomain.BaseDirectory}",
+                                Exception = exception
+                            });
+                }
+            }
+
+            var builder = new ContainerBuilder();
+            builder.RegisterInstallers(false);
+            var config = BaseInstaller.GetStackedConfig(builder, ConfigurationFactory.ParseString(this.Configuration));
+            builder.RegisterInstance(config).As<Config>();
+
+            var migratorTypeNames = config.GetStringList("ClusterKit.NodeManager.Migrators");
             foreach (var typeName in migratorTypeNames)
             {
                 var type = Type.GetType(typeName, false);
@@ -108,52 +145,11 @@ namespace ClusterKit.NodeManager.RemoteDomain
                     continue;
                 }
 
-                container.Register(Component.For(type));
-                yield return (IMigrator)container.Resolve(type);
-            }
-        }
-
-        /// <summary>
-        /// Creates the result value
-        /// </summary>
-        /// <returns>The result</returns>
-        protected abstract T GetResult();
-
-        /// <summary>
-        /// Creates and initializes the <see cref="IWindsorContainer"/>
-        /// </summary>
-        /// <returns>The DI container</returns>
-        protected virtual IWindsorContainer Initialize()
-        {
-            foreach (var file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
-            {
-                try
-                {
-                    var name = AssemblyName.GetAssemblyName(file);
-                    Assembly.Load(name);
-                }
-                catch (Exception exception)
-                {
-                    this.Errors.Add(
-                        new MigrationError
-                            {
-                                ErrorMessage = $"Error while loading assembly for domain {AppDomain.CurrentDomain.FriendlyName} in {AppDomain.CurrentDomain.BaseDirectory}",
-                                Exception = exception
-                            });
-                }
+                builder.RegisterType(type).As<IMigrator>();
             }
 
-            var container = new WindsorContainer();
-            container.AddFacility<TypedFactoryFacility>();
-            container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
-            container.Register(Component.For<IWindsorContainer>().Instance(container));
-            container.RegisterWindsorInstallers(false);
-            var config = BaseInstaller.GetStackedConfig(
-                container,
-                ConfigurationFactory.ParseString(this.Configuration));
-            container.Register(Component.For<Config>().Instance(config));
-            ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
-            return container;
+            this.container = builder.Build();
+            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(this.container));
         }
     }
 }

@@ -14,9 +14,7 @@ namespace ClusterKit.NodeManager
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Data;
@@ -82,28 +80,17 @@ namespace ClusterKit.NodeManager
                                                                      "NodeManager"
                                                                  };
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
 
-            container.Register(
-                Component.For<DataFactory<string, IPackage, string>>()
-                    .ImplementedBy<NugetPackagesFactory>()
-                    .LifestyleTransient());
-
-            container.Register(
-                Component.For<API.Provider.ApiProvider>().ImplementedBy<ApiProvider>().LifestyleSingleton());
-
+            container.RegisterType<NugetPackagesFactory>().As<DataFactory<string, IPackage, string>>();
+            container.RegisterType<ApiProvider>().As<API.Provider.ApiProvider>();
             var config = this.GetAkkaConfig();
             var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
-            container.Register(Component.For<IPackageRepository>()
-                .UsingFactoryMethod(() => PackageRepositoryFactory.Default.CreateRepository(nugetUrl)));
+            container.Register(c => PackageRepositoryFactory.Default.CreateRepository(nugetUrl))
+                .As<IPackageRepository>();
         }
     }
 }

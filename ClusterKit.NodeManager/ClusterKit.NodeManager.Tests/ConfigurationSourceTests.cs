@@ -13,8 +13,7 @@ namespace ClusterKit.NodeManager.Tests
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -84,7 +83,7 @@ namespace ClusterKit.NodeManager.Tests
             }");
 
             /// <inheritdoc />
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(ContainerBuilder container)
             {
             }
         }

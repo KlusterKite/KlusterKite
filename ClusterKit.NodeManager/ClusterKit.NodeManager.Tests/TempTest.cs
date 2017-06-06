@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ClusterKit.NodeManager.Tests
+﻿namespace ClusterKit.NodeManager.Tests
 {
+    using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
 
     using Akka.Configuration;
 
-    using Castle.Facilities.TypedFactory;
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.Resolvers.SpecializedResolvers;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Data.EF;
@@ -26,8 +20,6 @@ namespace ClusterKit.NodeManager.Tests
     using Microsoft.EntityFrameworkCore;
 
     using Npgsql;
-
-    using NuGet;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -92,13 +84,11 @@ namespace ClusterKit.NodeManager.Tests
         public void SeederTest()
         {
             var config = ConfigurationFactory.ParseString(File.ReadAllText("C:\\Dropbox\\Sources\\Git\\ClusterKit\\Docker\\ClusterKitSeeder\\seeder.hocon "));
-            var container = new WindsorContainer();
-            container.AddFacility<TypedFactoryFacility>();
-            container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
-            container.Register(Component.For<IWindsorContainer>().Instance(container));
-            container.RegisterWindsorInstallers();
-            config = BaseInstaller.GetStackedConfig(container, config);
-            container.Register(Component.For<Config>().Instance(config));
+            var builder = new ContainerBuilder();
+            builder.RegisterInstallers();
+            config = BaseInstaller.GetStackedConfig(builder, config);
+            builder.RegisterInstance(config).As<Config>();
+            var container = builder.Build();
 
             var seeder = new TestSeeder(config, container.Resolve<UniversalContextFactory>(), this.output);
             seeder.Seed();

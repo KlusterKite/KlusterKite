@@ -10,13 +10,12 @@
 namespace ClusterKit.Monitoring
 {
     using System.Collections.Generic;
+    using System.ComponentModel;
 
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Provider;
     using ClusterKit.Core;
@@ -48,18 +47,11 @@ namespace ClusterKit.Monitoring
                                                                      "Monitoring"
                                                                  };
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-            container.Register(
-                Component.For<ApiProvider>().ImplementedBy<MonitoringApiProvider>().LifestyleSingleton());
+            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterType<MonitoringApiProvider>().As<ApiProvider>();
         }
     }
 }

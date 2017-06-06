@@ -9,12 +9,12 @@
 
 namespace ClusterKit.NodeManager.Client
 {
+    using System.ComponentModel;
+
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.Log;
@@ -39,16 +39,11 @@ namespace ClusterKit.NodeManager.Client
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(Component.For<ILoggerConfigurator>().ImplementedBy<LoggerConfigurator>().LifestyleTransient());
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterType<LoggerConfigurator>().As<ILoggerConfigurator>();
         }
     }
 }

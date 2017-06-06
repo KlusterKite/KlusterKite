@@ -13,9 +13,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Data;
@@ -41,18 +39,14 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{ClusterKit.NodeManager.ConfigurationSeederType = \"ClusterKit.NodeManager.ConfigurationSource.ConfigurationSeeder, ClusterKit.NodeManager.ConfigurationSource\"}");
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container)
         {
-            container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactoryByLogin>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, User, Guid>>().ImplementedBy<UserFactoryByUid>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, Migration, int>>().ImplementedBy<MigrationDataFactory>().LifestyleTransient());
+            container.RegisterType<RoleFactory>().As<DataFactory<ConfigurationContext, Role, Guid>>();
+            container.RegisterType<UserFactoryByLogin>().As<DataFactory<ConfigurationContext, User, string>>();
+            container.RegisterType<UserFactoryByUid>().As<DataFactory<ConfigurationContext, User, Guid>>();
+            container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
+            container.RegisterType<MigrationDataFactory>().As<DataFactory<ConfigurationContext, Migration, int>>();
         }
     }
 }

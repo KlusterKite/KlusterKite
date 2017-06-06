@@ -23,9 +23,7 @@ namespace ClusterKit.NodeManager.Tests
     using Akka.Event;
     using Akka.TestKit;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.Ping;
@@ -158,7 +156,7 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public async Task NodeIsObsoleteOnStartTest()
         {
-            var router = (TestMessageRouter)this.ContainerBuilder.Resolve<IMessageRouter>();
+            var router = (TestMessageRouter)this.Container.Resolve<IMessageRouter>();
 
             // ReSharper disable once StringLiteralTypo
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
@@ -223,7 +221,7 @@ namespace ClusterKit.NodeManager.Tests
                 newReleaseId = newRelease.Id;
             }
 
-            var router = (TestMessageRouter)this.ContainerBuilder.Resolve<IMessageRouter>();
+            var router = (TestMessageRouter)this.Container.Resolve<IMessageRouter>();
 
             // ReSharper disable once StringLiteralTypo
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
@@ -2032,7 +2030,7 @@ namespace ClusterKit.NodeManager.Tests
             out VirtualNode node2,
             out VirtualNode node3)
         {
-            var router = (TestMessageRouter)this.ContainerBuilder.Resolve<IMessageRouter>();
+            var router = (TestMessageRouter)this.Container.Resolve<IMessageRouter>();
             this.ActorOf(() => new TestActorForwarder(this.TestActor), "migrationActor");
 
             // ReSharper disable once StringLiteralTypo
@@ -2255,11 +2253,11 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>The database context</returns>
         private ConfigurationContext GetContext()
         {
-            var connectionString = this.ContainerBuilder.Resolve<Config>()
+            var connectionString = this.Container.Resolve<Config>()
                 .GetString(NodeManagerActor.ConfigConnectionStringPath);
-            var databaseName = this.ContainerBuilder.Resolve<Config>()
+            var databaseName = this.Container.Resolve<Config>()
                 .GetString(NodeManagerActor.ConfigDatabaseNamePath);
-            return this.ContainerBuilder.Resolve<UniversalContextFactory>()
+            return this.Container.Resolve<UniversalContextFactory>()
                 .CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName);
         }
 
@@ -2312,11 +2310,6 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
-            /// <summary>
-            /// The di container
-            /// </summary>
-            private IWindsorContainer windsorContainer;
-
             /// <inheritdoc />
             protected override decimal AkkaConfigLoadPriority => -1M;
 
@@ -2376,47 +2369,37 @@ namespace ClusterKit.NodeManager.Tests
             }
 
             /// <inheritdoc />
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(ContainerBuilder container)
             {
-                this.windsorContainer = container;
+                container.RegisterAssemblyTypes(typeof(NodeManagerActor).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(Core.Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
 
-                container.Register(
-                    Classes.FromAssemblyContaining<NodeManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
-                        .LifestyleTransient());
-                container.Register(
-                    Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
-                        .LifestyleTransient());
-
-                container.Register(
-                    Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>()
-                        .LifestyleTransient());
-
+                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
                 var packageRepository = this.CreateTestRepository();
+                container.RegisterInstance(packageRepository).As<IPackageRepository>();
+                container.RegisterType<TestMessageRouter>().As<IMessageRouter>();
 
-                container.Register(Component.For<IPackageRepository>().Instance(packageRepository));
-                container.Register(
-                    Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
             }
 
             /// <inheritdoc />
-            protected override void PostStart()
+            protected override void PostStart(IComponentContext componentContext)
             {
-                base.PostStart();
-                var contextManager = this.windsorContainer.Resolve<UniversalContextFactory>();
-                var config = this.windsorContainer.Resolve<Config>();
+                base.PostStart(componentContext);
+                var contextManager = componentContext.Resolve<UniversalContextFactory>();
+                var config = componentContext.Resolve<Config>();
                 var connectionString = config.GetString(NodeManagerActor.ConfigConnectionStringPath);
                 var databaseName = config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
                 using (var context = contextManager.CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName))
                 {
-                    context.Database.EnsureDeleted();
                     context.ResetValueGenerators();
+                    context.Database.EnsureDeleted();
                     
                     context.Releases.Add(CreateRelease());
                     var release = CreateRelease();
                     release.State = EnReleaseState.Ready;
                     context.Releases.Add(release);
                     context.SaveChanges();
-                    this.windsorContainer.Resolve<ActorSystem>().Log.Info(
+                    componentContext.Resolve<ActorSystem>().Log.Info(
                         "!!! Created release with id {ReleaseId} in Database {ConnectionString}",
                         release.Id,
                         connectionString);

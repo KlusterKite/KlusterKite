@@ -16,15 +16,11 @@ namespace ClusterKit.NodeManager.Seeder
 
     using Akka.Configuration;
 
-    using Castle.Facilities.TypedFactory;
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.Resolvers.SpecializedResolvers;
-    using Castle.Windsor;
+    using Autofac;
+    using Autofac.Extras.CommonServiceLocator;
 
     using ClusterKit.Core;
     using ClusterKit.NodeManager.Migrator;
-
-    using CommonServiceLocator.WindsorAdapter;
 
     using JetBrains.Annotations;
 
@@ -51,7 +47,7 @@ namespace ClusterKit.NodeManager.Seeder
                 return;
             }
 
-            var container = InitializeDependencies(config);
+            var builder = InitializeDependencies(config);
 
             var seederTypes = GetSeederTypes(seederConfig);
             if (seederTypes == null)
@@ -61,7 +57,14 @@ namespace ClusterKit.NodeManager.Seeder
 
             foreach (var seederType in seederTypes)
             {
-                container.Register(Component.For(seederType));
+                builder.RegisterType(seederType);
+            }
+
+            var container = builder.Build();
+            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));
+
+            foreach (var seederType in seederTypes)
+            {
                 var seeder = (BaseSeeder)container.Resolve(seederType);
                 Console.WriteLine($@"Running {seederType.FullName}");
                 seeder.Seed();
@@ -108,16 +111,12 @@ namespace ClusterKit.NodeManager.Seeder
         /// </summary>
         /// <param name="config">The seeder configuration</param>
         /// <returns>The windsor container</returns>
-        private static WindsorContainer InitializeDependencies(Config config)
+        private static ContainerBuilder InitializeDependencies(Config config)
         {
-            var container = new WindsorContainer();
-            container.AddFacility<TypedFactoryFacility>();
-            container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
-            container.Register(Component.For<IWindsorContainer>().Instance(container));
-            container.RegisterWindsorInstallers();
+            var container = new ContainerBuilder();
+            container.RegisterInstallers();
             config = BaseInstaller.GetStackedConfig(container, config);
-            container.Register(Component.For<Config>().Instance(config));
-            ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
+            container.RegisterInstance(config).As<Config>();
             return container;
         }
 
