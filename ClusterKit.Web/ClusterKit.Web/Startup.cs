@@ -9,71 +9,130 @@
 
 namespace ClusterKit.Web
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Http.Formatting;
-    using System.Web.Http;
-    using System.Web.Http.Controllers;
-    using System.Web.Http.Routing;
 
-    using Autofac;
-    using Autofac.Integration.WebApi;
+    using Castle.Windsor;
 
     using JetBrains.Annotations;
+
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Microsoft.Extensions.Logging;
     using Microsoft.Practices.ServiceLocation;
-    using Owin;
+
+    using Serilog;
 
     /// <summary>
-    /// The OWIN startup class.
+    /// The web hosting startup class.
     /// </summary>
     [UsedImplicitly]
     public class Startup
     {
         /// <summary>
-        /// The Owin service configuration
+        /// The list of startup configurators
         /// </summary>
-        /// <param name="appBuilder">The builder</param>
-        [UsedImplicitly]
-        public void Configuration(IAppBuilder appBuilder)
+        private List<IWebHostingConfigurator> startupConfigurators;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        public Startup()
         {
-            var owinStartupConfigurators = ServiceLocator.Current.GetAllInstances<IOwinStartupConfigurator>().ToList();
-
-            // Configure Web API for self-host.
-            var config = new HttpConfiguration();
-            config.MapHttpAttributeRoutes(new CustomDirectRouteProvider());
-            config.Formatters.Clear();
-            config.Formatters.Add(new XmlMediaTypeFormatter { UseXmlSerializer = true });
-            config.Formatters.Add(new JsonMediaTypeFormatter());
-            config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
-
-            var lifetimeScope = ServiceLocator.Current.GetInstance<ILifetimeScope>();
-            appBuilder.UseAutofacMiddleware(lifetimeScope);
-
-            owinStartupConfigurators.ForEach(c => c.ConfigureApi(config));
-            config.DependencyResolver = new AutofacWebApiDependencyResolver(lifetimeScope);
-
-            config.EnsureInitialized();
-
-            owinStartupConfigurators.ForEach(c => c.ConfigureApp(appBuilder));
-            appBuilder.UseWebApi(config);
+            var windsorContainer = ServiceLocator.Current.GetInstance<IWindsorContainer>();
+            this.startupConfigurators = windsorContainer.ResolveAll<IWebHostingConfigurator>().ToList();
         }
 
         /// <summary>
-        /// Workaround to handle inherited routes
+        /// The services configuration
         /// </summary>
-        private class CustomDirectRouteProvider : DefaultDirectRouteProvider
+        /// <param name="services">The list of services</param>
+        [UsedImplicitly]
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<IControllerFactory, ControllerFactory>();
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            foreach (var configurator in this.startupConfigurators)
+            {
+                configurator.ConfigureServices(services);
+            }
+
+            var builder = services.AddMvc();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                builder.AddApplicationPart(assembly);
+            }
+
+            builder.AddControllersAsServices();
+        }
+
+        /// <summary>
+        /// The application configuration
+        /// </summary>
+        /// <param name="appBuilder">
+        /// The builder
+        /// </param>
+        /// <param name="env">
+        /// The env.
+        /// </param>
+        /// <param name="loggerFactory">
+        /// The logger Factory.
+        /// </param>
+        [UsedImplicitly]
+        public void Configure(IApplicationBuilder appBuilder, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddSerilog();
+            foreach (var configurator in this.startupConfigurators)
+            {
+                appBuilder = configurator.ConfigureApplication(appBuilder);
+            }
+
+            appBuilder.UseMvc();
+        }
+
+        /// <summary>
+        /// The controller factory
+        /// </summary>
+        [UsedImplicitly]
+        private class ControllerFactory : IControllerFactory
         {
             /// <summary>
-            /// Gets a set of route factories for the given action descriptor.
+            /// The windsor container
             /// </summary>
-            /// <returns>
-            /// A set of route factories.
-            /// </returns>
-            /// <param name="actionDescriptor">The action descriptor.</param>
-            protected override IReadOnlyList<IDirectRouteFactory> GetActionRouteFactories(HttpActionDescriptor actionDescriptor)
+            private readonly IWindsorContainer windsorContainer;
+
+            /// <inheritdoc />
+            public ControllerFactory()
             {
-                // inherit route attributes decorated on base class controller's actions
-                return actionDescriptor.GetCustomAttributes<IDirectRouteFactory>(inherit: true);
+                this.windsorContainer = ServiceLocator.Current.GetInstance<IWindsorContainer>();
+            }
+
+            /// <inheritdoc />
+            public object CreateController(ControllerContext context)
+            {
+                var controllerType = context.ActionDescriptor.ControllerTypeInfo.AsType();
+                var controller = this.windsorContainer.Resolve(controllerType) as Controller;
+                if (controller == null)
+                {
+                    return null;
+                }
+
+                controller.ControllerContext = context;
+                return controller;
+            }
+
+            /// <inheritdoc />
+            public void ReleaseController(ControllerContext context, object controller)
+            {
+                var disposable = controller as IDisposable;
+                disposable?.Dispose();
             }
         }
     }

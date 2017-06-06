@@ -3160,34 +3160,34 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// Testing authorized connection mutation request from <see cref="ApiDescription"/>
         /// </summary>
         /// <param name="setSession">A value indicating whether to set authentication session</param>
-        /// /// <param name="privilege">The privilege to set</param>
+        /// <param name="privilege">The privilege to set</param>
         /// <param name="mutationName">The mutation name</param>
         /// <param name="arguments">The mutation arguments</param>
         /// <param name="expectedResult">The expected result</param>
         /// <param name="expectingResult">A value indicating whether to expect data result</param>
         /// <returns>Async task</returns>
         [Theory]
-        [InlineData(false, false, "authorizedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": null}}}", false)]
+        [InlineData(false, null, "authorizedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": null}}}", false)]
         [InlineData(true, "query", "authorizedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "create", "authorizedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": {\"name\": \"new node\"}}}}", true)]
 
-        [InlineData(false, false, "authorizedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(false, null, "authorizedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "query", "authorizedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "update", "authorizedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": {\"name\": \"new node\"}}}}", true)]
 
-        [InlineData(false, false, "authorizedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(false, null, "authorizedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "query", "authorizedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "delete", "authorizedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\": {\"node\": {\"name\": \"1-test\"}}}}", true)]
 
-        [InlineData(false, false, "authorizedNamedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": null}}}", false)]
+        [InlineData(false, null, "authorizedNamedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": null}}}", false)]
         [InlineData(true, "allow", "authorizedNamedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "allow.Create", "authorizedNamedConnection_create", "input: {newNode: {id: \"E2EB0672-9717-4F42-91BF-5A3893C591C3\", name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": {\"name\": \"new node\"}}}}", true)]
 
-        [InlineData(false, false, "authorizedNamedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(false, null, "authorizedNamedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "allow", "authorizedNamedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "allow.Update", "authorizedNamedConnection_update", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\", newNode: {name: \"new node\"}}", "{\"data\": {\"m\": {\"node\": {\"name\": \"new node\"}}}}", true)]
 
-        [InlineData(false, false, "authorizedNamedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
+        [InlineData(false, null, "authorizedNamedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "allow", "authorizedNamedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\":  {\"node\": null}}}", false)]
         [InlineData(true, "allow.Delete", "authorizedNamedConnection_delete", "input: {id: \"3BEEE369-11DF-4A30-BF11-1D8465C87110\"}", "{\"data\": {\"m\": {\"node\": {\"name\": \"1-test\"}}}}", true)]
         public async Task AuthorizationConnectionMutationTest(

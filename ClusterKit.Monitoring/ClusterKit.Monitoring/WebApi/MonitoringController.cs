@@ -11,7 +11,6 @@ namespace ClusterKit.Monitoring.WebApi
 {
     using System;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using Akka.Actor;
 
@@ -20,12 +19,14 @@ namespace ClusterKit.Monitoring.WebApi
     using ClusterKit.Monitoring.Messages;
     using ClusterKit.Web.Authorization.Attributes;
 
+    using Microsoft.AspNetCore.Mvc;
+
     /// <summary>
     /// Manages web requests to describe current cluster health state
     /// </summary>
-    [RoutePrefix("api/1.x/clusterkit/monitoring")]
+    [Route("api/1.x/clusterkit/monitoring")]
     [RequireUser]
-    public class MonitoringController : ApiController
+    public class MonitoringController : Controller
     {
         /// <summary>
         /// The actor system.

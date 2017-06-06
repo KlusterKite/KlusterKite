@@ -1,24 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OwinConfigurator.cs" company="ClusterKit">
+// <copyright file="WebHostingConfigurator.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Defines the OwinConfigurator type.
+//   Defines the WebHostingConfigurator type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.Web.Authorization
 {
-    using System.Web.Http;
-
     using ClusterKit.Security.Attributes;
 
-    using Owin;
+    using Microsoft.AspNetCore.Builder;
 
     /// <summary>
     /// Configures current web-api server to act as OAuth2 authorization server
     /// </summary>
-    public class OwinConfigurator : IOwinStartupConfigurator
+    public class WebHostingConfigurator : BaseWebHostingConfigurator
     {
         /// <summary>
         /// The token manager
@@ -26,26 +24,20 @@ namespace ClusterKit.Web.Authorization
         private readonly ITokenManager tokenManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OwinConfigurator"/> class.
+        /// Initializes a new instance of the <see cref="WebHostingConfigurator"/> class.
         /// </summary>
         /// <param name="tokenManager">
         /// The token Manager.
         /// </param>
-        public OwinConfigurator(ITokenManager tokenManager)
+        public WebHostingConfigurator(ITokenManager tokenManager)
         {
             this.tokenManager = tokenManager;
         }
 
         /// <inheritdoc />
-        public void ConfigureApi(HttpConfiguration httpConfiguration)
+        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
         {
-        }
-
-        /// <inheritdoc />
-        public void ConfigureApp(IAppBuilder appBuilder)
-        {
-            appBuilder.Use<Authorizer>(new Authorizer.AuthorizerOptions("Bearer", this.tokenManager));
-            appBuilder.Use<CheckTokenMiddleware>();
+            return app.UseMiddleware<CheckTokenMiddleware>(this.tokenManager);
         }
     }
 }

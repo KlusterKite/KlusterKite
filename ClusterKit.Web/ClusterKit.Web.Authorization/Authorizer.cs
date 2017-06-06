@@ -15,16 +15,16 @@ namespace ClusterKit.Web.Authorization
 
     using JetBrains.Annotations;
 
-    using Microsoft.Owin;
-    using Microsoft.Owin.Security;
-    using Microsoft.Owin.Security.Infrastructure;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Http.Authentication;
 
     /// <summary>
     /// Checks the access token for validness and extracts the user session data
     /// </summary>
     [UsedImplicitly]
-    public class Authorizer : AuthenticationMiddleware<Authorizer.AuthorizerOptions>
+    public class Authorizer //: AuthenticationMiddleware<Authorizer.AuthorizerOptions>
     {
+        /*
         /// <summary>
         /// Initializes a new instance of the <see cref="Authorizer"/> class.
         /// </summary>
@@ -34,11 +34,12 @@ namespace ClusterKit.Web.Authorization
         /// <param name="options">
         /// The options.
         /// </param>
-        public Authorizer(OwinMiddleware next, AuthorizerOptions options)
-            : base(next, options)
+        public Authorizer(RequestDelegate next, AuthorizerOptions options)
         {
         }
+        */
 
+        /*
         /// <inheritdoc />
         protected override AuthenticationHandler<AuthorizerOptions> CreateHandler()
         {
@@ -108,5 +109,6 @@ namespace ClusterKit.Web.Authorization
                     new AuthenticationProperties { IssuedUtc = session.Created, ExpiresUtc = session.Expiring });
             }
         }
+        */
     }
 }

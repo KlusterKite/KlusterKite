@@ -10,14 +10,13 @@
 namespace ClusterKit.Web.Authorization
 {
     using System.Linq;
-    using System.Net.Http;
-    using System.Web.Http;
-
+    
     using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 
-    using Microsoft.Owin;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// The api controller extension to acquire authenticated user data
@@ -27,18 +26,18 @@ namespace ClusterKit.Web.Authorization
         /// <summary>
         /// Gets security request description
         /// </summary>
-        /// <param name="context">The owin context</param>
+        /// <param name="context">The http context</param>
         /// <returns>The security request description</returns>
         [UsedImplicitly]
-        public static RequestContext GetRequestDescription(this IOwinContext context)
+        public static RequestContext GetRequestDescription(this HttpContext context)
         {
             return new RequestContext
                        {
                            Authentication = context.GetSession(),
-                           RemoteAddress = context.Request.RemoteIpAddress,
-                           RequestedLocalUrl = context.Request.Uri.ToString(),
+                           RemoteAddress = context.Connection.RemoteIpAddress.ToString(),
+                           RequestedLocalUrl = context.Request.Path,
                            Headers =
-                               context.Request.Headers.Where(p => p.Key?.ToLower().Trim() != "authorization")
+                               context.Request.Headers.ToList().Where(p => p.Key?.ToLower().Trim() != "authorization")
                                    .ToDictionary(p => p.Key, p => string.Join("; ", p.Value))
                        };
         }
@@ -49,42 +48,25 @@ namespace ClusterKit.Web.Authorization
         /// <param name="controller">The api controller</param>
         /// <returns>The security request description</returns>
         [UsedImplicitly]
-        public static RequestContext GetRequestDescription(this ApiController controller)
+        public static RequestContext GetRequestDescription(this Controller controller)
         {
-            var context = controller.Request.GetOwinContext();
-            return context.GetRequestDescription();
+            return controller.HttpContext.GetRequestDescription();
         }
 
         /// <summary>
         /// Gets authenticated user session or null
         /// </summary>
-        /// <param name="context">The owin context</param>
+        /// <param name="context">The context</param>
         /// <returns>The user session</returns>
-        public static AccessTicket GetSession(this IOwinContext context)
+        public static AccessTicket GetSession(this HttpContext context)
         {
-            return context.Get<AccessTicket>("AccessTicket");
-        }
+            object ticket;
+            if (context.Items.TryGetValue("AccessTicket", out ticket))
+            {
+                return (AccessTicket)ticket;
+            }
 
-        /// <summary>
-        /// Gets authenticated user session or null
-        /// </summary>
-        /// <param name="controller">The api controller</param>
-        /// <returns>The user session</returns>
-        public static AccessTicket GetSession(this ApiController controller)
-        {
-            var context = controller.Request.GetOwinContext();
-            return context.GetSession();
-        }
-
-        /// <summary>
-        /// Gets authenticated user session or null
-        /// </summary>
-        /// <param name="context">The owin context</param>
-        /// <returns>The user session</returns>
-        [UsedImplicitly]
-        public static string GetAuthenticationToken(this IOwinContext context)
-        {
-            return context.Get<string>("Token");
+            return null;
         }
 
         /// <summary>
@@ -92,11 +74,37 @@ namespace ClusterKit.Web.Authorization
         /// </summary>
         /// <param name="controller">The api controller</param>
         /// <returns>The user session</returns>
-        [UsedImplicitly]
-        public static string GetAuthenticationToken(this ApiController controller)
+        public static AccessTicket GetSession(this Controller controller)
         {
-            var context = controller.Request.GetOwinContext();
-            return context.GetAuthenticationToken();
+            return controller.HttpContext.GetSession();
+        }
+
+        /// <summary>
+        /// Gets authenticated user session or null
+        /// </summary>
+        /// <param name="context">The http context</param>
+        /// <returns>The user session</returns>
+        [UsedImplicitly]
+        public static string GetAuthenticationToken(this HttpContext context)
+        {
+            object token;
+            if (context.Items.TryGetValue("Token", out token))
+            {
+                return (string)token;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets authenticated user session or null
+        /// </summary>
+        /// <param name="controller">The api controller</param>
+        /// <returns>The user session</returns>
+        [UsedImplicitly]
+        public static string GetAuthenticationToken(this Controller controller)
+        {
+            return controller.HttpContext.GetAuthenticationToken();
         }
     }
 }

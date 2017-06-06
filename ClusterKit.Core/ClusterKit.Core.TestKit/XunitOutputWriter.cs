@@ -66,4 +66,4 @@ namespace ClusterKit.Core.TestKit
             this.line.Clear();
         }
     }
-}
+} 

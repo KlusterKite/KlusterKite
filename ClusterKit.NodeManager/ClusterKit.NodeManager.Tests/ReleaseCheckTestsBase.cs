@@ -32,9 +32,9 @@ namespace ClusterKit.NodeManager.Tests
     public abstract class ReleaseCheckTestsBase
     {
         /// <summary>
-        /// The .NET Framework 4.5 name
+        /// The .NET Framework 4.6 name
         /// </summary> 
-        public const string Net45 = ".NETFramework,Version=v4.6";
+        public const string Net46 = ".NETFramework,Version=v4.6";
 
         /// <summary>
         /// The .NET Standard 1.1 name
@@ -148,10 +148,10 @@ namespace ClusterKit.NodeManager.Tests
             var migratorTemplates = new List<MigratorTemplate>();
             var m1 = new MigratorTemplate
                          {
-                             Code = "t1",
-                             Configuration = "t1",
+                             Code = "m1",
+                             Configuration = "m1",
                              PackageRequirements =
-                                 CreatePackageRequirement(templatePackageRequirements),
+                                 CreatePackageRequirement(templatePackageRequirements)
                          };
             migratorTemplates.Add(m1);
 
@@ -159,8 +159,8 @@ namespace ClusterKit.NodeManager.Tests
                 new ReleaseConfiguration
                     {
                         Packages = packageDescriptions,
-                        NodeTemplates = nodeTemplates,
-                        MigratorTemplates = migratorTemplates
+                    NodeTemplates = nodeTemplates,
+                    MigratorTemplates = migratorTemplates
                     };
 
             return new Release { Configuration = releaseConfiguration };
@@ -176,21 +176,21 @@ namespace ClusterKit.NodeManager.Tests
                          {
                              Id = "p1",
                              Version = SemanticVersion.Parse("1.0.0"),
-                             DependencySets = new[] { CreatePackageDependencySet(Net45, "dp1 1.0.0") }
+                             DependencySets = new[] { CreatePackageDependencySet(Net46, "dp1 1.0.0") }
                          };
 
             var p2 = new TestPackage
                          {
                              Id = "p2",
                              Version = SemanticVersion.Parse("1.0.0"),
-                             DependencySets = new[] { CreatePackageDependencySet(Net45, "dp2 1.0.0") }
+                             DependencySets = new[] { CreatePackageDependencySet(Net46, "dp2 1.0.0") }
                          };
 
             var p3 = new TestPackage
                          {
                              Id = "p3",
                              Version = SemanticVersion.Parse("1.0.0"),
-                             DependencySets = new[] { CreatePackageDependencySet(Net45, "dp3 2.0.0") }
+                             DependencySets = new[] { CreatePackageDependencySet(Net46, "dp3 2.0.0") }
                          };
             var dp1 = new TestPackage
                           {

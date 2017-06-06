@@ -56,9 +56,9 @@ namespace ClusterKit.Web.Tests.GraphQL
         }
 
         /// <summary>
-        /// Current owin bind port
+        /// Current bind port
         /// </summary>
-        private int OwinPort => this.Sys.Settings.Config.GetInt("ClusterKit.Web.OwinPort");
+        private int OwinPort => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
 
         /// <summary>
         /// Just generic test
@@ -327,11 +327,9 @@ namespace ClusterKit.Web.Tests.GraphQL
             }";
 
             request.AddJsonBody(new EndpointController.QueryRequest { Query = query });
-
             var result = await client.ExecuteTaskAsync(request);
-
-            Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
             this.Sys.Log.Info("Response {Response}", result.Content);
+            Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
 
             var expectedResult = @"
@@ -391,6 +389,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 var installers = base.GetPluginInstallers();
                 installers.Add(new Descriptor.Installer());
                 installers.Add(new Web.Installer());
+                
                 installers.Add(new Authentication.Installer());
                 installers.Add(new Web.GraphQL.Publisher.Installer());
                 installers.Add(new TestInstaller());
@@ -409,8 +408,8 @@ namespace ClusterKit.Web.Tests.GraphQL
                 {{
                     ClusterKit {{
  		                Web {{
-                            OwinPort = {port},
- 			                OwinBindAddress = ""http://*:{port}"",
+                            WebHostPort = {port},
+ 			                BindAddress = ""http://*:{port}"",
                             Debug.Trace = true
                         }}
                     }}
@@ -429,7 +428,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <inheritdoc />
             protected override Config GetAkkaConfig()
             {
-                return Config.Empty;
+                return ConfigurationFactory.ParseString("{ ClusterKit.Web.Debug.Trace = true }");
             }
 
             /// <inheritdoc />

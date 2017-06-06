@@ -44,9 +44,9 @@ namespace ClusterKit.Core.Tests.AkkaTest
         }
 
         /// <summary>
-        /// This test is failing
+        /// This test is failing - bug fixed
         /// </summary>
-        /// [Fact]
+        [Fact]
         public void FailingTest()
         {
             var loggerConfig = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new LocalXunitOutputWriter(this.output));

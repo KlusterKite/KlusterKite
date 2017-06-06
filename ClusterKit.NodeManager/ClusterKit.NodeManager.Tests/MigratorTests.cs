@@ -753,7 +753,7 @@ namespace ClusterKit.NodeManager.Tests
                 var activeRelease = this.CreateRelease(repo);
                 context.Releases.Add(activeRelease);
                 context.SaveChanges();
-                var errors = activeRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net45 }.ToList())
+                var errors = activeRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46 }.ToList())
                     .ToList();
                 foreach (var error in errors)
                 {
@@ -767,7 +767,7 @@ namespace ClusterKit.NodeManager.Tests
                 var nextRelease = this.CreateRelease(repo);
                 context.Releases.Add(nextRelease);
                 context.SaveChanges();
-                errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net45 }.ToList()).ToList();
+                errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46 }.ToList()).ToList();
                 foreach (var error in errors)
                 {
                     this.Sys.Log.Error("Error in next release {Field}: {Message}", error.Field, error.Message);
@@ -862,7 +862,7 @@ namespace ClusterKit.NodeManager.Tests
                 ClusterKit.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
                 ClusterKit.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
                 ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = """"
-                ClusterKit.NodeManager.FrameworkType = ""{ReleaseCheckTestsBase.Net45}""
+                ClusterKit.NodeManager.FrameworkType = ""{ReleaseCheckTestsBase.Net46}""
 
                 akka : {{
                   actor: {{

@@ -11,14 +11,14 @@ namespace ClusterKit.Web.GraphQL.Publisher
 {
     using System;
     using System.Linq;
-    using System.Net;
-    using System.Net.Http;
+
     using System.Text;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
+    using Akka.Actor;
     using Akka.Configuration;
 
+    using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization;
 
     using global::GraphQL;
@@ -26,13 +26,16 @@ namespace ClusterKit.Web.GraphQL.Publisher
     
     using JetBrains.Annotations;
 
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Practices.ServiceLocation;
+
     using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// GraphQL endpoint controller
     /// </summary>
-    [RoutePrefix("api/1.x/graphQL")]
-    public class EndpointController : ApiController
+    [Route("api/1.x/graphQL")]
+    public class EndpointController : Controller
     {
         /// <summary>
         /// The executor.
@@ -50,10 +53,15 @@ namespace ClusterKit.Web.GraphQL.Publisher
         private readonly IDocumentWriter writer;
 
         /// <summary>
+        /// The system.
+        /// </summary>
+        private readonly ActorSystem system;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EndpointController"/> class.
         /// </summary>
         /// <param name="schemaProvider">
-        /// The schema provider.
+        /// The schema Provider.
         /// </param>
         /// <param name="executor">
         /// The executor.
@@ -61,18 +69,24 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="writer">
         /// The writer.
         /// </param>
+        /// <param name="system">
+        /// The system.
+        /// </param>
         /// <param name="config">
-        /// The system config.
+        /// The config.
         /// </param>
         public EndpointController(
             SchemaProvider schemaProvider,
-            IDocumentExecuter executor,
-            IDocumentWriter writer,
-            Config config)
+                                  IDocumentExecuter executor,
+                                  IDocumentWriter writer,
+                                  ActorSystem system,
+                                  Config config)
         {
             this.schemaProvider = schemaProvider;
             this.executor = executor;
             this.writer = writer;
+            this.system = system;
+
             /*
             this.complexityConfiguration = new ComplexityConfiguration
                                                {
@@ -93,28 +107,31 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="query">The query data</param>
         /// <returns>GraphQL response</returns>
         [HttpPost]
-        [Route]
-        public async Task<HttpResponseMessage> Post(JObject query)
+        [Route("")]
+        public async Task<IActionResult> Post([FromBody] JObject query)
         {
-            var queryToExecute = (string)(query.Properties()
-                                              .FirstOrDefault(
-                                                  p => p.Name.Equals(
-                                                      "query",
-                                                      StringComparison.InvariantCultureIgnoreCase))?.Value as JValue);
+            this.system.Log.Info("{Type}: graphQL request received", this.GetType().Name);
+            var queryToExecute =
+                (string)
+                (query.Properties()
+                         .FirstOrDefault(p => p.Name.Equals("query", StringComparison.InvariantCultureIgnoreCase))
+                         ?.Value as JValue);
 
             if (string.IsNullOrWhiteSpace(queryToExecute))
             {
-                return new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest };
+                return this.BadRequest();
             }
 
-            var operationName = (string)(query.Properties()
-                                             .FirstOrDefault(
-                                                 p => p.Name.Equals(
-                                                     "OperationName",
-                                                     StringComparison.InvariantCultureIgnoreCase))?.Value as JValue);
+            var operationName =
+                (string)
+                (query.Properties()
+                     .FirstOrDefault(p => p.Name.Equals("OperationName", StringComparison.InvariantCultureIgnoreCase))
+                     ?.Value as JValue);
 
-            var variablesToken = query.Properties()
-                .FirstOrDefault(p => p.Name.Equals("variables", StringComparison.InvariantCultureIgnoreCase))?.Value;
+            var variablesToken =
+                query.Properties()
+                    .FirstOrDefault(
+                        p => p.Name.Equals("variables", StringComparison.InvariantCultureIgnoreCase))?.Value;
 
             Inputs inputs = null;
             if (variablesToken is JObject)
@@ -126,11 +143,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                 inputs = ((JValue)variablesToken).ToObject<string>()?.ToInputs();
             }
 
-            var requestContext = this.GetRequestDescription();
+            RequestContext requestContext = this.GetRequestDescription();
             var schema = this.schemaProvider.CurrentSchema;
             if (schema == null)
             {
-                return new HttpResponseMessage { StatusCode = HttpStatusCode.ServiceUnavailable };
+                return new StatusCodeResult(503);
             }
 
             var result = await this.executor.ExecuteAsync(
@@ -146,14 +163,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                      // options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                                  }).ConfigureAwait(false);
 
-            var httpResult = result.Errors?.Count > 0 ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
-
             var json = this.writer.Write(result);
+            var contentResult = this.Content(json, "application/json", Encoding.UTF8);
 
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = new HttpResponseMessage { StatusCode = httpResult, Content = content };
-
-            return response;
+            contentResult.StatusCode = result.Errors?.Count > 0 ? 400 : 200;
+            return contentResult;
         }
 
         /// <summary>

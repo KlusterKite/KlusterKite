@@ -203,8 +203,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.Monitoring",
                                              "ClusterKit.NodeManager",
                                              "ClusterKit.Data.EF.Npgsql",
-                                             "ClusterKit.Web.Swagger.Monitor",
-                                             "ClusterKit.Web.Swagger",
                                              "ClusterKit.Log.Console",
                                              "ClusterKit.Log.ElasticSearch",
                                              "ClusterKit.Web.Authentication",
@@ -312,8 +310,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                 new List<IEnumerable<PrivilegeDescription>>
                     {
                         Utils.GetDefinedPrivileges(typeof(Privileges)),
-                        Utils.GetDefinedPrivileges(
-                            typeof(Web.Swagger.Messages.Privileges)),
+
                         Utils.GetDefinedPrivileges(
                             typeof(Monitoring.Client.Privileges))
                     };

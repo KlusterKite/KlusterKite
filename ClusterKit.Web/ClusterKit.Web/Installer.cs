@@ -11,16 +11,19 @@ namespace ClusterKit.Web
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Web.Http;
-
+    using System.Threading.Tasks;
+    
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Autofac;
+    using Castle.MicroKernel.Registration;
+    using Castle.MicroKernel.SubSystems.Configuration;
+    using Castle.Windsor;
 
     using ClusterKit.Core;
 
-    using Microsoft.Owin.Hosting;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// Installing components from current library
@@ -30,7 +33,7 @@ namespace ClusterKit.Web
         /// <summary>
         /// Current windsor container
         /// </summary>
-        private ContainerBuilder currentContainer;
+        private IWindsorContainer currentContainer;
 
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
@@ -53,53 +56,80 @@ namespace ClusterKit.Web
                                                                      "Web"
                                                                  };
 
-        /// <inheritdoc />
-        protected override void PostStart(IComponentContext context)
+        /// <summary>
+        /// This method will be run after service start.
+        /// Methods are run in <seealso cref="BaseInstaller.AkkaConfigLoadPriority"/> order.
+        /// </summary>
+        protected override void PostStart()
         {
             if (this.currentContainer == null)
             {
                 throw new InvalidOperationException("There is no registered windsor container");
             }
 
-            var system = context.Resolve<ActorSystem>();
-            var bindUrl = GetOwinBindUrl(system.Settings.Config);
-            system.Log.Info("Starting web server on {Url}", bindUrl);
-            try
-            {
-                WebApp.Start<Startup>(bindUrl);
-            }
-            catch (Exception exception)
-            {
-                system.Log.Error(exception, "Could not start owin server");
-            }
-        }
-
-        /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
-        {
-            this.currentContainer = container;
-            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
-            container.RegisterType<WebTracer>().As<IOwinStartupConfigurator>();
-
             var registeredAssemblies =
-                GetRegisteredBaseInstallers(container)
+                GetRegisteredBaseInstallers(this.currentContainer)
                     .Select(i => i.GetType().Assembly)
                     .Distinct();
 
             foreach (var registeredAssembly in registeredAssemblies)
             {
-                container.RegisterAssemblyTypes(registeredAssembly).Where(t => t.IsSubclassOf(typeof(ApiController)));
+                this.currentContainer.Register(
+                    Classes.FromAssembly(registeredAssembly).BasedOn<Controller>().LifestyleTransient());
+            }
+
+            var system = this.currentContainer.Resolve<ActorSystem>();
+            var bindUrl = GetWebHostingBindUrl(system.Settings.Config);
+            system.Log.Info("Starting web server on {Url}", bindUrl);
+            try
+            {
+                var host = new WebHostBuilder()
+                    .CaptureStartupErrors(true)
+                    .UseUrls(bindUrl)
+                    .UseKestrel();
+
+                var server = host.UseStartup<Startup>().Build();
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        server.Run();
+                    }
+                    catch (Exception exception)
+                    {
+                        system.Log.Error(exception, "Web server stopped");
+                    }
+                });
+            }
+            catch (Exception exception)
+            {
+                system.Log.Error(exception, "Could not start web server");
             }
         }
 
         /// <summary>
-        /// Reads owin bind url from configuration
+        /// Registering DI components
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="store">The configuration store.</param>
+        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        {
+            this.currentContainer = container;
+            container.Register(
+                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+
+            container.Register(
+                Component.For<IWebHostingConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
+        }
+
+        /// <summary>
+        /// Reads bind url from configuration
         /// </summary>
         /// <param name="config">The akka config</param>
-        /// <returns>The Url to bind Owin</returns>
-        private static string GetOwinBindUrl(Config config)
+        /// <returns>The Url to bind web hosting</returns>
+        private static string GetWebHostingBindUrl(Config config)
         {
-            return config.GetString("ClusterKit.Web.OwinBindAddress", "http://*:80");
+            return config.GetString("ClusterKit.Web.BindAddress", "http://*:80");
         }
     }
 }

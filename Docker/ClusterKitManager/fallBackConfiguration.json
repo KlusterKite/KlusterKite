@@ -1,8 +1,56 @@
 {
-  "Configuration": "{\n       ClusterKit {\n        NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\nNodeManager.ConfigurationDatabaseProviderName = \"Npgsql\"\nNodeManager.DefaultNugetFeeds {\n              publicFeed {\n                      address = \"/opt/packageCache\"\n                      type = public\n              } \n              privateFeed {\n                      address = \"http://nuget/\"\n                      type = private\n              }          \n          }  \n        Web {\n          Swagger.Publish {\n              publishDocPath = \"clusterkit/manager/swagger/doc\"\n              publishUiPath = \"clusterkit/manager/swagger/ui\"\n          }\n          Services {\n            ClusterKit/Web/Swagger { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node\n              Port = 8080 // default owin port, current node listening port for server access\n              PublicHostName = default //public host name of this service. It doesn't supposed (but is not prohibited) that this should be real public service hostname. It's just used to distinguish services with identical url paths to be correctly published on frontend web servers. Real expected hostname should be configured in NginxConfigurator or similar publisher\n              Route = /clusterkit/manager/swagger //route (aka directory) path to service\n            }\n          }\n        }\n      }\n    }",
+  "Configuration": "{\n   ClusterKit {\n    NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n\tNodeManager.DefaultNugetFeeds {\n      publicFeed {\n              address = \"/opt/packageCache\"\n              type = public\n      } \n      privateFeed {\n              address = \"http://nuget/\"\n              type = private\n      }          \n    }  \n  }\n}",
   "NodeTemplate": "clusterManager",
   "ReleaseId": 1,
   "Packages": [
+    {
+      "Id": "ClusterKit.API.Endpoint",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Core.Service",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Data.EF.Npgsql",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Log.Console",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Log.ElasticSearch",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Monitoring",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Monitoring.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.NodeManager",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.NodeManager.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Security.SessionRedis",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Web.Authentication",
+      "Version": "0.0.0-local"
+    },
+    {
+      "Id": "ClusterKit.Web.GraphQL.Publisher",
+      "Version": "0.0.0-local"
+    },
     {
       "Id": "Akka",
       "Version": "1.2.0"
@@ -21,7 +69,7 @@
     },
     {
       "Id": "Akka.DI.CastleWindsor",
-      "Version": "1.0.8"
+      "Version": "1.0.8.191-beta"
     },
     {
       "Id": "Akka.DI.Core",
@@ -49,7 +97,7 @@
     },
     {
       "Id": "Castle.Core",
-      "Version": "3.3.0"
+      "Version": "3.3.3"
     },
     {
       "Id": "Castle.Windsor",
@@ -64,19 +112,11 @@
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.API.Endpoint",
-      "Version": "0.0.0-local"
-    },
-    {
       "Id": "ClusterKit.API.Provider",
       "Version": "0.0.0-local"
     },
     {
       "Id": "ClusterKit.Core",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Core.Service",
       "Version": "0.0.0-local"
     },
     {
@@ -92,10 +132,6 @@
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Data.EF.Npgsql",
-      "Version": "0.0.0-local"
-    },
-    {
       "Id": "ClusterKit.LargeObjects",
       "Version": "0.0.0-local"
     },
@@ -104,31 +140,7 @@
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Log.Console",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Log.ElasticSearch",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Monitoring",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Monitoring.Client",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.NodeManager",
-      "Version": "0.0.0-local"
-    },
-    {
       "Id": "ClusterKit.NodeManager.Authentication",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.NodeManager.Client",
       "Version": "0.0.0-local"
     },
     {
@@ -140,15 +152,7 @@
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Launcher.Utils",
-      "Version": "0.0.0-local"
-    },
-    {
       "Id": "ClusterKit.NodeManager.Migrator",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.NodeManager.Migrator.EF",
       "Version": "0.0.0-local"
     },
     {
@@ -160,15 +164,7 @@
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Security.SessionRedis",
-      "Version": "0.0.0-local"
-    },
-    {
       "Id": "ClusterKit.Web",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Web.Authentication",
       "Version": "0.0.0-local"
     },
     {
@@ -184,28 +180,16 @@
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.GraphQL.Publisher",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Web.Swagger",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Web.Swagger.Messages",
-      "Version": "0.0.0-local"
-    },
-    {
-      "Id": "ClusterKit.Web.Swagger.Monitor",
+      "Id": "ClusterKit.Web.Rest",
       "Version": "0.0.0-local"
     },
     {
       "Id": "CommonServiceLocator",
-      "Version": "1.3"
+      "Version": "1.3.0"
     },
     {
       "Id": "CommonServiceLocator.WindsorAdapter",
-      "Version": "1.0"
+      "Version": "1.0.0"
     },
     {
       "Id": "docopt.net",
@@ -213,27 +197,35 @@
     },
     {
       "Id": "DotNetty.Buffers",
-      "Version": "0.4.3"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Codecs",
-      "Version": "0.4.3"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Common",
-      "Version": "0.4.3"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Handlers",
-      "Version": "0.4.3"
+      "Version": "0.4.4"
     },
     {
       "Id": "DotNetty.Transport",
-      "Version": "0.4.3"
+      "Version": "0.4.4"
     },
     {
       "Id": "Elasticsearch.Net",
-      "Version": "2.4.2"
+      "Version": "6.0.0-alpha1"
+    },
+    {
+      "Id": "EntityFramework",
+      "Version": "6.1.3"
+    },
+    {
+      "Id": "EntityFramework6.Npgsql",
+      "Version": "3.1.1"
     },
     {
       "Id": "Google.ProtocolBuffers",
@@ -241,11 +233,15 @@
     },
     {
       "Id": "GraphQL",
-      "Version": "0.15.1.678"
+      "Version": "0.16.0-alpha-697"
     },
     {
       "Id": "GraphQL-Parser",
       "Version": "2.0.0"
+    },
+    {
+      "Id": "Helios",
+      "Version": "2.1.3"
     },
     {
       "Id": "Hyperion",
@@ -256,48 +252,200 @@
       "Version": "10.4.0"
     },
     {
+      "Id": "Libuv",
+      "Version": "1.9.1"
+    },
+    {
       "Id": "Microsoft.AspNet.Cors",
       "Version": "5.2.3"
     },
     {
-      "Id": "Microsoft.AspNet.WebApi.Client",
+      "Id": "Microsoft.AspNet.Mvc",
       "Version": "5.2.3"
     },
     {
-      "Id": "Microsoft.AspNet.WebApi.Core",
-      "Version": "5.2.3"
+      "Id": "Microsoft.AspNet.Razor",
+      "Version": "3.2.3"
     },
     {
-      "Id": "Microsoft.AspNet.WebApi.Cors",
-      "Version": "5.2.2"
+      "Id": "Microsoft.AspNet.WebPages",
+      "Version": "3.2.3"
     },
     {
-      "Id": "Microsoft.AspNet.WebApi.Owin",
-      "Version": "5.2.3"
+      "Id": "Microsoft.AspNetCore.Antiforgery",
+      "Version": "1.1.1"
     },
     {
-      "Id": "Microsoft.AspNet.WebApi.OwinSelfHost",
-      "Version": "5.2.3"
+      "Id": "Microsoft.AspNetCore.Authentication",
+      "Version": "1.1.2"
     },
     {
-      "Id": "Microsoft.Bcl",
-      "Version": "1.1.9"
+      "Id": "Microsoft.AspNetCore.Authentication.OAuth",
+      "Version": "1.1.2"
     },
     {
-      "Id": "Microsoft.Bcl.Build",
-      "Version": "1.0.14"
+      "Id": "Microsoft.AspNetCore.Authorization",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Cors",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Cryptography.Internal",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.DataProtection",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.DataProtection.Abstractions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Diagnostics.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Hosting",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Hosting.Abstractions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Hosting.Server.Abstractions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Html.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Http",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Http.Abstractions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Http.Extensions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Http.Features",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.JsonPatch",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Localization",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.Abstractions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.ApiExplorer",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.Core",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.Cors",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.DataAnnotations",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.Formatters.Json",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.Localization",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.Razor",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.Razor.Host",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.TagHelpers",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Mvc.ViewFeatures",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Razor",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Razor.Runtime",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.ResponseCaching.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Routing",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Routing.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.Server.Kestrel",
+      "Version": "1.0.3"
+    },
+    {
+      "Id": "Microsoft.AspNetCore.WebUtilities",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.Bcl.Immutable",
+      "Version": "1.0.34"
+    },
+    {
+      "Id": "Microsoft.CodeAnalysis.Analyzers",
+      "Version": "1.1.0"
+    },
+    {
+      "Id": "Microsoft.CodeAnalysis.Common",
+      "Version": "1.3.0"
+    },
+    {
+      "Id": "Microsoft.CodeAnalysis.CSharp",
+      "Version": "1.3.0"
     },
     {
       "Id": "Microsoft.CSharp",
       "Version": "4.3.0"
     },
     {
-      "Id": "Microsoft.EntityFrameworkCore",
-      "Version": "1.1.2"
-    },
-    {
-      "Id": "Microsoft.EntityFrameworkCore.Relational",
-      "Version": "1.1.2"
+      "Id": "Microsoft.DotNet.PlatformAbstractions",
+      "Version": "1.1.1"
     },
     {
       "Id": "Microsoft.Extensions.Caching.Abstractions",
@@ -308,64 +456,96 @@
       "Version": "1.1.1"
     },
     {
+      "Id": "Microsoft.Extensions.Configuration",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.Extensions.Configuration.Abstractions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.Extensions.Configuration.EnvironmentVariables",
+      "Version": "1.1.2"
+    },
+    {
       "Id": "Microsoft.Extensions.DependencyInjection",
-      "Version": "1.1.0"
-    },
-    {
-      "Id": "Microsoft.Extensions.DependencyInjection.Abstractions",
-      "Version": "1.1.0"
-    },
-    {
-      "Id": "Microsoft.Extensions.Logging",
       "Version": "1.1.1"
     },
     {
+      "Id": "Microsoft.Extensions.DependencyInjection.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.DependencyModel",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.FileProviders.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.FileProviders.Composite",
+      "Version": "1.1.0"
+    },
+    {
+      "Id": "Microsoft.Extensions.FileProviders.Physical",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.FileSystemGlobbing",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.Globalization.CultureInfoCache",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.Localization",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.Localization.Abstractions",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.Logging",
+      "Version": "1.1.2"
+    },
+    {
       "Id": "Microsoft.Extensions.Logging.Abstractions",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.Extensions.ObjectPool",
       "Version": "1.1.1"
     },
     {
       "Id": "Microsoft.Extensions.Options",
-      "Version": "1.1.1"
+      "Version": "1.1.2"
     },
     {
-      "Id": "Microsoft.Extensions.Primitives",
+      "Id": "Microsoft.Extensions.PlatformAbstractions",
       "Version": "1.1.0"
     },
     {
-      "Id": "Microsoft.Net.Http",
-      "Version": "2.2.22"
+      "Id": "Microsoft.Extensions.Primitives",
+      "Version": "1.1.1"
+    },
+    {
+      "Id": "Microsoft.Extensions.WebEncoders",
+      "Version": "1.1.2"
+    },
+    {
+      "Id": "Microsoft.Net.Http.Headers",
+      "Version": "1.1.2"
     },
     {
       "Id": "Microsoft.NETCore.Platforms",
       "Version": "1.1.0"
     },
     {
-      "Id": "Microsoft.NETCore.Targets",
-      "Version": "1.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin",
-      "Version": "3.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin.Cors",
-      "Version": "3.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin.Host.HttpListener",
-      "Version": "2.0.2"
-    },
-    {
-      "Id": "Microsoft.Owin.Hosting",
-      "Version": "3.0.1"
-    },
-    {
-      "Id": "Microsoft.Owin.Security",
-      "Version": "3.1.0"
-    },
-    {
-      "Id": "Microsoft.Owin.Security.OAuth",
-      "Version": "3.1.0"
+      "Id": "Microsoft.Web.Infrastructure",
+      "Version": "1.0.0"
     },
     {
       "Id": "Microsoft.Web.Xdt",
@@ -374,10 +554,6 @@
     {
       "Id": "Microsoft.Win32.Primitives",
       "Version": "4.3.0"
-    },
-    {
-      "Id": "Microsoft.Win32.Registry",
-      "Version": "4.0.0"
     },
     {
       "Id": "NETStandard.Library",
@@ -389,131 +565,23 @@
     },
     {
       "Id": "Npgsql",
-      "Version": "3.1.9"
-    },
-    {
-      "Id": "Npgsql.EntityFrameworkCore.PostgreSQL",
-      "Version": "1.1.0"
-    },
-    {
-      "Id": "NuGet.Common",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "NuGet.Configuration",
-      "Version": "4.0.0"
+      "Version": "3.2.2"
     },
     {
       "Id": "NuGet.Core",
       "Version": "2.14.0"
     },
     {
-      "Id": "NuGet.Frameworks",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "NuGet.Packaging",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "NuGet.Packaging.Core",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "NuGet.Packaging.Core.Types",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "NuGet.Protocol.Core.Types",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "NuGet.Protocol.Core.v3",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "NuGet.Versioning",
-      "Version": "4.0.0"
-    },
-    {
-      "Id": "Owin",
-      "Version": "1.0"
-    },
-    {
-      "Id": "Remotion.Linq",
-      "Version": "2.1.1"
-    },
-    {
-      "Id": "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.fedora.24-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.native.System",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.native.System.IO.Compression",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.native.System.Net.Http",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.native.System.Net.Security",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.native.System.Security.Cryptography.Apple",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.Apple",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl",
-      "Version": "4.3.0"
+      "Id": "RestSharp",
+      "Version": "105.2.3"
     },
     {
       "Id": "Serilog",
       "Version": "2.4.0"
+    },
+    {
+      "Id": "Serilog.Extensions.Logging",
+      "Version": "1.4.0"
     },
     {
       "Id": "Serilog.Sinks.ColoredConsole",
@@ -521,11 +589,11 @@
     },
     {
       "Id": "Serilog.Sinks.Elasticsearch",
-      "Version": "5.1.0"
+      "Version": "4.1.1"
     },
     {
       "Id": "Serilog.Sinks.File",
-      "Version": "3.0.1"
+      "Version": "3.2.0"
     },
     {
       "Id": "Serilog.Sinks.PeriodicBatching",
@@ -533,15 +601,15 @@
     },
     {
       "Id": "Serilog.Sinks.RollingFile",
-      "Version": "3.0.1"
+      "Version": "3.3.0"
     },
     {
-      "Id": "StackExchange.Redis",
-      "Version": "1.2.3"
+      "Id": "Serilog.Sinks.TextWriter",
+      "Version": "2.1.0"
     },
     {
-      "Id": "Swashbuckle.Core.Net45",
-      "Version": "5.2.1"
+      "Id": "StackExchange.Redis.Mono",
+      "Version": "1.0.0"
     },
     {
       "Id": "System.AppContext",
@@ -564,35 +632,11 @@
       "Version": "1.3.1"
     },
     {
-      "Id": "System.Collections.NonGeneric",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Collections.Specialized",
-      "Version": "4.3.0"
-    },
-    {
       "Id": "System.ComponentModel",
       "Version": "4.3.0"
     },
     {
-      "Id": "System.ComponentModel.Annotations",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.ComponentModel.Primitives",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.ComponentModel.TypeConverter",
-      "Version": "4.3.0"
-    },
-    {
       "Id": "System.Console",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Data.Common",
       "Version": "4.3.0"
     },
     {
@@ -608,12 +652,12 @@
       "Version": "4.3.1"
     },
     {
-      "Id": "System.Diagnostics.Process",
-      "Version": "4.1.0"
+      "Id": "System.Diagnostics.FileVersionInfo",
+      "Version": "4.0.0"
     },
     {
       "Id": "System.Diagnostics.StackTrace",
-      "Version": "4.3.0"
+      "Version": "4.0.1"
     },
     {
       "Id": "System.Diagnostics.Tools",
@@ -625,7 +669,7 @@
     },
     {
       "Id": "System.Dynamic.Runtime",
-      "Version": "4.3.0"
+      "Version": "4.0.11"
     },
     {
       "Id": "System.Globalization",
@@ -634,14 +678,6 @@
     {
       "Id": "System.Globalization.Calendars",
       "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Globalization.Extensions",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Interactive.Async",
-      "Version": "3.0.0"
     },
     {
       "Id": "System.IO",
@@ -672,31 +708,19 @@
       "Version": "4.3.0"
     },
     {
-      "Id": "System.Linq.Queryable",
-      "Version": "4.3.0"
-    },
-    {
       "Id": "System.Net.Http",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Net.NameResolution",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Net.NetworkInformation",
-      "Version": "4.3.0"
+      "Version": "4.3.2"
     },
     {
       "Id": "System.Net.Primitives",
       "Version": "4.3.0"
     },
     {
-      "Id": "System.Net.Security",
+      "Id": "System.Net.Sockets",
       "Version": "4.3.0"
     },
     {
-      "Id": "System.Net.Sockets",
+      "Id": "System.Numerics.Vectors",
       "Version": "4.3.0"
     },
     {
@@ -705,18 +729,6 @@
     },
     {
       "Id": "System.Reflection",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Reflection.Emit",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Reflection.Emit.ILGeneration",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Reflection.Emit.Lightweight",
       "Version": "4.3.0"
     },
     {
@@ -729,10 +741,6 @@
     },
     {
       "Id": "System.Reflection.Primitives",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Reflection.TypeExtensions",
       "Version": "4.3.0"
     },
     {
@@ -764,27 +772,7 @@
       "Version": "4.3.0"
     },
     {
-      "Id": "System.Runtime.InteropServices.WindowsRuntime",
-      "Version": "4.3.0"
-    },
-    {
       "Id": "System.Runtime.Numerics",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Runtime.Serialization.Formatters",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Runtime.Serialization.Primitives",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Runtime.WindowsRuntime",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Security.Claims",
       "Version": "4.3.0"
     },
     {
@@ -792,19 +780,7 @@
       "Version": "4.3.0"
     },
     {
-      "Id": "System.Security.Cryptography.Cng",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Security.Cryptography.Csp",
-      "Version": "4.3.0"
-    },
-    {
       "Id": "System.Security.Cryptography.Encoding",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Security.Cryptography.OpenSsl",
       "Version": "4.3.0"
     },
     {
@@ -812,19 +788,7 @@
       "Version": "4.3.0"
     },
     {
-      "Id": "System.Security.Cryptography.ProtectedData",
-      "Version": "4.0.0"
-    },
-    {
       "Id": "System.Security.Cryptography.X509Certificates",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Security.Principal",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Security.Principal.Windows",
       "Version": "4.3.0"
     },
     {
@@ -832,8 +796,16 @@
       "Version": "4.3.0"
     },
     {
+      "Id": "System.Text.Encoding.CodePages",
+      "Version": "4.0.1"
+    },
+    {
       "Id": "System.Text.Encoding.Extensions",
       "Version": "4.3.0"
+    },
+    {
+      "Id": "System.Text.Encodings.Web",
+      "Version": "4.3.1"
     },
     {
       "Id": "System.Text.RegularExpressions",
@@ -841,10 +813,6 @@
     },
     {
       "Id": "System.Threading",
-      "Version": "4.3.0"
-    },
-    {
-      "Id": "System.Threading.Overlapped",
       "Version": "4.3.0"
     },
     {
@@ -856,20 +824,16 @@
       "Version": "4.3.0"
     },
     {
-      "Id": "System.Threading.Thread",
-      "Version": "4.3.0"
+      "Id": "System.Threading.Tasks.Parallel",
+      "Version": "4.0.1"
     },
     {
-      "Id": "System.Threading.ThreadPool",
-      "Version": "4.3.0"
+      "Id": "System.Threading.Thread",
+      "Version": "4.0.0"
     },
     {
       "Id": "System.Threading.Timer",
       "Version": "4.3.0"
-    },
-    {
-      "Id": "System.ValueTuple",
-      "Version": "4.3.1"
     },
     {
       "Id": "System.Xml.ReaderWriter",
@@ -881,7 +845,15 @@
     },
     {
       "Id": "System.Xml.XmlDocument",
-      "Version": "4.3.0"
+      "Version": "4.0.1"
+    },
+    {
+      "Id": "System.Xml.XPath",
+      "Version": "4.0.1"
+    },
+    {
+      "Id": "System.Xml.XPath.XDocument",
+      "Version": "4.0.1"
     }
   ],
   "PackageSources": [

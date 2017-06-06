@@ -201,7 +201,7 @@ namespace ClusterKit.NodeManager.Tests
                 newRelease.Configuration.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
-                            [ReleaseCheckTestsBase.Net45] =
+                            [ReleaseCheckTestsBase.Net46] =
                             new List<PackageDescription>(
                                 newRelease.Configuration.Packages)
                         };
@@ -239,11 +239,9 @@ namespace ClusterKit.NodeManager.Tests
                                    TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(2, descriptions.Count);
-            Assert.Equal(
-                false,
+            Assert.False(
                 descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
-            Assert.Equal(
-                false,
+            Assert.False(
                 descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
         }
 
@@ -1658,7 +1656,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(1, migration.FromReleaseId);
             Assert.Equal(2, migration.ToReleaseId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
-            Assert.Equal(null, migration.Direction);
+            Assert.Null(migration.Direction);
         }
 
         /// <summary>
@@ -1904,7 +1902,7 @@ namespace ClusterKit.NodeManager.Tests
                     new Dictionary<string, List<PackageDescription>>
                         {
                             {
-                                ReleaseCheckTestsBase.Net45,
+                                ReleaseCheckTestsBase.Net46,
                                 new List<PackageDescription>()
                             }
                         };
@@ -1916,7 +1914,7 @@ namespace ClusterKit.NodeManager.Tests
                     new Dictionary<string, List<PackageDescription>>
                         {
                             {
-                                ReleaseCheckTestsBase.Net45,
+                                ReleaseCheckTestsBase.Net46,
                                 new List<PackageDescription>()
                             }
                         };
@@ -1932,7 +1930,7 @@ namespace ClusterKit.NodeManager.Tests
                                 new AvailableTemplatesRequest
                                     {
                                         ContainerType = "test",
-                                        FrameworkRuntimeType = ReleaseCheckTestsBase.Net45
+                                        FrameworkRuntimeType = ReleaseCheckTestsBase.Net46
                                     },
                                 TimeSpan.FromSeconds(1));
             Assert.NotNull(templates);
@@ -1942,7 +1940,7 @@ namespace ClusterKit.NodeManager.Tests
                                   new NewNodeTemplateRequest
                                       {
                                           ContainerType = "test",
-                                          FrameworkRuntimeType = ReleaseCheckTestsBase.Net45,
+                                          FrameworkRuntimeType = ReleaseCheckTestsBase.Net46,
                                           NodeUid = Guid.NewGuid()
                                       },
                                   TimeSpan.FromSeconds(1));
@@ -2442,7 +2440,7 @@ namespace ClusterKit.NodeManager.Tests
                                          {
                                              ReleaseCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ReleaseCheckTestsBase.Net45,
+                                                ReleaseCheckTestsBase.Net46,
                                                      "dp1 1.0.0")
                                          }
                              };
@@ -2456,7 +2454,7 @@ namespace ClusterKit.NodeManager.Tests
                                          {
                                              ReleaseCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ReleaseCheckTestsBase.Net45,
+                                                ReleaseCheckTestsBase.Net46,
                                                      "dp2 1.0.0")
                                          }
                              };
@@ -2470,7 +2468,7 @@ namespace ClusterKit.NodeManager.Tests
                                          {
                                              ReleaseCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ReleaseCheckTestsBase.Net45,
+                                                ReleaseCheckTestsBase.Net46,
                                                      "dp3 2.0.0")
                                          }
                              };
@@ -2504,7 +2502,7 @@ namespace ClusterKit.NodeManager.Tests
                                           {
                                               ReleaseCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ReleaseCheckTestsBase.Net45,
+                                                ReleaseCheckTestsBase.Net46,
                                                       "dp1 2.0.0")
                                           }
                               };
@@ -2518,7 +2516,7 @@ namespace ClusterKit.NodeManager.Tests
                                           {
                                               ReleaseCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ReleaseCheckTestsBase.Net45,
+                                                ReleaseCheckTestsBase.Net46,
                                                       "dp2 2.0.0")
                                           }
                               };
@@ -2532,7 +2530,7 @@ namespace ClusterKit.NodeManager.Tests
                                           {
                                               ReleaseCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ReleaseCheckTestsBase.Net45,
+                                                ReleaseCheckTestsBase.Net46,
                                                       "dp3 2.0.0")
                                           }
                               };

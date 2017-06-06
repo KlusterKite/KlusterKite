@@ -178,12 +178,25 @@ namespace ClusterKit.LargeObjects.Tests
             protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(
                 @"{
                     akka.actor {
+
+                         serialization-identifiers {
+                          ""ClusterKit.Core.Serializers.WindsorContainerSerializer, ClusterKit.Core"" = 101
+                          ""ClusterKit.Core.Serializers.WindsorDependencyResolverSerializer, ClusterKit.Core"" = 102
+                        }
                         serializers {
-                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                          hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                          windsorContainerSerializer = ""ClusterKit.Core.Serializers.WindsorContainerSerializer, ClusterKit.Core""
+                          windsorDependencyResolver = ""ClusterKit.Core.Serializers.WindsorDependencyResolverSerializer, ClusterKit.Core""
+                          json = ""Akka.Serialization.NewtonSoftJsonSerializer""
                         }
+
                         serialization-bindings {
-                            ""System.Object"" = hyperion
-                        }
+                           ""System.Object"" = ""hyperion""           
+                           ""Castle.Windsor.IWindsorContainer, Castle.Windsor"" = windsorContainerSerializer
+                           ""Castle.Windsor.WindsorContainer, Castle.Windsor"" = windsorContainerSerializer
+                           ""Akka.DI.CastleWindsor.WindsorDependencyResolver, Akka.DI.CastleWindsor"" = windsorDependencyResolver           
+                        } 
+
                     }
 
 

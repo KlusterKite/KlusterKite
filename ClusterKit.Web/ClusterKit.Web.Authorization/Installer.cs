@@ -45,6 +45,7 @@ namespace ClusterKit.Web.Authorization
         {
             container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
             container.RegisterType<OwinConfigurator>().As<IOwinStartupConfigurator>();
+            container.Register(Component.For<IWebHostingConfigurator>().ImplementedBy(typeof(WebHostingConfigurator)));
         }
     }
 }
