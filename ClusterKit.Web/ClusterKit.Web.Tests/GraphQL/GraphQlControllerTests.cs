@@ -432,7 +432,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
                 container.RegisterType<MoqTokenManager>().As<ITokenManager>().SingleInstance();
             }

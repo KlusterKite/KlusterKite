@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   <seealso cref="TestKit" /> extension class
+//   TestKit extension class
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,16 +14,11 @@ namespace ClusterKit.Core.TestKit
 
     using Akka.Actor;
     using Akka.Configuration;
-    using Akka.DI.AutoFac;
-    using Akka.DI.Core;
     using Akka.TestKit;
 
     using Autofac;
-    using Autofac.Extras.CommonServiceLocator;
 
     using JetBrains.Annotations;
-
-    using Microsoft.Practices.ServiceLocation;
 
     using Serilog;
     using Xunit;
@@ -262,6 +257,8 @@ namespace ClusterKit.Core.TestKit
             }
 
             var config = configurator.GetAkkaConfig(containerBuilder);
+            BaseInstaller.RunComponentRegistration(containerBuilder, config);
+
 
             var testActorSystem = ActorSystem.Create("test", config);
 

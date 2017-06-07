@@ -40,7 +40,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{ClusterKit.NodeManager.ConfigurationSeederType = \"ClusterKit.NodeManager.ConfigurationSource.ConfigurationSeeder, ClusterKit.NodeManager.ConfigurationSource\"}");
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterType<RoleFactory>().As<DataFactory<ConfigurationContext, Role, Guid>>();
             container.RegisterType<UserFactoryByLogin>().As<DataFactory<ConfigurationContext, User, string>>();

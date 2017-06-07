@@ -287,7 +287,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             }");
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
                 container.RegisterAssemblyTypes(typeof(ApiBrowserActor).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
                 container.RegisterType<TestMessageRouter>().As<IMessageRouter>().SingleInstance();

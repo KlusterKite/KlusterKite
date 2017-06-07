@@ -10,6 +10,7 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="1.1.3" />

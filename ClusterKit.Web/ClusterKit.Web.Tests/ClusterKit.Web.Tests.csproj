@@ -1,4 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
   <PropertyGroup>
     <TargetFrameworks>net46</TargetFrameworks>
     <PackageId>ClusterKit.Web.Tests</PackageId>
@@ -9,9 +14,15 @@
     <Product>ClusterKit</Product>
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <RuntimeIdentifier Condition="'$(PlatformTarget)' == 'x64' and '$(TargetFramework)' == 'net46'">win7-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(PlatformTarget)' == 'x86' and '$(TargetFramework)' == 'net46'">win7-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(PlatformTarget)' == '' and '$(TargetFramework)' == 'net46'">win7-x86</RuntimeIdentifier>
+
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="1.3.0" />
+    <PackageReference Include="Libuv" Version="1.9.2" />
     <PackageReference Include="Microsoft.AspNet.Cors" Version="5.2.3" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
     <PackageReference Include="RestSharp" Version="105.2.3" />
@@ -19,9 +30,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj" />
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj" />
+    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj" />
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Tests\ClusterKit.API.Tests.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
+    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.Authentication\ClusterKit.Web.Authentication.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj" />

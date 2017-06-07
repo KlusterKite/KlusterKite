@@ -41,7 +41,7 @@ namespace ClusterKit.Web.Authorization
         protected override IEnumerable<string> GetRoles() => new string[0];
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
             container.RegisterType<WebHostingConfigurator>().As<IWebHostingConfigurator>();

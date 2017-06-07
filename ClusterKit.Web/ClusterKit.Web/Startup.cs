@@ -12,8 +12,10 @@ namespace ClusterKit.Web
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Autofac;
+    using Autofac.Core;
     using Autofac.Extensions.DependencyInjection;
 
     using JetBrains.Annotations;
@@ -35,18 +37,24 @@ namespace ClusterKit.Web
     public class Startup
     {
         /// <summary>
-        /// The list of startup configurators
+        /// Gets source for service configuration waiter
         /// </summary>
-        private List<IWebHostingConfigurator> startupConfigurators;
+        private static TaskCompletionSource<object> serviceConfigurationWaiter = new TaskCompletionSource<object>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// Gets or sets the container builder
         /// </summary>
-        public Startup()
-        {
-            var componentContext = ServiceLocator.Current.GetInstance<IComponentContext>();
-            this.startupConfigurators = componentContext.Resolve<IEnumerable<IWebHostingConfigurator>>().ToList();
-        }
+        internal static ContainerBuilder ContainerBuilder { get; set; }
+
+        /// <summary>
+        /// Gets the task to wait for container
+        /// </summary>
+        internal static TaskCompletionSource<IComponentContext> ContainerWaiter { get; } = new TaskCompletionSource<IComponentContext>();
+
+        /// <summary>
+        /// Gets the task to wait for container
+        /// </summary>
+        internal static Task<object> ServiceConfigurationWaiter => serviceConfigurationWaiter.Task;
 
         /// <summary>
         /// The services configuration
@@ -58,21 +66,24 @@ namespace ClusterKit.Web
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            foreach (var configurator in this.startupConfigurators)
-            {
-                configurator.ConfigureServices(services);
-            }
 
             var builder = services.AddMvcCore();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 builder.AddApplicationPart(assembly);
             }
-
+            
             builder.AddControllersAsServices();
+            ContainerBuilder.Populate(services);
+            serviceConfigurationWaiter.SetResult(null);
+            var container = ContainerWaiter.Task.GetAwaiter().GetResult();
+            var startupConfigurators = container.Resolve<IEnumerable<IWebHostingConfigurator>>().ToList();
+            foreach (var configurator in startupConfigurators)
+            {
+                configurator.ConfigureServices(services);
+            }
 
-            var componentContext = ServiceLocator.Current.GetInstance<IComponentContext>();
-            return new AutofacServiceProvider(componentContext);
+            return new AutofacServiceProvider(container);
         }
 
         /// <summary>
@@ -91,7 +102,9 @@ namespace ClusterKit.Web
         public void Configure(IApplicationBuilder appBuilder, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddSerilog();
-            foreach (var configurator in this.startupConfigurators)
+            var container = ContainerWaiter.Task.GetAwaiter().GetResult();
+            var startupConfigurators = container.Resolve<IEnumerable<IWebHostingConfigurator>>().ToList();
+            foreach (var configurator in startupConfigurators)
             {
                 appBuilder = configurator.ConfigureApplication(appBuilder);
             }

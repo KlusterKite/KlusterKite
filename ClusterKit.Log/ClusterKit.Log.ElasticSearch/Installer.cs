@@ -37,7 +37,7 @@ namespace ClusterKit.Log.ElasticSearch
 
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterType<Configurator>().As<ILoggerConfigurator>();
         }

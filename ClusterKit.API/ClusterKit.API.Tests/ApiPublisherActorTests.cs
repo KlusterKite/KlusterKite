@@ -111,7 +111,7 @@ namespace ClusterKit.API.Tests
             protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder builder)
+            protected override void RegisterComponents(ContainerBuilder builder, Config config)
             {
                 builder.RegisterType<TestProvider>().As<ApiProvider>();
             }

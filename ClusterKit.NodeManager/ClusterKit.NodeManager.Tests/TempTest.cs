@@ -88,6 +88,7 @@
             builder.RegisterInstallers();
             config = BaseInstaller.GetStackedConfig(builder, config);
             builder.RegisterInstance(config).As<Config>();
+            BaseInstaller.RunComponentRegistration(builder, config);
             var container = builder.Build();
 
             var seeder = new TestSeeder(config, container.Resolve<UniversalContextFactory>(), this.output);

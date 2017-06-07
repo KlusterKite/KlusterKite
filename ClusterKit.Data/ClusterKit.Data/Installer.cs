@@ -44,7 +44,7 @@ namespace ClusterKit.Data
         protected override IEnumerable<string> GetRoles() => new string[0];
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
         }
     }

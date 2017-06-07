@@ -46,7 +46,7 @@ namespace ClusterKit.Core
                         try
                         {
                             var assemblyName = AssemblyName.GetAssemblyName(file);
-                            if (assemblyName != null)
+                            if (assemblyName != null) 
                             {
                                 Assembly.LoadFrom(file);
                             }

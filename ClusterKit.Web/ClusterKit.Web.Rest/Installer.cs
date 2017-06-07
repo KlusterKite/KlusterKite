@@ -33,7 +33,7 @@ namespace ClusterKit.Web.Rest
         protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
         }
     }

@@ -6,6 +6,7 @@
 //   Base class to install ClusterKit plugin components
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Core
 {
     using System;
@@ -96,22 +97,18 @@ namespace ClusterKit.Core
                 return config;
             }
 
-            var rolesList =
-                list.SelectMany(i => i.GetRoles())
-                    .Distinct()
-                    .Where(r => !string.IsNullOrWhiteSpace(r))
-                    .Select(r => $"\"{r.Replace("\"", "\\\"")}\"")
-                    .ToList();
+            var rolesList = list.SelectMany(i => i.GetRoles()).Distinct().Where(r => !string.IsNullOrWhiteSpace(r))
+                .Select(r => $"\"{r.Replace("\"", "\\\"")}\"").ToList();
 
             if (rolesList.Any())
             {
-                config =
-                    config.WithFallback(
-                        ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
+                config = config.WithFallback(
+                    ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
             }
 
-            return list.OrderByDescending(i => i.AkkaConfigLoadPriority)
-                .Aggregate(config, (current, installer) => current.WithFallback(installer.GetAkkaConfig()));
+            return list.OrderByDescending(i => i.AkkaConfigLoadPriority).Aggregate(
+                config,
+                (current, installer) => current.WithFallback(installer.GetAkkaConfig()));
         }
 
         /// <summary>
@@ -162,6 +159,39 @@ namespace ClusterKit.Core
         /// <summary>
         /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
         /// </summary>
+        /// <param name="container">
+        /// The container.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        public static void RunComponentRegistration([NotNull] ContainerBuilder container, [NotNull] Config config)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            List<BaseInstaller> installers;
+            if (!RegisteredInstallers.TryGetValue(container, out installers))
+            {
+                throw new InvalidOperationException("Container is not registered");
+            }
+
+            foreach (var installer in installers)
+            {
+                installer.RegisterComponents(container, config);
+            }
+        }
+
+        /// <summary>
+        /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
+        /// </summary>
         /// <param name="container">The container.</param>
         public void Install([NotNull] ContainerBuilder container)
         {
@@ -181,7 +211,6 @@ namespace ClusterKit.Core
             }
 
             RegisteredInstallers[container].Add(this);
-            this.RegisterComponents(container);
         }
 
         /// <summary>
@@ -227,7 +256,12 @@ namespace ClusterKit.Core
         /// <summary>
         /// Registering DI components
         /// </summary>
-        /// <param name="container">The container.</param>
-        protected abstract void RegisterComponents(ContainerBuilder container);
+        /// <param name="container">
+        /// The container.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        protected abstract void RegisterComponents(ContainerBuilder container, Config config);
     }
 }

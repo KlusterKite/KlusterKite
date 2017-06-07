@@ -10,6 +10,7 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel" Version="14.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />

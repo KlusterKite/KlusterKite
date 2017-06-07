@@ -69,6 +69,7 @@ namespace ClusterKit.Core.Service
             }
 
             containerBuilder.RegisterInstance(config).As<Config>();
+            BaseInstaller.RunComponentRegistration(containerBuilder, config);
 
             Console.WriteLine(@"Config created");
 

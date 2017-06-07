@@ -83,7 +83,7 @@ namespace ClusterKit.NodeManager.Tests
             }");
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
             }
         }

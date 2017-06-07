@@ -81,13 +81,12 @@ namespace ClusterKit.NodeManager
                                                                  };
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
 
             container.RegisterType<NugetPackagesFactory>().As<DataFactory<string, IPackage, string>>();
             container.RegisterType<ApiProvider>().As<API.Provider.ApiProvider>();
-            var config = this.GetAkkaConfig();
             var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
             container.Register(c => PackageRepositoryFactory.Default.CreateRepository(nugetUrl))
                 .As<IPackageRepository>();

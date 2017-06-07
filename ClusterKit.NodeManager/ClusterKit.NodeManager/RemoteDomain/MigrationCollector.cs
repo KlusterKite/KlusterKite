@@ -118,6 +118,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
             builder.RegisterInstallers(false);
             var config = BaseInstaller.GetStackedConfig(builder, ConfigurationFactory.ParseString(this.Configuration));
             builder.RegisterInstance(config).As<Config>();
+            BaseInstaller.RunComponentRegistration(builder, config);
 
             var migratorTypeNames = config.GetStringList("ClusterKit.NodeManager.Migrators");
             foreach (var typeName in migratorTypeNames)

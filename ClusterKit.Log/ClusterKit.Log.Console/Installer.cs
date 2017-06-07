@@ -36,7 +36,7 @@ namespace ClusterKit.Log.Console
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterType<Configurator>().As<ILoggerConfigurator>();
         }

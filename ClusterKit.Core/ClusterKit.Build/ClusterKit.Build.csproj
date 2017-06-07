@@ -10,6 +10,7 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <PackageReference Include="FAKE.Lib" Version="4.61.2" />
     <PackageReference Include="FSharp.Core" Version="4.1.17" />

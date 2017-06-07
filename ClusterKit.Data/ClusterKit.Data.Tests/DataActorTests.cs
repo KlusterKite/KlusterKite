@@ -331,7 +331,7 @@ namespace ClusterKit.Data.Tests
             protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
                 container.RegisterInstance(new DatabaseInstanceName());
                 container.RegisterAssemblyTypes(typeof(TestInstaller).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));

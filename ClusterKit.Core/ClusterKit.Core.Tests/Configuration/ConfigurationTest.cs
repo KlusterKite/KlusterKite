@@ -176,7 +176,7 @@ namespace ClusterKit.Core.Tests.Configuration
                                                                      };
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
                 container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
                 container.RegisterAssemblyTypes(typeof(TestMessageExtractor).Assembly);

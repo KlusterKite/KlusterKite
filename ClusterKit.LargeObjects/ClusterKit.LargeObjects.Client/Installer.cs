@@ -34,7 +34,7 @@ namespace ClusterKit.LargeObjects.Client
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
         }

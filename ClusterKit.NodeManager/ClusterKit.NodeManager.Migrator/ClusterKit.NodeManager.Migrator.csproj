@@ -10,4 +10,5 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
 </Project>

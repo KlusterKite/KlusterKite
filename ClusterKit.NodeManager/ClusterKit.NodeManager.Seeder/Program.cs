@@ -117,6 +117,7 @@ namespace ClusterKit.NodeManager.Seeder
             container.RegisterInstallers();
             config = BaseInstaller.GetStackedConfig(container, config);
             container.RegisterInstance(config).As<Config>();
+            BaseInstaller.RunComponentRegistration(container, config);
             return container;
         }
 

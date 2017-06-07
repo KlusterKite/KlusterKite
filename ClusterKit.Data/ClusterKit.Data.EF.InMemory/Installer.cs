@@ -35,7 +35,7 @@ namespace ClusterKit.Data.EF.InMemory
         protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterType<InMemoryContextFactory>().As<IContextFactory>();
         }

@@ -255,7 +255,7 @@ namespace ClusterKit.Web.Tests.Auth
             }
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
                 container.RegisterType<TestClientProvider>().As<IClientProvider>();
                 container.RegisterType<MoqTokenManager>().As<ITokenManager>();

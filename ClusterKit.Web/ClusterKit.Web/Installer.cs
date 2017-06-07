@@ -50,7 +50,7 @@ namespace ClusterKit.Web
                                                                  };
 
         /// <inheritdoc />
-        protected override void RegisterComponents(ContainerBuilder container)
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
             container.RegisterType<WebTracer>().As<IWebHostingConfigurator>();
@@ -64,38 +64,35 @@ namespace ClusterKit.Web
             {
                 container.RegisterAssemblyTypes(registeredAssembly).Where(t => t.IsSubclassOf(typeof(Controller)));
             }
+
+            Startup.ContainerBuilder = container;
+            var bindUrl = GetWebHostingBindUrl(config);
+            var host = new WebHostBuilder()
+                .CaptureStartupErrors(true)
+                .UseUrls(bindUrl)
+                .UseKestrel();
+
+            Task.Run(
+                () =>
+                    {
+                        var server = host.UseStartup<Startup>().Build();
+                        var system = Startup.ContainerWaiter.Task.Result.Resolve<ActorSystem>();
+                        try
+                        {
+                            server.Run();
+                        }
+                        catch (Exception exception)
+                        {
+                            system.Log.Error(exception, "Web server stopped");
+                        }
+                    });
+            Startup.ServiceConfigurationWaiter.Wait();
         }
 
         /// <inheritdoc />
         protected override void PostStart(IComponentContext context)
         {
-            var system = context.Resolve<ActorSystem>();
-            var bindUrl = GetWebHostingBindUrl(system.Settings.Config);
-            system.Log.Info("Starting web server on {Url}", bindUrl);
-            try
-            {
-                var host = new WebHostBuilder()
-                    .CaptureStartupErrors(true)
-                    .UseUrls(bindUrl)
-                    .UseKestrel();
-
-                var server = host.UseStartup<Startup>().Build();
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        server.Run();
-                    }
-                    catch (Exception exception)
-                    {
-                        system.Log.Error(exception, "Web server stopped");
-                    }
-                });
-            }
-            catch (Exception exception)
-            {
-                system.Log.Error(exception, "Could not start web server");
-            }
+            Startup.ContainerWaiter.SetResult(context);
         }
 
         /// <summary>

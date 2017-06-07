@@ -121,7 +121,7 @@ namespace ClusterKit.Web.Tests
             }
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
             }
         }

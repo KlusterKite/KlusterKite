@@ -10,6 +10,7 @@
     <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
     <ProjectReference Include="..\ClusterKit.Web.Client\ClusterKit.Web.Client.csproj" />
