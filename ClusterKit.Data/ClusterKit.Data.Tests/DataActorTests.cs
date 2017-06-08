@@ -11,8 +11,8 @@ namespace ClusterKit.Data.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -334,7 +334,7 @@ namespace ClusterKit.Data.Tests
             protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
                 container.RegisterInstance(new DatabaseInstanceName());
-                container.RegisterAssemblyTypes(typeof(TestInstaller).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(TestInstaller).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
                 container.RegisterType<TestUserFactory>().As<DataFactory<TestDataContext, User, Guid>>();
                 container.RegisterType<TestRolesFactory>().As<DataFactory<TestDataContext, Role, Guid>>();
             }

@@ -141,7 +141,7 @@ namespace ClusterKit.Data.EF
                                            ?? ApiDescriptionAttribute.ToCamelCase(navigation.PropertyInfo.Name);
 
                         var propertyType = navigation.PropertyInfo.PropertyType.GetInterfaces()
-                                               .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                                               .FirstOrDefault(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                                                ?.GetGenericArguments()[0] ?? navigation.PropertyInfo.PropertyType;
 
                         NavigationProperties[propertyName] = new PropertyDescription<TContext>(navigation.Name, propertyType);

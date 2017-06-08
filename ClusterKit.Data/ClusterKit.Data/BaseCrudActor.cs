@@ -11,10 +11,13 @@ namespace ClusterKit.Data
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Event;
+
+    using Autofac;
 
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
@@ -38,6 +41,11 @@ namespace ClusterKit.Data
         where TContext : IDisposable
     {
         /// <summary>
+        /// The DI component context
+        /// </summary>
+        private readonly IComponentContext componentContext;
+
+        /// <summary>
         /// The default query limit
         /// </summary>
         private readonly int defaultQueryLimit;
@@ -48,8 +56,9 @@ namespace ClusterKit.Data
         private readonly IReadOnlyDictionary<string, int> classQueryLimits;
 
         /// <inheritdoc />
-        protected BaseCrudActor()
+        protected BaseCrudActor(IComponentContext componentContext)
         {
+            this.componentContext = componentContext;
             this.Receive<ParcelException>(m => this.OnParcelException(m));
 
             var configSection = Context.System.Settings.Config.GetConfig("ClusterKit.Data.Crud.Query.Limits");
@@ -201,7 +210,7 @@ namespace ClusterKit.Data
                                     ? maxLimit
                                     : collectionRequest.Count;
 
-                    var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+                    var factory = DataFactory<TContext, TObject, TId>.CreateFactory(this.componentContext, ds);
 
                     var response = await factory.GetList(
                                        collectionRequest.Filter,
@@ -307,7 +316,7 @@ namespace ClusterKit.Data
                 response = new CrudActionResponse<TObject> { Exception = exception, ExtraData = request.ExtraData };
             }
 
-            if (typeof(ILargeObject).IsAssignableFrom(typeof(TObject)))
+            if (typeof(ILargeObject).GetTypeInfo().IsAssignableFrom(typeof(TObject)))
             {
                 Context.GetParcelManager().Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
             }
@@ -351,7 +360,7 @@ namespace ClusterKit.Data
         {
             using (var ds = this.GetContext())
             {
-                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(this.componentContext, ds);
                 switch (request.ActionType)
                 {
                     case EnActionType.Get:

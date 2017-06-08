@@ -10,7 +10,9 @@
 namespace ClusterKit.Data.Tests.Mock
 {
     using System;
-    
+
+    using Autofac;
+
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.EF;
 
@@ -28,7 +30,7 @@ namespace ClusterKit.Data.Tests.Mock
         private readonly UniversalContextFactory contextFactory;
 
         /// <inheritdoc />
-        public TestDataActor(UniversalContextFactory contextFactory)
+        public TestDataActor(UniversalContextFactory contextFactory, IComponentContext componentContext) : base(componentContext)
         {
             this.contextFactory = contextFactory;
 

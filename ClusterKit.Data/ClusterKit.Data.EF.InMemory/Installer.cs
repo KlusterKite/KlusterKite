@@ -9,8 +9,6 @@
 
 namespace ClusterKit.Data.EF.InMemory
 {
-    using System.ComponentModel;
-
     using Akka.Configuration;
 
     using Autofac;

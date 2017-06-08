@@ -22,8 +22,6 @@ namespace ClusterKit.Data
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.ServiceLocation;
-
     /// <summary>
     /// Base factory to work with data objects
     /// </summary>
@@ -52,12 +50,18 @@ namespace ClusterKit.Data
         /// <summary>
         /// Gets the new data factory registered in DI
         /// </summary>
-        /// <param name="context">Current data context</param>
-        /// <returns>The new data factory</returns>
-        public static DataFactory<TContext, TObject, TId> CreateFactory(TContext context)
+        /// <param name="componentContext">
+        /// The component Context.
+        /// </param>
+        /// <param name="context">
+        /// Current data context
+        /// </param>
+        /// <returns>
+        /// The new data factory
+        /// </returns>
+        public static DataFactory<TContext, TObject, TId> CreateFactory(IComponentContext componentContext, TContext context)
         {
-            var container = ServiceLocator.Current.GetInstance<IComponentContext>();
-            return container.Resolve<DataFactory<TContext, TObject, TId>>(new TypedParameter(typeof(TContext), context));
+            return componentContext.Resolve<DataFactory<TContext, TObject, TId>>(new TypedParameter(typeof(TContext), context));
         }
 
         /// <summary>

@@ -10,8 +10,8 @@
 namespace ClusterKit.Data.EF
 {
     using System;
-    using System.Data.Common;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     using JetBrains.Annotations;
 
@@ -21,7 +21,7 @@ namespace ClusterKit.Data.EF
     /// Base factory to create entity framework contexts
     /// </summary>
     /// <remarks>
-    /// Expected that TContext has a public constructor with <see cref="DbConnection"/> and <see cref="bool"/> arguments
+    /// Expected that TContext has a public constructor with <see cref="DbContextOptions{TContext}"/> argument
     /// </remarks>
     [UsedImplicitly]
     public abstract class BaseContextFactory : IContextFactory
@@ -87,7 +87,7 @@ namespace ClusterKit.Data.EF
             /// </summary>
             static ContextCreator()
             {
-                var constructor = typeof(TContext).GetConstructor(new[] { typeof(DbContextOptions<TContext>) });
+                var constructor = typeof(TContext).GetTypeInfo().GetConstructor(new[] { typeof(DbContextOptions<TContext>) });
                 if (constructor == null)
                 {
                     return;
