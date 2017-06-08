@@ -11,6 +11,7 @@ namespace ClusterKit.LargeObjects.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -180,21 +181,14 @@ namespace ClusterKit.LargeObjects.Tests
                     akka.actor {
 
                          serialization-identifiers {
-                          ""ClusterKit.Core.Serializers.WindsorContainerSerializer, ClusterKit.Core"" = 101
-                          ""ClusterKit.Core.Serializers.WindsorDependencyResolverSerializer, ClusterKit.Core"" = 102
                         }
                         serializers {
                           hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
-                          windsorContainerSerializer = ""ClusterKit.Core.Serializers.WindsorContainerSerializer, ClusterKit.Core""
-                          windsorDependencyResolver = ""ClusterKit.Core.Serializers.WindsorDependencyResolverSerializer, ClusterKit.Core""
                           json = ""Akka.Serialization.NewtonSoftJsonSerializer""
                         }
 
                         serialization-bindings {
                            ""System.Object"" = ""hyperion""           
-                           ""Castle.Windsor.IWindsorContainer, Castle.Windsor"" = windsorContainerSerializer
-                           ""Castle.Windsor.WindsorContainer, Castle.Windsor"" = windsorContainerSerializer
-                           ""Akka.DI.CastleWindsor.WindsorDependencyResolver, Akka.DI.CastleWindsor"" = windsorDependencyResolver           
                         } 
 
                     }
@@ -205,8 +199,8 @@ namespace ClusterKit.LargeObjects.Tests
             /// <inheritdoc />
             protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
-                container.RegisterAssemblyTypes(typeof(ParcelManagerActor).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
-                container.RegisterAssemblyTypes(typeof(Core.Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(ParcelManagerActor).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
                 container.RegisterType<TestIntEnveloper>().As<INotificationEnveloper>();
                 container.RegisterType<TestInt2Enveloper>().As<INotificationEnveloper>();
                 container.RegisterType<TestDoubleEnveloper>().As<INotificationEnveloper>();

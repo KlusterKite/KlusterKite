@@ -296,7 +296,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
             var apiObjectType = new ApiObjectType(typeName);
             apiObjectType.Fields.AddRange(Fields.Values.Where(f => !f.IsMutation).Select(f => f.Field));
-            apiObjectType.Description = type.GetCustomAttribute<ApiDescriptionAttribute>()?.Description;
+            apiObjectType.Description = type.GetTypeInfo().GetCustomAttribute<ApiDescriptionAttribute>()?.Description;
 
             if (apiObjectType.Fields.Count == 0)
             {
@@ -611,7 +611,7 @@ namespace ClusterKit.API.Provider.Resolvers
             var elementResolver = metadata.ScalarType != EnScalarType.None
                                       ? typeof(ScalarResolver<>).MakeGenericType(metadata.Type)
                                           .CreateInstance<IResolver>()
-                                      : metadata.Type.IsSubclassOf(typeof(Enum))
+                                      : metadata.Type.GetTypeInfo().IsSubclassOf(typeof(Enum))
                                           ? typeof(EnumResolver<>).MakeGenericType(metadata.Type)
                                               .CreateInstance<IResolver>()
                                           : typeof(ObjectResolver<>).MakeGenericType(metadata.Type)
@@ -709,7 +709,7 @@ namespace ClusterKit.API.Provider.Resolvers
         /// </returns>
         private static FieldDescription GenerateFieldFromMethod(MethodInfo method, PublishToApiAttribute attribute)
         {
-            var type = method.ReflectedType;
+            var type = method.DeclaringType;
             TypeMetadata metadata;
             try
             {
@@ -820,7 +820,7 @@ namespace ClusterKit.API.Provider.Resolvers
             PropertyInfo property,
             PublishToApiAttribute attribute)
         {
-            var declaringType = property.ReflectedType;
+            var declaringType = property.DeclaringType;
 
             TypeMetadata metadata;
             try
@@ -838,7 +838,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
             var flags = metadata.GetFlags();
 
-            if ((metadata.Type.IsSubclassOf(typeof(Enum)) || metadata.ScalarType != EnScalarType.None)
+            if ((metadata.Type.GetTypeInfo().IsSubclassOf(typeof(Enum)) || metadata.ScalarType != EnScalarType.None)
                 && !metadata.IsAsync && !metadata.IsForwarding
                 && (metadata.MetaType == TypeMetadata.EnMetaType.Object
                     || metadata.MetaType == TypeMetadata.EnMetaType.Scalar))
@@ -1162,7 +1162,7 @@ namespace ClusterKit.API.Provider.Resolvers
 
                 foreach (var relatedType in RelatedTypes.Where(r => r.Type != null))
                 {
-                    relatedType.Resolver = relatedType.Type.IsSubclassOf(typeof(Enum))
+                    relatedType.Resolver = relatedType.Type.GetTypeInfo().IsSubclassOf(typeof(Enum))
                                                ? typeof(EnumResolver<>).MakeGenericType(relatedType.Type)
                                                    .CreateInstance<IResolver>()
                                                : typeof(ObjectResolver<>).MakeGenericType(relatedType.Type)

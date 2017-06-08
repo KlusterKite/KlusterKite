@@ -12,6 +12,7 @@ namespace ClusterKit.API.Attributes
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// A bundle of naming utilities
@@ -29,7 +30,7 @@ namespace ClusterKit.API.Attributes
         /// <returns>A valid C# name</returns>
         public static string ToCSharpRepresentation(Type type, bool trimArgCount = true)
         {
-            if (type.IsGenericType)
+            if (type.GetTypeInfo().IsGenericType)
             {
                 var genericArgs = type.GetGenericArguments().ToList();
                 return ToCSharpRepresentation(type, trimArgCount, genericArgs);
@@ -50,15 +51,15 @@ namespace ClusterKit.API.Attributes
         /// <returns>A valid C# name</returns>
         private static string ToCSharpRepresentation(Type type, bool trimArgCount, List<Type> availableArguments)
         {
-            if (!type.IsGenericType)
+            if (!type.GetTypeInfo().IsGenericType)
             {
                 return type.FullName.Replace("+", ".");
             }
 
             var value = type.FullName.Replace("+", ".");
-            if (trimArgCount && value.IndexOf("`", StringComparison.InvariantCulture) > -1)
+            if (trimArgCount && value.IndexOf("`", StringComparison.OrdinalIgnoreCase) > -1)
             {
-                value = value.Substring(0, value.IndexOf("`", StringComparison.InvariantCulture));
+                value = value.Substring(0, value.IndexOf("`", StringComparison.OrdinalIgnoreCase));
             }
 
             if (type.DeclaringType != null)

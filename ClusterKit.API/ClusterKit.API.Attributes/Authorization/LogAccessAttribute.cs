@@ -66,7 +66,7 @@ namespace ClusterKit.API.Attributes.Authorization
             var logMessage = this.LogMessage;
             if (this.LogMessage == null)
             {
-                logMessage = $"The property {memberInfo.Name} of {NamingUtilities.ToCSharpRepresentation(memberInfo.ReflectedType)} with id {{id}} was accessed";
+                logMessage = $"The property {memberInfo.Name} of {NamingUtilities.ToCSharpRepresentation(memberInfo.DeclaringType)} with id {{id}} was accessed";
             }
 
             return new LogAccessRule

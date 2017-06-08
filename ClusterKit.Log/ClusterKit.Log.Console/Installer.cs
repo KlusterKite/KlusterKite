@@ -9,7 +9,7 @@
 
 namespace ClusterKit.Log.Console
 {
-    using System.ComponentModel;
+    using System.Reflection;
 
     using Akka.Configuration;
 
@@ -33,7 +33,7 @@ namespace ClusterKit.Log.Console
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Log.Console.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)

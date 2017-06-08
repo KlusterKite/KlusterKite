@@ -1,21 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.1;net46</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
     <PackageId>ClusterKit.API.Tests</PackageId>
     <Version>0.0.0.0-local</Version>
-    <Authors>ClusterKit</Authors>
-    <Description>Bundle of utils to create scalable and redundant services</Description>
-    <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
-    <Product>ClusterKit</Product>
-    <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
@@ -25,4 +19,21 @@
     <ProjectReference Include="..\ClusterKit.API.Endpoint\ClusterKit.API.Endpoint.csproj" />
     <ProjectReference Include="..\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="$(XunitVersion)" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="$(XunitVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
+  </ItemGroup>  
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>  
 </Project>

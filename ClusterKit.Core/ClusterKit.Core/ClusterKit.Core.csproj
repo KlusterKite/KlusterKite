@@ -39,11 +39,6 @@
     <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />    
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>

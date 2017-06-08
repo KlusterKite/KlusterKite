@@ -10,6 +10,7 @@
 namespace ClusterKit.API.Endpoint
 {
     using System.Collections.Generic;
+    using System.Reflection;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -33,7 +34,7 @@ namespace ClusterKit.API.Endpoint
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.API.Endpoint.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override IEnumerable<string> GetRoles()
@@ -44,7 +45,7 @@ namespace ClusterKit.API.Endpoint
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
         }
     }
 }

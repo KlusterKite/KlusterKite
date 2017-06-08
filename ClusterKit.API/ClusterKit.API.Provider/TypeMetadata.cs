@@ -123,7 +123,7 @@ namespace ClusterKit.API.Provider
 
             if (type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(uint)
                 || type == typeof(ulong) || type == typeof(ushort)
-                || (type.IsSubclassOf(typeof(Enum)) && type.GetCustomAttribute(typeof(FlagsAttribute)) != null))
+                || (type.GetTypeInfo().IsSubclassOf(typeof(Enum)) && type.GetTypeInfo().GetCustomAttribute(typeof(FlagsAttribute)) != null))
             {
                 return EnScalarType.Integer;
             }
@@ -173,7 +173,7 @@ namespace ClusterKit.API.Provider
                 var valueConverter =
                     converter.GetInterfaces()
                         .FirstOrDefault(
-                            i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueConverter<>));
+                            i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueConverter<>));
                 if (valueConverter == null)
                 {
                     throw new InvalidOperationException(
@@ -216,7 +216,7 @@ namespace ClusterKit.API.Provider
                 }
             }
 
-            if (scalarType != EnScalarType.None && type.IsSubclassOf(typeof(Enum)))
+            if (scalarType != EnScalarType.None && type.GetTypeInfo().IsSubclassOf(typeof(Enum)))
             {
                 type = Enum.GetUnderlyingType(type);
             }
@@ -225,7 +225,7 @@ namespace ClusterKit.API.Provider
             metadata.ScalarType = scalarType;
             metadata.Type = type;
 
-            if (metadata.ScalarType == EnScalarType.None && !type.IsSubclassOf(typeof(Enum)))
+            if (metadata.ScalarType == EnScalarType.None && !type.GetTypeInfo().IsSubclassOf(typeof(Enum)))
             {
                 var keyProperty =
                     type.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance)

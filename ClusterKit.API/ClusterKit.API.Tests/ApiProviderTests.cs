@@ -13,6 +13,7 @@ namespace ClusterKit.API.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Attributes;
@@ -74,7 +75,7 @@ namespace ClusterKit.API.Tests
             this.output.WriteLine(jsonDescription);
 
             Assert.Equal("TestApi", description.ApiName);
-            Assert.Equal(this.GetType().Assembly.GetName().Version, description.Version);
+            Assert.Equal(this.GetType().GetTypeInfo().Assembly.GetName().Version, description.Version);
             Assert.Equal(9, description.Types.Count);
 
             Assert.NotNull(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnTest".ToLower())));

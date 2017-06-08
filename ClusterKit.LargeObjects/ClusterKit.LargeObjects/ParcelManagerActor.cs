@@ -232,7 +232,14 @@ namespace ClusterKit.LargeObjects
             }
             finally
             {
+#if APPDOMAIN
                 connection.Close();
+#elif CORECLR
+                connection.Dispose();
+#else
+#error Not implemented
+                throw new InvalidOperationException();
+#endif
             }
         }
 
