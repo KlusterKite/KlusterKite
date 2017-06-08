@@ -11,6 +11,9 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Linq;
+#if CORECLR
+    using System.Reflection;
+#endif
 
     using Akka.Actor;
     using Akka.Cluster.Sharding;

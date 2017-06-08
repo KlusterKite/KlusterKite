@@ -10,6 +10,9 @@
 namespace ClusterKit.Core.TestKit
 {
     using System;
+#if CORECLR
+    using System.Reflection;
+#endif
 
     using Akka.Actor;
     using Akka.Configuration;

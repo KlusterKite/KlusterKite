@@ -10,9 +10,11 @@
 namespace ClusterKit.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    //using System.Runtime.Loader;
 
     using Akka.Actor;
     using Akka.DI.Core;
@@ -25,6 +27,11 @@ namespace ClusterKit.Core
     public static class ActorSystemUtils
     {
         /// <summary>
+        /// The list of loaded assemblies
+        /// </summary>
+        private static readonly List<Assembly> LoadedAssemblies = new List<Assembly>();
+
+        /// <summary>
         /// Scans main application directory for libraries and <see cref="BaseInstaller"/> in them and installs them
         /// </summary>
         /// <param name="container">
@@ -35,6 +42,7 @@ namespace ClusterKit.Core
         /// </param>
         public static void RegisterInstallers(this ContainerBuilder container, bool installAssemblies = true)
         {
+#if APPDOMAIN
             if (installAssemblies)
             {
                 var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -48,7 +56,11 @@ namespace ClusterKit.Core
                             var assemblyName = AssemblyName.GetAssemblyName(file);
                             if (assemblyName != null) 
                             {
-                                Assembly.LoadFrom(file);
+                                var assembly = Assembly.LoadFrom(file);
+                                if (!LoadedAssemblies.Contains(assembly))
+                                {
+                                    LoadedAssemblies.Add(assembly);
+                                }
                             }
                         }
                         catch (Exception exception)
@@ -61,7 +73,7 @@ namespace ClusterKit.Core
 
             Console.WriteLine(@"Assemblies loaded");
 
-            foreach (var type in AppDomain.CurrentDomain.GetAssemblies()
+            foreach (var type in LoadedAssemblies
                 .Where(a => !a.IsDynamic)
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.IsSubclassOf(typeof(BaseInstaller)))
@@ -77,6 +89,11 @@ namespace ClusterKit.Core
                     // ignore
                 }
             }
+#elif CORECLR
+            //AssemblyLoadContext.Default.
+#else
+            throw new NotImplementedException();
+#endif
 
             Console.WriteLine(@"Assemblies installed");
         }

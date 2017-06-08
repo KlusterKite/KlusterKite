@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.1;net46</TargetFrameworks>
     <PackageId>ClusterKit.Web.Rest</PackageId>
     <Version>0.0.0.0-local</Version>
     <Authors>ClusterKit</Authors>

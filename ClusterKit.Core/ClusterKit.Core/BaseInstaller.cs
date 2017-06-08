@@ -11,7 +11,9 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Akka.Configuration;
 
@@ -186,6 +188,28 @@ namespace ClusterKit.Core
             foreach (var installer in installers)
             {
                 installer.RegisterComponents(container, config);
+            }
+        }
+
+        /// <summary>
+        /// Reads texts resource
+        /// </summary>
+        /// <param name="assembly">The resource containing assembly</param>
+        /// <param name="resourceName">The resource name</param>
+        /// <returns>The resource contents</returns>
+        public static string ReadTextResource(Assembly assembly, string resourceName)
+        {
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                {
+                    return null;
+                }
+
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
             }
         }
 

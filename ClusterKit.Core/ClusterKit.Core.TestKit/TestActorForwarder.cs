@@ -3,13 +3,16 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Actor that envelopes all recieved messages in <seealso cref="TestMessage{T}" /> and forwards to test actor
+//   Actor that envelopes all received messages in TestMessage{T} and forwards to test actor
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ClusterKit.Core.TestKit
 {
     using System;
+#if CORECLR
+    using System.Reflection;
+#endif
 
     using Akka.Actor;
     using Akka.TestKit;
@@ -50,7 +53,7 @@ namespace ClusterKit.Core.TestKit
         {
             if (!string.IsNullOrWhiteSpace(path))
             {
-                var index = path.IndexOf("akka://test/", StringComparison.InvariantCulture);
+                var index = path.IndexOf("akka://test/", StringComparison.OrdinalIgnoreCase);
                 return index >= 0 ? path.Substring(index + 11) : path;
             }
 

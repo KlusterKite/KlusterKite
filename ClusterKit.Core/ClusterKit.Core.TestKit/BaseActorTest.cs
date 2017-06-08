@@ -11,6 +11,7 @@ namespace ClusterKit.Core.TestKit
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -183,7 +184,7 @@ namespace ClusterKit.Core.TestKit
                 {
                     Assert.False(true, $"Expected no messages, but got null message");
                 }
-                else if (message.GetType().IsGenericType && message.GetType().GetGenericTypeDefinition() == typeof(TestMessage<>))
+                else if (message.GetType().GetTypeInfo().IsGenericType && message.GetType().GetGenericTypeDefinition() == typeof(TestMessage<>))
                 {
                     var path = (string)message.GetType().GetProperty("ReceiverPathRooted")?.GetValue(message);
                     var type = message.GetType().GenericTypeArguments[0];
@@ -249,7 +250,6 @@ namespace ClusterKit.Core.TestKit
 
             var containerBuilder = new ContainerBuilder();
             
-
             var configurator = new TConfigurator();
             foreach (var pluginInstaller in configurator.GetPluginInstallers())
             {
@@ -259,12 +259,10 @@ namespace ClusterKit.Core.TestKit
             var config = configurator.GetAkkaConfig(containerBuilder);
             BaseInstaller.RunComponentRegistration(containerBuilder, config);
 
-
             var testActorSystem = ActorSystem.Create("test", config);
 
             containerBuilder.RegisterInstance(testActorSystem).As<ActorSystem>();
             containerBuilder.RegisterInstance(testActorSystem.Settings.Config).As<Config>();
-
 
             return new TestDescription
             {

@@ -10,12 +10,12 @@
 namespace ClusterKit.Core.Tests.AkkaTest
 {
     using System;
-    using System.IO;
-    using System.Text;
-
+    
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.Routing;
+
+    using ClusterKit.Core.TestKit;
 
     using Serilog;
 
@@ -49,7 +49,7 @@ namespace ClusterKit.Core.Tests.AkkaTest
         [Fact]
         public void FailingTest()
         {
-            var loggerConfig = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new LocalXunitOutputWriter(this.output));
+            var loggerConfig = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(this.output));
             Log.Logger = loggerConfig.CreateLogger();
 
             var config =
@@ -94,7 +94,7 @@ namespace ClusterKit.Core.Tests.AkkaTest
         [Fact]
         public void WorkingTest()
         {
-            var loggerConfig = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new LocalXunitOutputWriter(this.output));
+            var loggerConfig = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo.TextWriter(new XunitOutputWriter(this.output));
             Log.Logger = loggerConfig.CreateLogger();
 
             var config =
@@ -124,59 +124,6 @@ namespace ClusterKit.Core.Tests.AkkaTest
             finally
             {
                 system.Terminate().Wait(TimeSpan.FromSeconds(5));
-            }
-        }
-
-        /// <summary>
-        /// TextWriter to write logs to Xunit output
-        /// </summary>
-        public class LocalXunitOutputWriter : TextWriter
-        {
-            /// <summary>
-            /// The line to build
-            /// </summary>
-            private readonly StringBuilder line;
-
-            /// <summary>
-            /// The xunit output
-            /// </summary>
-            private readonly ITestOutputHelper output;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="LocalXunitOutputWriter"/> class.
-            /// </summary>
-            /// <param name="output">
-            /// The output.
-            /// </param>
-            public LocalXunitOutputWriter(ITestOutputHelper output)
-            {
-                this.output = output;
-                this.line = new StringBuilder();
-            }
-
-            /// <inheritdoc />
-            public override Encoding Encoding => Encoding.UTF8;
-
-            /// <inheritdoc />
-            public override void Write(char[] buffer)
-            {
-                var str = new string(buffer);
-                if (!str.EndsWith(this.NewLine))
-                {
-                    this.line.Append(str);
-                    return;
-                }
-
-                this.line.Append(str.Substring(0, str.Length - this.NewLine.Length));
-                this.output.WriteLine(this.line.ToString());
-                this.line.Clear();
-            }
-
-            /// <inheritdoc />
-            public override void WriteLine()
-            {
-                this.output.WriteLine(this.line.ToString());
-                this.line.Clear();
             }
         }
 

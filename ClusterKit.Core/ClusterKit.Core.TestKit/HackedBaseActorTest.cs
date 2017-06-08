@@ -15,9 +15,6 @@ namespace ClusterKit.Core.TestKit
     using Akka.TestKit.Xunit2;
 
     using Autofac;
-    using Autofac.Extras.CommonServiceLocator;
-
-    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// Some strange workaround to solve class creation order problem
@@ -41,8 +38,6 @@ namespace ClusterKit.Core.TestKit
             {
                 BaseInstaller.RunPostStart(containerBuilder, this.Container);
             }
-
-            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(this.Container));
         }
 
         /// <summary>

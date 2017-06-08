@@ -7,6 +7,7 @@ namespace ClusterKit.Core.Tests.Configuration
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     using Akka.Actor;
     using Akka.Cluster.Sharding;
@@ -178,8 +179,8 @@ namespace ClusterKit.Core.Tests.Configuration
             /// <inheritdoc />
             protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
-                container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
-                container.RegisterAssemblyTypes(typeof(TestMessageExtractor).Assembly);
+                container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(TestMessageExtractor).GetTypeInfo().Assembly);
             }
         }
 
@@ -196,7 +197,7 @@ namespace ClusterKit.Core.Tests.Configuration
             public object EntityMessage(object message) => message;
 
             /// <inheritdoc />
-            public string ShardId(object message) => message.GetType().Assembly.FullName;
+            public string ShardId(object message) => message.GetType().GetTypeInfo().Assembly.FullName;
         }
     }
 }

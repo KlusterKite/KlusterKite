@@ -9,6 +9,8 @@
 
 namespace ClusterKit.Core.TestKit
 {
+    using System.Reflection;
+
     using Akka.Actor;
     using Akka.Configuration;
 
@@ -34,7 +36,7 @@ namespace ClusterKit.Core.TestKit
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
         }
     }
 }
