@@ -65,7 +65,7 @@ namespace ClusterKit.Core.Service
             }
 
             Container = new ContainerBuilder();
-
+#if APPDOMAIN
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
                 {
                     Log.Logger.Error(
@@ -77,6 +77,10 @@ namespace ClusterKit.Core.Service
                         eventArgs.IsTerminating,
                         (eventArgs.ExceptionObject as Exception)?.StackTrace);
                 };
+#endif
+#if CORECLR
+            // todo: Handle exception
+#endif
 
             var container = Bootstrapper.ConfigureAndStart(Container, configurations.ToArray());
             var system = container.Resolve<ActorSystem>();

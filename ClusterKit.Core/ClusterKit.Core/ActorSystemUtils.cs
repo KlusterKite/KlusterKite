@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Utilities to work with <seealso cref="ActorSystem" />
+//   Utilities to work with ActorSystem
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,23 +14,22 @@ namespace ClusterKit.Core
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    //using System.Runtime.Loader;
 
     using Akka.Actor;
     using Akka.DI.Core;
 
     using Autofac;
+#if CORECLR
+        using System.Runtime.Loader;
+    using Microsoft.Extensions.DependencyModel;
+    using Microsoft.Extensions.PlatformAbstractions;
+#endif
 
     /// <summary>
     /// Utilities to work with <seealso cref="ActorSystem"/>
     /// </summary>
     public static class ActorSystemUtils
     {
-        /// <summary>
-        /// The list of loaded assemblies
-        /// </summary>
-        private static readonly List<Assembly> LoadedAssemblies = new List<Assembly>();
-
         /// <summary>
         /// Scans main application directory for libraries and <see cref="BaseInstaller"/> in them and installs them
         /// </summary>
@@ -42,10 +41,13 @@ namespace ClusterKit.Core
         /// </param>
         public static void RegisterInstallers(this ContainerBuilder container, bool installAssemblies = true)
         {
-#if APPDOMAIN
             if (installAssemblies)
             {
+#if APPDOMAIN
                 var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#elif CORECLR
+                var dir = PlatformServices.Default.Application.ApplicationBasePath;
+#endif
                 if (!string.IsNullOrWhiteSpace(dir))
                 {
                     var files = Directory.GetFiles(dir, "*.dll");
@@ -53,19 +55,18 @@ namespace ClusterKit.Core
                     {
                         try
                         {
-                            var assemblyName = AssemblyName.GetAssemblyName(file);
-                            if (assemblyName != null) 
-                            {
-                                var assembly = Assembly.LoadFrom(file);
-                                if (!LoadedAssemblies.Contains(assembly))
-                                {
-                                    LoadedAssemblies.Add(assembly);
-                                }
-                            }
+#if APPDOMAIN
+                            Assembly.LoadFrom(file);
+#elif CORECLR
+                            AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
+#else
+#warning Not implemented method
+                            throw new NotImplementedException();
+#endif
                         }
-                        catch (Exception exception)
+                        catch
                         {
-                            throw new Exception($"Error loading assembly {Path.GetFileName(file)}", exception);
+                            // ignore - not all dll are loadable
                         }
                     }
                 }
@@ -73,11 +74,11 @@ namespace ClusterKit.Core
 
             Console.WriteLine(@"Assemblies loaded");
 
-            foreach (var type in LoadedAssemblies
+            foreach (var type in GetLoadedAssemblies()
                 .Where(a => !a.IsDynamic)
                 .SelectMany(a => a.GetTypes())
-                .Where(t => t.IsSubclassOf(typeof(BaseInstaller)))
-                .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition && t.GetConstructor(new Type[0]) != null))
+                .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(BaseInstaller)))
+                .Where(t => !t.GetTypeInfo().IsAbstract && !t.GetTypeInfo().IsGenericTypeDefinition && t.GetConstructor(new Type[0]) != null))
             {
                 try
                 {
@@ -89,11 +90,6 @@ namespace ClusterKit.Core
                     // ignore
                 }
             }
-#elif CORECLR
-            //AssemblyLoadContext.Default.
-#else
-            throw new NotImplementedException();
-#endif
 
             Console.WriteLine(@"Assemblies installed");
         }
@@ -129,6 +125,36 @@ namespace ClusterKit.Core
                         path[0]);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the list of loaded assemblies
+        /// </summary>
+        /// <returns>The list of loaded assemblies</returns>
+        public static IEnumerable<Assembly> GetLoadedAssemblies()
+        {
+#if APPDOMAIN
+            return AppDomain.CurrentDomain.GetAssemblies();
+#elif CORECLR 
+            var assemblies = new List<Assembly>();
+            var dependencies = DependencyContext.Default.RuntimeLibraries;
+            foreach (var library in dependencies)
+            {
+                try
+                {
+                    var assembly = Assembly.Load(new AssemblyName(library.Name));
+                    assemblies.Add(assembly);
+                }
+                catch
+                {
+                    //do nothing can't if can't load assembly
+                }
+            }
+            return assemblies;
+#else
+#warning Method not implemented
+            throw new NotImplementedException();
+#endif
         }
     }
 }

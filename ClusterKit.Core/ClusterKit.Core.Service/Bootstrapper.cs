@@ -11,25 +11,21 @@ namespace ClusterKit.Core.Service
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
+
     using System.IO;
     using System.Linq;
     using System.Reflection;
 
     using Akka.Actor;
     using Akka.Configuration;
-    using Akka.Configuration.Hocon;
     using Akka.DI.AutoFac;
     using Akka.DI.Core;
 
     using Autofac;
-    using Autofac.Extras.CommonServiceLocator;
 
     using ClusterKit.Core.Log;
 
     using JetBrains.Annotations;
-
-    using Microsoft.Practices.ServiceLocation;
 
     using Serilog;
     using Serilog.Events;
@@ -112,8 +108,6 @@ namespace ClusterKit.Core.Service
             Console.WriteLine(@"starting akka system");
             actorSystem.AddDependencyResolver(new AutoFacDependencyResolver(container, actorSystem));
 
-            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));
-
             Console.WriteLine(@"Bootstrapper start finished");
 
             return container;
@@ -153,7 +147,7 @@ namespace ClusterKit.Core.Service
             }
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            var hoconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "akka.hocon");
+            var hoconPath = Path.Combine(Path.GetDirectoryName(typeof(Bootstrapper).GetTypeInfo().Assembly.Location), "akka.hocon");
             Console.WriteLine($@"loading akka.hocon ({hoconPath})");
             if (File.Exists(hoconPath))
             {
@@ -168,11 +162,6 @@ namespace ClusterKit.Core.Service
             }
 
             Console.WriteLine(@"loading application configuration");
-            var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
-            if (section?.AkkaConfig != null)
-            {
-                config = config.WithFallback(section.AkkaConfig);
-            }
 
             return config;
         }
