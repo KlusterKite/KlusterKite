@@ -12,11 +12,13 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
     using ClusterKit.API.Tests.Mock;
+    using ClusterKit.Core;
     using ClusterKit.Core.Log;
     using ClusterKit.Security.Attributes;
     using ClusterKit.Web.GraphQL.Publisher;
@@ -2583,11 +2585,15 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(3, schema.Query.Fields.Count());
             Assert.True(schema.Query.HasField("api"));
 
+            var query = BaseInstaller.ReadTextResource(
+                this.GetType().GetTypeInfo().Assembly,
+                "ClusterKit.Web.Tests.GraphQL.Resources.IntrospectionQuery.txt");
+
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
                                      r.Schema = schema;
-                                     r.Query = Resources.IntrospectionQuery;
+                                     r.Query = query;
                                      r.UserContext = new RequestContext();
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);

@@ -10,8 +10,6 @@ namespace ClusterKit.Web.Tests.Auth
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Configuration;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
@@ -156,6 +154,13 @@ namespace ClusterKit.Web.Tests.Auth
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            Startup.Reset();
+        }
+
         /// <summary>
         /// Sets the user authenticated session
         /// </summary>
@@ -210,12 +215,12 @@ namespace ClusterKit.Web.Tests.Auth
                 var port = ((IPEndPoint)listener.LocalEndpoint).Port;
                 listener.Stop();
 
+                // todo: move connection string to external config or environment
                 return ConfigurationFactory.ParseString($@"
                 {{
                     ClusterKit {{
  		                Web {{
-                            Authentication.RedisConnection = ""{ConfigurationManager.ConnectionStrings["redis"]
-                    .ConnectionString}""
+                            Authentication.RedisConnection = ""docker:6379""
                             WebHostPort = {port},
  			                BindAddress = ""http://*:{port}"",
                             Debug.Trace = true
@@ -259,7 +264,7 @@ namespace ClusterKit.Web.Tests.Auth
             {
                 container.RegisterType<TestController>();
                 container.RegisterType<PublicTestController>();
-                container.RegisterType<MoqTokenManager>().As<ITokenManager>();
+                container.RegisterType<MoqTokenManager>().As<ITokenManager>().SingleInstance();
             }
         }
 

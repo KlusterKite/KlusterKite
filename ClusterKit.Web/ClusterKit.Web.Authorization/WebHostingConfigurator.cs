@@ -9,7 +9,7 @@
 
 namespace ClusterKit.Web.Authorization
 {
-    using ClusterKit.Security.Attributes;
+    using Akka.Configuration;
 
     using Microsoft.AspNetCore.Builder;
 
@@ -18,26 +18,10 @@ namespace ClusterKit.Web.Authorization
     /// </summary>
     public class WebHostingConfigurator : BaseWebHostingConfigurator
     {
-        /// <summary>
-        /// The token manager
-        /// </summary>
-        private readonly ITokenManager tokenManager;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WebHostingConfigurator"/> class.
-        /// </summary>
-        /// <param name="tokenManager">
-        /// The token Manager.
-        /// </param>
-        public WebHostingConfigurator(ITokenManager tokenManager)
-        {
-            this.tokenManager = tokenManager;
-        }
-
         /// <inheritdoc />
-        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
+        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app, Config config)
         {
-            return app.UseMiddleware<CheckTokenMiddleware>(this.tokenManager);
+            return app.UseMiddleware<CheckTokenMiddleware>();
         }
     }
 }

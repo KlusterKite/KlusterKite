@@ -12,6 +12,11 @@
  				//	LocalHostName = $host //local hostname that proxy should path. This should be used to support virtual hosting inside single node
  				//}
  			}
+
+ 			// add needed configurators. If you want to remove configurator from fallback config - just put empty string with same name
+ 			Configurators {
+ 				WebTracer = "ClusterKit.Web.WebTracer, ClusterKit.Web"
+ 			}
  		}
  	}
 }

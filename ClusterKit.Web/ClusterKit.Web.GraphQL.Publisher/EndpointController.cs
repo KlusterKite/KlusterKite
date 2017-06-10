@@ -27,7 +27,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using JetBrains.Annotations;
 
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Practices.ServiceLocation;
 
     using Newtonsoft.Json.Linq;
 
@@ -114,7 +113,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var queryToExecute =
                 (string)
                 (query.Properties()
-                         .FirstOrDefault(p => p.Name.Equals("query", StringComparison.InvariantCultureIgnoreCase))
+                         .FirstOrDefault(p => p.Name.Equals("query", StringComparison.OrdinalIgnoreCase))
                          ?.Value as JValue);
 
             if (string.IsNullOrWhiteSpace(queryToExecute))
@@ -125,13 +124,13 @@ namespace ClusterKit.Web.GraphQL.Publisher
             var operationName =
                 (string)
                 (query.Properties()
-                     .FirstOrDefault(p => p.Name.Equals("OperationName", StringComparison.InvariantCultureIgnoreCase))
+                     .FirstOrDefault(p => p.Name.Equals("OperationName", StringComparison.OrdinalIgnoreCase))
                      ?.Value as JValue);
 
             var variablesToken =
                 query.Properties()
                     .FirstOrDefault(
-                        p => p.Name.Equals("variables", StringComparison.InvariantCultureIgnoreCase))?.Value;
+                        p => p.Name.Equals("variables", StringComparison.OrdinalIgnoreCase))?.Value;
 
             Inputs inputs = null;
             if (variablesToken is JObject)

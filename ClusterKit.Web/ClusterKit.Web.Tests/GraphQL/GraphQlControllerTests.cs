@@ -152,8 +152,11 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// <summary>
         /// Some load testing
         /// </summary>
+        /// <returns>
+        /// The async task
+        /// </returns>
         [Fact(Skip = "Just for profiling")]
-        public void LoadTest()
+        public async Task LoadTest()
         {
             this.ExpectNoMsg();
             var initialObjects = new List<TestObject>
@@ -262,17 +265,8 @@ namespace ClusterKit.Web.Tests.GraphQL
             stopwatch.Start();
 
             var numberOfRequests = 3000;
-            var options = new ParallelOptions
-                              {
-                                  MaxDegreeOfParallelism = 10
-                              };
-            Parallel.ForEach(
-                Enumerable.Range(1, numberOfRequests),
-                options,
-                i => client.Execute(request));
+            await Task.WhenAll(Enumerable.Range(1, numberOfRequests).Select(i => client.ExecuteTaskAsync(request)));
 
-            // var tasks = Enumerable.Range(1, numberOfRequests).Select<int, Task>(n => client.ExecuteTaskAsync(request));
-            // Task.WaitAll(tasks.ToArray());
             stopwatch.Stop();
             this.Sys.Log.Info(
                 "!!!!!!!!!! Served {numberOfRequests} requests in {StopWatch}ms ({StopWatchRequest}ms/req)",
@@ -370,6 +364,13 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.Equal(
                 ApiProviderPublishResolveIntegration.CleanResponse(expectedResult), 
                 ApiProviderPublishResolveIntegration.CleanResponse(result.Content));
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            Startup.Reset();
         }
 
         /// <summary>

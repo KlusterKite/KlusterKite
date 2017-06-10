@@ -11,6 +11,7 @@ namespace ClusterKit.Web
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     
     using Akka.Actor;
@@ -38,7 +39,7 @@ namespace ClusterKit.Web
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -52,20 +53,21 @@ namespace ClusterKit.Web
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
             container.RegisterType<WebTracer>().As<IWebHostingConfigurator>();
 
             var registeredAssemblies =
                 GetRegisteredBaseInstallers(container)
-                    .Select(i => i.GetType().Assembly)
+                    .Select(i => i.GetType().GetTypeInfo().Assembly)
                     .Distinct();
 
             foreach (var registeredAssembly in registeredAssemblies)
             {
-                container.RegisterAssemblyTypes(registeredAssembly).Where(t => t.IsSubclassOf(typeof(Controller)));
+                container.RegisterAssemblyTypes(registeredAssembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(Controller)));
             }
 
             Startup.ContainerBuilder = container;
+            Startup.Config = config;
             var bindUrl = GetWebHostingBindUrl(config);
             var host = new WebHostBuilder()
                 .CaptureStartupErrors(true)
@@ -79,6 +81,7 @@ namespace ClusterKit.Web
                         var system = Startup.ContainerWaiter.Task.Result.Resolve<ActorSystem>();
                         try
                         {
+                            system.Log.Info("Starting web server...");
                             server.Run();
                         }
                         catch (Exception exception)
@@ -92,7 +95,10 @@ namespace ClusterKit.Web
         /// <inheritdoc />
         protected override void PostStart(IComponentContext context)
         {
+            context.Resolve<ActorSystem>().Log.Info("{Type}: post start started", this.GetType().FullName);
             Startup.ContainerWaiter.SetResult(context);
+            Startup.ServiceStartWaiter.Wait();
+            context.Resolve<ActorSystem>().Log.Info("{Type}: post start completed", this.GetType().FullName);
         }
 
         /// <summary>

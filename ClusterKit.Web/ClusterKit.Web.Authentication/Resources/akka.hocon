@@ -11,5 +11,9 @@
 			//	LocalHostName = $host //local hostname that proxy should path. This should be used to support virtual hosting inside single node
 			}
 		}
+
+		Configurators {
+ 				Cors = "ClusterKit.Web.Authentication.WebHostingConfigurator, ClusterKit.Web.Authentication"
+ 		}
 	}
 }

@@ -68,7 +68,6 @@ namespace ClusterKit.Web.Authorization.Attributes
                                         ? $"{this.privilege}.{controllerContext?.ActionName}"
                                         : this.privilege;
 
-
             var session = context.HttpContext.GetSession();
             var isAuthorized = session == null 
                 || (session.User != null && this.IgnoreOnUserPresent)

@@ -28,28 +28,10 @@ namespace ClusterKit.Web
     [UsedImplicitly]
     public class WebTracer : BaseWebHostingConfigurator
     {
-        /// <summary>
-        /// The actor system
-        /// </summary>
-        /// <remarks>Just for debugging</remarks>
-        // ReSharper disable once NotAccessedField.Local
-        private ActorSystem system;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WebTracer"/> class.
-        /// </summary>
-        /// <param name="system">The actor system</param>
-        /// <param name="config">The system configuration</param>
-        public WebTracer(ActorSystem system, Config config)
-        {
-            this.system = system;
-        }
-
         /// <inheritdoc />
-        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
+        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app, Config config)
         {
-            app = app.UseMiddleware<TraceMiddleware>(this.system);
-            this.system.Log.Info("{Type}: installed TraceMiddleware to web server", this.GetType().Name);
+            app = app.UseMiddleware<TraceMiddleware>();
             return app;
         }
 

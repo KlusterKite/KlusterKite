@@ -48,7 +48,6 @@ namespace ClusterKit.Web.Authorization
             this.tokenManager = tokenManager;
         }
 
-
         /// <summary>Process an individual request.</summary>
         /// <param name="context">The request context</param>
         /// <returns>The async process task</returns>
@@ -57,7 +56,7 @@ namespace ClusterKit.Web.Authorization
         {
             var header = context.Request.Headers["Authorization"].ToString();
             if (!string.IsNullOrWhiteSpace(header)
-                && header.IndexOf("bearer ", StringComparison.InvariantCultureIgnoreCase) == 0)
+                && header.IndexOf("bearer ", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 var token = header.Substring(7);
                 var ticket = await this.tokenManager.ValidateAccessToken(token);

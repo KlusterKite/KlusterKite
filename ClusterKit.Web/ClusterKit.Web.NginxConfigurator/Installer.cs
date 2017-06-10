@@ -9,12 +9,11 @@
 
 namespace ClusterKit.Web.NginxConfigurator
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
-    using System.Security;
-    using System.Security.Permissions;
+    using System.Security.AccessControl;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -22,6 +21,9 @@ namespace ClusterKit.Web.NginxConfigurator
     using Autofac;
 
     using ClusterKit.Core;
+#if CORECLR
+    using Microsoft.Extensions.PlatformAbstractions;
+#endif
 
     /// <summary>
     /// Installing components from current library
@@ -57,7 +59,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.NginxConfigurator.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -71,19 +73,25 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
         }
 
         /// <summary>
-        /// Checks access to file
+        /// Checks the file access
         /// </summary>
-        /// <param name="filePath">Path to file for check</param>
-        /// <param name="permissionAccess">Permission to check</param>
-        private static void CheckFileAccess(string filePath, FileIOPermissionAccess permissionAccess)
+        /// <param name="filePath">The file path</param>
+        /// <param name="permissionAccess">The permission to check</param>
+        private static void CheckFileAccess(string filePath, FileSystemRights permissionAccess)
         {
             if (!Path.IsPathRooted(filePath))
             {
-                var currentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#if APPDOMAIN
+                var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#elif CORECLR
+                var dir = PlatformServices.Default.Application.ApplicationBasePath;
+#endif
+
+                var currentExecutablePath = Path.GetDirectoryName(dir);
                 if (string.IsNullOrWhiteSpace(currentExecutablePath))
                 {
                     throw new ConfigurationException("Failed to determine current executable path");
@@ -103,13 +111,25 @@ namespace ClusterKit.Web.NginxConfigurator
                 throw new ConfigurationException($"{configDirectory} does not exists");
             }
 
-            var path = File.Exists(filePath) ? filePath : configDirectory;
-            var permission = new FileIOPermission(permissionAccess, path);
-            var permissionSet = new PermissionSet(PermissionState.None);
-            if (!permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
+            var security = new FileSecurity(filePath, AccessControlSections.Access);
+            var rules = security.GetAccessRules(true, true, security.AccessRuleType).OfType<FileSystemAccessRule>().ToList();
+
+            var isAllowed = rules.Aggregate(
+                false,
+                (seed, rule) => seed || (rule.FileSystemRights.HasFlag(permissionAccess)
+                                         && rule.AccessControlType == AccessControlType.Allow));
+
+            var isDenied = rules.Aggregate(
+                false,
+                (seed, rule) => seed || (rule.FileSystemRights.HasFlag(permissionAccess)
+                                         && rule.AccessControlType == AccessControlType.Deny));
+
+            if (isAllowed && !isDenied)
             {
-                throw new ConfigurationException($"Cannot access {path} for writing");
+                return;
             }
+
+            throw new ConfigurationException($"Cannot access {filePath} for {permissionAccess}");
         }
 
         /// <summary>
@@ -124,7 +144,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig is not defined");
             }
 
-            CheckFileAccess(configPath, FileIOPermissionAccess.Write);
+            CheckFileAccess(configPath, FileSystemRights.Write);
         }
 
         /// <summary>
@@ -142,8 +162,8 @@ namespace ClusterKit.Web.NginxConfigurator
                     throw new ConfigurationException("ClusterKit.Web.Nginx.ReloadCommand.Command is not defined");
                 }
 
-                // todo: actualy need to check Execute access
-                CheckFileAccess(commandPath, FileIOPermissionAccess.Read);
+                CheckFileAccess(commandPath, FileSystemRights.Read);
+                CheckFileAccess(commandPath, FileSystemRights.ExecuteFile);
             }
         }
     }

@@ -318,7 +318,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
                 var currentMaximumApiVersion = endpoints.Descriptions.Any()
                                                    ? endpoints.Descriptions.Keys.Max()
-                                                   : new Version();
+                                                   : new Version(0, 0);
 
                 if (description.Description.Version > currentMaximumApiVersion)
                 {

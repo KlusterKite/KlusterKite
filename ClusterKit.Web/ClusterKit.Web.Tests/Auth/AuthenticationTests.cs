@@ -6,6 +6,7 @@
 //   Testing authentication process
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Web.Tests.Auth
 {
     using System;
@@ -76,16 +77,16 @@ namespace ClusterKit.Web.Tests.Auth
         /// Task to enable asynchronous execution
         /// </returns>
         [Theory]
-        [InlineData("unknownClient", null, "testUser", "testPassword", 400)]
-        [InlineData("unit-test-nosecret", null, "testUser", "testPassword", 200)]
-        [InlineData("unit-test-nosecret", "random", "testUser", "testPassword", 200)]
-        [InlineData("unit-test-nosecret", null, "testUser1", "testPassword", 400)]
-        [InlineData("unit-test-nosecret", null, "testUser", "testPassword1", 400)]
-        [InlineData("unit-test-secret", null, "testUser", "testPassword", 400)]
-        [InlineData("unit-test-secret", "random", "testUser", "testPassword", 400)]
-        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword", 200)]
-        [InlineData("unit-test-secret", "test-secret", "testUser1", "testPassword", 400)]
-        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword1", 400)]
+        [InlineData("unknownClient", null, "testUser", "testPassword", HttpStatusCode.BadRequest)]
+        [InlineData("unit-test-nosecret", null, "testUser", "testPassword", HttpStatusCode.OK)]
+        [InlineData("unit-test-nosecret", "random", "testUser", "testPassword", HttpStatusCode.OK)]
+        [InlineData("unit-test-nosecret", null, "testUser1", "testPassword", HttpStatusCode.BadRequest)]
+        [InlineData("unit-test-nosecret", null, "testUser", "testPassword1", HttpStatusCode.BadRequest)]
+        [InlineData("unit-test-secret", null, "testUser", "testPassword", HttpStatusCode.BadRequest)]
+        [InlineData("unit-test-secret", "random", "testUser", "testPassword", HttpStatusCode.BadRequest)]
+        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword", HttpStatusCode.OK)]
+        [InlineData("unit-test-secret", "test-secret", "testUser1", "testPassword", HttpStatusCode.BadRequest)]
+        [InlineData("unit-test-secret", "test-secret", "testUser", "testPassword1", HttpStatusCode.BadRequest)]
         public async Task GrantPasswordTest(
             string clientId,
             string clientSecret,
@@ -103,11 +104,12 @@ namespace ClusterKit.Web.Tests.Auth
             request.AddParameter("password", userPassword);
             request.AddParameter("client_id", clientId);
             if (!string.IsNullOrWhiteSpace(clientSecret))
-            { 
+            {
                 request.AddParameter("client_secret", clientSecret);
             }
 
             var result = await client.ExecuteTaskAsync<TokenResponse>(request);
+
             Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
             Assert.Equal(expectedResult, result.StatusCode);
 
@@ -139,15 +141,21 @@ namespace ClusterKit.Web.Tests.Auth
         /// <param name="expectedResult">The expected response code</param>
         /// <returns>Async task</returns>
         [Theory]
-        [InlineData(false, null, null, "unit-test-secret", "test-secret", 400)]
-        [InlineData(false, null, null, "unit-test-nosecret", null, 400)]
-        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", 400)]
-        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "test-secret", 200)]
-        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "random", 400)]
-        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-secret", "test-secret", 400)]
-        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", 400)]
-        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-nosecret", null, 200)]
-        [InlineData(true, "testUser", "unit-test-secret", "unit-test-nosecret", null, 400)]
+        [InlineData(false, null, null, "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(false, null, null, "unit-test-nosecret", null, HttpStatusCode.BadRequest)]
+        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.OK)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "random", HttpStatusCode.BadRequest)]
+        [InlineData(
+            true,
+            "testUser",
+            "unit-test-nosecret",
+            "unit-test-secret",
+            "test-secret",
+            HttpStatusCode.BadRequest)]
+        [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-nosecret", null, HttpStatusCode.OK)]
+        [InlineData(true, "testUser", "unit-test-secret", "unit-test-nosecret", null, HttpStatusCode.BadRequest)]
         public async Task GrantRefreshToken(
             bool createTicket,
             string ticketUserId,
@@ -196,6 +204,13 @@ namespace ClusterKit.Web.Tests.Auth
             }
         }
 
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            Startup.Reset();
+        }
+
         /// <summary>
         /// The test configurator
         /// </summary>
@@ -212,7 +227,8 @@ namespace ClusterKit.Web.Tests.Auth
                 var port = ((IPEndPoint)listener.LocalEndpoint).Port;
                 listener.Stop();
 
-                return ConfigurationFactory.ParseString($@"
+                return ConfigurationFactory.ParseString(
+                    $@"
                 {{
                     ClusterKit {{
  		                Web {{
@@ -258,7 +274,7 @@ namespace ClusterKit.Web.Tests.Auth
             protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
                 container.RegisterType<TestClientProvider>().As<IClientProvider>();
-                container.RegisterType<MoqTokenManager>().As<ITokenManager>();
+                container.RegisterType<MoqTokenManager>().As<ITokenManager>().SingleInstance();
             }
         }
 
@@ -347,25 +363,23 @@ namespace ClusterKit.Web.Tests.Auth
                 switch (clientId)
                 {
                     case "unit-test-nosecret":
-                        return
-                            Task.FromResult<IClient>(
-                                new TestClient
-                                    {
-                                        ClientId = clientId,
-                                        Name = "Test - no secret",
-                                        OwnScope = new[] { "Test1", "Test2" }
-                                    });
+                        return Task.FromResult<IClient>(
+                            new TestClient
+                                {
+                                    ClientId = clientId,
+                                    Name = "Test - no secret",
+                                    OwnScope = new[] { "Test1", "Test2" }
+                                });
                     case "unit-test-secret":
                         if (secret == "test-secret")
                         {
-                            return
-                                Task.FromResult<IClient>(
-                                    new TestClient
-                                        {
-                                            ClientId = clientId,
-                                            Name = "Test - secret",
-                                            OwnScope = new[] { "Test1", "Test3" }
-                                        });
+                            return Task.FromResult<IClient>(
+                                new TestClient
+                                    {
+                                        ClientId = clientId,
+                                        Name = "Test - secret",
+                                        OwnScope = new[] { "Test1", "Test3" }
+                                    });
                         }
 
                         break;

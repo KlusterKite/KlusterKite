@@ -13,7 +13,7 @@ namespace ClusterKit.Web.Rest
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Net;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -51,7 +51,7 @@ namespace ClusterKit.Web.Rest
         /// </summary>
         static BaseRestController()
         {
-            DataIsLarge = typeof(ILargeObject).IsAssignableFrom(typeof(TObject));
+            DataIsLarge = typeof(ILargeObject).GetTypeInfo().IsAssignableFrom(typeof(TObject));
         }
 
         /// <summary>
@@ -108,8 +108,8 @@ namespace ClusterKit.Web.Rest
         /// </summary>
         /// <param name="data">The object data</param>
         /// <returns>The new object, as it was created in data source</returns>
-        [Microsoft.AspNetCore.Mvc.HttpPut]
-        [Microsoft.AspNetCore.Mvc.Route("")]
+        [HttpPut]
+        [Route("")]
         [UsedImplicitly]
         public virtual async Task<IActionResult> Create(TObject data)
         {

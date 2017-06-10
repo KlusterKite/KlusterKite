@@ -9,6 +9,8 @@
 
 namespace ClusterKit.Web
 {
+    using Akka.Configuration;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -18,13 +20,13 @@ namespace ClusterKit.Web
     public abstract class BaseWebHostingConfigurator : IWebHostingConfigurator
     {
         /// <inheritdoc />
-        public virtual IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
+        public virtual IApplicationBuilder ConfigureApplication(IApplicationBuilder app, Config config)
         {
             return app;
         }
 
         /// <inheritdoc />
-        public virtual void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services, Config config)
         {
         }
     }

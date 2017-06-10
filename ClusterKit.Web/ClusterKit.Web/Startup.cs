@@ -11,12 +11,15 @@ namespace ClusterKit.Web
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
 
+    using Akka.Actor;
+    using Akka.Configuration;
+
     using Autofac;
-    using Autofac.Core;
     using Autofac.Extensions.DependencyInjection;
+
+    using ClusterKit.Core;
 
     using JetBrains.Annotations;
 
@@ -26,7 +29,6 @@ namespace ClusterKit.Web
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Practices.ServiceLocation;
 
     using Serilog;
 
@@ -42,19 +44,44 @@ namespace ClusterKit.Web
         private static TaskCompletionSource<object> serviceConfigurationWaiter = new TaskCompletionSource<object>();
 
         /// <summary>
+        /// Gets source for service start waiter
+        /// </summary>
+        private static TaskCompletionSource<object> serviceStartWaiter = new TaskCompletionSource<object>();
+
+        /// <summary>
         /// Gets or sets the container builder
         /// </summary>
         internal static ContainerBuilder ContainerBuilder { get; set; }
 
         /// <summary>
+        /// Gets or sets the application config
+        /// </summary>
+        internal static Config Config { get; set; }
+
+        /// <summary>
         /// Gets the task to wait for container
         /// </summary>
-        internal static TaskCompletionSource<IComponentContext> ContainerWaiter { get; } = new TaskCompletionSource<IComponentContext>();
+        internal static TaskCompletionSource<IComponentContext> ContainerWaiter { get; private set; } = new TaskCompletionSource<IComponentContext>();
 
         /// <summary>
         /// Gets the task to wait for container
         /// </summary>
         internal static Task<object> ServiceConfigurationWaiter => serviceConfigurationWaiter.Task;
+
+        /// <summary>
+        /// Gets the task to wait for container
+        /// </summary>
+        internal static Task<object> ServiceStartWaiter => serviceConfigurationWaiter.Task;
+
+        /// <summary>
+        /// Resets current initialization status
+        /// </summary>
+        public static void Reset()
+        {
+            serviceConfigurationWaiter = new TaskCompletionSource<object>();
+            serviceStartWaiter = new TaskCompletionSource<object>();
+            ContainerWaiter = new TaskCompletionSource<IComponentContext>();
+        }
 
         /// <summary>
         /// The services configuration
@@ -66,23 +93,26 @@ namespace ClusterKit.Web
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-
             var builder = services.AddMvcCore();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var assembly in ActorSystemUtils.GetLoadedAssemblies())
             {
                 builder.AddApplicationPart(assembly);
             }
             
             builder.AddControllersAsServices();
-            ContainerBuilder.Populate(services);
-            serviceConfigurationWaiter.SetResult(null);
-            var container = ContainerWaiter.Task.GetAwaiter().GetResult();
-            var startupConfigurators = container.Resolve<IEnumerable<IWebHostingConfigurator>>().ToList();
+            builder.AddJsonFormatters();
+
+            var startupConfigurators = this.GetConfigurators(Config);
             foreach (var configurator in startupConfigurators)
             {
-                configurator.ConfigureServices(services);
+                configurator.ConfigureServices(services, Config);
             }
 
+            ContainerBuilder.Populate(services);
+            serviceConfigurationWaiter.SetResult(null);
+            var container = ContainerWaiter.Task.Result;
+            var system = container.Resolve<ActorSystem>();
+            system.Log.Info("{Type}: ConfigureServices done", this.GetType().Name);
             return new AutofacServiceProvider(container);
         }
 
@@ -102,14 +132,50 @@ namespace ClusterKit.Web
         public void Configure(IApplicationBuilder appBuilder, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddSerilog();
-            var container = ContainerWaiter.Task.GetAwaiter().GetResult();
-            var startupConfigurators = container.Resolve<IEnumerable<IWebHostingConfigurator>>().ToList();
+            var startupConfigurators = this.GetConfigurators(Config);
             foreach (var configurator in startupConfigurators)
             {
-                appBuilder = configurator.ConfigureApplication(appBuilder);
+                appBuilder = configurator.ConfigureApplication(appBuilder, Config);
             }
 
             appBuilder.UseMvc();
+            serviceStartWaiter.SetResult(null);
+        }
+
+        /// <summary>
+        /// Reads configuration file and creates configurators
+        /// </summary>
+        /// <param name="config">The configuration</param>
+        /// <returns>The list of configurators</returns>
+        private IEnumerable<IWebHostingConfigurator> GetConfigurators(Config config)
+        {
+            var configSection = config.GetConfig("ClusterKit.Web.Configurators");
+            if (configSection == null)
+            {
+                yield break;
+            }
+
+            foreach (var valuePair in configSection.AsEnumerable())
+            {
+                if (!valuePair.Value.IsString())
+                {
+                    continue;
+                }
+
+                var typeName = valuePair.Value.GetString();
+                if (!string.IsNullOrWhiteSpace(typeName))
+                {
+                    var type = Type.GetType(typeName);
+                    if (type != null)
+                    {
+                        var configurator = Activator.CreateInstance(type) as IWebHostingConfigurator;
+                        if (configurator != null)
+                        {
+                            yield return configurator;
+                        }
+                    }
+                }
+            }
         }
     }
 }

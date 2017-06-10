@@ -9,6 +9,7 @@
 namespace ClusterKit.Web.Authorization
 {
     using System.Collections.Generic;
+    using System.Reflection;
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -32,7 +33,7 @@ namespace ClusterKit.Web.Authorization
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.Authorization.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -43,7 +44,7 @@ namespace ClusterKit.Web.Authorization
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
             container.RegisterType<WebHostingConfigurator>().As<IWebHostingConfigurator>();
         }
     }

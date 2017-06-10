@@ -10,9 +10,12 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher
 {
+    using Akka.Configuration;
+
     using ClusterKit.Web;
 
     using Microsoft.AspNetCore.Builder;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// External additional configuration.
@@ -21,9 +24,15 @@ namespace ClusterKit.Web.GraphQL.Publisher
     public class WebHostingConfigurator : BaseWebHostingConfigurator
     {
         /// <inheritdoc />
-        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app)
+        public override IApplicationBuilder ConfigureApplication(IApplicationBuilder app, Config config)
         {
             return app.UseCors(builder => { builder.AllowAnyOrigin(); });
+        }
+
+        /// <inheritdoc />
+        public override void ConfigureServices(IServiceCollection services, Config config)
+        {
+            services.AddCors();
         }
     }
 }
