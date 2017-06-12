@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\common.props" />
+  <!--
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <PropertyGroup Condition="'$(Platform)'=='x64'">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+-->
 
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
@@ -12,6 +14,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+
+    <PlatformTarget Condition=" '$(TargetFramework)' == 'net46' and '$(Platform)' == 'x64' ">x64</PlatformTarget>
+    <PlatformTarget Condition=" '$(TargetFramework)' == 'net46' and '$(Platform)' == 'Any CPU' ">x86</PlatformTarget>
+    <PlatformTarget Condition=" '$(TargetFramework)' == 'net46' and '$(PlatformTarget)' == 'Any CPU' ">x86</PlatformTarget>
 
 <!--
     <RuntimeIdentifier Condition="'$(PlatformTarget)' == 'x64' and '$(TargetFramework)' == 'net46'">win7-x64</RuntimeIdentifier>

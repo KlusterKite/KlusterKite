@@ -49,71 +49,45 @@ namespace ClusterKit.Web
         private static TaskCompletionSource<object> serviceStartWaiter = new TaskCompletionSource<object>();
 
         /// <summary>
-        /// Gets or sets the container builder
-        /// </summary>
-        internal static ContainerBuilder ContainerBuilder { get; set; }
-
-        /// <summary>
         /// Gets or sets the application config
         /// </summary>
         internal static Config Config { get; set; }
 
         /// <summary>
-        /// Gets the task to wait for container
+        /// Gets or sets the container builder
         /// </summary>
-        internal static TaskCompletionSource<IComponentContext> ContainerWaiter { get; private set; } = new TaskCompletionSource<IComponentContext>();
+        internal static ContainerBuilder ContainerBuilder { get; set; }
 
         /// <summary>
         /// Gets the task to wait for container
         /// </summary>
-        internal static Task<object> ServiceConfigurationWaiter => serviceConfigurationWaiter.Task;
+        internal static TaskCompletionSource<IComponentContext> ContainerWaiter { get; private set; } =
+            new TaskCompletionSource<IComponentContext>();
 
         /// <summary>
         /// Gets the task to wait for container
         /// </summary>
-        internal static Task<object> ServiceStartWaiter => serviceConfigurationWaiter.Task;
+        internal static Task ServiceConfigurationWaiter => serviceConfigurationWaiter.Task;
 
         /// <summary>
-        /// Resets current initialization status
+        /// Gets the task to wait for container
+        /// </summary>
+        internal static Task ServiceStartWaiter => serviceStartWaiter.Task;
+
+        /// <summary>
+        /// Gets the last thrown exception
+        /// </summary>
+        internal static Exception LastException { get; private set; }
+
+        /// <summary>
+        /// Resets current initialization status.
         /// </summary>
         public static void Reset()
         {
             serviceConfigurationWaiter = new TaskCompletionSource<object>();
             serviceStartWaiter = new TaskCompletionSource<object>();
             ContainerWaiter = new TaskCompletionSource<IComponentContext>();
-        }
-
-        /// <summary>
-        /// The services configuration
-        /// </summary>
-        /// <param name="services">The list of services</param>
-        /// <returns>Service provider</returns>
-        [UsedImplicitly]
-        public IServiceProvider ConfigureServices(IServiceCollection services)
-        {
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            var builder = services.AddMvcCore();
-            foreach (var assembly in ActorSystemUtils.GetLoadedAssemblies())
-            {
-                builder.AddApplicationPart(assembly);
-            }
-            
-            builder.AddControllersAsServices();
-            builder.AddJsonFormatters();
-
-            var startupConfigurators = this.GetConfigurators(Config);
-            foreach (var configurator in startupConfigurators)
-            {
-                configurator.ConfigureServices(services, Config);
-            }
-
-            ContainerBuilder.Populate(services);
-            serviceConfigurationWaiter.SetResult(null);
-            var container = ContainerWaiter.Task.Result;
-            var system = container.Resolve<ActorSystem>();
-            system.Log.Info("{Type}: ConfigureServices done", this.GetType().Name);
-            return new AutofacServiceProvider(container);
+            LastException = null;
         }
 
         /// <summary>
@@ -131,15 +105,64 @@ namespace ClusterKit.Web
         [UsedImplicitly]
         public void Configure(IApplicationBuilder appBuilder, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddSerilog();
-            var startupConfigurators = this.GetConfigurators(Config);
-            foreach (var configurator in startupConfigurators)
+            try
             {
-                appBuilder = configurator.ConfigureApplication(appBuilder, Config);
-            }
+                loggerFactory.AddSerilog();
+                var startupConfigurators = this.GetConfigurators(Config);
+                foreach (var configurator in startupConfigurators)
+                {
+                    appBuilder = configurator.ConfigureApplication(appBuilder, Config);
+                }
 
-            appBuilder.UseMvc();
-            serviceStartWaiter.SetResult(null);
+                appBuilder.UseMvc();
+                serviceStartWaiter.SetResult(null);
+            }
+            catch (Exception exception)
+            {
+                LastException = exception;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// The services configuration
+        /// </summary>
+        /// <param name="services">The list of services</param>
+        /// <returns>Service provider</returns>
+        [UsedImplicitly]
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            try
+            {
+                services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+                var builder = services.AddMvcCore();
+                foreach (var assembly in ActorSystemUtils.GetLoadedAssemblies())
+                {
+                    builder.AddApplicationPart(assembly);
+                }
+
+                // builder.AddControllersAsServices();
+                builder.AddJsonFormatters();
+
+                var startupConfigurators = this.GetConfigurators(Config);
+                foreach (var configurator in startupConfigurators)
+                {
+                    configurator.ConfigureServices(services, Config);
+                }
+
+                ContainerBuilder.Populate(services);
+                serviceConfigurationWaiter.SetResult(null);
+                var container = ContainerWaiter.Task.Result;
+                var system = container.Resolve<ActorSystem>();
+                system.Log.Info("{Type}: ConfigureServices done", this.GetType().Name);
+                return new AutofacServiceProvider(container);
+            }
+            catch (Exception exception)
+            {
+                LastException = exception;
+                throw;
+            }
         }
 
         /// <summary>

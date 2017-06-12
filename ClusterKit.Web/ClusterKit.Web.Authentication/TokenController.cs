@@ -279,7 +279,7 @@ namespace ClusterKit.Web.Authentication
         private string GetRequestParameter(string parameterName, bool allowGet = true)
         {
             var parameter = this.HttpContext.Request.Form[parameterName].ToString();
-            if (string.IsNullOrWhiteSpace(parameter))
+            if (string.IsNullOrWhiteSpace(parameter) && allowGet)
             {
                 parameter = this.HttpContext.Request.Query[parameterName].ToString();
             }

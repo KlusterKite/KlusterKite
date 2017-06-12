@@ -32,12 +32,10 @@ namespace ClusterKit.Web.Tests.Auth
     using Xunit;
     using Xunit.Abstractions;
 
-    using Installer = ClusterKit.Web.Installer;
-
     /// <summary>
     /// Testing authentication process
     /// </summary>
-    public class AuthenticationTests : BaseActorTest<AuthenticationTests.Configurator>
+    public class AuthenticationTests : WebTest<AuthenticationTests.Configurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationTests"/> class.
@@ -204,13 +202,6 @@ namespace ClusterKit.Web.Tests.Auth
             }
         }
 
-        /// <inheritdoc />
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            Startup.Reset();
-        }
-
         /// <summary>
         /// The test configurator
         /// </summary>
@@ -249,7 +240,7 @@ namespace ClusterKit.Web.Tests.Auth
             {
                 var installers = base.GetPluginInstallers();
                 installers.Add(new Descriptor.Installer());
-                installers.Add(new Installer());
+                installers.Add(new Web.Installer());
                 installers.Add(new Authentication.Installer());
                 installers.Add(new TestInstaller());
                 return installers;

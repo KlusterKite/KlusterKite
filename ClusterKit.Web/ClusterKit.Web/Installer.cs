@@ -12,6 +12,7 @@ namespace ClusterKit.Web
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
     
     using Akka.Actor;
@@ -29,6 +30,11 @@ namespace ClusterKit.Web
     /// </summary>
     public class Installer : BaseInstaller
     {
+        /// <summary>
+        /// The service task
+        /// </summary>
+        private readonly CancellationTokenSource service = new CancellationTokenSource();
+
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
@@ -75,10 +81,10 @@ namespace ClusterKit.Web
                 .UseKestrel();
 
             Task.Run(
-                () =>
+                async () =>
                     {
                         var server = host.UseStartup<Startup>().Build();
-                        var system = Startup.ContainerWaiter.Task.Result.Resolve<ActorSystem>();
+                        var system = (await Startup.ContainerWaiter.Task).Resolve<ActorSystem>();
                         try
                         {
                             system.Log.Info("Starting web server...");
@@ -88,17 +94,30 @@ namespace ClusterKit.Web
                         {
                             system.Log.Error(exception, "Web server stopped");
                         }
-                    });
-            Startup.ServiceConfigurationWaiter.Wait();
+                    }, 
+                this.service.Token);
+
+            var timeout = config.GetTimeSpan("ClusterKit.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
+            if (!Startup.ServiceConfigurationWaiter.Wait(timeout))
+            {
+                throw new Exception("Web server initialization timeout", Startup.LastException);
+            }
         }
 
         /// <inheritdoc />
         protected override void PostStart(IComponentContext context)
         {
-            context.Resolve<ActorSystem>().Log.Info("{Type}: post start started", this.GetType().FullName);
+            var actorSystem = context.Resolve<ActorSystem>();
+            actorSystem.RegisterOnTermination(() => this.service.Cancel());
+            actorSystem.Log.Info("{Type}: post start started", this.GetType().FullName);
             Startup.ContainerWaiter.SetResult(context);
-            Startup.ServiceStartWaiter.Wait();
-            context.Resolve<ActorSystem>().Log.Info("{Type}: post start completed", this.GetType().FullName);
+            var timeout = actorSystem.Settings.Config.GetTimeSpan("ClusterKit.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
+            if (!Startup.ServiceStartWaiter.Wait(timeout))
+            {
+                throw new Exception("Web server start timeout", Startup.LastException);
+            }
+
+            actorSystem.Log.Info("{Type}: post start completed", this.GetType().FullName);
         }
 
         /// <summary>

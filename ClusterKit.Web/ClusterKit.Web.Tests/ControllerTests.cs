@@ -29,7 +29,7 @@ namespace ClusterKit.Web.Tests
     /// <summary>
     /// Tests that ApiControllers are working
     /// </summary>
-    public class ControllerTests : BaseActorTest<ControllerTests.Configurator>
+    public class ControllerTests : WebTest<ControllerTests.Configurator>
     {
         /// <inheritdoc />
         public ControllerTests(ITestOutputHelper output)

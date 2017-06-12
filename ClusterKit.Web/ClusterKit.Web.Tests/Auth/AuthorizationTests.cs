@@ -32,7 +32,7 @@ namespace ClusterKit.Web.Tests.Auth
     /// <summary>
     /// Testing authorization process
     /// </summary>
-    public class AuthorizationTests : BaseActorTest<AuthorizationTests.Configurator>
+    public class AuthorizationTests : WebTest<AuthorizationTests.Configurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationTests"/> class.
@@ -152,13 +152,6 @@ namespace ClusterKit.Web.Tests.Auth
             var result = await client.ExecuteTaskAsync(request);
 
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-        }
-
-        /// <inheritdoc />
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            Startup.Reset();
         }
 
         /// <summary>

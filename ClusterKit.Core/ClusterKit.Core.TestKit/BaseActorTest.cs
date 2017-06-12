@@ -41,7 +41,6 @@ namespace ClusterKit.Core.TestKit
         /// </param>
         protected BaseActorTest(ITestOutputHelper output) : base(CreateTestActorSystem(output))
         {
-            this.Initialize();
         }
 
         /// <summary>
@@ -270,13 +269,6 @@ namespace ClusterKit.Core.TestKit
                 ContainerBuilder = containerBuilder,
                 Configurator = configurator
             };
-        }
-
-        /// <summary>
-        /// Actor system initialization
-        /// </summary>
-        private void Initialize()
-        {
         }
     }
 }
