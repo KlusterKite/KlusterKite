@@ -18,7 +18,9 @@ namespace ClusterKit.NodeManager.Client.MigrationStates
     /// The state of migrators resources
     /// </summary>
     [ApiDescription("The state of migrators resources", Name = "MigratorReleaseState")]
+#if APPDOMAIN
     [Serializable]
+#endif
     public class MigratorReleaseState
     {
         /// <summary>

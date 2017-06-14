@@ -13,6 +13,7 @@ namespace ClusterKit.NodeManager.Tests
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -41,8 +42,6 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Messages;
 
     using JetBrains.Annotations;
-
-    using NuGet;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -239,10 +238,8 @@ namespace ClusterKit.NodeManager.Tests
                                    TimeSpan.FromSeconds(1));
             Assert.NotNull(descriptions);
             Assert.Equal(2, descriptions.Count);
-            Assert.False(
-                descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
-            Assert.False(
-                descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
+            Assert.False(descriptions.FirstOrDefault(d => d.NodeAddress == activeNode.Address.Address)?.IsObsolete);
+            Assert.False(descriptions.FirstOrDefault(d => d.NodeAddress == obsoleteNode.Address.Address)?.IsObsolete);
         }
 
         /// <summary>
@@ -2253,8 +2250,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             var connectionString = this.Container.Resolve<Config>()
                 .GetString(NodeManagerActor.ConfigConnectionStringPath);
-            var databaseName = this.Container.Resolve<Config>()
-                .GetString(NodeManagerActor.ConfigDatabaseNamePath);
+            var databaseName = this.Container.Resolve<Config>().GetString(NodeManagerActor.ConfigDatabaseNamePath);
             return this.Container.Resolve<UniversalContextFactory>()
                 .CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName);
         }
@@ -2367,19 +2363,6 @@ namespace ClusterKit.NodeManager.Tests
             }
 
             /// <inheritdoc />
-            protected override void RegisterComponents(ContainerBuilder container, Config config)
-            {
-                container.RegisterAssemblyTypes(typeof(NodeManagerActor).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
-                container.RegisterAssemblyTypes(typeof(Core.Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
-
-                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
-                var packageRepository = this.CreateTestRepository();
-                container.RegisterInstance(packageRepository).As<IPackageRepository>();
-                container.RegisterType<TestMessageRouter>().As<IMessageRouter>();
-
-            }
-
-            /// <inheritdoc />
             protected override void PostStart(IComponentContext componentContext)
             {
                 base.PostStart(componentContext);
@@ -2387,11 +2370,12 @@ namespace ClusterKit.NodeManager.Tests
                 var config = componentContext.Resolve<Config>();
                 var connectionString = config.GetString(NodeManagerActor.ConfigConnectionStringPath);
                 var databaseName = config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
-                using (var context = contextManager.CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName))
+                using (var context =
+                    contextManager.CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName))
                 {
                     context.ResetValueGenerators();
                     context.Database.EnsureDeleted();
-                    
+
                     context.Releases.Add(CreateRelease());
                     var release = CreateRelease();
                     release.State = EnReleaseState.Ready;
@@ -2402,6 +2386,20 @@ namespace ClusterKit.NodeManager.Tests
                         release.Id,
                         connectionString);
                 }
+            }
+
+            /// <inheritdoc />
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
+            {
+                container.RegisterAssemblyTypes(typeof(NodeManagerActor).GetTypeInfo().Assembly)
+                    .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
+                    .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+
+                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
+                var packageRepository = this.CreateTestRepository();
+                container.RegisterInstance(packageRepository).As<IPackageRepository>();
+                container.RegisterType<TestMessageRouter>().As<IMessageRouter>();
             }
 
             /// <summary>
@@ -2431,129 +2429,93 @@ namespace ClusterKit.NodeManager.Tests
             /// <returns>The test repository</returns>
             private IPackageRepository CreateTestRepository()
             {
-                var p1 = new ReleaseCheckTestsBase.TestPackage
+                var p1 = new ReleaseCheckTestsBase.TestPackage("p1", "1.0.0")
                              {
-                                 Id = "p1",
-                                 Version = SemanticVersion.Parse("1.0.0"),
                                  DependencySets =
                                      new[]
                                          {
                                              ReleaseCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net46,
+                                                     ReleaseCheckTestsBase
+                                                         .Net46,
                                                      "dp1 1.0.0")
                                          }
                              };
 
-                var p2 = new ReleaseCheckTestsBase.TestPackage
+                var p2 = new ReleaseCheckTestsBase.TestPackage("p2", "1.0.0")
                              {
-                                 Id = "p2",
-                                 Version = SemanticVersion.Parse("1.0.0"),
                                  DependencySets =
                                      new[]
                                          {
                                              ReleaseCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net46,
+                                                     ReleaseCheckTestsBase
+                                                         .Net46,
                                                      "dp2 1.0.0")
                                          }
                              };
 
-                var p3 = new ReleaseCheckTestsBase.TestPackage
+                var p3 = new ReleaseCheckTestsBase.TestPackage("p3", "1.0.0")
                              {
-                                 Id = "p3",
-                                 Version = SemanticVersion.Parse("1.0.0"),
                                  DependencySets =
                                      new[]
                                          {
                                              ReleaseCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net46,
+                                                     ReleaseCheckTestsBase
+                                                         .Net46,
                                                      "dp3 2.0.0")
                                          }
                              };
-                var dp1 = new ReleaseCheckTestsBase.TestPackage
-                              {
-                                  Id = "dp1",
-                                  Version = SemanticVersion.Parse("1.0.0"),
-                                  DependencySets = new PackageDependencySet[0]
-                              };
+                var dp1 = new ReleaseCheckTestsBase.TestPackage("dp1", "1.0.0");
 
-                var dp2 = new ReleaseCheckTestsBase.TestPackage
-                              {
-                                  Id = "dp2",
-                                  Version = SemanticVersion.Parse("1.0.0"),
-                                  DependencySets = new PackageDependencySet[0]
-                              };
+                var dp2 = new ReleaseCheckTestsBase.TestPackage("dp2", "1.0.0");
 
-                var dp3 = new ReleaseCheckTestsBase.TestPackage
-                              {
-                                  Id = "dp3",
-                                  Version = SemanticVersion.Parse("1.0.0"),
-                                  DependencySets = new PackageDependencySet[0]
-                              };
+                var dp3 = new ReleaseCheckTestsBase.TestPackage("dp3", "1.0.0");
 
-                var p12 = new ReleaseCheckTestsBase.TestPackage
+                var p12 = new ReleaseCheckTestsBase.TestPackage("p1", "2.0.0")
                               {
-                                  Id = "p1",
-                                  Version = SemanticVersion.Parse("2.0.0"),
                                   DependencySets =
                                       new[]
                                           {
                                               ReleaseCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net46,
+                                                      ReleaseCheckTestsBase
+                                                          .Net46,
                                                       "dp1 2.0.0")
                                           }
                               };
 
-                var p22 = new ReleaseCheckTestsBase.TestPackage
+                var p22 = new ReleaseCheckTestsBase.TestPackage("p2", "2.0.0")
                               {
-                                  Id = "p2",
-                                  Version = SemanticVersion.Parse("2.0.0"),
                                   DependencySets =
                                       new[]
                                           {
                                               ReleaseCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net46,
+                                                      ReleaseCheckTestsBase
+                                                          .Net46,
                                                       "dp2 2.0.0")
                                           }
                               };
 
-                var p32 = new ReleaseCheckTestsBase.TestPackage
+                var p32 = new ReleaseCheckTestsBase.TestPackage("p3", "2.0.0")
                               {
-                                  Id = "p3",
-                                  Version = SemanticVersion.Parse("2.0.0"),
                                   DependencySets =
                                       new[]
                                           {
                                               ReleaseCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                ReleaseCheckTestsBase.Net46,
+                                                      ReleaseCheckTestsBase
+                                                          .Net46,
                                                       "dp3 2.0.0")
                                           }
                               };
-                var dp12 = new ReleaseCheckTestsBase.TestPackage
-                               {
-                                   Id = "dp1",
-                                   Version = SemanticVersion.Parse("2.0.0"),
-                                   DependencySets = new PackageDependencySet[0]
-                               };
+                var dp12 = new ReleaseCheckTestsBase.TestPackage("dp1", "2.0.0");
 
-                var dp22 = new ReleaseCheckTestsBase.TestPackage
-                               {
-                                   Id = "dp2",
-                                   Version = SemanticVersion.Parse("2.0.0"),
-                                   DependencySets = new PackageDependencySet[0]
-                               };
+                var dp22 = new ReleaseCheckTestsBase.TestPackage("dp2", "2.0.0");
 
-                var dp32 = new ReleaseCheckTestsBase.TestPackage
-                               {
-                                   Id = "dp3",
-                                   Version = SemanticVersion.Parse("2.0.0"),
-                                   DependencySets = new PackageDependencySet[0]
-                               };
+                var dp32 = new ReleaseCheckTestsBase.TestPackage("dp3", "2.0.0");
 
                 return new ReleaseCheckTestsBase.TestRepository(
                     p1,

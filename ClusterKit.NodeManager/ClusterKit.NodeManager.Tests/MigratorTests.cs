@@ -14,13 +14,14 @@ namespace ClusterKit.NodeManager.Tests
     using System.IO;
     using System.Linq;
     using System.Reflection;
+#if CORECLR
+    using System.Runtime.Loader;
+#endif
 
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -34,7 +35,12 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Tests.Migrations;
 
-    using NuGet;
+    using Microsoft.Extensions.DependencyModel;
+
+    using NuGet.Frameworks;
+    using NuGet.Packaging;
+    using NuGet.Packaging.Core;
+    using NuGet.Versioning;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -122,8 +128,8 @@ namespace ClusterKit.NodeManager.Tests
                 this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
@@ -188,8 +194,8 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
                 var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
@@ -294,8 +300,8 @@ namespace ClusterKit.NodeManager.Tests
                 this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
@@ -370,8 +376,8 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
@@ -481,8 +487,8 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
@@ -576,8 +582,8 @@ namespace ClusterKit.NodeManager.Tests
                 this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
                 this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(10));
@@ -624,8 +630,8 @@ namespace ClusterKit.NodeManager.Tests
                 var actor = this.ActorOf(
                     () => new MigratorForwarder(
                         this.TestActor,
-                        this.WindsorContainer.Resolve<UniversalContextFactory>(),
-                        this.WindsorContainer.Resolve<IPackageRepository>()),
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
                 var state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(30));
@@ -725,8 +731,9 @@ namespace ClusterKit.NodeManager.Tests
                                            }.ToList()
                                };
 
-            var packageDescriptions = repo.Search(string.Empty, true)
-                .Select(p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList();
+            var packageDescriptions = repo.SearchAsync(string.Empty, true).GetAwaiter().GetResult()
+                .Select(p => p.Identity).Select(
+                    p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList();
 
             var configuration = new ReleaseConfiguration
                                     {
@@ -746,7 +753,7 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private void CreateReleases()
         {
-            var repo = this.WindsorContainer.Resolve<IPackageRepository>();
+            var repo = this.Container.Resolve<IPackageRepository>();
 
             using (var context = this.GetContext())
             {
@@ -754,7 +761,7 @@ namespace ClusterKit.NodeManager.Tests
                 context.Releases.Add(activeRelease);
                 context.SaveChanges();
                 var errors = activeRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46 }.ToList())
-                    .ToList();
+                    .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
                     this.Sys.Log.Error("Error in active release {Field}: {Message}", error.Field, error.Message);
@@ -767,7 +774,8 @@ namespace ClusterKit.NodeManager.Tests
                 var nextRelease = this.CreateRelease(repo);
                 context.Releases.Add(nextRelease);
                 context.SaveChanges();
-                errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46 }.ToList()).ToList();
+                errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46 }.ToList())
+                    .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
                     this.Sys.Log.Error("Error in next release {Field}: {Message}", error.Field, error.Message);
@@ -785,7 +793,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>The database context</returns>
         private ConfigurationContext GetContext()
         {
-            return this.WindsorContainer.Resolve<UniversalContextFactory>()
+            return this.Container.Resolve<UniversalContextFactory>()
                 .CreateContext<ConfigurationContext>("InMemory", this.connectionString, this.databaseName);
         }
 
@@ -845,11 +853,6 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private class TestInstaller : BaseInstaller
         {
-            /// <summary>
-            /// The di container
-            /// </summary>
-            private IWindsorContainer windsorContainer;
-
             /// <inheritdoc />
             protected override decimal AkkaConfigLoadPriority => -1M;
 
@@ -906,11 +909,10 @@ namespace ClusterKit.NodeManager.Tests
             }
 
             /// <inheritdoc />
-            protected override void PostStart()
+            protected override void PostStart(IComponentContext componentContext)
             {
-                base.PostStart();
-                var contextManager = this.windsorContainer.Resolve<UniversalContextFactory>();
-                var config = this.windsorContainer.Resolve<Config>();
+                var contextManager = componentContext.Resolve<UniversalContextFactory>();
+                var config = componentContext.Resolve<Config>();
                 var connectionString = config.GetString(NodeManagerActor.ConfigConnectionStringPath);
                 var databaseName = config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
                 using (var context =
@@ -922,25 +924,48 @@ namespace ClusterKit.NodeManager.Tests
             }
 
             /// <inheritdoc />
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
-                this.windsorContainer = container;
-                container.Register(
-                    Classes.FromAssemblyContaining<NodeManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
-                        .LifestyleTransient());
-                container.Register(
-                    Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase)))
-                        .LifestyleTransient());
+                container.RegisterAssemblyTypes(typeof(NodeManagerActor).GetTypeInfo().Assembly)
+                    .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
+                    .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
 
-                container.Register(
-                    Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>()
-                        .LifestyleTransient());
+                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
 
-                var packageRepository = this.CreateTestRepository();
+                container.RegisterInstance(this.CreateTestRepository()).As<IPackageRepository>();
+                container.RegisterType<TestMessageRouter>().As<IMessageRouter>();
+            }
 
-                container.Register(Component.For<IPackageRepository>().Instance(packageRepository));
-                container.Register(
-                    Component.For<IMessageRouter>().ImplementedBy<TestMessageRouter>().LifestyleSingleton());
+            /// <summary>
+            /// Gets the list of loaded assemblies
+            /// </summary>
+            /// <returns>The list of loaded assemblies</returns>
+            private static IEnumerable<Assembly> GetLoadedAssemblies()
+            {
+#if APPDOMAIN
+                return AppDomain.CurrentDomain.GetAssemblies();
+#elif CORECLR
+                var assemblies = new List<Assembly>();
+                var dependencies = DependencyContext.Default.RuntimeLibraries;
+                foreach (var library in dependencies)
+                {
+                    try
+                    {
+                        var assembly = Assembly.Load(new AssemblyName(library.Name));
+                        assemblies.Add(assembly);
+                    }
+                    catch
+                    {
+                        // do nothing can't if can't load assembly
+                    }
+                }
+
+                return assemblies;
+#else
+#warning Method not implemented
+            throw new NotImplementedException();
+#endif
             }
 
             /// <summary>
@@ -951,6 +976,7 @@ namespace ClusterKit.NodeManager.Tests
             /// <returns>The test package</returns>
             private ReleaseCheckTestsBase.TestPackage CreateTestPackage(Assembly assembly, Assembly[] allAssemblies)
             {
+                /*
                 Action<IFileSystem, string> extractContentsAction = (system, destination) =>
                     {
                         foreach (var f in assembly.GetFiles())
@@ -959,7 +985,9 @@ namespace ClusterKit.NodeManager.Tests
                             system.AddFile(Path.Combine(destination, "lib", fileName), f);
                         }
                     };
+                    */
 
+                /*
                 Func<IEnumerable<IPackageFile>> filesAction = () => assembly.GetFiles().Select(
                     fs => new ReleaseCheckTestsBase.TestPackageFile
                               {
@@ -972,38 +1000,42 @@ namespace ClusterKit.NodeManager.Tests
                                       "lib",
                                       Path.GetFileName(fs.Name) ?? fs.Name)
                               });
-
+                              */
                 var dependencies = assembly.GetReferencedAssemblies().Select(
                     d =>
                         {
                             var dependentAssembly = allAssemblies.FirstOrDefault(a => a.GetName().Name == d.Name);
                             return dependentAssembly != null && !dependentAssembly.IsDynamic
-                                   && !dependentAssembly.GlobalAssemblyCache ? dependentAssembly : null;
+#if APPDOMAIN
+                                   && !dependentAssembly.GlobalAssemblyCache 
+#endif
+                                       ? dependentAssembly
+                                       : null;
                         }).Where(d => d != null).Select(
                     d => new PackageDependency(
                         d.GetName().Name,
-                        new VersionSpec
-                            {
-                                MinVersion = SemanticVersion.Parse(d.GetName().Version.ToString()),
-                                IsMinInclusive = true
-                            }));
+                        new VersionRange(NuGetVersion.Parse(d.GetName().Version.ToString())))).ToList();
 
-                return new ReleaseCheckTestsBase.TestPackage
+                var standardDependencies = new PackageDependencyGroup(
+                    NuGetFramework.ParseFrameworkName(
+                        ReleaseCheckTestsBase.NetStandard,
+                        DefaultFrameworkNameProvider.Instance),
+                    dependencies);
+                var net46Dependencies = new PackageDependencyGroup(
+                    NuGetFramework.ParseFrameworkName(
+                        ReleaseCheckTestsBase.Net46,
+                        DefaultFrameworkNameProvider.Instance),
+                    dependencies);
+                return new ReleaseCheckTestsBase.TestPackage(
+                           assembly.GetName().Name,
+                           assembly.GetName().Version.ToString())
                            {
-                               Id = assembly.GetName().Name,
-                               Version =
-                                   new SemanticVersion(
-                                       assembly.GetName().Version.ToString()),
                                DependencySets =
-                                   new List<PackageDependencySet>
+                                   new[]
                                        {
-                                           new
-                                               PackageDependencySet(
-                                                   null,
-                                                   dependencies)
-                                       },
-                               ExtractContentsAction = extractContentsAction,
-                               GetFilesAction = filesAction
+                                           standardDependencies,
+                                           net46Dependencies
+                                       }
                            };
             }
 
@@ -1016,7 +1048,7 @@ namespace ClusterKit.NodeManager.Tests
                 var ignoredAssemblies = new List<string>();
                 while (true)
                 {
-                    var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    var loadedAssemblies = GetLoadedAssemblies().ToList();
 
                     var assembliesToLoad = loadedAssemblies
                         .SelectMany(a => a.GetReferencedAssemblies().Select(r => new { r, a })).GroupBy(a => a.r.Name)
@@ -1034,7 +1066,12 @@ namespace ClusterKit.NodeManager.Tests
                     {
                         try
                         {
+#if APPDOMAIN
                             AppDomain.CurrentDomain.Load(assemblyName);
+#endif
+#if CORECLR
+                            AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
+#endif
                         }
                         catch
                         {
@@ -1045,10 +1082,15 @@ namespace ClusterKit.NodeManager.Tests
                     }
                 }
 
-                var packages = AppDomain.CurrentDomain.GetAssemblies()
+                var assemblies = GetLoadedAssemblies().ToArray();
+                var packages = assemblies
+#if APPDOMAIN
                     .Where(a => !a.GlobalAssemblyCache && !a.IsDynamic)
-                    .Select(p => this.CreateTestPackage(p, AppDomain.CurrentDomain.GetAssemblies())).GroupBy(a => a.Id)
-                    .Select(g => g.OrderByDescending(a => a.Version).First()).Cast<IPackage>().ToArray();
+#elif CORECLR
+                    .Where(a => !a.IsDynamic)
+#endif
+                    .Select(p => this.CreateTestPackage(p, assemblies)).GroupBy(a => a.Identity.Id)
+                    .Select(g => g.OrderByDescending(a => a.Identity.Id).First()).ToArray();
                 return new ReleaseCheckTestsBase.TestRepository(packages);
             }
         }

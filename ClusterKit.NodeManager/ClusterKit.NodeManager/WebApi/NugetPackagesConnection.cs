@@ -17,8 +17,7 @@ namespace ClusterKit.NodeManager.WebApi
 
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client.ApiSurrogates;
-
-    using NuGet;
+    using ClusterKit.NodeManager.ConfigurationSource;
 
     /// <summary>
     /// The connection to the nuget server
@@ -26,57 +25,52 @@ namespace ClusterKit.NodeManager.WebApi
     public class NugetPackagesConnection : INodeConnection<PackageFamily>
     {
         /// <summary>
-        /// The nuget server url
+        /// The packages repository
         /// </summary>
-        private string nugetServerUrl;
+        private readonly IPackageRepository packageRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NugetPackagesConnection"/> class.
         /// </summary>
-        /// <param name="nugetServerUrl">
-        /// The nuget server url.
+        /// <param name="packageRepository">
+        /// The package Repository.
         /// </param>
-        public NugetPackagesConnection(string nugetServerUrl)
+        public NugetPackagesConnection(IPackageRepository packageRepository)
         {
-            this.nugetServerUrl = nugetServerUrl;
+            this.packageRepository = packageRepository;
         }
 
         /// <inheritdoc />
-        public Task<QueryResult<PackageFamily>> Query(
+        public async Task<QueryResult<PackageFamily>> Query(
             Expression<Func<PackageFamily, bool>> filter,
             IEnumerable<SortingCondition> sort,
             int? limit,
             int? offset,
             ApiRequest apiRequest)
         {
-            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(this.nugetServerUrl);
-
             IQueryable<PackageFamily> query;
-            if (apiRequest.Fields.Where(f => f.FieldName == "items").SelectMany(f => f.Fields).Any(f => f.FieldName == "availableVersions"))
+            if (apiRequest.Fields.Where(f => f.FieldName == "items").SelectMany(f => f.Fields)
+                .Any(f => f.FieldName == "availableVersions"))
             {
-                query = nugetRepository.Search(string.Empty, true).ToList().GroupBy(p => p.Id).Select(
-                    g =>
-                        {
-                            var package = g.FirstOrDefault(p => p.IsLatestVersion) ?? g.First();
-                            return new PackageFamily
-                                       {
-                                           Name = package.Id,
-                                           Version = package.Version.ToString(),
-                                           AvailableVersions =
-                                               g.OrderByDescending(p => p.Version)
-                                                   .Select(p => p.Version.ToString())
-                                                   .ToList()
-                                       };
-                        }).AsQueryable();
+                query = (await this.packageRepository.SearchAsync(string.Empty, true)).Select(p => p.Identity)
+                    .GroupBy(p => p.Id).Select(
+                        g =>
+                            {
+                                var package = g.OrderByDescending(p => p.Version).First();
+                                return new PackageFamily
+                                           {
+                                               Name = package.Id,
+                                               Version = package.Version.ToString(),
+                                               AvailableVersions = g.OrderByDescending(p => p.Version)
+                                                   .Select(p => p.Version.ToString()).ToList()
+                                           };
+                            }).AsQueryable();
             }
             else
             {
-                query =
-                    nugetRepository.Search(string.Empty, true)
-                        .Where(p => p.IsLatestVersion)
-                        .ToList()
-                        .Select(p => new PackageFamily { Name = p.Id, Version = p.Version.ToString() })
-                        .AsQueryable();
+                query = (await this.packageRepository.SearchAsync(string.Empty, true)).Select(p => p.Identity)
+                    .GroupBy(p => p.Id).Select(g => g.OrderByDescending(p => p.Version).First())
+                    .Select(p => new PackageFamily { Name = p.Id, Version = p.Version.ToString() }).AsQueryable();
             }
 
             if (filter != null)
@@ -101,7 +95,7 @@ namespace ClusterKit.NodeManager.WebApi
                 query = query.Take(limit.Value);
             }
 
-            return Task.FromResult(new QueryResult<PackageFamily> { Count = count, Items = query });
+            return new QueryResult<PackageFamily> { Count = count, Items = query };
         }
 
         /// <inheritdoc />

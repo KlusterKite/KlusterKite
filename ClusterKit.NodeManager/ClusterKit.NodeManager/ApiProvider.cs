@@ -12,6 +12,7 @@ namespace ClusterKit.NodeManager
     using Akka.Actor;
 
     using ClusterKit.API.Attributes;
+    using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.WebApi;
     using ClusterKit.Security.Attributes;
 
@@ -34,10 +35,11 @@ namespace ClusterKit.NodeManager
         /// <param name="actorSystem">
         /// The actor system.
         /// </param>
-        public ApiProvider(ActorSystem actorSystem)
+        /// <param name="packageRepository">The package repository</param>
+        public ApiProvider(ActorSystem actorSystem, IPackageRepository packageRepository)
         {
             this.actorSystem = actorSystem;
-            this.ClusterKitNodesApi = new NodeManagerApi(actorSystem);
+            this.ClusterKitNodesApi = new NodeManagerApi(actorSystem, packageRepository);
         }
 
         /// <summary>

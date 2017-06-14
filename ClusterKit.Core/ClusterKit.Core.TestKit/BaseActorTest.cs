@@ -253,6 +253,7 @@ namespace ClusterKit.Core.TestKit
             foreach (var pluginInstaller in configurator.GetPluginInstallers())
             {
                 pluginInstaller.Install(containerBuilder);
+                containerBuilder.RegisterInstance(pluginInstaller).As<BaseInstaller>();
             }
 
             var config = configurator.GetAkkaConfig(containerBuilder);

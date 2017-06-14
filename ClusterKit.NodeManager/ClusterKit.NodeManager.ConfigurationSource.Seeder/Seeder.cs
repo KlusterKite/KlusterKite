@@ -12,7 +12,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Configuration;
@@ -30,12 +30,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Infrastructure;
     using Microsoft.EntityFrameworkCore.Storage;
-
-    using NuGet;
-    using NuGet.Common;
-    using NuGet.Configuration;
-    using NuGet.Protocol;
-    using NuGet.Protocol.Core.Types;
 
     /// <summary>
     /// Seeds the <see cref="ConfigurationContext"/>
@@ -67,6 +61,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         private readonly UniversalContextFactory contextFactory;
 
         /// <summary>
+        /// The package repository
+        /// </summary>
+        private readonly IPackageRepository packageRepository;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Seeder"/> class.
         /// </summary>
         /// <param name="config">
@@ -75,10 +74,14 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// <param name="contextFactory">
         /// The context factory.
         /// </param>
-        public Seeder(Config config, UniversalContextFactory contextFactory)
+        /// <param name="packageRepository">
+        /// The package repository.
+        /// </param>
+        public Seeder(Config config, UniversalContextFactory contextFactory, IPackageRepository packageRepository)
         {
             this.Config = config;
             this.contextFactory = contextFactory;
+            this.packageRepository = packageRepository;
         }
 
         /// <summary>
@@ -114,13 +117,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                 context.Database.Migrate();
                 
                 this.SetupUsers(context);
-                var repository = this.Config.GetString("Nuget");
                 var configuration =
                     new ReleaseConfiguration
                         {
                             NodeTemplates = this.GetNodeTemplates().ToList(),
                             MigratorTemplates = this.GetMigratorTemplates().ToList(),
-                            Packages = this.GetPackageDescriptions(repository).GetAwaiter().GetResult(),
+                            Packages = this.GetPackageDescriptions().GetAwaiter().GetResult(),
                             SeedAddresses = this.GetSeeds().ToList(),
                             NugetFeeds = this.GetNugetFeeds().ToList()
                         };
@@ -135,7 +137,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
 
                 var supportedFrameworks = this.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
                 var initialErrors =
-                    initialRelease.SetPackagesDescriptionsForTemplates(repository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
+                    initialRelease.SetPackagesDescriptionsForTemplates(this.packageRepository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
 
                 foreach (var errorDescription in initialErrors)
                 {
@@ -184,7 +186,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.Log.ElasticSearch",
                                              "ClusterKit.Monitoring.Client",
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = Configurations.Publisher
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.publisher.hocon")
                              };
             yield return new NodeTemplate
                              {
@@ -211,8 +213,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.API.Endpoint",
                                              "ClusterKit.Web.GraphQL.Publisher"
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = Configurations.ClusterManager,
-                             };
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.clusterManager.hocon")
+            };
 
             yield return new NodeTemplate
                              {
@@ -229,8 +231,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.NodeManager.Client",
                                              "ClusterKit.Monitoring.Client"
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = Configurations.Empty,
-                             };
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.empty.hocon")
+            };
         }
 
         /// <summary>
@@ -243,7 +245,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                              {
                                  Name = "ClusterKit Migrator",
                                  Code = "ClusterKit",
-                                 Configuration = Configurations.Migrator,
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.migrator.hocon"),
                                  PackageRequirements =
                                      new[]
                                          {
@@ -261,11 +263,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// <summary>
         /// Get the list of package descriptions
         /// </summary>
-        /// <param name="repository">The package repository</param>
         /// <returns>The list of package descriptions</returns>
-        protected virtual async Task<List<PackageDescription>> GetPackageDescriptions(string repository)
+        protected virtual async Task<List<PackageDescription>> GetPackageDescriptions()
         {
-            return (await PackageUtils.Search(repository, string.Empty))
+            return (await this.packageRepository.SearchAsync(string.Empty, true))
                 .Select(p => new PackageDescription(p.Identity.Id, p.Identity.Version.ToString())).ToList();
         }
 

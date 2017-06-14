@@ -9,6 +9,8 @@
 
 namespace ClusterKit.NodeManager.Authentication
 {
+    using System.Reflection;
+
     using Akka.Actor;
     using Akka.Configuration;
 
@@ -35,12 +37,12 @@ namespace ClusterKit.NodeManager.Authentication
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.NodeManager.Authentication.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.RegisterAssemblyTypes(typeof(Installer).Assembly).Where(t => t.IsSubclassOf(typeof(ActorBase)));
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
             container.RegisterType<ClientProvider>().As<IClientProvider>();
         }
     }

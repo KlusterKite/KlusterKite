@@ -21,7 +21,9 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The compatible node template
     /// </summary>
     [ApiDescription("The compatible node template", Name = "CompatibleTemplate")]
+#if APPDOMAIN
     [Serializable]
+#endif
     public class CompatibleTemplate
     {
         /// <summary>

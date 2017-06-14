@@ -9,11 +9,14 @@
 
 namespace ClusterKit.NodeManager.Launcher.Utils
 {
-    using System;
-    using System.Globalization;
     using System.IO;
     using System.Reflection;
+
+#if APPDOMAIN
+    using System;
+    using System.Globalization;
     using System.Xml;
+#endif
 
     /// <summary>
     /// A bundle of methods to tune executable configuration file
@@ -28,6 +31,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         /// </param>
         public static void FixAssemblyVersions(string configurationFileName)
         {
+#if APPDOMAIN
             var document = new XmlDocument();
             document.Load(configurationFileName);
             var documentElement = document.DocumentElement;
@@ -90,6 +94,29 @@ namespace ClusterKit.NodeManager.Launcher.Utils
             }
 
             document.Save(configurationFileName);
+#endif
+        }
+
+        /// <summary>
+        /// Reads texts resource
+        /// </summary>
+        /// <param name="assembly">The resource containing assembly</param>
+        /// <param name="resourceName">The resource name</param>
+        /// <returns>The resource contents</returns>
+        public static string ReadTextResource(Assembly assembly, string resourceName)
+        {
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                {
+                    return null;
+                }
+
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
         }
     }
 }

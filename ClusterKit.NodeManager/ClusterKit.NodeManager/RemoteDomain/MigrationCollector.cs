@@ -18,13 +18,10 @@ namespace ClusterKit.NodeManager.RemoteDomain
     using Akka.Configuration;
 
     using Autofac;
-    using Autofac.Extras.CommonServiceLocator;
 
     using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Migrator;
-
-    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// Base class to launch <see cref="IMigrator"/> in remote domain
@@ -32,7 +29,10 @@ namespace ClusterKit.NodeManager.RemoteDomain
     /// <typeparam name="T">
     /// The type of expected result
     /// </typeparam>
-    public abstract class MigrationCollector<T> : MarshalByRefObject
+    public abstract class MigrationCollector<T>
+#if APPDOMAIN
+        : MarshalByRefObject
+#endif
     {
         /// <summary>
         /// Gets the DI container
@@ -95,6 +95,8 @@ namespace ClusterKit.NodeManager.RemoteDomain
                 return;
             }
 
+            throw new NotImplementedException();
+            /*
             foreach (var file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
             {
                 try
@@ -150,7 +152,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
             }
 
             this.container = builder.Build();
-            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(this.container));
+            */
         }
     }
 }

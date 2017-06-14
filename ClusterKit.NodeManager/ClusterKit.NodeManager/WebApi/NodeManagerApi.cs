@@ -23,6 +23,7 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
+    using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Messages;
     using ClusterKit.Security.Attributes;
 
@@ -40,9 +41,9 @@ namespace ClusterKit.NodeManager.WebApi
         private readonly ActorSystem actorSystem;
 
         /// <summary>
-        /// The address of the cluster nuget repository
+        /// The package repository
         /// </summary>
-        private readonly string feedUrl;
+        private readonly IPackageRepository packageRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerApi"/> class.
@@ -50,10 +51,11 @@ namespace ClusterKit.NodeManager.WebApi
         /// <param name="actorSystem">
         /// The actor system.
         /// </param>
-        public NodeManagerApi(ActorSystem actorSystem)
+        /// <param name="packageRepository">The package repository</param>
+        public NodeManagerApi(ActorSystem actorSystem, IPackageRepository packageRepository)
         {
             this.actorSystem = actorSystem;
-            this.feedUrl = actorSystem.Settings.Config.GetString(NodeManagerActor.PackageRepositoryUrlPath);
+            this.packageRepository = packageRepository;
             this.AkkaTimeout = ConfigurationUtils.GetRestTimeout(actorSystem);
             this.ClusterManagement = new ClusterManagement(this.actorSystem);
         }
@@ -85,7 +87,7 @@ namespace ClusterKit.NodeManager.WebApi
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetPackages, Scope = EnPrivilegeScope.User)]
-        public NugetPackagesConnection NugetPackages => new NugetPackagesConnection(this.feedUrl);
+        public NugetPackagesConnection NugetPackages => new NugetPackagesConnection(this.packageRepository);
 
         /// <summary>
         /// Gets timeout for actor system requests

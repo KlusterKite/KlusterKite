@@ -10,12 +10,10 @@
 namespace ClusterKit.NodeManager.Tests
 {
     using System.Collections.Generic;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Threading;
 
-    using NuGet;
     using NuGet.Frameworks;
     using NuGet.Packaging;
     using NuGet.Protocol;

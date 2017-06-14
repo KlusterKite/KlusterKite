@@ -19,8 +19,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
-
+    
     using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +43,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         public static async Task<List<ErrorDescription>> CheckAll(
             this Release release,
             ConfigurationContext context,
-            string nugetRepository,
+            IPackageRepository nugetRepository,
             List<string> supportedFrameworks)
         {
             release.CompatibleTemplatesBackward = release.GetCompatibleTemplates(context).ToList();
@@ -216,7 +215,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </returns>
         public static async Task<List<ErrorDescription>> SetPackagesDescriptionsForTemplates(
             this Release release,
-            string nugetRepository,
+            IPackageRepository nugetRepository,
             List<string> supportedFrameworks)
         {
             var errors = new List<ErrorDescription>();
@@ -237,7 +236,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 errors.Add(new ErrorDescription("configuration.packages", "Packages are not initialized"));
                 return errors;
             }
-
+             
             var (packages, packagesErrors) = await CheckPackages(release, supportedFrameworks, nugetRepository);
             errors.AddRange(packagesErrors);
             errors.AddRange(await CheckTemplatesPackages(release, supportedFrameworks, packages, nugetRepository));
@@ -257,7 +256,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// The nuget repository.
         /// </param>
         private static async Task<(Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>)>
-            CheckPackages(Release release, List<string> supportedFrameworks, string nugetRepository)
+            CheckPackages(Release release, List<string> supportedFrameworks, IPackageRepository nugetRepository)
         {
             var definedPackages = new Dictionary<string, IPackageSearchMetadata>();
             var errors = new List<ErrorDescription>();
@@ -267,8 +266,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                    async description => new
                                                             {
                                                                 Description = description,
-                                                                Package = await PackageUtils.Search(
-                                                                              nugetRepository,
+                                                                Package = await nugetRepository.GetAsync(
                                                                               description.Id,
                                                                               NuGetVersion.Parse(description.Version))
                                                             }));
@@ -344,7 +342,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             [NotNull] Release release,
             [NotNull] List<string> supportedFrameworks,
             [NotNull] Dictionary<string, IPackageSearchMetadata> definedPackages,
-            [NotNull] string nugetRepository)
+            [NotNull] IPackageRepository nugetRepository)
         {
             if (release == null)
             {
@@ -490,7 +488,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </returns>
         private static async Task<(Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>)> GetTemplateDirectPackages(
             Dictionary<string, IPackageSearchMetadata> definedPackages,
-            string nugetRepository,
+            IPackageRepository nugetRepository,
             ITemplate nodeTemplate,
             string templateField)
         {
@@ -518,8 +516,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 async r => new
                                {
                                    Requirement = r,
-                                   Package = await PackageUtils.Search(
-                                                 nugetRepository,
+                                   Package = await nugetRepository.GetAsync(
                                                  r.Id,
                                                  NuGetVersion.Parse(r.SpecificVersion))
                                }));

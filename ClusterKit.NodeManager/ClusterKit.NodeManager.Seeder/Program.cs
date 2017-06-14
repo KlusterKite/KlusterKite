@@ -13,18 +13,16 @@ namespace ClusterKit.NodeManager.Seeder
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Akka.Configuration;
 
     using Autofac;
-    using Autofac.Extras.CommonServiceLocator;
 
     using ClusterKit.Core;
     using ClusterKit.NodeManager.Migrator;
 
     using JetBrains.Annotations;
-
-    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// Service main entry point
@@ -61,7 +59,6 @@ namespace ClusterKit.NodeManager.Seeder
             }
 
             var container = builder.Build();
-            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));
 
             foreach (var seederType in seederTypes)
             {
@@ -91,7 +88,7 @@ namespace ClusterKit.NodeManager.Seeder
                 return null;
             }
 
-            var invalidTypes = types.Where(t => !t.Type.IsSubclassOf(typeof(BaseSeeder))).ToList();
+            var invalidTypes = types.Where(t => !t.Type.GetTypeInfo().IsSubclassOf(typeof(BaseSeeder))).ToList();
             foreach (var type in invalidTypes)
             {
                 Console.WriteLine($@"{type.Name} is not a BaseSeeder");

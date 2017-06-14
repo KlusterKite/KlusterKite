@@ -10,9 +10,7 @@
 namespace ClusterKit.NodeManager.Launcher
 {
     using System;
-    using System.Configuration;
     using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -21,7 +19,10 @@ namespace ClusterKit.NodeManager.Launcher
     using System.Threading;
     using System.Xml;
 
+    using Akka.Configuration;
+
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
 
     using Newtonsoft.Json;
 
@@ -47,14 +48,18 @@ namespace ClusterKit.NodeManager.Launcher
                 this.IsValid = false;
             }
 
+            var config = File.Exists("config.hocon")
+                             ? ConfigurationFactory.ParseString(File.ReadAllText("config.hocon"))
+                             : Config.Empty;
+
             EnStopMode stopMode;
-            if (Enum.TryParse(ConfigurationManager.AppSettings["stopMode"], out stopMode))
+            if (Enum.TryParse(config.GetString("stopMode", EnStopMode.CleanRestart.ToString()), out stopMode))
             {
                 this.StopMode = stopMode;
             }
 
             if (stopMode == EnStopMode.RunAction
-                && string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["stopAction"]))
+                && string.IsNullOrWhiteSpace(config.GetString("stopAction")))
             {
                 Console.WriteLine(@"stopAction is not configured");
                 this.IsValid = false;
@@ -62,7 +67,7 @@ namespace ClusterKit.NodeManager.Launcher
 
             try
             {
-                this.ConfigurationUrl = new Uri(ConfigurationManager.AppSettings["nodeManagerUrl"]);
+                this.ConfigurationUrl = new Uri(config.GetString("nodeManagerUrl"));
             }
             catch (ArgumentNullException)
             {
@@ -77,7 +82,7 @@ namespace ClusterKit.NodeManager.Launcher
 
             try
             {
-                this.AuthenticationUrl = new Uri(ConfigurationManager.AppSettings["authenticationUrl"]);
+                this.AuthenticationUrl = new Uri(config.GetString("authenticationUrl"));
             }
             catch (ArgumentNullException)
             {
@@ -90,7 +95,7 @@ namespace ClusterKit.NodeManager.Launcher
                 this.IsValid = false;
             }
 
-            this.WorkingDirectory = ConfigurationManager.AppSettings["workingDirectory"];
+            this.WorkingDirectory = config.GetString("workingDirectory");
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
                 Console.WriteLine(@"workingDirectory is not configured");
@@ -117,23 +122,25 @@ namespace ClusterKit.NodeManager.Launcher
             }
 
             this.ContainerType = Environment.GetEnvironmentVariable("CONTAINER_TYPE")
-                                 ?? ConfigurationManager.AppSettings["containerType"];
+                                 ?? config.GetString("containerType", "worker");
 
-            this.FrameworkRuntimeType = ConfigurationManager.AppSettings["frameworkRuntimeType"];
+            this.FrameworkRuntimeType = config.GetString("frameworkRuntimeType");
             if (string.IsNullOrWhiteSpace(this.WorkingDirectory))
             {
                 Console.WriteLine(@"containerType is not configured");
                 this.IsValid = false;
             }
 
-            this.ApiClientId = ConfigurationManager.AppSettings["apiClientId"];
-            this.ApiClientSecret = ConfigurationManager.AppSettings["apiClientSecret"];
+            this.ApiClientId = config.GetString("apiClientId");
+            this.ApiClientSecret = config.GetString("apiClientSecret");
 
             if (string.IsNullOrWhiteSpace(this.ApiClientId) || string.IsNullOrWhiteSpace(this.ApiClientSecret))
             {
                 Console.WriteLine(@"api access is not configured");
                 this.IsValid = false;
             }
+
+            this.FallBackConfiguration = config.GetString("fallbackConfiguration");
         }
 
         /// <summary>
@@ -206,6 +213,11 @@ namespace ClusterKit.NodeManager.Launcher
         /// Gets the current working directory. All packages and new service will be stored here.
         /// </summary>
         private string WorkingDirectory { get; }
+
+        /// <summary>
+        /// Gets the fallback configuration file
+        /// </summary>
+        private string FallBackConfiguration { get; }
 
         /// <summary>
         /// Checks the ability to create and write to a file in the supplied directory.
@@ -283,7 +295,8 @@ namespace ClusterKit.NodeManager.Launcher
             this.PrepareNuGetConfig(config);
             this.InstallPackages(config);
             this.CreateService(config);
-            this.FixAssemblyVersions();
+            ConfigurationUtils.FixAssemblyVersions(
+                Path.Combine(this.WorkingDirectory, "service", "ClusterKit.Core.Service.exe.config"));
         }
 
         /// <summary>
@@ -312,7 +325,7 @@ namespace ClusterKit.NodeManager.Launcher
                             NodeUid = this.Uid,
                             FrameworkRuntimeType = this.FrameworkRuntimeType
                         });
-                var response = client.Execute<NodeStartUpConfiguration>(request);
+                var response = client.ExecuteTaskAsync<NodeStartUpConfiguration>(request).GetAwaiter().GetResult();
 
                 if (response.ResponseStatus != ResponseStatus.Completed
                     || response.StatusCode == HttpStatusCode.BadGateway)
@@ -335,14 +348,13 @@ namespace ClusterKit.NodeManager.Launcher
         /// <returns>The new config</returns>
         private NodeStartUpConfiguration GetFallBackConfig()
         {
-            var fallBackConfiguration = ConfigurationManager.AppSettings["fallbackConfiguration"];
-            if (string.IsNullOrWhiteSpace(fallBackConfiguration) || !File.Exists(fallBackConfiguration))
+            if (string.IsNullOrWhiteSpace(this.FallBackConfiguration) || !File.Exists(this.FallBackConfiguration))
             {
                 throw new Exception("Could not get configuration from service and there is no fallback configuration");
             }
 
             Console.WriteLine(@"Could not get configuration, using fallback...");
-            return JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(fallBackConfiguration));
+            return JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText(this.FallBackConfiguration));
         }
 
         /// <summary>
@@ -361,7 +373,7 @@ namespace ClusterKit.NodeManager.Launcher
 
             while (true)
             {
-                var result = client.Execute(request);
+                var result = client.ExecuteTaskAsync(request).GetAwaiter().GetResult();
                 if (result.ResponseStatus != ResponseStatus.Completed 
                     || result.StatusCode == HttpStatusCode.BadGateway 
                     || result.StatusCode == HttpStatusCode.NotFound)
@@ -454,76 +466,6 @@ namespace ClusterKit.NodeManager.Launcher
         }
 
         /// <summary>
-        /// Fixes service configuration file to pass possible version conflicts in dependent assemblies
-        /// </summary>
-        private void FixAssemblyVersions()
-        {
-            var dirName = Path.Combine(this.WorkingDirectory, "service");
-            var configName = Path.Combine(dirName, "ClusterKit.Core.Service.exe.config");
-
-            XmlDocument confDoc = new XmlDocument();
-            confDoc.Load(configName);
-            var documentElement = confDoc.DocumentElement;
-            if (documentElement == null)
-            {
-                Console.WriteLine($@"Configuration file {configName} is broken");
-                return;
-            }
-
-            documentElement = (XmlElement)documentElement.SelectSingleNode("/configuration");
-            if (documentElement == null)
-            {
-                Console.WriteLine($@"Configuration file {configName} is broken");
-                return;
-            }
-
-            var runTimeNode = documentElement.SelectSingleNode("./runtime")
-                              ?? documentElement.AppendChild(confDoc.CreateElement("runtime"));
-
-            var nameTable = confDoc.NameTable;
-            var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string Uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", Uri);
-
-            var assemblyBindingNode = runTimeNode.SelectSingleNode("./urn:assemblyBinding", namespaceManager)
-                                      ?? runTimeNode.AppendChild(confDoc.CreateElement("assemblyBinding", Uri));
-
-            foreach (var lib in Directory.GetFiles(dirName, "*.dll"))
-            {
-                var parameters = AssemblyName.GetAssemblyName(lib);
-                var dependentNode =
-                    assemblyBindingNode?.SelectSingleNode(
-                        $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
-                        namespaceManager)
-                    ?? assemblyBindingNode?.AppendChild(confDoc.CreateElement("dependentAssembly", Uri));
-
-                if (dependentNode == null)
-                {
-                    continue;
-                }
-
-                dependentNode.RemoveAll();
-                var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("assemblyIdentity", Uri));
-                assemblyIdentityNode.SetAttribute("name", parameters.Name);
-                var publicKeyToken =
-                    BitConverter.ToString(parameters.GetPublicKeyToken())
-                        .Replace("-", string.Empty)
-                        .ToLower(CultureInfo.InvariantCulture);
-                assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
-                var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(confDoc.CreateElement("bindingRedirect", Uri));
-                bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
-                bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
-
-                // Console.WriteLine($"{parameters.Name} {parameters.Version} {BitConverter.ToString(parameters.GetPublicKeyToken()).Replace("-", "").ToLower(CultureInfo.InvariantCulture)}");
-                Console.WriteLine($@"{parameters.Name} {parameters.Version}");
-            }
-
-            confDoc.Save(configName);
-        }
-
-        /// <summary>
         /// Download specified nuget packages and their dependencies
         /// </summary>
         /// <param name="configuration">The node configuration</param>
@@ -533,7 +475,7 @@ namespace ClusterKit.NodeManager.Launcher
             xmlDocument.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<packages>\n</packages>\n");
 
             // ReSharper disable PossibleNullReferenceException
-            var rootNode = xmlDocument.DocumentElement.SelectSingleNode("/packages");
+            var rootNode = xmlDocument.DocumentElement;
             foreach (var package in configuration.Packages)
             {
                 var packageNode = (XmlElement)rootNode.AppendChild(xmlDocument.CreateElement("package"));
@@ -541,7 +483,11 @@ namespace ClusterKit.NodeManager.Launcher
                 packageNode.SetAttribute("version", package.Version);
             }
 
-            xmlDocument.Save(Path.Combine(this.WorkingDirectory, "packages.config"));
+            using (var fileStream = File.Create(Path.Combine(this.WorkingDirectory, "packages.config")))
+            {
+                xmlDocument.Save(fileStream);
+            }
+
             using (var process = new Process())
             {
                 process.StartInfo.UseShellExecute = false;
@@ -618,12 +564,12 @@ namespace ClusterKit.NodeManager.Launcher
             var configPath = Path.Combine(this.WorkingDirectory, "nuget.config");
 
             File.Copy(
-                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "nuget.exe"),
+                Path.Combine(Path.GetDirectoryName(this.GetType().GetTypeInfo().Assembly.Location) ?? ".", "nuget.exe"),
                 Path.Combine(this.WorkingDirectory, "nuget.exe"));
 
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml(Resources.NugetConfig);
-            var root = doc.SelectSingleNode("/configuration/packageSources");
+            doc.LoadXml(ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.Launcher.Resources.nuget.config"));
+            var root = doc.DocumentElement?.ChildNodes.OfType<XmlElement>().FirstOrDefault(n => n.Name == "packageSources");
 
             int index = 0;
             foreach (var packageSource in configuration.PackageSources)
@@ -634,7 +580,10 @@ namespace ClusterKit.NodeManager.Launcher
                 root?.AppendChild(addNode);
             }
 
-            doc.Save(configPath);
+            using (var fileStream = File.Create(configPath))
+            {
+                doc.Save(fileStream);
+            }
         }
 
         /// <summary>
@@ -654,10 +603,12 @@ namespace ClusterKit.NodeManager.Launcher
                             this.LaunchNode();
                             Thread.Sleep(TimeSpan.FromSeconds(30));
                         }
+#if APPDOMAIN
                         catch (ThreadAbortException)
                         {
                             throw;
                         }
+#endif
                         catch (Exception exception)
                         {
                             Console.WriteLine($@"Failed to launch, {exception.Message}");

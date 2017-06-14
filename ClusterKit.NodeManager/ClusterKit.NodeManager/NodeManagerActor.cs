@@ -20,6 +20,8 @@ namespace ClusterKit.NodeManager
     using Akka.Event;
     using Akka.Util.Internal;
 
+    using Autofac;
+
     using ClusterKit.API.Client;
     using ClusterKit.Core;
     using ClusterKit.Core.Monads;
@@ -41,8 +43,6 @@ namespace ClusterKit.NodeManager
 
     using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
-
-    using NuGet;
 
     /// <summary>
     /// Singleton actor performing all node configuration related work
@@ -113,10 +113,10 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<Address, NodeDescription> nodeDescriptions =
             new Dictionary<Address, NodeDescription>();
 
-        /// <summary>
+        /// <summary>  
         /// The nuget repository
         /// </summary>
-        private readonly string nugetRepository;
+        private readonly IPackageRepository nugetRepository;
 
         /// <summary>
         /// Random number generator
@@ -202,6 +202,9 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
         /// </summary>
+        /// <param name="componentContext">
+        /// The DI context
+        /// </param>
         /// <param name="contextFactory">
         /// Configuration context factory
         /// </param>
@@ -212,13 +215,14 @@ namespace ClusterKit.NodeManager
         /// The nuget repository
         /// </param>
         public NodeManagerActor(
+            IComponentContext componentContext,
             UniversalContextFactory contextFactory,
-            IMessageRouter router /*,
-            IPackageRepository nugetRepository*/)
+            IMessageRouter router,
+            IPackageRepository nugetRepository) : base(componentContext)
         {
             this.contextFactory = contextFactory;
             this.router = router;
-            // this.nugetRepository = nugetRepository;
+            this.nugetRepository = nugetRepository;
 
             this.fullClusterWaitTimeout = Context.System.Settings.Config.GetTimeSpan(
                 "ClusterKit.NodeManager.FullClusterWaitTimeout",
@@ -467,8 +471,14 @@ namespace ClusterKit.NodeManager
             }
 
             this.workers = Context.ActorOf(
-                Props.Create(() => new Worker(this.databaseProviderName, this.connectionString, this.databaseName, this.contextFactory, this.Self))
-                    .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
+                Props.Create(
+                    () => new Worker(
+                        this.databaseProviderName,
+                        this.connectionString,
+                        this.databaseName,
+                        this.ComponentContext,
+                        this.contextFactory,
+                        this.Self)).WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                 "workers");
 
             var migrationActorSubstitute =
@@ -1902,6 +1912,9 @@ namespace ClusterKit.NodeManager
             /// <param name="databaseName">
             /// The database name
             /// </param>
+            /// <param name="componentContext">
+            /// The DI context
+            /// </param>
             /// <param name="contextFactory">
             /// Configuration context factory
             /// </param>
@@ -1912,9 +1925,10 @@ namespace ClusterKit.NodeManager
                 string databaseProviderName,
                 string connectionString,
                 string databaseName,
+                IComponentContext componentContext,
                 UniversalContextFactory contextFactory,
                 IActorRef parent)
-                : base(parent)
+                : base(componentContext, parent)
             {
                 // ReSharper disable FormatStringProblem
                 Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
@@ -1964,7 +1978,7 @@ namespace ClusterKit.NodeManager
             {
                 using (var ds = this.GetContext())
                 {
-                    var factory = DataFactory<ConfigurationContext, User, string>.CreateFactory(ds);
+                    var factory = DataFactory<ConfigurationContext, User, string>.CreateFactory(this.ComponentContext, ds);
                     try
                     {
                         var user = await factory.Get(request.Login);
@@ -1996,7 +2010,7 @@ namespace ClusterKit.NodeManager
             {
                 using (var ds = this.GetContext())
                 {
-                    var factory = DataFactory<ConfigurationContext, User, Guid>.CreateFactory(ds);
+                    var factory = DataFactory<ConfigurationContext, User, Guid>.CreateFactory(this.ComponentContext, ds);
                     try
                     {
                         var user = await factory.Get(request.Uid);

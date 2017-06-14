@@ -188,6 +188,7 @@ namespace ClusterKit.Core
             foreach (var installer in installers)
             {
                 installer.RegisterComponents(container, config);
+                container.RegisterInstance(installer).As<BaseInstaller>();
             }
         }
 

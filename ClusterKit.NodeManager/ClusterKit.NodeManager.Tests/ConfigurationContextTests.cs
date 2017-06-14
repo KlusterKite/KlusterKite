@@ -12,6 +12,7 @@ namespace ClusterKit.NodeManager.Tests
     using System;
     using System.Linq;
 
+    using ClusterKit.Data.EF.InMemory;
     using ClusterKit.NodeManager.ConfigurationSource;
 
     using Microsoft.EntityFrameworkCore;
@@ -53,7 +54,9 @@ namespace ClusterKit.NodeManager.Tests
         {
             var builder = new DbContextOptionsBuilder<ConfigurationContext>();
             builder.UseInMemoryDatabase("ClusterKit.NodeManager.Tests.ConfigurationContextTests");
-            return new ConfigurationContext(builder.Options);
+            var configurationContext = new ConfigurationContext(builder.Options);
+            configurationContext.ResetValueGenerators();
+            return configurationContext;
         }
     }
 }

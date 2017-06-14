@@ -1,0 +1,721 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ClusterKit.Core</name>
+    </assembly>
+    <members>
+        <member name="T:ClusterKit.Core.ActorSystemUtils">
+            <summary>
+            Utilities to work with <seealso cref="T:Akka.Actor.ActorSystem"/>
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.ActorSystemUtils.RegisterWindsorInstallers(Castle.Windsor.IWindsorContainer,System.Boolean)">
+            <summary>
+            Scans main application directory for libraries and windsor installers in them and installs them
+            </summary>
+            <param name="container">
+            Current windsor container
+            </param>
+            <param name="installAssemblies">
+            A value indicating whether this should scan current directory and load assemblies
+            </param>
+        </member>
+        <member name="M:ClusterKit.Core.ActorSystemUtils.StartNameSpaceActorsFromConfiguration(Akka.Actor.ActorSystem)">
+            <summary>
+            Parses hocon configuration of actor system and starts <seealso cref="T:ClusterKit.Core.NameSpaceActor"/> that was defined in it
+            </summary>
+            <param name="sys">The actor system</param>
+        </member>
+        <member name="T:ClusterKit.Core.BaseInstaller">
+            <summary>
+            Base class to install ClusterKit plugin components
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.BaseInstaller.PriorityClusterRole">
+            <summary>
+            Predefined priority to load configuration for plugins, that handles node role functionality
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.BaseInstaller.PrioritySharedLib">
+            <summary>
+            Predefined priority to load configuration for plugins, that handles other plugins functionality
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.BaseInstaller.PriorityTest">
+            <summary>
+            Predefined priority to load configuration for plugins, that handles unit tests
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.BaseInstaller.RegisteredInstallers">
+            <summary>
+            Every time <seealso cref="M:ClusterKit.Core.BaseInstaller.Install(Castle.Windsor.IWindsorContainer,Castle.MicroKernel.SubSystems.Configuration.IConfigurationStore)"/> called, installer register itself here
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Core.BaseInstaller.AkkaConfigLoadPriority">
+            <summary>
+            Gets priority for ordering akka configurations. Highest priority will override lower priority.
+            </summary>
+            <remarks>Consider using <seealso cref="T:ClusterKit.Core.BaseInstaller"/> integrated constants</remarks>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.GetRegisteredBaseInstallers(Castle.Windsor.IWindsorContainer)">
+            <summary>
+            Gets the list of all registered installers
+            </summary>
+            <param name="container">
+            The windsor container.
+            </param>
+            <returns>
+            the list of all registered installers
+            </returns>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.GetStackedConfig(Castle.Windsor.IWindsorContainer,Akka.Configuration.Config)">
+            <summary>
+            Generates overall akka config from all registered modules (with respect to external provided configuration file)
+            </summary>
+            <param name="container">
+            The windsor container.
+            </param>
+            <param name="config">
+            Top level config
+            </param>
+            <returns>
+            Akka and system configuration
+            </returns>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.RunPostStart(Castle.Windsor.IWindsorContainer)">
+            <summary>
+            Runs all registered installers <seealso cref="M:ClusterKit.Core.BaseInstaller.PostStart"/>
+            </summary>
+            <param name="container">
+            The windsor container.
+            </param>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.RunPreCheck(Castle.Windsor.IWindsorContainer,Akka.Configuration.Config)">
+            <summary>
+            Runs all registered installers <seealso cref="M:ClusterKit.Core.BaseInstaller.PreCheck(Akka.Configuration.Config)"/>
+            </summary>
+            <param name="container">
+            The windsor container.
+            </param>
+            <param name="config">Full akka config</param>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.Install(Castle.Windsor.IWindsorContainer,Castle.MicroKernel.SubSystems.Configuration.IConfigurationStore)">
+            <summary>
+            Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
+            </summary>
+            <param name="container">The container.</param>
+            <param name="store">The configuration store.</param>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.PreCheck(Akka.Configuration.Config)">
+            <summary>
+            Should check the config and environment for possible errors.
+            If any found, shod throw the exception to prevent node from starting.
+            </summary>
+            <param name="config">Full akka config</param>
+            <exception cref="T:System.Exception">
+            Thrown if there are error in configuration and/or environment
+            </exception>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.GetAkkaConfig">
+            <summary>
+            Gets default akka configuration for current module
+            </summary>
+            <returns>Akka configuration</returns>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.GetRoles">
+            <summary>
+            Gets list of roles, that would be assign to cluster node with this plugin installed.
+            </summary>
+            <returns>The list of roles</returns>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.PostStart">
+            <summary>
+            This method will be run after service start.
+            Methods are run in <seealso cref="P:ClusterKit.Core.BaseInstaller.AkkaConfigLoadPriority"/> order.
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.BaseInstaller.RegisterWindsorComponents(Castle.Windsor.IWindsorContainer,Castle.MicroKernel.SubSystems.Configuration.IConfigurationStore)">
+            <summary>
+            Registering DI components
+            </summary>
+            <param name="container">The container.</param>
+            <param name="store">The configuration store.</param>
+        </member>
+        <member name="T:ClusterKit.Core.Cluster.ClusterLoggingActor">
+            <summary>
+            Logging cluster system events
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.Cluster.ClusterLoggingActor.cluster">
+            <summary>
+            The cluster.
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.Cluster.ClusterLoggingActor.OnReceive(System.Object)">
+            <summary>
+            Processing cluster event
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:ClusterKit.Core.Cluster.ClusterLoggingActor.PostStop">
+            <summary>
+            Re-subscribe on restart
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.Cluster.ClusterLoggingActor.PreStart">
+            <summary>
+            Need to subscribe to cluster changes
+            </summary>
+        </member>
+        <member name="T:ClusterKit.Core.Configuration">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Core.Configuration.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Core.Configuration.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Core.Configuration.AkkaConfig">
+             <summary>
+               Looks up a localized string similar to {
+                akka : {
+                  
+                  stdout-loglevel : INFO
+                  loggers : [&quot;Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog&quot;]
+                  log-config-on-start : off
+                  loglevel : INFO
+            
+                  actor : {
+            
+                    serializers {
+                      hyperion = &quot;Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion&quot;
+                      json = &quot;Akka.Serialization.NewtonSoftJsonSerializer&quot;
+                    }
+            
+                    serialization-bindings {
+                       &quot;System.Object&quot; = hyperion
+                    } 
+            
+                    provider = &quot;Akka.C [rest of string was truncated]&quot;;.
+             </summary>
+        </member>
+        <member name="T:ClusterKit.Core.ConfigurationUtils">
+            <summary>
+            Bundle of web related configuration utils
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.ConfigurationUtils.GetRestTimeout(Akka.Actor.ActorSystem)">
+            <summary>
+            Gets the default timeout from rest api to actor system
+            </summary>
+            <param name="actorSystem">The actor system</param>
+            <returns>Default timeout</returns>
+        </member>
+        <member name="M:ClusterKit.Core.ConfigurationUtils.GetRestTimeout(Akka.Configuration.Config)">
+            <summary>
+            Gets the default timeout from rest api to actor system
+            </summary>
+            <param name="config">The actor system configuration (assumed that this should be the root of configuration)</param>
+            <returns>Default timeout</returns>
+        </member>
+        <member name="T:ClusterKit.Core.EnActorType">
+            <summary>
+            Types of actors to generate from <seealso cref="T:ClusterKit.Core.NameSpaceActor"/>
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.EnActorType.Simple">
+            <summary>
+            Just simple actor
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.EnActorType.Singleton">
+            <summary>
+            Cluster singleton actor
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.EnActorType.SingletonProxy">
+            <summary>
+            Cluster singleton proxy actor
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.EnActorType.Sharding">
+            <summary>
+            Cluster sharding manager
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.EnActorType.ShardingProxy">
+            <summary>
+            Cluster sharding proxy actor
+            </summary>
+        </member>
+        <member name="T:ClusterKit.Core.IMessageRouter">
+            <summary>
+            Base class to route messages.
+            Used to give possibility to create routing mocks
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.IMessageRouter.Ask``1(Akka.Actor.Address,System.String,System.Object,System.TimeSpan)">
+            <summary>
+            Sends message to the specified actor path on the specified node. See also <see cref="M:Akka.Actor.Futures.Ask``1(Akka.Actor.ICanTell,System.Object,System.Nullable{System.TimeSpan})"/>
+            </summary>
+            <typeparam name="T">The type of awaited response</typeparam>
+            <param name="nodeAddress">The node address.</param>
+            <param name="path">The recipient path.</param>
+            <param name="message">The message.</param>
+             <param name="timeout">The maximum time to wait for response</param>
+            <returns>The response</returns>
+        </member>
+        <member name="M:ClusterKit.Core.IMessageRouter.Tell(Akka.Actor.Address,System.String,System.Object,Akka.Actor.IActorRef)">
+            <summary>
+            Sends message to the specified actor path on the specified node
+            </summary>
+            <param name="nodeAddress">
+            The node address.
+            </param>
+            <param name="path">
+            The recipient path.
+            </param>
+            <param name="message">
+            The message.
+            </param>
+            <param name="sender">
+            The sender.
+            </param>
+        </member>
+        <member name="T:ClusterKit.Core.Installer">
+            <summary>
+            Installing components from current library
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Core.Installer.AkkaConfigLoadPriority">
+            <summary>
+            Gets priority for ordering akka configurations. Highest priority will override lower priority.
+            </summary>
+            <remarks>Consider using <seealso cref="T:ClusterKit.Core.BaseInstaller"/> integrated constants</remarks>
+        </member>
+        <member name="M:ClusterKit.Core.Installer.GetAkkaConfig">
+            <summary>
+            Gets default akka configuration for current module
+            </summary>
+            <returns>Akka configuration</returns>
+        </member>
+        <member name="M:ClusterKit.Core.Installer.RegisterWindsorComponents(Castle.Windsor.IWindsorContainer,Castle.MicroKernel.SubSystems.Configuration.IConfigurationStore)">
+            <summary>
+            Registering DI components
+            </summary>
+            <param name="container">The container.</param>
+            <param name="store">The configuration store.</param>
+        </member>
+        <member name="T:ClusterKit.Core.Log.Constants">
+            <summary>
+            Gets the list of constants
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.Log.Constants.LogRecordTypeKey">
+            <summary>
+            The property/key name to mark log records
+            </summary>
+        </member>
+        <member name="T:ClusterKit.Core.Log.EnLogRecordType">
+            <summary>
+            The type of log record
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.Log.EnLogRecordType.Default">
+            <summary>
+            The default record
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.Log.EnLogRecordType.Security">
+            <summary>
+            The security log record
+            </summary>
+        </member>
+        <member name="T:ClusterKit.Core.Log.ILoggerConfigurator">
+            <summary>
+            The logger configurator
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.Log.ILoggerConfigurator.Configure(Serilog.LoggerConfiguration,Akka.Configuration.Config)">
+            <summary>
+            Performs configuration
+            </summary>
+            <param name="configuration">Previous configuration</param>
+            <param name="config">Akka configuration</param>
+            <returns>Updated configuration</returns>
+        </member>
+        <member name="T:ClusterKit.Core.MessageRouter">
+            <summary>
+            Base class to route messages.
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.MessageRouter.actorSystem">
+            <summary>
+            Current actor system
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.MessageRouter.#ctor(Akka.Actor.ActorSystem)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Core.MessageRouter"/> class.
+            </summary>
+            <param name="actorSystem">
+            The actor system.
+            </param>
+        </member>
+        <member name="M:ClusterKit.Core.MessageRouter.Ask``1(Akka.Actor.Address,System.String,System.Object,System.TimeSpan)">
+            <summary>
+            Sends message to the specified actor path on the specified node. See also <see cref="M:Akka.Actor.Futures.Ask(Akka.Actor.ICanTell,System.Object,System.Nullable{System.TimeSpan})"/>
+            </summary>
+            <typeparam name="T">The type of awaited response</typeparam>
+            <param name="nodeAddress">The node address.</param>
+            <param name="path">The recipient path.</param>
+            <param name="message">The message.</param>
+             <param name="timeout">The maximum time to wait for response</param>
+            <returns>The response</returns>
+        </member>
+        <member name="M:ClusterKit.Core.MessageRouter.Tell(Akka.Actor.Address,System.String,System.Object,Akka.Actor.IActorRef)">
+            <summary>
+            Sends message to the specified actor path on the specified node
+            </summary>
+            <param name="nodeAddress">
+            The node address.
+            </param>
+            <param name="path">
+            The recipient path.
+            </param>
+            <param name="message">
+            The message.
+            </param>
+            <param name="sender">
+            The sender.
+            </param>
+        </member>
+        <member name="T:ClusterKit.Core.Monads.Maybe`1">
+            <summary>
+            Generic helper to make typed nulls
+            </summary>
+            <typeparam name="T">End type</typeparam>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Core.Monads.Maybe`1"/> structure.
+            </summary>
+            <param name="value">
+            The value.
+            </param>
+        </member>
+        <member name="P:ClusterKit.Core.Monads.Maybe`1.HasValue">
+            <summary>
+            Gets a value indicating whether this is not a null
+            </summary>
+        </member>
+        <member name="P:ClusterKit.Core.Monads.Maybe`1.Value">
+            <summary>
+            Gets the value.
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.op_Implicit(`0)~ClusterKit.Core.Monads.Maybe{`0}">
+            <summary>
+            Converts original object to wrapper
+            </summary>
+            <param name="obj">The original object</param>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.op_Implicit(ClusterKit.Core.Monads.Maybe{`0})~`0">
+            <summary>
+            Converts wrapper to the original object
+            </summary>
+            <param name="obj">Wrapped object</param>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.op_Inequality(ClusterKit.Core.Monads.Maybe{`0},ClusterKit.Core.Monads.Maybe{`0})">
+            <summary>
+            Not equals for two wrappers
+            </summary>
+            <param name="left">Left wrapper</param>
+            <param name="right">Right wrapper</param>
+            <returns>Whether these to wrappers are not equal</returns>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.op_Equality(ClusterKit.Core.Monads.Maybe{`0},ClusterKit.Core.Monads.Maybe{`0})">
+            <summary>
+            Equals for two wrappers
+            </summary>
+            <param name="left">Left wrapper</param>
+            <param name="right">Right wrapper</param>
+            <returns>Whether these to wrappers are equal</returns>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.Equals(ClusterKit.Core.Monads.Maybe{`0})">
+            <summary>
+            Equals for two wrappers
+            </summary>
+            <param name="other">Wrapper to compare</param>
+            <returns>Whether these to wrappers are equal</returns>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            </returns>
+            <param name="obj">The object to compare with the current instance. </param>
+        </member>
+        <member name="M:ClusterKit.Core.Monads.Maybe`1.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+        </member>
+        <member name="T:ClusterKit.Core.NameSpaceActor">
+            <summary>
+            Actor to provide namespace in actors tree. Usually used only once in library
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.NameSpaceActor.windsorContainer">
+            <summary>
+            The dependency injection container
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.#ctor(Castle.Windsor.IWindsorContainer)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Core.NameSpaceActor"/> class.
+            </summary>
+            <param name="windsorContainer">
+            Dependency resolver
+            </param>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.CreateShardingActor(Akka.Actor.IActorContext,Akka.Configuration.Config,Castle.Windsor.IWindsorContainer,System.String)">
+            <summary>
+            Creates cluster sharding actor from config
+            </summary>
+            <param name="context">Current actor context (will create child actor)</param>
+            <param name="actorConfig">Configuration to create from</param>
+            <param name="container">Dependency resolver</param>
+            <param name="pathName">New actor's path name</param>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.CreateShardingProxyActor(Akka.Actor.IActorContext,Akka.Configuration.Config,Castle.Windsor.IWindsorContainer,System.String)">
+            <summary>
+            Creates cluster sharding proxy actor from config
+            </summary>
+            <param name="context">Current actor context (will create child actor)</param>
+            <param name="actorConfig">Configuration to create from</param>
+            <param name="container">Dependency resolver</param>
+            <param name="pathName">New actor's path name</param>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.CreateSimpleActor(Akka.Actor.IActorContext,Akka.Configuration.Config,Castle.Windsor.IWindsorContainer,System.String,System.String)">
+            <summary>
+            Creates simple actor from config
+            </summary>
+            <param name="context">Current actor context (will create child actor)</param>
+            <param name="actorConfig">Configuration to create from</param>
+            <param name="container">Dependency resolver</param>
+            <param name="currentPath">Parent (current) actor path</param>
+            <param name="pathName">New actor's path name</param>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.CreateSingletonActor(Akka.Actor.IActorContext,Akka.Configuration.Config,System.String,System.String)">
+            <summary>
+            Creates cluster singleton actor from config
+            </summary>
+            <param name="context">Current actor context (will create child actor)</param>
+            <param name="actorConfig">Configuration to create from</param>
+            <param name="currentPath">Parent (current) actor path</param>
+            <param name="pathName">New actor's path name</param>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.CreateSingletonProxyActor(Akka.Actor.IActorContext,Akka.Configuration.Config,System.String,System.String)">
+            <summary>
+            Creates cluster singleton proxy actor from config
+            </summary>
+            <param name="context">Current actor context (will create child actor)</param>
+            <param name="actorConfig">Configuration to create from</param>
+            <param name="currentPath">Parent (current) actor path</param>
+            <param name="pathName">New actor's path name</param>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.OnReceive(System.Object)">
+            <summary>
+            The on receive.
+            </summary>
+            <param name="message">
+            The message.
+            </param>
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.PreStart">
+            <inheritdoc />
+        </member>
+        <member name="M:ClusterKit.Core.NameSpaceActor.InitChildActorsFromConfig(Akka.Actor.IActorContext,Akka.Actor.ActorPath,Castle.Windsor.IWindsorContainer)">
+            <summary>
+            Creates child actors according to current config
+            </summary>
+            <param name="context">Current actor's context</param>
+            <param name="actorPath">Current actor's path</param>
+            <param name="container">Dependency resolver</param>
+        </member>
+        <member name="T:ClusterKit.Core.Ping.PingActor">
+            <summary>
+            General actor to resolve ping requests.
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.Ping.PingActor.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Core.Ping.PingActor"/> class.
+            </summary>
+        </member>
+        <member name="T:ClusterKit.Core.Ping.PingMessage">
+            <summary>
+            Standard request message for <seealso cref="T:ClusterKit.Core.Ping.PingActor"/>
+            </summary>
+        </member>
+        <member name="T:ClusterKit.Core.Ping.PongMessage">
+            <summary>
+            Standard response message for <seealso cref="T:ClusterKit.Core.Ping.PingActor"/>
+            </summary>
+        </member>
+        <member name="T:ClusterKit.Core.ShardingProxyWrappperActor">
+            <summary>
+            Wraps sharding proxy into well known path
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.ShardingProxyWrappperActor.#ctor(Castle.Windsor.IWindsorContainer,Akka.Configuration.Config)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Core.ShardingProxyWrappperActor"/> class.
+            </summary>
+            <param name="container">
+            The dependency resolver.
+            </param>
+            <param name="shardingConfig">
+            The sharding config.
+            </param>
+        </member>
+        <member name="T:ClusterKit.Core.ShardingWrappperActor">
+            <summary>
+            Wraps sharding into well known path
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.ShardingWrappperActor.#ctor(Castle.Windsor.IWindsorContainer,Akka.Configuration.Config)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Core.ShardingWrappperActor"/> class.
+            </summary>
+            <param name="container">
+            The dependency resolver.
+            </param>
+            <param name="shardingConfig">
+            The sharding config.
+            </param>
+        </member>
+        <member name="T:ClusterKit.Core.Tools.CurrentLocale">
+            <summary>
+            Helper class to set current thread culture. Will restore original culture on dispose.
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.Tools.CurrentLocale.localThread">
+            <summary>
+            Origin thread with modified locale
+            </summary>
+        </member>
+        <member name="F:ClusterKit.Core.Tools.CurrentLocale.originalCulture">
+            <summary>
+            Origin culture, before modification
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.Tools.CurrentLocale.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ClusterKit.Core.Tools.CurrentLocale"/> class.
+            </summary>
+            <param name="locale">Locale code to set</param>
+        </member>
+        <member name="M:ClusterKit.Core.Tools.CurrentLocale.Dispose">
+            <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        </member>
+        <member name="T:ClusterKit.Core.Utils.AkkaUtils">
+            <summary>
+            Just some helpers
+            </summary>
+        </member>
+        <member name="M:ClusterKit.Core.Utils.AkkaUtils.DeserializeFromAkka``1(System.Byte[],Akka.Actor.ActorSystem)">
+            <summary>
+            The deserialize from akka.
+            </summary>
+            <param name="serializedData">
+            The serialized data.
+            </param>
+            <param name="system">
+            The system.
+            </param>
+            <typeparam name="T">
+            The original object type
+            </typeparam>
+            <returns>
+            The <see cref="!:T"/>.
+            </returns>
+        </member>
+        <member name="M:ClusterKit.Core.Utils.AkkaUtils.DeserializeFromAkkaString``1(System.String,Akka.Actor.ActorSystem)">
+            <summary>
+            The deserialize from akka string.
+            </summary>
+            <param name="serializedData">
+            The serialized data.
+            </param>
+            <param name="system">
+            The system.
+            </param>
+            <typeparam name="T">
+            The original object type
+            </typeparam>
+            <returns>
+            The <see cref="!:T"/>.
+            </returns>
+        </member>
+        <member name="M:ClusterKit.Core.Utils.AkkaUtils.GetFromConfiguration(Akka.Actor.IActorRef,Akka.Actor.ActorSystem,System.String)">
+            <summary>
+            Workaround of <seealso href="https://github.com/akkadotnet/akka.net/issues/1321"/>  bug
+            </summary>
+            <param name="actorRef">Current actor reference</param>
+            <param name="system">Akka actor system</param>
+            <param name="childPath">Path to create router</param>
+            <returns>Configured router</returns>
+        </member>
+        <member name="M:ClusterKit.Core.Utils.AkkaUtils.GetFromConfiguration(Akka.Actor.ActorSystem,System.String)">
+            <summary>
+            Workaround of <seealso href="https://github.com/akkadotnet/akka.net/issues/1321"/> bug
+            </summary>
+            <param name="system">Akka actor system</param>
+            <param name="actorPath">Path to child actor in deployment configuration</param>
+            <returns>Configured router</returns>
+        </member>
+        <member name="M:ClusterKit.Core.Utils.AkkaUtils.SerializeToAkka(System.Object,Akka.Actor.ActorSystem)">
+            <summary>
+            The serialize to akka.
+            </summary>
+            <param name="objToSerialize">
+            The object to serialize.
+            </param>
+            <param name="system">
+            The system.
+            </param>
+            <returns>
+            The byte array
+            </returns>
+        </member>
+        <member name="M:ClusterKit.Core.Utils.AkkaUtils.SerializeToAkkaString(System.Object,Akka.Actor.ActorSystem)">
+            <summary>
+            The serialize to akka string.
+            </summary>
+            <param name="objToSerialize">
+            The object to serialize.
+            </param>
+            <param name="system">
+            The system.
+            </param>
+            <returns>
+            The <see cref="T:System.String"/>.
+            </returns>
+        </member>
+    </members>
+</doc>

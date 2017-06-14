@@ -24,7 +24,9 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [UsedImplicitly]
     [ApiDescription("Node template description", Name = "NodeTemplate")]
+#if APPDOMAIN
     [Serializable]
+#endif
     public class NodeTemplate : ITemplate
     {
         /// <summary>

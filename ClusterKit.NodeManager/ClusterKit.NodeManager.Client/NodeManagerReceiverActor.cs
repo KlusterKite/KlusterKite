@@ -38,7 +38,10 @@ namespace ClusterKit.NodeManager.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerReceiverActor"/> class.
         /// </summary>
-        public NodeManagerReceiverActor()
+        /// <param name="baseInstallers">
+        /// The base Installers.
+        /// </param>
+        public NodeManagerReceiverActor(IEnumerable<BaseInstaller> baseInstallers)
         {
             var config = Context.System.Settings.Config;
             var nodeIdString = config.GetString("ClusterKit.NodeManager.NodeId");
@@ -61,8 +64,7 @@ namespace ClusterKit.NodeManager.Client
                     NodeId = nodeId,
                     StartTimeStamp = this.startTimeStamp,
                     Roles = config.GetStringList("akka.cluster.roles")?.ToList() ?? new List<string>(),
-                    Modules = AppDomain.CurrentDomain.GetAssemblies()
-                                .Where(a => a.GetTypes().Any(t => t.IsSubclassOf(typeof(BaseInstaller))))
+                    Modules = baseInstallers.Select(i => i.GetType().GetTypeInfo().Assembly).Distinct()
                                 .Select(
                                     a =>
                                         new PackageDescription

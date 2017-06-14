@@ -15,7 +15,9 @@ namespace ClusterKit.NodeManager.RemoteDomain
     /// <summary>
     /// The description of migrator action to migrate resources
     /// </summary>
+#if APPDOMAIN
     [Serializable]
+#endif
     public class MigratorMigrationsCommand 
     {
         /// <summary>

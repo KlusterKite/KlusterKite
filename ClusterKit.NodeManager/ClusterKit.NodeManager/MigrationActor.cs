@@ -11,13 +11,8 @@ namespace ClusterKit.NodeManager
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Runtime.Versioning;
-    using System.Security.Policy;
-    using System.Xml;
 
     using Akka;
     using Akka.Actor;
@@ -34,7 +29,7 @@ namespace ClusterKit.NodeManager
 
     using Microsoft.EntityFrameworkCore;
 
-    using NuGet;
+    using NuGet.Protocol.Core.Types;
 
     /// <summary>
     /// The actor responsible for non-code cluster migrations and updates
@@ -491,6 +486,8 @@ namespace ClusterKit.NodeManager
         /// </returns>
         private List<MigrationLogRecord> ExecuteMigration(EnMigrationSide side, MigratorTemplatePlan plan)
         {
+            throw new NotImplementedException();
+            /*
             var log = new List<MigrationLogRecord>();
             var releaseDir = side == EnMigrationSide.Source
                                  ? Path.Combine(this.StateData.FromReleaseExecutionDir, plan.Template.Code)
@@ -625,6 +622,7 @@ namespace ClusterKit.NodeManager
             }
 
             return log;
+            */
         }
 
         /// <summary>
@@ -638,6 +636,8 @@ namespace ClusterKit.NodeManager
         /// </returns>
         private List<MigrationLogRecord> ExecuteMigration(MigratorTemplatePlan plan)
         {
+            throw new NotImplementedException();
+            /*
             var log = new List<MigrationLogRecord>();
             var releaseDir = Path.Combine(this.StateData.ReleaseExecutionDir, plan.Template.Code);
 
@@ -721,6 +721,7 @@ namespace ClusterKit.NodeManager
             }
 
             return log;
+            */
         }
 
         /// <summary>
@@ -729,8 +730,10 @@ namespace ClusterKit.NodeManager
         /// <param name="package">The package to extract</param>
         /// <param name="tmpDir">The temp directory to extract packages</param>
         /// <param name="executionDir">The execution directory to load packages</param>
-        private void ExtractPackage(IPackage package, string tmpDir, string executionDir)
+        private void ExtractPackage(IPackageSearchMetadata package, string tmpDir, string executionDir)
         {
+            throw new NotImplementedException();
+            /*
             var fileSystem = new PhysicalFileSystem(tmpDir);
             package.ExtractContents(fileSystem, package.Id);
 
@@ -755,6 +758,7 @@ namespace ClusterKit.NodeManager
                         this.GetType().Name,
                         package.Id);
             }
+            */
         }
 
         /// <summary>
@@ -841,6 +845,8 @@ namespace ClusterKit.NodeManager
         /// <param name="errors">The list of errors to fill</param>
         private void ExtractReleaseMigrationTemplate(Release release, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationError> errors)
         {
+            throw new NotImplementedException();
+            /*
             var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
             if (Directory.Exists(migratorExecutionDirectory))
             {
@@ -927,6 +933,7 @@ namespace ClusterKit.NodeManager
             }
 
             this.CreateApplicationConfig(migratorExecutionDirectory);
+            */
         }
 
         /// <summary>
@@ -935,6 +942,8 @@ namespace ClusterKit.NodeManager
         /// <param name="appDirectory">The application directory</param>
         private void CreateApplicationConfig(string appDirectory)
         {
+            throw new NotImplementedException();
+            /*
             var configDoc = new XmlDocument();
             configDoc.LoadXml(
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -982,6 +991,7 @@ namespace ClusterKit.NodeManager
             {
                 File.Copy(filename, $"{file}.config", true);
             }
+            */
         }
 
         /// <summary>
@@ -1002,12 +1012,12 @@ namespace ClusterKit.NodeManager
                 return EnMigrationDirection.Stay;
             }
 
-            if (destination.IndexOf(source, StringComparison.InvariantCulture) == 0)
+            if (destination.IndexOf(source, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return EnMigrationDirection.Upgrade;
             }
 
-            if (source.IndexOf(destination, StringComparison.InvariantCulture) == 0)
+            if (source.IndexOf(destination, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return EnMigrationDirection.Downgrade;
             }
@@ -1102,6 +1112,8 @@ namespace ClusterKit.NodeManager
             int? migrationId,
             out List<MigrationError> errors)
         {
+            throw new NotImplementedException();
+            /*
             var result = new List<MigratorTemplateReleaseState>();
             errors = new List<MigrationError>();
 
@@ -1178,6 +1190,7 @@ namespace ClusterKit.NodeManager
             }
 
             return result;
+            */
         }
 
         /// <summary>

@@ -14,7 +14,9 @@ namespace ClusterKit.NodeManager.Migrator
     /// <summary>
     /// The description of some migratable resource
     /// </summary>
+#if APPDOMAIN
     [Serializable]
+#endif
     public class ResourceId
     {
         /// <summary>
