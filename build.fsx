@@ -39,17 +39,33 @@ Target "DockerBase" (fun _ ->
 
 // builds standard docker images
 Target "DockerContainers" (fun _ ->
-    
-    RestorePackages |> ignore
-    
-    MSBuildRelease "./build/launcher" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"|] |> ignore
 
+    let buildProject (outputPath:string) (projectPath:string) = 
+        let setParams defaults = { 
+                defaults with
+                    Verbosity = Some(Minimal)
+                    Targets = ["Restore"; "Publish"]
+                    RestorePackagesFlag = true
+                    Properties = 
+                    [
+                        "Optimize", "True"
+                        "DebugSymbols", "True"
+                        "Configuration", "Release"
+                        "TargetFramework", "netcoreapp1.1"
+                        "OutputPath", outputPath
+                    ]
+                }
+        build setParams projectPath
+
+    CleanDirs [|"./build/launcher"; "./build/launcherpublish"; "./build/seed"; "./build/seedpublish"; "./build/seeder"; "./build/seederpublish";|]
+    buildProject (Path.GetFullPath "./build/launcher") "./build/src/ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"
+    
     // MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.Console/ClusterKit.Log.Console.csproj"|] |> ignore
     // MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.ElasticSearch/ClusterKit.Log.ElasticSearch.csproj"|] |> ignore
-    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj"|] |> ignore
-    MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"|] |> ignore
+    // buildProject (Path.GetFullPath "./build/seed") "./ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj"
+    buildProject (Path.GetFullPath "./build/seed") "./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"
 
-    MSBuildRelease "./build/seeder" "Build" [|"./ClusterKit.NodeManager/ClusterKit.NodeManager.Seeder.Launcher/ClusterKit.NodeManager.Seeder.Launcher.csproj"|] |> ignore
+    buildProject (Path.GetFullPath "./build/seeder") "./ClusterKit.NodeManager/ClusterKit.NodeManager.Seeder.Launcher/ClusterKit.NodeManager.Seeder.Launcher.csproj"
     
 
     let copyLauncherData (path : string) =
@@ -58,7 +74,7 @@ Target "DockerContainers" (fun _ ->
         let packageCacheDir = Path.Combine ([|fullPath; "packageCache"|])
 
         CleanDirs [|buildDir; packageCacheDir|]
-        CopyDir buildDir "./build/launcher" (fun file -> true)
+        CopyDir buildDir "./build/launcherpublish" (fun file -> true)
         CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
         CopyTo buildDir [|"./nuget.exe"|]
 
@@ -73,11 +89,11 @@ Target "DockerContainers" (fun _ ->
             (new DirectoryInfo(packageThirdPartyDir))
 
     Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeed/build"|]
-    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seed" (fun file -> true)
+    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeed/build" "./build/seedpublish" (fun file -> true)
     buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
 
     Fake.FileHelper.CleanDirs [|"./Docker/ClusterKitSeeder/build"|]
-    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeeder/build" "./build/seeder" (fun file -> true)
+    Fake.FileHelper.CopyDir "./Docker/ClusterKitSeeder/build" "./build/seederpublish" (fun file -> true)
     buildDocker "clusterkit/seeder" "Docker/ClusterKitSeeder"
 
     copyLauncherData "./Docker/ClusterKitWorker" |> ignore
@@ -95,7 +111,7 @@ Target "DockerContainers" (fun _ ->
     
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build"
-
+    (*
     NpmHelper.Npm(fun p -> 
               { p with
                   Command = NpmHelper.Install NpmHelper.Standard
@@ -112,12 +128,13 @@ Target "DockerContainers" (fun _ ->
 
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
     Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local"
-    
+    *)
 )
 
 
 "DockerBase" ?=> "CleanDockerImages"
 "DockerContainers" ?=> "CleanDockerImages"
+"DockerContainers" ?=> "PrepareSources"
 "DockerBase" ?=> "DockerContainers"
 
 // prepares docker images
