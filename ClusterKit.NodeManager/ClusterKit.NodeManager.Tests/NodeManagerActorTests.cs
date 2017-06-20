@@ -52,6 +52,7 @@ namespace ClusterKit.NodeManager.Tests
     /// <summary>
     ///     Testing node manager actor
     /// </summary>
+    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
     public class NodeManagerActorTests : BaseActorTest<NodeManagerActorTests.Configurator>
     {
         /// <summary>

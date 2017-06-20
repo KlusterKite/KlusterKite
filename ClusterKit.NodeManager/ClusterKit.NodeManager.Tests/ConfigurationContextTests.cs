@@ -22,6 +22,7 @@ namespace ClusterKit.NodeManager.Tests
     /// <summary>
     /// Validating the <see cref="ConfigurationContext"/>
     /// </summary>
+    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
     public class ConfigurationContextTests : IDisposable
     {
         /// <summary>

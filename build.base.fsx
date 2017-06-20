@@ -93,6 +93,8 @@ Target "PrepareSources" (fun _ ->
 
     filesInDirMatching "*.sln" (new DirectoryInfo("."))
         |> Seq.iter (fun (file:FileInfo) -> CopyFile sourcesDir file.FullName)
+    filesInDirMatching "*.props" (new DirectoryInfo("."))
+        |> Seq.iter (fun (file:FileInfo) -> CopyFile sourcesDir file.FullName)
        
 
     let projects = filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))

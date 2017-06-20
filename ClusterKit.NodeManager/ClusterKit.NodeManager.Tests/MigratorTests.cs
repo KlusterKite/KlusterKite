@@ -50,6 +50,7 @@ namespace ClusterKit.NodeManager.Tests
     /// <summary>
     /// Testing the <see cref="MigrationActor"/>
     /// </summary>
+    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
     public class MigratorTests : BaseActorTest<MigratorTests.Configurator>
     {
         /// <summary>
@@ -921,8 +922,8 @@ namespace ClusterKit.NodeManager.Tests
                 using (var context =
                     contextManager.CreateContext<ConfigurationContext>("InMemory", connectionString, databaseName))
                 {
-                    context.Database.EnsureDeleted();
                     context.ResetValueGenerators();
+                    context.Database.EnsureDeleted();
                 }
             }
 

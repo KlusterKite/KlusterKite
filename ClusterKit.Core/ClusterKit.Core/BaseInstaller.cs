@@ -225,17 +225,20 @@ namespace ClusterKit.Core
                 throw new ArgumentNullException(nameof(container));
             }
 
-            if (!RegisteredInstallers.ContainsKey(container))
+            lock (RegisteredInstallers)
             {
-                RegisteredInstallers[container] = new List<BaseInstaller>();
-            }
+                if (!RegisteredInstallers.ContainsKey(container))
+                {
+                    RegisteredInstallers[container] = new List<BaseInstaller>();
+                }
 
-            if (RegisteredInstallers[container].Contains(this))
-            {
-                return;
-            }
+                if (RegisteredInstallers[container].Contains(this))
+                {
+                    return;
+                }
 
-            RegisteredInstallers[container].Add(this);
+                RegisteredInstallers[container].Add(this);
+            }
         }
 
         /// <summary>

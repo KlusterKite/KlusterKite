@@ -13,6 +13,7 @@ namespace ClusterKit.NodeManager.Tests
     using System.Collections.Generic;
     using System.Linq;
 
+    using ClusterKit.Data.EF.InMemory;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
@@ -25,6 +26,7 @@ namespace ClusterKit.NodeManager.Tests
     /// <summary>
     /// Testing basic work with <see cref="Release"/>
     /// </summary>
+    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
     public class ReleaseTests : IDisposable
     {
         /// <summary>
@@ -258,7 +260,9 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         private void CreateTestDatabase()
         {
-            this.CreateContext().Database.EnsureDeleted();
+            var configurationContext = this.CreateContext();
+            configurationContext.ResetValueGenerators();
+            configurationContext.Database.EnsureDeleted();
             var template1 = new NodeTemplate
                                 {
                                     Code = "template1",

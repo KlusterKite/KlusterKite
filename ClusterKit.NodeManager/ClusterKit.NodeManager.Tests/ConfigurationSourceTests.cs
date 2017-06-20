@@ -24,6 +24,7 @@ namespace ClusterKit.NodeManager.Tests
     /// <summary>
     /// Tests for ClusterKit.NodeManager.ConfigurationSource
     /// </summary>
+    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
     public class ConfigurationSourceTests : BaseActorTest<ConfigurationSourceTests.Configurator>
     {
         /// <summary>
