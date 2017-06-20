@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource\ClusterKit.NodeManager.ConfigurationSource.csproj" />
+    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Utils\ClusterKit.NodeManager.Launcher.Utils.csproj" />
   </ItemGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">

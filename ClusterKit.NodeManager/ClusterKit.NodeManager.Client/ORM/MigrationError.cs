@@ -21,9 +21,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [ApiDescription("The error description during the resource check and/or migration", Name = "MigrationError")]
     [Table("MigrationErrors")]
-#if APPDOMAIN
-    [Serializable]
-#endif
     public class MigrationError : MigrationLogRecord
     {
         /// <summary>

@@ -13,6 +13,8 @@ namespace ClusterKit.NodeManager.RemoteDomain
     using System.Collections.Generic;
     using System.Linq;
 
+    using Autofac;
+
     using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Migrator;
@@ -23,10 +25,10 @@ namespace ClusterKit.NodeManager.RemoteDomain
     public class ReleaseStateCollector : MigrationCollector<List<MigratorReleaseState>>
     {
         /// <inheritdoc />
-        protected override List<MigratorReleaseState> GetResult()
+        protected override List<MigratorReleaseState> GetTypedResult(IComponentContext context)
         {
             var result = new List<MigratorReleaseState>();
-            foreach (var migrator in this.GetMigrators())
+            foreach (var migrator in this.GetMigrators(context))
             {
                 List<ResourceId> resources;
                 try

@@ -21,9 +21,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [ApiDescription("The cluster migration operation", Name = "MigrationOperation")]
     [Table("MigrationOperations")]
-#if APPDOMAIN
-    [Serializable]
-#endif
     public class MigrationOperation : MigrationLogRecord
     {
         /// <summary>

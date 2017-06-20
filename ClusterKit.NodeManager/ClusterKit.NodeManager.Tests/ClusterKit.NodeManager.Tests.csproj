@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.EF.Npgsql\ClusterKit.Data.EF.Npgsql.csproj" />
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.GraphQL.Publisher\ClusterKit.Web.GraphQL.Publisher.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource.Seeder\ClusterKit.NodeManager.ConfigurationSource.Seeder.csproj" />
+    <ProjectReference Include="..\ClusterKit.NodeManager.Migrator.Executor\ClusterKit.NodeManager.Migrator.Executor.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager\ClusterKit.NodeManager.csproj" />
   </ItemGroup>
   

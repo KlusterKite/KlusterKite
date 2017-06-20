@@ -13,6 +13,8 @@ namespace ClusterKit.NodeManager.RemoteDomain
     using System.Collections.Generic;
     using System.Linq;
 
+    using Autofac;
+
     using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
@@ -34,11 +36,11 @@ namespace ClusterKit.NodeManager.RemoteDomain
         public List<string> Logs { get; set; } = new List<string>();
 
         /// <inheritdoc />
-        protected override List<MigrationOperation> GetResult()
+        protected override List<MigrationOperation> GetTypedResult(IComponentContext context)
         {
             this.Logs.Add("Started");
             var result = new List<MigrationOperation>();
-            var migrators = this.GetMigrators().ToList();
+            var migrators = this.GetMigrators(context).ToList();
             foreach (var command in this.Commands)
             {
                 this.Logs.Add($"Executing migrator {command.TypeName}");

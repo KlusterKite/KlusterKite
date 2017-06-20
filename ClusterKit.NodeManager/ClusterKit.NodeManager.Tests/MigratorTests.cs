@@ -14,9 +14,6 @@ namespace ClusterKit.NodeManager.Tests
     using System.IO;
     using System.Linq;
     using System.Reflection;
-#if CORECLR
-    using System.Runtime.Loader;
-#endif
 
     using Akka.Actor;
     using Akka.Configuration;
@@ -33,9 +30,12 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
     using ClusterKit.NodeManager.Tests.Migrations;
 
+#if CORECLR
     using Microsoft.Extensions.DependencyModel;
+#endif
 
     using NuGet.Frameworks;
     using NuGet.Packaging;
@@ -634,7 +634,7 @@ namespace ClusterKit.NodeManager.Tests
                         this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
-                var state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(30));
+                var state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(45));
                 this.ExpectNoMsg();
                 Assert.Equal(1, state.States.Count);
                 Assert.Equal(1, state.States[0].MigratorsStates.Count);
@@ -727,7 +727,10 @@ namespace ClusterKit.NodeManager.Tests
                                            {
                                                new NodeTemplate.PackageRequirement(
                                                    "ClusterKit.NodeManager.Tests",
-                                                   null)
+                                                   null),
+                                               new NodeTemplate.PackageRequirement(
+                                                   "Akka.Logger.Serilog",
+                                                   null),
                                            }.ToList()
                                };
 
@@ -944,7 +947,33 @@ namespace ClusterKit.NodeManager.Tests
             private static IEnumerable<Assembly> GetLoadedAssemblies()
             {
 #if APPDOMAIN
-                return AppDomain.CurrentDomain.GetAssemblies();
+                var assemblies = new List<Assembly>();
+                var currentDirectory = Path.GetFullPath(".");
+                foreach (var file in Directory.GetFiles(currentDirectory, "*.dll"))
+                {
+                    try
+                    {
+                        assemblies.Add(Assembly.ReflectionOnlyLoadFrom(file));
+                    }
+                    catch(Exception exception)
+                    {
+                        // ignore
+                    }
+                }
+
+                foreach (var file in Directory.GetFiles(currentDirectory, "*.exe"))
+                {
+                    try
+                    {
+                        assemblies.Add(Assembly.ReflectionOnlyLoadFrom(file));
+                    }
+                    catch (Exception exception)
+                    {
+                        // ignore
+                    }
+                }
+
+                return assemblies;
 #elif CORECLR
                 var assemblies = new List<Assembly>();
                 var dependencies = DependencyContext.Default.RuntimeLibraries;
@@ -962,9 +991,6 @@ namespace ClusterKit.NodeManager.Tests
                 }
 
                 return assemblies;
-#else
-#warning Method not implemented
-            throw new NotImplementedException();
 #endif
             }
 
@@ -1026,6 +1052,14 @@ namespace ClusterKit.NodeManager.Tests
                         ReleaseCheckTestsBase.Net46,
                         DefaultFrameworkNameProvider.Instance),
                     dependencies);
+
+                Func<string, string, string, IEnumerable<string>> extaction = (framework, destination, temp) =>
+                    {
+                        var fileName = Path.GetFileName(assembly.Location);
+                        File.Copy(assembly.Location, Path.Combine(destination, fileName));
+                        return new[] { fileName };
+                    };
+
                 return new ReleaseCheckTestsBase.TestPackage(
                            assembly.GetName().Name,
                            assembly.GetName().Version.ToString())
@@ -1035,8 +1069,9 @@ namespace ClusterKit.NodeManager.Tests
                                        {
                                            standardDependencies,
                                            net46Dependencies
-                                       }
-                           };
+                                       },
+                               Extract = extaction
+                };
             }
 
             /// <summary>
@@ -1045,50 +1080,20 @@ namespace ClusterKit.NodeManager.Tests
             /// <returns>The test repository</returns>
             private IPackageRepository CreateTestRepository()
             {
-                var ignoredAssemblies = new List<string>();
-                while (true)
-                {
-                    var loadedAssemblies = GetLoadedAssemblies().ToList();
-
-                    var assembliesToLoad = loadedAssemblies
-                        .SelectMany(a => a.GetReferencedAssemblies().Select(r => new { r, a })).GroupBy(a => a.r.Name)
-                        .Select(g => g.OrderByDescending(a => a.r.Version).First()).OrderBy(p => p.r.Name)
-                        .Select(p => p.r).Distinct().Where(
-                            a => loadedAssemblies.All(l => l.GetName().Name != a.Name)
-                                 && !ignoredAssemblies.Contains(a.Name)).ToList();
-
-                    if (assembliesToLoad.Count == 0)
-                    {
-                        break;
-                    }
-
-                    foreach (var assemblyName in assembliesToLoad)
-                    {
-                        try
-                        {
-#if APPDOMAIN
-                            AppDomain.CurrentDomain.Load(assemblyName);
-#endif
-#if CORECLR
-                            AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
-#endif
-                        }
-                        catch
-                        {
-                            ignoredAssemblies.Add(assemblyName.Name);
-
-                            // ignore
-                        }
-                    }
-                }
-
-                var assemblies = GetLoadedAssemblies().ToArray();
-                var packages = assemblies
+                var loadedAssemblies = GetLoadedAssemblies()
 #if APPDOMAIN
                     .Where(a => !a.GlobalAssemblyCache && !a.IsDynamic)
 #elif CORECLR
                     .Where(a => !a.IsDynamic)
-#endif
+#endif                    
+                    .ToList();
+
+                var ignoredAssemblies = loadedAssemblies.SelectMany(a => a.GetReferencedAssemblies())
+                    .Where(r => loadedAssemblies.All(a => a.FullName != r.FullName)).Select(r => r.FullName).ToList();
+
+                var assemblies = loadedAssemblies.ToArray();
+                var packages = assemblies
+                    .Where(a => !ignoredAssemblies.Contains(a.FullName))
                     .Select(p => this.CreateTestPackage(p, assemblies)).GroupBy(a => a.Identity.Id)
                     .Select(g => g.OrderByDescending(a => a.Identity.Id).First()).ToArray();
                 return new ReleaseCheckTestsBase.TestRepository(packages);

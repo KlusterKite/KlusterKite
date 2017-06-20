@@ -44,7 +44,6 @@ namespace ClusterKit.NodeManager.Tests
             this.output = output;
         }
 
-
         /// <summary>
         /// Testing files installation
         /// </summary>
@@ -67,7 +66,6 @@ namespace ClusterKit.NodeManager.Tests
                 new DefaultFrameworkNameProvider());
 
             var runtime = "win7-x64";
-
 
             using (var reader = package.GetReader())
             {

@@ -4,7 +4,6 @@
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager.Launcher</PackageId>
     <Version>0.0.0.0-local</Version>
-    <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>exe</OutputType>
     <IsTool>true</IsTool>

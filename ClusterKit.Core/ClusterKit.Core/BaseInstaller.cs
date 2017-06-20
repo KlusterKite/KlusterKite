@@ -61,7 +61,7 @@ namespace ClusterKit.Core
         /// Gets the list of all registered installers
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The windsor builder.
         /// </param>
         /// <returns>
         /// the list of all registered installers
@@ -81,7 +81,7 @@ namespace ClusterKit.Core
         /// Generates overall akka config from all registered modules (with respect to external provided configuration file)
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The windsor builder.
         /// </param>
         /// <param name="config">
         /// Top level config
@@ -118,7 +118,7 @@ namespace ClusterKit.Core
         /// <seealso cref="PostStart"/>
         /// </summary>
         /// <param name="container">
-        /// The container builder
+        /// The builder builder
         /// </param>
         /// <param name="context">
         /// The context.
@@ -141,7 +141,7 @@ namespace ClusterKit.Core
         /// Runs all registered installers <seealso cref="PreCheck"/>
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The windsor builder.
         /// </param>
         /// <param name="config">Full akka config</param>
         public static void RunPreCheck(ContainerBuilder container, Config config)
@@ -161,17 +161,17 @@ namespace ClusterKit.Core
         /// <summary>
         /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
         /// </summary>
-        /// <param name="container">
-        /// The container.
+        /// <param name="builder">
+        /// The builder.
         /// </param>
         /// <param name="config">
         /// The config.
         /// </param>
-        public static void RunComponentRegistration([NotNull] ContainerBuilder container, [NotNull] Config config)
+        public static void RunComponentRegistration([NotNull] ContainerBuilder builder, [NotNull] Config config)
         {
-            if (container == null)
+            if (builder == null)
             {
-                throw new ArgumentNullException(nameof(container));
+                throw new ArgumentNullException(nameof(builder));
             }
 
             if (config == null)
@@ -180,15 +180,15 @@ namespace ClusterKit.Core
             }
 
             List<BaseInstaller> installers;
-            if (!RegisteredInstallers.TryGetValue(container, out installers))
+            if (!RegisteredInstallers.TryGetValue(builder, out installers))
             {
-                throw new InvalidOperationException("Container is not registered");
+                throw new InvalidOperationException("builder is not registered");
             }
 
             foreach (var installer in installers)
             {
-                installer.RegisterComponents(container, config);
-                container.RegisterInstance(installer).As<BaseInstaller>();
+                installer.RegisterComponents(builder, config);
+                builder.RegisterInstance(installer).As<BaseInstaller>();
             }
         }
 
@@ -217,7 +217,7 @@ namespace ClusterKit.Core
         /// <summary>
         /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
         /// </summary>
-        /// <param name="container">The container.</param>
+        /// <param name="container">The builder.</param>
         public void Install([NotNull] ContainerBuilder container)
         {
             if (container == null)
@@ -282,7 +282,7 @@ namespace ClusterKit.Core
         /// Registering DI components
         /// </summary>
         /// <param name="container">
-        /// The container.
+        /// The builder.
         /// </param>
         /// <param name="config">
         /// The config.

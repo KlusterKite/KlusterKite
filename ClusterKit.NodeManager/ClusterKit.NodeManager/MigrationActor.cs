@@ -11,8 +11,10 @@ namespace ClusterKit.NodeManager
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Akka;
     using Akka.Actor;
@@ -23,13 +25,21 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
+    using ClusterKit.NodeManager.Migrator;
     using ClusterKit.NodeManager.RemoteDomain;
+
+    using Google.Protobuf;
 
     using JetBrains.Annotations;
 
     using Microsoft.EntityFrameworkCore;
 
+    using Newtonsoft.Json;
+
     using NuGet.Protocol.Core.Types;
+    using NuGet.Versioning;
 
     /// <summary>
     /// The actor responsible for non-code cluster migrations and updates
@@ -486,8 +496,6 @@ namespace ClusterKit.NodeManager
         /// </returns>
         private List<MigrationLogRecord> ExecuteMigration(EnMigrationSide side, MigratorTemplatePlan plan)
         {
-            throw new NotImplementedException();
-            /*
             var log = new List<MigrationLogRecord>();
             var releaseDir = side == EnMigrationSide.Source
                                  ? Path.Combine(this.StateData.FromReleaseExecutionDir, plan.Template.Code)
@@ -504,16 +512,10 @@ namespace ClusterKit.NodeManager
                 releaseId,
                 plan.MigratorPlans.Values.SelectMany(m => m.Resources.Values).Count());
 
-            var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
-            var appDomain = AppDomain.CreateDomain("MigratorDomain", new Evidence(), appDomainSetup);
 
             try
             {
-                var collector = (MigrationExecutor)appDomain.CreateInstanceAndUnwrap(
-                    "ClusterKit.NodeManager",
-                    "ClusterKit.NodeManager.RemoteDomain.MigrationExecutor");
-                collector.Configuration = plan.Template.Configuration;
-                collector.Commands = plan.MigratorPlans.Values.ToList();
+                var collector = new MigrationExecutor { Commands = plan.MigratorPlans.Values.ToList() };
 
                 Context.GetLogger().Info(
                     "{Type}: {MigratorTemplateCode} of release {ReleaseId} migration executor was created",
@@ -521,7 +523,7 @@ namespace ClusterKit.NodeManager
                     plan.Template.Code,
                     releaseId);
 
-                appDomain.DoCallBack(collector.Execute);
+                collector = this.ExecuteMigrator(releaseDir, collector);
                 var operations = collector.Result;
                 foreach (var logMessage in collector.Logs)
                 {
@@ -616,13 +618,8 @@ namespace ClusterKit.NodeManager
                             Exception = exception
                         });
             }
-            finally
-            {
-                AppDomain.Unload(appDomain);
-            }
 
             return log;
-            */
         }
 
         /// <summary>
@@ -636,22 +633,15 @@ namespace ClusterKit.NodeManager
         /// </returns>
         private List<MigrationLogRecord> ExecuteMigration(MigratorTemplatePlan plan)
         {
-            throw new NotImplementedException();
-            /*
             var log = new List<MigrationLogRecord>();
             var releaseDir = Path.Combine(this.StateData.ReleaseExecutionDir, plan.Template.Code);
 
-            var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
-            var appDomain = AppDomain.CreateDomain("MigratorDomain", new Evidence(), appDomainSetup);
-
             try
             {
-                var collector = (MigrationExecutor)appDomain.CreateInstanceAndUnwrap(
-                    "ClusterKit.NodeManager",
-                    "ClusterKit.NodeManager.RemoteDomain.MigrationExecutor");
-                collector.Configuration = plan.Template.Configuration;
+                var collector = new MigrationExecutor();
                 collector.Commands = plan.MigratorPlans.Values.ToList();
-                appDomain.DoCallBack(collector.Execute);
+                collector = this.ExecuteMigrator(releaseDir, collector);
+
                 var operations = collector.Result;
                 if (operations != null)
                 {
@@ -715,50 +705,36 @@ namespace ClusterKit.NodeManager
                             Exception = exception
                         });
             }
-            finally
-            {
-                AppDomain.Unload(appDomain);
-            }
 
             return log;
-            */
         }
 
         /// <summary>
         /// Extracts the lib files to execution directory
         /// </summary>
-        /// <param name="package">The package to extract</param>
-        /// <param name="tmpDir">The temp directory to extract packages</param>
-        /// <param name="executionDir">The execution directory to load packages</param>
-        private void ExtractPackage(IPackageSearchMetadata package, string tmpDir, string executionDir)
+        /// <param name="package">
+        /// The package to extract
+        /// </param>
+        /// <param name="tmpDir">
+        /// The temp directory to extract packages
+        /// </param>
+        /// <param name="executionDir">
+        /// The execution directory to load packages
+        /// </param>
+        /// <returns>
+        /// The async task
+        /// </returns>
+        private async Task ExtractPackageAsync(IPackageSearchMetadata package, string tmpDir, string executionDir)
         {
-            throw new NotImplementedException();
-            /*
-            var fileSystem = new PhysicalFileSystem(tmpDir);
-            package.ExtractContents(fileSystem, package.Id);
-
-            var files = package.GetLibFiles().ToList();
-
-            IEnumerable<IPackageFile> compatibleFiles;
-            if (VersionUtility.TryGetCompatibleItems(new FrameworkName(this.frameworkName), files, out compatibleFiles))
-            {
-                foreach (var compatibleFile in compatibleFiles)
-                {
-                    File.Copy(
-                        Path.Combine(tmpDir, package.Id, compatibleFile.Path),
-                        Path.Combine(executionDir, Path.GetFileName(compatibleFile.Path)),
-                        true);
-                }
-            }
-            else
+            var files = await this.nugetRepository.ExtractPackage(package, this.frameworkName, executionDir, tmpDir);
+            if (!files.Any())
             {
                 Context.GetLogger()
                     .Warning(
                         "{Type}: Package {PackageId} does not contains compatible files",
                         this.GetType().Name,
-                        package.Id);
+                        package.Identity.ToString());
             }
-            */
         }
 
         /// <summary>
@@ -779,7 +755,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// the success of the operation
         /// </returns>
-        private List<MigrationError> ExtractReleaseMigrators(
+        private async Task<List<MigrationError>> ExtractReleaseMigratorsAsync(
             Release release,
             string executionDirectory,
             int? migrationId,
@@ -801,7 +777,7 @@ namespace ClusterKit.NodeManager
                 {
                     try
                     {
-                        this.ExtractReleaseMigrationTemplate(
+                        await this.ExtractReleaseMigrationTemplateAsync(
                             release,
                             migrationId,
                             migratorTemplate,
@@ -836,17 +812,32 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Extracts packages for the <see cref="MigratorTemplate"/>
         /// </summary>
-        /// <param name="release">The release</param>
-        /// <param name="migrationId">The possible migration id</param>
-        /// <param name="migratorTemplate">The migrator template to extract</param>
-        /// <param name="executionDirectory">The execution directory</param>
-        /// <param name="forceExtract">Whether to overwrite previous extraction</param>
-        /// <param name="tempDir">The temporary data directory</param>
-        /// <param name="errors">The list of errors to fill</param>
-        private void ExtractReleaseMigrationTemplate(Release release, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationError> errors)
+        /// <param name="release">
+        /// The release
+        /// </param>
+        /// <param name="migrationId">
+        /// The possible migration id
+        /// </param>
+        /// <param name="migratorTemplate">
+        /// The migrator template to extract
+        /// </param>
+        /// <param name="executionDirectory">
+        /// The execution directory
+        /// </param>
+        /// <param name="forceExtract">
+        /// Whether to overwrite previous extraction
+        /// </param>
+        /// <param name="tempDir">
+        /// The temporary data directory
+        /// </param>
+        /// <param name="errors">
+        /// The list of errors to fill
+        /// </param>
+        /// <returns>
+        /// The async task
+        /// </returns>
+        private async Task ExtractReleaseMigrationTemplateAsync(Release release, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationError> errors)
         {
-            throw new NotImplementedException();
-            /*
             var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
             if (Directory.Exists(migratorExecutionDirectory))
             {
@@ -863,18 +854,13 @@ namespace ClusterKit.NodeManager
             var migratorTempDirectory = Path.Combine(tempDir, migratorTemplate.Code);
             Directory.CreateDirectory(migratorExecutionDirectory);
             Directory.CreateDirectory(migratorTempDirectory);
-            var packageDescriptions = migratorTemplate.PackagesToInstall[this.frameworkName];
-           
-            foreach (var packageDescription in packageDescriptions)
-            {
-                var package = this.nugetRepository.Search(packageDescription.Id, true)
-                    .ToList()
-                    .FirstOrDefault(
-                        p => p.Id == packageDescription.Id && p.Version == SemanticVersion.Parse(packageDescription.Version));
 
+            List<IPackageSearchMetadata> packages = new List<IPackageSearchMetadata>();
+            foreach (var packageDescription in migratorTemplate.PackagesToInstall[this.frameworkName])
+            {
+                var package = await this.nugetRepository.GetAsync(packageDescription.Id, NuGetVersion.Parse(packageDescription.Version));
                 if (package == null)
                 {
-                    Directory.Delete(executionDirectory, true);
                     Context.GetLogger()
                         .Error(
                             "{Type} could not find package {PackageName} {PackageVersion} for migrator template {MigratorTemplateCode} of release {ReleaseId}",
@@ -896,34 +882,37 @@ namespace ClusterKit.NodeManager
                     continue;
                 }
 
-                try
-                {
-                    this.ExtractPackage(package, migratorTempDirectory, migratorExecutionDirectory);
-                }
-                catch (Exception exception)
-                {
-                    Directory.Delete(executionDirectory, true);
-                    Context.GetLogger()
-                        .Error(
-                            exception,
-                            "{Type} Error on extracting package {PackageName} {PackageVersion} for migrator template {MigratorTemplateCode} of release {ReleaseId}",
-                            this.GetType().Name,
-                            packageDescription.Id,
-                            packageDescription.Version,
-                            migratorTemplate.Code,
-                            release.Id);
-                    errors.Add(
-                        new MigrationError
-                            {
-                                ReleaseId = release.Id,
-                                MigrationId = migrationId,
-                                MigratorTemplateCode = migratorTemplate.Code,
-                                MigratorTemplateName = migratorTemplate.Name,
-                                ErrorMessage =
-                                    $"error on extracting package {packageDescription.Id} {packageDescription.Version}: {exception.Message}",
-                                Exception = exception
-                            });
-                }
+                packages.Add(package);
+            }
+
+            try
+            {
+                await this.nugetRepository.CreateServiceAsync(
+                    packages,
+                    this.frameworkName,
+                    migratorExecutionDirectory,
+                    "ClusterKit.NodeManager.Migrator.Executor");
+            }
+            catch (Exception exception)
+            {
+                Context.GetLogger()
+                    .Error(
+                        exception,
+                        "{Type} Error on creating service for migrator template {MigratorTemplateCode} of release {ReleaseId}",
+                        this.GetType().Name,
+                        migratorTemplate.Code,
+                        release.Id);
+                errors.Add(
+                    new MigrationError
+                        {
+                            ReleaseId = release.Id,
+                            MigrationId = migrationId,
+                            MigratorTemplateCode = migratorTemplate.Code,
+                            MigratorTemplateName = migratorTemplate.Name,
+                            ErrorMessage =
+                                $"error on creating service: {exception.Message}",
+                            Exception = exception
+                        });
             }
 
             if (errors.Any())
@@ -932,66 +921,7 @@ namespace ClusterKit.NodeManager
                 return;
             }
 
-            this.CreateApplicationConfig(migratorExecutionDirectory);
-            */
-        }
-
-        /// <summary>
-        /// Creates application config for the extracted application
-        /// </summary>
-        /// <param name="appDirectory">The application directory</param>
-        private void CreateApplicationConfig(string appDirectory)
-        {
-            throw new NotImplementedException();
-            /*
-            var configDoc = new XmlDocument();
-            configDoc.LoadXml(
-                @"<?xml version=""1.0"" encoding=""utf-8""?>
-                            <configuration>
-                               <runtime>
-                                <assemblyBinding xmlns=""urn:schemas-microsoft-com:asm.v1"">
-                                </assemblyBinding>
-                              </runtime>
-                            </configuration>
-                        ");
-
-            var nameTable = configDoc.NameTable;
-            var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string Uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", Uri);
-            var files = Directory.GetFiles(appDirectory, "*.dll");
-            var assemblyBindingNode = configDoc.DocumentElement?.SelectSingleNode(
-                "/configuration/runtime/urn:assemblyBinding",
-                namespaceManager);
-            if (assemblyBindingNode == null)
-            {
-                return;
-            }
-
-            foreach (var file in files)
-            {
-                var assemblyName = AssemblyName.GetAssemblyName(file);
-                var dependentNode = assemblyBindingNode.AppendChild(configDoc.CreateElement("dependentAssembly", Uri));
-                var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("assemblyIdentity", Uri));
-                assemblyIdentityNode.SetAttribute("name", assemblyName.Name);
-                var publicKeyToken = BitConverter.ToString(assemblyName.GetPublicKeyToken())
-                    .Replace("-", string.Empty)
-                    .ToLower(CultureInfo.InvariantCulture);
-                assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
-                var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(configDoc.CreateElement("bindingRedirect", Uri));
-                bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{assemblyName.Version}");
-                bindingRedirectNode.SetAttribute("newVersion", assemblyName.Version.ToString());
-            }
-
-            var filename = Path.Combine(appDirectory, "app.config");
-            configDoc.Save(filename);
-            foreach (var file in files)
-            {
-                File.Copy(filename, $"{file}.config", true);
-            }
-            */
+            File.WriteAllText(Path.Combine(migratorExecutionDirectory, "config.hocon"), migratorTemplate.Configuration);
         }
 
         /// <summary>
@@ -1089,6 +1019,57 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
+        /// Executes the <see cref="MigrationCollector"/> from pre-installed service
+        /// </summary>
+        /// <typeparam name="T">The collector end-type</typeparam>
+        /// <param name="installedPath">The service installation path</param>
+        /// <param name="instance">The collector instance</param>
+        /// <returns>The executed collector</returns>
+        private T ExecuteMigrator<T>(string installedPath, T instance) where T : MigrationCollector
+        {
+#if APPDOMAIN
+            const string ExecutableFileName = "ClusterKit.NodeManager.Migrator.Executor.exe";
+            const string ExecutableArguments = "";
+#elif CORECLR
+            const string ExecutableFileName = "dotnet";
+            const string ExecutableArguments = "ClusterKit.NodeManager.Migrator.Executor.dll";
+#endif
+            var process = new Process
+                              {
+                                  StartInfo =
+                                      {
+                                          UseShellExecute = false,
+                                          WorkingDirectory = installedPath,
+                                          FileName = ExecutableFileName,
+                                          Arguments = ExecutableArguments,
+                                          RedirectStandardOutput = true,
+                                          RedirectStandardInput = true,
+                                          RedirectStandardError = true
+                                      }
+                              };
+
+            process.Start();
+
+            string readLine = null;
+            while (readLine != ProcessHelper.EOF && !process.HasExited)
+            {
+                readLine = process.StandardOutput.ReadLine();
+            }
+
+            process.StandardInput.Send(instance);
+            var output = process.StandardOutput.Receive() as T;
+            process.WaitForExit();
+            var error = process.StandardError.ReadToEnd();
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                Context.GetLogger().Error("{Type}: Migrator exited with error {Error}", this.GetType().Name, error);
+            }
+
+            process.Dispose();
+            return output;
+        }
+
+        /// <summary>
         /// Gets the state of the release
         /// </summary>
         /// <param name="release">
@@ -1112,8 +1093,6 @@ namespace ClusterKit.NodeManager
             int? migrationId,
             out List<MigrationError> errors)
         {
-            throw new NotImplementedException();
-            /*
             var result = new List<MigratorTemplateReleaseState>();
             errors = new List<MigrationError>();
 
@@ -1122,19 +1101,13 @@ namespace ClusterKit.NodeManager
             {
                 var state = new MigratorTemplateReleaseState { Code = migratorTemplate.Code, Template = migratorTemplate };
                 var releaseDir = Path.Combine(executionDirectory, migratorTemplate.Code);
-                var appDomainSetup = new AppDomainSetup { ApplicationBase = releaseDir, ConfigurationFile = "app.config" };
-                var appDomain = AppDomain.CreateDomain("ReleaseMigratorDomain", new Evidence(), appDomainSetup);
-
                 try
                 {
-                    var collector = (ReleaseStateCollector)appDomain.CreateInstanceAndUnwrap(
-                        "ClusterKit.NodeManager",
-                        "ClusterKit.NodeManager.RemoteDomain.ReleaseStateCollector");
-                    collector.Configuration = migratorTemplate.Configuration;
-                    appDomain.DoCallBack(collector.Execute);
+                    var collector = new ReleaseStateCollector();
+                    collector = this.ExecuteMigrator(releaseDir, collector);
                     var collectorErrors = collector.Errors;
                     var migratorReleaseStates = collector.Result;
-                    
+
                     if (collectorErrors.Any())
                     {
                         foreach (var error in collector.Errors)
@@ -1183,14 +1156,9 @@ namespace ClusterKit.NodeManager
                             migratorTemplate.Code,
                             release.Id);
                 }
-                finally
-                {
-                    AppDomain.Unload(appDomain);
-                }
             }
 
             return result;
-            */
         }
 
         /// <summary>
@@ -1208,13 +1176,14 @@ namespace ClusterKit.NodeManager
                                         ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
 
             var extractionErrors = this
-                .ExtractReleaseMigrators(migration.FromRelease, fromReleaseExecutionDir, migration.Id, forceExtract)
+                .ExtractReleaseMigratorsAsync(migration.FromRelease, fromReleaseExecutionDir, migration.Id, forceExtract)
+                .GetAwaiter().GetResult()
                 .Union(
-                    this.ExtractReleaseMigrators(
+                    this.ExtractReleaseMigratorsAsync(
                         migration.ToRelease,
                         toReleaseExecutionDir,
                         migration.Id,
-                        forceExtract))
+                        forceExtract).GetAwaiter().GetResult())
                 .ToList();
 
             if (extractionErrors.Any())
@@ -1264,7 +1233,7 @@ namespace ClusterKit.NodeManager
             var releaseExecutionDir = data?.ReleaseExecutionDir
                                       ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             data = new Data { ReleaseExecutionDir = releaseExecutionDir, Release = release };
-            var extractionErrors = this.ExtractReleaseMigrators(release, releaseExecutionDir, null, forceExtract);
+            var extractionErrors = this.ExtractReleaseMigratorsAsync(release, releaseExecutionDir, null, forceExtract).GetAwaiter().GetResult();
             if (extractionErrors.Any())
             {
                 this.Parent.Tell(new MigrationActorInitializationFailed { Errors = extractionErrors });

@@ -11,7 +11,6 @@ namespace ClusterKit.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
@@ -22,6 +21,9 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
+
+    using JetBrains.Annotations;
 
     using NuGet.Frameworks;
     using NuGet.Packaging;
@@ -63,7 +65,7 @@ namespace ClusterKit.NodeManager.Tests
         protected ITestOutputHelper Output { get; }
 
         /// <summary>
-        /// Creates a <see cref="PackageDependencySet"/> from string definition
+        /// Creates a <see cref="PackageDependencyGroup"/> from string definition
         /// </summary>
         /// <param name="framework">The framework name</param>
         /// <param name="definition">The dependencies definition</param>
@@ -71,23 +73,13 @@ namespace ClusterKit.NodeManager.Tests
         internal static PackageDependencyGroup CreatePackageDependencySet(string framework, params string[] definition)
         {
             return new PackageDependencyGroup(
-                NuGetFramework.ParseFolder(framework),
+                NuGetFramework.ParseFrameworkName(framework, DefaultFrameworkNameProvider.Instance),
                 definition.Select(
                     d =>
                         {
                             var parts = d.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                             return new PackageDependency(parts[0], CreateVersionRange(parts[1]));
                         }));
-        }
-
-        /// <summary>
-        /// Creates the version range
-        /// </summary>
-        /// <param name="minVersion">The minimum required version</param>
-        /// <returns>The version range</returns>
-        internal static VersionRange CreateVersionRange(string minVersion)
-        {
-            return new VersionRange(NuGetVersion.Parse(minVersion));
         }
 
         /// <summary>
@@ -138,7 +130,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             if (packages == null)
             {
-                packages = new[] { "p1 1.0.0", "p2 1.0.0", "dp1 1.0.0", "dp2 1.0.0" };
+                packages = new[] { "p1 1.0.0", "p2 1.0.0", "dp1 1.0.0", "dp2 1.0.0", "ClusterKit.NodeManager.Migrator.Executor 1.0.0" };
             }
 
             if (templatePackageRequirements == null)
@@ -187,17 +179,38 @@ namespace ClusterKit.NodeManager.Tests
         {
             var p1 = new TestPackage("p1", "1.0.0")
                          {
-                             DependencySets = new[] { CreatePackageDependencySet(Net46, "dp1 1.0.0") }
+                             DependencySets =
+                                 new[]
+                                     {
+                                         CreatePackageDependencySet(Net46, "dp1 1.0.0"),
+                                         CreatePackageDependencySet(
+                                             NetStandard,
+                                             "dp1 1.0.0")
+                                     }
                          };
 
             var p2 = new TestPackage("p2", "1.0.0")
-            {
-                             DependencySets = new[] { CreatePackageDependencySet(Net46, "dp2 1.0.0") }
+                         {
+                             DependencySets =
+                                 new[]
+                                     {
+                                         CreatePackageDependencySet(Net46, "dp2 1.0.0"),
+                                         CreatePackageDependencySet(
+                                             NetStandard,
+                                             "dp2 1.0.0")
+                                     }
                          };
 
             var p3 = new TestPackage("p3", "1.0.0")
-            {
-                             DependencySets = new[] { CreatePackageDependencySet(Net46, "dp3 2.0.0") }
+                         {
+                             DependencySets =
+                                 new[]
+                                     {
+                                         CreatePackageDependencySet(Net46, "dp3 2.0.0"),
+                                         CreatePackageDependencySet(
+                                             NetStandard,
+                                             "dp3 2.0.0")
+                                     }
                          };
             var dp1 = new TestPackage("dp1", "1.0.0");
 
@@ -205,7 +218,19 @@ namespace ClusterKit.NodeManager.Tests
 
             var dp3 = new TestPackage("dp3", "1.0.0");
 
-            return new TestRepository(p1, p2, p3, dp1, dp2, dp3);
+            var executor = new TestPackage("ClusterKit.NodeManager.Migrator.Executor", "1.0.0");
+
+            return new TestRepository(p1, p2, p3, dp1, dp2, dp3, executor);
+        }
+
+        /// <summary>
+        /// Creates the version range
+        /// </summary>
+        /// <param name="minVersion">The minimum required version</param>
+        /// <returns>The version range</returns>
+        internal static VersionRange CreateVersionRange(string minVersion)
+        {
+            return new VersionRange(NuGetVersion.Parse(minVersion));
         }
 
         /// <summary>
@@ -245,11 +270,16 @@ namespace ClusterKit.NodeManager.Tests
             /// <inheritdoc />
             public long? DownloadCount { get; }
 
+            /// <summary>
+            /// Gets or sets the extract action
+            /// </summary>
+            public Func<string, string, string, IEnumerable<string>> Extract { get; set; }
+
             /// <inheritdoc />
             public Uri IconUrl { get; }
 
             /// <inheritdoc />
-            public PackageIdentity Identity { get; set;  }
+            public PackageIdentity Identity { get; set; }
 
             /// <inheritdoc />
             public bool IsListed { get; }
@@ -330,24 +360,52 @@ namespace ClusterKit.NodeManager.Tests
             /// <inheritdoc />
             public TestRepository(params TestPackage[] packages)
             {
+                this.Packages = packages?.ToList() ?? new List<TestPackage>();
+            }
+
+            /// <summary>
+            /// Gets the list of defined packages packages.
+            /// </summary>
+            [UsedImplicitly]
+            public List<TestPackage> Packages { get; }
+
+            /// <inheritdoc />
+            public Task<IEnumerable<string>> ExtractPackage(
+                IPackageSearchMetadata package,
+                string frameworkName,
+                string executionDir,
+                string tmpDir)
+            {
+                var testPackage = package as TestPackage;
+                if (testPackage == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return Task.FromResult(testPackage.Extract(frameworkName, executionDir, tmpDir));
             }
 
             /// <inheritdoc />
             public Task<IPackageSearchMetadata> GetAsync(string id)
             {
-                throw new NotImplementedException();
+                return Task.FromResult<IPackageSearchMetadata>(
+                    this.Packages.Where(p => p.Identity.Id == id).OrderByDescending(p => p.Identity.Version)
+                        .FirstOrDefault());
             }
 
             /// <inheritdoc />
             public Task<IPackageSearchMetadata> GetAsync(string id, NuGetVersion version)
             {
-                throw new NotImplementedException();
+                return Task.FromResult<IPackageSearchMetadata>(
+                    this.Packages.FirstOrDefault(p => p.Identity.Id == id && p.Identity.Version == version));
             }
 
             /// <inheritdoc />
             public Task<IEnumerable<IPackageSearchMetadata>> SearchAsync(string terms, bool includePreRelease)
             {
-                throw new NotImplementedException();
+                return Task.FromResult(
+                    this.Packages.Where(p => p.Identity.Id.ToLowerInvariant().Contains(terms.ToLowerInvariant()))
+                        .Cast<IPackageSearchMetadata>());
             }
         }
     }

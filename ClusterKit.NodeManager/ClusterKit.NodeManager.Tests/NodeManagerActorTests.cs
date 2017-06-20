@@ -39,6 +39,7 @@ namespace ClusterKit.NodeManager.Tests
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
     using ClusterKit.NodeManager.Messages;
 
     using JetBrains.Annotations;
@@ -2399,7 +2400,7 @@ namespace ClusterKit.NodeManager.Tests
                 container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
                 var packageRepository = this.CreateTestRepository();
                 container.RegisterInstance(packageRepository).As<IPackageRepository>();
-                container.RegisterType<TestMessageRouter>().As<IMessageRouter>();
+                container.RegisterType<TestMessageRouter>().As<IMessageRouter>().SingleInstance();
             }
 
             /// <summary>

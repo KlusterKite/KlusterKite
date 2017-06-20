@@ -19,7 +19,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Launcher.Messages;
-    
+    using ClusterKit.NodeManager.Launcher.Utils;
+
     using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
 
@@ -262,23 +263,33 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             var errors = new List<ErrorDescription>();
 
             var packages = await Task.WhenAll(
-                               release.Configuration.Packages.Select(
-                                   async description => new
+                               release.Configuration.Packages
+                               .Select(d => new { Description = d, Version = NuGetVersion.TryParse(d.Version,out var v) ? v : null})
+                               .Select(
+                                   async p => new
                                                             {
-                                                                Description = description,
-                                                                Package = await nugetRepository.GetAsync(
-                                                                              description.Id,
-                                                                              NuGetVersion.Parse(description.Version))
+                                                                p.Description,
+                                                                p.Version,
+                                                                Package = p.Version != null ? await nugetRepository.GetAsync(
+                                                                              p.Description.Id,
+                                                                              p.Version) : null
                                                             }));
 
             foreach (var package in packages)
             {
-                if (package.Package == null)
+                if (package.Version == null)
                 {
                     errors.Add(
                         new ErrorDescription(
                             $"configuration.packages[\"{package.Description.Id}\"]",
                             "Package version could not be parsed"));
+                }
+                else if (package.Package == null)
+                {
+                    errors.Add(
+                        new ErrorDescription(
+                            $"configuration.packages[\"{package.Description.Id}\"]",
+                            "Package of specified version could not be found in the nuget repository"));
                 }
                 else
                 {
@@ -393,6 +404,15 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     continue;
                 }
 
+                if (template is MigratorTemplate)
+                {
+                    // Every MigratorTemplate should contain this package for execution
+                    if (template.PackageRequirements.All(p => p.Id != "ClusterKit.NodeManager.Migrator.Executor"))
+                    {
+                        template.PackageRequirements.Add(new NodeTemplate.PackageRequirement("ClusterKit.NodeManager.Migrator.Executor", null));
+                    }
+                }
+
                 var (templatePackages, templateErrors) =
                     await GetTemplateDirectPackages(definedPackages, nugetRepository, template, templateField);
 
@@ -438,11 +458,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                                     errors.Add(
                                         new ErrorDescription(
                                             requirementField,
-                                            $"Package dependency {dependency.Id} {dependency.VersionRange} is missing"));
+                                            $"Package dependency for {supportedFramework.DotNetFrameworkName} {dependency.Id} {dependency.VersionRange} is missing"));
                                     continue;
                                 }
 
-                                if (queue.All(p => p.Identity.Id != dependency.Id))
+                                if (queue.All(p => p.Identity.Id != packageToInstall.Identity.Id))
                                 {
                                     queue.Enqueue(packageToInstall);
                                 }
@@ -512,20 +532,28 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 }
             }
 
-            var searchResults = await Task.WhenAll(nodeTemplate.PackageRequirements.Where(r => r.SpecificVersion != null).Select(
+            var searchResults = await Task.WhenAll(nodeTemplate.PackageRequirements.Where(r => r.SpecificVersion != null)
+                .Select(r => new { Requirement = r, Version = NuGetVersion.TryParse(r.SpecificVersion, out var v) ? v : null })
+                .Select(
                 async r => new
                                {
-                                   Requirement = r,
-                                   Package = await nugetRepository.GetAsync(
-                                                 r.Id,
-                                                 NuGetVersion.Parse(r.SpecificVersion))
+                                   r.Requirement,
+                                   r.Version,
+                                   Package = r.Version != null ? await nugetRepository.GetAsync(
+                                                 r.Requirement.Id,
+                                                 r.Version) : null
                                }));
 
             foreach (var result in searchResults)
             {
-                if (result.Package == null)
+                var requirementField = $"{templateField}.packageRequirements[\"{result.Requirement.Id}\"]";
+                if (result.Version == null)
                 {
-                    var requirementField = $"{templateField}.packageRequirements[\"{result.Requirement.Id}\"]";
+                    errors.Add(
+                        new ErrorDescription(requirementField, "Package version could not be parsed"));
+                }
+                else if (result.Package == null)
+                {
                     errors.Add(
                         new ErrorDescription(requirementField, "Package could not be found in nuget repository"));
                 }

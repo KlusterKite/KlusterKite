@@ -21,9 +21,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The base class for migration log records
     /// </summary>
     [Table("MigrationLogRecords")]
-#if APPDOMAIN
-    [Serializable]
-#endif
     public abstract class MigrationLogRecord
     {
         /// <summary>

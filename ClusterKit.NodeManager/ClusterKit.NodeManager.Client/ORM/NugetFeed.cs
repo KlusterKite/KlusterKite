@@ -19,9 +19,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// Link to the nuget feed to download updates
     /// </summary>
     [ApiDescription("The link to the nuget feed to download updates", Name = "NugetFeed")]
-#if APPDOMAIN
-    [Serializable]
-#endif
     public class NugetFeed
     {
         /// <summary>

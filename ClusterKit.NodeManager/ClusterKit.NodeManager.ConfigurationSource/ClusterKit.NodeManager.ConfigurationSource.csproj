@@ -22,6 +22,12 @@
     <ProjectReference Include="..\ClusterKit.NodeManager.Migrator.EF\ClusterKit.NodeManager.Migrator.EF.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Compile Update="ReleaseExtensions.cs">
+      <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
+    </Compile>
+  </ItemGroup>
+  
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
   </PropertyGroup>

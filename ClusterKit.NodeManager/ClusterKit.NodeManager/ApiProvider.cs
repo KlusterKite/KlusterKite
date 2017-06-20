@@ -12,7 +12,7 @@ namespace ClusterKit.NodeManager
     using Akka.Actor;
 
     using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Utils;
     using ClusterKit.NodeManager.WebApi;
     using ClusterKit.Security.Attributes;
 

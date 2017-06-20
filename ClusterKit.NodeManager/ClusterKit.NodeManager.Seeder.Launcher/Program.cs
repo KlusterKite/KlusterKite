@@ -106,7 +106,8 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                     try
                     {
                         File.Copy(configuration.ConfigFile, Path.Combine(executionDir, "seeder.hocon"), true);
-                        ConfigurationUtils.FixAssemblyVersions(Path.Combine(executionDir, "ClusterKit.NodeManager.Seeder.exe.config"));
+                        // todo: move to CreateServiceAsync
+                        // ConfigurationUtils.FixAssemblyVersions(Path.Combine(executionDir, "ClusterKit.NodeManager.Seeder.exe.config"));
                         Console.WriteLine($"Seeder prepared in {executionDir}");
                         var process = new Process
                                           {

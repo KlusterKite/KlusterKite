@@ -18,6 +18,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
     using ClusterKit.Core;
     using ClusterKit.Data;
     using ClusterKit.NodeManager.Client.ORM;
+    using ClusterKit.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
 
@@ -47,6 +48,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             container.RegisterType<UserFactoryByUid>().As<DataFactory<ConfigurationContext, User, Guid>>();
             container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
             container.RegisterType<MigrationDataFactory>().As<DataFactory<ConfigurationContext, Migration, int>>();
+
+            var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
+            if (!config.GetBoolean("ClusterKit.NodeManager.RegisterNuget", true)
+                && !string.IsNullOrWhiteSpace(nugetUrl))
+            {
+                container.RegisterInstance(new RemotePackageRepository(nugetUrl)).As<IPackageRepository>();
+            }
         }
     }
 }

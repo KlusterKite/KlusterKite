@@ -20,9 +20,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The release configuration description
     /// </summary>
     [ApiDescription("The release configuration description", Name = "ReleaseConfiguration")]
-#if APPDOMAIN
-    [Serializable]
-#endif
     public class ReleaseConfiguration
     { 
         /// <summary>

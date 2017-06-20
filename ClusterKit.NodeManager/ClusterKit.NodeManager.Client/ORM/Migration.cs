@@ -23,9 +23,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The history record describing cluster migration
     /// </summary>
     [ApiDescription("The history record describing cluster migration", Name = "Migration")]
-#if APPDOMAIN
-    [Serializable]
-#endif
     public class Migration : IObjectWithId<int>
     {
         /// <summary>

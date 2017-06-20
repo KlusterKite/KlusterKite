@@ -11,39 +11,17 @@ namespace ClusterKit.NodeManager.RemoteDomain
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-
-    using Akka.Configuration;
 
     using Autofac;
 
-    using ClusterKit.Core;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.Migrator;
 
     /// <summary>
     /// Base class to launch <see cref="IMigrator"/> in remote domain
     /// </summary>
-    /// <typeparam name="T">
-    /// The type of expected result
-    /// </typeparam>
-    public abstract class MigrationCollector<T>
-#if APPDOMAIN
-        : MarshalByRefObject
-#endif
+    public abstract class MigrationCollector
     {
-        /// <summary>
-        /// Gets the DI container
-        /// </summary>
-        private IContainer container;
-
-        /// <summary>
-        /// Gets or sets the configuration
-        /// </summary>
-        public string Configuration { get; set; }
-
         /// <summary>
         /// Gets the list of errors
         /// </summary>
@@ -52,16 +30,19 @@ namespace ClusterKit.NodeManager.RemoteDomain
         /// <summary>
         /// Gets or sets the result
         /// </summary>
-        public T Result { get; set; }
+        public object Result { get; set; }
 
         /// <summary>
         /// Executes the collector
         /// </summary>
-        public void Execute()
+        /// <param name="componentContext">
+        /// The component context.
+        /// </param>
+        public void Execute(IComponentContext componentContext)
         {
             try
             {
-                this.Result = this.GetResult();
+                this.Result = this.GetResult(componentContext);
             }
             catch (Exception e)
             {
@@ -72,87 +53,59 @@ namespace ClusterKit.NodeManager.RemoteDomain
         /// <summary>
         /// Gets the list of migrators
         /// </summary>
-        /// <returns>The list of migrators</returns>
-        protected IEnumerable<IMigrator> GetMigrators()
+        /// <param name="componentContext">
+        /// The component context.
+        /// </param>
+        /// <returns>
+        /// The list of migrators
+        /// </returns>
+        protected IEnumerable<IMigrator> GetMigrators(IComponentContext componentContext)
         {
-            this.Initialize();
-            return this.container.Resolve<IEnumerable<IMigrator>>();
+            return componentContext.Resolve<IEnumerable<IMigrator>>();
         }
 
         /// <summary>
         /// Creates the result value
         /// </summary>
+        /// <param name="componentContext">
+        /// The component context.
+        /// </param>
         /// <returns>The result</returns>
-        protected abstract T GetResult();
+        protected abstract object GetResult(IComponentContext componentContext);
+    }
+
+    /// <summary>
+    /// The migration collector.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The expected result type
+    /// </typeparam>
+    // ReSharper disable once StyleCop.SA1402
+    public abstract class MigrationCollector<T> : MigrationCollector where T : class
+    {
+        /// <summary>
+        /// Gets or sets the result
+        /// </summary>
+        public new T Result
+        {
+            get => base.Result as T;
+
+            set => base.Result = value;
+        }
+
+        /// <inheritdoc />
+        protected override object GetResult(IComponentContext componentContext)
+        {
+            return this.GetTypedResult(componentContext);
+        }
 
         /// <summary>
-        /// Creates and initializes the <see cref="IContainer"/>
+        /// Creates the result value
         /// </summary>
-        protected virtual void Initialize()
-        {
-            if (this.container != null)
-            {
-                return;
-            }
-
-            throw new NotImplementedException();
-            /*
-            foreach (var file in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
-            {
-                try
-                {
-                    var name = AssemblyName.GetAssemblyName(file);
-                    Assembly.Load(name);
-                }
-                catch (Exception exception)
-                {
-                    this.Errors.Add(
-                        new MigrationError
-                            {
-                                ErrorMessage =
-                                    $"Error while loading assembly for domain {AppDomain.CurrentDomain.FriendlyName} in {AppDomain.CurrentDomain.BaseDirectory}",
-                                Exception = exception
-                            });
-                }
-            }
-
-            var builder = new ContainerBuilder();
-            builder.RegisterInstallers(false);
-            var config = BaseInstaller.GetStackedConfig(builder, ConfigurationFactory.ParseString(this.Configuration));
-            builder.RegisterInstance(config).As<Config>();
-            BaseInstaller.RunComponentRegistration(builder, config);
-
-            var migratorTypeNames = config.GetStringList("ClusterKit.NodeManager.Migrators");
-            foreach (var typeName in migratorTypeNames)
-            {
-                var type = Type.GetType(typeName, false);
-                if (type == null)
-                {
-                    this.Errors.Add(
-                        new MigrationError
-                            {
-                                ErrorMessage = $"Migrator type {typeName} was not found",
-                                MigratorTypeName = typeName
-                            });
-                    continue;
-                }
-
-                if (!type.GetInterfaces().Contains(typeof(IMigrator)))
-                {
-                    this.Errors.Add(
-                        new MigrationError
-                            {
-                                ErrorMessage = $"Type {typeName} doesn't implement IMigrator",
-                                MigratorTypeName = typeName
-                            });
-                    continue;
-                }
-
-                builder.RegisterType(type).As<IMigrator>();
-            }
-
-            this.container = builder.Build();
-            */
-        }
+        /// <param name="componentContext">
+        /// The component context.
+        /// </param>
+        /// <returns>The result</returns>
+        protected abstract T GetTypedResult(IComponentContext componentContext);
     }
 }

@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace ClusterKit.NodeManager.Launcher.Utils
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -48,5 +48,15 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// The search result
         /// </returns>
         Task<IEnumerable<IPackageSearchMetadata>> SearchAsync(string terms, bool includePreRelease);
+
+        /// <summary>
+        /// Extracts package files to the specified destination
+        /// </summary>
+        /// <param name="package">The package to extract</param>
+        /// <param name="frameworkName">The execution framework name</param>
+        /// <param name="executionDir">The path to extract</param>
+        /// <param name="tmpDir">The temporary directory name</param>
+        /// <returns>The list of extracted files</returns>
+        Task<IEnumerable<string>> ExtractPackage(IPackageSearchMetadata package, string frameworkName, string executionDir, string tmpDir);
     }
 }

@@ -67,7 +67,7 @@ namespace ClusterKit.NodeManager
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Core.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.NodeManager.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.

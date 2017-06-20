@@ -117,7 +117,7 @@ namespace ClusterKit.NodeManager.Launcher
             if (!string.IsNullOrWhiteSpace(this.WorkingDirectory) && Directory.Exists(this.WorkingDirectory)
                 && !CheckDirectoryAccess(this.WorkingDirectory))
             {
-                Console.WriteLine(@"workingDirectory is not accessable");
+                Console.WriteLine(@"workingDirectory is not accessible");
                 this.IsValid = false;
             }
 
@@ -295,8 +295,6 @@ namespace ClusterKit.NodeManager.Launcher
             this.PrepareNuGetConfig(config);
             this.InstallPackages(config);
             this.CreateService(config);
-            ConfigurationUtils.FixAssemblyVersions(
-                Path.Combine(this.WorkingDirectory, "service", "ClusterKit.Core.Service.exe.config"));
         }
 
         /// <summary>
@@ -402,6 +400,8 @@ namespace ClusterKit.NodeManager.Launcher
             var serviceDir = Path.Combine(this.WorkingDirectory, "service");
             Directory.CreateDirectory(serviceDir);
 
+            // todo: move to CreateServiceAsync
+
             var packageReader =
                 new NuGet.Protocol.FindLocalPackagesResourcePackagesConfig(
                     Path.Combine(this.WorkingDirectory, "packages"));
@@ -463,6 +463,8 @@ namespace ClusterKit.NodeManager.Launcher
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
             Console.WriteLine($@"Start configuration: 
                                 {startConfig}");
+
+
         }
 
         /// <summary>

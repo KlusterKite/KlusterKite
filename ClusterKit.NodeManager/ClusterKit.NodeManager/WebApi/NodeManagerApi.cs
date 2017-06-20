@@ -19,15 +19,17 @@ namespace ClusterKit.NodeManager.WebApi
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Attributes.Authorization;
     using ClusterKit.API.Client;
-    using ClusterKit.Core;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Utils;
     using ClusterKit.NodeManager.Messages;
     using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
+
+    using ConfigurationUtils = ClusterKit.Core.ConfigurationUtils;
 
     /// <summary>
     /// The node manager api

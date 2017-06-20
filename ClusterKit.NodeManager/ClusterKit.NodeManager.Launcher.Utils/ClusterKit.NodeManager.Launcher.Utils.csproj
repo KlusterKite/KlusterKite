@@ -10,11 +10,18 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
+    <None Remove="Resources\runtimeconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\runtimeconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="RestSharp.NetCore" Version="105.2.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <PackageReference Include="RestSharp" Version="105.2.3" />

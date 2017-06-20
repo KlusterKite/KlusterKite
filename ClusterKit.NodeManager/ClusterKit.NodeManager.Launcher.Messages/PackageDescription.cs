@@ -18,7 +18,6 @@ namespace ClusterKit.NodeManager.Launcher.Messages
     /// Short description of NuGet package
     /// </summary>
     [ApiDescription("Short description of NuGet package", Name = "PackageDescription")]
-    [Serializable]
     public class PackageDescription
     {
         /// <summary>
