@@ -286,14 +286,15 @@ namespace ClusterKit.NodeManager.Launcher
         /// </summary>
         private void ConfigureNode()
         {
+
             Console.WriteLine(@"Configuring node...");
 
             var config = this.GetConfig();
 
             Console.WriteLine($@"Got {config.NodeTemplate} configuration");
             this.CleanWorkingDir();
-            this.PrepareNuGetConfig(config);
-            this.InstallPackages(config);
+            // this.PrepareNuGetConfig(config);
+            // this.InstallPackages(config);
             this.CreateService(config);
         }
 
@@ -473,6 +474,8 @@ namespace ClusterKit.NodeManager.Launcher
         /// <param name="configuration">The node configuration</param>
         private void InstallPackages(NodeStartUpConfiguration configuration)
         {
+            return;
+
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<packages>\n</packages>\n");
 

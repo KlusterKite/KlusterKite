@@ -218,4 +218,5 @@ FakesAssemblies/
 _Pvt_Extensions
 
 .fake
+paket.lock
 packagesOut
