@@ -1,25 +1,17 @@
 ﻿namespace ClusterKit.NodeManager.Tests
 {
-    using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
 
     using Akka.Configuration;
 
-    using Autofac;
-
-    using ClusterKit.Core;
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.ConfigurationSource.Seeder;
+    using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Launcher.Utils;
 
-    using Microsoft.EntityFrameworkCore;
+    using Newtonsoft.Json;
 
-    using Npgsql;
+    using NuGet.Packaging.Core;
+    using NuGet.Versioning;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -40,121 +32,29 @@
         }
 
         [Fact]
-        public void MigratorTest()
+        public void LauncherTest()
         {
-            //User ID=postgres;Host=docker;Port=5432;Database=clusterkit.nodemanager.configuration;Pooling=true
-            var connectionStringBuilder =
-                new NpgsqlConnectionStringBuilder("User ID=postgres;Host=docker;Port=5432;Pooling=true")
-                    {
-                        Database = Guid.NewGuid().ToString("N")
-                    };
-
-            var connectionString = connectionStringBuilder.ConnectionString;
-            var optionsBuilder = new DbContextOptionsBuilder<ConfigurationContext>();
-            optionsBuilder.UseNpgsql(connectionString);
-
-            using (var context = new ConfigurationContext(optionsBuilder.Options))
+            var config = ConfigurationFactory.ParseString(File.ReadAllText("./TempData/config.hocon"));
+            var configuration =
+                JsonConvert.DeserializeObject<NodeStartUpConfiguration>(File.ReadAllText("./TempData/fallBackConfiguration.json"));
+            var nugetUrl = "http://nuget/";
+            var serviceDir = Path.Combine(".", "service");
+            if (Directory.Exists(serviceDir))
             {
-                try
-                {
-                    context.Database.Migrate();
-                    var release = new Release();
-                    context.Releases.Add(release);
-                    context.SaveChanges();
-                }
-                finally
-                {
-                    context.Database.EnsureDeleted();
-                }
-            }
-        }
-
-        [Fact]
-        public void NugetTest()
-        {
-            var packages = PackageUtils.Search("http://nuget/", string.Empty).GetAwaiter().GetResult()
-                .OrderBy(p => p.Identity.Id).ToList();
-            foreach (var package in packages)
-            {
-                this.output.WriteLine($"{package.Identity.Id} {string.Join(", ", package.GetVersionsAsync().GetAwaiter().GetResult().Select(v => v.Version))}");
-            }
-        }
-
-        [Fact]
-        public void SeederTest()
-        {
-            var config = ConfigurationFactory.ParseString(File.ReadAllText("C:\\Dropbox\\Sources\\Git\\ClusterKit\\Docker\\ClusterKitSeeder\\seeder.hocon "));
-            var builder = new ContainerBuilder();
-            builder.RegisterInstallers();
-            config = BaseInstaller.GetStackedConfig(builder, config);
-            builder.RegisterInstance(config).As<Config>();
-            BaseInstaller.RunComponentRegistration(builder, config);
-            var container = builder.Build();
-
-            var seeder = new TestSeeder(config, container.Resolve<UniversalContextFactory>(), this.output);
-            seeder.Seed();
-            
-        }
-
-        protected class TestSeeder : Seeder
-        {
-            private readonly ITestOutputHelper output;
-
-            /// <inheritdoc />
-            public TestSeeder(Config config, UniversalContextFactory contextFactory, ITestOutputHelper output)
-                : base(config, contextFactory)
-            {
-                this.output = output;
+                Directory.Delete(serviceDir, true);
             }
 
-            /// <inheritdoc />
-            public override void Seed()
-            {
-                var repository = this.Config.GetString("Nuget");
-                var watch = new Stopwatch();
-                watch.Start();
-                var packageDescriptions = this.GetPackageDescriptions(repository).GetAwaiter().GetResult();
-                watch.Stop();
-                this.output.WriteLine($"Retrieved packages in {watch.ElapsedMilliseconds}ms");
-                watch.Restart();
-                var configuration =
-                    new ReleaseConfiguration
-                        {
-                            NodeTemplates = this.GetNodeTemplates().ToList(),
-                            MigratorTemplates = this.GetMigratorTemplates().ToList(),
-                            Packages = packageDescriptions,
-                            SeedAddresses = this.GetSeeds().ToList(),
-                            NugetFeeds = this.GetNugetFeeds().ToList()
-                        };
-                var initialRelease = new Release
-                                         {
-                                             State = EnReleaseState.Active,
-                                             Name = "Initial configuration",
-                                             Started = DateTimeOffset.Now,
-                                             Configuration = configuration
-                                         };
+            Directory.CreateDirectory(serviceDir);
 
-                var supportedFrameworks = this.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                watch.Stop();
-                this.output.WriteLine($"Release created in {watch.ElapsedMilliseconds}ms");
-                watch.Restart();
-
-                var initialErrors =
-                    initialRelease.SetPackagesDescriptionsForTemplates(repository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
-
-                watch.Stop();
-                this.output.WriteLine($"Templates set in {watch.ElapsedMilliseconds}ms");
-
-                foreach (var errorDescription in initialErrors)
-                {
-                    this.output.WriteLine($"ERROR: {errorDescription}");
-                }
-
-                foreach (var packageDescription in initialRelease.Configuration.MigratorTemplates.First().PackagesToInstall.Values.First().OrderBy(p => p.Id))
-                {
-                    this.output.WriteLine($"{packageDescription.Id} {packageDescription.Version}");
-                }
-            }
+            var repository = new RemotePackageRepository(nugetUrl);
+            repository.CreateServiceAsync(
+                configuration.Packages.Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version))),
+                "win7-x64",
+                PackageRepositoryExtensions.CurrentRuntime,
+                serviceDir,
+                "ClusterKit.Core.Service",
+                this.output.WriteLine).GetAwaiter().GetResult();
         }
+
     }
 }

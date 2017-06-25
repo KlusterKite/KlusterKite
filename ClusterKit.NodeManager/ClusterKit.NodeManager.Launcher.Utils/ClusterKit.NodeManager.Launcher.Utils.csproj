@@ -11,12 +11,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <None Remove="Resources\runtimeconfig.json" />
+    <None Remove="Resources\runtimes.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\runtimeconfig.json" />
+    <EmbeddedResource Include="Resources\runtimes.json" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="NuGet.Commands" Version="4.0.0" />
+    <PackageReference Include="NuGet.ProjectModel" Version="4.0.0" />
     <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.0.0" />
+    <PackageReference Include="NuGet.RuntimeModel" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">

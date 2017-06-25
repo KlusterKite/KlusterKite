@@ -37,7 +37,8 @@ namespace ClusterKit.NodeManager.FallbackPackageFixer
         {
             if (args.Length < 2)
             {
-                Console.WriteLine($"Usage: {Path.GetFileName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)} [fallback.json] [package directories...]");
+                Console.WriteLine($"Usage: {Path.GetFileName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)}"
+                                  + " [fallback.json] [package directories...]");
                 return;
             }
 

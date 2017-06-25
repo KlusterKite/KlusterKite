@@ -15,6 +15,7 @@ namespace ClusterKit.NodeManager.Tests.Mock
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Utils;
 
+    using NuGet.Packaging.Core;
     using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
 
@@ -42,7 +43,13 @@ namespace ClusterKit.NodeManager.Tests.Mock
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<string>> ExtractPackage(IPackageSearchMetadata package, string frameworkName, string executionDir, string tmpDir)
+        public Task<Dictionary<PackageIdentity, IEnumerable<string>>> ExtractPackage(
+            IEnumerable<PackageIdentity> packages,
+            string runtime,
+            string frameworkName,
+            string executionDir,
+            string tmpDir,
+            Action<string> logAction = null)
         {
             throw new NotImplementedException();
         }

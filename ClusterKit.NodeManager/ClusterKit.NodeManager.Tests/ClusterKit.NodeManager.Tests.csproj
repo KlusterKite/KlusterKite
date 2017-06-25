@@ -10,9 +10,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <Compile Remove="TempTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="xunit" Version="$(XunitVersion)" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="$(XunitVersion)" />
@@ -26,6 +23,14 @@
     <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource.Seeder\ClusterKit.NodeManager.ConfigurationSource.Seeder.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.Migrator.Executor\ClusterKit.NodeManager.Migrator.Executor.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager\ClusterKit.NodeManager.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="TempData\config.hocon">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TempData\fallBackConfiguration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">

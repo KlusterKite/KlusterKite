@@ -60,7 +60,7 @@ namespace ClusterKit.Core
 #elif CORECLR
                             AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
 #else
-#warning Not implemented method
+#error Not implemented method
                             throw new NotImplementedException();
 #endif
                         }
@@ -74,21 +74,33 @@ namespace ClusterKit.Core
 
             Console.WriteLine(@"Assemblies loaded");
 
-            foreach (var type in GetLoadedAssemblies()
-                .Where(a => !a.IsDynamic)
-                .SelectMany(a => a.GetTypes())
-                .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(BaseInstaller)))
-                .Where(t => !t.GetTypeInfo().IsAbstract && !t.GetTypeInfo().IsGenericTypeDefinition && t.GetConstructor(new Type[0]) != null))
+            try
             {
-                try
+                foreach (var type in GetLoadedAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.GetTypes())
+                    .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(BaseInstaller))).Where(
+                        t => !t.GetTypeInfo().IsAbstract && !t.GetTypeInfo().IsGenericTypeDefinition
+                             && t.GetConstructor(new Type[0]) != null))
                 {
-                    var installer = (BaseInstaller)Activator.CreateInstance(type);
-                    installer.Install(container);
+                    try
+                    {
+                        var installer = (BaseInstaller)Activator.CreateInstance(type);
+                        installer.Install(container);
+                    }
+                    catch (Exception)
+                    {
+                        // ignore
+                    }
                 }
-                catch (Exception)
+            }
+            catch (ReflectionTypeLoadException loadException)
+            {
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!");
+                foreach (var loaderException in loadException.LoaderExceptions)
                 {
-                    // ignore
+                    Console.WriteLine(loaderException.Message);
                 }
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!");
+                throw;
             }
 
             Console.WriteLine(@"Assemblies installed");

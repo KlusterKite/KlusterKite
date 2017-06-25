@@ -1,8 +1,0 @@
-{
-                ClusterKit.NodeManager.ReleaseId = 1
-                ClusterKit.NodeManager.NodeTemplate = manager
-                ClusterKit.NodeManager.ContainerType = worker
-                ClusterKit.NodeManager.FrameworkType = ".NETFramework,Version=v4.6"
-                ClusterKit.NodeManager.NodeId = 72ae4d9f-713a-4dd2-901b-b11db38220bd
-                akka.cluster.seed-nodes = ["akka.tcp://ClusterKit@seed:3090"]
-            }

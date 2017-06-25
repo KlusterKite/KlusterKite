@@ -42,7 +42,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         /// <param name="packageFiles">
         /// The list of installed packages and their files
         /// </param>
-        public static void FixAssemblyVersions(string serviceFolder, string executionFileName, Dictionary<PackageIdentity, List<string>> packageFiles)
+        public static void FixAssemblyVersions(string serviceFolder, string executionFileName, Dictionary<PackageIdentity, IEnumerable<string>> packageFiles)
         {
 #if APPDOMAIN
             var document = new XmlDocument();
@@ -121,18 +121,6 @@ namespace ClusterKit.NodeManager.Launcher.Utils
 
             // creating deps.json
             var writer = new DependencyContextWriter();
-
-            /*
-            var compilationLibraries = packageFiles.Select(
-                p => new CompilationLibrary(
-                    "project",
-                    p.Key.Id,
-                    p.Key.Version.ToString(),
-                    null,
-                    p.Value,
-                    new Dependency[0],
-                    false));
-                    */
             var compilationLibraries = new CompilationLibrary[0];
 
             var runtimeLibraries = packageFiles.Select(
@@ -141,7 +129,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
                     p.Key.Id,
                     p.Key.Version.ToString(),
                     string.Empty,
-                    new []{ new RuntimeAssetGroup(string.Empty, p.Value) },
+                    new []{ new RuntimeAssetGroup(string.Empty, p.Value.Where(f => Path.GetExtension(f) == ".dll").Distinct()) },
                     new RuntimeAssetGroup[] { },
                     new ResourceAssembly[] { },
                     new Dependency[] { },

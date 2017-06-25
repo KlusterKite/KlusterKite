@@ -44,9 +44,9 @@ namespace ClusterKit.NodeManager.Tests
         public const string Net46 = ".NETFramework,Version=v4.6";
 
         /// <summary>
-        /// The .NET Standard 1.1 name
+        /// The .NET Core 1.1 name
         /// </summary>
-        public const string NetStandard = ".NET Standard,Version=v1.1";
+        public const string NetCore = ".NET Core,Version=v1.1";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseCheckTestsBase"/> class.
@@ -184,7 +184,7 @@ namespace ClusterKit.NodeManager.Tests
                                      {
                                          CreatePackageDependencySet(Net46, "dp1 1.0.0"),
                                          CreatePackageDependencySet(
-                                             NetStandard,
+                                             NetCore,
                                              "dp1 1.0.0")
                                      }
                          };
@@ -196,7 +196,7 @@ namespace ClusterKit.NodeManager.Tests
                                      {
                                          CreatePackageDependencySet(Net46, "dp2 1.0.0"),
                                          CreatePackageDependencySet(
-                                             NetStandard,
+                                             NetCore,
                                              "dp2 1.0.0")
                                      }
                          };
@@ -208,7 +208,7 @@ namespace ClusterKit.NodeManager.Tests
                                      {
                                          CreatePackageDependencySet(Net46, "dp3 2.0.0"),
                                          CreatePackageDependencySet(
-                                             NetStandard,
+                                             NetCore,
                                              "dp3 2.0.0")
                                      }
                          };
@@ -406,6 +406,24 @@ namespace ClusterKit.NodeManager.Tests
                 return Task.FromResult(
                     this.Packages.Where(p => p.Identity.Id.ToLowerInvariant().Contains(terms.ToLowerInvariant()))
                         .Cast<IPackageSearchMetadata>());
+            }
+
+            /// <inheritdoc />
+            public async Task<Dictionary<PackageIdentity, IEnumerable<string>>> ExtractPackage(
+                IEnumerable<PackageIdentity> packages,
+                string runtime,
+                string frameworkName,
+                string executionDir,
+                string tmpDir,
+                Action<string> logAction = null)
+            {
+                var packagesToExtract = packages.Select(p => this.Packages.First(m => m.Identity.Equals(p)));
+                var tasks = packagesToExtract.ToDictionary(
+                    p => p.Identity,
+                    async p => await this.ExtractPackage(p, frameworkName, executionDir, tmpDir));
+                await Task.WhenAll(tasks.Values);
+
+                return tasks.ToDictionary(p => p.Key, p => p.Value.Result);
             }
         }
     }

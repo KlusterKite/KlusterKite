@@ -1045,7 +1045,7 @@ namespace ClusterKit.NodeManager.Tests
 
                 var standardDependencies = new PackageDependencyGroup(
                     NuGetFramework.ParseFrameworkName(
-                        ReleaseCheckTestsBase.NetStandard,
+                        ReleaseCheckTestsBase.NetCore,
                         DefaultFrameworkNameProvider.Instance),
                     dependencies);
                 var net46Dependencies = new PackageDependencyGroup(

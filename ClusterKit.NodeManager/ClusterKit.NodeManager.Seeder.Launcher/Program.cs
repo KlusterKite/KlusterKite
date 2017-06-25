@@ -77,8 +77,8 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                                 currentFramework,
                                 configuration.Nuget);
                         Console.WriteLine("Packages list created");
-                        requiredPackages.Select(p => p.Identity)
-                            .Install(currentFramework, configuration.Nuget, executionDir);
+                        //requiredPackages.Select(p => p.Identity)
+                            //.Install(runtime, currentFramework, configuration.Nuget, executionDir);
                         Console.WriteLine("Packages installed");
                     }
                     catch (PackageNotFoundException packageNotFoundException)
@@ -106,6 +106,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                     try
                     {
                         File.Copy(configuration.ConfigFile, Path.Combine(executionDir, "seeder.hocon"), true);
+                        
                         // todo: move to CreateServiceAsync
                         // ConfigurationUtils.FixAssemblyVersions(Path.Combine(executionDir, "ClusterKit.NodeManager.Seeder.exe.config"));
                         Console.WriteLine($"Seeder prepared in {executionDir}");

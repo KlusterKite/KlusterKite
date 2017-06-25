@@ -9,9 +9,11 @@
 
 namespace ClusterKit.NodeManager.Launcher.Utils
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    using NuGet.Packaging.Core;
     using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
 
@@ -52,11 +54,19 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         /// <summary>
         /// Extracts package files to the specified destination
         /// </summary>
-        /// <param name="package">The package to extract</param>
+        /// <param name="packages">The list of packages to extract</param>
+        /// <param name="runtime">The current runtime</param>
         /// <param name="frameworkName">The execution framework name</param>
         /// <param name="executionDir">The path to extract</param>
         /// <param name="tmpDir">The temporary directory name</param>
-        /// <returns>The list of extracted files</returns>
-        Task<IEnumerable<string>> ExtractPackage(IPackageSearchMetadata package, string frameworkName, string executionDir, string tmpDir);
+        /// <param name="logAction">The log writing action</param>
+        /// <returns>The list of extracted files by package</returns>
+        Task<Dictionary<PackageIdentity, IEnumerable<string>>> ExtractPackage(
+            IEnumerable<PackageIdentity> packages,
+            string runtime,
+            string frameworkName,
+            string executionDir,
+            string tmpDir,
+            Action<string> logAction = null);
     }
 }

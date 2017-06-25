@@ -13,17 +13,24 @@ namespace ClusterKit.NodeManager.Launcher.Utils
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
 
     using ClusterKit.NodeManager.Launcher.Utils.Exceptions;
 
+    using NuGet.Client;
+    using NuGet.Commands;
     using NuGet.Common;
     using NuGet.Configuration;
+    using NuGet.ContentModel;
     using NuGet.Frameworks;
+    using NuGet.LibraryModel;
     using NuGet.Packaging.Core;
+    using NuGet.ProjectModel;
     using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
+    using NuGet.RuntimeModel;
     using NuGet.Versioning;
 
     /// <summary>
@@ -32,26 +39,60 @@ namespace ClusterKit.NodeManager.Launcher.Utils
     public static class PackageUtils
     {
         /// <summary>
+        /// The global runtime graph
+        /// </summary>
+        private static RuntimeGraph runtimeGraph;
+
+        /// <summary>
+        /// Initializes static members of the <see cref="PackageUtils"/> class.
+        /// </summary>
+        static PackageUtils()
+        {
+            runtimeGraph = JsonRuntimeFormat.ReadRuntimeGraph(
+                typeof(PackageUtils).GetTypeInfo().Assembly
+                    .GetManifestResourceStream("ClusterKit.NodeManager.Launcher.Utils.Resources.runtimes.json"));
+        }
+
+        /// <summary>
         /// Installs specified packages to specified place
         /// </summary>
-        /// <param name="packages">The list of packages to install</param>
-        /// <param name="framework">The target framework to install</param>
-        /// <param name="nugetUrl">The url of nuget repository</param>
-        /// <param name="directoryToInstall">The directory to install packages contents</param>
-        public static void Install(
+        /// <param name="packages">
+        /// The list of packages to install
+        /// </param>
+        /// <param name="runtime">
+        /// The current runtime
+        /// </param>
+        /// <param name="framework">
+        /// The target framework to install
+        /// </param>
+        /// <param name="nugetUrl">
+        /// The url of nuget repository
+        /// </param>
+        /// <param name="directoryToInstall">
+        /// The directory to install packages contents
+        /// </param>
+        /// <param name="logAction">The log writing action</param>
+        /// <returns>
+        /// The list of installed files for each package
+        /// </returns>
+        public static async Task<Dictionary<PackageIdentity, IEnumerable<string>>> Install(
             this IEnumerable<PackageIdentity> packages,
+            string runtime,
             NuGetFramework framework,
             string nugetUrl,
-            string directoryToInstall)
+            string directoryToInstall,
+            Action<string> logAction = null)
         {
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(tempDir);
 
             var source = new PackageSource(nugetUrl);
             var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
+            var sourceCacheContext = new SourceCacheContext();
+            
             var downloadResource = sourceRepository.GetResource<DownloadResource>();
-            var packageDownloadContext = new PackageDownloadContext(new SourceCacheContext());
-
+            var packageDownloadContext = new PackageDownloadContext(sourceCacheContext);
+            var result = new Dictionary<PackageIdentity, IEnumerable<string>>();
             try
             {
                 var downloadTasks = packages.Select(
@@ -60,23 +101,41 @@ namespace ClusterKit.NodeManager.Launcher.Utils
                         packageDownloadContext,
                         tempDir,
                         NullLogger.Instance,
-                        CancellationToken.None));
-                var downloads = Task.WhenAll(downloadTasks).GetAwaiter().GetResult();
+                        CancellationToken.None).ContinueWith(
+                        t =>
+                            {
+                                logAction?.Invoke(
+                                    t.Result.PackageReader == null
+                                        ? $"{package.Id} {package.Version} failed to download: {t.Result.Status}"
+                                        : $"{package.Id} downloaded");
+                                return t.Result;
+                            }));
 
-                var tools = downloads.Where(d => !d.PackageReader.GetLibItems().Any());
-                var libraries = downloads.Where(d => d.PackageReader.GetLibItems().Any());
+                var downloads = await Task.WhenAll(downloadTasks);
+
+                if (downloads.Any(d => d.PackageReader == null))
+                {
+                    throw new Exception("Could not install all required packages");
+                }
+
+                var tools = downloads.Where(d => d.PackageReader.GetToolItems().Any()).ToList();
+                var libraries = downloads.Where(d => !d.PackageReader.GetToolItems().Any()).ToList();
 
                 foreach (var package in tools.OrderBy(d => d.PackageReader.GetIdentity().Id))
                 {
-                    Console.WriteLine(package.PackageReader.GetIdentity());
-                    ExtractPackage(package, framework, directoryToInstall);
+                    var files = ExtractPackage(package, runtime, framework, directoryToInstall).ToList();
+                    logAction?.Invoke($"{package.PackageReader.GetIdentity()} extracted as tool with {files.Count} files");
+                    result[package.PackageReader.GetIdentity()] = files;
                 }
 
                 foreach (var package in libraries.OrderBy(d => d.PackageReader.GetIdentity().Id))
                 {
-                    Console.WriteLine(package.PackageReader.GetIdentity());
-                    ExtractPackage(package, framework, directoryToInstall);
+                    var files = ExtractPackage(package, runtime, framework, directoryToInstall).ToList();
+                    logAction?.Invoke($"{package.PackageReader.GetIdentity()} extracted as lib with {files.Count} files");
+                    result[package.PackageReader.GetIdentity()] = files;
                 }
+
+                return result;
             }
             finally
             {
@@ -301,31 +360,74 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         /// <summary>
         /// Extracts the lib files to execution directory
         /// </summary>
-        /// <param name="package">The package to extract</param>
-        /// <param name="frameworkName">The current framework name</param>
-        /// <param name="executionDir">The execution directory to load packages</param>
-        private static void ExtractPackage(
+        /// <param name="package">
+        /// The package to extract
+        /// </param>
+        /// <param name="runtime">
+        /// The current runtime
+        /// </param>
+        /// <param name="frameworkName">
+        /// The current framework name
+        /// </param>
+        /// <param name="executionDir">
+        /// The execution directory to load packages
+        /// </param>
+        /// <param name="logAction">The log writing action</param>
+        /// <returns>
+        /// The list of extracted files
+        /// </returns>
+        private static IEnumerable<string> ExtractPackage(
             DownloadResourceResult package,
+            string runtime,
             NuGetFramework frameworkName,
-            string executionDir)
+            string executionDir,
+            Action<string> logAction = null)
         {
             try
             {
-                var files = NuGetFrameworkUtility.GetNearest(package.PackageReader.GetLibItems(), frameworkName)
-                            ?? NuGetFrameworkUtility.GetNearest(package.PackageReader.GetToolItems(), frameworkName);
+                var id = package.PackageReader.GetIdentity();
+                var files = NuGetFrameworkUtility.GetNearest(package.PackageReader.GetLibItems(), frameworkName)?.Items.ToList()
+                            ?? NuGetFrameworkUtility.GetNearest(package.PackageReader.GetToolItems(), frameworkName)?.Items.ToList();
 
-                if (files == null)
+                if (files == null || files.Count == 0)
                 {
-                    return;
+                    var collection = new ContentItemCollection();
+                    collection.Load(package.PackageReader.GetFiles());
+
+                    var conventions = new ManagedCodeConventions(runtimeGraph);
+                    var criteria = conventions.Criteria.ForFrameworkAndRuntime(
+                        NuGetFramework.ParseFrameworkName(
+                            PackageRepositoryExtensions.CurrentRuntime,
+                            DefaultFrameworkNameProvider.Instance),
+                        runtime);
+
+                    files = collection.FindBestItemGroup(criteria, conventions.Patterns.NativeLibraries)?.Items
+                        .Select(i => i.Path).ToList();
+                    if (files == null || files.Count == 0)
+                    {
+                        files = collection.FindBestItemGroup(criteria, conventions.Patterns.RuntimeAssemblies)?.Items
+                            .Select(i => i.Path).ToList();
+                    }
+
+                    if (files == null || files.Count == 0)
+                    {
+                        return new string[0];
+                    }
+                    else
+                    {
+                        logAction?.Invoke($"{id.Id}: {string.Join(", ", files)}");
+                    }
                 }
 
-                foreach (var file in files.Items)
+                foreach (var file in files)
                 {
                     using (var fileStream = File.Create(Path.Combine(executionDir, Path.GetFileName(file) ?? file)))
                     {
                         package.PackageReader.GetStream(file).CopyTo(fileStream);
                     }
                 }
+
+                return files.Select(file => Path.GetFileName(file) ?? file);
             }
             finally
             {

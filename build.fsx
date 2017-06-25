@@ -17,10 +17,17 @@ group netcorebuild
 #r ".fake/build.fsx/packages/netcorebuild/Microsoft.Build/lib/netstandard1.5/Microsoft.Build.dll"
 #r ".fake/build.fsx/packages/netcorebuild/System.Xml.ReaderWriter/lib/netstandard1.3/System.Xml.ReaderWriter.dll"
 #r ".fake/build.fsx/packages/netcorebuild/System.Xml.XmlDocument/lib/netstandard1.3/System.Xml.XmlDocument.dll"
+#r ".fake/build.fsx/packages/netcorebuild/System.Xml.XDocument/lib/netstandard1.3/System.Xml.XDocument.dll"
+#r ".fake/build.fsx/packages/netcorebuild/System.IO.Compression/runtimes/win/lib/netstandard1.3/System.IO.Compression.dll"
+#r ".fake/build.fsx/packages/netcorebuild/System.IO.Compression.ZipFile/lib/netstandard1.3/System.IO.Compression.ZipFile.dll"
+#r ".fake/build.fsx/packages/netcorebuild/System.Net.Http/runtimes/win/lib/netstandard1.3/System.Net.Http.dll"
 
+#r @".fake/build.fsx/packages/netcorebuild/Newtonsoft.Json/lib/netstandard1.3/Newtonsoft.Json.dll"
+#r @".fake/build.fsx/packages/netcorebuild/NuGet.Protocol.Core.Types/lib/netstandard1.3/NuGet.Protocol.Core.Types.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Protocol.Core.v3/lib/netstandard1.3/NuGet.Protocol.Core.v3.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Configuration/lib/netstandard1.3/NuGet.Configuration.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Common/lib/netstandard1.3/NuGet.Common.dll"
+#r @".fake/build.fsx/packages/netcorebuild/NuGet.Frameworks/lib/netstandard1.3/NuGet.Frameworks.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Versioning/lib/netstandard1.0/NuGet.Versioning.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Packaging/lib/netstandard1.3/NuGet.Packaging.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Packaging.Core/lib/netstandard1.3/NuGet.Packaging.Core.dll"
@@ -298,14 +305,15 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
                             |> Seq.groupBy (fun (p:LocalPackageInfo) -> p.Identity.Id.ToLower())
                             |> dict
                             |> Dictionary<string, seq<LocalPackageInfo>>
-    
+
     let directPackages = filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
                             |> Seq.map(fun (file:FileInfo) -> new Project(file.FullName, null, null, ProjectCollection.GlobalProjectCollection, ProjectLoadSettings.IgnoreMissingImports))
-                            |> Seq.collect (fun proj -> proj.AllEvaluatedItems)
+                            |> Seq.collect (fun proj -> proj.ItemsIgnoringCondition)
                             |> Seq.filter (fun item -> item.ItemType = "PackageReference")
-                            |> Seq.map (fun item -> ((item.Xml.Include), (item.Metadata |> Seq.filter (fun d -> d.Name = "Version") |> Seq.tryHead |> (fun i -> if i.IsSome then i.Value.EvaluatedValue else ""))))
+                            |> Seq.map (fun item -> ((item.Xml.Include), (item.Metadata |> Seq.filter (fun d -> d.Name = "Version") |> Seq.tryHead |> (fun i -> if i.IsSome then i.Value.EvaluatedValue else null))))
+                            |> Seq.filter (fun (_, version) -> version <> null)
                             |> Seq.distinct
-                            |> Seq.sortBy (fun (id, version) -> id)
+                            |> Seq.sortBy (fun (id, _) -> id)
                             |> Seq.map (fun (id, version) -> 
                                 let (success, list) = packageGroups.TryGetValue(id.ToLower())
                                 if success then
@@ -319,7 +327,7 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
                             |> Seq.distinct
                             |> Seq.map (fun (p:LocalPackageInfo) -> p.Identity, p)
                             |> dict
-
+   
     let getDirectDependecies (packages : IDictionary<Core.PackageIdentity, LocalPackageInfo>) = 
         packages.Values
             |> Seq.collect(fun (p:LocalPackageInfo) -> p.Nuspec.GetDependencyGroups())
@@ -381,7 +389,7 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
     let filteredDependencies =
         dependecies.Values
         |> Seq.groupBy(fun (p:LocalPackageInfo) -> p.Identity.Id)
-        |> Seq.map (fun (key, list) -> list |> Seq.sortBy(fun p -> p.Identity.Version) |> Seq.last)
+        |> Seq.map (fun (_, list) -> list |> Seq.sortBy(fun p -> p.Identity.Version) |> Seq.last)
         
     filteredDependencies
     |> Seq.sortBy(fun (p:LocalPackageInfo) -> p.Identity.Id)
@@ -389,11 +397,10 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
         CopyFile packageThirdPartyDir p.Path        
     )
 
-    printfn "total %d third party packages"  (filteredDependencies |> Seq.length)            
-
+    printfn "total %d third party packages"  (filteredDependencies |> Seq.length)      
 )
 
-"PrepareSources" ==> "RestoreThirdPartyPackages"
+//"PrepareSources" ==> "RestoreThirdPartyPackages"
 
 Target.Create "PushThirdPartyPackages" (fun _ ->
     pushPackage (Path.Combine(packageThirdPartyDir, "*.nupkg"))
@@ -468,7 +475,7 @@ Target.Create "DockerContainers" (fun _ ->
         let packageCacheDir = Path.Combine ([|fullPath; "packageCache"|])
 
         CleanDirs [|buildDir; packageCacheDir|]
-        CopyDir buildDir "./build/launcherpublish" (fun file -> true)
+        CopyDir buildDir "./build/launcherpublish" (fun _ -> true)
         CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
         CopyTo buildDir [|"./nuget.exe"|]
 
@@ -482,11 +489,11 @@ Target.Create "DockerContainers" (fun _ ->
         
 
     CleanDirs [|"./Docker/ClusterKitSeed/build"|]
-    CopyDir "./Docker/ClusterKitSeed/build" "./build/seedpublish" (fun file -> true)
+    CopyDir "./Docker/ClusterKitSeed/build" "./build/seedpublish" (fun _ -> true)
     buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
 
     CleanDirs [|"./Docker/ClusterKitSeeder/build"|]
-    CopyDir "./Docker/ClusterKitSeeder/build" "./build/seederpublish" (fun file -> true)
+    CopyDir "./Docker/ClusterKitSeeder/build" "./build/seederpublish" (fun _ -> true)
     buildDocker "clusterkit/seeder" "Docker/ClusterKitSeeder"
 
     copyLauncherData "./Docker/ClusterKitWorker" |> ignore

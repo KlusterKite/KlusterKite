@@ -38,6 +38,7 @@ namespace ClusterKit.NodeManager
 
     using Newtonsoft.Json;
 
+    using NuGet.Packaging.Core;
     using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
 
@@ -72,6 +73,11 @@ namespace ClusterKit.NodeManager
         private readonly string frameworkName;
 
         /// <summary>
+        /// The current environment runtime name
+        /// </summary>
+        private readonly string runtime;
+
+        /// <summary>
         /// The nuget repository
         /// </summary>
         private readonly IPackageRepository nugetRepository;
@@ -96,6 +102,7 @@ namespace ClusterKit.NodeManager
             this.databaseName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
             this.databaseProviderName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
             this.frameworkName = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.FrameworkType");
+            this.runtime = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.Runtime");
         }
 
         /// <summary>
@@ -710,34 +717,6 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// Extracts the lib files to execution directory
-        /// </summary>
-        /// <param name="package">
-        /// The package to extract
-        /// </param>
-        /// <param name="tmpDir">
-        /// The temp directory to extract packages
-        /// </param>
-        /// <param name="executionDir">
-        /// The execution directory to load packages
-        /// </param>
-        /// <returns>
-        /// The async task
-        /// </returns>
-        private async Task ExtractPackageAsync(IPackageSearchMetadata package, string tmpDir, string executionDir)
-        {
-            var files = await this.nugetRepository.ExtractPackage(package, this.frameworkName, executionDir, tmpDir);
-            if (!files.Any())
-            {
-                Context.GetLogger()
-                    .Warning(
-                        "{Type}: Package {PackageId} does not contains compatible files",
-                        this.GetType().Name,
-                        package.Identity.ToString());
-            }
-        }
-
-        /// <summary>
         /// Extracts the specified packages for the release migrators
         /// </summary>
         /// <param name="release">
@@ -855,40 +834,14 @@ namespace ClusterKit.NodeManager
             Directory.CreateDirectory(migratorExecutionDirectory);
             Directory.CreateDirectory(migratorTempDirectory);
 
-            List<IPackageSearchMetadata> packages = new List<IPackageSearchMetadata>();
-            foreach (var packageDescription in migratorTemplate.PackagesToInstall[this.frameworkName])
-            {
-                var package = await this.nugetRepository.GetAsync(packageDescription.Id, NuGetVersion.Parse(packageDescription.Version));
-                if (package == null)
-                {
-                    Context.GetLogger()
-                        .Error(
-                            "{Type} could not find package {PackageName} {PackageVersion} for migrator template {MigratorTemplateCode} of release {ReleaseId}",
-                            this.GetType().Name,
-                            packageDescription.Id,
-                            packageDescription.Version,
-                            migratorTemplate.Code,
-                            release.Id);
-                    errors.Add(
-                        new MigrationError
-                            {
-                                ReleaseId = release.Id,
-                                MigrationId = migrationId,
-                                MigratorTemplateCode = migratorTemplate.Code,
-                                MigratorTemplateName = migratorTemplate.Name,
-                                ErrorMessage =
-                                    $"could not find package {packageDescription.Id} {packageDescription.Version}"
-                            });
-                    continue;
-                }
-
-                packages.Add(package);
-            }
 
             try
             {
+                var packages = migratorTemplate.PackagesToInstall[this.frameworkName]
+                    .Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version))).ToList();
                 await this.nugetRepository.CreateServiceAsync(
                     packages,
+                    this.runtime,
                     this.frameworkName,
                     migratorExecutionDirectory,
                     "ClusterKit.NodeManager.Migrator.Executor");
