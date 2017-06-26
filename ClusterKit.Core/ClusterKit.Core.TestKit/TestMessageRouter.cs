@@ -11,6 +11,9 @@ namespace ClusterKit.Core.TestKit
 {
     using System;
     using System.Collections.Generic;
+#if CORECLR
+    using System.Reflection;
+#endif
     using System.Threading.Tasks;
 
     using Akka.Actor;

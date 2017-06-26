@@ -41,13 +41,13 @@ namespace ClusterKit.API.Provider.Resolvers
         static EnumResolver()
         {
             var type = typeof(T);
-            if (!type.IsSubclassOf(typeof(Enum)))
+            if (!type.GetTypeInfo().IsSubclassOf(typeof(Enum)))
             {
                 throw new Exception($"{type.Name} should be enum");
             }
 
             GeneratedType = new ApiEnumType(ApiDescriptionAttribute.GetTypeName(type), Enum.GetNames(type));
-            hasFlags = type.GetCustomAttribute<FlagsAttribute>() != null;
+            hasFlags = type.GetTypeInfo().GetCustomAttribute<FlagsAttribute>() != null;
         }
 
         /// <summary>

@@ -20,7 +20,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The release configuration description
     /// </summary>
     [ApiDescription("The release configuration description", Name = "ReleaseConfiguration")]
-    [Serializable]
     public class ReleaseConfiguration
     { 
         /// <summary>
@@ -48,10 +47,10 @@ namespace ClusterKit.NodeManager.Client.ORM
         public List<string> SeedAddresses { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of nuget feeds
+        /// Gets or sets the nuget server url
         /// </summary>
-        [DeclareField("the list of nuget feeds")]
-        public List<NugetFeed> NugetFeeds { get; set; }
+        [DeclareField("the nuget server url")]
+        public string NugetFeed { get; set; }
 
         /// <summary>
         /// Get the united list of <see cref="NodeTemplates"/> and <see cref="MigratorTemplates"/>

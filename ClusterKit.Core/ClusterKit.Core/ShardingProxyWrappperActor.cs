@@ -11,13 +11,15 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Linq;
-
+#if CORECLR
+    using System.Reflection;
+#endif
     using Akka.Actor;
     using Akka.Cluster.Sharding;
     using Akka.Configuration;
     using Akka.Event;
 
-    using Castle.Windsor;
+    using Autofac;
 
     /// <summary>
     /// Wraps sharding proxy into well known path
@@ -33,7 +35,7 @@ namespace ClusterKit.Core
         /// <param name="shardingConfig">
         /// The sharding config.
         /// </param>
-        public ShardingProxyWrappperActor(IWindsorContainer container, Config shardingConfig)
+        public ShardingProxyWrappperActor(IComponentContext container, Config shardingConfig)
         {
             var shardingTypeName = shardingConfig.GetString("type-name");
             if (string.IsNullOrWhiteSpace(shardingTypeName))

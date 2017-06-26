@@ -1,18 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager</PackageId>
     <Version>0.0.0.0-local</Version>
-    <Authors>ClusterKit</Authors>
-    <Description>Bundle of utils to create scalable and redundant services</Description>
-    <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
-    <Product>ClusterKit</Product>
-    <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <PackageReference Include="Microsoft.Web.Xdt" Version="2.1.1" />
-    <PackageReference Include="NuGet.Core" Version="2.14.0" />
+    <None Remove="Resources\akka.hocon" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\akka.hocon" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj" />
@@ -20,5 +21,16 @@
     <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj" />
     <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource\ClusterKit.NodeManager.ConfigurationSource.csproj" />
+    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Utils\ClusterKit.NodeManager.Launcher.Utils.csproj" />
   </ItemGroup>
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
 </Project>

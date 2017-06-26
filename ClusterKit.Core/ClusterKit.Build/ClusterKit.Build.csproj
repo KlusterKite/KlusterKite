@@ -1,20 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
     <PackageId>ClusterKit.Build</PackageId>
-    <Version>0.0.0.0-local</Version>
-    <Authors>Mikhail Kantarovskiy and ClusterKit contributors</Authors>
-    <Description>Bundle of utils to Assemble ClusterKit services</Description>
-    <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
-    <Product>ClusterKit</Product>
-    <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
+    <Version>0.0.0.0-local</Version>    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>$(ClusterKitPackageTags)</PackageTags>    
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="FAKE.Lib" Version="4.61.2" />
-    <PackageReference Include="FSharp.Core" Version="4.1.17" />
-    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <None Update="build.base.fsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

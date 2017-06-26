@@ -10,11 +10,12 @@
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
-    using System.Data.Entity;
     using System.Linq.Expressions;
 
     using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client.ORM;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Data factory to work with <see cref="Migration"/>

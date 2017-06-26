@@ -14,7 +14,6 @@ namespace ClusterKit.NodeManager.Migrator
     /// <summary>
     /// The description of some migratable resource
     /// </summary>
-    [Serializable]
     public class ResourceId
     {
         /// <summary>
@@ -31,5 +30,10 @@ namespace ClusterKit.NodeManager.Migrator
         /// Gets or sets the resource connection string (or some identification to help connect to such resource)
         /// </summary>
         public string ConnectionString { get; set; }
+
+        /// <summary>
+        /// Gets or sets the resource provider name
+        /// </summary>
+        public string ProviderName { get; set; }
     }
 }

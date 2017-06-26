@@ -21,7 +21,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [ApiDescription("The error description during the resource check and/or migration", Name = "MigrationError")]
     [Table("MigrationErrors")]
-    [Serializable]
     public class MigrationError : MigrationLogRecord
     {
         /// <summary>
@@ -63,7 +62,12 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <param name="value">The exception</param>
         private void AddExceptionToStackTrace(Exception value)
         {
+#if APPDOMAIN
             this.ErrorStackTrace += $"{value.GetType().Name}: {value.Message}\n{value.StackTrace}\n{(value as System.IO.FileNotFoundException)?.FusionLog}";
+#endif
+#if CORECLR
+            this.ErrorStackTrace += $"{value.GetType().Name}: {value.Message}\n{value.StackTrace}";
+#endif
 
             if (value.InnerException != null)
             {

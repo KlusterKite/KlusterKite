@@ -1,20 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
     <PackageId>ClusterKit.Core.Service</PackageId>
     <Version>0.0.0.0-local</Version>
-    <Authors>ClusterKit</Authors>
     <Description>Bundle of utils to create scalable and redundant services</Description>
-    <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
-    <Product>ClusterKit</Product>
-    <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
-    <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>exe</OutputType>
     <IsTool>true</IsTool>
     <StartupObject />
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <PackageReference Include="docopt.net" Version="0.6.1.9" />
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="2.0.0" />
@@ -22,7 +21,23 @@
   <ItemGroup>
     <ProjectReference Include="..\ClusterKit.Core\ClusterKit.Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
     <Reference Include="System.Configuration" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+  </ItemGroup>  
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);APPDOMAIN;CONFIGURATION</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>  
 </Project>

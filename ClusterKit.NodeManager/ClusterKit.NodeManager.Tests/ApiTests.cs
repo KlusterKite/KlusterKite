@@ -13,6 +13,7 @@ namespace ClusterKit.NodeManager.Tests
 
     using Akka.Actor;
 
+    using ClusterKit.NodeManager.Tests.Mock;
     using ClusterKit.Web.GraphQL.Publisher;
 
     using GraphQL.Utilities;
@@ -50,7 +51,7 @@ namespace ClusterKit.NodeManager.Tests
         public void ApiGenerationTest()
         {
             var system = ActorSystem.Create("test");
-            var api = new ApiProvider(system);
+            var api = new ApiProvider(system, new MockPackageRepository());
 
             foreach (var error in api.GenerationErrors)
             {

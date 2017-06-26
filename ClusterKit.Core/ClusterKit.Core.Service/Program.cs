@@ -12,7 +12,9 @@ namespace ClusterKit.Core.Service
     using System;
     using System.Collections.Generic;
 
-    using Castle.Windsor;
+    using Akka.Actor;
+
+    using Autofac;
 
     using DocoptNet;
 
@@ -37,7 +39,7 @@ namespace ClusterKit.Core.Service
         /// <summary>
         /// Gets or sets the dependency injection container
         /// </summary>
-        private static IWindsorContainer Container { get; set; }
+        private static ContainerBuilder Container { get; set; }
 
         /// <summary>
         /// Service main entry point
@@ -62,8 +64,8 @@ namespace ClusterKit.Core.Service
                 Console.WriteLine($@"Will use config from {config}");
             }
 
-            Container = new WindsorContainer();
-
+            Container = new ContainerBuilder();
+#if APPDOMAIN
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
                 {
                     Log.Logger.Error(
@@ -75,8 +77,13 @@ namespace ClusterKit.Core.Service
                         eventArgs.IsTerminating,
                         (eventArgs.ExceptionObject as Exception)?.StackTrace);
                 };
+#endif
+#if CORECLR
+            // todo: Handle exception
+#endif
 
-            var system = Bootstrapper.ConfigureAndStart(Container, configurations.ToArray());
+            var container = Bootstrapper.ConfigureAndStart(Container, configurations.ToArray());
+            var system = container.Resolve<ActorSystem>();
             Log.Logger.Warning("{Type}: Started", "System");
             Console.CancelKeyPress += (sender, eventArgs) =>
                 {
@@ -99,7 +106,7 @@ namespace ClusterKit.Core.Service
                 };
 
             system.StartNameSpaceActorsFromConfiguration();
-            BaseInstaller.RunPostStart(Container);
+            BaseInstaller.RunPostStart(Container, container);
 
             var waitedTask = new System.Threading.Tasks.TaskCompletionSource<bool>();
             system.WhenTerminated.ContinueWith(task => waitedTask.SetResult(true));

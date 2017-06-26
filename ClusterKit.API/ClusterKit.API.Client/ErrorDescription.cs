@@ -62,5 +62,11 @@ namespace ClusterKit.API.Client
         [UsedImplicitly]
         [DeclareField(Description = "The error message")]
         public string Message { get; set; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"{this.Field}: {this.Message}";
+        }
     }
 }

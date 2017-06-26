@@ -10,13 +10,12 @@
 namespace ClusterKit.Monitoring.Client
 {
     using System.Collections.Generic;
+    using System.Reflection;
 
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
 
@@ -29,14 +28,14 @@ namespace ClusterKit.Monitoring.Client
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
-        // ReSharper disable once ArrangeStaticMemberQualifier
+        // ReSharper disable once ArrangeStaticMemberQualifier -
         protected override decimal AkkaConfigLoadPriority => BaseInstaller.PriorityClusterRole;
 
         /// <summary>
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Monitoring.Client.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -44,15 +43,10 @@ namespace ClusterKit.Monitoring.Client
         /// <returns>The list of roles</returns>
         protected override IEnumerable<string> GetRoles() => new string[0];
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
         }
     }
 }

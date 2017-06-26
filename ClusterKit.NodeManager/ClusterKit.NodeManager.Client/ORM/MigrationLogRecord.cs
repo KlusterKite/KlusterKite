@@ -21,21 +21,21 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The base class for migration log records
     /// </summary>
     [Table("MigrationLogRecords")]
-    [Serializable]
     public abstract class MigrationLogRecord
     {
         /// <summary>
         /// Gets or sets the error id
         /// </summary>
         [Key]
-        [DeclareField("the migration id", IsKey = true)]
+        [DeclareField("the log record id", IsKey = true)]
         [UsedImplicitly]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column(TypeName = "serial")]  // TODO: check and remove that Npgsql.EntityFrameworkCore.PostgreSQL can generate serial columns on migration without this kludge
         public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the migration id
         /// </summary>
-        [ForeignKey(nameof(Migration))]
         [DeclareField("the migration id")]
         [UsedImplicitly]
         public int? MigrationId { get; set; }
@@ -44,6 +44,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the migration
         /// </summary>
         [UsedImplicitly]
+        [ForeignKey(nameof(MigrationId))]
         public Migration Migration { get; set; }
 
         /// <summary>

@@ -9,8 +9,6 @@
 
 namespace ClusterKit.Monitoring.Client.Messages
 {
-    using System.Xml.Serialization;
-
     using ClusterKit.API.Attributes;
 
     using JetBrains.Annotations;
@@ -77,7 +75,6 @@ namespace ClusterKit.Monitoring.Client.Messages
         /// <summary>
         /// Gets or sets the actor's children
         /// </summary>
-        [XmlArray("children")]
         [DeclareField("the actor's children")]
         public Node[] Children { get; set; }
     }

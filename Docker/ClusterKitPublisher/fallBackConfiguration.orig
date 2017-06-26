@@ -1,5 +1,5 @@
 {
-  "Configuration": "{\n   ClusterKit {\n     Web {\n       Nginx {\n         PathToConfig = \"/etc/nginx/sites-enabled/clusterkit.config\"\n         ReloadCommand {\n           Command = /etc/init.d/nginx\n           Arguments = reload\n         } \n         Configuration {\n           default {\n             \"location /clusterkit\" { \n               proxy_pass = \"http://monitoringUI/clusterkit\"\n             }\n           }\n         }\n       }\n     }\n   }\n \n   akka {\n     remote {\n       helios {\n         tcp {\n           hostname = 0.0.0.0\n           port = 0\n         }\n       }\n     }\n     cluster {\n       seed-nodes = []\n     }\n   }\n }\n",
+  "Configuration": "{\n   ClusterKit {\n     Web {\n       Nginx {\n         PathToConfig = \"/etc/nginx/sites-enabled/clusterkit.config\"\n         ReloadCommand {\n           Command = /etc/init.d/nginx\n           Arguments = reload\n         } \n         Configuration {\n           default {\n             \"location /clusterkit\" { \n               proxy_pass = \"http://monitoringUI/clusterkit\"\n             }\n           }\n         }\n       }\n     }\n   }\n}",
   "NodeTemplate": "publisher",
   "ReleaseId": 1,
   "Packages": [
@@ -33,10 +33,7 @@
       "Version": "0.0.0-local"
     }
   ],
-  "PackageSources": [
-    "/opt/packageCache",
-    "http://nuget/"
-  ],
+  "PackageSource": "http://nuget/",
   "Seeds": [
     "akka.tcp://ClusterKit@seed:3090"
   ]

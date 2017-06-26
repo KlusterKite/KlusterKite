@@ -27,4 +27,8 @@
 
 		}
 	}	
+
+	ClusterKit.Web.Configurators {
+		Cors = "ClusterKit.Web.GraphQL.Publisher.WebHostingConfigurator, ClusterKit.Web.GraphQL.Publisher"
+	}	
 }

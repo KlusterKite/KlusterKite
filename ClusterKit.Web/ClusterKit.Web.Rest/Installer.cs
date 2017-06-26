@@ -11,8 +11,7 @@ namespace ClusterKit.Web.Rest
 {
     using Akka.Configuration;
 
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
 
@@ -33,12 +32,8 @@ namespace ClusterKit.Web.Rest
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
         }
     }

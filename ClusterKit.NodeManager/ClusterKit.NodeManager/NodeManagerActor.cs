@@ -20,6 +20,8 @@ namespace ClusterKit.NodeManager
     using Akka.Event;
     using Akka.Util.Internal;
 
+    using Autofac;
+
     using ClusterKit.API.Client;
     using ClusterKit.Core;
     using ClusterKit.Core.Monads;
@@ -28,19 +30,20 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Data;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
+    using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client.Messages;
     using ClusterKit.NodeManager.Client.Messages.Migration;
     using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
     using ClusterKit.NodeManager.Messages;
     using ClusterKit.Security.Attributes;
     using ClusterKit.Security.Client;
 
     using JetBrains.Annotations;
-
-    using NuGet;
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Singleton actor performing all node configuration related work
@@ -57,6 +60,11 @@ namespace ClusterKit.NodeManager
         /// Akka configuration path to connection string
         /// </summary>
         public const string ConfigDatabaseNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseName";
+
+        /// <summary>
+        /// Akka configuration path to connection string
+        /// </summary>
+        public const string ConfigDatabaseProviderNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseProviderName";
 
         /// <summary>
         /// Akka configuration path to connection string
@@ -78,7 +86,7 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// The data source context factory
         /// </summary>
-        private readonly IContextFactory<ConfigurationContext> contextFactory;
+        private readonly UniversalContextFactory contextFactory;
 
         /// <summary>
         /// In case of cluster is full, time span that new node candidate will repeat join request
@@ -106,7 +114,7 @@ namespace ClusterKit.NodeManager
         private readonly Dictionary<Address, NodeDescription> nodeDescriptions =
             new Dictionary<Address, NodeDescription>();
 
-        /// <summary>
+        /// <summary>  
         /// The nuget repository
         /// </summary>
         private readonly IPackageRepository nugetRepository;
@@ -173,6 +181,11 @@ namespace ClusterKit.NodeManager
         private string databaseName;
 
         /// <summary>
+        /// The database provider name
+        /// </summary>
+        private string databaseProviderName;
+
+        /// <summary>
         /// The resource migrator
         /// </summary>
         private ICanTell resourceMigrator;
@@ -190,6 +203,9 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
         /// </summary>
+        /// <param name="componentContext">
+        /// The DI context
+        /// </param>
         /// <param name="contextFactory">
         /// Configuration context factory
         /// </param>
@@ -200,9 +216,10 @@ namespace ClusterKit.NodeManager
         /// The nuget repository
         /// </param>
         public NodeManagerActor(
-            IContextFactory<ConfigurationContext> contextFactory,
+            IComponentContext componentContext,
+            UniversalContextFactory contextFactory,
             IMessageRouter router,
-            IPackageRepository nugetRepository)
+            IPackageRepository nugetRepository) : base(componentContext)
         {
             this.contextFactory = contextFactory;
             this.router = router;
@@ -272,9 +289,12 @@ namespace ClusterKit.NodeManager
         }
 
         /// <inheritdoc />
-        protected override Task<ConfigurationContext> GetContext()
+        protected override ConfigurationContext GetContext()
         {
-            return this.contextFactory.CreateContext(this.connectionString, this.databaseName);
+            return this.contextFactory.CreateContext<ConfigurationContext>(
+                this.databaseProviderName,
+                this.connectionString,
+                this.databaseName);
         }
 
         /// <summary>
@@ -288,20 +308,18 @@ namespace ClusterKit.NodeManager
         {
             if (message == null)
             {
-                Context.GetLogger()
-                    .Warning(
-                        "{Type}: received null message from {ActorAddress}",
-                        this.GetType().Name,
-                        this.Sender.Path.ToString());
+                Context.GetLogger().Warning(
+                    "{Type}: received null message from {ActorAddress}",
+                    this.GetType().Name,
+                    this.Sender.Path.ToString());
             }
             else
             {
-                Context.GetLogger()
-                    .Warning(
-                        "{Type}: received unsupported message of type {MessageTypeName} from {ActorAddress}",
-                        this.GetType().Name,
-                        message.GetType().Name,
-                        this.Sender.Path.ToString());
+                Context.GetLogger().Warning(
+                    "{Type}: received unsupported message of type {MessageTypeName} from {ActorAddress}",
+                    this.GetType().Name,
+                    message.GetType().Name,
+                    this.Sender.Path.ToString());
             }
 
             base.Unhandled(message);
@@ -320,9 +338,29 @@ namespace ClusterKit.NodeManager
             }
 
             nodeDescription.IsObsolete = nodeDescription.ReleaseId != this.currentRelease.Id
-                                         && this.currentRelease.CompatibleTemplates.All(
+                                         && this.currentRelease.CompatibleTemplatesBackward.All(
                                              ct => ct.TemplateCode != nodeDescription.NodeTemplate
                                                    || ct.CompatibleReleaseId != nodeDescription.ReleaseId);
+        }
+
+        /// <summary>
+        /// Gets the active release from data source
+        /// </summary>
+        /// <param name="context">The data context</param>
+        private void GetCurrentRelease(ConfigurationContext context)
+        {
+            var releases = context.Releases
+                .Include(nameof(Release.CompatibleTemplatesBackward))
+                .Include($"{nameof(Release.MigrationLogs)}")
+                .Where(r => r.State == EnReleaseState.Active).ToList();
+            this.currentRelease = releases.SingleOrDefault();
+
+            if (this.currentRelease == null)
+            {
+                Context.GetLogger().Error(
+                    "{Type}: Could not find any active release in database",
+                    this.GetType().Name);
+            }
         }
 
         /// <summary>
@@ -345,17 +383,15 @@ namespace ClusterKit.NodeManager
                                       : 0) + (this.awaitingRequestsByTemplate.ContainsKey(t.Code)
                                                   ? this.awaitingRequestsByTemplate[t.Code].Count
                                                   : 0)
-                             })
-                .ToList();
+                             }).ToList();
 
             if (availableTemplates.Count == 0)
             {
-                Context.GetLogger()
-                    .Info(
-                        "{Type}: There is no configuration available for {ContainerType} with framework {FrameworkName}",
-                        this.GetType().Name,
-                        containerType,
-                        frameworkType);
+                Context.GetLogger().Info(
+                    "{Type}: There is no configuration available for {ContainerType} with framework {FrameworkName}",
+                    this.GetType().Name,
+                    containerType,
+                    frameworkType);
                 return new List<NodeTemplate>();
             }
 
@@ -363,8 +399,7 @@ namespace ClusterKit.NodeManager
             var templates = availableTemplates
                 .Where(
                     t => t.Template.MinimumRequiredInstances > 0 && t.NodesCount < t.Template.MinimumRequiredInstances)
-                .Select(t => t.Template)
-                .ToList();
+                .Select(t => t.Template).ToList();
 
             if (templates.Count == 0)
             {
@@ -373,19 +408,17 @@ namespace ClusterKit.NodeManager
                     .Where(
                         t => !t.Template.MaximumNeededInstances.HasValue
                              || (t.Template.MaximumNeededInstances.Value > 0
-                                 && t.NodesCount < t.Template.MaximumNeededInstances.Value))
-                    .Select(t => t.Template)
+                                 && t.NodesCount < t.Template.MaximumNeededInstances.Value)).Select(t => t.Template)
                     .ToList();
             }
 
             if (templates.Count == 0)
             {
-                Context.GetLogger()
-                    .Info(
-                        "{Type}: Cluster is full, there is now room for {ContainerType} with framework {FrameworkName}",
-                        this.GetType().Name,
-                        containerType,
-                        frameworkType);
+                Context.GetLogger().Info(
+                    "{Type}: Cluster is full, there is now room for {ContainerType} with framework {FrameworkName}",
+                    this.GetType().Name,
+                    containerType,
+                    frameworkType);
             }
 
             return templates;
@@ -398,32 +431,21 @@ namespace ClusterKit.NodeManager
         {
             this.connectionString = Context.System.Settings.Config.GetString(ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(ConfigDatabaseNamePath);
+            this.databaseProviderName = Context.System.Settings.Config.GetString(ConfigDatabaseProviderNamePath);
 
-            using (var context = this.contextFactory.CreateContext(this.connectionString, this.databaseName).Result)
+            using (var context = this.contextFactory.CreateContext<ConfigurationContext>(
+                this.databaseProviderName,
+                this.connectionString,
+                this.databaseName))
             {
                 this.GetCurrentRelease(context);
                 this.currentMigration = context.Migrations.Include(nameof(Migration.FromRelease))
                     .Include(nameof(Migration.ToRelease))
-                    .Include($"{nameof(Migration.Operations)}.{nameof(MigrationOperation.Error)}")
-                    .Include(nameof(Migration.Errors))
+                    .Include($"{nameof(Migration.Logs)}")
                     .FirstOrDefault(m => m.IsActive);
             }
 
             this.InitResourceState();
-        }
-
-        /// <summary>
-        /// Gets the active release from data source
-        /// </summary>
-        /// <param name="context">The data context</param>
-        private void GetCurrentRelease(ConfigurationContext context)
-        {
-            var releases = context.Releases.Include(nameof(Release.CompatibleTemplates))
-                .Include($"{nameof(Release.Operations)}.{nameof(MigrationOperation.Error)}")
-                .Include(nameof(Release.Errors))
-                .Where(r => r.State == EnReleaseState.Active)
-                .ToList();
-            this.currentRelease = releases.SingleOrDefault();
         }
 
         /// <summary>
@@ -450,8 +472,14 @@ namespace ClusterKit.NodeManager
             }
 
             this.workers = Context.ActorOf(
-                Props.Create(() => new Worker(this.connectionString, this.databaseName, this.contextFactory, this.Self))
-                    .WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
+                Props.Create(
+                    () => new Worker(
+                        this.databaseProviderName,
+                        this.connectionString,
+                        this.databaseName,
+                        this.ComponentContext,
+                        this.contextFactory,
+                        this.Self)).WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                 "workers");
 
             var migrationActorSubstitute =
@@ -473,12 +501,15 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void InitMigration()
         {
-            var hasUpgradingResources = this.resourceState.MigrationState.TemplateStates.Any(
-                t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Upgrade));
-            var hasDowngradingResources = this.resourceState.MigrationState.TemplateStates.Any(
-                t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Downgrade));
-            var hasBrokenResources = this.resourceState.MigrationState.TemplateStates.Any(
-                t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Undefined));
+            var hasUpgradingResources =
+                this.resourceState.MigrationState.TemplateStates.Any(
+                    t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Upgrade));
+            var hasDowngradingResources =
+                this.resourceState.MigrationState.TemplateStates.Any(
+                    t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Downgrade));
+            var hasBrokenResources =
+                this.resourceState.MigrationState.TemplateStates.Any(
+                    t => t.Migrators.Any(m => m.Direction == EnMigrationDirection.Undefined));
 
             if ((hasUpgradingResources && hasDowngradingResources) || hasBrokenResources)
             {
@@ -495,7 +526,7 @@ namespace ClusterKit.NodeManager
                                 : hasDowngradingResources
                                     ? EnMigrationDirection.Downgrade
                                     : EnMigrationDirection.Stay;
-            using (var ds = this.GetContext().Result)
+            using (var ds = this.GetContext())
             {
                 var migration = ds.Migrations.FirstOrDefault(m => m.IsActive);
                 if (migration == null || migration.Id != this.currentMigration.Id)
@@ -539,10 +570,9 @@ namespace ClusterKit.NodeManager
             if (!this.currentMigration.Direction.HasValue
                 || this.currentMigration.Direction == EnMigrationDirection.Undefined)
             {
-                Context.GetLogger()
-                    .Error(
-                        "{Type}: current migration is marked ready but has invalid direction value",
-                        this.GetType().Name);
+                Context.GetLogger().Error(
+                    "{Type}: current migration is marked ready but has invalid direction value",
+                    this.GetType().Name);
                 this.resourceState.CanCancelMigration = false;
                 this.resourceState.CanFinishMigration = false;
                 this.resourceState.CanMigrateResources = false;
@@ -591,11 +621,10 @@ namespace ClusterKit.NodeManager
             this.resourceState.CanUpdateNodesToSource = this.currentRelease.Id == this.currentMigration.ToReleaseId
                                                         && (this.currentMigration.Direction == EnMigrationDirection.Stay
                                                             || (this.currentMigration.Direction == EnMigrationDirection
-                                                                    .Downgrade
-                                                                && this.resourceState.MigrationState.Position
-                                                                == EnMigrationActorMigrationPosition.Source)
-                                                            || this.currentMigration.Direction == EnMigrationDirection
-                                                                .Upgrade);
+                                                                    .Downgrade && this.resourceState.MigrationState
+                                                                    .Position == EnMigrationActorMigrationPosition
+                                                                    .Source) || this.currentMigration.Direction
+                                                            == EnMigrationDirection.Upgrade);
         }
 
         /// <summary>
@@ -701,21 +730,19 @@ namespace ClusterKit.NodeManager
         /// The <see cref="MigrationActor"/> encountered errors on resource check state
         /// </summary>
         /// <param name="state">The initialization error</param>
-        /// <returns>The async task</returns>
-        private async Task OnMigrationActorInitializationFailed(MigrationActorInitializationFailed state)
+        private void OnMigrationActorInitializationFailed(MigrationActorInitializationFailed state)
         {
             Context.GetLogger().Error("{Type}: MigrationActor failed to initialize", this.GetType().Name);
             foreach (var error in state.Errors)
             {
-                Context.GetLogger()
-                    .Error(
-                        "{Type}: MigrationActor error - {ErrorMessage}\n{ErrorStackTrace}",
-                        this.GetType().Name,
-                        error.ErrorMessage,
-                        error.ErrorStackTrace);
+                Context.GetLogger().Error(
+                    "{Type}: MigrationActor error - {ErrorMessage}\n{ErrorStackTrace}",
+                    this.GetType().Name,
+                    error.ErrorMessage,
+                    error.ErrorStackTrace);
             }
 
-            await this.OnMigrationLogRecords(state.Errors.Cast<MigrationLogRecord>().ToList());
+            this.OnMigrationLogRecords(state.Errors.Cast<MigrationLogRecord>().ToList());
             this.resourceState.OperationIsInProgress = false;
             this.resourceState.ReleaseState = null;
             this.resourceState.MigrationState = null;
@@ -731,10 +758,9 @@ namespace ClusterKit.NodeManager
             this.resourceState.OperationIsInProgress = false;
             if (this.currentMigration == null)
             {
-                Context.GetLogger()
-                    .Error(
-                        "{Type}: received an MigrationActorMigrationState without active migration",
-                        this.GetType().Name);
+                Context.GetLogger().Error(
+                    "{Type}: received an MigrationActorMigrationState without active migration",
+                    this.GetType().Name);
                 return;
             }
 
@@ -753,10 +779,9 @@ namespace ClusterKit.NodeManager
             this.resourceState.OperationIsInProgress = false;
             if (this.currentMigration != null)
             {
-                Context.GetLogger()
-                    .Error(
-                        "{Type}: received a MigrationActorReleaseState with active migration in progress",
-                        this.GetType().Name);
+                Context.GetLogger().Error(
+                    "{Type}: received a MigrationActorReleaseState with active migration in progress",
+                    this.GetType().Name);
                 return;
             }
 
@@ -769,20 +794,19 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Processes the cancel migration request
         /// </summary>
-        /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
-        private async Task OnMigrationCancel(MigrationCancel request)
+        private void OnMigrationCancel()
         {
             if (this.resourceState.OperationIsInProgress || this.currentMigration == null
                 || !this.resourceState.CanCancelMigration)
             {
-                Context.GetLogger()
-                    .Warning("{Type}: received MigrationCancel request in inappropriate state", this.GetType().Name);
+                Context.GetLogger().Warning(
+                    "{Type}: received MigrationCancel request in inappropriate state",
+                    this.GetType().Name);
                 this.Sender.Tell(false);
                 return;
             }
 
-            using (var ds = await this.GetContext())
+            using (var ds = this.GetContext())
             {
                 var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
                 if (migration == null)
@@ -822,20 +846,19 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Processes the finish migration request
         /// </summary>
-        /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
-        private async Task OnMigrationFinish(MigrationFinish request)
+        private void OnMigrationFinish()
         {
             if (this.resourceState.OperationIsInProgress || this.currentMigration == null
                 || !this.resourceState.CanFinishMigration)
             {
-                Context.GetLogger()
-                    .Warning("{Type}: received MigrationFinish request in inappropriate state", this.GetType().Name);
+                Context.GetLogger().Warning(
+                    "{Type}: received MigrationFinish request in inappropriate state",
+                    this.GetType().Name);
                 this.Sender.Tell(false);
                 return;
             }
 
-            using (var ds = await this.GetContext())
+            using (var ds = this.GetContext())
             {
                 var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
                 if (migration == null)
@@ -876,16 +899,15 @@ namespace ClusterKit.NodeManager
         /// Received a number of log records to store
         /// </summary>
         /// <param name="records">The records to store</param>
-        /// <returns>The async task</returns>
-        private async Task OnMigrationLogRecords(List<MigrationLogRecord> records)
+        private void OnMigrationLogRecords(List<MigrationLogRecord> records)
         {
             Context.GetLogger().Info("{Type}: received new MigrationLogRecords", this.GetType().Name);
-            using (var ds = await this.contextFactory.CreateContext(this.connectionString, this.databaseName))
+            using (var ds = this.GetContext())
             {
                 foreach (var record in records)
                 {
                     ds.MigrationLogs.Add(record);
-                    await ds.SaveChangesAsync();
+                    ds.SaveChanges();
                 }
             }
         }
@@ -894,21 +916,20 @@ namespace ClusterKit.NodeManager
         /// Processes the request to update cluster nodes during migration process
         /// </summary>
         /// <param name="request">The update request</param>
-        /// <returns>The async task</returns>
-        private async Task OnMigrationNodesUpgrade(NodesUpgrade request)
+        private void OnMigrationNodesUpgrade(NodesUpgrade request)
         {
-            if (this.resourceState.OperationIsInProgress 
-                || this.currentMigration == null
+            if (this.resourceState.OperationIsInProgress || this.currentMigration == null
                 || (request.Target == EnMigrationSide.Source && !this.resourceState.CanUpdateNodesToSource)
                 || (request.Target == EnMigrationSide.Destination && !this.resourceState.CanUpdateNodesToDestination))
             {
-                Context.GetLogger()
-                    .Warning("{Type}: received NodesUpgrade request in inappropriate state", this.GetType().Name);
+                Context.GetLogger().Warning(
+                    "{Type}: received NodesUpgrade request in inappropriate state",
+                    this.GetType().Name);
                 this.Sender.Tell(false);
                 return;
             }
 
-            using (var ds = await this.GetContext())
+            using (var ds = this.GetContext())
             {
                 var sourceRelease = ds.Releases.First(r => r.Id == this.currentMigration.FromReleaseId);
                 var destinationRelease = ds.Releases.First(r => r.Id == this.currentMigration.ToReleaseId);
@@ -951,8 +972,9 @@ namespace ClusterKit.NodeManager
             if (this.resourceState.OperationIsInProgress || this.currentMigration == null
                 || !this.resourceState.CanMigrateResources || this.resourceState.MigrationState == null)
             {
-                Context.GetLogger()
-                    .Warning("{Type}: received ResourceUpgrade request in inappropriate state", this.GetType().Name);
+                Context.GetLogger().Warning(
+                    "{Type}: received ResourceUpgrade request in inappropriate state",
+                    this.GetType().Name);
                 this.Sender.Tell(false);
                 return;
             }
@@ -966,13 +988,12 @@ namespace ClusterKit.NodeManager
                 var resource = migrator?.Resources.FirstOrDefault(r => r.Code == upgrade.ResourceCode);
                 if (resource == null)
                 {
-                    Context.GetLogger()
-                        .Warning(
-                            "{Type}: received ResourceUpgrade request with unknown resource {TemplateCode} {MigratorTypeName} {ResourceCode}",
-                            this.GetType().Name,
-                            upgrade.TemplateCode,
-                            upgrade.MigratorTypeName,
-                            upgrade.ResourceCode);
+                    Context.GetLogger().Warning(
+                        "{Type}: received ResourceUpgrade request with unknown resource {TemplateCode} {MigratorTypeName} {ResourceCode}",
+                        this.GetType().Name,
+                        upgrade.TemplateCode,
+                        upgrade.MigratorTypeName,
+                        upgrade.ResourceCode);
                     this.Sender.Tell(false);
                     return;
                 }
@@ -1032,15 +1053,11 @@ namespace ClusterKit.NodeManager
                         NodeTemplate = selectedNodeTemplate.Code,
                         ReleaseId = this.currentRelease.Id,
                         Configuration = selectedNodeTemplate.Configuration,
-                        Seeds =
-                            this.currentRelease.Configuration.SeedAddresses
-                                .OrderBy(s => this.random.NextDouble())
-                                .ToList(),
+                        Seeds = this.currentRelease.Configuration.SeedAddresses
+                            .OrderBy(s => this.random.NextDouble()).ToList(),
                         Packages =
                             selectedNodeTemplate.PackagesToInstall[request.FrameworkRuntimeType],
-                        PackageSources =
-                            this.currentRelease.Configuration.NugetFeeds.Select(f => f.Address)
-                                .ToList()
+                        PackageSource = this.currentRelease.Configuration.NugetFeed
                     });
 
             List<Guid> requests;
@@ -1069,21 +1086,19 @@ namespace ClusterKit.NodeManager
             var address = nodeDescription.NodeAddress;
             if (nodeDescription.NodeAddress == null)
             {
-                Context.GetLogger()
-                    .Warning(
-                        "{Type}: received nodeDescription with null address from {NodeAddress}",
-                        this.GetType().Name,
-                        this.Sender.Path.Address.ToString());
+                Context.GetLogger().Warning(
+                    "{Type}: received nodeDescription with null address from {NodeAddress}",
+                    this.GetType().Name,
+                    this.Sender.Path.Address.ToString());
                 return;
             }
 
             if (!this.requestDescriptionNotifications.TryGetValue(address, out cancelable))
             {
-                Context.GetLogger()
-                    .Warning(
-                        "{Type}: received nodeDescription from unknown node with address {NodeAddress}",
-                        this.GetType().Name,
-                        address.ToString());
+                Context.GetLogger().Warning(
+                    "{Type}: received nodeDescription from unknown node with address {NodeAddress}",
+                    this.GetType().Name,
+                    address.ToString());
                 return;
             }
 
@@ -1118,20 +1133,18 @@ namespace ClusterKit.NodeManager
                     awaitingRequests.Remove(nodeDescription.NodeId);
                 }
 
-                Context.GetLogger()
-                    .Info(
-                        "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
-                        this.GetType().Name,
-                        nodeDescription.NodeTemplate,
-                        address.ToString());
+                Context.GetLogger().Info(
+                    "{Type}: New node {NodeTemplateName} on address {NodeAddress}",
+                    this.GetType().Name,
+                    nodeDescription.NodeTemplate,
+                    address.ToString());
             }
             else
             {
-                Context.GetLogger()
-                    .Info(
-                        "{Type}: New node without nodetemplate on address {NodeAddress}",
-                        this.GetType().Name,
-                        address.ToString());
+                Context.GetLogger().Info(
+                    "{Type}: New node without node template on address {NodeAddress}",
+                    this.GetType().Name,
+                    address.ToString());
             }
 
             this.Self.Tell(new UpgradeMessage());
@@ -1166,11 +1179,10 @@ namespace ClusterKit.NodeManager
             }
             else
             {
-                Context.GetLogger()
-                    .Warning(
-                        "{Type}: received node down for unknown node with address {NodeAddress}",
-                        this.GetType().ToString(),
-                        address.ToString());
+                Context.GetLogger().Warning(
+                    "{Type}: received node down for unknown node with address {NodeAddress}",
+                    this.GetType().ToString(),
+                    address.ToString());
             }
         }
 
@@ -1195,8 +1207,7 @@ namespace ClusterKit.NodeManager
                                               Roles = new List<string>(member.Roles),
                                               LeaderInRoles =
                                                   this.roleLeaders.Where(p => p.Value == address)
-                                                      .Select(p => p.Key)
-                                                      .ToList(),
+                                                      .Select(p => p.Key).ToList(),
                                               IsClusterLeader = address == this.clusterLeader
                                           };
 
@@ -1242,8 +1253,7 @@ namespace ClusterKit.NodeManager
 
             // removing lost nodes
             var obsoleteUpgrades = this.upgradingNodes.Values
-                .Where(u => DateTimeOffset.Now - u.UpgradeStartTime >= upgradeTimeOut)
-                .ToList();
+                .Where(u => DateTimeOffset.Now - u.UpgradeStartTime >= upgradeTimeOut).ToList();
 
             obsoleteUpgrades.ForEach(u => this.upgradingNodes.Remove(u.NodeId));
             var isUpgrading = false;
@@ -1315,13 +1325,17 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Process the <see cref="ReleaseSetReadyRequest"/>
         /// </summary>
-        /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
+        /// <param name="request">
+        /// The request
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         private async Task OnReleaseCheck(ReleaseCheckRequest request)
         {
             try
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
@@ -1341,10 +1355,10 @@ namespace ClusterKit.NodeManager
 
                     var supportedFrameworks =
                         Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var errors = release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList()).ToArray();
-                    if (errors.Length > 0)
+                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
+                    if (errors.Count > 0)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors), null));
+                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
                         return;
                     }
 
@@ -1361,12 +1375,11 @@ namespace ClusterKit.NodeManager
         /// Process the <see cref="ReleaseSetObsoleteRequest"/>
         /// </summary>
         /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
-        private async Task OnReleaseSetObsolete(ReleaseSetObsoleteRequest request)
+        private void OnReleaseSetObsolete(ReleaseSetObsoleteRequest request)
         {
             try
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
@@ -1404,13 +1417,17 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Process the <see cref="ReleaseSetReadyRequest"/>
         /// </summary>
-        /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
+        /// <param name="request">
+        /// The request
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         private async Task OnReleaseSetReady(ReleaseSetReadyRequest request)
         {
             try
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
@@ -1440,10 +1457,10 @@ namespace ClusterKit.NodeManager
 
                     var supportedFrameworks =
                         Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var errors = release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList()).ToArray();
-                    if (errors.Length > 0)
+                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
+                    if (errors.Count > 0)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors), null));
+                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
                         return;
                     }
 
@@ -1468,12 +1485,11 @@ namespace ClusterKit.NodeManager
         /// Process the <see cref="ReleaseSetStableRequest"/>
         /// </summary>
         /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
-        private async Task OnReleaseSetStable(ReleaseSetStableRequest request)
+        private void OnReleaseSetStable(ReleaseSetStableRequest request)
         {
             try
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
@@ -1561,8 +1577,9 @@ namespace ClusterKit.NodeManager
         {
             if (string.IsNullOrWhiteSpace(message.Role))
             {
-                Context.GetLogger()
-                    .Warning("{Type}: received RoleLeaderChanged message with empty role", this.GetType().ToString());
+                Context.GetLogger().Warning(
+                    "{Type}: received RoleLeaderChanged message with empty role",
+                    this.GetType().ToString());
                 return;
             }
 
@@ -1601,8 +1618,8 @@ namespace ClusterKit.NodeManager
                                      : 0,
                              ObsoleteNodes =
                                  this.activeNodesByTemplate.ContainsKey(t.Code)
-                                     ? this.activeNodesByTemplate[t.Code]
-                                         .Count(a => this.nodeDescriptions[a].IsObsolete)
+                                     ? this.activeNodesByTemplate[t.Code].Count(
+                                         a => this.nodeDescriptions[a].IsObsolete)
                                      : 0,
                              UpgradingNodes =
                                  this.upgradingNodes.Values.Count(
@@ -1614,10 +1631,8 @@ namespace ClusterKit.NodeManager
                          };
             var stats = new TemplatesUsageStatistics
                             {
-                                Templates =
-                                    this.currentRelease.Configuration.NodeTemplates
-                                        .Select(selector)
-                                        .ToList()
+                                Templates = this.currentRelease.Configuration.NodeTemplates
+                                    .Select(selector).ToList()
                             };
 
             this.Sender.Tell(stats, this.Self);
@@ -1627,8 +1642,7 @@ namespace ClusterKit.NodeManager
         /// Initiates the cluster migration process to the new release
         /// </summary>
         /// <param name="request">The request</param>
-        /// <returns>The async task</returns>
-        private async Task OnUpdateCluster(UpdateClusterRequest request)
+        private void OnUpdateCluster(UpdateClusterRequest request)
         {
             if (this.resourceState.OperationIsInProgress)
             {
@@ -1655,7 +1669,7 @@ namespace ClusterKit.NodeManager
 
             try
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
                     var activeMigration = ds.Migrations.FirstOrDefault(m => m.IsActive);
                     if (activeMigration != null)
@@ -1725,14 +1739,13 @@ namespace ClusterKit.NodeManager
         /// </summary>
         private void Start()
         {
-            Cluster.Get(Context.System)
-                .Subscribe(
-                    this.Self,
-                    ClusterEvent.InitialStateAsEvents,
-                    typeof(ClusterEvent.MemberRemoved),
-                    typeof(ClusterEvent.MemberUp),
-                    typeof(ClusterEvent.LeaderChanged),
-                    typeof(ClusterEvent.RoleLeaderChanged));
+            Cluster.Get(Context.System).Subscribe(
+                this.Self,
+                ClusterEvent.InitialStateAsEvents,
+                typeof(ClusterEvent.MemberRemoved),
+                typeof(ClusterEvent.MemberUp),
+                typeof(ClusterEvent.LeaderChanged),
+                typeof(ClusterEvent.RoleLeaderChanged));
 
             // ping message will indicate that actor started and ready to work
             this.Receive<PingMessage>(m => this.Sender.Tell(new PongMessage()));
@@ -1773,21 +1786,21 @@ namespace ClusterKit.NodeManager
             this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
             this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
             this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
-            this.ReceiveAsync<ReleaseSetObsoleteRequest>(this.OnReleaseSetObsolete);
-            this.ReceiveAsync<ReleaseSetStableRequest>(this.OnReleaseSetStable);
-            this.ReceiveAsync<UpdateClusterRequest>(this.OnUpdateCluster);
+            this.Receive<ReleaseSetObsoleteRequest>(r => this.OnReleaseSetObsolete(r));
+            this.Receive<ReleaseSetStableRequest>(r => this.OnReleaseSetStable(r));
+            this.Receive<UpdateClusterRequest>(r => this.OnUpdateCluster(r));
 
             this.Receive<CollectionRequest<Migration>>(m => this.workers.Forward(m));
 
             this.Receive<ProcessingTheRequest>(m => this.resourceState.OperationIsInProgress = true);
             this.Receive<MigrationActorMigrationState>(s => this.OnMigrationActorMigrationState(s));
             this.Receive<MigrationActorReleaseState>(s => this.OnMigrationActorReleaseState(s));
-            this.ReceiveAsync<MigrationActorInitializationFailed>(this.OnMigrationActorInitializationFailed);
-            this.ReceiveAsync<List<MigrationLogRecord>>(this.OnMigrationLogRecords);
-            this.ReceiveAsync<MigrationCancel>(this.OnMigrationCancel);
-            this.ReceiveAsync<MigrationFinish>(this.OnMigrationFinish);
+            this.Receive<MigrationActorInitializationFailed>(r => this.OnMigrationActorInitializationFailed(r));
+            this.Receive<List<MigrationLogRecord>>(r => this.OnMigrationLogRecords(r));
+            this.Receive<MigrationCancel>(r => this.OnMigrationCancel());
+            this.Receive<MigrationFinish>(r => this.OnMigrationFinish());
             this.Receive<List<ResourceUpgrade>>(r => this.OnMigrationResourceUpgrade(r));
-            this.ReceiveAsync<NodesUpgrade>(this.OnMigrationNodesUpgrade);
+            this.Receive<NodesUpgrade>(r => this.OnMigrationNodesUpgrade(r));
 
             this.Receive<ResourceStateRequest>(r => this.Sender.Tell(this.resourceState));
             this.Receive<CurrentReleaseRequest>(r => this.Sender.Tell(this.currentRelease));
@@ -1867,6 +1880,11 @@ namespace ClusterKit.NodeManager
         private class Worker : BaseCrudActorWithNotifications<ConfigurationContext>
         {
             /// <summary>
+            /// The database provider name
+            /// </summary>
+            private readonly string databaseProviderName;
+
+            /// <summary>
             /// The database connection string
             /// </summary>
             private readonly string connectionString;
@@ -1874,7 +1892,7 @@ namespace ClusterKit.NodeManager
             /// <summary>
             /// Configuration context factory
             /// </summary>
-            private readonly IContextFactory<ConfigurationContext> contextFactory;
+            private readonly UniversalContextFactory contextFactory;
 
             /// <summary>
             /// The database name
@@ -1884,11 +1902,17 @@ namespace ClusterKit.NodeManager
             /// <summary>
             /// Initializes a new instance of the <see cref="Worker"/> class.
             /// </summary>
+            /// <param name="databaseProviderName">
+            /// The database provider name
+            /// </param>
             /// <param name="connectionString">
             /// The database connection string
             /// </param>
             /// <param name="databaseName">
             /// The database name
+            /// </param>
+            /// <param name="componentContext">
+            /// The DI context
             /// </param>
             /// <param name="contextFactory">
             /// Configuration context factory
@@ -1897,16 +1921,19 @@ namespace ClusterKit.NodeManager
             /// Reference to the <seealso cref="NodeManagerActor"/>
             /// </param>
             public Worker(
+                string databaseProviderName,
                 string connectionString,
                 string databaseName,
-                IContextFactory<ConfigurationContext> contextFactory,
+                IComponentContext componentContext,
+                UniversalContextFactory contextFactory,
                 IActorRef parent)
-                : base(parent)
+                : base(componentContext, parent)
             {
                 // ReSharper disable FormatStringProblem
                 Context.GetLogger().Info("{Type}: started on {Path}", this.GetType().Name, this.Self.Path.ToString());
 
                 // ReSharper restore FormatStringProblem
+                this.databaseProviderName = databaseProviderName;
                 this.connectionString = connectionString;
                 this.databaseName = databaseName;
                 this.contextFactory = contextFactory;
@@ -1920,10 +1947,10 @@ namespace ClusterKit.NodeManager
                 this.ReceiveAsync<CollectionRequest<Release>>(this.OnCollectionRequest<Release, int>);
                 this.ReceiveAsync<CollectionRequest<Migration>>(this.OnCollectionRequest<Migration, int>);
 
-                this.ReceiveAsync<UserChangePasswordRequest>(this.OnUserChangePassword);
-                this.ReceiveAsync<UserResetPasswordRequest>(this.OnUserResetPassword);
-                this.ReceiveAsync<UserRoleAddRequest>(this.OnUserRoleAdd);
-                this.ReceiveAsync<UserRoleRemoveRequest>(this.UserRoleRemove);
+                this.Receive<UserChangePasswordRequest>(r => this.OnUserChangePassword(r));
+                this.Receive<UserResetPasswordRequest>(r => this.OnUserResetPassword(r));
+                this.Receive<UserRoleAddRequest>(r => this.OnUserRoleAdd(r));
+                this.Receive<UserRoleRemoveRequest>(r => this.UserRoleRemove(r));
 
                 this.ReceiveAsync<AuthenticateUserWithCredentials>(this.AuthenticateUser);
                 this.ReceiveAsync<AuthenticateUserWithUid>(this.AuthenticateUser);
@@ -1933,9 +1960,12 @@ namespace ClusterKit.NodeManager
             /// Opens new database connection and generates execution context
             /// </summary>
             /// <returns>New working context</returns>
-            protected override async Task<ConfigurationContext> GetContext()
+            protected override ConfigurationContext GetContext()
             {
-                return await this.contextFactory.CreateContext(this.connectionString, this.databaseName);
+                return this.contextFactory.CreateContext<ConfigurationContext>(
+                    this.databaseProviderName,
+                    this.connectionString,
+                    this.databaseName);
             }
 
             /// <summary>
@@ -1945,9 +1975,9 @@ namespace ClusterKit.NodeManager
             /// <returns>The async task</returns>
             private async Task AuthenticateUser(AuthenticateUserWithCredentials request)
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
-                    var factory = DataFactory<ConfigurationContext, User, string>.CreateFactory(ds);
+                    var factory = DataFactory<ConfigurationContext, User, string>.CreateFactory(this.ComponentContext, ds);
                     try
                     {
                         var user = await factory.Get(request.Login);
@@ -1977,9 +2007,9 @@ namespace ClusterKit.NodeManager
             /// <returns>The async task</returns>
             private async Task AuthenticateUser(AuthenticateUserWithUid request)
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
-                    var factory = DataFactory<ConfigurationContext, User, Guid>.CreateFactory(ds);
+                    var factory = DataFactory<ConfigurationContext, User, Guid>.CreateFactory(this.ComponentContext, ds);
                     try
                     {
                         var user = await factory.Get(request.Uid);
@@ -2006,12 +2036,11 @@ namespace ClusterKit.NodeManager
             /// Process the <see cref="UserChangePasswordRequest"/>
             /// </summary>
             /// <param name="request">The request</param>
-            /// <returns>The async task</returns>
-            private async Task OnUserChangePassword(UserChangePasswordRequest request)
+            private void OnUserChangePassword(UserChangePasswordRequest request)
             {
                 try
                 {
-                    using (var ds = await this.GetContext())
+                    using (var ds = this.GetContext())
                     {
                         var user = ds.Users.FirstOrDefault(u => u.Login == request.Login);
                         if (user == null)
@@ -2054,12 +2083,11 @@ namespace ClusterKit.NodeManager
             /// Process the <see cref="UserResetPasswordRequest"/>
             /// </summary>
             /// <param name="request">The request</param>
-            /// <returns>The async task</returns>
-            private async Task OnUserResetPassword(UserResetPasswordRequest request)
+            private void OnUserResetPassword(UserResetPasswordRequest request)
             {
                 try
                 {
-                    using (var ds = await this.GetContext())
+                    using (var ds = this.GetContext())
                     {
                         var user = ds.Users.FirstOrDefault(u => u.Uid == request.UserUid);
                         if (user == null)
@@ -2092,12 +2120,11 @@ namespace ClusterKit.NodeManager
             /// Process the <see cref="UserRoleAddRequest"/>
             /// </summary>
             /// <param name="request">The request</param>
-            /// <returns>The async task</returns>
-            private async Task OnUserRoleAdd(UserRoleAddRequest request)
+            private void OnUserRoleAdd(UserRoleAddRequest request)
             {
                 try
                 {
-                    using (var ds = await this.GetContext())
+                    using (var ds = this.GetContext())
                     {
                         var user = ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid);
                         var role = ds.Roles.Include(nameof(Role.Users)).FirstOrDefault(r => r.Uid == request.RoleUid);
@@ -2113,7 +2140,7 @@ namespace ClusterKit.NodeManager
                             return;
                         }
 
-                        if (user.Roles.Any(r => r.Uid == role.Uid))
+                        if (user.Roles.Any(r => r.RoleUid == role.Uid))
                         {
                             var exception =
                                 new MutationException(new ErrorDescription(null, "The role is already granted"));
@@ -2124,7 +2151,7 @@ namespace ClusterKit.NodeManager
                             return;
                         }
 
-                        user.Roles.Add(role);
+                        user.Roles.Add(new RoleUser { RoleUid = role.Uid });
                         ds.SaveChanges();
                         SecurityLog.CreateRecord(
                             EnSecurityLogType.DataUpdateGranted,
@@ -2137,7 +2164,7 @@ namespace ClusterKit.NodeManager
                             role.Uid);
                     }
 
-                    using (var ds = await this.GetContext())
+                    using (var ds = this.GetContext())
                     {
                         this.Sender.Tell(
                             request.ReturnUser
@@ -2162,12 +2189,11 @@ namespace ClusterKit.NodeManager
             /// Process the <see cref="UserRoleRemoveRequest"/>
             /// </summary>
             /// <param name="request">The request</param>
-            /// <returns>The async task</returns>
-            private async Task UserRoleRemove(UserRoleRemoveRequest request)
+            private void UserRoleRemove(UserRoleRemoveRequest request)
             {
                 try
                 {
-                    using (var ds = await this.GetContext())
+                    using (var ds = this.GetContext())
                     {
                         var user = ds.Users.Include(nameof(User.Roles)).FirstOrDefault(u => u.Uid == request.UserUid);
                         var role = ds.Roles.Include(nameof(Role.Users)).FirstOrDefault(r => r.Uid == request.RoleUid);
@@ -2183,7 +2209,7 @@ namespace ClusterKit.NodeManager
                             return;
                         }
 
-                        if (user.Roles.All(r => r.Uid != role.Uid))
+                        if (user.Roles.All(r => r.RoleUid != role.Uid))
                         {
                             var exception =
                                 new MutationException(new ErrorDescription(null, "The role is not granted"));
@@ -2194,7 +2220,8 @@ namespace ClusterKit.NodeManager
                             return;
                         }
 
-                        user.Roles.Add(role);
+                        ds.RoleUsers.Remove(ds.RoleUsers.First(ru => ru.RoleUid == role.Uid && ru.UserUid == user.Uid));
+
                         ds.SaveChanges();
                         SecurityLog.CreateRecord(
                             EnSecurityLogType.DataUpdateGranted,
@@ -2207,7 +2234,7 @@ namespace ClusterKit.NodeManager
                             user.Uid);
                     }
 
-                    using (var ds = await this.GetContext())
+                    using (var ds = this.GetContext())
                     {
                         this.Sender.Tell(
                             request.ReturnUser

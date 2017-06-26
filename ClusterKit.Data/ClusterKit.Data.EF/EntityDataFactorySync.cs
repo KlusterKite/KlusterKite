@@ -14,8 +14,6 @@ namespace ClusterKit.Data.EF
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
-    using System.Data.Entity.Infrastructure;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
@@ -26,13 +24,15 @@ namespace ClusterKit.Data.EF
 
     using JetBrains.Annotations;
 
+    using Microsoft.EntityFrameworkCore;
+
     /// <summary>
     /// Base factory to work with data objects using Entity Framework.
     /// The main work with database is working without async/await due to EF performance issues.
     /// <see href="http://stackoverflow.com/questions/28543293/entity-framework-async-operation-takes-ten-times-as-long-to-complete"/>
     /// You can still use <see cref="EntityDataFactory{TContext,TObject,TId}"/> for true async/await
     /// </summary>
-    /// <typeparam name="TContext">The current datasource context</typeparam>
+    /// <typeparam name="TContext">The current data source context</typeparam>
     /// <typeparam name="TObject">Type of data object to work with</typeparam>
     /// <typeparam name="TId">The type of object identification field</typeparam>
     [UsedImplicitly]
@@ -44,14 +44,14 @@ namespace ClusterKit.Data.EF
         /// Initializes a new instance of the <see cref="EntityDataFactorySync{TContext,TObject,TId}"/> class.
         /// </summary>
         /// <param name="context">
-        /// The current datasource context
+        /// The current data source context
         /// </param>
         protected EntityDataFactorySync(TContext context) : base(context)
         {
         }
 
         /// <summary>
-        /// Deletes object from datasource
+        /// Deletes object from data source
         /// </summary>
         /// <param name="id">Objects identification</param>
         /// <returns>Removed objects data</returns>
@@ -69,13 +69,13 @@ namespace ClusterKit.Data.EF
         }
 
         /// <summary>
-        /// Gets an object from datasource using it's identification
+        /// Gets an object from data source using it's identification
         /// </summary>
         /// <param name="id">The object's identification</param>
         /// <returns>Async execution task</returns>
         public override Task<Maybe<TObject>> Get(TId id)
         {
-            return Task.FromResult<Maybe<TObject>>(this.GetDbQuery().FirstOrDefault(this.GetIdValidationExpression(id)));
+            return Task.FromResult<Maybe<TObject>>(this.GetDbSet().FirstOrDefault(this.GetIdValidationExpression(id)));
         }
 
         /// <summary>
@@ -94,11 +94,11 @@ namespace ClusterKit.Data.EF
             int? count,
             ApiRequest apiRequest)
         {
-            var query = this.GetDbQuery() as IQueryable<TObject>;
+            var query = this.GetDbSet() as IQueryable<TObject>;
 
             if (apiRequest != null)
             {
-                query = query.SetIncludes(apiRequest);
+                query = query.SetIncludes(this.Context, apiRequest);
             }
 
             if (filter != null)
@@ -150,12 +150,6 @@ namespace ClusterKit.Data.EF
             this.Context.SaveChanges();
             return Task.CompletedTask;
         }
-
-        /// <summary>
-        /// Gets the query to receive all objects
-        /// </summary>
-        /// <returns>The query</returns>
-        protected virtual DbQuery<TObject> GetDbQuery() => this.GetDbSet();
 
         /// <summary>
         /// Gets the data set from current context

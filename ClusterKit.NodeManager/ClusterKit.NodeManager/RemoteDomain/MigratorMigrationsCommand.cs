@@ -9,13 +9,11 @@
 
 namespace ClusterKit.NodeManager.RemoteDomain
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
     /// The description of migrator action to migrate resources
     /// </summary>
-    [Serializable]
     public class MigratorMigrationsCommand 
     {
         /// <summary>

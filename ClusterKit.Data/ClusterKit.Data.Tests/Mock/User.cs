@@ -43,6 +43,6 @@ namespace ClusterKit.Data.Tests.Mock
         /// Gets or sets the user roles
         /// </summary>
         [DeclareField(Access = EnAccessFlag.Queryable)]
-        public List<Role> Roles { get; set; }
+        public List<RoleUser> Roles { get; set; }
     }
 }

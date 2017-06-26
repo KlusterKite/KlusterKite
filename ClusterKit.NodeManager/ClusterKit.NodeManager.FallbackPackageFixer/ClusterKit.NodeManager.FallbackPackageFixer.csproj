@@ -1,20 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager.FallbackPackageFixer</PackageId>
     <Version>0.0.0.0-local</Version>
-    <Authors>ClusterKit</Authors>
-    <Description>Bundle of utils to create scalable and redundant services</Description>
-    <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
-    <Product>ClusterKit</Product>
-    <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>exe</OutputType>
     <IsTool>true</IsTool>
     <StartupObject />
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
     <PackageReference Include="NuGet.Packaging" Version="4.0.0" />
     <PackageReference Include="NuGet.Protocol.Core.Types" Version="4.0.0" />
@@ -28,4 +27,14 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
 </Project>

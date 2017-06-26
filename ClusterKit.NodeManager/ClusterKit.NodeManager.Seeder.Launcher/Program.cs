@@ -12,19 +12,21 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Runtime.Versioning;
     using System.Threading;
-    using System.Xml;
+    using System.Threading.Tasks;
 
     using Akka.Configuration;
 
+    using ClusterKit.NodeManager.Launcher.Utils;
+    using ClusterKit.NodeManager.Launcher.Utils.Exceptions;
+
     using JetBrains.Annotations;
 
-    using NuGet;
+    using NuGet.Frameworks;
+    using NuGet.Packaging.Core;
+    using NuGet.Protocol.Core.Types;
 
     /// <summary>
     /// Service main entry point
@@ -59,101 +61,81 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
         /// <param name="seederConfiguration">The seeder configuration</param>
         private static void RunSeederConfiguration(Configuration configuration, SeederConfiguration seederConfiguration)
         {
-            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             var executionDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            var tempDirectoryInfo = Directory.CreateDirectory(tempDir);
-            var executionDirectoryInfo = Directory.CreateDirectory(executionDir);
+            Directory.CreateDirectory(executionDir);
+
             try
             {
-                var repository = PackageRepositoryFactory.Default.CreateRepository(configuration.Nuget);
-
                 while (true)
                 {
                     try
                     {
-                        var requiredPackages = seederConfiguration.RequiredPackages
-                            .Select(
-                                name => repository.Search(name, true)
-                                    .ToList()
-                                    .FirstOrDefault(p => p.Id == name && p.IsLatestVersion))
-                            .ToList();
+                        var repository = new RemotePackageRepository(configuration.Nuget);
+                        var packages = GetPackagesToInstall(repository, seederConfiguration).GetAwaiter()
+                            .GetResult();
 
-                        if (requiredPackages.Any(p => p == null))
-                        {
-                            Console.WriteLine("Could not find required packages in repository... Retrying...");
-                            Thread.Sleep(configuration.NugetCheckPeriod);
-                            continue;
-                        }
-
-                        while (true)
-                        {
-                            var dependencies = requiredPackages
-                                .Select(
-                                    p => p.DependencySets.FirstOrDefault(
-                                        s => s.SupportedFrameworks == null || !s.SupportedFrameworks.Any()
-                                             || s.SupportedFrameworks.Any(f => f == configuration.ExecutionFramework)))
-                                .Where(ds => ds != null)
-                                .SelectMany(ds => ds.Dependencies)
-                                .GroupBy(d => d.Id)
-                                .Where(d => requiredPackages.All(r => r.Id != d.Key))
-                                .Select(
-                                    g => repository.Search(g.Key, true)
-                                        .ToList()
-                                        .Where(p => p.Id == g.Key && g.All(pd => pd.VersionSpec.Satisfies(p.Version)))
-                                        .OrderBy(p => p.Version)
-                                        .FirstOrDefault())
-                                .ToList();
-
-                            if (dependencies.Count == 0)
-                            {
-                                break;
-                            }
-
-                            if (dependencies.Any(d => d == null))
-                            {
-                                Console.WriteLine("Could not find required dependencies in repository... Retrying...");
-                                requiredPackages = null;
-                                break;
-                            }
-
-                            requiredPackages.AddRange(dependencies);
-                        }
-
-                        if (requiredPackages == null)
-                        {
-                            Thread.Sleep(configuration.NugetCheckPeriod);
-                            continue;
-                        }
-
-                        foreach (var package in requiredPackages)
-                        {
-                            ExtractPackage(package, configuration.ExecutionFramework, tempDir, executionDir);
-                        }
+                        repository.CreateServiceAsync(
+                            packages,
+                            configuration.Runtime,
+                            PackageRepositoryExtensions.CurrentRuntime,
+                            executionDir,
+                            "ClusterKit.NodeManager.Seeder",
+                            Console.WriteLine).GetAwaiter().GetResult();
+                            
+                        Console.WriteLine("Packages installed");
                     }
-                    catch
+                    catch (PackageNotFoundException packageNotFoundException)
                     {
-                        Console.WriteLine("Error while connecting to the nuget repository... Retrying...");
+                        Console.WriteLine($"Package {packageNotFoundException.Message} was not found");
                         Thread.Sleep(configuration.NugetCheckPeriod);
                         continue;
                     }
+                    catch (AggregateException exception)
+                    {
+                        var e = exception.InnerExceptions?.FirstOrDefault() ?? exception;
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.StackTrace);
+                        Thread.Sleep(configuration.NugetCheckPeriod);
+                        continue;
+                    }
+                    catch (Exception exception)
+                   {
+                       Console.WriteLine(exception.Message);
+                       Console.WriteLine(exception.StackTrace);
+                        Thread.Sleep(configuration.NugetCheckPeriod);
+                       continue;
+                   }
 
                     try
                     {
                         File.Copy(configuration.ConfigFile, Path.Combine(executionDir, "seeder.hocon"), true);
-                        FixAssemblyVersions(executionDir);
+                        
+                        // todo: move to CreateServiceAsync
+                        // ConfigurationUtils.FixAssemblyVersions(Path.Combine(executionDir, "ClusterKit.NodeManager.Seeder.exe.config"));
                         Console.WriteLine($"Seeder prepared in {executionDir}");
+#if APPDOMAIN
+                        var process = new Process
+                                          {
+                                              StartInfo =
+                                                  {
+                                                      UseShellExecute = false,
+                                                      WorkingDirectory =executionDir,
+                                                      FileName = "ClusterKit.NodeManager.Seeder.exe",
+                                                      Arguments = seederConfiguration.Name
+                                                  }
+                                          };
+#elif CORECLR
                         var process = new Process
                                           {
                                               StartInfo =
                                                   {
                                                       UseShellExecute = false,
                                                       WorkingDirectory = executionDir,
-                                                      FileName = Path.Combine(
-                                                          executionDir,
-                                                          "ClusterKit.NodeManager.Seeder.exe"),
-                                                      Arguments = seederConfiguration.Name
+                                                      FileName = "dotnet",
+                                                      Arguments = $"ClusterKit.NodeManager.Seeder.dll {seederConfiguration.Name}"
                                                   }
                                           };
+#endif
                         process.Start();
                         process.WaitForExit();
                         process.Dispose();
@@ -171,78 +153,81 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
             }
             finally
             {
-                tempDirectoryInfo.Delete(true);
-                executionDirectoryInfo.Delete(true);
+                try
+                {
+                    Directory.Delete(executionDir, true);
+                }
+                catch
+                {
+                    Console.WriteLine("Failed to remove execution directory");
+                }
             }
         }
 
         /// <summary>
-        /// Fixes service configuration file to pass possible version conflicts in dependent assemblies
+        /// Gets the list of packages to install along with there dependencies
         /// </summary>
-        /// <param name="executionDirectory">
-        /// The execution Directory.
-        /// </param>
-        private static void FixAssemblyVersions(string executionDirectory)
+        /// <param name="repository">The package repository</param>
+        /// <param name="seederConfiguration">The seeder configuration</param>
+        /// <returns>The list of packages</returns>
+        private static async Task<IEnumerable<PackageIdentity>> GetPackagesToInstall(
+            IPackageRepository repository,
+            SeederConfiguration seederConfiguration)
         {
-            var configName = Path.Combine(executionDirectory, "ClusterKit.NodeManager.Seeder.exe.config");
+            // TODO: extract to helper method along with Release extensions
+            var supportedFramework = NuGetFramework.ParseFrameworkName(
+                PackageRepositoryExtensions.CurrentRuntime, 
+                DefaultFrameworkNameProvider.Instance);
 
-            XmlDocument document = new XmlDocument();
-            document.Load(configName);
-            var documentElement = document.DocumentElement;
-            if (documentElement == null)
+            var packageTasks =
+                seederConfiguration.RequiredPackages.Select(
+                    async packageName =>
+                        {
+                            var package = await repository.GetAsync(packageName);
+                            if (package == null)
+                            {
+                                throw new PackageNotFoundException(packageName);
+                            }
+
+                            return package;
+                        });
+
+            var packagesToInstall = (await Task.WhenAll(packageTasks)).ToDictionary(p => p.Identity.Id);
+            var queue = new Queue<IPackageSearchMetadata>(packagesToInstall.Values);
+
+            while (queue.Count > 0)
             {
-                Console.WriteLine($@"Configuration file {configName} is broken");
-                return;
-            }
-
-            documentElement = (XmlElement)documentElement.SelectSingleNode("/configuration");
-            if (documentElement == null)
-            {
-                Console.WriteLine($@"Configuration file {configName} is broken");
-                return;
-            }
-
-            var runTimeNode = documentElement.SelectSingleNode("./runtime")
-                              ?? documentElement.AppendChild(document.CreateElement("runtime"));
-
-            var nameTable = document.NameTable;
-            var namespaceManager = new XmlNamespaceManager(nameTable);
-            const string Uri = "urn:schemas-microsoft-com:asm.v1";
-            namespaceManager.AddNamespace("urn", Uri);
-
-            var assemblyBindingNode = runTimeNode.SelectSingleNode("./urn:assemblyBinding", namespaceManager)
-                                      ?? runTimeNode.AppendChild(document.CreateElement("assemblyBinding", Uri));
-
-            foreach (var lib in Directory.GetFiles(executionDirectory, "*.dll"))
-            {
-                var parameters = AssemblyName.GetAssemblyName(lib);
-                var dependentNode =
-                    assemblyBindingNode?.SelectSingleNode(
-                        $"./urn:dependentAssembly[./urn:assemblyIdentity/@name='{parameters.Name}']",
-                        namespaceManager)
-                    ?? assemblyBindingNode?.AppendChild(document.CreateElement("dependentAssembly", Uri));
-
-                if (dependentNode == null)
+                var package = queue.Dequeue();
+                var dependencySet =
+                    NuGetFrameworkUtility.GetNearest(package.DependencySets, supportedFramework);
+                if (dependencySet == null || !NuGetFrameworkUtility.IsCompatibleWithFallbackCheck(
+                        supportedFramework,
+                        dependencySet.TargetFramework))
                 {
                     continue;
                 }
 
-                dependentNode.RemoveAll();
-                var assemblyIdentityNode =
-                    (XmlElement)dependentNode.AppendChild(document.CreateElement("assemblyIdentity", Uri));
-                assemblyIdentityNode.SetAttribute("name", parameters.Name);
-                var publicKeyToken =
-                    BitConverter.ToString(parameters.GetPublicKeyToken())
-                        .Replace("-", string.Empty)
-                        .ToLower(CultureInfo.InvariantCulture);
-                assemblyIdentityNode.SetAttribute("publicKeyToken", publicKeyToken);
-                var bindingRedirectNode =
-                    (XmlElement)dependentNode.AppendChild(document.CreateElement("bindingRedirect", Uri));
-                bindingRedirectNode.SetAttribute("oldVersion", $"0.0.0.0-{parameters.Version}");
-                bindingRedirectNode.SetAttribute("newVersion", parameters.Version.ToString());
+                foreach (var dependency in dependencySet.Packages)
+                {
+                    IPackageSearchMetadata packageToInstall;
+                    if (!packagesToInstall.TryGetValue(dependency.Id, out packageToInstall))
+                    {
+                        packageToInstall = await repository.GetAsync(dependency.Id);
+                        if (packageToInstall == null)
+                        {
+                            throw new PackageNotFoundException(dependency.Id);
+                        }
+
+                        packagesToInstall.Add(dependency.Id, packageToInstall);
+                        if (queue.All(p => p.Identity.Id != packageToInstall.Identity.Id))
+                        {
+                            queue.Enqueue(packageToInstall);
+                        }
+                    }
+                }
             }
 
-            document.Save(configName);
+            return packagesToInstall.Values.Select(p => p.Identity);
         }
 
         /// <summary>
@@ -261,7 +246,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
             }
 
             configuration.Config = ConfigurationFactory.ParseString(File.ReadAllText(configuration.ConfigFile));
-            configuration.Nuget = configuration.Config.GetString("Nuget");
+            configuration.Nuget = configuration.Config.GetString("ClusterKit.NodeManager.PackageRepository");
             if (string.IsNullOrWhiteSpace(configuration.Nuget))
             {
                 Console.WriteLine("Nuget is not properly defined");
@@ -270,7 +255,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
             configuration.NugetCheckPeriod =
                 configuration.Config.GetTimeSpan("NugetCheckPeriod", TimeSpan.FromMinutes(1));
-            configuration.ExecutionFramework = new FrameworkName(configuration.Config.GetString("ExecutionFramework"));
+            configuration.Runtime = configuration.Config.GetString("Runtime");
 
             configuration.Configurations = new List<SeederConfiguration>();
             foreach (var subConfig in configuration.Config.GetStringList("SeederConfigurations"))
@@ -306,53 +291,5 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
             return configuration;
         }
-
-        /// <summary>
-        /// Extracts the lib files to execution directory
-        /// </summary>
-        /// <param name="package">The package to extract</param>
-        /// <param name="frameworkName">The current framework name</param>
-        /// <param name="tmpDir">The temp directory to extract packages</param>
-        /// <param name="executionDir">The execution directory to load packages</param>
-        private static void ExtractPackage(IPackage package, FrameworkName frameworkName, string tmpDir, string executionDir)
-        {
-            Console.WriteLine($"Installing {package.Id} {package.Version}");
-            var fileSystem = new PhysicalFileSystem(tmpDir);
-            package.ExtractContents(fileSystem, package.Id);
-
-            IEnumerable<IPackageFile> compatibleFiles;
-            if (VersionUtility.TryGetCompatibleItems(frameworkName, package.GetLibFiles(), out compatibleFiles))
-            {
-                var hasFiles = false;
-                foreach (var compatibleFile in compatibleFiles)
-                {
-                    hasFiles = true;
-                    File.Copy(
-                        Path.Combine(tmpDir, package.Id, compatibleFile.Path),
-                        Path.Combine(executionDir, Path.GetFileName(compatibleFile.Path)),
-                        true);
-                }
-
-                if (hasFiles)
-                {
-                    return;
-                }
-            }
-           
-            if (VersionUtility.TryGetCompatibleItems(frameworkName, package.GetToolFiles(), out compatibleFiles))
-            {
-                foreach (var compatibleFile in compatibleFiles)
-                {
-                    File.Copy(
-                        Path.Combine(tmpDir, package.Id, compatibleFile.Path),
-                        Path.Combine(executionDir, Path.GetFileName(compatibleFile.Path)),
-                        true);
-                }
-            }
-            else
-            {
-                Console.WriteLine($"Error: No items found for {package.Id} {package.Version}");
-            }
-        } 
     }
 }

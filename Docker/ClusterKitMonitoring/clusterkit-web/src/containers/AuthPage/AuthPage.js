@@ -36,7 +36,7 @@ export default class AuthPage extends React.Component {
 
     fetch(url, {
       method: 'post',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: payload,
       mode: 'cors'
     }).then(response => this.processAuthResponse(response, data.Username));

@@ -12,15 +12,14 @@ namespace ClusterKit.Data.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Configuration;
     using Akka.DI.Core;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client;
     using ClusterKit.Core;
@@ -34,8 +33,6 @@ namespace ClusterKit.Data.Tests
     using Xunit;
     using Xunit.Abstractions;
 
-    using Component = Castle.MicroKernel.Registration.Component;
-
     /// <summary>
     /// Testing the <see cref="BaseCrudActor{TContext}"/>
     /// </summary>
@@ -48,21 +45,92 @@ namespace ClusterKit.Data.Tests
         }
 
         /// <summary>
+        /// Testing the create request
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task CreateTest()
+        {
+            var actor = this.InitContext();
+
+            var uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC3}");
+            var request =
+                new CrudActionMessage<User, Guid>
+                    {
+                        ActionType = EnActionType.Create,
+                        Data = new User
+                                   {
+                                       Login = "new_user",
+                                       Password = "456",
+                                       Uid = uid
+                                   }
+                    };
+
+            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(5));
+            Assert.NotNull(result);
+            if (result.Exception != null)
+            {
+                this.Sys.Log.Error(result.Exception, "Exception");
+            }
+
+            Assert.Null(result.Exception);
+            Assert.NotNull(result.Data);
+            Assert.Equal("new_user", result.Data.Login);
+
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
+            using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
+            {
+                Assert.Equal(3, context.Users.Count());
+            }
+        }
+
+        /// <summary>
+        /// Testing the delete request
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task DeleteTest()
+        {
+            var actor = this.InitContext();
+
+            var uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}");
+            var request = new CrudActionMessage<User, Guid> { ActionType = EnActionType.Delete, Id = uid };
+
+            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(5));
+            Assert.NotNull(result);
+            if (result.Exception != null)
+            {
+                this.Sys.Log.Error(result.Exception, "Exception");
+            }
+
+            Assert.Null(result.Exception);
+            Assert.NotNull(result.Data);
+            Assert.Equal("user1", result.Data.Login);
+
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
+            using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
+            {
+                Assert.Equal(1, context.Users.Count());
+            }
+        }
+
+        /// <summary>
         /// Testing the get by id request
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
         public async Task GetByIdTest()
         {
-            var actor = await this.InitContext();
+            var actor = this.InitContext();
 
-            var request = new CrudActionMessage<User, Guid>
-                              {
-                                  ActionType = EnActionType.Get,
-                                  Id = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}")
-            };
+            var request =
+                new CrudActionMessage<User, Guid>
+                    {
+                        ActionType = EnActionType.Get,
+                        Id = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}")
+                    };
 
-            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(1));
+            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(5));
             Assert.NotNull(result);
             if (result.Exception != null)
             {
@@ -75,67 +143,29 @@ namespace ClusterKit.Data.Tests
         }
 
         /// <summary>
-        /// Testing the create request
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task CreateTest()
-        {
-            var actor = await this.InitContext();
-
-            var uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC3}");
-            var request = new CrudActionMessage<User, Guid>
-            {
-                ActionType = EnActionType.Create,
-                Data = new User
-                {
-                    Login = "new_user",
-                    Password = "456",
-                    Uid = uid
-                }
-            };
-
-            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(1));
-            Assert.NotNull(result);
-            if (result.Exception != null)
-            {
-                this.Sys.Log.Error(result.Exception, "Exception");
-            }
-
-            Assert.Null(result.Exception);
-            Assert.NotNull(result.Data);
-            Assert.Equal("new_user", result.Data.Login);
-
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<TestDataContext>>();
-            using (var context = await contextFactory.CreateContext(null, null))
-            {
-                Assert.Equal(3, context.Users.Count());
-            }
-        }
-
-        /// <summary>
         /// Testing update request
         /// </summary>
         /// <returns>The async task</returns>
         [Fact]
         public async Task UpdateTest()
         {
-            var actor = await this.InitContext();
+            var actor = this.InitContext();
 
             var uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}");
-            var request = new CrudActionMessage<User, Guid>
-            {
-                ActionType = EnActionType.Update,
-                Id = uid,
-                Data = new User
-                           {
-                               Login = "new_user",
-                               Password = "456",
-                               Uid = uid
-                }
-            };
+            var request =
+                new CrudActionMessage<User, Guid>
+                    {
+                        ActionType = EnActionType.Update,
+                        Id = uid,
+                        Data = new User
+                                   {
+                                       Login = "new_user",
+                                       Password = "456",
+                                       Uid = uid
+                                   }
+                    };
 
-            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(1));
+            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(5));
             Assert.NotNull(result);
             if (result.Exception != null)
             {
@@ -147,11 +177,10 @@ namespace ClusterKit.Data.Tests
             Assert.Equal("new_user", result.Data.Login);
             Assert.Equal("456", result.Data.Password);
 
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<TestDataContext>>();
-            using (var context = await contextFactory.CreateContext(null, null))
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
+            using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
-                var user =
-                    context.Users.FirstOrDefault(u => u.Uid == uid);
+                var user = context.Users.FirstOrDefault(u => u.Uid == uid);
                 Assert.NotNull(user);
                 Assert.Equal("new_user", user.Login);
                 Assert.Equal("456", user.Password);
@@ -165,7 +194,7 @@ namespace ClusterKit.Data.Tests
         [Fact]
         public async Task UpdateWithApiRequestTest()
         {
-            var actor = await this.InitContext();
+            var actor = this.InitContext();
 
             var uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}");
             var argumentsJson = @"
@@ -178,20 +207,21 @@ namespace ClusterKit.Data.Tests
             ";
             var apiRequest = new ApiRequest { Arguments = JObject.Parse(argumentsJson) };
 
-            var request = new CrudActionMessage<User, Guid>
-            {
-                ActionType = EnActionType.Update,
-                Id = uid,
-                Data = new User
-                {
-                    Login = "new_user",
-                    Password = "456",
-                    Uid = uid
-                },
-                ApiRequest = apiRequest
-            };
+            var request =
+                new CrudActionMessage<User, Guid>
+                    {
+                        ActionType = EnActionType.Update,
+                        Id = uid,
+                        Data = new User
+                                   {
+                                       Login = "new_user",
+                                       Password = "456",
+                                       Uid = uid
+                                   },
+                        ApiRequest = apiRequest
+                    };
 
-            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(1));
+            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(5));
             Assert.NotNull(result);
             if (result.Exception != null)
             {
@@ -203,48 +233,25 @@ namespace ClusterKit.Data.Tests
             Assert.Equal("new_user", result.Data.Login);
             Assert.Equal("123", result.Data.Password);
 
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<TestDataContext>>();
-            using (var context = await contextFactory.CreateContext(null, null))
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
+            using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
-                var user =
-                    context.Users.FirstOrDefault(u => u.Uid == uid);
+                var user = context.Users.FirstOrDefault(u => u.Uid == uid);
                 Assert.NotNull(user);
                 Assert.Equal("new_user", user.Login);
                 Assert.Equal("123", user.Password);
             }
         }
 
-        /// <summary>
-        /// Testing the delete request
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task DeleteTest()
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
         {
-            var actor = await this.InitContext();
+            base.Dispose(disposing);
 
-            var uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}");
-            var request = new CrudActionMessage<User, Guid>
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
+            using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
             {
-                ActionType = EnActionType.Delete,
-                Id = uid
-            };
-
-            var result = await actor.Ask<CrudActionResponse<User>>(request, TimeSpan.FromSeconds(1));
-            Assert.NotNull(result);
-            if (result.Exception != null)
-            {
-                this.Sys.Log.Error(result.Exception, "Exception");
-            }
-
-            Assert.Null(result.Exception);
-            Assert.NotNull(result.Data);
-            Assert.Equal("user1", result.Data.Login);
-
-            var contextFactory = this.WindsorContainer.Resolve<IContextFactory<TestDataContext>>();
-            using (var context = await contextFactory.CreateContext(null, null))
-            {
-                Assert.Equal(1, context.Users.Count());
+                context.Database.EnsureDeleted();
             }
         }
 
@@ -252,10 +259,30 @@ namespace ClusterKit.Data.Tests
         /// Performs context initialization
         /// </summary>
         /// <returns>The data actor</returns>
-        private async Task<IActorRef> InitContext()
+        private IActorRef InitContext()
         {
-            var contextFactory = (TestContextFactory)this.WindsorContainer.Resolve<IContextFactory<TestDataContext>>();
-            await contextFactory.CreateAndUpgradeContext(null, null);
+            var contextFactory = this.Container.Resolve<UniversalContextFactory>();
+            using (var context = contextFactory.CreateContext<TestDataContext>("InMemory", null, "test"))
+            {
+                var user1 = new User
+                                {
+                                    Login = "user1",
+                                    Password = "123",
+                                    Uid = Guid.Parse("{72C23018-0C49-4419-8982-D7C0168E8DC2}")
+                                };
+
+                var user2 = new User
+                                {
+                                    Login = "user2",
+                                    Password = "123",
+                                    Uid = Guid.Parse("{D906C0AB-1108-4B39-B179-C30C83425482}")
+                                };
+
+                context.Users.Add(user1);
+                context.Users.Add(user2);
+                context.SaveChanges();
+            }
+
             var actor = this.Sys.ActorOf(this.Sys.DI().Props<TestDataActor>(), "data");
             this.ExpectNoMsg();
             return actor;
@@ -272,12 +299,16 @@ namespace ClusterKit.Data.Tests
             /// <returns>The list of installers</returns>
             public override List<BaseInstaller> GetPluginInstallers()
             {
-                var pluginInstallers = new List<BaseInstaller>
-                                           {
-                                               new Core.Installer(),
-                                               new Core.TestKit.Installer(),
-                                               new TestInstaller()
-                                           };
+                var pluginInstallers =
+                    new List<BaseInstaller>
+                        {
+                            new Core.Installer(),
+                            new Core.TestKit.Installer(),
+                            new TestInstaller(),
+                            new Data.Installer(),
+                            new EF.Installer(),
+                            new EF.InMemory.Installer(),
+                        };
                 return pluginInstallers;
             }
         }
@@ -299,34 +330,13 @@ namespace ClusterKit.Data.Tests
             /// <returns>Akka configuration</returns>
             protected override Config GetAkkaConfig() => ConfigurationFactory.Empty;
 
-            /// <summary>
-            /// Registering DI components
-            /// </summary>
-            /// <param name="container">The container.</param>
-            /// <param name="store">The configuration store.</param>
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            /// <inheritdoc />
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
-                container.Register(Component.For<DatabaseInstanceName>().Instance(new DatabaseInstanceName()));
-                container.Register(Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-                container.Register(
-                    Component.For<DataFactory<TestDataContext, User, Guid>>()
-                        .ImplementedBy<TestUserFactory>()
-                        .LifestyleTransient());
-                container.Register(
-                    Component.For<DataFactory<TestDataContext, Role, Guid>>()
-                        .ImplementedBy<TestRolesFactory>()
-                        .LifestyleTransient());
-
-                container.Register(
-                    Component.For<BaseConnectionManager>()
-                        .ImplementedBy<TestConnectionManager>()
-                        .LifestyleSingleton());
-
-                container.Register(
-                    Component.For<IContextFactory<TestDataContext>>()
-                        .ImplementedBy<TestContextFactory>()
-                        .LifestyleTransient());
+                container.RegisterInstance(new DatabaseInstanceName());
+                container.RegisterAssemblyTypes(typeof(TestInstaller).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+                container.RegisterType<TestUserFactory>().As<DataFactory<TestDataContext, User, Guid>>();
+                container.RegisterType<TestRolesFactory>().As<DataFactory<TestDataContext, Role, Guid>>();
             }
         }
     }

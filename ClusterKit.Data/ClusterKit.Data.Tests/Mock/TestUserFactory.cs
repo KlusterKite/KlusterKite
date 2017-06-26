@@ -10,10 +10,12 @@
 namespace ClusterKit.Data.Tests.Mock
 {
     using System;
-    using System.Data.Entity;
+    
     using System.Linq.Expressions;
 
     using ClusterKit.Data.EF;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// The users data factory

@@ -14,6 +14,10 @@ namespace ClusterKit.Security.Attributes
     using System.Linq;
     using System.Reflection;
 
+#if CORECLR
+    using Microsoft.Extensions.DependencyModel;
+#endif
+
     /// <summary>
     /// The bundle of utils for current library
     /// </summary>
@@ -31,7 +35,7 @@ namespace ClusterKit.Security.Attributes
         /// <returns>The list of privilege descriptions</returns>
         public static IEnumerable<PrivilegeDescription> GetDefinedPrivileges(Type container)
         {
-            if (container.GetCustomAttribute(typeof(PrivilegesContainerAttribute), true) == null)
+            if (container.GetTypeInfo().GetCustomAttribute(typeof(PrivilegesContainerAttribute), true) == null)
             {
                 return new PrivilegeDescription[0];
             }
@@ -48,8 +52,7 @@ namespace ClusterKit.Security.Attributes
         public static void CreatePrivilegesCache()
         {
             DefinedPrivileges =
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(
+                    GetLoadedAssemblies().SelectMany(
                         a =>
                             {
                                 try
@@ -58,14 +61,15 @@ namespace ClusterKit.Security.Attributes
                                         a.GetTypes()
                                             .Where(
                                                 t =>
-                                                    t.IsAbstract && t.IsSealed
-                                                    && t.GetCustomAttribute(typeof(PrivilegesContainerAttribute), true)
+                                                    t.GetTypeInfo().IsAbstract && t.GetTypeInfo().IsSealed
+                                                    && t.GetTypeInfo().GetCustomAttribute(typeof(PrivilegesContainerAttribute), true)
                                                     != null)
                                             .SelectMany(SearchDefinedPrivileges);
                                 }
-                                catch (Exception e)
+                                catch 
                                 {
-                                    throw new Exception($"Could not get types from module {a.FullName}", e);
+                                    // throw new Exception($"Could not get types from module {a.FullName}", e);
+                                    return new PrivilegeDescription[0];
                                 }
                             })
                     .OrderBy(d => d.AssemblyName)
@@ -73,6 +77,36 @@ namespace ClusterKit.Security.Attributes
                     .ThenBy(d => d.Action)
                     .ToList()
                     .AsReadOnly();
+        }
+
+        /// <summary>
+        /// Gets the list of loaded assemblies
+        /// </summary>
+        /// <returns>The list of loaded assemblies</returns>
+        public static IEnumerable<Assembly> GetLoadedAssemblies()
+        {
+#if APPDOMAIN
+            return AppDomain.CurrentDomain.GetAssemblies();
+#elif CORECLR
+            var assemblies = new List<Assembly>();
+            var dependencies = DependencyContext.Default.RuntimeLibraries;
+            foreach (var library in dependencies)
+            {
+                try
+                {
+                    var assembly = Assembly.Load(new AssemblyName(library.Name));
+                    assemblies.Add(assembly);
+                }
+                catch
+                {
+                    //do nothing can't if can't load assembly
+                }
+            }
+            return assemblies;
+#else
+#error Method not implemented
+            throw new NotImplementedException();
+#endif
         }
 
         /// <summary>
@@ -96,7 +130,7 @@ namespace ClusterKit.Security.Attributes
                                     return new[]
                                                {
                                                    new PrivilegeDescription(
-                                                       container.Assembly.GetName().Name,
+                                                       container.GetTypeInfo().Assembly.GetName().Name,
                                                        null,
                                                        (string)f.GetValue(null))
                                                };
@@ -108,7 +142,7 @@ namespace ClusterKit.Security.Attributes
                                         descriptionAttribute.Actions.Select(
                                             action =>
                                                 new PrivilegeDescription(
-                                                    container.Assembly.GetName().Name,
+                                                    container.GetTypeInfo().Assembly.GetName().Name,
                                                     descriptionAttribute.Description,
                                                     $"{f.GetValue(null)}.{action}",
                                                     action,
@@ -118,7 +152,7 @@ namespace ClusterKit.Security.Attributes
                                 return new[]
                                            {
                                                new PrivilegeDescription(
-                                                   container.Assembly.GetName().Name,
+                                                   container.GetTypeInfo().Assembly.GetName().Name,
                                                    descriptionAttribute.Description,
                                                    (string)f.GetValue(null),
                                                    target: descriptionAttribute.Target)

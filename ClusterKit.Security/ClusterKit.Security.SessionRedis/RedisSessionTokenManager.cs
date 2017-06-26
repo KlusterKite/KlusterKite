@@ -11,6 +11,9 @@ namespace ClusterKit.Security.SessionRedis
 {
     using System;
     using System.Diagnostics;
+    using System.Linq;
+    using System.Net;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -27,25 +30,24 @@ namespace ClusterKit.Security.SessionRedis
     /// </summary>
     /// <remarks>
     /// Async/await was removed as it caused performance issues.
-    /// TODO: should recheck after migration to .Net.Core
     /// </remarks>
     [UsedImplicitly]
     public class RedisSessionTokenManager : ITokenManager
     {
         /// <summary>
-        /// The actor system
-        /// </summary>
-        private readonly ActorSystem system;
-
-        /// <summary>
         /// The redis connection string
         /// </summary>
-        private readonly string redisConnectionString;
+        private readonly ConfigurationOptions redisConnectionString;
 
         /// <summary>
         /// The redis database number
         /// </summary>
         private readonly int redisDb;
+
+        /// <summary>
+        /// The actor system
+        /// </summary>
+        private readonly ActorSystem system;
 
         /// <summary>
         /// The token key prefix to store in redis
@@ -61,8 +63,22 @@ namespace ClusterKit.Security.SessionRedis
         public RedisSessionTokenManager(ActorSystem system)
         {
             this.system = system;
-            this.redisConnectionString =
-                system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.RedisConnection");
+            var connectionString = system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.RedisConnection");
+
+            var config = ConfigurationOptions.Parse(connectionString);
+            var addressEndpoint = (DnsEndPoint)config.EndPoints.First();
+            var port = addressEndpoint.Port;
+
+            bool isIp = IsIpAddress(addressEndpoint.Host);
+            if (!isIp)
+            {
+                var ip = Dns.GetHostEntryAsync(addressEndpoint.Host).GetAwaiter().GetResult();
+                config.EndPoints.Remove(addressEndpoint);
+                config.EndPoints.Add(ip.AddressList.First(), port);
+            }
+
+            this.redisConnectionString = config;
+
             this.redisDb = system.Settings.Config.GetInt("ClusterKit.Security.SessionRedis.RedisDb");
             this.tokenKeyPrefix = system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.TokenKeyPrefix");
         }
@@ -95,15 +111,33 @@ namespace ClusterKit.Security.SessionRedis
         }
 
         /// <inheritdoc />
-        public Task<AccessTicket> ValidateAccessToken(string token)
+        public Task<string> CreateRefreshToken(RefreshTicket ticket)
         {
+            var watch = new Stopwatch();
+            watch.Start();
+
+            var tokenUid = Guid.NewGuid();
+            var token = tokenUid.ToString("N");
+
+            var data = ticket.SerializeToAkka(this.system);
+            this.system.Log.Info("{Type}: Refresh token prepared", this.GetType().Name);
             using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
-                var data = db.StringGet(this.GetRedisAccessKey(token));
-                return data.HasValue 
-                    ? Task.FromResult(((byte[])data).DeserializeFromAkka<AccessTicket>(this.system)) 
-                    : Task.FromResult<AccessTicket>(null);
+                this.system.Log.Info("{Type}: Database opened", this.GetType().Name);
+                var result = db.StringSet(
+                    this.GetRedisRefreshKey(token),
+                    data,
+                    ticket.Expiring.HasValue ? (TimeSpan?)(ticket.Expiring.Value - DateTimeOffset.Now) : null);
+                this.system.Log.Info("{Type}: token saved", this.GetType().Name);
+                if (result)
+                {
+                    return Task.FromResult(token);
+                }
+
+                var exception = new Exception("Session data server is unavailable");
+                this.system.Log.Error(exception, "{Type}: Session data server is unavailable", this.GetType().Name);
+                throw exception;
             }
         }
 
@@ -118,32 +152,25 @@ namespace ClusterKit.Security.SessionRedis
         }
 
         /// <inheritdoc />
-        public Task<string> CreateRefreshToken(RefreshTicket ticket)
+        public Task<bool> RevokeRefreshToken(string token)
         {
-            var watch = new Stopwatch();
-            watch.Start();
-
-            var tokenUid = Guid.NewGuid();
-            var token = tokenUid.ToString("N");
-
-            var data = ticket.SerializeToAkka(this.system);
             using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
+                return Task.FromResult(db.KeyDelete(this.GetRedisRefreshKey(token)));
+            }
+        }
 
-                var result = db.StringSet(
-                    this.GetRedisRefreshKey(token),
-                    data,
-                    ticket.Expiring.HasValue ? (TimeSpan?)(ticket.Expiring.Value - DateTimeOffset.Now) : null);
-
-                if (result)
-                {
-                    return Task.FromResult(token);
-                }
-
-                var exception = new Exception("Session data server is unavailable");
-                this.system.Log.Error(exception, "{Type}: Session data server is unavailable", this.GetType().Name);
-                throw exception;
+        /// <inheritdoc />
+        public Task<AccessTicket> ValidateAccessToken(string token)
+        {
+            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
+            {
+                var db = connection.GetDatabase(this.redisDb);
+                var data = db.StringGet(this.GetRedisAccessKey(token));
+                return data.HasValue
+                           ? Task.FromResult(((byte[])data).DeserializeFromAkka<AccessTicket>(this.system))
+                           : Task.FromResult<AccessTicket>(null);
             }
         }
 
@@ -159,20 +186,21 @@ namespace ClusterKit.Security.SessionRedis
                 var redisRefreshKey = this.GetRedisRefreshKey(token);
                 var data = db.StringGet(redisRefreshKey);
                 db.KeyDelete(redisRefreshKey);
-                return data.HasValue 
-                    ? Task.FromResult(((byte[])data).DeserializeFromAkka<RefreshTicket>(this.system)) 
-                    : Task.FromResult<RefreshTicket>(null);
+                return data.HasValue
+                           ? Task.FromResult(((byte[])data).DeserializeFromAkka<RefreshTicket>(this.system))
+                           : Task.FromResult<RefreshTicket>(null);
             }
         }
 
-        /// <inheritdoc />
-        public Task<bool> RevokeRefreshToken(string token)
+        /// <summary>
+        /// Tests host against IP address
+        /// </summary>
+        /// <param name="host">The host name</param>
+        /// <returns>A value indicating whether the provided host is a pure IPv4</returns>
+        private static bool IsIpAddress(string host)
         {
-            using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
-            {
-                var db = connection.GetDatabase(this.redisDb);
-                return Task.FromResult(db.KeyDelete(this.GetRedisRefreshKey(token)));
-            }
+            string ipPattern = @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b";
+            return Regex.IsMatch(host, ipPattern);
         }
 
         /// <summary>

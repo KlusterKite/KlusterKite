@@ -11,18 +11,19 @@ namespace ClusterKit.Web.NginxConfigurator
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
-    using System.Security.Permissions;
+    using System.Security.AccessControl;
 
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.Core.Internal;
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
+#if CORECLR
+    using Microsoft.Extensions.PlatformAbstractions;
+#endif
 
     /// <summary>
     /// Installing components from current library
@@ -58,7 +59,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.NginxConfigurator.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -69,27 +70,28 @@ namespace ClusterKit.Web.NginxConfigurator
             return new[] { "Web.Nginx" };
         }
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
         }
 
         /// <summary>
-        /// Checks access to file
+        /// Checks the file access
         /// </summary>
-        /// <param name="filePath">Path to file for check</param>
-        /// <param name="permissionAccess">Permission to check</param>
-        private static void CheckFileAccess(string filePath, FileIOPermissionAccess permissionAccess)
+        /// <param name="filePath">The file path</param>
+        /// <param name="permissionAccess">The permission to check</param>
+        private static void CheckFileAccess(string filePath, FileSystemRights permissionAccess)
         {
             if (!Path.IsPathRooted(filePath))
             {
-                var currentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#if APPDOMAIN
+                var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#elif CORECLR
+                var dir = PlatformServices.Default.Application.ApplicationBasePath;
+#endif
+
+                var currentExecutablePath = Path.GetDirectoryName(dir);
                 if (string.IsNullOrWhiteSpace(currentExecutablePath))
                 {
                     throw new ConfigurationException("Failed to determine current executable path");
@@ -109,12 +111,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 throw new ConfigurationException($"{configDirectory} does not exists");
             }
 
-            var path = File.Exists(filePath) ? filePath : configDirectory;
-            var permission = new FileIOPermission(permissionAccess, path);
-            if (!permission.IsGranted())
-            {
-                throw new ConfigurationException($"Cannot access {path} for writing");
-            }
+            // TODO: check file access
         }
 
         /// <summary>
@@ -129,7 +126,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig is not defined");
             }
 
-            CheckFileAccess(configPath, FileIOPermissionAccess.Write);
+            CheckFileAccess(configPath, FileSystemRights.Write);
         }
 
         /// <summary>
@@ -147,8 +144,8 @@ namespace ClusterKit.Web.NginxConfigurator
                     throw new ConfigurationException("ClusterKit.Web.Nginx.ReloadCommand.Command is not defined");
                 }
 
-                // todo: actualy need to check Execute access
-                CheckFileAccess(commandPath, FileIOPermissionAccess.Read);
+                CheckFileAccess(commandPath, FileSystemRights.Read);
+                CheckFileAccess(commandPath, FileSystemRights.ExecuteFile);
             }
         }
     }

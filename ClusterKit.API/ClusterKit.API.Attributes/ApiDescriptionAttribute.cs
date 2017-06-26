@@ -119,9 +119,9 @@ namespace ClusterKit.API.Attributes
                 return $"List<{GetTypeName(listType.GenericTypeArguments[0])}>";
             }
 
-            var attr = type.GetCustomAttribute<ApiDescriptionAttribute>();
+            var attr = type.GetTypeInfo().GetCustomAttribute<ApiDescriptionAttribute>();
             var name = attr?.GetName(type) ?? NamingUtilities.ToCSharpRepresentation(type);
-            return type.IsGenericType && !string.IsNullOrWhiteSpace(attr?.GetName(type))
+            return type.GetTypeInfo().IsGenericType && !string.IsNullOrWhiteSpace(attr?.GetName(type))
                        ? $"{name}<{string.Join(",", type.GetGenericArguments().Select(GetTypeName))}>"
                        : name;
         }
@@ -173,13 +173,13 @@ namespace ClusterKit.API.Attributes
         /// <returns>The list of base types</returns>
         private static IEnumerable<Type> GetBaseTypes(Type type)
         {
-            if (type.BaseType == null)
+            if (type.GetTypeInfo().BaseType == null)
             {
                 yield break;
             }
 
-            yield return type.BaseType;
-            foreach (var baseType in GetBaseTypes(type.BaseType))
+            yield return type.GetTypeInfo().BaseType;
+            foreach (var baseType in GetBaseTypes(type.GetTypeInfo().BaseType))
             {
                 yield return baseType;
             }

@@ -12,9 +12,11 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
+    using ClusterKit.Core;
     using ClusterKit.Security.Attributes;
     using ClusterKit.Web.GraphQL.Publisher;
 
@@ -487,10 +489,15 @@ namespace ClusterKit.Web.Tests.GraphQL
                                 {
                                     ApiMutation.CreateFromField(
                                         ApiField.Object(
-                                        "objects_create",
-                                        "object",
-                                        arguments: new[] { objectType.CreateField("new", description: "The new object data") },
-                                        description: "creates a new object"), 
+                                            "objects_create",
+                                            "object",
+                                            arguments: new[]
+                                                           {
+                                                               objectType.CreateField(
+                                                                   "new",
+                                                                   description: "The new object data")
+                                                           },
+                                            description: "creates a new object"),
                                         ApiMutation.EnType.ConnectionCreate,
                                         new List<ApiRequest>())
                                 };
@@ -500,15 +507,14 @@ namespace ClusterKit.Web.Tests.GraphQL
                           "0.0.0.1",
                           new[] { objectType },
                           new[] { objectType.CreateField("objects", EnFieldFlags.IsConnection, "The objects dataset") },
-                          mutations) {
-                                        Description = "The test api" 
-                                     };
+                          mutations) { Description = "The test api" };
 
             var provider = new MoqProvider { Description = api };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
             var errors = SchemaGenerator.CheckSchema(schema).Select(e => $"Schema type error: {e}")
-                            .Union(SchemaGenerator.CheckSchemaIntrospection(schema)).Select(e => $"Schema introspection error: {e}");
+                .Union(SchemaGenerator.CheckSchemaIntrospection(schema))
+                .Select(e => $"Schema introspection error: {e}");
 
             var hasErrors = false;
             foreach (var error in errors)
@@ -526,16 +532,25 @@ namespace ClusterKit.Web.Tests.GraphQL
             }
 
             Assert.False(hasErrors);
+            var query = BaseInstaller.ReadTextResource(
+                this.GetType().GetTypeInfo().Assembly,
+                "ClusterKit.Web.Tests.GraphQL.Resources.IntrospectionQuery.txt");
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
                                  {
                                      r.Schema = schema;
-                                     r.Query = Resources.IntrospectionQuery;
+                                     
+                                     r.Query = query;
                                  }).ConfigureAwait(true);
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
-            Assert.Equal(CleanResponse(Resources.SchemaDescriptionTestSnapshot), CleanResponse(response));
+
+            var expectedResponse = BaseInstaller.ReadTextResource(
+                this.GetType().GetTypeInfo().Assembly,
+                "ClusterKit.Web.Tests.GraphQL.Resources.SchemaDescriptionTestSnapshot.txt");
+
+            Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
         }
 
         /// <summary>

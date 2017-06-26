@@ -45,6 +45,12 @@ namespace ClusterKit.Core.TestKit
         public override Encoding Encoding => Encoding.UTF8;
 
         /// <inheritdoc />
+        public override void Write(char value)
+        {
+            this.Write(new[] { value });
+        }
+
+        /// <inheritdoc />
         public override void Write(char[] buffer)
         {
             var str = new string(buffer);
@@ -66,4 +72,4 @@ namespace ClusterKit.Core.TestKit
             this.line.Clear();
         }
     }
-}
+} 

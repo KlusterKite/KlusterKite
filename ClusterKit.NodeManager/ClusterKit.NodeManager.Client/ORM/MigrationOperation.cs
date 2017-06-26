@@ -21,7 +21,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// </summary>
     [ApiDescription("The cluster migration operation", Name = "MigrationOperation")]
     [Table("MigrationOperations")]
-    [Serializable]
     public class MigrationOperation : MigrationLogRecord
     {
         /// <summary>

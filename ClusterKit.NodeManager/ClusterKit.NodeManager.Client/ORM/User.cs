@@ -36,7 +36,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// Gets or sets the list of roles assigned to this user
         /// </summary>
         [DeclareField(Description = "The list of roles assigned to this user", Access = EnAccessFlag.Queryable)]
-        public List<Role> Roles { get; set; } = new List<Role>();
+        public List<RoleUser> Roles { get; set; } = new List<RoleUser>();
 
         /// <summary>
         /// Gets or sets the user uid
@@ -76,8 +76,8 @@ namespace ClusterKit.NodeManager.Client.ORM
                 throw new InvalidOperationException("Roles were not loaded");
             }
 
-            var assignedScope = this.Roles.SelectMany(r => r.AllowedScope).Distinct();
-            var deniedScope = this.Roles.SelectMany(r => r.DeniedScope).Distinct().ToList();
+            var assignedScope = this.Roles.SelectMany(r => r.Role.AllowedScope).Distinct();
+            var deniedScope = this.Roles.SelectMany(r => r.Role.DeniedScope).Distinct().ToList();
             return assignedScope.Where(s => !deniedScope.Contains(s));
         }
 

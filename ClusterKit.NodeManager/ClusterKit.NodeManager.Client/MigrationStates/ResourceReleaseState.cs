@@ -17,7 +17,6 @@ namespace ClusterKit.NodeManager.Client.MigrationStates
     /// The resource description
     /// </summary>
     [ApiDescription("The resource description", Name = "ResourceReleaseState")]
-    [Serializable]
     public class ResourceReleaseState
     {
         /// <summary>

@@ -11,18 +11,25 @@ namespace ClusterKit.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Runtime.Versioning;
+    using System.Threading.Tasks;
 
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
 
-    using NuGet;
+    using JetBrains.Annotations;
+
+    using NuGet.Frameworks;
+    using NuGet.Packaging;
+    using NuGet.Packaging.Core;
+    using NuGet.Protocol.Core.Types;
+    using NuGet.Versioning;
 
     using Xunit.Abstractions;
 
@@ -32,14 +39,14 @@ namespace ClusterKit.NodeManager.Tests
     public abstract class ReleaseCheckTestsBase
     {
         /// <summary>
-        /// The .NET Framework 4.5 name
+        /// The .NET Framework 4.6 name
         /// </summary> 
-        public const string Net45 = ".NETFramework,Version=v4.6";
+        public const string Net46 = ".NETFramework,Version=v4.6";
 
         /// <summary>
-        /// The .NET Standard 1.1 name
+        /// The .NET Core 1.1 name
         /// </summary>
-        public const string NetStandard = ".NET Standard,Version=v1.1";
+        public const string NetCore = ".NET Core,Version=v1.1";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseCheckTestsBase"/> class.
@@ -58,21 +65,20 @@ namespace ClusterKit.NodeManager.Tests
         protected ITestOutputHelper Output { get; }
 
         /// <summary>
-        /// Creates a <see cref="PackageDependencySet"/> from string definition
+        /// Creates a <see cref="PackageDependencyGroup"/> from string definition
         /// </summary>
         /// <param name="framework">The framework name</param>
         /// <param name="definition">The dependencies definition</param>
         /// <returns>The dependency set</returns>
-        internal static PackageDependencySet CreatePackageDependencySet(string framework, params string[] definition)
+        internal static PackageDependencyGroup CreatePackageDependencySet(string framework, params string[] definition)
         {
-            var frameworkName = new FrameworkName(framework);
-            return new PackageDependencySet(
-                frameworkName,
+            return new PackageDependencyGroup(
+                NuGetFramework.ParseFrameworkName(framework, DefaultFrameworkNameProvider.Instance),
                 definition.Select(
                     d =>
                         {
                             var parts = d.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                            return new PackageDependency(parts[0], CreateVersionSpec(parts[1]));
+                            return new PackageDependency(parts[0], CreateVersionRange(parts[1]));
                         }));
         }
 
@@ -107,12 +113,11 @@ namespace ClusterKit.NodeManager.Tests
         internal static List<NodeTemplate.PackageRequirement> CreatePackageRequirement(params string[] packages)
         {
             return packages.Select(
-                    p =>
-                        {
-                            var parts = p.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                            return new NodeTemplate.PackageRequirement(parts[0], parts.Length > 1 ? parts[1] : null);
-                        })
-                .ToList();
+                p =>
+                    {
+                        var parts = p.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        return new NodeTemplate.PackageRequirement(parts[0], parts.Length > 1 ? parts[1] : null);
+                    }).ToList();
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             if (packages == null)
             {
-                packages = new[] { "p1 1.0.0", "p2 1.0.0", "dp1 1.0.0", "dp2 1.0.0" };
+                packages = new[] { "p1 1.0.0", "p2 1.0.0", "dp1 1.0.0", "dp2 1.0.0", "ClusterKit.NodeManager.Migrator.Executor 1.0.0" };
             }
 
             if (templatePackageRequirements == null)
@@ -148,10 +153,10 @@ namespace ClusterKit.NodeManager.Tests
             var migratorTemplates = new List<MigratorTemplate>();
             var m1 = new MigratorTemplate
                          {
-                             Code = "t1",
-                             Configuration = "t1",
+                             Code = "m1",
+                             Configuration = "m1",
                              PackageRequirements =
-                                 CreatePackageRequirement(templatePackageRequirements),
+                                 CreatePackageRequirement(templatePackageRequirements)
                          };
             migratorTemplates.Add(m1);
 
@@ -172,62 +177,60 @@ namespace ClusterKit.NodeManager.Tests
         /// <returns>The test repository</returns>
         internal static TestRepository CreateRepository()
         {
-            var p1 = new TestPackage
+            var p1 = new TestPackage("p1", "1.0.0")
                          {
-                             Id = "p1",
-                             Version = SemanticVersion.Parse("1.0.0"),
-                             DependencySets = new[] { CreatePackageDependencySet(Net45, "dp1 1.0.0") }
+                             DependencySets =
+                                 new[]
+                                     {
+                                         CreatePackageDependencySet(Net46, "dp1 1.0.0"),
+                                         CreatePackageDependencySet(
+                                             NetCore,
+                                             "dp1 1.0.0")
+                                     }
                          };
 
-            var p2 = new TestPackage
+            var p2 = new TestPackage("p2", "1.0.0")
                          {
-                             Id = "p2",
-                             Version = SemanticVersion.Parse("1.0.0"),
-                             DependencySets = new[] { CreatePackageDependencySet(Net45, "dp2 1.0.0") }
+                             DependencySets =
+                                 new[]
+                                     {
+                                         CreatePackageDependencySet(Net46, "dp2 1.0.0"),
+                                         CreatePackageDependencySet(
+                                             NetCore,
+                                             "dp2 1.0.0")
+                                     }
                          };
 
-            var p3 = new TestPackage
+            var p3 = new TestPackage("p3", "1.0.0")
                          {
-                             Id = "p3",
-                             Version = SemanticVersion.Parse("1.0.0"),
-                             DependencySets = new[] { CreatePackageDependencySet(Net45, "dp3 2.0.0") }
+                             DependencySets =
+                                 new[]
+                                     {
+                                         CreatePackageDependencySet(Net46, "dp3 2.0.0"),
+                                         CreatePackageDependencySet(
+                                             NetCore,
+                                             "dp3 2.0.0")
+                                     }
                          };
-            var dp1 = new TestPackage
-                          {
-                              Id = "dp1",
-                              Version = SemanticVersion.Parse("1.0.0"),
-                              DependencySets = new PackageDependencySet[0]
-                          };
+            var dp1 = new TestPackage("dp1", "1.0.0");
 
-            var dp2 = new TestPackage
-                          {
-                              Id = "dp2",
-                              Version = SemanticVersion.Parse("1.0.0"),
-                              DependencySets = new PackageDependencySet[0]
-                          };
+            var dp2 = new TestPackage("dp2", "1.0.0");
 
-            var dp3 = new TestPackage
-                          {
-                              Id = "dp3",
-                              Version = SemanticVersion.Parse("1.0.0"),
-                              DependencySets = new PackageDependencySet[0]
-                          };
+            var dp3 = new TestPackage("dp3", "1.0.0");
 
-            return new TestRepository(p1, p2, p3, dp1, dp2, dp3);
+            var executor = new TestPackage("ClusterKit.NodeManager.Migrator.Executor", "1.0.0");
+
+            return new TestRepository(p1, p2, p3, dp1, dp2, dp3, executor);
         }
 
         /// <summary>
-        /// Creates the <see cref="VersionSpec"/> with specified version as minimum version inclusive
+        /// Creates the version range
         /// </summary>
-        /// <param name="version">
-        /// The version.
-        /// </param>
-        /// <returns>
-        /// The <see cref="VersionSpec"/>.
-        /// </returns>
-        internal static VersionSpec CreateVersionSpec(string version)
+        /// <param name="minVersion">The minimum required version</param>
+        /// <returns>The version range</returns>
+        internal static VersionRange CreateVersionRange(string minVersion)
         {
-            return new VersionSpec { IsMinInclusive = true, MinVersion = SemanticVersion.Parse(version) };
+            return new VersionRange(NuGetVersion.Parse(minVersion));
         }
 
         /// <summary>
@@ -245,158 +248,73 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// The test package representation
         /// </summary>
-        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "This is the test class")]
-        internal class TestPackage : IPackage
+        [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty", Justification = "This is test implementation")]
+        internal class TestPackage : IPackageSearchMetadata
         {
             /// <inheritdoc />
-            public IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; set; }
-
-            /// <inheritdoc />
-            public IEnumerable<string> Authors { get; set; }
-
-            /// <inheritdoc />
-            public string Copyright { get; set; }
-
-            /// <inheritdoc />
-            public IEnumerable<PackageDependencySet> DependencySets { get; set; }
-
-            /// <inheritdoc />
-            public string Description { get; set; }
-
-            /// <inheritdoc />
-            public bool DevelopmentDependency { get; set; }
-
-            /// <inheritdoc />
-            public int DownloadCount { get; set; }
-
-            /// <summary>
-            /// Gets or sets a delegate to implement <see cref="IPackage.ExtractContents"/>
-            /// </summary>
-            public Action<IFileSystem, string> ExtractContentsAction { get; set; }
-
-            /// <inheritdoc />
-            public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies { get; set; }
-
-            /// <summary>
-            /// Gets or sets a delegate to implement <see cref="IPackage.GetFiles"/>
-            /// </summary>
-            public Func<IEnumerable<IPackageFile>> GetFilesAction { get; set; }
-
-            /// <summary>
-            /// Gets or sets a delegate to implement <see cref="IPackage.ExtractContents"/>
-            /// </summary>
-            public Func<Stream> GetStreamAction { get; set; }
-
-            /// <summary>
-            /// Gets or sets a delegate to implement <see cref="IPackage.ExtractContents"/>
-            /// </summary>
-            public Func<IEnumerable<FrameworkName>> GetSupportedFrameworksAction { get; set; }
-
-            /// <inheritdoc />
-            public Uri IconUrl { get; set; }
-
-            /// <inheritdoc />
-            public string Id { get; set; }
-
-            /// <inheritdoc />
-            public bool IsAbsoluteLatestVersion { get; set; }
-
-            /// <inheritdoc />
-            public bool IsLatestVersion { get; set; }
-
-            /// <inheritdoc />
-            public string Language { get; set; }
-
-            /// <inheritdoc />
-            public Uri LicenseUrl { get; set; }
-
-            /// <inheritdoc />
-            public bool Listed { get; set; }
-
-            /// <inheritdoc />
-            public Version MinClientVersion { get; set; }
-
-            /// <inheritdoc />
-            public IEnumerable<string> Owners { get; set; }
-
-            /// <inheritdoc />
-            public ICollection<PackageReferenceSet> PackageAssemblyReferences { get; set; }
-
-            /// <inheritdoc />
-            public Uri ProjectUrl { get; set; }
-
-            /// <inheritdoc />
-            public DateTimeOffset? Published { get; set; }
-
-            /// <inheritdoc />
-            public string ReleaseNotes { get; set; }
-
-            /// <inheritdoc />
-            public Uri ReportAbuseUrl { get; set; }
-
-            /// <inheritdoc />
-            public bool RequireLicenseAcceptance { get; set; }
-
-            /// <inheritdoc />
-            public string Summary { get; set; }
-
-            /// <inheritdoc />
-            public string Tags { get; set; }
-
-            /// <inheritdoc />
-            public string Title { get; set; }
-
-            /// <inheritdoc />
-            public SemanticVersion Version { get; set; }
-
-            /// <inheritdoc />
-            public void ExtractContents(IFileSystem fileSystem, string extractPath)
+            public TestPackage(string id, string version)
             {
-                if (this.ExtractContentsAction == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                this.ExtractContentsAction(fileSystem, extractPath);
+                this.Identity = new PackageIdentity(id, NuGetVersion.Parse(version));
+                this.DependencySets = new List<PackageDependencyGroup>();
             }
 
             /// <inheritdoc />
-            public IEnumerable<IPackageFile> GetFiles()
-            {
-                if (this.GetFilesAction == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return this.GetFilesAction();
-            }
+            public string Authors { get; }
 
             /// <inheritdoc />
-            public Stream GetStream()
-            {
-                if (this.GetStreamAction == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return this.GetStreamAction();
-            }
+            public IEnumerable<PackageDependencyGroup> DependencySets { get; set; }
 
             /// <inheritdoc />
-            public IEnumerable<FrameworkName> GetSupportedFrameworks()
-            {
-                if (this.GetSupportedFrameworksAction == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return this.GetSupportedFrameworksAction();
-            }
+            public string Description { get; }
 
             /// <inheritdoc />
-            public override string ToString()
+            public long? DownloadCount { get; }
+
+            /// <summary>
+            /// Gets or sets the extract action
+            /// </summary>
+            public Func<string, string, string, IEnumerable<string>> Extract { get; set; }
+
+            /// <inheritdoc />
+            public Uri IconUrl { get; }
+
+            /// <inheritdoc />
+            public PackageIdentity Identity { get; set; }
+
+            /// <inheritdoc />
+            public bool IsListed { get; }
+
+            /// <inheritdoc />
+            public Uri LicenseUrl { get; }
+
+            /// <inheritdoc />
+            public string Owners { get; }
+
+            /// <inheritdoc />
+            public Uri ProjectUrl { get; }
+
+            /// <inheritdoc />
+            public DateTimeOffset? Published { get; }
+
+            /// <inheritdoc />
+            public Uri ReportAbuseUrl { get; }
+
+            /// <inheritdoc />
+            public bool RequireLicenseAcceptance { get; }
+
+            /// <inheritdoc />
+            public string Summary { get; }
+
+            /// <inheritdoc />
+            public string Tags { get; }
+
+            /// <inheritdoc />
+            public string Title { get; }
+
+            /// <inheritdoc />
+            public Task<IEnumerable<VersionInfo>> GetVersionsAsync()
             {
-                return this.Id ?? base.ToString();
+                throw new NotImplementedException();
             }
         }
 
@@ -408,6 +326,11 @@ namespace ClusterKit.NodeManager.Tests
             /// <inheritdoc />
             public string EffectivePath { get; set; }
 
+            /// <summary>
+            /// Gets or sets a delegate for <see cref="IPackageFile.GetStream"/>
+            /// </summary>
+            public Func<Stream> GetStreamAction { get; set; }
+
             /// <inheritdoc />
             public string Path { get; set; }
 
@@ -416,11 +339,6 @@ namespace ClusterKit.NodeManager.Tests
 
             /// <inheritdoc />
             public FrameworkName TargetFramework { get; set; }
-
-            /// <summary>
-            /// Gets or sets a delegate for <see cref="IPackageFile.GetStream"/>
-            /// </summary>
-            public Func<Stream> GetStreamAction { get; set; }
 
             /// <inheritdoc />
             public Stream GetStream()
@@ -439,47 +357,73 @@ namespace ClusterKit.NodeManager.Tests
         /// </summary>
         internal class TestRepository : IPackageRepository
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TestRepository"/> class.
-            /// </summary>
-            /// <param name="packages">
-            /// The packages.
-            /// </param>
-            public TestRepository(params IPackage[] packages)
+            /// <inheritdoc />
+            public TestRepository(params TestPackage[] packages)
             {
-                this.Packages = packages.ToImmutableDictionary(p => $"{p.Id} {p.Version}");
+                this.Packages = packages?.ToList() ?? new List<TestPackage>();
             }
 
             /// <summary>
-            /// Gets the list of stored packages
+            /// Gets the list of defined packages packages.
             /// </summary>
-            public IReadOnlyDictionary<string, IPackage> Packages { get; }
+            [UsedImplicitly]
+            public List<TestPackage> Packages { get; }
 
             /// <inheritdoc />
-            public PackageSaveModes PackageSaveMode { get; set; }
-
-            /// <inheritdoc />
-            public string Source => string.Empty;
-
-            /// <inheritdoc />
-            public bool SupportsPrereleasePackages => true;
-
-            /// <inheritdoc />
-            public void AddPackage(IPackage package)
+            public Task<IEnumerable<string>> ExtractPackage(
+                IPackageSearchMetadata package,
+                string frameworkName,
+                string executionDir,
+                string tmpDir)
             {
-                throw new InvalidOperationException();
+                var testPackage = package as TestPackage;
+                if (testPackage == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return Task.FromResult(testPackage.Extract(frameworkName, executionDir, tmpDir));
             }
 
             /// <inheritdoc />
-            public IQueryable<IPackage> GetPackages()
+            public Task<IPackageSearchMetadata> GetAsync(string id)
             {
-                return this.Packages.Values.AsQueryable();
+                return Task.FromResult<IPackageSearchMetadata>(
+                    this.Packages.Where(p => p.Identity.Id == id).OrderByDescending(p => p.Identity.Version)
+                        .FirstOrDefault());
             }
 
             /// <inheritdoc />
-            public void RemovePackage(IPackage package)
+            public Task<IPackageSearchMetadata> GetAsync(string id, NuGetVersion version)
             {
-                throw new InvalidOperationException();
+                return Task.FromResult<IPackageSearchMetadata>(
+                    this.Packages.FirstOrDefault(p => p.Identity.Id == id && p.Identity.Version == version));
+            }
+
+            /// <inheritdoc />
+            public Task<IEnumerable<IPackageSearchMetadata>> SearchAsync(string terms, bool includePreRelease)
+            {
+                return Task.FromResult(
+                    this.Packages.Where(p => p.Identity.Id.ToLowerInvariant().Contains(terms.ToLowerInvariant()))
+                        .Cast<IPackageSearchMetadata>());
+            }
+
+            /// <inheritdoc />
+            public async Task<Dictionary<PackageIdentity, IEnumerable<string>>> ExtractPackage(
+                IEnumerable<PackageIdentity> packages,
+                string runtime,
+                string frameworkName,
+                string executionDir,
+                string tmpDir,
+                Action<string> logAction = null)
+            {
+                var packagesToExtract = packages.Select(p => this.Packages.First(m => m.Identity.Equals(p)));
+                var tasks = packagesToExtract.ToDictionary(
+                    p => p.Identity,
+                    async p => await this.ExtractPackage(p, frameworkName, executionDir, tmpDir));
+                await Task.WhenAll(tasks.Values);
+
+                return tasks.ToDictionary(p => p.Key, p => p.Value.Result);
             }
         }
     }

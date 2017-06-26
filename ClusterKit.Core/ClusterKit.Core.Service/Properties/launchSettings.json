@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "ClusterKit.Core.Service": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -7,6 +7,7 @@
       loglevel : INFO
 
       actor : {
+        serialize-creators = off
 
         serializers {
           hyperion = "Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion"
@@ -14,8 +15,10 @@
         }
 
         serialization-bindings {
-           "System.Object" = hyperion
+           "System.Object" = "hyperion"           
+    
         } 
+
 
         provider = "Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"
         

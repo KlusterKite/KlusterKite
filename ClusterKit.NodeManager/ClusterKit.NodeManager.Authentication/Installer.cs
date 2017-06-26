@@ -9,12 +9,12 @@
 
 namespace ClusterKit.NodeManager.Authentication
 {
+    using System.Reflection;
+
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Security.Attributes;
@@ -37,18 +37,13 @@ namespace ClusterKit.NodeManager.Authentication
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.NodeManager.Authentication.Resources.akka.hocon"));
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-            container.Register(Component.For<IClientProvider>().ImplementedBy<ClientProvider>());
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+            container.RegisterType<ClientProvider>().As<IClientProvider>();
         }
     }
 }

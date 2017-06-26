@@ -10,18 +10,15 @@
 namespace ClusterKit.NodeManager.ConfigurationSource
 {
     using System;
-    using System.Data.Entity;
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Data;
-    using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client.ORM;
+    using ClusterKit.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
 
@@ -36,31 +33,28 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
         protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
-
+         
         /// <summary>
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
         protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{ClusterKit.NodeManager.ConfigurationSeederType = \"ClusterKit.NodeManager.ConfigurationSource.ConfigurationSeeder, ClusterKit.NodeManager.ConfigurationSource\"}");
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            Database.SetInitializer(new NullDatabaseInitializer<ConfigurationContext>());
-            container.Register(Component.For<DataFactory<ConfigurationContext, Role, Guid>>().ImplementedBy<RoleFactory>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, User, string>>().ImplementedBy<UserFactoryByLogin>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, User, Guid>>().ImplementedBy<UserFactoryByUid>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, Release, int>>().ImplementedBy<ReleaseDataFactory>().LifestyleTransient());
-            container.Register(Component.For<DataFactory<ConfigurationContext, Migration, int>>().ImplementedBy<MigrationDataFactory>().LifestyleTransient());
+            container.RegisterType<RoleFactory>().As<DataFactory<ConfigurationContext, Role, Guid>>();
+            container.RegisterType<UserFactoryByLogin>().As<DataFactory<ConfigurationContext, User, string>>();
+            container.RegisterType<UserFactoryByUid>().As<DataFactory<ConfigurationContext, User, Guid>>();
+            container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
+            container.RegisterType<MigrationDataFactory>().As<DataFactory<ConfigurationContext, Migration, int>>();
 
-            container.Register(
-                Component.For<IContextFactory<ConfigurationContext>>()
-                    .ImplementedBy<BaseContextFactory<ConfigurationContext>>()
-                    .LifestyleTransient());
+            var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
+            if (config.GetBoolean("ClusterKit.NodeManager.RegisterNuget", true)
+                && !string.IsNullOrWhiteSpace(nugetUrl))
+            {
+                container.RegisterInstance(new RemotePackageRepository(nugetUrl)).As<IPackageRepository>();
+            }
         }
     }
 }

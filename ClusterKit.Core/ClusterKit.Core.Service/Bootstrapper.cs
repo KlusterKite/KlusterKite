@@ -11,34 +11,24 @@ namespace ClusterKit.Core.Service
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
+
     using System.IO;
     using System.Linq;
     using System.Reflection;
 
     using Akka.Actor;
     using Akka.Configuration;
-    using Akka.Configuration.Hocon;
-    using Akka.DI.CastleWindsor;
+    using Akka.DI.AutoFac;
     using Akka.DI.Core;
-    using Akka.Util.Internal;
 
-    using Castle.Facilities.TypedFactory;
-    using Castle.MicroKernel.Resolvers.SpecializedResolvers;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core.Log;
 
-    using CommonServiceLocator.WindsorAdapter;
-
     using JetBrains.Annotations;
-
-    using Microsoft.Practices.ServiceLocation;
 
     using Serilog;
     using Serilog.Events;
-
-    using Component = Castle.MicroKernel.Registration.Component;
 
     /// <summary>
     /// Dependency injection configuration
@@ -49,23 +39,19 @@ namespace ClusterKit.Core.Service
         /// <summary>
         ///  Dependency injection configuration
         /// </summary>
-        /// <param name="container">Dependency injection container</param>
+        /// <param name="containerBuilder">Dependency injection container</param>
         /// <param name="configurations">
         /// Startup parameters
         /// </param>
-        /// <returns>The actor system</returns>
-        public static ActorSystem ConfigureAndStart(IWindsorContainer container, string[] configurations)
+        /// <returns>The DI container</returns>
+        public static IContainer ConfigureAndStart(ContainerBuilder containerBuilder, string[] configurations)
         {
             Console.WriteLine(@"Starting bootstrapper");
 
-            container.AddFacility<TypedFactoryFacility>();
-            container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel, true));
-            container.Register(Component.For<IWindsorContainer>().Instance(container));
-
-            container.RegisterWindsorInstallers();
+            containerBuilder.RegisterInstallers();
 
             Console.WriteLine(@"Preparing config");
-            var config = BaseInstaller.GetStackedConfig(container, CreateTopLevelConfig(configurations));
+            var config = BaseInstaller.GetStackedConfig(containerBuilder, CreateTopLevelConfig(configurations));
 
             Log.Debug($"Cluster configuration: seed-nodes { string.Join(", ", config.GetStringList("akka.cluster.seed-nodes") ?? new List<string>())}");
             Log.Debug($"Cluster configuration: min-nr-of-members { config.GetInt("akka.cluster.min-nr-of-members")}");
@@ -78,7 +64,9 @@ namespace ClusterKit.Core.Service
                 Log.Debug($"Cluster node public hostname: { publicHostName }");
             }
 
-            container.Register(Component.For<Config>().Instance(config));
+            containerBuilder.RegisterInstance(config).As<Config>();
+            BaseInstaller.RunComponentRegistration(containerBuilder, config);
+
             Console.WriteLine(@"Config created");
 
             // log configuration
@@ -88,8 +76,12 @@ namespace ClusterKit.Core.Service
                 level = LogEventLevel.Verbose;
             }
 
+            var actorSystem = ActorSystem.Create("ClusterKit", config);
+            containerBuilder.RegisterInstance(actorSystem).As<ActorSystem>();
+            var container = containerBuilder.Build();
+
             var loggerConfig = new LoggerConfiguration().MinimumLevel.Is(level);
-            var configurators = container.ResolveAll<ILoggerConfigurator>();
+            var configurators = container.Resolve<IEnumerable<ILoggerConfigurator>>().ToList();
 
             configurators.ForEach(c => Log.Information("Using log configurator {TypeName}", c.GetType().FullName));
 
@@ -110,19 +102,15 @@ namespace ClusterKit.Core.Service
             // log configuration finished
 
             // performing pre-start checks
-            BaseInstaller.RunPreCheck(container, config);
+            BaseInstaller.RunPreCheck(containerBuilder, config);
 
             // starting Akka system
             Console.WriteLine(@"starting akka system");
-            var actorSystem = ActorSystem.Create("ClusterKit", config);
-            actorSystem.AddDependencyResolver(new WindsorDependencyResolver(container, actorSystem));
-
-            container.Register(Component.For<ActorSystem>().Instance(actorSystem).LifestyleSingleton());
-            ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
+            actorSystem.AddDependencyResolver(new AutoFacDependencyResolver(container, actorSystem));
 
             Console.WriteLine(@"Bootstrapper start finished");
 
-            return actorSystem;
+            return container;
         }
 
         /// <summary>
@@ -159,7 +147,7 @@ namespace ClusterKit.Core.Service
             }
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            var hoconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "akka.hocon");
+            var hoconPath = Path.Combine(Path.GetDirectoryName(typeof(Bootstrapper).GetTypeInfo().Assembly.Location), "akka.hocon");
             Console.WriteLine($@"loading akka.hocon ({hoconPath})");
             if (File.Exists(hoconPath))
             {
@@ -174,11 +162,6 @@ namespace ClusterKit.Core.Service
             }
 
             Console.WriteLine(@"loading application configuration");
-            var section = ConfigurationManager.GetSection("akka") as AkkaConfigurationSection;
-            if (section?.AkkaConfig != null)
-            {
-                config = config.WithFallback(section.AkkaConfig);
-            }
 
             return config;
         }

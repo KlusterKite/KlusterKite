@@ -22,7 +22,6 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The address of fixed cluster seed for new node configuration
     /// </summary>
     [ApiDescription("The address of fixed cluster seed for new node configuration", Name = "SeedAddress")]
-    [Serializable]
     public class SeedAddress : IObjectWithId<int>
     {
         /// <summary>

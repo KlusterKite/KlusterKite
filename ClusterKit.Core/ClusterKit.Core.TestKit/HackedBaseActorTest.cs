@@ -10,14 +10,11 @@
 namespace ClusterKit.Core.TestKit
 {
     using Akka.Actor;
+    using Akka.DI.AutoFac;
+    using Akka.DI.Core;
     using Akka.TestKit.Xunit2;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.Windsor;
-
-    using CommonServiceLocator.WindsorAdapter;
-
-    using Microsoft.Practices.ServiceLocation;
+    using Autofac;
 
     /// <summary>
     /// Some strange workaround to solve class creation order problem
@@ -32,15 +29,21 @@ namespace ClusterKit.Core.TestKit
         /// </param>
         protected HackedBaseActorTest(TestDescription description) : base(description.System)
         {
-            description.Container.Register(Component.For<IActorRef>().Instance(this.TestActor).Named("testActor").LifestyleTransient());
-            this.WindsorContainer = description.Container;
-            ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(this.WindsorContainer));
+            var containerBuilder = description.ContainerBuilder;
+            containerBuilder.RegisterInstance(this.TestActor).As<IActorRef>().Named("testActor", typeof(IActorRef));
+            this.Container = containerBuilder.Build();
+            this.Sys.AddDependencyResolver(new AutoFacDependencyResolver(this.Container, this.Sys));
+
+            if (description.Configurator.RunPostStart)
+            {
+                BaseInstaller.RunPostStart(containerBuilder, this.Container);
+            }
         }
 
         /// <summary>
-        /// Gets the Windsor container
+        /// Gets DI container
         /// </summary>
-        protected IWindsorContainer WindsorContainer { get; }
+        protected IContainer Container { get; }
 
         /// <summary>
         /// Base test class initialization data
@@ -48,14 +51,19 @@ namespace ClusterKit.Core.TestKit
         protected class TestDescription
         {
             /// <summary>
-            /// Gets or sets DI container
-            /// </summary>
-            public WindsorContainer Container { get; set; }
+            /// Gets or sets DI container builder
+            /// </summary> 
+            public ContainerBuilder ContainerBuilder { get; set; }
 
             /// <summary>
             /// Gets or sets ready actor system
             /// </summary>
             public ActorSystem System { get; set; }
+
+            /// <summary>
+            /// Gets or sets the test configurator
+            /// </summary>
+            public TestConfigurator Configurator { get; set; }
         }
     }
 }

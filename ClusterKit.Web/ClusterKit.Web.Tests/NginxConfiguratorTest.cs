@@ -17,7 +17,7 @@ namespace ClusterKit.Web.Tests
     using Akka.Configuration;
     using Akka.DI.Core;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -49,7 +49,7 @@ namespace ClusterKit.Web.Tests
         [Fact]
         public void ServiceConfigGenerationTest()
         {
-            BaseInstaller.RunPreCheck(this.WindsorContainer, this.Sys.Settings.Config);
+            // BaseInstaller.RunPreCheck(this.Container, this.Sys.Settings.Config);
             var configurator = this.ActorOfAsTestActorRef<NginxConfiguratorActor>("configurator");
 
             this.ActorOfAsTestActorRef<NameSpaceActor>(this.Sys.DI().Props<NameSpaceActor>(), "Web");
@@ -110,16 +110,8 @@ namespace ClusterKit.Web.Tests
         /// </summary>
         public class Configurator : TestConfigurator
         {
-            /// <summary>
-            /// Gets the akka system config
-            /// </summary>
-            /// <param name="windsorContainer">
-            /// The windsor Container.
-            /// </param>
-            /// <returns>
-            /// The config
-            /// </returns>
-            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            /// <inheritdoc />
+            public override Config GetAkkaConfig(ContainerBuilder containerBuilder)
             {
                 return ConfigurationFactory.ParseString(@"
                 {
@@ -170,7 +162,7 @@ namespace ClusterKit.Web.Tests
                     }
                 }
 
-                }").WithFallback(base.GetAkkaConfig(windsorContainer));
+                }").WithFallback(base.GetAkkaConfig(containerBuilder));
             }
 
             /// <summary>

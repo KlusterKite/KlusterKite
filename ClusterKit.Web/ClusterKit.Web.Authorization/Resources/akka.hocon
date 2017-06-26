@@ -1,2 +1,5 @@
 {
+	ClusterKit.Web.Configurators {
+		Authorization = "ClusterKit.Web.Authorization.WebHostingConfigurator, ClusterKit.Web.Authorization"
+	}
 }

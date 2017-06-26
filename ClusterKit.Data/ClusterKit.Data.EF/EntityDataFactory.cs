@@ -11,8 +11,6 @@ namespace ClusterKit.Data.EF
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
-    using System.Data.Entity.Infrastructure;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
@@ -23,6 +21,8 @@ namespace ClusterKit.Data.EF
     using ClusterKit.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// Base factory to work with data objects using Entity Framework
@@ -70,7 +70,7 @@ namespace ClusterKit.Data.EF
         /// <returns>Async execution task</returns>
         public override async Task<Maybe<TObject>> Get(TId id)
         {
-            return await this.GetDbQuery().FirstOrDefaultAsync(this.GetIdValidationExpression(id));
+            return await this.GetDbSet().FirstOrDefaultAsync(this.GetIdValidationExpression(id));
         }
 
         /// <summary>
@@ -89,11 +89,11 @@ namespace ClusterKit.Data.EF
             int? count,
             ApiRequest apiRequest)
         {
-            var query = this.GetDbQuery() as IQueryable<TObject>;
+            var query = this.GetDbSet() as IQueryable<TObject>;
             
             if (apiRequest != null)
             {
-                query = query.SetIncludes(apiRequest);
+                query = query.SetIncludes(this.Context, apiRequest);
             }
 
             if (filter != null)
@@ -143,13 +143,6 @@ namespace ClusterKit.Data.EF
             this.Context.Entry(oldData).CurrentValues.SetValues(newData);
             await this.Context.SaveChangesAsync();
         }
-
-        /// <summary>
-        /// Gets the query to receive all objects
-        /// </summary>
-        /// <returns>The query</returns>
-        [UsedImplicitly]
-        protected virtual DbQuery<TObject> GetDbQuery() => this.GetDbSet();
 
         /// <summary>
         /// Gets the data set from current context

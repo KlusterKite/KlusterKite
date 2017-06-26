@@ -13,9 +13,8 @@ namespace ClusterKit.API.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Threading.Tasks;
-
-    using Castle.Core.Internal;
 
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
@@ -59,7 +58,10 @@ namespace ClusterKit.API.Tests
         {
             var provider = new TestApi();
 
-            provider.GenerationErrors.ForEach(e => this.output.WriteLine($"Generation error: {e}"));
+            foreach (var e in provider.GenerationErrors)
+            {
+                this.output.WriteLine($"Generation error: {e}");
+            }
 
             Assert.Equal(0, provider.GenerationErrors.Count);
 
@@ -73,7 +75,7 @@ namespace ClusterKit.API.Tests
             this.output.WriteLine(jsonDescription);
 
             Assert.Equal("TestApi", description.ApiName);
-            Assert.Equal(this.GetType().Assembly.GetName().Version, description.Version);
+            Assert.Equal(this.GetType().GetTypeInfo().Assembly.GetName().Version, description.Version);
             Assert.Equal(9, description.Types.Count);
 
             Assert.NotNull(description.Types.FirstOrDefault(t => t.TypeName.ToLower().Contains("EnTest".ToLower())));

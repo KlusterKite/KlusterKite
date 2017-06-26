@@ -1,7 +1,6 @@
 ﻿{
-	ExecutionFramework = ".NETFramework,Version=v4.6"
+	Runtime = "ubuntu.14.04-x64"
 
-	Nuget = "http://nuget/"
 	NugetCheckPeriod = 30s
 
 	SeederConfigurations = [
@@ -24,6 +23,8 @@
 
 	ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
 	ClusterKit.NodeManager.ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
+        ClusterKit.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"
+	ClusterKit.NodeManager.PackageRepository = "http://nuget/"
 	ClusterKit.NodeManager.Seeds = [
 		"akka.tcp://ClusterKit@seed:3090"
 	]
@@ -40,6 +41,7 @@
 	}
 
 	ClusterKit.NodeManager.SupportedFrameworks = [
-		".NETFramework,Version=v4.6"
+		".NETFramework,Version=v4.6",
+		".NETCoreApp,Version=v1.1"
 	]
 }

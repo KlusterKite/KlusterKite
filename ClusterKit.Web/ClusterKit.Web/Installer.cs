@@ -11,18 +11,19 @@ namespace ClusterKit.Web
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Web.Http;
-
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+    
     using Akka.Actor;
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
 
-    using Microsoft.Owin.Hosting;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// Installing components from current library
@@ -30,9 +31,9 @@ namespace ClusterKit.Web
     public class Installer : BaseInstaller
     {
         /// <summary>
-        /// Current windsor container
+        /// The service task
         /// </summary>
-        private IWindsorContainer currentContainer;
+        private readonly CancellationTokenSource service = new CancellationTokenSource();
 
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
@@ -44,7 +45,7 @@ namespace ClusterKit.Web
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -55,64 +56,78 @@ namespace ClusterKit.Web
                                                                      "Web"
                                                                  };
 
-        /// <summary>
-        /// This method will be run after service start.
-        /// Methods are run in <seealso cref="BaseInstaller.AkkaConfigLoadPriority"/> order.
-        /// </summary>
-        protected override void PostStart()
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            if (this.currentContainer == null)
-            {
-                throw new InvalidOperationException("There is no registered windsor container");
-            }
+            container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+            container.RegisterType<WebTracer>().As<IWebHostingConfigurator>();
 
             var registeredAssemblies =
-                GetRegisteredBaseInstallers(this.currentContainer)
-                    .Select(i => i.GetType().Assembly)
+                GetRegisteredBaseInstallers(container)
+                    .Select(i => i.GetType().GetTypeInfo().Assembly)
                     .Distinct();
 
             foreach (var registeredAssembly in registeredAssemblies)
             {
-                this.currentContainer.Register(
-                    Classes.FromAssembly(registeredAssembly).BasedOn<ApiController>().LifestyleScoped());
+                container.RegisterAssemblyTypes(registeredAssembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(Controller)));
             }
 
-            var system = this.currentContainer.Resolve<ActorSystem>();
-            var bindUrl = GetOwinBindUrl(system.Settings.Config);
-            system.Log.Info("Starting web server on {Url}", bindUrl);
-            try
+            Startup.ContainerBuilder = container;
+            Startup.Config = config;
+            var bindUrl = GetWebHostingBindUrl(config);
+            var host = new WebHostBuilder()
+                .CaptureStartupErrors(true)
+                .UseUrls(bindUrl)
+                .UseKestrel();
+
+            Task.Run(
+                async () =>
+                    {
+                        var server = host.UseStartup<Startup>().Build();
+                        var system = (await Startup.ContainerWaiter.Task).Resolve<ActorSystem>();
+                        try
+                        {
+                            system.Log.Info("Starting web server...");
+                            server.Run();
+                        }
+                        catch (Exception exception)
+                        {
+                            system.Log.Error(exception, "Web server stopped");
+                        }
+                    }, 
+                this.service.Token);
+
+            var timeout = config.GetTimeSpan("ClusterKit.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
+            if (!Startup.ServiceConfigurationWaiter.Wait(timeout))
             {
-                WebApp.Start<Startup>(bindUrl);
-            }
-            catch (Exception exception)
-            {
-                system.Log.Error(exception, "Could not start owin server");
+                throw new Exception("Web server initialization timeout", Startup.LastException);
             }
         }
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void PostStart(IComponentContext context)
         {
-            this.currentContainer = container;
-            container.Register(
-                Classes.FromThisAssembly().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
+            var actorSystem = context.Resolve<ActorSystem>();
+            actorSystem.RegisterOnTermination(() => this.service.Cancel());
+            actorSystem.Log.Info("{Type}: post start started", this.GetType().FullName);
+            Startup.ContainerWaiter.SetResult(context);
+            var timeout = actorSystem.Settings.Config.GetTimeSpan("ClusterKit.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
+            if (!Startup.ServiceStartWaiter.Wait(timeout))
+            {
+                throw new Exception("Web server start timeout", Startup.LastException);
+            }
 
-            container.Register(
-                Component.For<IOwinStartupConfigurator>().ImplementedBy<WebTracer>().LifestyleTransient());
+            actorSystem.Log.Info("{Type}: post start completed", this.GetType().FullName);
         }
 
         /// <summary>
-        /// Reads owin bind url from configuration
+        /// Reads bind url from configuration
         /// </summary>
         /// <param name="config">The akka config</param>
-        /// <returns>The Url to bind Owin</returns>
-        private static string GetOwinBindUrl(Config config)
+        /// <returns>The Url to bind web hosting</returns>
+        private static string GetWebHostingBindUrl(Config config)
         {
-            return config.GetString("ClusterKit.Web.OwinBindAddress", "http://*:80");
+            return config.GetString("ClusterKit.Web.BindAddress", "http://*:80");
         }
     }
 }

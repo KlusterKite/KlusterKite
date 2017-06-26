@@ -11,22 +11,25 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
 
     using Akka.Configuration;
 
     using ClusterKit.Data.EF;
     using ClusterKit.NodeManager.Client;
     using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource.Migrator.Migrations;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
     using ClusterKit.NodeManager.Migrator;
     using ClusterKit.Security.Attributes;
 
     using JetBrains.Annotations;
 
-    using NuGet;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Infrastructure;
+    using Microsoft.EntityFrameworkCore.Storage;
 
     /// <summary>
     /// Seeds the <see cref="ConfigurationContext"/>
@@ -41,20 +44,26 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         protected const string ConfigConnectionStringPath = "ClusterKit.NodeManager.ConfigurationDatabaseConnectionString";
 
         /// <summary>
-        /// Akka configuration path to connection string
+        /// Akka configuration path to database name
         /// </summary>
         [UsedImplicitly]
         protected const string ConfigDatabaseNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseName";
 
         /// <summary>
-        /// The seeder config
+        /// Akka configuration path to database provider name
         /// </summary>
-        private readonly Config config;
+        [UsedImplicitly]
+        protected const string ConfigDatabaseProviderNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseProviderName";
 
         /// <summary>
-        /// The connection manager
+        /// The context factory
         /// </summary>
-        private readonly BaseConnectionManager connectionManager;
+        private readonly UniversalContextFactory contextFactory;
+
+        /// <summary>
+        /// The package repository
+        /// </summary>
+        private readonly IPackageRepository packageRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Seeder"/> class.
@@ -62,71 +71,81 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// <param name="config">
         /// The config.
         /// </param>
-        /// <param name="connectionManager">
-        /// The connection manager.
+        /// <param name="contextFactory">
+        /// The context factory.
         /// </param>
-        public Seeder(Config config, BaseConnectionManager connectionManager)
+        /// <param name="packageRepository">
+        /// The package repository.
+        /// </param>
+        public Seeder(Config config, UniversalContextFactory contextFactory, IPackageRepository packageRepository)
         {
-            this.config = config;
-            this.connectionManager = connectionManager;
+            this.Config = config;
+            this.contextFactory = contextFactory;
+            this.packageRepository = packageRepository;
         }
+
+        /// <summary>
+        /// Gets the seeder configuration
+        /// </summary>
+        protected Config Config { get; }
 
         /// <inheritdoc />
         public override void Seed()
         {
-            var connectionString = this.config.GetString(ConfigConnectionStringPath);
-            var databaseName = this.connectionManager.EscapeDatabaseName(this.config.GetString(ConfigDatabaseNamePath));
-            using (var connection = this.connectionManager.CreateConnection(connectionString))
+            var connectionString = this.Config.GetString(ConfigConnectionStringPath);
+            var databaseName = this.Config.GetString(ConfigDatabaseNamePath);
+            var databaseProviderName = this.Config.GetString(ConfigDatabaseProviderNamePath);
+            using (var context =
+                this.contextFactory.CreateContext<ConfigurationContext>(
+                    databaseProviderName,
+                    connectionString,
+                    databaseName))
             {
-                connection.Open();
-                Console.WriteLine(@"Opened the connection");
+                var databaseCreator = context.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+                if (databaseCreator == null)
+                {
+                    Console.WriteLine(@"Error - could not check database existence. There is no IDatabaseCreator.");
+                    return;
+                }
 
-                if (this.connectionManager.CheckDatabaseExistence(connection, databaseName))
+                if (databaseCreator.Exists())
                 {
                     Console.WriteLine(@"ClusterKit configuration database is already existing");
                     return;
                 }
 
-                this.connectionManager.CheckCreateDatabase(connection, databaseName);
-                this.connectionManager.SwitchDatabase(connection, databaseName);
+                context.Database.Migrate();
+                
+                this.SetupUsers(context);
+                var configuration =
+                    new ReleaseConfiguration
+                        {
+                            NodeTemplates = this.GetNodeTemplates().ToList(),
+                            MigratorTemplates = this.GetMigratorTemplates().ToList(),
+                            Packages = this.GetPackageDescriptions().GetAwaiter().GetResult(),
+                            SeedAddresses = this.GetSeeds().ToList(),
+                            NugetFeed = this.Config.GetString("ClusterKit.NodeManager.PackageRepository")
+                        };
 
-                using (var context = new ConfigurationContext(connection, false))
+                var initialRelease = new Release
+                                         {
+                                             State = EnReleaseState.Active,
+                                             Name = "Initial configuration",
+                                             Started = DateTimeOffset.Now,
+                                             Configuration = configuration
+                                         };
+
+                var supportedFrameworks = this.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                var initialErrors =
+                    initialRelease.SetPackagesDescriptionsForTemplates(this.packageRepository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
+
+                foreach (var errorDescription in initialErrors)
                 {
-                    var migrator = new MigrateDatabaseToLatestVersion<ConfigurationContext, Configuration>(true);
-                    migrator.InitializeDatabase(context);
-
-                    this.SetupUsers(context);
-                    var repository = PackageRepositoryFactory.Default.CreateRepository(this.config.GetString("Nuget"));
-                    var configuration = new ReleaseConfiguration
-                                            {
-                                                NodeTemplates = this.GetNodeTemplates().ToList(),
-                                                MigratorTemplates = this.GetMigratorTemplates().ToList(),
-                                                Packages = this.GetPackageDescriptions(repository).ToList(),
-                                                SeedAddresses = this.GetSeeds().ToList(),
-                                                NugetFeeds = this.GetNugetFeeds().ToList()
-                                            };
-
-                    var initialRelease = new Release
-                                             {
-                                                 State = EnReleaseState.Active,
-                                                 Name = "Initial configuration",
-                                                 Started = DateTimeOffset.Now,
-                                                 Configuration = configuration
-                                             };
-
-                    var supportedFrameworks = this.config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var initialErrors = initialRelease.SetPackagesDescriptionsForTemplates(
-                        repository,
-                        supportedFrameworks.ToList());
-
-                    foreach (var errorDescription in initialErrors)
-                    {
-                        Console.WriteLine($@"error in {errorDescription.Field} - {errorDescription.Message}");
-                    }
-
-                    context.Releases.Add(initialRelease);
-                    context.SaveChanges();
+                    Console.WriteLine($@"error in {errorDescription.Field} - {errorDescription.Message}");
                 }
+
+                context.Releases.Add(initialRelease);
+                context.SaveChanges();
             }
 
             Console.WriteLine(@"ClusterKit configuration database created");
@@ -139,7 +158,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         [UsedImplicitly]
         protected virtual IEnumerable<string> GetSeeds()
         {
-            return this.config.GetStringList("ClusterKit.NodeManager.Seeds");
+            return this.Config.GetStringList("ClusterKit.NodeManager.Seeds");
         }
 
         /// <summary>
@@ -167,7 +186,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.Log.ElasticSearch",
                                              "ClusterKit.Monitoring.Client",
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = Configurations.Publisher
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.publisher.hocon")
                              };
             yield return new NodeTemplate
                              {
@@ -186,17 +205,16 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.Monitoring",
                                              "ClusterKit.NodeManager",
                                              "ClusterKit.Data.EF.Npgsql",
-                                             "ClusterKit.Web.Swagger.Monitor",
-                                             "ClusterKit.Web.Swagger",
                                              "ClusterKit.Log.Console",
                                              "ClusterKit.Log.ElasticSearch",
                                              "ClusterKit.Web.Authentication",
+                                             "ClusterKit.NodeManager.Authentication",
                                              "ClusterKit.Security.SessionRedis",
                                              "ClusterKit.API.Endpoint",
                                              "ClusterKit.Web.GraphQL.Publisher"
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = Configurations.ClusterManager,
-                             };
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.clusterManager.hocon")
+            };
 
             yield return new NodeTemplate
                              {
@@ -213,8 +231,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              "ClusterKit.NodeManager.Client",
                                              "ClusterKit.Monitoring.Client"
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = Configurations.Empty,
-                             };
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.empty.hocon")
+            };
         }
 
         /// <summary>
@@ -227,13 +245,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                              {
                                  Name = "ClusterKit Migrator",
                                  Code = "ClusterKit",
-                                 Configuration = Configurations.Migrator,
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.migrator.hocon"),
                                  PackageRequirements =
                                      new[]
                                          {
-                                             new NodeTemplate.PackageRequirement(
-                                                 "ClusterKit.NodeManager.ConfigurationSource.Migrator",
-                                                 null),
                                             new NodeTemplate.PackageRequirement(
                                                  "ClusterKit.NodeManager",
                                                  null),
@@ -248,39 +263,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// <summary>
         /// Get the list of package descriptions
         /// </summary>
-        /// <param name="repository">The package repository</param>
         /// <returns>The list of package descriptions</returns>
-        protected virtual IEnumerable<PackageDescription> GetPackageDescriptions(IPackageRepository repository)
+        protected virtual async Task<List<PackageDescription>> GetPackageDescriptions()
         {
-            return repository.Search(string.Empty, true)
-                .Where(p => p.IsLatestVersion)
-                .ToList()
-                .Select(p => new PackageDescription(p.Id, p.Version.ToString()));
-        }
-
-        /// <summary>
-        /// Gets the list of nuget feeds
-        /// </summary>
-        /// <returns>The list of nuget feeds</returns>
-        protected virtual IEnumerable<NugetFeed> GetNugetFeeds()
-        {
-            var nugetFeedsConfig = this.config.GetConfig("ClusterKit.NodeManager.NugetFeeds");
-
-            if (nugetFeedsConfig != null)
-            {
-                foreach (var pair in nugetFeedsConfig.AsEnumerable())
-                {
-                    var feedConfig = nugetFeedsConfig.GetConfig(pair.Key);
-
-                    NugetFeed.EnFeedType feedType;
-                    if (!Enum.TryParse(feedConfig.GetString("type"), out feedType))
-                    {
-                        feedType = NugetFeed.EnFeedType.Private;
-                    }
-
-                   yield return new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType };
-                }
-            }
+            return (await this.packageRepository.SearchAsync(string.Empty, true))
+                .Select(p => new PackageDescription(p.Identity.Id, p.Identity.Version.ToString())).ToList();
         }
 
         /// <summary>
@@ -295,19 +282,21 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                 return;
             }
 
-            var adminPrivileges = new List<IEnumerable<PrivilegeDescription>>
-                                      {
-                                          Utils.GetDefinedPrivileges(typeof(Privileges)),
-                                          Utils.GetDefinedPrivileges(typeof(Web.Swagger.Messages.Privileges)),
-                                          Utils.GetDefinedPrivileges(typeof(Monitoring.Client.Privileges))
-                                      };
+            var adminPrivileges =
+                new List<IEnumerable<PrivilegeDescription>>
+                    {
+                        Utils.GetDefinedPrivileges(typeof(Privileges)),
+
+                        Utils.GetDefinedPrivileges(
+                            typeof(Monitoring.Client.Privileges))
+                    };
 
             var adminRole = new Role
                                 {
                                     Uid = Guid.NewGuid(),
                                     Name = "Admin",
-                                    AllowedScope =
-                                        adminPrivileges.SelectMany(l => l.Select(p => p.Privilege)).ToList()
+                                    AllowedScope = adminPrivileges.SelectMany(l => l.Select(p => p.Privilege))
+                                        .ToList()
                                 };
             var guestRole = new Role
                                 {
@@ -324,9 +313,19 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
             context.Roles.Add(adminRole);
             context.Roles.Add(guestRole);
 
-            var adminUser = new User { Uid = Guid.NewGuid(), Login = "admin", Roles = new List<Role> { adminRole } };
+            var adminUser = new User
+                                {
+                                    Uid = Guid.NewGuid(),
+                                    Login = "admin",
+                                    Roles = new List<RoleUser> { new RoleUser { Role = adminRole } }
+                                };
             adminUser.SetPassword("admin");
-            var guestUser = new User { Uid = Guid.NewGuid(), Login = "guest", Roles = new List<Role> { guestRole } };
+            var guestUser = new User
+                                {
+                                    Uid = Guid.NewGuid(),
+                                    Login = "guest",
+                                    Roles = new List<RoleUser> { new RoleUser { Role = guestRole } }
+                                };
             guestUser.SetPassword("guest");
 
             context.Users.Add(adminUser);

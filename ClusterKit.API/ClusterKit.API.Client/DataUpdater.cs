@@ -151,10 +151,10 @@ namespace ClusterKit.API.Client
                 var source = Expression.Parameter(typeof(TObject), "s");
                 var json = Expression.Parameter(typeof(JObject), "json");
 
-                if (property.PropertyType.IsPrimitive
+                if (property.PropertyType.GetTypeInfo().IsPrimitive
                     || DataUpdaterConfig.AdditionalScalarTypes.Contains(property.PropertyType)
-                    || DataUpdaterConfig.AdditionalScalarTypes.Any(t => property.PropertyType.IsSubclassOf(t))
-                    || property.PropertyType.GetInterface("System.Collections.IEnumerable") != null)
+                    || DataUpdaterConfig.AdditionalScalarTypes.Any(t => property.PropertyType.GetTypeInfo().IsSubclassOf(t))
+                    || property.PropertyType.GetTypeInfo().GetInterface("System.Collections.IEnumerable") != null)
                 {
                     // creating direct copy
                     var copy = Expression.Assign(

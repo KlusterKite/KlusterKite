@@ -9,11 +9,12 @@
 
 namespace ClusterKit.API.Endpoint
 {
+    using System;
     using System.Collections.Generic;
 
     using Akka.Actor;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client.Messages;
     using ClusterKit.API.Provider;
@@ -34,19 +35,26 @@ namespace ClusterKit.API.Endpoint
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiPublisherActor"/> class.
         /// </summary>
-        /// <param name="container">
+        /// <param name="componentContext">
         /// The DI container.
         /// </param>
-        public ApiPublisherActor(IWindsorContainer container)
+        public ApiPublisherActor(IComponentContext componentContext)
         {
-            var providers = container.ResolveAll<ApiProvider>();
+            var providers = componentContext.Resolve<IEnumerable<ApiProvider>>();
             foreach (var apiProvider in providers)
             {
-                var actor = Context.ActorOf(
-                    Props.Create(() => new ApiHandlerActor(apiProvider)),
-                    apiProvider.ApiDescription.ApiName);
-                this.apiHandlers.Add(
-                    new ApiDiscoverResponse { Description = apiProvider.ApiDescription, Handler = actor });
+                var props = Props.Create(() => new ApiHandlerActor(apiProvider));
+                try
+                {
+                    var actor = Context.ActorOf(props, apiProvider.ApiDescription.ApiName);
+                    this.apiHandlers.Add(
+                        new ApiDiscoverResponse { Description = apiProvider.ApiDescription, Handler = actor });
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                    throw;
+                }
             }
 
             this.Receive<ApiDiscoverRequest>(r => this.Sender.Tell(this.apiHandlers));

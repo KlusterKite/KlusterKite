@@ -6,17 +6,18 @@
 //   Base class to install ClusterKit plugin components
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using JetBrains.Annotations;
 
@@ -24,7 +25,7 @@ namespace ClusterKit.Core
     /// Base class to install ClusterKit plugin components
     /// </summary>
     [UsedImplicitly]
-    public abstract class BaseInstaller : IWindsorInstaller
+    public abstract class BaseInstaller
     {
         /// <summary>
         /// Predefined priority to load configuration for plugins, that handles node role functionality
@@ -47,8 +48,8 @@ namespace ClusterKit.Core
         /// <summary>
         /// Every time <seealso cref="Install"/> called, installer register itself here
         /// </summary>
-        private static readonly Dictionary<IWindsorContainer, List<BaseInstaller>> RegisteredInstallers =
-            new Dictionary<IWindsorContainer, List<BaseInstaller>>();
+        private static readonly Dictionary<ContainerBuilder, List<BaseInstaller>> RegisteredInstallers =
+            new Dictionary<ContainerBuilder, List<BaseInstaller>>();
 
         /// <summary>
         /// Gets priority for ordering akka configurations. Highest priority will override lower priority.
@@ -60,12 +61,12 @@ namespace ClusterKit.Core
         /// Gets the list of all registered installers
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The windsor builder.
         /// </param>
         /// <returns>
         /// the list of all registered installers
         /// </returns>
-        public static IList<BaseInstaller> GetRegisteredBaseInstallers(IWindsorContainer container)
+        public static IList<BaseInstaller> GetRegisteredBaseInstallers(ContainerBuilder container)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -80,7 +81,7 @@ namespace ClusterKit.Core
         /// Generates overall akka config from all registered modules (with respect to external provided configuration file)
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The windsor builder.
         /// </param>
         /// <param name="config">
         /// Top level config
@@ -88,7 +89,7 @@ namespace ClusterKit.Core
         /// <returns>
         /// Akka and system configuration
         /// </returns>
-        public static Config GetStackedConfig(IWindsorContainer container, Config config)
+        public static Config GetStackedConfig(ContainerBuilder container, Config config)
         {
             Serilog.Log.Information("ClusterKit starting plugin manager");
 
@@ -98,31 +99,31 @@ namespace ClusterKit.Core
                 return config;
             }
 
-            var rolesList =
-                list.SelectMany(i => i.GetRoles())
-                    .Distinct()
-                    .Where(r => !string.IsNullOrWhiteSpace(r))
-                    .Select(r => $"\"{r.Replace("\"", "\\\"")}\"")
-                    .ToList();
+            var rolesList = list.SelectMany(i => i.GetRoles()).Distinct().Where(r => !string.IsNullOrWhiteSpace(r))
+                .Select(r => $"\"{r.Replace("\"", "\\\"")}\"").ToList();
 
             if (rolesList.Any())
             {
-                config =
-                    config.WithFallback(
-                        ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
+                config = config.WithFallback(
+                    ConfigurationFactory.ParseString($"akka.cluster.roles = [{string.Join(", ", rolesList)}]"));
             }
 
-            return list.OrderByDescending(i => i.AkkaConfigLoadPriority)
-                .Aggregate(config, (current, installer) => current.WithFallback(installer.GetAkkaConfig()));
+            return list.OrderByDescending(i => i.AkkaConfigLoadPriority).Aggregate(
+                config,
+                (current, installer) => current.WithFallback(installer.GetAkkaConfig()));
         }
 
         /// <summary>
-        /// Runs all registered installers <seealso cref="PostStart"/>
+        /// Runs all registered installers 
+        /// <seealso cref="PostStart"/>
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The builder builder
         /// </param>
-        public static void RunPostStart(IWindsorContainer container)
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        public static void RunPostStart(ContainerBuilder container, IComponentContext context)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -132,7 +133,7 @@ namespace ClusterKit.Core
 
             foreach (var installer in list.OrderBy(l => l.AkkaConfigLoadPriority))
             {
-                installer.PostStart();
+                installer.PostStart(context);
             }
         }
 
@@ -140,10 +141,10 @@ namespace ClusterKit.Core
         /// Runs all registered installers <seealso cref="PreCheck"/>
         /// </summary>
         /// <param name="container">
-        /// The windsor container.
+        /// The windsor builder.
         /// </param>
         /// <param name="config">Full akka config</param>
-        public static void RunPreCheck(IWindsorContainer container, Config config)
+        public static void RunPreCheck(ContainerBuilder container, Config config)
         {
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))
@@ -160,27 +161,84 @@ namespace ClusterKit.Core
         /// <summary>
         /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
         /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        public void Install([NotNull] IWindsorContainer container, IConfigurationStore store)
+        /// <param name="builder">
+        /// The builder.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        public static void RunComponentRegistration([NotNull] ContainerBuilder builder, [NotNull] Config config)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            List<BaseInstaller> installers;
+            if (!RegisteredInstallers.TryGetValue(builder, out installers))
+            {
+                throw new InvalidOperationException("builder is not registered");
+            }
+
+            foreach (var installer in installers)
+            {
+                installer.RegisterComponents(builder, config);
+                builder.RegisterInstance(installer).As<BaseInstaller>();
+            }
+        }
+
+        /// <summary>
+        /// Reads texts resource
+        /// </summary>
+        /// <param name="assembly">The resource containing assembly</param>
+        /// <param name="resourceName">The resource name</param>
+        /// <returns>The resource contents</returns>
+        public static string ReadTextResource(Assembly assembly, string resourceName)
+        {
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                {
+                    return null;
+                }
+
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs the installation in the <see cref="T:Castle.Windsor.IWindsorContainer"/>.
+        /// </summary>
+        /// <param name="container">The builder.</param>
+        public void Install([NotNull] ContainerBuilder container)
         {
             if (container == null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
 
-            if (!RegisteredInstallers.ContainsKey(container))
+            lock (RegisteredInstallers)
             {
-                RegisteredInstallers[container] = new List<BaseInstaller>();
-            }
+                if (!RegisteredInstallers.ContainsKey(container))
+                {
+                    RegisteredInstallers[container] = new List<BaseInstaller>();
+                }
 
-            if (RegisteredInstallers[container].Contains(this))
-            {
-                return;
-            }
+                if (RegisteredInstallers[container].Contains(this))
+                {
+                    return;
+                }
 
-            RegisteredInstallers[container].Add(this);
-            this.RegisterWindsorComponents(container, store);
+                RegisteredInstallers[container].Add(this);
+            }
         }
 
         /// <summary>
@@ -212,17 +270,26 @@ namespace ClusterKit.Core
 
         /// <summary>
         /// This method will be run after service start.
-        /// Methods are run in <seealso cref="AkkaConfigLoadPriority"/> order.
+        /// Methods are run in 
+        /// <seealso cref="AkkaConfigLoadPriority"/>
+        /// order.
         /// </summary>
-        protected virtual void PostStart()
+        /// <param name="context">
+        /// The context.
+        /// </param>
+        protected virtual void PostStart(IComponentContext context)
         {
         }
 
         /// <summary>
         /// Registering DI components
         /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected abstract void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store);
+        /// <param name="container">
+        /// The builder.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        protected abstract void RegisterComponents(ContainerBuilder container, Config config);
     }
 }

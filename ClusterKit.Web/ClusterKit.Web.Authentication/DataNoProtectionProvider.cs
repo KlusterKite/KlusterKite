@@ -9,7 +9,7 @@
 
 namespace ClusterKit.Web.Authentication
 {
-    using Microsoft.Owin.Security.DataProtection;
+    using Microsoft.AspNetCore.DataProtection;
 
     /// <summary>
     /// Substitute for data protection as data protection is provided by <see cref="ClusterKit.Security.Attributes.ITokenManager"/>
@@ -17,7 +17,7 @@ namespace ClusterKit.Web.Authentication
     public class DataNoProtectionProvider : IDataProtectionProvider
     {
         /// <inheritdoc />
-        public IDataProtector Create(params string[] purposes)
+        public IDataProtector CreateProtector(string purpose)
         {
             return new DataNotProtector();
         }
@@ -27,6 +27,12 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         private class DataNotProtector : IDataProtector
         {
+            /// <inheritdoc />
+            public IDataProtector CreateProtector(string purpose)
+            {
+                return this;
+            }
+
             /// <inheritdoc />
             public byte[] Protect(byte[] userData)
             {

@@ -13,10 +13,8 @@ namespace ClusterKit.Web.Rest
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Net;
-    using System.Net.Http;
+    using System.Reflection;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using Akka.Actor;
 
@@ -33,6 +31,8 @@ namespace ClusterKit.Web.Rest
 
     using JetBrains.Annotations;
 
+    using Microsoft.AspNetCore.Mvc;
+
     /// <summary>
     /// Base class to provide basic CRUD operation for REST service
     /// </summary>
@@ -43,7 +43,7 @@ namespace ClusterKit.Web.Rest
     /// The type of object identity field
     /// </typeparam>
     [UsedImplicitly]
-    public abstract class BaseRestController<TObject, TId> : ApiController
+    public abstract class BaseRestController<TObject, TId> : Controller
         where TObject : class
     {
         /// <summary>
@@ -51,7 +51,7 @@ namespace ClusterKit.Web.Rest
         /// </summary>
         static BaseRestController()
         {
-            DataIsLarge = typeof(ILargeObject).IsAssignableFrom(typeof(TObject));
+            DataIsLarge = typeof(ILargeObject).GetTypeInfo().IsAssignableFrom(typeof(TObject));
         }
 
         /// <summary>
@@ -107,21 +107,21 @@ namespace ClusterKit.Web.Rest
         /// Creates the object
         /// </summary>
         /// <param name="data">The object data</param>
-        /// <returns>The new object, as it was created in datasource</returns>
+        /// <returns>The new object, as it was created in data source</returns>
         [HttpPut]
         [Route("")]
         [UsedImplicitly]
-        public virtual async Task<TObject> Create(TObject data)
+        public virtual async Task<IActionResult> Create(TObject data)
         {
             var request = new CrudActionMessage<TObject, TId>
                               {
                                   ActionType = EnActionType.Create,
                                   Data = data,
                                   RequestContext =
-                                      this.Request.GetOwinContext()
-                                          .GetRequestDescription()
+                                      this.GetRequestDescription()
                               };
-            return await this.SendRequest(request);
+            var result = await this.SendRequest(request);
+            return this.Ok(result);
         }
 
         /// <summary>
@@ -132,17 +132,16 @@ namespace ClusterKit.Web.Rest
         [HttpDelete]
         [Route("{id}/")]
         [UsedImplicitly]
-        public virtual async Task<TObject> Delete(TId id)
+        public virtual async Task<IActionResult> Delete(TId id)
         {
             var request = new CrudActionMessage<TObject, TId>
                               {
                                   ActionType = EnActionType.Delete,
                                   Id = id,
                                   RequestContext =
-                                      this.Request.GetOwinContext()
-                                          .GetRequestDescription()
+                                      this.GetRequestDescription()
                               };
-            return await this.SendRequest(request);
+            return this.Ok(await this.SendRequest(request));
         }
 
         /// <summary>
@@ -153,27 +152,26 @@ namespace ClusterKit.Web.Rest
         [HttpGet]
         [Route("{id}/")]
         [UsedImplicitly]
-        public virtual async Task<TObject> Get(TId id)
+        public virtual async Task<IActionResult> Get(TId id)
         {
             var request = new CrudActionMessage<TObject, TId>
                               {
                                   ActionType = EnActionType.Get,
                                   Id = id,
                                   RequestContext =
-                                      this.Request.GetOwinContext()
-                                          .GetRequestDescription()
+                                      this.GetRequestDescription()
                               };
             var response = await this.SendRequest(request);
 
             SecurityLog.CreateRecord(
                 EnSecurityLogType.DataReadGranted,
                 response is ICrucialObject ? EnSeverity.Crucial : EnSeverity.Trivial,
-                this.Request.GetOwinContext().GetRequestDescription(),
+                this.GetRequestDescription(),
                 "{ObjectType} with id {ObjectId} was read.",
                 typeof(TObject).FullName,
                 id);
 
-            return response;
+            return this.Ok(response);
         }
 
         /// <summary>
@@ -191,7 +189,7 @@ namespace ClusterKit.Web.Rest
         [Route("")]
         [HttpGet]
         [UsedImplicitly]
-        public virtual async Task<CollectionResponse<TObject>> GetList(int count = 100, int skip = 0)
+        public virtual async Task<IActionResult> GetList(int count = 100, int skip = 0)
         {
             var collectionRequest = new CollectionRequest<TObject>
                                         {
@@ -200,8 +198,7 @@ namespace ClusterKit.Web.Rest
                                             Count = count,
                                             Skip = skip,
                                             RequestContext =
-                                                this.Request.GetOwinContext()
-                                                    .GetRequestDescription()
+                                                this.GetRequestDescription()
                                         };
 
             CollectionResponse<TObject> response;
@@ -228,11 +225,11 @@ namespace ClusterKit.Web.Rest
             SecurityLog.CreateRecord(
                 EnSecurityLogType.DataReadGranted,
                 severity,
-                this.Request.GetOwinContext().GetRequestDescription(),
+                this.GetRequestDescription(),
                 "The list of {ObjectType} was read.",
                 typeof(TObject).FullName);
 
-            return response;
+            return this.Ok(response);
         }
 
         /// <summary>
@@ -246,7 +243,7 @@ namespace ClusterKit.Web.Rest
         [HttpPatch]
         [Route("{id}/")]
         [UsedImplicitly]
-        public virtual async Task<TObject> Update([FromUri] TId id, [FromBody] TObject data)
+        public virtual async Task<IActionResult> Update(TId id, [FromBody] TObject data)
         {
             var request = new CrudActionMessage<TObject, TId>
                               {
@@ -254,10 +251,9 @@ namespace ClusterKit.Web.Rest
                                   Data = data,
                                   Id = id,
                                   RequestContext =
-                                      this.Request.GetOwinContext()
-                                          .GetRequestDescription()
+                                      this.GetRequestDescription()
                               };
-            return await this.SendRequest(request);
+            return this.Ok(await this.SendRequest(request));
         }
 
         /// <summary>
@@ -306,7 +302,7 @@ namespace ClusterKit.Web.Rest
 
             if (result.Exception?.GetType() == typeof(EntityNotFoundException) || result.Data == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return null;
             }
 
             return result.Data;

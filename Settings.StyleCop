@@ -77,4 +77,13 @@
       <AnalyzerSettings />
     </Analyzer>
   </Analyzers>
+  <SourceFileList>
+    <!-- Excluding files with C#7 from style cop in order to stop generating false errors -->
+    <SourceFile>ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ReleaseExtensions.cs</SourceFile>
+    <Settings>
+      <GlobalSettings>
+        <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
+      </GlobalSettings>
+    </Settings>
+  </SourceFileList>
 </StyleCopSettings>

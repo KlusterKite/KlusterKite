@@ -138,7 +138,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 }
 
                 if (parameter.Value.IsObject()
-                    && parameter.Key.StartsWith("location ", StringComparison.InvariantCultureIgnoreCase))
+                    && parameter.Key.StartsWith("location ", StringComparison.OrdinalIgnoreCase))
                 {
                     var serviceName = parameter.Key.Substring("location ".Length).Trim();
                     this.InitServiceFromConfiguration(
@@ -181,13 +181,13 @@ namespace ClusterKit.Web.NginxConfigurator
             if (headers == null
                 || (headers.IsString()
                     && (headers.GetString() ?? string.Empty).ToLower()
-                           .IndexOf("Host ", StringComparison.InvariantCulture) < 0)
+                           .IndexOf("Host ", StringComparison.OrdinalIgnoreCase) < 0)
                 || (headers.IsArray()
                     && headers.GetArray()
                            .Select(v => v.GetString())
                            .All(
                                v =>
-                               (v ?? string.Empty).ToLower().IndexOf("Host ", StringComparison.InvariantCulture) < 0)))
+                               (v ?? string.Empty).ToLower().IndexOf("Host ", StringComparison.OrdinalIgnoreCase) < 0)))
             {
                 serviceConfig.Append("\t\tproxy_set_header Host $http_host;\n");
             }

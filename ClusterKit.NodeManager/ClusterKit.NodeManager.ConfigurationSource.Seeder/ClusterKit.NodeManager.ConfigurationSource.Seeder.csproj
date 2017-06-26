@@ -1,18 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
     <PackageId>ClusterKit.NodeManager.ConfigurationSource.Seeder</PackageId>
     <Version>0.0.0.0-local</Version>
-    <Authors>ClusterKit</Authors>
-    <Description>Bundle of utils to create scalable and redundant services</Description>
-    <Company>Mikhail Kantarovskiy and ClusterKit contributors</Company>
-    <Product>ClusterKit</Product>
-    <Copyright>Copyright ©Mikhail Kantarovskiy and ClusterKit contributors 2017</Copyright>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
+  <ItemGroup>
+    <None Remove="Resources\clusterManager.hocon" />
+    <None Remove="Resources\empty.hocon" />
+    <None Remove="Resources\migrator.hocon" />
+    <None Remove="Resources\publisher.hocon" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\clusterManager.hocon" />
+    <EmbeddedResource Include="Resources\empty.hocon" />
+    <EmbeddedResource Include="Resources\migrator.hocon" />
+    <EmbeddedResource Include="Resources\publisher.hocon" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ClusterKit.Monitoring\ClusterKit.Monitoring.Client\ClusterKit.Monitoring.Client.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.Swagger.Messages\ClusterKit.Web.Swagger.Messages.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource.Migrator\ClusterKit.NodeManager.ConfigurationSource.Migrator.csproj" />
+    <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource\ClusterKit.NodeManager.ConfigurationSource.csproj" />
   </ItemGroup>
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
 </Project>

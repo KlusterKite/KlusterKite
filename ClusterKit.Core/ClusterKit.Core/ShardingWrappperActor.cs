@@ -11,6 +11,9 @@ namespace ClusterKit.Core
 {
     using System;
     using System.Linq;
+#if CORECLR
+    using System.Reflection;
+#endif
 
     using Akka.Actor;
     using Akka.Cluster.Sharding;
@@ -18,7 +21,7 @@ namespace ClusterKit.Core
     using Akka.DI.Core;
     using Akka.Event;
 
-    using Castle.Windsor;
+    using Autofac;
 
     /// <summary>
     /// Wraps sharding into well known path
@@ -34,7 +37,7 @@ namespace ClusterKit.Core
         /// <param name="shardingConfig">
         /// The sharding config.
         /// </param>
-        public ShardingWrappperActor(IWindsorContainer container, Config shardingConfig)
+        public ShardingWrappperActor(IComponentContext container, Config shardingConfig)
         {
             var shardingTypeName = shardingConfig.GetString("type-name");
             if (string.IsNullOrWhiteSpace(shardingTypeName))

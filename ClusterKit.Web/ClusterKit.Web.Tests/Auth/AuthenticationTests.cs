@@ -6,6 +6,7 @@
 //   Testing authentication process
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Web.Tests.Auth
 {
     using System;
@@ -16,9 +17,7 @@ namespace ClusterKit.Web.Tests.Auth
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -33,12 +32,10 @@ namespace ClusterKit.Web.Tests.Auth
     using Xunit;
     using Xunit.Abstractions;
 
-    using Installer = ClusterKit.Web.Installer;
-
     /// <summary>
     /// Testing authentication process
     /// </summary>
-    public class AuthenticationTests : BaseActorTest<AuthenticationTests.Configurator>
+    public class AuthenticationTests : WebTest<AuthenticationTests.Configurator>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationTests"/> class.
@@ -52,9 +49,9 @@ namespace ClusterKit.Web.Tests.Auth
         }
 
         /// <summary>
-        /// Current owin bind port
+        /// Current server bind port
         /// </summary>
-        private int OwinPort => this.Sys.Settings.Config.GetInt("ClusterKit.Web.OwinPort");
+        private int Port => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
 
         /// <summary>
         /// Basic authorization test
@@ -97,7 +94,7 @@ namespace ClusterKit.Web.Tests.Auth
         {
             this.ExpectNoMsg();
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST, Resource = "/api/1.x/security/token" };
             request.AddParameter("grant_type", "password");
@@ -105,17 +102,20 @@ namespace ClusterKit.Web.Tests.Auth
             request.AddParameter("password", userPassword);
             request.AddParameter("client_id", clientId);
             if (!string.IsNullOrWhiteSpace(clientSecret))
-            { 
+            {
                 request.AddParameter("client_secret", clientSecret);
             }
 
             var result = await client.ExecuteTaskAsync<TokenResponse>(request);
+
+            Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
             Assert.Equal(expectedResult, result.StatusCode);
 
             if (expectedResult == HttpStatusCode.OK)
             {
+                this.Sys.Log.Info("Response: {Response}", result.Content);
                 var tokenDescription = result.Data;
-                var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
+                var tokenManager = this.Container.Resolve<ITokenManager>();
                 var accessTicket = await tokenManager.ValidateAccessToken(tokenDescription.AccessToken);
                 Assert.NotNull(accessTicket);
                 Assert.NotNull(accessTicket.User);
@@ -144,7 +144,13 @@ namespace ClusterKit.Web.Tests.Auth
         [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
         [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.OK)]
         [InlineData(true, "testUser", "unit-test-secret", "unit-test-secret", "random", HttpStatusCode.BadRequest)]
-        [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
+        [InlineData(
+            true,
+            "testUser",
+            "unit-test-nosecret",
+            "unit-test-secret",
+            "test-secret",
+            HttpStatusCode.BadRequest)]
         [InlineData(true, null, "unit-test-secret", "unit-test-secret", "test-secret", HttpStatusCode.BadRequest)]
         [InlineData(true, "testUser", "unit-test-nosecret", "unit-test-nosecret", null, HttpStatusCode.OK)]
         [InlineData(true, "testUser", "unit-test-secret", "unit-test-nosecret", null, HttpStatusCode.BadRequest)]
@@ -157,7 +163,7 @@ namespace ClusterKit.Web.Tests.Auth
             HttpStatusCode expectedResult)
         {
             this.ExpectNoMsg();
-            var tokenManager = this.WindsorContainer.Resolve<ITokenManager>();
+            var tokenManager = this.Container.Resolve<ITokenManager>();
             var token = createTicket
                             ? await tokenManager.CreateRefreshToken(
                                   new RefreshTicket(
@@ -168,7 +174,7 @@ namespace ClusterKit.Web.Tests.Auth
                                       DateTimeOffset.Now.AddMinutes(1)))
                             : Guid.NewGuid().ToString("N");
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST, Resource = "/api/1.x/security/token" };
             request.AddParameter("grant_type", "refresh_token");
@@ -204,33 +210,26 @@ namespace ClusterKit.Web.Tests.Auth
             /// <inheritdoc />
             public override bool RunPostStart => true;
 
-            /// <summary>
-            /// Gets the akka system config
-            /// </summary>
-            /// <param name="windsorContainer">
-            /// The windsor Container.
-            /// </param>
-            /// <returns>
-            /// The config
-            /// </returns>
-            public override Config GetAkkaConfig(IWindsorContainer windsorContainer)
+            /// <inheritdoc />
+            public override Config GetAkkaConfig(ContainerBuilder containerBuilder)
             {
                 var listener = new TcpListener(IPAddress.Any, 0);
                 listener.Start();
                 var port = ((IPEndPoint)listener.LocalEndpoint).Port;
                 listener.Stop();
 
-                return ConfigurationFactory.ParseString($@"
+                return ConfigurationFactory.ParseString(
+                    $@"
                 {{
                     ClusterKit {{
  		                Web {{
-                            OwinPort = {port},
- 			                OwinBindAddress = ""http://*:{port}"",
+                            WebHostPort = {port},
+ 			                BindAddress = ""http://*:{port}"",
                             Debug.Trace = true
                         }}
                     }}
                 }}
-").WithFallback(base.GetAkkaConfig(windsorContainer));
+").WithFallback(base.GetAkkaConfig(containerBuilder));
             }
 
             /// <summary>
@@ -241,7 +240,7 @@ namespace ClusterKit.Web.Tests.Auth
             {
                 var installers = base.GetPluginInstallers();
                 installers.Add(new Descriptor.Installer());
-                installers.Add(new Installer());
+                installers.Add(new Web.Installer());
                 installers.Add(new Authentication.Installer());
                 installers.Add(new TestInstaller());
                 return installers;
@@ -263,10 +262,10 @@ namespace ClusterKit.Web.Tests.Auth
             }
 
             /// <inheritdoc />
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
-                container.Register(Component.For<IClientProvider>().ImplementedBy<TestClientProvider>());
-                container.Register(Component.For<ITokenManager>().ImplementedBy<MoqTokenManager>().LifestyleSingleton());
+                container.RegisterType<TestClientProvider>().As<IClientProvider>();
+                container.RegisterType<MoqTokenManager>().As<ITokenManager>().SingleInstance();
             }
         }
 
@@ -355,25 +354,23 @@ namespace ClusterKit.Web.Tests.Auth
                 switch (clientId)
                 {
                     case "unit-test-nosecret":
-                        return
-                            Task.FromResult<IClient>(
-                                new TestClient
-                                    {
-                                        ClientId = clientId,
-                                        Name = "Test - no secret",
-                                        OwnScope = new[] { "Test1", "Test2" }
-                                    });
+                        return Task.FromResult<IClient>(
+                            new TestClient
+                                {
+                                    ClientId = clientId,
+                                    Name = "Test - no secret",
+                                    OwnScope = new[] { "Test1", "Test2" }
+                                });
                     case "unit-test-secret":
                         if (secret == "test-secret")
                         {
-                            return
-                                Task.FromResult<IClient>(
-                                    new TestClient
-                                        {
-                                            ClientId = clientId,
-                                            Name = "Test - secret",
-                                            OwnScope = new[] { "Test1", "Test3" }
-                                        });
+                            return Task.FromResult<IClient>(
+                                new TestClient
+                                    {
+                                        ClientId = clientId,
+                                        Name = "Test - secret",
+                                        OwnScope = new[] { "Test1", "Test3" }
+                                    });
                         }
 
                         break;

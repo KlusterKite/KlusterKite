@@ -10,10 +10,7 @@
 namespace ClusterKit.NodeManager.WebApi
 {
     using System;
-    using System.Net;
-    using System.Net.Http;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using Akka.Actor;
 
@@ -25,13 +22,17 @@ namespace ClusterKit.NodeManager.WebApi
 
     using JetBrains.Annotations;
 
+    using Microsoft.AspNetCore.Mvc;
+
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Serves node management api functions
     /// </summary>
     [UsedImplicitly]
     [RequireSession]
-    [RoutePrefix("api/1.x/clusterkit/nodemanager")]
-    public class NodeManagerController : ApiController
+    [Route("api/1.x/clusterkit/nodemanager")]
+    public class NodeManagerController : Controller
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerController"/> class.
@@ -63,8 +64,13 @@ namespace ClusterKit.NodeManager.WebApi
         [Route("getConfiguration")]
         [HttpPost]
         [RequireClientPrivilege(Privileges.GetConfiguration)]
-        public async Task<NodeStartUpConfiguration> GetConfiguration(NewNodeTemplateRequest request)
+        public async Task<IActionResult> GetConfiguration([FromBody] NewNodeTemplateRequest request)
         {
+            this.System.Log.Info(
+                "{Type}: Serving GetConfiguration request {RequestData}",
+                this.GetType().Name,
+                JsonConvert.SerializeObject(request));
+
             object result;
             try
             {
@@ -81,7 +87,7 @@ namespace ClusterKit.NodeManager.WebApi
             if (configuration != null)
             {
                 this.System.Log.Info("{Type}: sending configuration", this.GetType().Name);
-                return configuration;
+                return this.Ok(configuration);
             }
 
             var waitMessage = result as NodeStartupWaitMessage;
@@ -92,14 +98,12 @@ namespace ClusterKit.NodeManager.WebApi
                     this.GetType().Name,
                     request.ContainerType,
                     request.FrameworkRuntimeType);
-                var httpResponseMessage = new HttpResponseMessage { StatusCode = HttpStatusCode.ServiceUnavailable };
-
-                httpResponseMessage.Headers.Add("Retry-After", ((int)waitMessage.WaitTime.TotalSeconds).ToString());
-                throw new HttpResponseException(httpResponseMessage);
+                this.HttpContext.Response.Headers.Add("Retry-After", ((int)waitMessage.WaitTime.TotalSeconds).ToString());
+                return new StatusCodeResult(503);
             }
 
             this.System.Log.Info("{Type}: NewNodeTemplateRequest - unknown response of type {ResponseType}", this.GetType().Name, result?.GetType().Name);
-            throw new HttpResponseException(HttpStatusCode.InternalServerError);
+            return new StatusCodeResult(500);
         }
 
         /// <summary>
@@ -110,15 +114,15 @@ namespace ClusterKit.NodeManager.WebApi
         [Route("upgradeNode")]
         [HttpPost]
         [RequireUserPrivilege(Privileges.UpgradeNode)]
-        public async Task UpgradeNode(Address address)
+        public async Task<IActionResult> UpgradeNode(Address address)
         {
             var result = await this.System.ActorSelection(this.GetManagerActorProxyPath()).Ask<bool>(new NodeUpgradeRequest { Address = address }, this.AkkaTimeout);
             if (!result)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return this.NotFound();
             }
 
-            throw new HttpResponseException(HttpStatusCode.OK);
+            return this.Ok();
         }
 
         /// <summary>

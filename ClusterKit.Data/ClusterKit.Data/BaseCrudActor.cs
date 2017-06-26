@@ -6,15 +6,19 @@
 //   Generic actor to perform basic crud operation on EF objects
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace ClusterKit.Data
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Actor;
     using Akka.Event;
+
+    using Autofac;
 
     using ClusterKit.API.Attributes;
     using ClusterKit.API.Client;
@@ -38,18 +42,19 @@ namespace ClusterKit.Data
         where TContext : IDisposable
     {
         /// <summary>
-        /// The default query limit
-        /// </summary>
-        private readonly int defaultQueryLimit;
-
-        /// <summary>
         /// The list of individual class limits
         /// </summary>
         private readonly IReadOnlyDictionary<string, int> classQueryLimits;
 
+        /// <summary>
+        /// The default query limit
+        /// </summary>
+        private readonly int defaultQueryLimit;
+
         /// <inheritdoc />
-        protected BaseCrudActor()
+        protected BaseCrudActor(IComponentContext componentContext)
         {
+            this.ComponentContext = componentContext;
             this.Receive<ParcelException>(m => this.OnParcelException(m));
 
             var configSection = Context.System.Settings.Config.GetConfig("ClusterKit.Data.Crud.Query.Limits");
@@ -67,13 +72,19 @@ namespace ClusterKit.Data
         }
 
         /// <summary>
+        /// The DI component context
+        /// </summary>
+        protected IComponentContext ComponentContext { get; }
+
+        /// <summary>
         /// Method called after successful object creation in database
         /// </summary>
         /// <typeparam name="TObject">
         /// The type of ef object
         /// </typeparam>
         /// <param name="result">Created object</param>
-        protected virtual void AfterCreate<TObject>(TObject result) where TObject : class
+        protected virtual void AfterCreate<TObject>(TObject result)
+            where TObject : class
         {
         }
 
@@ -84,7 +95,8 @@ namespace ClusterKit.Data
         /// The type of ef object
         /// </typeparam>
         /// <param name="deletedObject">removed object</param>
-        protected virtual void AfterDelete<TObject>(TObject deletedObject) where TObject : class
+        protected virtual void AfterDelete<TObject>(TObject deletedObject)
+            where TObject : class
         {
         }
 
@@ -100,7 +112,8 @@ namespace ClusterKit.Data
         /// <param name="oldObject">
         /// The old Object.
         /// </param>
-        protected virtual void AfterUpdate<TObject>(TObject newObject, TObject oldObject) where TObject : class
+        protected virtual void AfterUpdate<TObject>(TObject newObject, TObject oldObject)
+            where TObject : class
         {
         }
 
@@ -126,7 +139,8 @@ namespace ClusterKit.Data
         /// </typeparam>
         /// <param name="request">Object intended to be created</param>
         /// <returns>Object that will be created or null to prevent creation</returns>
-        protected virtual TObject BeforeCreate<TObject>(TObject request) where TObject : class
+        protected virtual TObject BeforeCreate<TObject>(TObject request)
+            where TObject : class
         {
             return request;
         }
@@ -139,7 +153,8 @@ namespace ClusterKit.Data
         /// </typeparam>
         /// <param name="oldObject">Object intended to be removed</param>
         /// <returns>Object that will be removed</returns>
-        protected virtual TObject BeforeDelete<TObject>(TObject oldObject) where TObject : class
+        protected virtual TObject BeforeDelete<TObject>(TObject oldObject)
+            where TObject : class
         {
             return oldObject;
         }
@@ -159,7 +174,8 @@ namespace ClusterKit.Data
         /// <returns>
         /// The new version of object or null to prevent update
         /// </returns>
-        protected virtual TObject BeforeUpdate<TObject>(TObject newObject, TObject oldObject) where TObject : class
+        protected virtual TObject BeforeUpdate<TObject>(TObject newObject, TObject oldObject)
+            where TObject : class
         {
             return newObject;
         }
@@ -168,7 +184,7 @@ namespace ClusterKit.Data
         /// Gets current data context
         /// </summary>
         /// <returns>The data context</returns>
-        protected abstract Task<TContext> GetContext();
+        protected abstract TContext GetContext();
 
         /// <summary>
         /// Process collection requests
@@ -186,7 +202,7 @@ namespace ClusterKit.Data
         {
             try
             {
-                using (var ds = await this.GetContext())
+                using (var ds = this.GetContext())
                 {
                     int maxLimit;
                     if (!this.classQueryLimits.TryGetValue(
@@ -196,12 +212,12 @@ namespace ClusterKit.Data
                         maxLimit = this.defaultQueryLimit;
                     }
 
-                    var limit = maxLimit != 0
-                                && (!collectionRequest.Count.HasValue || collectionRequest.Count.Value > maxLimit)
+                    var limit = maxLimit != 0 && (!collectionRequest.Count.HasValue
+                                                  || collectionRequest.Count.Value > maxLimit)
                                     ? maxLimit
                                     : collectionRequest.Count;
 
-                    var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+                    var factory = DataFactory<TContext, TObject, TId>.CreateFactory(this.ComponentContext, ds);
 
                     var response = await factory.GetList(
                                        collectionRequest.Filter,
@@ -212,8 +228,9 @@ namespace ClusterKit.Data
 
                     if (collectionRequest.AcceptAsParcel)
                     {
-                        Context.GetParcelManager()
-                            .Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
+                        Context.GetParcelManager().Tell(
+                            new Parcel { Payload = response, Recipient = this.Sender },
+                            this.Self);
                     }
                     else
                     {
@@ -225,30 +242,29 @@ namespace ClusterKit.Data
             {
                 try
                 {
-                    Context.GetLogger()
-                        .Error(
-                            exception,
-                            "{Type}: Exception on processing CollectionRequest\n\t filter: {FilterExpression}\n\t sort: {SortExpression}\n\t limit: {Limit}\n\t offset: {Offset}",
-                            $"BaseCrudActor<{typeof(TObject).Name}>",
-                            collectionRequest.Filter?.ToString(),
-                            collectionRequest.Sort?.ToString(),
-                            collectionRequest.Count,
-                            collectionRequest.Skip);
+                    Context.GetLogger().Error(
+                        exception,
+                        "{Type}: Exception on processing CollectionRequest\n\t filter: {FilterExpression}\n\t sort: {SortExpression}\n\t limit: {Limit}\n\t offset: {Offset}",
+                        $"BaseCrudActor<{typeof(TObject).Name}>",
+                        collectionRequest.Filter?.ToString(),
+                        collectionRequest.Sort?.ToString(),
+                        collectionRequest.Count,
+                        collectionRequest.Skip);
                 }
                 catch
                 {
-                    Context.GetLogger()
-                        .Error(
-                            exception,
-                            "{Type}: Exception on processing CollectionRequest",
-                            $"BaseCrudActor<{typeof(TObject).Name}>");
+                    Context.GetLogger().Error(
+                        exception,
+                        "{Type}: Exception on processing CollectionRequest",
+                        $"BaseCrudActor<{typeof(TObject).Name}>");
                 }
 
                 var response = new CollectionResponse<TObject> { Items = new List<TObject>() };
                 if (collectionRequest.AcceptAsParcel)
                 {
-                    Context.GetParcelManager()
-                        .Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
+                    Context.GetParcelManager().Tell(
+                        new Parcel { Payload = response, Recipient = this.Sender },
+                        this.Self);
                 }
                 else
                 {
@@ -297,17 +313,16 @@ namespace ClusterKit.Data
             }
             catch (Exception exception)
             {
-                Context.GetLogger()
-                    .Error(
-                        exception,
-                        "{Type}: Error while processing {ActionType} for {EntityType}",
-                        this.GetType().Name,
-                        request.ActionType,
-                        typeof(TObject).Name);
+                Context.GetLogger().Error(
+                    exception,
+                    "{Type}: Error while processing {ActionType} for {EntityType}",
+                    this.GetType().Name,
+                    request.ActionType,
+                    typeof(TObject).Name);
                 response = new CrudActionResponse<TObject> { Exception = exception, ExtraData = request.ExtraData };
             }
 
-            if (typeof(ILargeObject).IsAssignableFrom(typeof(TObject)))
+            if (typeof(ILargeObject).GetTypeInfo().IsAssignableFrom(typeof(TObject)))
             {
                 Context.GetParcelManager().Tell(new Parcel { Payload = response, Recipient = this.Sender }, this.Self);
             }
@@ -347,11 +362,12 @@ namespace ClusterKit.Data
         /// </returns>
         [UsedImplicitly]
         protected virtual async Task<CrudActionResponse<TObject>> ProcessRequest<TObject, TId>(
-            CrudActionMessage<TObject, TId> request) where TObject : class
+            CrudActionMessage<TObject, TId> request)
+            where TObject : class
         {
-            using (var ds = await this.GetContext())
+            using (var ds = this.GetContext())
             {
-                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(ds);
+                var factory = DataFactory<TContext, TObject, TId>.CreateFactory(this.ComponentContext, ds);
                 switch (request.ActionType)
                 {
                     case EnActionType.Get:
@@ -372,10 +388,9 @@ namespace ClusterKit.Data
                         }
                         catch (Exception exception)
                         {
-                            return
-                                CrudActionResponse<TObject>.Error(
-                                    new DatasourceInnerException("Exception on Get operation", exception),
-                                    request.ExtraData);
+                            return CrudActionResponse<TObject>.Error(
+                                new DatasourceInnerException("Exception on Get operation", exception),
+                                request.ExtraData);
                         }
 
                     case EnActionType.Create:
@@ -383,17 +398,18 @@ namespace ClusterKit.Data
                             var entity = request.Data;
                             if (entity == null)
                             {
-                                return CrudActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new RequestEmptyException(),
+                                    request.ExtraData);
                             }
 
                             entity = this.BeforeCreate(entity);
                             var oldObject = await factory.Get(factory.GetId(entity));
                             if (oldObject != null)
                             {
-                                var crudActionResponse =
-                                    CrudActionResponse<TObject>.Error(
-                                        new InsertDuplicateIdException(),
-                                        request.ExtraData);
+                                var crudActionResponse = CrudActionResponse<TObject>.Error(
+                                    new InsertDuplicateIdException(),
+                                    request.ExtraData);
                                 crudActionResponse.Data = oldObject;
 
                                 return crudActionResponse;
@@ -401,13 +417,15 @@ namespace ClusterKit.Data
 
                             if (entity == null)
                             {
-                                return CrudActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new BeforeActionException(),
+                                    request.ExtraData);
                             }
 
                             try
                             {
                                 await factory.Insert(entity);
-                                
+
                                 // security update logs are set here to be sure that they are made independently of client notification success
                                 SecurityLog.CreateRecord(
                                     EnSecurityLogType.DataCreateGranted,
@@ -422,10 +440,9 @@ namespace ClusterKit.Data
                             }
                             catch (Exception exception)
                             {
-                                return
-                                    CrudActionResponse<TObject>.Error(
-                                        new DatasourceInnerException("Exception on Insert operation", exception),
-                                        request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new DatasourceInnerException("Exception on Insert operation", exception),
+                                    request.ExtraData);
                             }
                         }
 
@@ -434,7 +451,9 @@ namespace ClusterKit.Data
                             var entity = request.Data;
                             if (entity == null)
                             {
-                                return CrudActionResponse<TObject>.Error(new RequestEmptyException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new RequestEmptyException(),
+                                    request.ExtraData);
                             }
 
                             var oldObject = await factory.Get(request.Id);
@@ -462,7 +481,9 @@ namespace ClusterKit.Data
                             entity = this.BeforeUpdate<TObject>(entity, oldObject);
                             if (entity == null)
                             {
-                                return CrudActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new BeforeActionException(),
+                                    request.ExtraData);
                             }
 
                             try
@@ -497,10 +518,9 @@ namespace ClusterKit.Data
                             }
                             catch (Exception exception)
                             {
-                                return
-                                    CrudActionResponse<TObject>.Error(
-                                        new DatasourceInnerException("Exception on Update operation", exception),
-                                        request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new DatasourceInnerException("Exception on Update operation", exception),
+                                    request.ExtraData);
                             }
                         }
 
@@ -517,7 +537,9 @@ namespace ClusterKit.Data
                             oldObject = this.BeforeDelete(oldObject.Value);
                             if (oldObject == null)
                             {
-                                return CrudActionResponse<TObject>.Error(new BeforeActionException(), request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new BeforeActionException(),
+                                    request.ExtraData);
                             }
 
                             try
@@ -526,18 +548,16 @@ namespace ClusterKit.Data
                             }
                             catch (Exception exception)
                             {
-                                return
-                                    CrudActionResponse<TObject>.Error(
-                                        new DatasourceInnerException("Exception on Delete operation", exception),
-                                        request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new DatasourceInnerException("Exception on Delete operation", exception),
+                                    request.ExtraData);
                             }
 
                             if (oldObject == null)
                             {
-                                return
-                                    CrudActionResponse<TObject>.Error(
-                                        new EntityNotFoundException("After \"Before\" action modification"),
-                                        request.ExtraData);
+                                return CrudActionResponse<TObject>.Error(
+                                    new EntityNotFoundException("After \"Before\" action modification"),
+                                    request.ExtraData);
                             }
 
                             // security update logs are set here to be sure that they are made independently of client notification success
@@ -554,10 +574,9 @@ namespace ClusterKit.Data
                         }
 
                     default:
-                        return
-                            CrudActionResponse<TObject>.Error(
-                                new ArgumentOutOfRangeException(nameof(request.ActionType)),
-                                request.ExtraData);
+                        return CrudActionResponse<TObject>.Error(
+                            new ArgumentOutOfRangeException(nameof(request.ActionType)),
+                            request.ExtraData);
                 }
             }
         }

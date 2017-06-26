@@ -19,16 +19,17 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Core.Monads;
     using ClusterKit.Data;
     using ClusterKit.Data.CRUD.ActionMessages;
+    using ClusterKit.NodeManager.ConfigurationSource;
+    using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
-
-    using NuGet;
 
     /// <summary>
     /// Data factory to read packages from nuget feed
     /// </summary>
     [UsedImplicitly]
-    public class NugetPackagesFactory : DataFactory<string, IPackage, string>
+    public class NugetPackagesFactory : DataFactory<IPackageRepository, PackageDescription, string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NugetPackagesFactory"/> class.
@@ -36,67 +37,53 @@ namespace ClusterKit.NodeManager
         /// <param name="context">
         /// Nuget server url
         /// </param>
-        public NugetPackagesFactory(string context)
+        public NugetPackagesFactory(IPackageRepository context)
             : base(context)
         {
         }
 
-        /// <summary>
-        /// Deletes object from datasource
-        /// </summary>
-        /// <param name="id">Objects identification</param>
-        /// <returns>
-        /// Removed objects data
-        /// </returns>
-        public override Task<Maybe<IPackage>> Delete(string id)
+        /// <inheritdoc />
+        public override Task<Maybe<PackageDescription>> Delete(string id)
         {
             throw new InvalidOperationException();
         }
-
-        /// <summary>
-        /// Gets an object from datasource using it's identification
-        /// </summary>
-        /// <param name="id">The object's identification</param>
-        /// <returns>
-        /// Async execution task
-        /// </returns>
-        public override Task<Maybe<IPackage>> Get(string id)
-        {
-            throw new InvalidOperationException();
-        }
-
-        /// <summary>
-        /// Gets the object's identification from object
-        /// </summary>
-        /// <param name="obj">The data object</param>
-        /// <returns>
-        /// The object's identification
-        /// </returns>
-        public override string GetId(IPackage obj) => obj.Id;
 
         /// <inheritdoc />
-        public override Task<CollectionResponse<IPackage>> GetList(
-            Expression<Func<IPackage, bool>> filter,
+        public override Task<Maybe<PackageDescription>> Get(string id)
+        {
+            throw new InvalidOperationException();
+        }
+
+        /// <inheritdoc />
+        public override string GetId(PackageDescription obj) => obj.Id;
+
+        /// <inheritdoc />
+        public override async Task<CollectionResponse<PackageDescription>> GetList(
+            Expression<Func<PackageDescription, bool>> filter,
             List<SortingCondition> sort,
             int? skip,
             int? count,
             ApiRequest apiRequest)
         {
-            var nugetRepository = PackageRepositoryFactory.Default.CreateRepository(this.Context);
-            var query = nugetRepository.Search(string.Empty, true).Where(p => p.IsLatestVersion);
+            var query = (await this.Context.SearchAsync(string.Empty, true))
+                .Select(p => p.Identity)
+                .GroupBy(p => p.Id)
+                .Select(g => g.OrderByDescending(p => p.Version).First())
+                .Select(p => new PackageDescription(p.Id, p.Version.ToString()))
+                .AsQueryable();
 
             if (filter != null)
             {
                 query = query.Where(filter);
             }
 
-            var result = new CollectionResponse<IPackage> { Count = query.Count() };
+            var result = new CollectionResponse<PackageDescription> { Count = query.Count() };
             if (sort != null)
             {
                 query = query.ApplySorting(sort);
             }
 
-            if (skip.HasValue && query is IOrderedQueryable<IPackage>)
+            if (skip.HasValue && query is IOrderedQueryable<PackageDescription>)
             {
                 query = query.Skip(skip.Value);
             }
@@ -108,29 +95,17 @@ namespace ClusterKit.NodeManager
 
             result.Items = query.ToList();
 
-            return Task.FromResult(result);
+            return result;
         }
 
-        /// <summary>
-        /// Adds an object to datasource
-        /// </summary>
-        /// <param name="obj">The object to add</param>
-        /// <returns>
-        /// Async execution task
-        /// </returns>
-        public override Task Insert(IPackage obj)
+        /// <inheritdoc />
+        public override Task Insert(PackageDescription obj)
         {
             throw new InvalidOperationException();
         }
 
-        /// <summary>
-        /// Updates an object in datasource
-        /// </summary>
-        /// <param name="newData">The new object's data</param><param name="oldData">The old object's data</param>
-        /// <returns>
-        /// Async execution task
-        /// </returns>
-        public override Task Update(IPackage newData, IPackage oldData)
+        /// <inheritdoc />
+        public override Task Update(PackageDescription newData, PackageDescription oldData)
         {
             throw new InvalidOperationException();
         }

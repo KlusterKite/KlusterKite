@@ -9,12 +9,11 @@
 namespace ClusterKit.Security.SessionRedis
 {
     using System.Collections.Generic;
+    using System.Reflection;
 
     using Akka.Configuration;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Security.Attributes;
@@ -34,7 +33,7 @@ namespace ClusterKit.Security.SessionRedis
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(Configuration.AkkaConfig);
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Security.SessionRedis.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -42,15 +41,10 @@ namespace ClusterKit.Security.SessionRedis
         /// <returns>The list of roles</returns>
         protected override IEnumerable<string> GetRoles() => new string[0];
 
-        /// <summary>
-        /// Registering DI components
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="store">The configuration store.</param>
-        protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+        /// <inheritdoc />
+        protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
-            container.Register(
-                Component.For<ITokenManager>().ImplementedBy<RedisSessionTokenManager>().LifestyleSingleton());
+            container.RegisterType<RedisSessionTokenManager>().As<ITokenManager>().SingleInstance();
         }
     }
 }

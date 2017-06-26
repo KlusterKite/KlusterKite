@@ -9,10 +9,9 @@
 
 namespace ClusterKit.Data.Tests.Mock
 {
-    using System.Data.Common;
-    using System.Data.Entity;
-
     using JetBrains.Annotations;
+
+    using Microsoft.EntityFrameworkCore;
 
     /// <summary>
     /// The test data context
@@ -22,33 +21,29 @@ namespace ClusterKit.Data.Tests.Mock
         /// <summary>
         /// Initializes a new instance of the <see cref="TestDataContext"/> class.
         /// </summary>
-        [UsedImplicitly]
-        public TestDataContext()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestDataContext"/> class.
-        /// </summary>
-        /// <param name="existingConnection">
-        /// The existing connection.
-        /// </param>
-        /// <param name="contextOwnsConnection">
-        /// The context owns connection.
+        /// <param name="options">
+        /// The options.
         /// </param>
         [UsedImplicitly]
-        public TestDataContext(DbConnection existingConnection, bool contextOwnsConnection = true)
+        public TestDataContext(DbContextOptions<TestDataContext> options)
+            : base(options)
         {
         }
-
-        /// <summary>
-        /// Gets or sets the users table
-        /// </summary>
-        public virtual DbSet<User> Users { get; set; }
 
         /// <summary>
         /// Gets or sets the roles table
         /// </summary>
-        public virtual DbSet<Role> Roles { get; set; }
+        public DbSet<Role> Roles { get; set; }
+
+        /// <summary>
+        /// Gets or sets the users table
+        /// </summary>
+        public DbSet<User> Users { get; set; }
+
+        /// <inheritdoc />
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RoleUser>().HasKey(t => new { t.UserUid, t.RoleUid });
+        }
     }
 }

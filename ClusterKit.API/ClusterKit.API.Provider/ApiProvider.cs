@@ -12,9 +12,8 @@ namespace ClusterKit.API.Provider
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
-
-    using Castle.Core.Internal;
 
     using ClusterKit.API.Client;
     using ClusterKit.API.Provider.Resolvers;
@@ -177,12 +176,12 @@ namespace ClusterKit.API.Provider
         /// </summary>
         private void Assemble()
         {
-            this.ApiDescription.Version = this.GetType().Assembly.GetName().Version;
+            this.ApiDescription.Version = this.GetType().GetTypeInfo().Assembly.GetName().Version;
             this.ApiDescription.Types.Clear();
             this.ApiDescription.Mutations.Clear();
 
-            var rootResolver = typeof(ObjectResolver<>)
-                .MakeGenericType(this.GetType()).CreateInstance<ObjectResolver>();
+            var rootResolver = (ObjectResolver)Activator.CreateInstance(typeof(ObjectResolver<>)
+                .MakeGenericType(this.GetType()));
             this.resolver = rootResolver;
             var root = rootResolver.GetApiType();
             this.ApiDescription.TypeName = this.ApiDescription.ApiName = root.TypeName;

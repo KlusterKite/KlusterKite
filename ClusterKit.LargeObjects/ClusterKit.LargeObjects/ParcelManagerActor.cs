@@ -22,7 +22,7 @@ namespace ClusterKit.LargeObjects
     using Akka.Event;
     using Akka.Util.Internal;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core.Utils;
     using ClusterKit.LargeObjects.Client;
@@ -88,14 +88,13 @@ namespace ClusterKit.LargeObjects
         /// <param name="container">
         /// The DI container.
         /// </param>
-        public ParcelManagerActor(IWindsorContainer container)
+        public ParcelManagerActor(IComponentContext container)
         {
             this.readTimeout = Context.System.Settings.Config.GetTimeSpan(
                 "ClusterKit.LargeObjects.TcpReadTimeout",
                 TimeSpan.FromSeconds(10));
             this.envelopers =
-                container.ResolveAll(typeof(INotificationEnveloper))
-                    .Cast<INotificationEnveloper>()
+                container.Resolve<IEnumerable<INotificationEnveloper>>()
                     .OrderByDescending(e => e.Priority)
                     .ToList();
             this.Receive<Parcel>(m => this.OnSetLargeObjectMessage(m));
@@ -233,7 +232,14 @@ namespace ClusterKit.LargeObjects
             }
             finally
             {
+#if APPDOMAIN
                 connection.Close();
+#elif CORECLR
+                connection.Dispose();
+#else
+#error Not implemented
+                throw new InvalidOperationException();
+#endif
             }
         }
 

@@ -14,7 +14,7 @@ namespace ClusterKit.Data
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.API.Client;
     using ClusterKit.Core.Monads;
@@ -22,12 +22,10 @@ namespace ClusterKit.Data
 
     using JetBrains.Annotations;
 
-    using Microsoft.Practices.ServiceLocation;
-
     /// <summary>
     /// Base factory to work with data objects
     /// </summary>
-    /// <typeparam name="TContext">The current datasource context</typeparam>
+    /// <typeparam name="TContext">The current data source context</typeparam>
     /// <typeparam name="TObject">Type of data object to work with</typeparam>
     /// <typeparam name="TId">The type of object identification field</typeparam>
     public abstract class DataFactory<TContext, TObject, TId> where TObject : class
@@ -36,7 +34,7 @@ namespace ClusterKit.Data
         /// Initializes a new instance of the <see cref="DataFactory{TContext,TObject,TId}"/> class.
         /// </summary>
         /// <param name="context">
-        /// The current datasource context.
+        /// The current data source context.
         /// </param>
         protected DataFactory(TContext context)
         {
@@ -44,7 +42,7 @@ namespace ClusterKit.Data
         }
 
         /// <summary>
-        /// Gets the current datasource context
+        /// Gets the current data source context
         /// </summary>
         [UsedImplicitly]
         protected TContext Context { get; }
@@ -52,23 +50,29 @@ namespace ClusterKit.Data
         /// <summary>
         /// Gets the new data factory registered in DI
         /// </summary>
-        /// <param name="context">Current data context</param>
-        /// <returns>The new data factory</returns>
-        public static DataFactory<TContext, TObject, TId> CreateFactory(TContext context)
+        /// <param name="componentContext">
+        /// The component Context.
+        /// </param>
+        /// <param name="context">
+        /// Current data context
+        /// </param>
+        /// <returns>
+        /// The new data factory
+        /// </returns>
+        public static DataFactory<TContext, TObject, TId> CreateFactory(IComponentContext componentContext, TContext context)
         {
-            var container = ServiceLocator.Current.GetInstance<IWindsorContainer>();
-            return container.Resolve<DataFactory<TContext, TObject, TId>>(new { context });
+            return componentContext.Resolve<DataFactory<TContext, TObject, TId>>(new TypedParameter(typeof(TContext), context));
         }
 
         /// <summary>
-        /// Deletes object from datasource
+        /// Deletes object from data source
         /// </summary>
         /// <param name="id">Objects identification</param>
         /// <returns>Removed objects data</returns>
         public abstract Task<Maybe<TObject>> Delete(TId id);
 
         /// <summary>
-        /// Gets an object from datasource using it's identification
+        /// Gets an object from data source using it's identification
         /// </summary>
         /// <param name="id">The object's identification</param>
         /// <returns>Async execution task</returns>
@@ -82,7 +86,7 @@ namespace ClusterKit.Data
         public abstract TId GetId(TObject obj);
 
         /// <summary>
-        /// Gets a list of objects from datasource
+        /// Gets a list of objects from data source
         /// </summary>
         /// <param name="filter">
         /// The filter condition.
@@ -100,7 +104,7 @@ namespace ClusterKit.Data
         /// The original <see cref="ApiRequest"/>. Optional.
         /// </param>
         /// <returns>
-        /// The list of objects from datasource
+        /// The list of objects from data source
         /// </returns>
         public abstract Task<CollectionResponse<TObject>> GetList(
             Expression<Func<TObject, bool>> filter,
@@ -110,14 +114,14 @@ namespace ClusterKit.Data
             ApiRequest apiRequest);
 
         /// <summary>
-        /// Adds an object to datasource
+        /// Adds an object to data source
         /// </summary>
         /// <param name="obj">The object to add</param>
         /// <returns>Async execution task</returns>
         public abstract Task Insert(TObject obj);
 
         /// <summary>
-        /// Updates an object in datasource
+        /// Updates an object in data source
         /// </summary>
         /// <param name="newData">The new object's data</param>
         /// <param name="oldData">The old object's data</param>

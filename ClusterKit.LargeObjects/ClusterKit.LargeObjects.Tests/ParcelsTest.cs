@@ -11,6 +11,7 @@ namespace ClusterKit.LargeObjects.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Akka.Actor;
@@ -18,9 +19,7 @@ namespace ClusterKit.LargeObjects.Tests
     using Akka.DI.Core;
     using Akka.TestKit;
 
-    using Castle.MicroKernel.Registration;
-    using Castle.MicroKernel.SubSystems.Configuration;
-    using Castle.Windsor;
+    using Autofac;
 
     using ClusterKit.Core;
     using ClusterKit.Core.TestKit;
@@ -180,33 +179,31 @@ namespace ClusterKit.LargeObjects.Tests
             protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(
                 @"{
                     akka.actor {
+
+                         serialization-identifiers {
+                        }
                         serializers {
-                            hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                          hyperion = ""Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion""
+                          json = ""Akka.Serialization.NewtonSoftJsonSerializer""
                         }
+
                         serialization-bindings {
-                            ""System.Object"" = hyperion
-                        }
+                           ""System.Object"" = ""hyperion""           
+                        } 
+
                     }
 
 
                    }");
 
-            /// <summary>
-            /// Registering DI components
-            /// </summary>
-            /// <param name="container">The container.</param>
-            /// <param name="store">The configuration store.</param>
-            protected override void RegisterWindsorComponents(IWindsorContainer container, IConfigurationStore store)
+            /// <inheritdoc />
+            protected override void RegisterComponents(ContainerBuilder container, Config config)
             {
-                container.Register(Classes.FromAssemblyContaining<ParcelManagerActor>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-                container.Register(Classes.FromAssemblyContaining<Core.Installer>().Where(t => t.IsSubclassOf(typeof(ActorBase))).LifestyleTransient());
-
-                container.Register(
-                    Component.For<INotificationEnveloper>().ImplementedBy<TestIntEnveloper>().LifestyleTransient());
-                container.Register(
-                    Component.For<INotificationEnveloper>().ImplementedBy<TestInt2Enveloper>().LifestyleTransient());
-                container.Register(
-                    Component.For<INotificationEnveloper>().ImplementedBy<TestDoubleEnveloper>().LifestyleTransient());
+                container.RegisterAssemblyTypes(typeof(ParcelManagerActor).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+                container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
+                container.RegisterType<TestIntEnveloper>().As<INotificationEnveloper>();
+                container.RegisterType<TestInt2Enveloper>().As<INotificationEnveloper>();
+                container.RegisterType<TestDoubleEnveloper>().As<INotificationEnveloper>();
             }
         }
 

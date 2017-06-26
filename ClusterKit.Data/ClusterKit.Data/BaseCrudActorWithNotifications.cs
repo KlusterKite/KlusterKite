@@ -13,6 +13,8 @@ namespace ClusterKit.Data
 
     using Akka.Actor;
 
+    using Autofac;
+
     using ClusterKit.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
@@ -29,10 +31,14 @@ namespace ClusterKit.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseCrudActorWithNotifications{TContext}"/> class.
         /// </summary>
+        /// <param name="componentContext">
+        /// The component context.
+        /// </param>
         /// <param name="notificationReceiver">
         /// Reference to actor to receive notifications
         /// </param>
-        protected BaseCrudActorWithNotifications(IActorRef notificationReceiver)
+        protected BaseCrudActorWithNotifications(IComponentContext componentContext, IActorRef notificationReceiver) 
+            : base(componentContext)
         {
             this.NotificationReceiver = notificationReceiver;
         }
