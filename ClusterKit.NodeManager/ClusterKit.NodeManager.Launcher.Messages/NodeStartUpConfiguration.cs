@@ -37,9 +37,9 @@ namespace ClusterKit.NodeManager.Launcher.Messages
         public List<PackageDescription> Packages { get; set; }
 
         /// <summary>
-        /// Gets or sets NuGet feed urls to download packages
+        /// Gets or sets NuGet feed url to download packages
         /// </summary>
-        public List<string> PackageSources { get; set; }
+        public string PackageSource { get; set; }
 
         /// <summary>
         /// Gets or sets list of akka cluster seeds to configure akka cluster node

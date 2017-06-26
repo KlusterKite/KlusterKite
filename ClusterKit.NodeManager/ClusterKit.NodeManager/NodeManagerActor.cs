@@ -1057,9 +1057,7 @@ namespace ClusterKit.NodeManager
                             .OrderBy(s => this.random.NextDouble()).ToList(),
                         Packages =
                             selectedNodeTemplate.PackagesToInstall[request.FrameworkRuntimeType],
-                        PackageSources =
-                            this.currentRelease.Configuration.NugetFeeds.Select(f => f.Address)
-                                .ToList()
+                        PackageSource = this.currentRelease.Configuration.NugetFeed
                     });
 
             List<Guid> requests;

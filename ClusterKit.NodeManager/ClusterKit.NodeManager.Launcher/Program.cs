@@ -319,7 +319,8 @@ namespace ClusterKit.NodeManager.Launcher
                 var client = new RestClient(this.ConfigurationUrl) { Timeout = 5000, Authenticator = authenticator };
 
                 var request = new RestRequest { Method = Method.POST };
-                request.AddBody(
+                Console.WriteLine($"Requesting configuration for {this.ContainerType} with runtime {this.Runtime} and {PackageRepositoryExtensions.CurrentRuntime}");
+                request.AddJsonBody(
                     new NewNodeTemplateRequest
                         {
                             ContainerType = this.ContainerType,
@@ -327,6 +328,7 @@ namespace ClusterKit.NodeManager.Launcher
                             FrameworkRuntimeType = PackageRepositoryExtensions.CurrentRuntime,
                             Runtime = this.Runtime
                         });
+
                 var response = client.ExecuteTaskAsync<NodeStartUpConfiguration>(request).GetAwaiter().GetResult();
 
                 if (response.ResponseStatus != ResponseStatus.Completed
@@ -404,8 +406,7 @@ namespace ClusterKit.NodeManager.Launcher
             var serviceDir = Path.Combine(this.WorkingDirectory, "service");
             Directory.CreateDirectory(serviceDir);
             
-            var nugetUrl = configuration.PackageSources.First();
-            var repository = new RemotePackageRepository(nugetUrl);
+            var repository = new RemotePackageRepository(configuration.PackageSource);
             repository.CreateServiceAsync(
                 configuration.Packages.Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version))),
                 this.Runtime,

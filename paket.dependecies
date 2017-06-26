@@ -8,5 +8,6 @@ group NetcoreBuild
 	nuget Fake.IO.FileSystem prerelease	
 	nuget Microsoft.Build
 	nuget NuGet.Protocol.Core.v3
+	nuget Npm
 
 	

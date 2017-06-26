@@ -124,7 +124,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                             MigratorTemplates = this.GetMigratorTemplates().ToList(),
                             Packages = this.GetPackageDescriptions().GetAwaiter().GetResult(),
                             SeedAddresses = this.GetSeeds().ToList(),
-                            NugetFeeds = this.GetNugetFeeds().ToList()
+                            NugetFeed = this.Config.GetString("ClusterKit.NodeManager.PackageRepository")
                         };
 
                 var initialRelease = new Release
@@ -268,31 +268,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         {
             return (await this.packageRepository.SearchAsync(string.Empty, true))
                 .Select(p => new PackageDescription(p.Identity.Id, p.Identity.Version.ToString())).ToList();
-        }
-
-        /// <summary>
-        /// Gets the list of nuget feeds
-        /// </summary>
-        /// <returns>The list of nuget feeds</returns>
-        protected virtual IEnumerable<NugetFeed> GetNugetFeeds()
-        {
-            var nugetFeedsConfig = this.Config.GetConfig("ClusterKit.NodeManager.NugetFeeds");
-
-            if (nugetFeedsConfig != null)
-            {
-                foreach (var pair in nugetFeedsConfig.AsEnumerable())
-                {
-                    var feedConfig = nugetFeedsConfig.GetConfig(pair.Key);
-
-                    NugetFeed.EnFeedType feedType;
-                    if (!Enum.TryParse(feedConfig.GetString("type"), out feedType))
-                    {
-                        feedType = NugetFeed.EnFeedType.Private;
-                    }
-
-                   yield return new NugetFeed { Address = feedConfig.GetString("address"), Type = feedType };
-                }
-            }
         }
 
         /// <summary>

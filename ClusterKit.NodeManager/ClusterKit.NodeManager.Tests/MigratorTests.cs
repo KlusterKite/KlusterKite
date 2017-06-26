@@ -744,7 +744,7 @@ namespace ClusterKit.NodeManager.Tests
                                         NodeTemplates = new[] { template }.ToList(),
                                         MigratorTemplates = new[] { migrator }.ToList(),
                                         Packages = packageDescriptions,
-                                        NugetFeeds = new[] { new NugetFeed() }.ToList(),
+                                        NugetFeed = "http://nuget/",
                                         SeedAddresses = new[] { "http://seed" }.ToList()
                                     };
 

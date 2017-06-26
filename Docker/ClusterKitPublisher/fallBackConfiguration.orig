@@ -33,9 +33,7 @@
       "Version": "0.0.0-local"
     }
   ],
-  "PackageSources": [
-    "http://nuget/"
-  ],
+  "PackageSource": "http://nuget/",
   "Seeds": [
     "akka.tcp://ClusterKit@seed:3090"
   ]

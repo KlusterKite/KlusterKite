@@ -58,9 +58,8 @@
 
 
   ],
-  "PackageSources": [
-    "http://nuget/"
-  ],
+
+  "PackageSource": "http://nuget/",
   "Seeds": [
     "akka.tcp://ClusterKit@seed:3090"
   ]

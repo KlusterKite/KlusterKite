@@ -1,5 +1,5 @@
 {
-  "Configuration": "{\n   ClusterKit {\n    NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n    NodeManager.ConfigurationDatabaseName = \"ClusterKit.NodeManagerConfiguration\"\n    NodeManager.ConfigurationDatabaseProviderName = \"Npgsql\"\n    NodeManager.PackageRepository = \"http://nuget/\"\n	NodeManager.DefaultNugetFeeds {\n      privateFeed {\n              address = \"http://nuget/\"\n              type = private\n      }          \n    }  \n  }\n}",
+  "Configuration": "{\n   ClusterKit {\n    NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n    NodeManager.ConfigurationDatabaseName = \"ClusterKit.NodeManagerConfiguration\"\n    NodeManager.ConfigurationDatabaseProviderName = \"Npgsql\"\n    NodeManager.PackageRepository = \"http://nuget/\"\n\tNodeManager.DefaultNugetFeeds {\n      privateFeed {\n              address = \"http://nuget/\"\n              type = private\n      }          \n    }  \n  }\n}",
   "NodeTemplate": "clusterManager",
   "ReleaseId": 1,
   "Packages": [
@@ -721,7 +721,7 @@
     },
     {
       "Id": "StackExchange.Redis",
-      "Version": "1.2.3"
+      "Version": "1.2.4"
     },
     {
       "Id": "System.AppContext",
@@ -1152,9 +1152,8 @@
       "Version": "4.3.0"
     }
   ],
-  "PackageSources": [
-    "http://nuget/"
-  ],
+   "PackageSource": "http://nuget/",
+
   "Seeds": [
     "akka.tcp://ClusterKit@seed:3090"
   ]

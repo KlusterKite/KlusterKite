@@ -1,305 +1,296 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationContextModelSnapshot.cs" company="ClusterKit">
-//   All rights reserved
-// </copyright>
-// <summary>
-//   The model snapshot
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using ClusterKit.NodeManager.ConfigurationSource;
+using ClusterKit.NodeManager.Client.ORM;
 
 namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 {
-    using System;
-
-    using JetBrains.Annotations;
-
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Infrastructure;
-    using Microsoft.EntityFrameworkCore.Metadata;
-
-    /// <summary>
-    /// The model snapshot
-    /// </summary>
-    [UsedImplicitly]
     [DbContext(typeof(ConfigurationContext))]
-    // ReSharper disable once PartialTypeWithSinglePart
-    public partial class ConfigurationContextModelSnapshot : ModelSnapshot
+    partial class ConfigurationContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("Npgsql:ValueGenerationStrategy", 1).HasAnnotation("ProductVersion", "1.1.2");
+            modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", 1)
+                .HasAnnotation("ProductVersion", "1.1.2");
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.CompatibleTemplate",
-                b =>
-                    {
-                        b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("serial")
-                            .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.CompatibleTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
-                        b.Property<int>("CompatibleReleaseId");
+                    b.Property<int>("CompatibleReleaseId");
 
-                        b.Property<int>("ReleaseId");
+                    b.Property<int>("ReleaseId");
 
-                        b.Property<string>("TemplateCode");
+                    b.Property<string>("TemplateCode");
 
-                        b.HasKey("Id");
+                    b.HasKey("Id");
 
-                        b.HasIndex("CompatibleReleaseId");
+                    b.HasIndex("CompatibleReleaseId");
 
-                        b.HasIndex("ReleaseId");
+                    b.HasIndex("ReleaseId");
 
-                        b.ToTable("CompatibleTemplate");
-                    });
+                    b.ToTable("CompatibleTemplate");
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.Migration",
-                b =>
-                    {
-                        b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("serial")
-                            .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Migration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
-                        b.Property<int?>("Direction");
+                    b.Property<int?>("Direction");
 
-                        b.Property<DateTimeOffset?>("Finished");
+                    b.Property<DateTimeOffset?>("Finished");
 
-                        b.Property<int>("FromReleaseId");
+                    b.Property<int>("FromReleaseId");
 
-                        b.Property<bool>("IsActive");
+                    b.Property<bool>("IsActive");
 
-                        b.Property<DateTimeOffset>("Started");
+                    b.Property<DateTimeOffset>("Started");
 
-                        b.Property<int>("State");
+                    b.Property<int>("State");
 
-                        b.Property<int>("ToReleaseId");
+                    b.Property<int>("ToReleaseId");
 
-                        b.HasKey("Id");
+                    b.HasKey("Id");
 
-                        b.HasIndex("FromReleaseId");
+                    b.HasIndex("FromReleaseId");
 
-                        b.HasIndex("ToReleaseId");
+                    b.HasIndex("ToReleaseId");
 
-                        b.ToTable("Migrations");
-                    });
+                    b.ToTable("Migrations");
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.MigrationLogRecord",
-                b =>
-                    {
-                        b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("serial")
-                            .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
-                        b.Property<string>("Discriminator").IsRequired();
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
 
-                        b.Property<int?>("MigrationId");
+                    b.Property<int?>("MigrationId");
 
-                        b.Property<string>("MigratorName");
+                    b.Property<string>("MigratorName");
 
-                        b.Property<string>("MigratorTemplateCode");
+                    b.Property<string>("MigratorTemplateCode");
 
-                        b.Property<string>("MigratorTemplateName");
+                    b.Property<string>("MigratorTemplateName");
 
-                        b.Property<string>("MigratorTypeName");
+                    b.Property<string>("MigratorTypeName");
 
-                        b.Property<int>("ReleaseId");
+                    b.Property<int>("ReleaseId");
 
-                        b.Property<string>("ResourceCode");
+                    b.Property<string>("ResourceCode");
 
-                        b.Property<string>("ResourceName");
+                    b.Property<string>("ResourceName");
 
-                        b.HasKey("Id");
+                    b.HasKey("Id");
 
-                        b.HasIndex("MigrationId");
+                    b.HasIndex("MigrationId");
 
-                        b.HasIndex("ReleaseId");
+                    b.HasIndex("ReleaseId");
 
-                        b.ToTable("MigrationLogRecords");
+                    b.ToTable("MigrationLogRecords");
 
-                        b.HasDiscriminator<string>("Discriminator").HasValue("MigrationLogRecord");
-                    });
+                    b.HasDiscriminator<string>("Discriminator").HasValue("MigrationLogRecord");
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.Release",
-                b =>
-                    {
-                        b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("serial")
-                            .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Release", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
-                        b.Property<string>("ConfigurationJson");
+                    b.Property<string>("ConfigurationJson");
 
-                        b.Property<DateTimeOffset>("Created");
+                    b.Property<DateTimeOffset>("Created");
 
-                        b.Property<DateTimeOffset?>("Finished");
+                    b.Property<DateTimeOffset?>("Finished");
 
-                        b.Property<bool>("IsStable");
+                    b.Property<bool>("IsStable");
 
-                        b.Property<int>("MajorVersion");
+                    b.Property<int>("MajorVersion");
 
-                        b.Property<int>("MinorVersion");
+                    b.Property<int>("MinorVersion");
 
-                        b.Property<string>("Name");
+                    b.Property<string>("Name");
 
-                        b.Property<string>("Notes");
+                    b.Property<string>("Notes");
 
-                        b.Property<DateTimeOffset?>("Started");
+                    b.Property<DateTimeOffset?>("Started");
 
-                        b.Property<int>("State");
+                    b.Property<int>("State");
 
-                        b.HasKey("Id");
+                    b.HasKey("Id");
 
-                        b.ToTable("Releases");
-                    });
+                    b.ToTable("Releases");
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.Role",
-                b =>
-                    {
-                        b.Property<Guid>("Uid").ValueGeneratedOnAdd();
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Role", b =>
+                {
+                    b.Property<Guid>("Uid")
+                        .ValueGeneratedOnAdd();
 
-                        b.Property<string>("AllowedScopeJson");
+                    b.Property<string>("AllowedScopeJson");
 
-                        b.Property<string>("DeniedScopeJson");
+                    b.Property<string>("DeniedScopeJson");
 
-                        b.Property<string>("Name");
+                    b.Property<string>("Name");
 
-                        b.HasKey("Uid");
+                    b.HasKey("Uid");
 
-                        b.ToTable("Roles");
-                    });
+                    b.ToTable("Roles");
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.RoleUser",
-                b =>
-                    {
-                        b.Property<Guid>("UserUid");
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.RoleUser", b =>
+                {
+                    b.Property<Guid>("UserUid");
 
-                        b.Property<Guid>("RoleUid");
+                    b.Property<Guid>("RoleUid");
 
-                        b.HasKey("UserUid", "RoleUid");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
-                        b.HasIndex("RoleUid");
+                    b.HasKey("UserUid", "RoleUid");
 
-                        b.ToTable("RoleUsers");
-                    });
+                    b.HasAlternateKey("Id");
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.User",
-                b =>
-                    {
-                        b.Property<Guid>("Uid").ValueGeneratedOnAdd();
+                    b.HasIndex("RoleUid");
 
-                        b.Property<DateTimeOffset?>("ActiveTill");
+                    b.ToTable("RoleUsers");
+                });
 
-                        b.Property<DateTimeOffset?>("BlockedTill");
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.User", b =>
+                {
+                    b.Property<Guid>("Uid")
+                        .ValueGeneratedOnAdd();
 
-                        b.Property<bool>("IsBlocked");
+                    b.Property<DateTimeOffset?>("ActiveTill");
 
-                        b.Property<bool>("IsDeleted");
+                    b.Property<DateTimeOffset?>("BlockedTill");
 
-                        b.Property<string>("Login");
+                    b.Property<bool>("IsBlocked");
 
-                        b.Property<string>("Password");
+                    b.Property<bool>("IsDeleted");
 
-                        b.HasKey("Uid");
+                    b.Property<string>("Login");
 
-                        b.HasIndex("Login");
+                    b.Property<string>("Password");
 
-                        b.ToTable("Users");
-                    });
+                    b.HasKey("Uid");
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.MigrationError",
-                b =>
-                    {
-                        b.HasBaseType("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord");
+                    b.HasIndex("Login");
 
-                        b.Property<DateTimeOffset>("Created");
+                    b.ToTable("Users");
+                });
 
-                        b.Property<string>("ErrorMessage");
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationError", b =>
+                {
+                    b.HasBaseType("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord");
 
-                        b.Property<string>("ErrorStackTrace");
+                    b.Property<DateTimeOffset>("Created");
 
-                        b.ToTable("MigrationErrors");
+                    b.Property<string>("ErrorMessage");
 
-                        b.HasDiscriminator().HasValue("MigrationError");
-                    });
+                    b.Property<string>("ErrorStackTrace");
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.MigrationOperation",
-                b =>
-                    {
-                        b.HasBaseType("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord");
+                    b.ToTable("MigrationErrors");
 
-                        b.Property<string>("DestinationPoint");
+                    b.HasDiscriminator().HasValue("MigrationError");
+                });
 
-                        b.Property<int?>("ErrorId");
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationOperation", b =>
+                {
+                    b.HasBaseType("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord");
 
-                        b.Property<DateTimeOffset>("Finished");
+                    b.Property<string>("DestinationPoint");
 
-                        b.Property<string>("SourcePoint");
+                    b.Property<int?>("ErrorId");
 
-                        b.Property<DateTimeOffset>("Started");
+                    b.Property<DateTimeOffset>("Finished");
 
-                        b.HasIndex("ErrorId");
+                    b.Property<string>("SourcePoint");
 
-                        b.ToTable("MigrationOperations");
+                    b.Property<DateTimeOffset>("Started");
 
-                        b.HasDiscriminator().HasValue("MigrationOperation");
-                    });
+                    b.HasIndex("ErrorId");
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.CompatibleTemplate",
-                b =>
-                    {
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "CompatibleRelease")
-                            .WithMany("CompatibleTemplatesForward").HasForeignKey("CompatibleReleaseId")
-                            .OnDelete(DeleteBehavior.Cascade);
+                    b.ToTable("MigrationOperations");
 
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "Release")
-                            .WithMany("CompatibleTemplatesBackward").HasForeignKey("ReleaseId")
-                            .OnDelete(DeleteBehavior.Cascade);
-                    });
+                    b.HasDiscriminator().HasValue("MigrationOperation");
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.Migration",
-                b =>
-                    {
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "FromRelease").WithMany()
-                            .HasForeignKey("FromReleaseId").OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.CompatibleTemplate", b =>
+                {
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "CompatibleRelease")
+                        .WithMany("CompatibleTemplatesForward")
+                        .HasForeignKey("CompatibleReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "ToRelease").WithMany()
-                            .HasForeignKey("ToReleaseId").OnDelete(DeleteBehavior.Cascade);
-                    });
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "Release")
+                        .WithMany("CompatibleTemplatesBackward")
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.MigrationLogRecord",
-                b =>
-                    {
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.Migration", "Migration").WithMany("Logs")
-                            .HasForeignKey("MigrationId");
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Migration", b =>
+                {
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "FromRelease")
+                        .WithMany()
+                        .HasForeignKey("FromReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "Release").WithMany("MigrationLogs")
-                            .HasForeignKey("ReleaseId").OnDelete(DeleteBehavior.Cascade);
-                    });
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "ToRelease")
+                        .WithMany()
+                        .HasForeignKey("ToReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.RoleUser",
-                b =>
-                    {
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.Role", "Role").WithMany("Users")
-                            .HasForeignKey("RoleUid").OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord", b =>
+                {
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Migration", "Migration")
+                        .WithMany("Logs")
+                        .HasForeignKey("MigrationId");
 
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.User", "User").WithMany("Roles")
-                            .HasForeignKey("UserUid").OnDelete(DeleteBehavior.Cascade);
-                    });
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "Release")
+                        .WithMany("MigrationLogs")
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
 
-            modelBuilder.Entity(
-                "ClusterKit.NodeManager.Client.ORM.MigrationOperation",
-                b =>
-                    {
-                        b.HasOne("ClusterKit.NodeManager.Client.ORM.MigrationError", "Error").WithMany()
-                            .HasForeignKey("ErrorId");
-                    });
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.RoleUser", b =>
+                {
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleUid")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.User", "User")
+                        .WithMany("Roles")
+                        .HasForeignKey("UserUid")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationOperation", b =>
+                {
+                    b.HasOne("ClusterKit.NodeManager.Client.ORM.MigrationError", "Error")
+                        .WithMany()
+                        .HasForeignKey("ErrorId");
+                });
         }
     }
 }

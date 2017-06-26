@@ -195,7 +195,9 @@ namespace ClusterKit.Web.Authentication
             }
 
             var accessToken = await this.tokenManager.CreateAccessToken(result.AccessTicket);
-            var refreshToken = await this.tokenManager.CreateRefreshToken(result.RefreshTicket);
+            var refreshToken = result.RefreshTicket != null 
+                ? await this.tokenManager.CreateRefreshToken(result.RefreshTicket) 
+                : null;
 
             var response = new TokenResponse
                                {

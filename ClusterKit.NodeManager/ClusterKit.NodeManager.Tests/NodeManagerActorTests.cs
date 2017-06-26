@@ -197,7 +197,7 @@ namespace ClusterKit.NodeManager.Tests
                 var newRelease = ReleaseCheckTestsBase.CreateRelease();
                 newRelease.State = EnReleaseState.Active;
                 newRelease.Configuration.SeedAddresses = new List<string>();
-                newRelease.Configuration.NugetFeeds = new List<NugetFeed>();
+                newRelease.Configuration.NugetFeed = "http://nuget/";
                 newRelease.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
                 newRelease.Configuration.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
@@ -2413,7 +2413,7 @@ namespace ClusterKit.NodeManager.Tests
                 var release = ReleaseCheckTestsBase.CreateRelease();
                 release.State = EnReleaseState.Active;
                 release.Configuration.SeedAddresses = new List<string>();
-                release.Configuration.NugetFeeds = new List<NugetFeed>();
+                release.Configuration.NugetFeed = "http://nuget/";
                 release.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
                 release.Configuration.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>

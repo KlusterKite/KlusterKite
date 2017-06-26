@@ -24,6 +24,8 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Microsoft.AspNetCore.Mvc;
 
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Serves node management api functions
     /// </summary>
@@ -62,8 +64,13 @@ namespace ClusterKit.NodeManager.WebApi
         [Route("getConfiguration")]
         [HttpPost]
         [RequireClientPrivilege(Privileges.GetConfiguration)]
-        public async Task<IActionResult> GetConfiguration(NewNodeTemplateRequest request)
+        public async Task<IActionResult> GetConfiguration([FromBody] NewNodeTemplateRequest request)
         {
+            this.System.Log.Info(
+                "{Type}: Serving GetConfiguration request {RequestData}",
+                this.GetType().Name,
+                JsonConvert.SerializeObject(request));
+
             object result;
             try
             {

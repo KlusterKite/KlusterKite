@@ -9,7 +9,7 @@ using ClusterKit.NodeManager.Client.ORM;
 namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 {
     [DbContext(typeof(ConfigurationContext))]
-    [Migration("20170601045606_Init")]
+    [Migration("20170626102834_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,7 +161,14 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 
                     b.Property<Guid>("RoleUid");
 
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("serial")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
+
                     b.HasKey("UserUid", "RoleUid");
+
+                    b.HasAlternateKey("Id");
 
                     b.HasIndex("RoleUid");
 

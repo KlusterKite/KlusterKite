@@ -68,11 +68,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     "Seeds addresses is empty");
             }
 
-            if (release?.Configuration?.NugetFeeds == null || release.Configuration.NugetFeeds.Count == 0)
+            if (string.IsNullOrWhiteSpace(release?.Configuration?.NugetFeed))
             {
                 yield return new ErrorDescription(
-                    "configuration.nugetFeeds",
-                    "Nuget feeds list is empty");
+                    "configuration.nugetFeed",
+                    "Nuget feed is empty");
             }
 
             if (release?.Configuration?.NodeTemplates == null 
