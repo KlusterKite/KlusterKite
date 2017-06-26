@@ -33,7 +33,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// </summary>
         /// <remarks>Consider using <seealso cref="BaseInstaller"/> integrated constants</remarks>
         protected override decimal AkkaConfigLoadPriority => PrioritySharedLib;
-
+         
         /// <summary>
         /// Gets default akka configuration for current module
         /// </summary>
@@ -50,7 +50,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             container.RegisterType<MigrationDataFactory>().As<DataFactory<ConfigurationContext, Migration, int>>();
 
             var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
-            if (!config.GetBoolean("ClusterKit.NodeManager.RegisterNuget", true)
+            if (config.GetBoolean("ClusterKit.NodeManager.RegisterNuget", true)
                 && !string.IsNullOrWhiteSpace(nugetUrl))
             {
                 container.RegisterInstance(new RemotePackageRepository(nugetUrl)).As<IPackageRepository>();

@@ -48,6 +48,8 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         /// </summary>
         static PackageUtils()
         {
+            // the original data was taken from: https://github.com/dotnet/corefx/blob/master/pkg/Microsoft.NETCore.Platforms/runtime.json
+            // the additional documentation: https://docs.microsoft.com/en-us/dotnet/core/rid-catalog
             runtimeGraph = JsonRuntimeFormat.ReadRuntimeGraph(
                 typeof(PackageUtils).GetTypeInfo().Assembly
                     .GetManifestResourceStream("ClusterKit.NodeManager.Launcher.Utils.Resources.runtimes.json"));

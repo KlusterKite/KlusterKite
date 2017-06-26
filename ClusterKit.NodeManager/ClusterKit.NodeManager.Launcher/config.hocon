@@ -5,7 +5,7 @@ stopMode = "CleanRestart"
 stopAction = "echo stopped"
 
 containerType = "worker"
-frameworkRuntimeType = ".NETFramework,Version=v4.6"
+runtime = "win7-x64"
 
 apiClientId = "ClusterKit.NodeManager.Launcher"
 apiClientSecret = "{49F20BD7-DA51-4A7B-B13F-44881D71D395}"

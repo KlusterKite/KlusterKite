@@ -308,20 +308,26 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
 
     let directPackages = filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
                             |> Seq.map(fun (file:FileInfo) -> new Project(file.FullName, null, null, ProjectCollection.GlobalProjectCollection, ProjectLoadSettings.IgnoreMissingImports))
-                            |> Seq.collect (fun proj -> proj.ItemsIgnoringCondition)
-                            |> Seq.filter (fun item -> item.ItemType = "PackageReference")
-                            |> Seq.map (fun item -> ((item.Xml.Include), (item.Metadata |> Seq.filter (fun d -> d.Name = "Version") |> Seq.tryHead |> (fun i -> if i.IsSome then i.Value.EvaluatedValue else null))))
-                            |> Seq.filter (fun (_, version) -> version <> null)
+                            |> Seq.collect (fun proj -> proj.ItemsIgnoringCondition |> Seq.map (fun item -> (proj, item)))
+                            |> Seq.filter (fun (_, item) -> item.ItemType = "PackageReference")
+                            |> Seq.map (fun (proj, item) -> ((item.Xml.Include), (item.Metadata |> Seq.filter (fun d -> d.Name = "Version") |> Seq.tryHead |> (fun i -> if i.IsSome then i.Value.EvaluatedValue else null)), proj))
+                            |> Seq.filter (fun (_, version, _) -> version <> null)
+                            |> Seq.map (fun (id, version, _) -> 
+                                // printfn "%s: %s %s" (Path.GetFileName proj.FullPath) id version  
+                                (id, version)
+                            )
                             |> Seq.distinct
                             |> Seq.sortBy (fun (id, _) -> id)
                             |> Seq.map (fun (id, version) -> 
-                                let (success, list) = packageGroups.TryGetValue(id.ToLower())
+                                let (success, list) = packageGroups.TryGetValue(id.ToLower().Trim())
                                 if success then
                                     list
                                     |> Seq.filter (fun (p:LocalPackageInfo) -> VersionRange.Parse(version).Satisfies(p.Identity.Version))
                                     |> Seq.sortBy (fun (p:LocalPackageInfo) -> p.Identity.Version)
                                     |> Seq.tryHead
-                                else None)
+                                else
+                                    printfn "!!!!Package %s was not found" (id.ToLower().Trim())
+                                    None)
                             |> Seq.filter (fun (p:LocalPackageInfo option) -> p.IsSome)
                             |> Seq.map (fun (p:LocalPackageInfo option) -> p.Value)
                             |> Seq.distinct
@@ -371,7 +377,6 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
 
     let rec getPackagesWithDependencies (_packages : IDictionary<Core.PackageIdentity, LocalPackageInfo>) = 
         let _directDependencies = getDirectDependecies _packages
-        // tracef "found %d new dependencies \n"  (_directDependencies |> Seq.length)
         if _directDependencies |> Seq.isEmpty then
             _packages
         else
@@ -400,7 +405,7 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
     printfn "total %d third party packages"  (filteredDependencies |> Seq.length)      
 )
 
-//"PrepareSources" ==> "RestoreThirdPartyPackages"
+"PrepareSources" ==> "RestoreThirdPartyPackages"
 
 Target.Create "PushThirdPartyPackages" (fun _ ->
     pushPackage (Path.Combine(packageThirdPartyDir, "*.nupkg"))

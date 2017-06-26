@@ -111,25 +111,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 throw new ConfigurationException($"{configDirectory} does not exists");
             }
 
-            var security = new FileSecurity(filePath, AccessControlSections.Access);
-            var rules = security.GetAccessRules(true, true, security.AccessRuleType).OfType<FileSystemAccessRule>().ToList();
-
-            var isAllowed = rules.Aggregate(
-                false,
-                (seed, rule) => seed || (rule.FileSystemRights.HasFlag(permissionAccess)
-                                         && rule.AccessControlType == AccessControlType.Allow));
-
-            var isDenied = rules.Aggregate(
-                false,
-                (seed, rule) => seed || (rule.FileSystemRights.HasFlag(permissionAccess)
-                                         && rule.AccessControlType == AccessControlType.Deny));
-
-            if (isAllowed && !isDenied)
-            {
-                return;
-            }
-
-            throw new ConfigurationException($"Cannot access {filePath} for {permissionAccess}");
+            // TODO: check file access
         }
 
         /// <summary>

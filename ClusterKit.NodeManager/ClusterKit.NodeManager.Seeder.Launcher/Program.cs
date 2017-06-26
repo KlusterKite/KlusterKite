@@ -14,8 +14,8 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Runtime.Versioning;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Akka.Configuration;
 
@@ -25,7 +25,9 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
     using JetBrains.Annotations;
 
     using NuGet.Frameworks;
-    
+    using NuGet.Packaging.Core;
+    using NuGet.Protocol.Core.Types;
+
     /// <summary>
     /// Service main entry point
     /// </summary>
@@ -64,21 +66,22 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
             try
             {
-                var currentFramework = NuGetFramework.ParseFrameworkName(
-                    configuration.ExecutionFramework.FullName,
-                    new DefaultFrameworkNameProvider());
-
                 while (true)
                 {
                     try
                     {
-                        var requiredPackages =
-                            seederConfiguration.RequiredPackages.SearchLatestPackagesWithDependencies(
-                                currentFramework,
-                                configuration.Nuget);
-                        Console.WriteLine("Packages list created");
-                        //requiredPackages.Select(p => p.Identity)
-                            //.Install(runtime, currentFramework, configuration.Nuget, executionDir);
+                        var repository = new RemotePackageRepository(configuration.Nuget);
+                        var packages = GetPackagesToInstall(repository, seederConfiguration).GetAwaiter()
+                            .GetResult();
+
+                        repository.CreateServiceAsync(
+                            packages,
+                            configuration.Runtime,
+                            PackageRepositoryExtensions.CurrentRuntime,
+                            executionDir,
+                            "ClusterKit.NodeManager.Seeder",
+                            Console.WriteLine).GetAwaiter().GetResult();
+                            
                         Console.WriteLine("Packages installed");
                     }
                     catch (PackageNotFoundException packageNotFoundException)
@@ -110,18 +113,29 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                         // todo: move to CreateServiceAsync
                         // ConfigurationUtils.FixAssemblyVersions(Path.Combine(executionDir, "ClusterKit.NodeManager.Seeder.exe.config"));
                         Console.WriteLine($"Seeder prepared in {executionDir}");
+#if APPDOMAIN
+                        var process = new Process
+                                          {
+                                              StartInfo =
+                                                  {
+                                                      UseShellExecute = false,
+                                                      WorkingDirectory =executionDir,
+                                                      FileName = "ClusterKit.NodeManager.Seeder.exe",
+                                                      Arguments = seederConfiguration.Name
+                                                  }
+                                          };
+#elif CORECLR
                         var process = new Process
                                           {
                                               StartInfo =
                                                   {
                                                       UseShellExecute = false,
                                                       WorkingDirectory = executionDir,
-                                                      FileName = Path.Combine(
-                                                          executionDir,
-                                                          "ClusterKit.NodeManager.Seeder.exe"),
-                                                      Arguments = seederConfiguration.Name
+                                                      FileName = "dotnet",
+                                                      Arguments = $"ClusterKit.NodeManager.Seeder.dll {seederConfiguration.Name}"
                                                   }
                                           };
+#endif
                         process.Start();
                         process.WaitForExit();
                         process.Dispose();
@@ -151,6 +165,72 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
         }
 
         /// <summary>
+        /// Gets the list of packages to install along with there dependencies
+        /// </summary>
+        /// <param name="repository">The package repository</param>
+        /// <param name="seederConfiguration">The seeder configuration</param>
+        /// <returns>The list of packages</returns>
+        private static async Task<IEnumerable<PackageIdentity>> GetPackagesToInstall(
+            IPackageRepository repository,
+            SeederConfiguration seederConfiguration)
+        {
+            // TODO: extract to helper method along with Release extensions
+            var supportedFramework = NuGetFramework.ParseFrameworkName(
+                PackageRepositoryExtensions.CurrentRuntime, 
+                DefaultFrameworkNameProvider.Instance);
+
+            var packageTasks =
+                seederConfiguration.RequiredPackages.Select(
+                    async packageName =>
+                        {
+                            var package = await repository.GetAsync(packageName);
+                            if (package == null)
+                            {
+                                throw new PackageNotFoundException(packageName);
+                            }
+
+                            return package;
+                        });
+
+            var packagesToInstall = (await Task.WhenAll(packageTasks)).ToDictionary(p => p.Identity.Id);
+            var queue = new Queue<IPackageSearchMetadata>(packagesToInstall.Values);
+
+            while (queue.Count > 0)
+            {
+                var package = queue.Dequeue();
+                var dependencySet =
+                    NuGetFrameworkUtility.GetNearest(package.DependencySets, supportedFramework);
+                if (dependencySet == null || !NuGetFrameworkUtility.IsCompatibleWithFallbackCheck(
+                        supportedFramework,
+                        dependencySet.TargetFramework))
+                {
+                    continue;
+                }
+
+                foreach (var dependency in dependencySet.Packages)
+                {
+                    IPackageSearchMetadata packageToInstall;
+                    if (!packagesToInstall.TryGetValue(dependency.Id, out packageToInstall))
+                    {
+                        packageToInstall = await repository.GetAsync(dependency.Id);
+                        if (packageToInstall == null)
+                        {
+                            throw new PackageNotFoundException(dependency.Id);
+                        }
+
+                        packagesToInstall.Add(dependency.Id, packageToInstall);
+                        if (queue.All(p => p.Identity.Id != packageToInstall.Identity.Id))
+                        {
+                            queue.Enqueue(packageToInstall);
+                        }
+                    }
+                }
+            }
+
+            return packagesToInstall.Values.Select(p => p.Identity);
+        }
+
+        /// <summary>
         /// Reads the configuration
         /// </summary>
         /// <param name="args">The program command line arguments</param>
@@ -166,7 +246,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
             }
 
             configuration.Config = ConfigurationFactory.ParseString(File.ReadAllText(configuration.ConfigFile));
-            configuration.Nuget = configuration.Config.GetString("Nuget");
+            configuration.Nuget = configuration.Config.GetString("ClusterKit.NodeManager.PackageRepository");
             if (string.IsNullOrWhiteSpace(configuration.Nuget))
             {
                 Console.WriteLine("Nuget is not properly defined");
@@ -175,7 +255,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
             configuration.NugetCheckPeriod =
                 configuration.Config.GetTimeSpan("NugetCheckPeriod", TimeSpan.FromMinutes(1));
-            configuration.ExecutionFramework = new FrameworkName(configuration.Config.GetString("ExecutionFramework"));
+            configuration.Runtime = configuration.Config.GetString("Runtime");
 
             configuration.Configurations = new List<SeederConfiguration>();
             foreach (var subConfig in configuration.Config.GetStringList("SeederConfigurations"))

@@ -11,6 +11,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using NuGet.Frameworks;
@@ -40,9 +41,10 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         }
 
         /// <inheritdoc />
-        public Task<IPackageSearchMetadata> GetAsync(string id)
+        public async Task<IPackageSearchMetadata> GetAsync(string id)
         {
-            throw new NotImplementedException();
+            var packages = await PackageUtils.Search(this.url, id);
+            return packages.Where(p => p.Identity.Id == id).OrderByDescending(p => p.Identity.Version).FirstOrDefault();
         }
 
         /// <inheritdoc />

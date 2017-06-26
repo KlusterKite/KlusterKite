@@ -516,6 +516,10 @@
       "Version": "4.3.0"
     },
     {
+      "Id": "System.IO.FileSystem.AccessControl",
+      "Version": "4.3.0"
+    },
+    {
       "Id": "System.IO.FileSystem.Primitives",
       "Version": "4.3.0"
     },
@@ -680,6 +684,10 @@
       "Version": "4.3.0"
     },
     {
+      "Id": "System.Security.AccessControl",
+      "Version": "4.3.0"
+    },
+    {
       "Id": "System.Security.Claims",
       "Version": "4.3.0"
     },
@@ -797,7 +805,6 @@
     }
   ],
   "PackageSources": [
-    "/opt/packageCache",
     "http://nuget/"
   ],
   "Seeds": [

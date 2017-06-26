@@ -11,8 +11,6 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Versioning;
-
     using Akka.Configuration;
 
     /// <summary>
@@ -21,9 +19,9 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
     public class Configuration
     {
         /// <summary>
-        /// Gets or sets the current execution framework
+        /// Gets or sets the current execution runtime
         /// </summary>
-        public FrameworkName ExecutionFramework { get; set; }
+        public string Runtime { get; set; }
 
         /// <summary>
         /// Gets or sets the configuration file name

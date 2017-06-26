@@ -34,7 +34,6 @@
     }
   ],
   "PackageSources": [
-    "/opt/packageCache",
     "http://nuget/"
   ],
   "Seeds": [
