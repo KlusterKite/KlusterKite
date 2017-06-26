@@ -38,6 +38,7 @@ group netcorebuild
 
 open System
 open System.IO
+open System.Diagnostics
 open System.Xml
 open System.Text.RegularExpressions
 open System.Collections.Generic;
@@ -445,7 +446,7 @@ Target.Create "DockerBase" (fun _ ->
 
 // builds standard docker images
 Target.Create "DockerContainers" (fun _ ->
-
+    
     let buildProject (outputPath:string) (projectPath:string) = 
         let setParams defaults = { 
                 defaults with
@@ -507,40 +508,57 @@ Target.Create "DockerContainers" (fun _ ->
     buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
 
     buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
-    (*
-    if not (directoryExists "./packages/Npm.js") then
-        "Npm.js" |> RestorePackageId(fun p-> 
-            { p with
-                OutputPath = "./packages"
-                ExcludeVersion = true})
     
-    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
-    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build"
-    *)
-    (*
-    NpmHelper.Npm(fun p -> 
-              { p with
-                  Command = NpmHelper.Install NpmHelper.Standard
-                  WorkingDirectory = "./Docker/ClusterKitMonitoring/clusterkit-web" 
-              })
+    // building node.js web sites
+    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
+    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build"
+    
+    /// Default paths to Npm
+    let npmFileName =
+        match isWindows with
+        | true -> 
+            System.Environment.GetEnvironmentVariable("PATH")
+            |> fun path -> path.Split ';'
+            |> Seq.tryFind (fun p -> p.Contains "nodejs")
+            |> fun res ->
+                match res with
+                | Some npm when File.Exists (sprintf @"%snpm.cmd" npm) -> (sprintf @"%snpm.cmd" npm)
+                | _ -> "./fake/build.fsx/packages/netcorebuild/Npm/content/.bin/npm.cmd"
+        | _ -> 
+            let info = new ProcessStartInfo("which","npm")
+            info.StandardOutputEncoding <- System.Text.Encoding.UTF8
+            info.RedirectStandardOutput <- true
+            info.UseShellExecute        <- false
+            info.CreateNoWindow         <- true
+            use proc = Process.Start info
+            proc.WaitForExit()
+            match proc.ExitCode with
+                | 0 when not proc.StandardOutput.EndOfStream ->
+                  proc.StandardOutput.ReadLine()
+                | _ -> "/usr/bin/npm"
 
-    NpmHelper.Npm(fun p ->
-            { p with
-                Command = (NpmHelper.Run "build")
-                WorkingDirectory = "./Docker/ClusterKitMonitoring/clusterkit-web"
-            })
+    printfn "Running: %s install" npmFileName
+    if not(execProcess (fun info -> 
+                info.UseShellExecute <- false
+                info.WorkingDirectory <- "./Docker/ClusterKitMonitoring/clusterkit-web" 
+                info.FileName <- npmFileName
+                info.Arguments <- "install") (TimeSpan.FromDays 2.0)) then failwith "Could not install npm modules"
+    printfn "Running: %s run build" npmFileName
+    if not(execProcess (fun info -> 
+                info.UseShellExecute <- false
+                info.WorkingDirectory <- "./Docker/ClusterKitMonitoring/clusterkit-web" 
+                info.FileName <- npmFileName
+                info.Arguments <- "run build") (TimeSpan.FromDays 2.0)) then failwith "Could build clusterkit-web"
 
     buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
-
-    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
-    Fake.FileHelper.Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local"
-    *)
+    
+    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
+    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local"
 )
 
-
+"PrepareSources" ==> "DockerContainers"
 "DockerBase" ?=> "CleanDockerImages"
 "DockerContainers" ?=> "CleanDockerImages"
-"DockerContainers" ?=> "PrepareSources"
 "DockerBase" ?=> "DockerContainers"
 
 // prepares docker images
