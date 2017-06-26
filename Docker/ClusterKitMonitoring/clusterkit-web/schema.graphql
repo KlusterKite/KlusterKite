@@ -9,6 +9,10 @@ type Boolean_MutationPayload {
   api: ClusterKitMonitoring_ClusterKitNodeApi
 }
 
+input ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input {
+  clientMutationId: String
+}
+
 # ClusterKit node monitoring
 # The root provider
 type ClusterKitMonitoring_ClusterKitNodeApi implements IClusterKitMonitoring, IClusterKitNodeApi, Node {
@@ -584,10 +588,6 @@ type ClusterKitMonitoring_Root implements IClusterKitMonitoring_Root, Node {
   id: ID
 }
 
-input ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan_Input {
-  clientMutationId: String
-}
-
 # Akka system address
 type ClusterKitNodeApi_AkkaAddress implements IClusterKitNodeApi_AkkaAddress, Node {
   # the address string representation
@@ -605,6 +605,133 @@ type ClusterKitNodeApi_AkkaAddress implements IClusterKitNodeApi_AkkaAddress, No
   # the address system name
   system: String
   id: ID
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel_Input {
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationFinish_Input {
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationNodesUpdate_Input {
+  # The update direction
+  target: ClusterKitNodeApi_EnMigrationSide
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate_Input {
+  # The list of resources to update
+  request: ClusterKitNodeApi_ResourceUpgradeRequest_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input {
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_Release_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_delete_Input {
+  # The object's id
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete_Input {
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input {
+  id: Int
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_setStable_Input {
+  id: Int
+  isStable: Boolean
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_releases_update_Input {
+  # The object's id
+  id: Int
+
+  # The object's data
+  newNode: ClusterKitNodeApi_Release_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_roles_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_Role_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input {
+  userUid: Uid
+  roleUid: Uid
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_roles_update_Input {
+  # The object's id
+  id: Uid
+
+  # The object's data
+  newNode: ClusterKitNodeApi_Role_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser_Input {
+  userUid: Uid
+  roleUid: Uid
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_upgradeNode_Input {
+  address: String
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_create_Input {
+  # The object's data
+  newNode: ClusterKitNodeApi_User_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_grantRole_Input {
+  userUid: Uid
+  roleUid: Uid
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword_Input {
+  id: Uid
+  password: String
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_update_Input {
+  # The object's id
+  id: Uid
+
+  # The object's data
+  newNode: ClusterKitNodeApi_User_Input
+  clientMutationId: String
+}
+
+input ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole_Input {
+  userUid: Uid
+  roleUid: Uid
+  clientMutationId: String
 }
 
 # Short user description
@@ -1071,6 +1198,15 @@ enum ClusterKitNodeApi_ErrorDescription_Sort {
   message_desc
 }
 
+input ClusterKitNodeApi_me_changePassword_Input {
+  # The user current password
+  oldPassword: String
+
+  # The user new password
+  newPassword: String
+  clientMutationId: String
+}
+
 # The history record describing cluster migration
 type ClusterKitNodeApi_Migration implements IClusterKitNodeApi_Migration, Node {
   # The migration id
@@ -1109,6 +1245,161 @@ type ClusterKitNodeApi_Migration implements IClusterKitNodeApi_Migration, Node {
   # the new release
   toRelease: ClusterKitNodeApi_Release
   id: ID
+}
+
+# The list of connected ClusterKitNodeApi_Migration
+#  The history record describing cluster migration
+type ClusterKitNodeApi_Migration_Connection implements IClusterKitNodeApi_Migration_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_Migration_Edge]
+}
+
+# The ClusterKitNodeApi_Migration in a connected list
+#  The history record describing cluster migration
+type ClusterKitNodeApi_Migration_Edge implements IClusterKitNodeApi_Migration_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # The history record describing cluster migration
+  node: ClusterKitNodeApi_Migration
+}
+
+input ClusterKitNodeApi_Migration_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_Migration_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_Migration_Filter_Input
+
+  # id exactly equals to the parameter, id: The migration id
+  id: Int
+
+  # id not equals to the parameter, id: The migration id
+  id_not: Int
+
+  # id is less then the parameter, id: The migration id
+  id_lt: Int
+
+  # id is less then or equal to the parameter, id: The migration id
+  id_lte: Int
+
+  # id is greater then the parameter, id: The migration id
+  id_gt: Int
+
+  # id is greater then or equal to the parameter, id: The migration id
+  id_gte: Int
+
+  # isActive exactly equals to the parameter, isActive: a value indicating that current migration is in process
+  isActive: Boolean
+
+  # isActive not equals to the parameter, isActive: a value indicating that current migration is in process
+  isActive_not: Boolean
+
+  # state exactly equals to the parameter, state: the migration state
+  state: ClusterKitNodeApi_EnMigrationState
+
+  # state not equals to the parameter, state: the migration state
+  state_not: ClusterKitNodeApi_EnMigrationState
+
+  # direction exactly equals to the parameter, direction: the migration direction
+  direction: ClusterKitNodeApi_EnMigrationDirection
+
+  # direction not equals to the parameter, direction: the migration direction
+  direction_not: ClusterKitNodeApi_EnMigrationDirection
+
+  # started exactly equals to the parameter, started: the migration start time
+  started: Date
+
+  # started not equals to the parameter, started: the migration start time
+  started_not: Date
+
+  # started is less then the parameter, started: the migration start time
+  started_lt: Date
+
+  # started is less then or equal to the parameter, started: the migration start time
+  started_lte: Date
+
+  # started is greater then the parameter, started: the migration start time
+  started_gt: Date
+
+  # started is greater then or equal to the parameter, started: the migration start time
+  started_gte: Date
+
+  # finished exactly equals to the parameter, finished: the migration finish time
+  finished: Date
+
+  # finished not equals to the parameter, finished: the migration finish time
+  finished_not: Date
+
+  # finished is less then the parameter, finished: the migration finish time
+  finished_lt: Date
+
+  # finished is less then or equal to the parameter, finished: the migration finish time
+  finished_lte: Date
+
+  # finished is greater then the parameter, finished: the migration finish time
+  finished_gt: Date
+
+  # finished is greater then or equal to the parameter, finished: the migration finish time
+  finished_gte: Date
+
+  # fromReleaseId exactly equals to the parameter, fromReleaseId: the previous release id
+  fromReleaseId: Int
+
+  # fromReleaseId not equals to the parameter, fromReleaseId: the previous release id
+  fromReleaseId_not: Int
+
+  # fromReleaseId is less then the parameter, fromReleaseId: the previous release id
+  fromReleaseId_lt: Int
+
+  # fromReleaseId is less then or equal to the parameter, fromReleaseId: the previous release id
+  fromReleaseId_lte: Int
+
+  # fromReleaseId is greater then the parameter, fromReleaseId: the previous release id
+  fromReleaseId_gt: Int
+
+  # fromReleaseId is greater then or equal to the parameter, fromReleaseId: the previous release id
+  fromReleaseId_gte: Int
+
+  # toReleaseId exactly equals to the parameter, toReleaseId: the new release id
+  toReleaseId: Int
+
+  # toReleaseId not equals to the parameter, toReleaseId: the new release id
+  toReleaseId_not: Int
+
+  # toReleaseId is less then the parameter, toReleaseId: the new release id
+  toReleaseId_lt: Int
+
+  # toReleaseId is less then or equal to the parameter, toReleaseId: the new release id
+  toReleaseId_lte: Int
+
+  # toReleaseId is greater then the parameter, toReleaseId: the new release id
+  toReleaseId_gt: Int
+
+  # toReleaseId is greater then or equal to the parameter, toReleaseId: the new release id
+  toReleaseId_gte: Int
+}
+
+enum ClusterKitNodeApi_Migration_Sort {
+  id_asc
+  id_desc
+  isActive_asc
+  isActive_desc
+  state_asc
+  state_desc
+  direction_asc
+  direction_desc
+  started_asc
+  started_desc
+  finished_asc
+  finished_desc
+  fromReleaseId_asc
+  fromReleaseId_desc
+  toReleaseId_asc
+  toReleaseId_desc
 }
 
 # The MigrationActor state with active migration
@@ -2574,161 +2865,6 @@ enum ClusterKitNodeApi_MigrationOperation_Sort {
   resourceName_desc
 }
 
-# The list of connected ClusterKitNodeApi_Migration
-#  The history record describing cluster migration
-type ClusterKitNodeApi_Migration_Connection implements IClusterKitNodeApi_Migration_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_Migration_Edge]
-}
-
-# The ClusterKitNodeApi_Migration in a connected list
-#  The history record describing cluster migration
-type ClusterKitNodeApi_Migration_Edge implements IClusterKitNodeApi_Migration_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # The history record describing cluster migration
-  node: ClusterKitNodeApi_Migration
-}
-
-input ClusterKitNodeApi_Migration_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_Migration_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_Migration_Filter_Input
-
-  # id exactly equals to the parameter, id: The migration id
-  id: Int
-
-  # id not equals to the parameter, id: The migration id
-  id_not: Int
-
-  # id is less then the parameter, id: The migration id
-  id_lt: Int
-
-  # id is less then or equal to the parameter, id: The migration id
-  id_lte: Int
-
-  # id is greater then the parameter, id: The migration id
-  id_gt: Int
-
-  # id is greater then or equal to the parameter, id: The migration id
-  id_gte: Int
-
-  # isActive exactly equals to the parameter, isActive: a value indicating that current migration is in process
-  isActive: Boolean
-
-  # isActive not equals to the parameter, isActive: a value indicating that current migration is in process
-  isActive_not: Boolean
-
-  # state exactly equals to the parameter, state: the migration state
-  state: ClusterKitNodeApi_EnMigrationState
-
-  # state not equals to the parameter, state: the migration state
-  state_not: ClusterKitNodeApi_EnMigrationState
-
-  # direction exactly equals to the parameter, direction: the migration direction
-  direction: ClusterKitNodeApi_EnMigrationDirection
-
-  # direction not equals to the parameter, direction: the migration direction
-  direction_not: ClusterKitNodeApi_EnMigrationDirection
-
-  # started exactly equals to the parameter, started: the migration start time
-  started: Date
-
-  # started not equals to the parameter, started: the migration start time
-  started_not: Date
-
-  # started is less then the parameter, started: the migration start time
-  started_lt: Date
-
-  # started is less then or equal to the parameter, started: the migration start time
-  started_lte: Date
-
-  # started is greater then the parameter, started: the migration start time
-  started_gt: Date
-
-  # started is greater then or equal to the parameter, started: the migration start time
-  started_gte: Date
-
-  # finished exactly equals to the parameter, finished: the migration finish time
-  finished: Date
-
-  # finished not equals to the parameter, finished: the migration finish time
-  finished_not: Date
-
-  # finished is less then the parameter, finished: the migration finish time
-  finished_lt: Date
-
-  # finished is less then or equal to the parameter, finished: the migration finish time
-  finished_lte: Date
-
-  # finished is greater then the parameter, finished: the migration finish time
-  finished_gt: Date
-
-  # finished is greater then or equal to the parameter, finished: the migration finish time
-  finished_gte: Date
-
-  # fromReleaseId exactly equals to the parameter, fromReleaseId: the previous release id
-  fromReleaseId: Int
-
-  # fromReleaseId not equals to the parameter, fromReleaseId: the previous release id
-  fromReleaseId_not: Int
-
-  # fromReleaseId is less then the parameter, fromReleaseId: the previous release id
-  fromReleaseId_lt: Int
-
-  # fromReleaseId is less then or equal to the parameter, fromReleaseId: the previous release id
-  fromReleaseId_lte: Int
-
-  # fromReleaseId is greater then the parameter, fromReleaseId: the previous release id
-  fromReleaseId_gt: Int
-
-  # fromReleaseId is greater then or equal to the parameter, fromReleaseId: the previous release id
-  fromReleaseId_gte: Int
-
-  # toReleaseId exactly equals to the parameter, toReleaseId: the new release id
-  toReleaseId: Int
-
-  # toReleaseId not equals to the parameter, toReleaseId: the new release id
-  toReleaseId_not: Int
-
-  # toReleaseId is less then the parameter, toReleaseId: the new release id
-  toReleaseId_lt: Int
-
-  # toReleaseId is less then or equal to the parameter, toReleaseId: the new release id
-  toReleaseId_lte: Int
-
-  # toReleaseId is greater then the parameter, toReleaseId: the new release id
-  toReleaseId_gt: Int
-
-  # toReleaseId is greater then or equal to the parameter, toReleaseId: the new release id
-  toReleaseId_gte: Int
-}
-
-enum ClusterKitNodeApi_Migration_Sort {
-  id_asc
-  id_desc
-  isActive_asc
-  isActive_desc
-  state_asc
-  state_desc
-  direction_asc
-  direction_desc
-  started_asc
-  started_desc
-  finished_asc
-  finished_desc
-  fromReleaseId_asc
-  fromReleaseId_desc
-  toReleaseId_asc
-  toReleaseId_desc
-}
-
 # The migrator state according to the migration
 type ClusterKitNodeApi_MigratorMigrationState implements IClusterKitNodeApi_MigratorMigrationState, Node {
   # the migrator type name
@@ -3187,232 +3323,6 @@ type ClusterKitNodeApi_MigratorTemplate implements IClusterKitNodeApi_MigratorTe
   id: ID
 }
 
-# The migrator template state according to the migration
-type ClusterKitNodeApi_MigratorTemplateMigrationState implements IClusterKitNodeApi_MigratorTemplateMigrationState, Node {
-  # the template code
-  code: String
-
-  # the migrator template from source release
-  sourceTemplate: ClusterKitNodeApi_MigratorTemplate
-
-  # the migrator template from destination release
-  destinationTemplate: ClusterKitNodeApi_MigratorTemplate
-
-  # the current migrator position
-  position: ClusterKitNodeApi_EnMigratorPosition
-
-  # the list of states of migratorsn
-  migrators(filter: ClusterKitNodeApi_MigratorMigrationState_Filter_Input, sort: [ClusterKitNodeApi_MigratorMigrationState_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_MigratorMigrationState_Connection
-  id: ID
-}
-
-# The list of connected ClusterKitNodeApi_MigratorTemplateMigrationState
-#  The migrator template state according to the migration
-type ClusterKitNodeApi_MigratorTemplateMigrationState_Connection implements IClusterKitNodeApi_MigratorTemplateMigrationState_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_MigratorTemplateMigrationState_Edge]
-}
-
-# The ClusterKitNodeApi_MigratorTemplateMigrationState in a connected list
-#  The migrator template state according to the migration
-type ClusterKitNodeApi_MigratorTemplateMigrationState_Edge implements IClusterKitNodeApi_MigratorTemplateMigrationState_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # The migrator template state according to the migration
-  node: ClusterKitNodeApi_MigratorTemplateMigrationState
-}
-
-input ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input
-
-  # code exactly equals to the parameter, code: the template code
-  code: String
-
-  # code not equals to the parameter, code: the template code
-  code_not: String
-
-  # code is a substring of the parameter, code: the template code
-  code_in: String
-
-  # code is not a substring of the parameter, code: the template code
-  code_not_in: String
-
-  # code contains the parameter as substring, code: the template code
-  code_contains: String
-
-  # code doesn't contain the parameter as substring, code: the template code
-  code_not_contains: String
-
-  # code starts with the parameter value, code: the template code
-  code_starts_with: String
-
-  # code doesn't start with the parameter value, code: the template code
-  code_not_starts_with: String
-
-  # code ends with the parameter value, code: the template code
-  code_ends_with: String
-
-  # code doesn't end with the parameter value, code: the template code
-  code_not_ends_with: String
-
-  # code lowercased equals the parameter, code: the template code
-  code_l: String
-
-  # code lowercased doesn't equal the parameter, code: the template code
-  code_l_not: String
-
-  # code lowercased is a substring of the parameter, code: the template code
-  code_l_in: String
-
-  # code lowercased is not a substring of the parameter, code: the template code
-  code_l_not_in: String
-
-  # code lowercased contains the parameter as substring, code: the template code
-  code_l_contains: String
-
-  # code lowercased doesn't contain the parameter as substring, code: the template code
-  code_l_not_contains: String
-
-  # code lowercased starts with the parameter value, code: the template code
-  code_l_starts_with: String
-
-  # code lowercased doesn't start with the parameter value, code: the template code
-  code_l_not_starts_with: String
-
-  # code lowercased ends with the parameter value, code: the template code
-  code_l_ends_with: String
-
-  # code lowercased doesn't end with the parameter value, code: the template code
-  code_l_not_ends_with: String
-
-  # position exactly equals to the parameter, position: the current migrator position
-  position: ClusterKitNodeApi_EnMigratorPosition
-
-  # position not equals to the parameter, position: the current migrator position
-  position_not: ClusterKitNodeApi_EnMigratorPosition
-}
-
-enum ClusterKitNodeApi_MigratorTemplateMigrationState_Sort {
-  code_asc
-  code_desc
-  position_asc
-  position_desc
-}
-
-# The state of resources of the migrator template
-type ClusterKitNodeApi_MigratorTemplateReleaseState implements IClusterKitNodeApi_MigratorTemplateReleaseState, Node {
-  # the template code
-  code: String
-
-  # the migrator template
-  template: ClusterKitNodeApi_MigratorTemplate
-
-  # the migrator states
-  migratorsStates(filter: ClusterKitNodeApi_MigratorReleaseState_Filter_Input, sort: [ClusterKitNodeApi_MigratorReleaseState_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_MigratorReleaseState_Connection
-  id: ID
-}
-
-# The list of connected ClusterKitNodeApi_MigratorTemplateReleaseState
-#  The state of resources of the migrator template
-type ClusterKitNodeApi_MigratorTemplateReleaseState_Connection implements IClusterKitNodeApi_MigratorTemplateReleaseState_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [ClusterKitNodeApi_MigratorTemplateReleaseState_Edge]
-}
-
-# The ClusterKitNodeApi_MigratorTemplateReleaseState in a connected list
-#  The state of resources of the migrator template
-type ClusterKitNodeApi_MigratorTemplateReleaseState_Edge implements IClusterKitNodeApi_MigratorTemplateReleaseState_Edge {
-  # A value to use with paging positioning
-  cursor: String
-
-  # The state of resources of the migrator template
-  node: ClusterKitNodeApi_MigratorTemplateReleaseState
-}
-
-input ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input {
-  # Combine filter conditions with logic "OR"
-  OR: ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input
-
-  # Combine filter conditions with logic "AND"
-  AND: ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input
-
-  # code exactly equals to the parameter, code: the template code
-  code: String
-
-  # code not equals to the parameter, code: the template code
-  code_not: String
-
-  # code is a substring of the parameter, code: the template code
-  code_in: String
-
-  # code is not a substring of the parameter, code: the template code
-  code_not_in: String
-
-  # code contains the parameter as substring, code: the template code
-  code_contains: String
-
-  # code doesn't contain the parameter as substring, code: the template code
-  code_not_contains: String
-
-  # code starts with the parameter value, code: the template code
-  code_starts_with: String
-
-  # code doesn't start with the parameter value, code: the template code
-  code_not_starts_with: String
-
-  # code ends with the parameter value, code: the template code
-  code_ends_with: String
-
-  # code doesn't end with the parameter value, code: the template code
-  code_not_ends_with: String
-
-  # code lowercased equals the parameter, code: the template code
-  code_l: String
-
-  # code lowercased doesn't equal the parameter, code: the template code
-  code_l_not: String
-
-  # code lowercased is a substring of the parameter, code: the template code
-  code_l_in: String
-
-  # code lowercased is not a substring of the parameter, code: the template code
-  code_l_not_in: String
-
-  # code lowercased contains the parameter as substring, code: the template code
-  code_l_contains: String
-
-  # code lowercased doesn't contain the parameter as substring, code: the template code
-  code_l_not_contains: String
-
-  # code lowercased starts with the parameter value, code: the template code
-  code_l_starts_with: String
-
-  # code lowercased doesn't start with the parameter value, code: the template code
-  code_l_not_starts_with: String
-
-  # code lowercased ends with the parameter value, code: the template code
-  code_l_ends_with: String
-
-  # code lowercased doesn't end with the parameter value, code: the template code
-  code_l_not_ends_with: String
-}
-
-enum ClusterKitNodeApi_MigratorTemplateReleaseState_Sort {
-  code_asc
-  code_desc
-}
-
 # The list of connected ClusterKitNodeApi_MigratorTemplate
 #  A cluster migrator template definition
 type ClusterKitNodeApi_MigratorTemplate_Connection implements IClusterKitNodeApi_MigratorTemplate_Connection {
@@ -3751,6 +3661,232 @@ enum ClusterKitNodeApi_MigratorTemplate_Sort {
   notes_desc
   priority_asc
   priority_desc
+}
+
+# The migrator template state according to the migration
+type ClusterKitNodeApi_MigratorTemplateMigrationState implements IClusterKitNodeApi_MigratorTemplateMigrationState, Node {
+  # the template code
+  code: String
+
+  # the migrator template from source release
+  sourceTemplate: ClusterKitNodeApi_MigratorTemplate
+
+  # the migrator template from destination release
+  destinationTemplate: ClusterKitNodeApi_MigratorTemplate
+
+  # the current migrator position
+  position: ClusterKitNodeApi_EnMigratorPosition
+
+  # the list of states of migratorsn
+  migrators(filter: ClusterKitNodeApi_MigratorMigrationState_Filter_Input, sort: [ClusterKitNodeApi_MigratorMigrationState_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_MigratorMigrationState_Connection
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_MigratorTemplateMigrationState
+#  The migrator template state according to the migration
+type ClusterKitNodeApi_MigratorTemplateMigrationState_Connection implements IClusterKitNodeApi_MigratorTemplateMigrationState_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_MigratorTemplateMigrationState_Edge]
+}
+
+# The ClusterKitNodeApi_MigratorTemplateMigrationState in a connected list
+#  The migrator template state according to the migration
+type ClusterKitNodeApi_MigratorTemplateMigrationState_Edge implements IClusterKitNodeApi_MigratorTemplateMigrationState_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # The migrator template state according to the migration
+  node: ClusterKitNodeApi_MigratorTemplateMigrationState
+}
+
+input ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input
+
+  # code exactly equals to the parameter, code: the template code
+  code: String
+
+  # code not equals to the parameter, code: the template code
+  code_not: String
+
+  # code is a substring of the parameter, code: the template code
+  code_in: String
+
+  # code is not a substring of the parameter, code: the template code
+  code_not_in: String
+
+  # code contains the parameter as substring, code: the template code
+  code_contains: String
+
+  # code doesn't contain the parameter as substring, code: the template code
+  code_not_contains: String
+
+  # code starts with the parameter value, code: the template code
+  code_starts_with: String
+
+  # code doesn't start with the parameter value, code: the template code
+  code_not_starts_with: String
+
+  # code ends with the parameter value, code: the template code
+  code_ends_with: String
+
+  # code doesn't end with the parameter value, code: the template code
+  code_not_ends_with: String
+
+  # code lowercased equals the parameter, code: the template code
+  code_l: String
+
+  # code lowercased doesn't equal the parameter, code: the template code
+  code_l_not: String
+
+  # code lowercased is a substring of the parameter, code: the template code
+  code_l_in: String
+
+  # code lowercased is not a substring of the parameter, code: the template code
+  code_l_not_in: String
+
+  # code lowercased contains the parameter as substring, code: the template code
+  code_l_contains: String
+
+  # code lowercased doesn't contain the parameter as substring, code: the template code
+  code_l_not_contains: String
+
+  # code lowercased starts with the parameter value, code: the template code
+  code_l_starts_with: String
+
+  # code lowercased doesn't start with the parameter value, code: the template code
+  code_l_not_starts_with: String
+
+  # code lowercased ends with the parameter value, code: the template code
+  code_l_ends_with: String
+
+  # code lowercased doesn't end with the parameter value, code: the template code
+  code_l_not_ends_with: String
+
+  # position exactly equals to the parameter, position: the current migrator position
+  position: ClusterKitNodeApi_EnMigratorPosition
+
+  # position not equals to the parameter, position: the current migrator position
+  position_not: ClusterKitNodeApi_EnMigratorPosition
+}
+
+enum ClusterKitNodeApi_MigratorTemplateMigrationState_Sort {
+  code_asc
+  code_desc
+  position_asc
+  position_desc
+}
+
+# The state of resources of the migrator template
+type ClusterKitNodeApi_MigratorTemplateReleaseState implements IClusterKitNodeApi_MigratorTemplateReleaseState, Node {
+  # the template code
+  code: String
+
+  # the migrator template
+  template: ClusterKitNodeApi_MigratorTemplate
+
+  # the migrator states
+  migratorsStates(filter: ClusterKitNodeApi_MigratorReleaseState_Filter_Input, sort: [ClusterKitNodeApi_MigratorReleaseState_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_MigratorReleaseState_Connection
+  id: ID
+}
+
+# The list of connected ClusterKitNodeApi_MigratorTemplateReleaseState
+#  The state of resources of the migrator template
+type ClusterKitNodeApi_MigratorTemplateReleaseState_Connection implements IClusterKitNodeApi_MigratorTemplateReleaseState_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [ClusterKitNodeApi_MigratorTemplateReleaseState_Edge]
+}
+
+# The ClusterKitNodeApi_MigratorTemplateReleaseState in a connected list
+#  The state of resources of the migrator template
+type ClusterKitNodeApi_MigratorTemplateReleaseState_Edge implements IClusterKitNodeApi_MigratorTemplateReleaseState_Edge {
+  # A value to use with paging positioning
+  cursor: String
+
+  # The state of resources of the migrator template
+  node: ClusterKitNodeApi_MigratorTemplateReleaseState
+}
+
+input ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input {
+  # Combine filter conditions with logic "OR"
+  OR: ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input
+
+  # Combine filter conditions with logic "AND"
+  AND: ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input
+
+  # code exactly equals to the parameter, code: the template code
+  code: String
+
+  # code not equals to the parameter, code: the template code
+  code_not: String
+
+  # code is a substring of the parameter, code: the template code
+  code_in: String
+
+  # code is not a substring of the parameter, code: the template code
+  code_not_in: String
+
+  # code contains the parameter as substring, code: the template code
+  code_contains: String
+
+  # code doesn't contain the parameter as substring, code: the template code
+  code_not_contains: String
+
+  # code starts with the parameter value, code: the template code
+  code_starts_with: String
+
+  # code doesn't start with the parameter value, code: the template code
+  code_not_starts_with: String
+
+  # code ends with the parameter value, code: the template code
+  code_ends_with: String
+
+  # code doesn't end with the parameter value, code: the template code
+  code_not_ends_with: String
+
+  # code lowercased equals the parameter, code: the template code
+  code_l: String
+
+  # code lowercased doesn't equal the parameter, code: the template code
+  code_l_not: String
+
+  # code lowercased is a substring of the parameter, code: the template code
+  code_l_in: String
+
+  # code lowercased is not a substring of the parameter, code: the template code
+  code_l_not_in: String
+
+  # code lowercased contains the parameter as substring, code: the template code
+  code_l_contains: String
+
+  # code lowercased doesn't contain the parameter as substring, code: the template code
+  code_l_not_contains: String
+
+  # code lowercased starts with the parameter value, code: the template code
+  code_l_starts_with: String
+
+  # code lowercased doesn't start with the parameter value, code: the template code
+  code_l_not_starts_with: String
+
+  # code lowercased ends with the parameter value, code: the template code
+  code_l_ends_with: String
+
+  # code lowercased doesn't end with the parameter value, code: the template code
+  code_l_not_ends_with: String
+}
+
+enum ClusterKitNodeApi_MigratorTemplateReleaseState_Sort {
+  code_asc
+  code_desc
 }
 
 # The standard mutation result
@@ -5491,43 +5627,6 @@ type ClusterKitNodeApi_Release implements IClusterKitNodeApi_Release, Node {
   id: ID
 }
 
-# The release configuration description
-type ClusterKitNodeApi_ReleaseConfiguration implements IClusterKitNodeApi_ReleaseConfiguration, Node {
-  # the list of available packages with their versions
-  packages(filter: ClusterKitNodeApi_PackageDescription_Filter_Input, sort: [ClusterKitNodeApi_PackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_PackageDescription_Connection
-
-  # the list of configured node templates
-  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NodeTemplate_Connection
-
-  # the list of configured cluster migrator templates
-  migratorTemplates(filter: ClusterKitNodeApi_MigratorTemplate_Filter_Input, sort: [ClusterKitNodeApi_MigratorTemplate_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_MigratorTemplate_Connection
-
-  # the list of seed addresses
-  seedAddresses: [String]
-
-  # the list of nuget feeds
-  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetFeed_Connection
-  id: ID
-}
-
-# The release configuration description
-input ClusterKitNodeApi_ReleaseConfiguration_Input {
-  # the list of available packages with their versions
-  packages: [ClusterKitNodeApi_PackageDescription_Input]
-
-  # the list of configured node templates
-  nodeTemplates: [ClusterKitNodeApi_NodeTemplate_Input]
-
-  # the list of configured cluster migrator templates
-  migratorTemplates: [ClusterKitNodeApi_MigratorTemplate_Input]
-
-  # the list of seed addresses
-  seedAddresses: [String]
-
-  # the list of nuget feeds
-  nugetFeeds: [ClusterKitNodeApi_NugetFeed_Input]
-}
-
 # The list of connected ClusterKitNodeApi_Release
 #  The cluster configuration with all program modules versions, node templates and configurations
 type ClusterKitNodeApi_Release_Connection implements IClusterKitNodeApi_Release_Connection {
@@ -5865,6 +5964,43 @@ enum ClusterKitNodeApi_Release_Sort {
   state_desc
   isStable_asc
   isStable_desc
+}
+
+# The release configuration description
+type ClusterKitNodeApi_ReleaseConfiguration implements IClusterKitNodeApi_ReleaseConfiguration, Node {
+  # the list of available packages with their versions
+  packages(filter: ClusterKitNodeApi_PackageDescription_Filter_Input, sort: [ClusterKitNodeApi_PackageDescription_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_PackageDescription_Connection
+
+  # the list of configured node templates
+  nodeTemplates(filter: ClusterKitNodeApi_NodeTemplate_Filter_Input, sort: [ClusterKitNodeApi_NodeTemplate_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NodeTemplate_Connection
+
+  # the list of configured cluster migrator templates
+  migratorTemplates(filter: ClusterKitNodeApi_MigratorTemplate_Filter_Input, sort: [ClusterKitNodeApi_MigratorTemplate_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_MigratorTemplate_Connection
+
+  # the list of seed addresses
+  seedAddresses: [String]
+
+  # the list of nuget feeds
+  nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: String, offset: Int, limit: Int): ClusterKitNodeApi_NugetFeed_Connection
+  id: ID
+}
+
+# The release configuration description
+input ClusterKitNodeApi_ReleaseConfiguration_Input {
+  # the list of available packages with their versions
+  packages: [ClusterKitNodeApi_PackageDescription_Input]
+
+  # the list of configured node templates
+  nodeTemplates: [ClusterKitNodeApi_NodeTemplate_Input]
+
+  # the list of configured cluster migrator templates
+  migratorTemplates: [ClusterKitNodeApi_MigratorTemplate_Input]
+
+  # the list of seed addresses
+  seedAddresses: [String]
+
+  # the list of nuget feeds
+  nugetFeeds: [ClusterKitNodeApi_NugetFeed_Input]
 }
 
 # The resource state according to the migration
@@ -6555,12 +6691,6 @@ type ClusterKitNodeApi_ResourceState implements IClusterKitNodeApi_ResourceState
   id: ID
 }
 
-# The request to update resources
-input ClusterKitNodeApi_ResourceUpgradeRequest_Input {
-  # the list of resources to update
-  resources: [ClusterKitNodeApi_ResourceUpgrade_Input]
-}
-
 # The command to update resource
 input ClusterKitNodeApi_ResourceUpgrade_Input {
   # The code of migrator template
@@ -6574,6 +6704,12 @@ input ClusterKitNodeApi_ResourceUpgrade_Input {
 
   # The update target
   target: ClusterKitNodeApi_EnMigrationSide
+}
+
+# The request to update resources
+input ClusterKitNodeApi_ResourceUpgradeRequest_Input {
+  # the list of resources to update
+  resources: [ClusterKitNodeApi_ResourceUpgrade_Input]
 }
 
 # Security role. The amount of privileges assigned to the user
@@ -7244,142 +7380,6 @@ enum ClusterKitNodeApi_User_Sort {
   login_desc
 }
 
-input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel_Input {
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationFinish_Input {
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationNodesUpdate_Input {
-  # The update direction
-  target: ClusterKitNodeApi_EnMigrationSide
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate_Input {
-  # The list of resources to update
-  request: ClusterKitNodeApi_ResourceUpgradeRequest_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_releases_check_Input {
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_releases_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_Release_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_releases_delete_Input {
-  # The object's id
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_releases_setObsolete_Input {
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_releases_setReady_Input {
-  id: Int
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_releases_setStable_Input {
-  id: Int
-  isStable: Boolean
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_releases_update_Input {
-  # The object's id
-  id: Int
-
-  # The object's data
-  newNode: ClusterKitNodeApi_Release_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_roles_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_Role_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_roles_grantToUser_Input {
-  userUid: Uid
-  roleUid: Uid
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_roles_update_Input {
-  # The object's id
-  id: Uid
-
-  # The object's data
-  newNode: ClusterKitNodeApi_Role_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_roles_withdrawFromUser_Input {
-  userUid: Uid
-  roleUid: Uid
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_upgradeNode_Input {
-  address: String
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_users_create_Input {
-  # The object's data
-  newNode: ClusterKitNodeApi_User_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_users_grantRole_Input {
-  userUid: Uid
-  roleUid: Uid
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_users_resetPassword_Input {
-  id: Uid
-  password: String
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_users_update_Input {
-  # The object's id
-  id: Uid
-
-  # The object's data
-  newNode: ClusterKitNodeApi_User_Input
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_clusterKitNodesApi_users_withdrawRole_Input {
-  userUid: Uid
-  roleUid: Uid
-  clientMutationId: String
-}
-
-input ClusterKitNodeApi_me_changePassword_Input {
-  # The user current password
-  oldPassword: String
-
-  # The user new password
-  newPassword: String
-  clientMutationId: String
-}
-
 # The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
 # timestamps to be formatted in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
@@ -7701,6 +7701,24 @@ interface IClusterKitNodeApi_Migration {
   toRelease: IClusterKitNodeApi_Release
 }
 
+# The list of connected ClusterKitNodeApi_Migration
+#  The history record describing cluster migration
+interface IClusterKitNodeApi_Migration_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_Migration_Edge]
+}
+
+# The ClusterKitNodeApi_Migration in a connected list
+#  The history record describing cluster migration
+interface IClusterKitNodeApi_Migration_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_Migration
+}
+
 # The MigrationActor state with active migration
 interface IClusterKitNodeApi_MigrationActorMigrationState {
   id: ID
@@ -7853,24 +7871,6 @@ interface IClusterKitNodeApi_MigrationOperation_Edge {
   node: IClusterKitNodeApi_MigrationOperation
 }
 
-# The list of connected ClusterKitNodeApi_Migration
-#  The history record describing cluster migration
-interface IClusterKitNodeApi_Migration_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_Migration_Edge]
-}
-
-# The ClusterKitNodeApi_Migration in a connected list
-#  The history record describing cluster migration
-interface IClusterKitNodeApi_Migration_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_Migration
-}
-
 # The migrator state according to the migration
 interface IClusterKitNodeApi_MigratorMigrationState {
   id: ID
@@ -7975,6 +7975,24 @@ interface IClusterKitNodeApi_MigratorTemplate {
   packagesToInstall(filter: ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, sort: [ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_Pair_System_String_List_PackageDescription___Connection
 }
 
+# The list of connected ClusterKitNodeApi_MigratorTemplate
+#  A cluster migrator template definition
+interface IClusterKitNodeApi_MigratorTemplate_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_MigratorTemplate_Edge]
+}
+
+# The ClusterKitNodeApi_MigratorTemplate in a connected list
+#  A cluster migrator template definition
+interface IClusterKitNodeApi_MigratorTemplate_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_MigratorTemplate
+}
+
 # The migrator template state according to the migration
 interface IClusterKitNodeApi_MigratorTemplateMigrationState {
   id: ID
@@ -8043,24 +8061,6 @@ interface IClusterKitNodeApi_MigratorTemplateReleaseState_Edge {
   # A value to use with paging positioning
   cursor: String
   node: IClusterKitNodeApi_MigratorTemplateReleaseState
-}
-
-# The list of connected ClusterKitNodeApi_MigratorTemplate
-#  A cluster migrator template definition
-interface IClusterKitNodeApi_MigratorTemplate_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_MigratorTemplate_Edge]
-}
-
-# The ClusterKitNodeApi_MigratorTemplate in a connected list
-#  A cluster migrator template definition
-interface IClusterKitNodeApi_MigratorTemplate_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_MigratorTemplate
 }
 
 # The standard mutation result
@@ -8390,6 +8390,24 @@ interface IClusterKitNodeApi_Release {
   errors(filter: ClusterKitNodeApi_MigrationError_Filter_Input, sort: [ClusterKitNodeApi_MigrationError_Sort], id: Int, offset: Int, limit: Int): IClusterKitNodeApi_MigrationError_Connection
 }
 
+# The list of connected ClusterKitNodeApi_Release
+#  The cluster configuration with all program modules versions, node templates and configurations
+interface IClusterKitNodeApi_Release_Connection {
+  # The total count of objects satisfying filter conditions
+  count: Int
+
+  # The list of edges according to filtering and paging conditions
+  edges: [IClusterKitNodeApi_Release_Edge]
+}
+
+# The ClusterKitNodeApi_Release in a connected list
+#  The cluster configuration with all program modules versions, node templates and configurations
+interface IClusterKitNodeApi_Release_Edge {
+  # A value to use with paging positioning
+  cursor: String
+  node: IClusterKitNodeApi_Release
+}
+
 # The release configuration description
 interface IClusterKitNodeApi_ReleaseConfiguration {
   id: ID
@@ -8408,24 +8426,6 @@ interface IClusterKitNodeApi_ReleaseConfiguration {
 
   # the list of nuget feeds
   nugetFeeds(filter: ClusterKitNodeApi_NugetFeed_Filter_Input, sort: [ClusterKitNodeApi_NugetFeed_Sort], id: String, offset: Int, limit: Int): IClusterKitNodeApi_NugetFeed_Connection
-}
-
-# The list of connected ClusterKitNodeApi_Release
-#  The cluster configuration with all program modules versions, node templates and configurations
-interface IClusterKitNodeApi_Release_Connection {
-  # The total count of objects satisfying filter conditions
-  count: Int
-
-  # The list of edges according to filtering and paging conditions
-  edges: [IClusterKitNodeApi_Release_Edge]
-}
-
-# The ClusterKitNodeApi_Release in a connected list
-#  The cluster configuration with all program modules versions, node templates and configurations
-interface IClusterKitNodeApi_Release_Edge {
-  # A value to use with paging positioning
-  cursor: String
-  node: IClusterKitNodeApi_Release
 }
 
 # The resource state according to the migration

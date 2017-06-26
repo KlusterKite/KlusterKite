@@ -52,6 +52,10 @@ export default class Form extends React.Component { // eslint-disable-line react
     }
   }
 
+  submitOrShowError() {
+    this.refs.form.refs.formsy.submit();
+  }
+
   render() {
     return (
       <FormsyForm
@@ -59,7 +63,7 @@ export default class Form extends React.Component { // eslint-disable-line react
         onValid={this.enableButton}
         onInvalid={this.disableButton}
         className={this.props.className}
-        validatePristine={true}
+        ref="form"
       >
         {this.props.children}
         {!this.props.forbidEdit &&
@@ -76,6 +80,7 @@ export default class Form extends React.Component { // eslint-disable-line react
             onDelete={this.props.onDelete}
             onCancel={this.props.onCancel}
             submitOnEnter={this.props.submitOnEnter}
+            onSubmit={this.submitOrShowError.bind(this)}
           />
         }
       </FormsyForm>

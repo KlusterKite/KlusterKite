@@ -77,7 +77,7 @@ class ReleaseConfigCopyPage extends React.Component {
               processing: false,
               saveErrors: null
             });
-            browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
+            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {

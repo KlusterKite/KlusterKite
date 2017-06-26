@@ -13,8 +13,6 @@ class NodeTemplatesList extends React.Component {
   static propTypes = {
     releaseId: React.PropTypes.string,
     configuration: React.PropTypes.object,
-    createMigratorTemplatePrivilege: React.PropTypes.bool.isRequired,
-    getMigratorTemplatePrivilege: React.PropTypes.bool.isRequired,
     canEdit: React.PropTypes.bool
   };
 

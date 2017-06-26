@@ -58,7 +58,7 @@ class SeedPage extends React.Component {
             });
           } else {
             console.log('success');
-            // browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`);
+            // browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -75,7 +75,7 @@ class SeedPage extends React.Component {
   }
 
   onCancel = () => {
-    browserHistory.push(`/clusterkit/Releases/${this.props.params.releaseId}`)
+    browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`)
   };
 
   render () {

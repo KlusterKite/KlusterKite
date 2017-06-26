@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class UpgradeNodeMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_upgradeNode}`
+    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_upgradeNode}`
   }
 
   getFatQuery () {

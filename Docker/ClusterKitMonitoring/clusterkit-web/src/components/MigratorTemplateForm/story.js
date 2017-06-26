@@ -2,26 +2,26 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 // import StubContainer from 'react-storybooks-relay-container';
 
-import MigratorTemplateForm from './TemplateForm';
+import MigratorTemplateForm from './MigratorTemplateForm';
 
-storiesOf('Templates')
+storiesOf('Migrator Templates')
   .add('edit', () => {
     const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <MigratorTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} />;
   })
   .add('edit saving', () => {
-    const template = getTemplate();
+    const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <MigratorTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saving={true} />;
   })
   .add('edit saved', () => {
-    const template = getTemplate();
+    const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <MigratorTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saved={true} />;
   })
   .add('edit save error', () => {
-    const template = getTemplate();
+    const template = getTemplate().data.api.template;
     const packages = getPackages().data.api.clusterKitNodesApi.nugetPackages;
     return <MigratorTemplateForm onSubmit={action('submitted')} initialValues={template} packagesList={packages} saveError="Cannot update this record!" />;
   })
@@ -35,63 +35,40 @@ const getTemplate = () => {
   return {
     "data": {
       "api": {
-        "id": "W10=",
-        "__typename": "ClusterKitMonitoring_ClusterKitNodeApi",
         "template": {
-          "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJub2RlVGVtcGxhdGVzIiwiaWQiOiJwdWJsaXNoZXIifV0=",
-          "__typename": "ClusterKitNodeApi_Template",
-          "code": "publisher",
-          "configuration": "{\n  ClusterKit {\n    Web {\n      Nginx {\n        PathToConfig = \"/etc/nginx/sites-enabled/clusterkit.config\"\n        ReloadCommand {\n          Command = /etc/init.d/nginx\n          Arguments = reload\n        } \n        Configuration {\n          default {\n            \"location /clusterkit\" { \n              proxy_pass = \"http://monitoringUI/clusterkit\"\n            }\n          }\n        }\n      }\n    }\n  }\n\n  akka {\n    remote {\n      helios {\n        tcp {\n          hostname = 0.0.0.0\n          port = 0\n        }\n      }\n    }\n    cluster {\n      seed-nodes = []\n    }\n  }\n}\n",
-          "containerTypes": ["publisher"],
-          "maximumNeededInstances": 1,
-          "minimumRequiredInstances": 1,
-          "name": "Cluster Nginx configurator",
+          "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjJ9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJtaWdyYXRvclRlbXBsYXRlcyIsImlkIjoiQ2x1c3RlcktpdCJ9XQ==",
+          "__typename": "ClusterKitNodeApi_MigratorTemplate",
+          "code": "ClusterKit",
+          "configuration": "{\n\tClusterKit.NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true;Database=ClusterKit.NodeManagerConfiguration\"\t  \n    ClusterKit.NodeManager.Migrators = [\n        \"ClusterKit.NodeManager.ConfigurationSource.Migrator.ConfigurationMigrator, ClusterKit.NodeManager.ConfigurationSource.Migrator\"\n    ]\n}\n",
+          "name": "ClusterKit Migrator",
+          "notes": null,
           "packageRequirements": {
             "edges": [{
               "node": {
-                "__id": "ClusterKit.Core.Service",
+                "__id": "ClusterKit.NodeManager.ConfigurationSource.Migrator",
                 "specificVersion": null,
-                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJub2RlVGVtcGxhdGVzIiwiaWQiOiJwdWJsaXNoZXIifSx7ImYiOiJwYWNrYWdlUmVxdWlyZW1lbnRzIiwiaWQiOiJDbHVzdGVyS2l0LkNvcmUuU2VydmljZSJ9XQ==",
+                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjJ9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJtaWdyYXRvclRlbXBsYXRlcyIsImlkIjoiQ2x1c3RlcktpdCJ9LHsiZiI6InBhY2thZ2VSZXF1aXJlbWVudHMiLCJpZCI6IkNsdXN0ZXJLaXQuTm9kZU1hbmFnZXIuQ29uZmlndXJhdGlvblNvdXJjZS5NaWdyYXRvciJ9XQ==",
                 "__typename": "ClusterKitNodeApi_PackageRequirement"
-              }, "cursor": "ClusterKit.Core.Service", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
+              },
+              "cursor": "ClusterKit.NodeManager.ConfigurationSource.Migrator",
+              "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
             }, {
               "node": {
-                "__id": "ClusterKit.Web.NginxConfigurator",
+                "__id": "ClusterKit.NodeManager",
                 "specificVersion": null,
-                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJub2RlVGVtcGxhdGVzIiwiaWQiOiJwdWJsaXNoZXIifSx7ImYiOiJwYWNrYWdlUmVxdWlyZW1lbnRzIiwiaWQiOiJDbHVzdGVyS2l0LldlYi5OZ2lueENvbmZpZ3VyYXRvciJ9XQ==",
+                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjJ9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJtaWdyYXRvclRlbXBsYXRlcyIsImlkIjoiQ2x1c3RlcktpdCJ9LHsiZiI6InBhY2thZ2VSZXF1aXJlbWVudHMiLCJpZCI6IkNsdXN0ZXJLaXQuTm9kZU1hbmFnZXIifV0=",
                 "__typename": "ClusterKitNodeApi_PackageRequirement"
-              }, "cursor": "ClusterKit.Web.NginxConfigurator", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
+              }, "cursor": "ClusterKit.NodeManager", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
             }, {
               "node": {
-                "__id": "ClusterKit.NodeManager.Client",
+                "__id": "ClusterKit.Data.EF.Npgsql",
                 "specificVersion": null,
-                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJub2RlVGVtcGxhdGVzIiwiaWQiOiJwdWJsaXNoZXIifSx7ImYiOiJwYWNrYWdlUmVxdWlyZW1lbnRzIiwiaWQiOiJDbHVzdGVyS2l0Lk5vZGVNYW5hZ2VyLkNsaWVudCJ9XQ==",
+                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjJ9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJtaWdyYXRvclRlbXBsYXRlcyIsImlkIjoiQ2x1c3RlcktpdCJ9LHsiZiI6InBhY2thZ2VSZXF1aXJlbWVudHMiLCJpZCI6IkNsdXN0ZXJLaXQuRGF0YS5FRi5OcGdzcWwifV0=",
                 "__typename": "ClusterKitNodeApi_PackageRequirement"
-              }, "cursor": "ClusterKit.NodeManager.Client", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
-            }, {
-              "node": {
-                "__id": "ClusterKit.Log.Console",
-                "specificVersion": null,
-                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJub2RlVGVtcGxhdGVzIiwiaWQiOiJwdWJsaXNoZXIifSx7ImYiOiJwYWNrYWdlUmVxdWlyZW1lbnRzIiwiaWQiOiJDbHVzdGVyS2l0LkxvZy5Db25zb2xlIn1d",
-                "__typename": "ClusterKitNodeApi_PackageRequirement"
-              }, "cursor": "ClusterKit.Log.Console", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
-            }, {
-              "node": {
-                "__id": "ClusterKit.Log.ElasticSearch",
-                "specificVersion": null,
-                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJub2RlVGVtcGxhdGVzIiwiaWQiOiJwdWJsaXNoZXIifSx7ImYiOiJwYWNrYWdlUmVxdWlyZW1lbnRzIiwiaWQiOiJDbHVzdGVyS2l0LkxvZy5FbGFzdGljU2VhcmNoIn1d",
-                "__typename": "ClusterKitNodeApi_PackageRequirement"
-              }, "cursor": "ClusterKit.Log.ElasticSearch", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
-            }, {
-              "node": {
-                "__id": "ClusterKit.Monitoring.Client",
-                "specificVersion": null,
-                "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifSx7ImYiOiJub2RlVGVtcGxhdGVzIiwiaWQiOiJwdWJsaXNoZXIifSx7ImYiOiJwYWNrYWdlUmVxdWlyZW1lbnRzIiwiaWQiOiJDbHVzdGVyS2l0Lk1vbml0b3JpbmcuQ2xpZW50In1d",
-                "__typename": "ClusterKitNodeApi_PackageRequirement"
-              }, "cursor": "ClusterKit.Monitoring.Client", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
+              }, "cursor": "ClusterKit.Data.EF.Npgsql", "__typename": "ClusterKitNodeApi_PackageRequirement_Edge"
             }], "__typename": "ClusterKitNodeApi_PackageRequirement_Connection"
           },
-          "priority": 1000.0
+          "priority": 1.0
         }
       }
     }
@@ -122,7 +99,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Core",
+                  "name": "ClusterKit.NodeManager.ConfigurationSource.Migrator",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -131,7 +108,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Core.Service",
+                  "name": "ClusterKit.NodeManager",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -140,7 +117,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Data.CRUD",
+                  "name": "ClusterKit.Data.EF.Npgsql",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"

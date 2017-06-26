@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class RollbackClusterMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster}`
+    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_releases_rollbackCluster}`
   }
 
   getFatQuery () {

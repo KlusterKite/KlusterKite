@@ -73,7 +73,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
   };
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_update}`
+    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_releases_update}`
   }
 
   getFatQuery () {

@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class SetReadyMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitNodeApi_clusterKitNodesApi_releases_setReady}`
+    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_releases_setReady}`
   }
 
   getFatQuery () {

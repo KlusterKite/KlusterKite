@@ -75,7 +75,7 @@ class ReleasePage extends React.Component {
               saving: false,
               saveErrors: null
             });
-            browserHistory.push(`/clusterkit/Releases/${response.clusterKitNodeApi_clusterKitNodesApi_releases_create.node.id}`);
+            browserHistory.push(`/clusterkit/Release/${response.clusterKitNodeApi_clusterKitNodesApi_releases_create.node.id}`);
           }
         },
         onFailure: (transaction) => console.log(transaction),
