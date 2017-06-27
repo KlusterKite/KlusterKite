@@ -220,3 +220,4 @@ _Pvt_Extensions
 .fake
 paket.lock
 packagesOut
+.paket

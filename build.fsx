@@ -1,10 +1,11 @@
 (* -- Fake Dependencies paket.dependencies
-file ./paket.dependecies
+file ./paket.dependencies
 group netcorebuild
 -- Fake Dependencies -- *)
 
-#load ".fake/build.fsx/loadDependencies.fsx"
+// #load ".fake/build.fsx/loadDependencies.fsx"
 // TODO: remove dll load after loadDependencies.fsx fixed in fake
+(* 
 #r ".fake/build.fsx/packages/netcorebuild/Fake.Core.Targets/lib/netstandard1.6/Fake.Core.Targets.dll"
 #r ".fake/build.fsx/packages/netcorebuild/Fake.Core.Environment/lib/netstandard1.6/Fake.Core.Environment.dll"
 #r ".fake/build.fsx/packages/netcorebuild/Fake.Core.Process/lib/netstandard1.6/Fake.Core.Process.dll"
@@ -32,7 +33,7 @@ group netcorebuild
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Packaging/lib/netstandard1.3/NuGet.Packaging.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Packaging.Core/lib/netstandard1.3/NuGet.Packaging.Core.dll"
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Packaging.Core.Types/lib/netstandard1.3/NuGet.Packaging.Core.Types.dll"
-
+*)
 
 
 
