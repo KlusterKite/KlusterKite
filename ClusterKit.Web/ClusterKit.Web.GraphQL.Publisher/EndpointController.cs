@@ -109,7 +109,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
         [Route("")]
         public async Task<IActionResult> Post([FromBody] JObject query)
         {
-            this.system.Log.Info("{Type}: graphQL request received", this.GetType().Name);
             var queryToExecute =
                 (string)
                 (query.Properties()

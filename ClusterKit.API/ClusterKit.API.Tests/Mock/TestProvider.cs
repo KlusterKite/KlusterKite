@@ -355,6 +355,17 @@ namespace ClusterKit.API.Tests.Mock
         public TestObjectConnection AuthorizedNamedConnection => this.Connection;
 
         /// <summary>
+        /// The list of abstract class entities
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareConnection]
+        public List<TestLog> MultipleEndClassArray => new List<TestLog>
+                                                          {
+                                                              new TestLogFirst { Id = 1, FirstMessage = "first" },
+                                                              new TestLogSecond {Id = 2, SecondMessage = "second" }
+                                                          };
+
+        /// <summary>
         /// Gets the field that logs its access
         /// </summary>
         [UsedImplicitly]
