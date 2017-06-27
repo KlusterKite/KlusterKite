@@ -5,7 +5,7 @@ group netcorebuild
 
 // #load ".fake/build.fsx/loadDependencies.fsx"
 // TODO: remove dll load after loadDependencies.fsx fixed in fake
-(* 
+(*
 #r ".fake/build.fsx/packages/netcorebuild/Fake.Core.Targets/lib/netstandard1.6/Fake.Core.Targets.dll"
 #r ".fake/build.fsx/packages/netcorebuild/Fake.Core.Environment/lib/netstandard1.6/Fake.Core.Environment.dll"
 #r ".fake/build.fsx/packages/netcorebuild/Fake.Core.Process/lib/netstandard1.6/Fake.Core.Process.dll"
@@ -80,6 +80,18 @@ let buildDocker (containerName:string) (path:string) =
                 info.Arguments <- (sprintf "build -t %s:latest %s" containerName path)
                 )  (TimeSpan.FromDays 2.0))) then
         failwithf "Error while building %s" path
+
+let dotNetBuild setParams project =
+    let args = 
+        MSBuildDefaults
+        |> setParams
+        |> serializeMSBuildParams
+    if not((execProcess (fun info ->
+                info.FileName <- "dotnet"
+                info.Arguments <- (sprintf "build %s %s" args project)
+                )  (TimeSpan.FromDays 2.0))) then
+        failwithf "Error while building %s" project
+    
 
 let pushPackage (package:string) =
     let localPath = Path.GetFullPath(".")
@@ -163,7 +175,7 @@ Target.Create "Restore" (fun _ ->
                         "Configuration", "Release"                        
                     ]
             }
-            build setParams file.FullName)        
+            dotNetBuild setParams file.FullName)        
 )
 
 "PrepareSources" ==> "Restore"
@@ -185,7 +197,7 @@ Target.Create  "Build" (fun _ ->
                         "Configuration", "Release"                        
                     ]
             }
-            build setParams file.FullName)
+            dotNetBuild setParams file.FullName)
         (filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir)))
 )
 
@@ -209,7 +221,7 @@ Target.Create "Nuget" (fun _ ->
                         "Configuration", "Release"                        
                     ]
             }
-            build setParams file.FullName)
+            dotNetBuild setParams file.FullName)
 
     CleanDir packageDir
     filesInDirMatchingRecursive "*.nupkg" (new DirectoryInfo(sourcesDir))
@@ -246,6 +258,7 @@ Target.Create "Nuget" (fun _ ->
             nuspec.Save(stream)     
             stream.Dispose()
         )
+
         ExecProcess (fun info ->
             info.FileName <- "nuget.exe";
             info.Arguments <- sprintf "pack \"%s\" -OutputDirectory \"%s\"" nuspecName.FullName packageDir)
