@@ -106,7 +106,7 @@ namespace ClusterKit.NodeManager.Authentication.Clients
             }
 
             // ReSharper restore ArrangeRedundantParentheses
-            // todo: move expiring timespan to config
+            // todo: move expiring time-span to config
             var accessTicket = new AccessTicket(
                 user.GetDescription(),
                 user.GetScope(),

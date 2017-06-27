@@ -71,7 +71,7 @@ namespace ClusterKit.NodeManager.Client.ORM
         /// <returns>The list of privileges</returns>
         public IEnumerable<string> GetScope()
         {
-            if (this.Roles == null)
+            if (this.Roles == null || this.Roles.Any(r => r.Role == null))
             {
                 throw new InvalidOperationException("Roles were not loaded");
             }

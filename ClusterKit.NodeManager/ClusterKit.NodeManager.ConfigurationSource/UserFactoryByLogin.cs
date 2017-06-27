@@ -33,7 +33,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <inheritdoc />
         public override async Task<Maybe<User>> Get(string id)
         {
-            return await this.Context.Users.Include(nameof(User.Roles)).FirstOrDefaultAsync(u => u.Login == id);
+            return await this.Context.Users
+                .Include(nameof(User.Roles))
+                .Include($"{nameof(User.Roles)}.{nameof(RoleUser.Role)}")
+                .FirstOrDefaultAsync(u => u.Login == id);
         }
 
         /// <inheritdoc />
