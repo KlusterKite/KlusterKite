@@ -25,21 +25,14 @@ namespace ClusterKit.NodeManager
     using ClusterKit.NodeManager.Client.MigrationStates;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Migrator;
     using ClusterKit.NodeManager.RemoteDomain;
-
-    using Google.Protobuf;
 
     using JetBrains.Annotations;
 
     using Microsoft.EntityFrameworkCore;
 
-    using Newtonsoft.Json;
-
     using NuGet.Packaging.Core;
-    using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
 
     /// <summary>
@@ -66,11 +59,6 @@ namespace ClusterKit.NodeManager
         /// The configuration database provider name
         /// </summary>
         private readonly string databaseProviderName;
-
-        /// <summary>
-        /// The current environment framework name
-        /// </summary>
-        private readonly string frameworkName;
 
         /// <summary>
         /// The current environment runtime name
@@ -101,7 +89,6 @@ namespace ClusterKit.NodeManager
                 Context.System.Settings.Config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
             this.databaseProviderName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
-            this.frameworkName = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.FrameworkType");
             this.runtime = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.Runtime");
         }
 
@@ -519,7 +506,6 @@ namespace ClusterKit.NodeManager
                 releaseId,
                 plan.MigratorPlans.Values.SelectMany(m => m.Resources.Values).Count());
 
-
             try
             {
                 var collector = new MigrationExecutor { Commands = plan.MigratorPlans.Values.ToList() };
@@ -834,27 +820,32 @@ namespace ClusterKit.NodeManager
             Directory.CreateDirectory(migratorExecutionDirectory);
             Directory.CreateDirectory(migratorTempDirectory);
 
-
             try
             {
-                var packages = migratorTemplate.PackagesToInstall[this.frameworkName]
-                    .Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version))).ToList();
+                if (!migratorTemplate.PackagesToInstall.TryGetValue(
+                        PackageRepositoryExtensions.CurrentRuntime,
+                        out var packagesToInstall))
+                {
+                    throw new Exception($"Framework {PackageRepositoryExtensions.CurrentRuntime} is not supported");
+                }
+
+                var packages = packagesToInstall.Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version)))
+                    .ToList();
                 await this.nugetRepository.CreateServiceAsync(
                     packages,
                     this.runtime,
-                    this.frameworkName,
+                    PackageRepositoryExtensions.CurrentRuntime,
                     migratorExecutionDirectory,
                     "ClusterKit.NodeManager.Migrator.Executor");
             }
             catch (Exception exception)
             {
-                Context.GetLogger()
-                    .Error(
-                        exception,
-                        "{Type} Error on creating service for migrator template {MigratorTemplateCode} of release {ReleaseId}",
-                        this.GetType().Name,
-                        migratorTemplate.Code,
-                        release.Id);
+                Context.GetLogger().Error(
+                    exception,
+                    "{Type} Error on creating service for migrator template {MigratorTemplateCode} of release {ReleaseId}",
+                    this.GetType().Name,
+                    migratorTemplate.Code,
+                    release.Id);
                 errors.Add(
                     new MigrationError
                         {
@@ -862,8 +853,7 @@ namespace ClusterKit.NodeManager
                             MigrationId = migrationId,
                             MigratorTemplateCode = migratorTemplate.Code,
                             MigratorTemplateName = migratorTemplate.Name,
-                            ErrorMessage =
-                                $"error on creating service: {exception.Message}",
+                            ErrorMessage = $"error on creating service: {exception.Message}",
                             Exception = exception
                         });
             }

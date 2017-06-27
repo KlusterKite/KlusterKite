@@ -107,7 +107,11 @@ namespace ClusterKit.Web
         {
             try
             {
-                loggerFactory.AddSerilog();
+                if (Config.GetBoolean("ClusterKit.Web.Debug.Trace"))
+                {
+                    loggerFactory.AddSerilog();
+                }
+
                 var startupConfigurators = this.GetConfigurators(Config);
                 foreach (var configurator in startupConfigurators)
                 {
