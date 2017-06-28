@@ -329,11 +329,40 @@ namespace ClusterKit.API.Tests
         /// Testing request for list with multiple type elements
         /// </summary>
         /// <returns>The async task</returns>
-        [Fact]
+        [Fact(Skip = "TBD")]
         public async Task TypedCollectionTest()
         {
             var provider = this.GetProvider();
             var context = new RequestContext();
+
+            var objFields = new List<ApiRequest>
+                                       {
+                                           new ApiRequest { FieldName = "id" },
+                                           new ApiRequest { FieldName = "__type" },
+                                           new ApiRequest { FieldName = "@TestLogFirst:firstMessage" },
+                                           new ApiRequest { FieldName = "@TestLogSecond:secondMessage" },
+                                       };
+
+            var connectionFields = new List<ApiRequest>
+                                       {
+                                           new ApiRequest { FieldName = "count" },
+                                           new ApiRequest { FieldName = "items", Fields = objFields }
+                                       };
+
+            var query = new List<ApiRequest> { new ApiRequest { FieldName = "multipleEndClassArray", Fields = connectionFields } };
+            var result = await this.Query(provider, query, context);
+            Assert.NotNull(result);
+            Assert.NotNull(result.Property("multipleEndClassArray"));
+             
+            Assert.Equal(1, result.SelectToken("multipleEndClassArray.items[0].id")?.Value<int>());
+            Assert.Equal("TestLogFirst", result.SelectToken("multipleEndClassArray.items[0].__type")?.Value<string>());
+            Assert.Null(result.SelectToken("multipleEndClassArray.items[0].secondMessage"));
+            Assert.Equal("first", result.SelectToken("multipleEndClassArray.items[0].firstMessage")?.Value<string>());
+
+            Assert.Equal(1, result.SelectToken("multipleEndClassArray.items[1].id")?.Value<int>());
+            Assert.Equal("TestLogSecond", result.SelectToken("multipleEndClassArray.items[1].__type")?.Value<string>());
+            Assert.Null(result.SelectToken("multipleEndClassArray.items[1].firstMessage"));
+            Assert.Equal("second", result.SelectToken("multipleEndClassArray.items[1].secondMessage")?.Value<string>());
         }
 
         /// <summary>
@@ -351,7 +380,7 @@ namespace ClusterKit.API.Tests
         /// <param name="expectedResult">
         /// The expected value (or errors if no result expected).
         /// </param>
-        /// <param name="expectConnectionFormnat">
+        /// <param name="expectConnectionFormat">
         /// A value indicating whether to expect response in connection mutation result format
         /// </param>
         /// <returns>
@@ -374,7 +403,7 @@ namespace ClusterKit.API.Tests
             string mutationRequest,
             bool expectResult,
             string expectedResult,
-            bool expectConnectionFormnat)
+            bool expectConnectionFormat)
         {
             var initialObjects = new List<TestObject>
                                      {
@@ -475,7 +504,7 @@ namespace ClusterKit.API.Tests
             Assert.NotNull(result);
             this.output.WriteLine(result.ToString(Formatting.Indented));
 
-            if (expectConnectionFormnat)
+            if (expectConnectionFormat)
             {
                 var resultObject = result.Property("result");
                 var resultErrors = result.Property("errors");

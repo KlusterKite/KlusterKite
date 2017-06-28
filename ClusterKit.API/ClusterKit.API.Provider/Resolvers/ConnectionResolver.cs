@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿ // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConnectionResolver.cs" company="ClusterKit">
 //   All rights reserved
 // </copyright>
@@ -59,7 +59,7 @@ namespace ClusterKit.API.Provider.Resolvers
             Action<Exception> onErrorCallback)
         {
             var connection = nodeConnection as INodeConnection<T>;
-            if (connection == null)
+            if (connection == null) 
             {
                 return Task.FromResult<JObject>(null);
             }

@@ -276,13 +276,18 @@ namespace ClusterKit.API.Provider.Resolvers
         private static bool isInitialized;
 
         /// <summary>
+        /// The current type name
+        /// </summary>
+        private static string typeName;
+
+        /// <summary>
         /// Initializes static members of the <see cref="ObjectResolver{T}"/> class.
         /// </summary>
         static ObjectResolver()
         {
             var type = typeof(T);
 
-            var typeName = ApiDescriptionAttribute.GetTypeName(type);
+            typeName = ApiDescriptionAttribute.GetTypeName(type);
 
             foreach (var f in GenerateTypeProperties())
             {
@@ -410,8 +415,14 @@ namespace ClusterKit.API.Provider.Resolvers
             foreach (var fieldRequest in fields)
             {
                 var fieldName = fieldRequest.Alias ?? fieldRequest.FieldName;
-                FieldDescription field;
-                if (!Fields.TryGetValue(fieldRequest.FieldName, out field))
+
+                if (fieldRequest.FieldName == "__type")
+                {
+                    result.Add(fieldName, typeName);
+                    continue;
+                }
+
+                if (!Fields.TryGetValue(fieldRequest.FieldName, out var field))
                 {
                     onErrorCallback?.Invoke(new Exception($"Unknown field {fieldRequest.FieldName}"));
                     continue;
