@@ -804,7 +804,7 @@
       "Version": "4.3.0"
     }
   ],
-  "PackageSource": "http://nuget/",
+  "PackageSources": null,
   "Seeds": [
     "akka.tcp://ClusterKit@seed:3090"
   ]
