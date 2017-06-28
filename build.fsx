@@ -438,14 +438,6 @@ Target.Create "DockerContainers" (fun _ ->
         CopyDir buildDir "./build/launcherpublish" (fun _ -> true)
         CopyTo buildDir [|"./Docker/utils/launcher/start.sh"|]
         CopyTo buildDir [|"./nuget.exe"|]
-
-        let copyThirdPartyPackage (f: FileInfo) =
-            if (Path.GetExtension(f.FullName) = ".nupkg") then
-                if not (File.Exists (Path.Combine [|(Path.GetFullPath("./packageOut/")); f.Name|])) then
-                    Copy packageCacheDir [|f.FullName|]
-
-        (new DirectoryInfo(packageThirdPartyDir)).GetFiles("*", SearchOption.TopDirectoryOnly)
-        |> Seq.iter copyThirdPartyPackage
         
 
     CleanDirs [|"./Docker/ClusterKitSeed/build"|]

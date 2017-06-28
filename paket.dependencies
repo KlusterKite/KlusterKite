@@ -9,5 +9,6 @@ group NetcoreBuild
 	nuget Microsoft.Build
 	nuget NuGet.Protocol.Core.v3
 	nuget Npm
+	nuget Microsoft.NETCore.UniversalWindowsPlatform 5.1.0
 
 	

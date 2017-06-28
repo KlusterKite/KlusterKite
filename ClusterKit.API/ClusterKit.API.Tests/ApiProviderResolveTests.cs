@@ -326,6 +326,17 @@ namespace ClusterKit.API.Tests
         }
 
         /// <summary>
+        /// Testing request for list with multiple type elements
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task TypedCollectionTest()
+        {
+            var provider = this.GetProvider();
+            var context = new RequestContext();
+        }
+
+        /// <summary>
         /// Testing connection mutation resolve
         /// </summary>
         /// <param name="mutationName">

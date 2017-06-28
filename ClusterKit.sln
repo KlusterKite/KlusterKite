@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{EFA4EE0E-5FC0-423C-9B82-477AE9207F1B}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		global.sln.DotSettings = global.sln.DotSettings
 		nuget.config = nuget.config
 		nuget.exe = nuget.exe
-		paket.dependecies = paket.dependecies
+		paket.dependencies = paket.dependencies
 		README.md = README.md
 		Settings.StyleCop = Settings.StyleCop
 		test.bat = test.bat
