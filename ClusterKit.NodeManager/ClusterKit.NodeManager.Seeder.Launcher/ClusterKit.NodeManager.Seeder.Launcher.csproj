@@ -7,7 +7,6 @@
     <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>exe</OutputType>
-    <IsTool>true</IsTool>
     <StartupObject />
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>

@@ -157,29 +157,6 @@ Target.Create "PrepareSources" (fun _ ->
 
 "SetVersion" ?=> "PrepareSources"
 
-Target.Create "Restore" (fun _ ->
-    printfn "Restoring packages..."
-    let sourcesDir = Path.Combine(buildDir, "src")  
-    filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir))
-    |> Seq.iter
-        (fun (file:FileInfo) ->
-            let setParams defaults = { 
-                defaults with
-                    Verbosity = Some(Minimal)
-                    Targets = ["Restore"]
-                    RestorePackagesFlag = true
-                    Properties = 
-                    [
-                        "Optimize", "True"
-                        "DebugSymbols", "True"
-                        "Configuration", "Release"                        
-                    ]
-            }
-            dotNetBuild setParams file.FullName)        
-)
-
-"PrepareSources" ==> "Restore"
-
 Target.Create  "Build" (fun _ ->
     printfn "Build..."
     let sourcesDir = Path.Combine(buildDir, "src")  
@@ -200,8 +177,6 @@ Target.Create  "Build" (fun _ ->
             dotNetBuild setParams file.FullName)
         (filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir)))
 )
-
-"Restore" ==> "Build"
 
 Target.Create "Nuget" (fun _ ->
     printfn "Packing nuget..."
@@ -229,42 +204,6 @@ Target.Create "Nuget" (fun _ ->
         (fun (file:FileInfo) ->
                 printfn "%s" (Path.GetFileName file.FullName)
                 CopyFile packageDir file.FullName)
-
-    // workaround of https://github.com/NuGet/Home/issues/4360
-    filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
-    |> Seq.filter (fun (file:FileInfo) -> Regex.IsMatch(File.ReadAllText(file.FullName), "<IsTool>true</IsTool>", (RegexOptions.CultureInvariant ||| RegexOptions.IgnoreCase)))
-    |> Seq.iter (fun (file:FileInfo) -> 
-        printfn "Repacking tool: %s\n" (Path.GetFileName file.FullName)
-        let projectDir = Path.GetDirectoryName file.FullName
-        let nuspecName = filesInDirMatchingRecursive "*.nuspec" (new DirectoryInfo(projectDir)) |> Seq.head
-        let nuspec = new XmlDocument()
-        nuspec.LoadXml(File.ReadAllText(nuspecName.FullName))
-        let namespaceManager = new XmlNamespaceManager(nuspec.NameTable);
-        namespaceManager.AddNamespace("n", "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd");
-        let filesNode = nuspec.SelectSingleNode("/n:package/n:files", namespaceManager)
-        filesNode.InnerXml <- ""
-        let buildFilesPath = Path.Combine(projectDir, "bin", "Release")
-        
-        filesInDirMatchingRecursive "*.*" (new DirectoryInfo(buildFilesPath))
-        |> Seq.filter (fun (file:FileInfo) -> not(Regex.IsMatch(file.FullName, "\\.nupkg$")))
-        |> Seq.iter (fun (file:FileInfo) -> 
-            let fileElement = filesNode.AppendChild(nuspec.CreateElement("file", "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd")) :?> XmlElement
-            let relativeFileName = file.FullName.Substring(buildFilesPath.Length)
-            fileElement.SetAttribute("src", file.FullName);
-            fileElement.SetAttribute("target", (sprintf "tools%s" relativeFileName))
-        )
-        (
-            use stream = File.Create(nuspecName.FullName)
-            nuspec.Save(stream)     
-            stream.Dispose()
-        )
-
-        ExecProcess (fun info ->
-            info.FileName <- "nuget.exe";
-            info.Arguments <- sprintf "pack \"%s\" -OutputDirectory \"%s\"" nuspecName.FullName packageDir)
-            (TimeSpan.FromMinutes 30.0)
-            |> ignore       
-    )
 )
 
 "Build" ==> "Nuget"
@@ -421,6 +360,7 @@ Target.Create "RestoreThirdPartyPackages" (fun _ ->
 )
 
 "PrepareSources" ==> "RestoreThirdPartyPackages"
+"Build" ==> "RestoreThirdPartyPackages"
 
 Target.Create "PushThirdPartyPackages" (fun _ ->
     pushPackage (Path.Combine(packageThirdPartyDir, "*.nupkg"))
@@ -476,7 +416,7 @@ Target.Create "DockerContainers" (fun _ ->
                         "OutputPath", outputPath
                     ]
                 }
-        build setParams projectPath
+        dotNetBuild setParams projectPath
 
     CleanDirs [|"./build/launcher"; "./build/launcherpublish"; "./build/seed"; "./build/seedpublish"; "./build/seeder"; "./build/seederpublish";|]
     buildProject (Path.GetFullPath "./build/launcher") "./build/src/ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"

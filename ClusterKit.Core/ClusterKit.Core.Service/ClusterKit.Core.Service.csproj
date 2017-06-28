@@ -7,7 +7,6 @@
     <Description>Bundle of utils to create scalable and redundant services</Description>
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>exe</OutputType>
-    <IsTool>true</IsTool>
     <StartupObject />
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>

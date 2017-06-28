@@ -9,7 +9,6 @@
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>Exe</OutputType>
-    <IsTool>true</IsTool>
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
