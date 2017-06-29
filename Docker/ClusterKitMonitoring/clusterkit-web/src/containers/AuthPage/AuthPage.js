@@ -55,7 +55,8 @@ export default class AuthPage extends React.Component {
       response.json().then(function(data) {
         console.log('got data', data);
         that.authenticate(data, username);
-        that.getPrivileges(data.access_token);
+        // that.getPrivileges(data.access_token);
+        that.savePrivilegesAndRedirect([]);
       });
     } else {
       this.setState({

@@ -46,17 +46,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
             }
           }
         }
-        nugetFeeds {
-          edges {
-            node {
-              id
-              address
-              type
-              userName
-              password
-            }
-          }
-        }
+        nugetFeed
         packages {
           edges {
             node {
@@ -209,7 +199,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         configuration: {
           nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
           migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migratorTemplates'),
-          nugetFeeds: this.convertEdgesToArray(this.props.configuration.nugetFeeds.edges, 'nugetFeeds'),
+          nugetFeed: this.props.configuration.nugetFeed,
           packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
           seedAddresses: this.updateSeedAddresses(this.props.configuration.seedAddresses),
         },
@@ -224,7 +214,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         configuration: {
           nodeTemplates: this.props.configuration.nodeTemplates,
           migratorTemplates: this.props.configuration.migratorTemplates,
-          nugetFeeds: this.props.configuration.nugetFeeds,
+          nugetFeed: this.props.configuration.nugetFeed,
           packages: this.props.configuration.packages,
           seedAddresses: this.props.configuration.seedAddresses,
           id: this.props.configuration.id
