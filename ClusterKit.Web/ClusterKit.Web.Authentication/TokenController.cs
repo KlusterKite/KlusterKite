@@ -54,6 +54,7 @@ namespace ClusterKit.Web.Authentication
         /// </summary>
         /// <returns>The token processing result</returns>
         [HttpPost]
+        [HttpOptions]
         public Task<IActionResult> Grant()
         {
             var grantType = this.GetRequestParameter("grant_type");

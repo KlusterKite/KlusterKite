@@ -89,6 +89,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="query">The query data</param>
         /// <returns>GraphQL response</returns>
         [HttpPost]
+        [HttpOptions]
         [Route("")]
         public async Task<IActionResult> Post([FromBody] JObject query)
         {

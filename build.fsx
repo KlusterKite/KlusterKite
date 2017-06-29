@@ -35,30 +35,19 @@ group netcorebuild
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Packaging.Core.Types/lib/netstandard1.3/NuGet.Packaging.Core.Types.dll"
 
 #load "./build.base.fsx"
-open ClusterKit.Build.Config
 open ClusterKit.Build.Base
 
 open System
 open System.IO
 open System.Diagnostics
-open System.Text.RegularExpressions
-open System.Collections.Generic;
-
-open Microsoft.Build.Evaluation
 
 open Fake.Core
 open Fake.Core.TargetOperators
 open Fake.Core.Environment
 open Fake.Core.Process
-open Fake.DotNet.NuGet.Version
 open Fake.DotNet.MsBuild
 open Fake.IO.FileSystem.Shell
 
-open NuGet.Configuration;
-open NuGet.Common;
-open NuGet.Protocol;
-open NuGet.Versioning;
-open NuGet.Packaging;
 
 // builds base (system) docker images
 Target.Create "DockerBase" (fun _ ->
