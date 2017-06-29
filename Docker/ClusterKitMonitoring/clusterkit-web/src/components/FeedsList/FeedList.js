@@ -1,8 +1,6 @@
 import React from 'react';
 import Relay from 'react-relay'
 
-import { Link } from 'react-router';
-
 class FeedList extends React.Component {
   constructor (props) {
     super(props);
@@ -17,46 +15,12 @@ class FeedList extends React.Component {
   };
 
   render() {
-    const feeds = this.props.configuration && this.props.configuration.nugetFeeds && this.props.configuration.nugetFeeds.edges;
-
     return (
       <div>
         <div>
-          <h3>Nuget feeds list</h3>
-          {this.props.canEdit &&
-          <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}/create`} className="btn btn-primary" role="button">Add
-            a new feed</Link>
-          }
-          {feeds && feeds.length > 0 &&
-          <table className="table table-hover">
-            <thead>
-            <tr>
-              <th>Address</th>
-              <th>Type</th>
-            </tr>
-            </thead>
-            <tbody>
-            {feeds.map((item) =>
-              <tr key={item.node.id || item.node.address}>
-                <td>
-                  {this.props.canEdit &&
-                    <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
-                      {item.node.address}
-                    </Link>
-                  }
-                  {!this.props.canEdit &&
-                    <span>{item.node.address}</span>
-                  }
-                </td>
-                <td>
-                  {item.node.type}
-                </td>
-              </tr>
-            )
-            }
-            </tbody>
-          </table>
-          }
+          <h3>Nuget feeds</h3>
+
+          <p>{this.props.configuration && this.props.configuration.nugetFeed}</p>
         </div>
       </div>
     );
@@ -68,17 +32,7 @@ export default Relay.createContainer(
   {
     fragments: {
       configuration: () => Relay.QL`fragment on IClusterKitNodeApi_ReleaseConfiguration {
-        nugetFeeds {
-          edges {
-            node {
-              id
-              address
-              type
-              userName
-              password
-            }
-          }
-        }
+        nugetFeed
       }
       `,
     },

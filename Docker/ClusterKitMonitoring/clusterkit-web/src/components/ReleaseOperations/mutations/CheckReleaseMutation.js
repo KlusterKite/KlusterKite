@@ -38,7 +38,16 @@ export default class CheckReleaseMutation extends Relay.Mutation {
               }
             }
             node {
-              compatibleTemplates {
+              compatibleTemplatesForward {
+                edges {
+                  node {
+                    templateCode
+                    releaseId
+                    compatibleReleaseId
+                  }
+                }
+              }
+              compatibleTemplatesBackward {
                 edges {
                   node {
                     templateCode

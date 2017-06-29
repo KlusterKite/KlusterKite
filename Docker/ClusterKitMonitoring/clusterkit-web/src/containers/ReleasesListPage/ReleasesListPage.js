@@ -51,7 +51,7 @@ export default Relay.createContainer(
         __typename
         clusterKitNodesApi {
           id
-          ${ReleasesList.getFragment('clusterKitNodesApi', { page: variables.page, itemsPerPage: variables.itemsPerPage, offset: variables.offset})},
+          ${ReleasesList.getFragment('clusterKitNodesApi', { itemsPerPage: variables.itemsPerPage, offset: variables.offset})},
         }
       }
       `,

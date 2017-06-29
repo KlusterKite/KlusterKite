@@ -14,7 +14,8 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
   static propTypes = {
     newReleaseInnerId: React.PropTypes.number.isRequired,
     activeNodes: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-    compatibleTemplates: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+    compatibleTemplatesForward: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+    compatibleTemplatesBackward: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     newNodeTemplates: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   };
 
@@ -80,10 +81,10 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
 
   onReceiveProps(nextProps, skipCheck) {
     if ((nextProps.activeNodes && (!isEqual(nextProps.activeNodes, this.props.activeNodes) || skipCheck)) ||
-        (nextProps.compatibleTemplates && (!isEqual(nextProps.compatibleTemplates, this.props.compatibleTemplates) || skipCheck)) ||
+        (nextProps.compatibleTemplatesForward && (!isEqual(nextProps.compatibleTemplatesForward, this.props.compatibleTemplatesForward) || skipCheck)) ||
         (nextProps.newNodeTemplates && (!isEqual(nextProps.newNodeTemplates, this.props.newNodeTemplates) || skipCheck))
     ) {
-      this.compareNodes(nextProps.activeNodes, nextProps.compatibleTemplates, nextProps.newNodeTemplates);
+      this.compareNodes(nextProps.activeNodes, nextProps.compatibleTemplatesForward, nextProps.newNodeTemplates);
     }
   }
 

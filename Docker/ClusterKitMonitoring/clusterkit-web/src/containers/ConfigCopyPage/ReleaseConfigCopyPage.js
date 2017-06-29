@@ -132,17 +132,7 @@ export default Relay.createContainer(
               edges {
                 node {
                   configuration {
-                    nugetFeeds {
-                      edges {
-                        node {
-                          id
-                          address
-                          type
-                          userName
-                          password
-                        }
-                      }
-                    }
+                    nugetFeed
                     nodeTemplates {
                       edges {
                         node {

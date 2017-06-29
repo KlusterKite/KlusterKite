@@ -99,7 +99,7 @@ export default class CloneConfigMutation extends Relay.Mutation {
         configuration: {
           migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migrationTemplates'),
           nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
-          nugetFeeds: this.convertEdgesToArray(this.props.configuration.nugetFeeds.edges, 'nugetFeeds'),
+          nugetFeed: this.props.configuration.nugetFeed,
           packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
           seedAddresses: this.props.configuration.seedAddresses
         },
@@ -114,7 +114,7 @@ export default class CloneConfigMutation extends Relay.Mutation {
         configuration: {
           migratorTemplates: this.props.configuration.migratorTemplates,
           nodeTemplates: this.props.configuration.nodeTemplates,
-          nugetFeeds: this.props.configuration.nugetFeeds,
+          nugetFeed: this.props.configuration.nugetFeed,
           packages: this.props.configuration.packages,
           seedAddresses: this.props.configuration.seedAddresses,
           id: this.props.configuration.id
