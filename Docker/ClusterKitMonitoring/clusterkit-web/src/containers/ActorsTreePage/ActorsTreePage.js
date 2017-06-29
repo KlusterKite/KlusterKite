@@ -121,6 +121,45 @@ export default Relay.createContainer(
                                   queueSize
                                   queueSizeSum
                                   maxQueueSize
+                                  children {
+                                    edges {
+                                      node {
+                                        name
+                                        actorType
+                                        dispatcherType
+                                        currentMessage
+                                        queueSize
+                                        queueSizeSum
+                                        maxQueueSize
+                                        children {
+                                          edges {
+                                            node {
+                                              name
+                                              actorType
+                                              dispatcherType
+                                              currentMessage
+                                              queueSize
+                                              queueSizeSum
+                                              maxQueueSize
+                                              children {
+                                                edges {
+                                                  node {
+                                                    name
+                                                    actorType
+                                                    dispatcherType
+                                                    currentMessage
+                                                    queueSize
+                                                    queueSizeSum
+                                                    maxQueueSize
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
                                 }
                               }
                             }
