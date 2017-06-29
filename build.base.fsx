@@ -125,6 +125,8 @@ module  Base =
 
         filesInDirMatching "*.sln" (new DirectoryInfo("."))
             |> Seq.iter (fun (file:FileInfo) -> CopyFile sourcesDir file.FullName)
+        filesInDirMatching "*.fsx" (new DirectoryInfo("."))
+            |> Seq.iter (fun (file:FileInfo) -> CopyFile sourcesDir file.FullName)
         filesInDirMatching "*.props" (new DirectoryInfo("."))
             |> Seq.iter (fun (file:FileInfo) -> CopyFile sourcesDir file.FullName)
        
@@ -137,7 +139,7 @@ module  Base =
             RegexReplaceInFileWithEncoding  "<Version>(.*)</Version>" (sprintf "<Version>%s</Version>" version) Text.Encoding.UTF8 file.FullName) 
     )
 
-    "SetVersion" ?=> "PrepareSources"
+    "SetVersion" ?=> "PrepareSources"    
 
     Target.Create  "Build" (fun _ ->
         printfn "Build..."
@@ -159,6 +161,8 @@ module  Base =
                 dotNetBuild setParams file.FullName)
             (filesInDirMatching "*.sln" (new DirectoryInfo(sourcesDir)))
     )
+
+    "PrepareSources" ==> "Build"
 
     Target.Create "Nuget" (fun _ ->
         printfn "Packing nuget..."

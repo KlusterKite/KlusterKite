@@ -1,16 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
     <PackageId>ClusterKit.Build</PackageId>
     <Version>0.0.0.0-local</Version>    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>$(ClusterKitPackageTags)</PackageTags>    
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <None Update="build.base.fsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Content Include="..\..\build.base.fsx" Link="build.base.fsx">
+      <IncludeInPackage>true</IncludeInPackage>
+      <BuildAction>Content</BuildAction>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fake.Core.Process">
+      <Version>5.0.0-alpha010</Version>
+    </PackageReference>
+    <PackageReference Include="Fake.Core.Targets">
+      <Version>5.0.0-alpha010</Version>
+    </PackageReference>
+    <PackageReference Include="Fake.DotNet.MsBuild">
+      <Version>5.0.0-alpha010</Version>
+    </PackageReference>
+    <PackageReference Include="Fake.DotNet.NuGet">
+      <Version>5.0.0-alpha010</Version>
+    </PackageReference>
+    <PackageReference Include="Fake.IO.FileSystem">
+      <Version>5.0.0-alpha010</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="15.1.1012" />
+    <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.0.0" />
   </ItemGroup>
 </Project>
