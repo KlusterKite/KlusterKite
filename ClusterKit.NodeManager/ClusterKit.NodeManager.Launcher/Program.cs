@@ -15,10 +15,7 @@ namespace ClusterKit.NodeManager.Launcher
     using System.IO;
     using System.Linq;
     using System.Net;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
     using System.Threading;
-    using System.Xml;
 
     using Akka.Configuration;
 
@@ -27,8 +24,6 @@ namespace ClusterKit.NodeManager.Launcher
 
     using Newtonsoft.Json;
 
-    using NuGet.Common;
-    using NuGet.Frameworks;
     using NuGet.Packaging.Core;
     using NuGet.Versioning;
 
@@ -137,7 +132,6 @@ namespace ClusterKit.NodeManager.Launcher
             this.ApiClientId = config.GetString("apiClientId");
             this.ApiClientSecret = config.GetString("apiClientSecret");
             
-
             if (string.IsNullOrWhiteSpace(this.ApiClientId) || string.IsNullOrWhiteSpace(this.ApiClientSecret))
             {
                 Console.WriteLine(@"api access is not configured");
@@ -290,7 +284,6 @@ namespace ClusterKit.NodeManager.Launcher
         /// </summary>
         private void ConfigureNode()
         {
-
             Console.WriteLine(@"Configuring node...");
 
             var config = this.GetConfig();

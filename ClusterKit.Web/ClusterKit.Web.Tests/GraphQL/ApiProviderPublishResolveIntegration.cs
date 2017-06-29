@@ -3131,7 +3131,6 @@ namespace ClusterKit.Web.Tests.GraphQL
             var response = new DocumentWriter(true).Write(result);
             this.output.WriteLine(response);
             
-           
             var expectedResult = expectingResult
                             ? @"
                             {

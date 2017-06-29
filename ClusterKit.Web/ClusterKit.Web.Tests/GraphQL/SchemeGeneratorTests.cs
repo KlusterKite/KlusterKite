@@ -485,18 +485,17 @@ namespace ClusterKit.Web.Tests.GraphQL
                                    };
 
             var objectType = new ApiObjectType("object", objectFields) { Description = "Some abstract object" };
+            var apiField = objectType.CreateField(
+                "new",
+                description: "The new object data");
+
             var mutations = new[]
                                 {
                                     ApiMutation.CreateFromField(
                                         ApiField.Object(
                                             "objects_create",
                                             "object",
-                                            arguments: new[]
-                                                           {
-                                                               objectType.CreateField(
-                                                                   "new",
-                                                                   description: "The new object data")
-                                                           },
+                                            arguments: new[] { apiField },
                                             description: "creates a new object"),
                                         ApiMutation.EnType.ConnectionCreate,
                                         new List<ApiRequest>())

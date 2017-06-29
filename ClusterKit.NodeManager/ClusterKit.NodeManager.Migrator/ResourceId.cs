@@ -9,8 +9,6 @@
 
 namespace ClusterKit.NodeManager.Migrator
 {
-    using System;
-
     /// <summary>
     /// The description of some migratable resource
     /// </summary>

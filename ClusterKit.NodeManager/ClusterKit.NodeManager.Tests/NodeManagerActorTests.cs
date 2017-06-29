@@ -1636,7 +1636,7 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal(2, migration.ToReleaseId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
 
-            actor.Tell(new MigrationActorInitializationFailed { Errors = new List<MigrationError>() });
+            actor.Tell(new MigrationActorInitializationFailed { Errors = new List<MigrationLogRecord>() });
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);

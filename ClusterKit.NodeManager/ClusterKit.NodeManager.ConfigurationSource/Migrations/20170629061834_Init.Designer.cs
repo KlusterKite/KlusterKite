@@ -9,7 +9,7 @@ using ClusterKit.NodeManager.Client.ORM;
 namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 {
     [DbContext(typeof(ConfigurationContext))]
-    [Migration("20170626102834_Init")]
+    [Migration("20170629061834_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,8 +77,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                         .HasColumnType("serial")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", 1);
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
+                    b.Property<string>("DestinationPoint");
+
+                    b.Property<string>("ErrorMessage");
+
+                    b.Property<string>("ErrorStackTrace");
+
+                    b.Property<DateTimeOffset?>("Finished");
 
                     b.Property<int?>("MigrationId");
 
@@ -96,6 +101,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 
                     b.Property<string>("ResourceName");
 
+                    b.Property<string>("SourcePoint");
+
+                    b.Property<DateTimeOffset>("Started");
+
+                    b.Property<int>("Type");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MigrationId");
@@ -103,8 +114,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.HasIndex("ReleaseId");
 
                     b.ToTable("MigrationLogRecords");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("MigrationLogRecord");
                 });
 
             modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Release", b =>
@@ -199,42 +208,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationError", b =>
-                {
-                    b.HasBaseType("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord");
-
-                    b.Property<DateTimeOffset>("Created");
-
-                    b.Property<string>("ErrorMessage");
-
-                    b.Property<string>("ErrorStackTrace");
-
-                    b.ToTable("MigrationErrors");
-
-                    b.HasDiscriminator().HasValue("MigrationError");
-                });
-
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationOperation", b =>
-                {
-                    b.HasBaseType("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord");
-
-                    b.Property<string>("DestinationPoint");
-
-                    b.Property<int?>("ErrorId");
-
-                    b.Property<DateTimeOffset>("Finished");
-
-                    b.Property<string>("SourcePoint");
-
-                    b.Property<DateTimeOffset>("Started");
-
-                    b.HasIndex("ErrorId");
-
-                    b.ToTable("MigrationOperations");
-
-                    b.HasDiscriminator().HasValue("MigrationOperation");
-                });
-
             modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.CompatibleTemplate", b =>
                 {
                     b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "CompatibleRelease")
@@ -284,13 +257,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                         .WithMany("Roles")
                         .HasForeignKey("UserUid")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationOperation", b =>
-                {
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.MigrationError", "Error")
-                        .WithMany()
-                        .HasForeignKey("ErrorId");
                 });
         }
     }

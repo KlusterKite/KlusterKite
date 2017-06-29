@@ -11,11 +11,11 @@ namespace ClusterKit.NodeManager.Launcher.Utils
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
 
     using NuGet.Packaging.Core;
 #if CORECLR
+    using System.Linq;
     using Microsoft.Extensions.DependencyModel;
 #endif
 

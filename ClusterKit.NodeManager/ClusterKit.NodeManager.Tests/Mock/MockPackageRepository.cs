@@ -12,7 +12,6 @@ namespace ClusterKit.NodeManager.Tests.Mock
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Utils;
 
     using NuGet.Packaging.Core;

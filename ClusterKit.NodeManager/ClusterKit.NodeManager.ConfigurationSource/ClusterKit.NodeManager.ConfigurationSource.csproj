@@ -28,6 +28,10 @@
     </Compile>
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+  
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
   </PropertyGroup>

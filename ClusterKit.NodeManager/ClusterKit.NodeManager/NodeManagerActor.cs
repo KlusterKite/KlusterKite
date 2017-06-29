@@ -742,7 +742,7 @@ namespace ClusterKit.NodeManager
                     error.ErrorStackTrace);
             }
 
-            this.OnMigrationLogRecords(state.Errors.Cast<MigrationLogRecord>().ToList());
+            this.OnMigrationLogRecords(state.Errors.ToList());
             this.resourceState.OperationIsInProgress = false;
             this.resourceState.ReleaseState = null;
             this.resourceState.MigrationState = null;

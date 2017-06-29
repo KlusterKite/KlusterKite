@@ -196,7 +196,7 @@ namespace ClusterKit.Security.SessionRedis
         /// Tests host against IP address
         /// </summary>
         /// <param name="host">The host name</param>
-        /// <returns>A value indicating whether the provided host is a pure IPv4</returns>
+        /// <returns>A value indicating whether the provided host is a pure IP-v4</returns>
         private static bool IsIpAddress(string host)
         {
             string ipPattern = @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b";

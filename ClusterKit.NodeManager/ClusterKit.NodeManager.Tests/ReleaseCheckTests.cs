@@ -247,7 +247,6 @@ namespace ClusterKit.NodeManager.Tests
             Assert.Equal($"Package dependency for {Net46} dp3.1.0.0 doesn't satisfy version requirements [2.0.0, ).", errors[0].Message);
             Assert.Equal("configuration.nodeTemplates[\"t1\"].packageRequirements[\"p3\"]", errors[1].Field);
             Assert.Equal($"Package dependency for {NetCore} dp3.1.0.0 doesn't satisfy version requirements [2.0.0, ).", errors[1].Message);
-
         }
 
         /// <summary>

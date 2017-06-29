@@ -232,6 +232,7 @@ namespace ClusterKit.Web.Tests.Auth
                 var installers = base.GetPluginInstallers();
                 installers.Add(new Descriptor.Installer());
                 installers.Add(new Web.Installer());
+                // ReSharper disable once RedundantNameQualifier
                 installers.Add(new Web.Authorization.Installer());
                 installers.Add(new TestInstaller());
                 return installers;

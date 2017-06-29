@@ -38,8 +38,9 @@ namespace ClusterKit.NodeManager.RemoteDomain
                 catch (Exception exception)
                 {
                     this.Errors.Add(
-                        new MigrationError
+                        new MigrationLogRecord
                             {
+                                Type = EnMigrationLogRecordType.Error,
                                 MigratorTypeName = migrator.GetType().FullName,
                                 MigratorName = migrator.Name,
                                 ErrorMessage =
@@ -57,8 +58,9 @@ namespace ClusterKit.NodeManager.RemoteDomain
                 catch (Exception exception)
                 {
                     this.Errors.Add(
-                        new MigrationError
+                        new MigrationLogRecord
                             {
+                                Type = EnMigrationLogRecordType.Error,
                                 MigratorTypeName = migrator.GetType().FullName,
                                 MigratorName = migrator.Name,
                                 ErrorMessage =
@@ -84,8 +86,9 @@ namespace ClusterKit.NodeManager.RemoteDomain
                     catch (Exception exception)
                     {
                         this.Errors.Add(
-                            new MigrationError
+                            new MigrationLogRecord
                                 {
+                                    Type = EnMigrationLogRecordType.Error,
                                     MigratorTypeName = migrator.GetType().FullName,
                                     MigratorName = migrator.Name,
                                     ResourceCode = resource.Code,

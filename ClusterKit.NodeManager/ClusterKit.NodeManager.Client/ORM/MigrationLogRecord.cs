@@ -21,10 +21,11 @@ namespace ClusterKit.NodeManager.Client.ORM
     /// The base class for migration log records
     /// </summary>
     [Table("MigrationLogRecords")]
-    public abstract class MigrationLogRecord
+    [ApiDescription(Name = "MigrationLogRecord")]
+    public class MigrationLogRecord
     {
         /// <summary>
-        /// Gets or sets the error id
+        /// Gets or sets the log record id
         /// </summary>
         [Key]
         [DeclareField("the log record id", IsKey = true)]
@@ -32,6 +33,13 @@ namespace ClusterKit.NodeManager.Client.ORM
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column(TypeName = "serial")]  // TODO: check and remove that Npgsql.EntityFrameworkCore.PostgreSQL can generate serial columns on migration without this kludge
         public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the log record type
+        /// </summary>
+        [DeclareField("the log record type")]
+        [UsedImplicitly]
+        public EnMigrationLogRecordType Type { get; set; }
 
         /// <summary>
         /// Gets or sets the migration id
@@ -103,5 +111,79 @@ namespace ClusterKit.NodeManager.Client.ORM
         [DeclareField("the resource name")]
         [UsedImplicitly]
         public string ResourceName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the operation execution start time
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the operation execution start time")]
+        public DateTimeOffset Started { get; set; }
+
+        /// <summary>
+        /// Gets or sets the operation execution finish time
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the operation execution finish time")]
+        public DateTimeOffset? Finished { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source migration point.
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the source migration point")]
+        public string SourcePoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source migration point.
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the destination migration point")]
+        public string DestinationPoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the error message
+        /// </summary>
+        [DeclareField("the resource name")]
+        [UsedImplicitly]
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the error stack trace
+        /// </summary>
+        [DeclareField("the error stack trace")]
+        [UsedImplicitly]
+        public string ErrorStackTrace { get; set; }
+
+        /// <summary>
+        /// Sets the description from exception
+        /// </summary>
+        public Exception Exception
+        {
+            set
+            {
+                this.ErrorStackTrace = string.Empty;
+                this.AddExceptionToStackTrace(value);
+            }
+        }
+
+        /// <summary>
+        /// Adds exception description to <see cref="ErrorStackTrace"/>
+        /// </summary>
+        /// <param name="value">The exception</param>
+        private void AddExceptionToStackTrace(Exception value)
+        {
+#if APPDOMAIN
+            this.ErrorStackTrace += $"{value.GetType().Name}: {value.Message}\n{value.StackTrace}\n{(value as System.IO.FileNotFoundException)?.FusionLog}";
+#endif
+#if CORECLR
+            this.ErrorStackTrace += $"{value.GetType().Name}: {value.Message}\n{value.StackTrace}";
+#endif
+
+            if (value.InnerException != null)
+            {
+                this.ErrorStackTrace += "\n---------------------\n";
+                this.AddExceptionToStackTrace(value.InnerException);
+            }
+        }
     }
 }

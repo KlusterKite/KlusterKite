@@ -9,8 +9,6 @@
 
 namespace ClusterKit.NodeManager.Client.MigrationStates
 {
-    using System;
-
     using ClusterKit.API.Attributes;
 
     /// <summary>

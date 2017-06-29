@@ -362,7 +362,7 @@ namespace ClusterKit.API.Tests.Mock
         public List<TestLog> MultipleEndClassArray => new List<TestLog>
                                                           {
                                                               new TestLogFirst { Id = 1, FirstMessage = "first" },
-                                                              new TestLogSecond {Id = 2, SecondMessage = "second" }
+                                                              new TestLogSecond { Id = 2, SecondMessage = "second" }
                                                           };
 
         /// <summary>

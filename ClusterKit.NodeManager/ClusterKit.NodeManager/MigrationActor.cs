@@ -162,17 +162,18 @@ namespace ClusterKit.NodeManager
         /// <param name="request">The list of migrating resources</param>
         /// <param name="errors">The list of processing errors</param>
         /// <returns>The migration plan</returns>
-        private MigrationPlan CreateMigrationPlan(List<ResourceUpgrade> request, out List<MigrationError> errors)
+        private MigrationPlan CreateMigrationPlan(List<ResourceUpgrade> request, out List<MigrationLogRecord> errors)
         {
             var plan = new MigrationPlan();
-            errors = new List<MigrationError>();
+            errors = new List<MigrationLogRecord>();
             var errorId = -1;
             foreach (var resourceUpgrade in request)
             {
-                var error = new MigrationError
-                                {
+                var error = new MigrationLogRecord
+                {
                                     Id = errorId--,
-                                    Created = DateTimeOffset.Now,
+                                    Type = EnMigrationLogRecordType.Error,
+                                    Started = DateTimeOffset.Now,
                                     ReleaseId = this.StateData.Migration.ToReleaseId,
                                     MigratorTemplateCode = resourceUpgrade.TemplateCode,
                                     MigratorTypeName = resourceUpgrade.MigratorTypeName,
@@ -402,15 +403,16 @@ namespace ClusterKit.NodeManager
         /// <param name="request">The list of migrating resources</param>
         /// <param name="errors">The list of processing errors</param>
         /// <returns>The migration plan</returns>
-        private MigrationPlan CreateReleasePlan(List<ResourceUpgrade> request, out List<MigrationError> errors)
+        private MigrationPlan CreateReleasePlan(List<ResourceUpgrade> request, out List<MigrationLogRecord> errors)
         {
             var plan = new MigrationPlan();
-            errors = new List<MigrationError>();
+            errors = new List<MigrationLogRecord>();
             foreach (var resourceUpgrade in request)
             {
-                var error = new MigrationError
+                var error = new MigrationLogRecord
                                 {
-                                    Created = DateTimeOffset.Now,
+                                    Started = DateTimeOffset.Now,
+                                    Type = EnMigrationLogRecordType.Error,
                                     ReleaseId = this.StateData.Release.Id,
                                     MigratorTemplateCode = resourceUpgrade.TemplateCode,
                                     MigratorTypeName = resourceUpgrade.MigratorTypeName,
@@ -541,21 +543,16 @@ namespace ClusterKit.NodeManager
                         operation.MigratorTemplateCode = plan.Template.Code;
                         operation.MigratorTemplateName = plan.Template.Name;
 
-                        if (operation.Error != null)
+                        if (operation.Type.HasFlag(EnMigrationLogRecordType.Error))
                         {
-                            operation.Error.ReleaseId = releaseId;
-                            operation.Error.MigrationId = this.StateData.Migration.Id;
-                            operation.Error.MigratorTemplateCode = plan.Template.Code;
-                            operation.Error.MigratorTemplateName = plan.Template.Name;
-
                             Context.GetLogger()
                                 .Error(
                                     "{Type}: Error while executing migration for template {MigratorTemplateCode} of release {ReleaseId}: {ErrorMessage} \n {ErrorStackTrace}",
                                     this.GetType().Name,
                                     plan.Template.Code,
                                     releaseId,
-                                    operation.Error.ErrorMessage,
-                                    operation.Error.ErrorStackTrace);
+                                    operation.ErrorMessage,
+                                    operation.ErrorStackTrace);
                         }
                         else
                         {
@@ -579,8 +576,9 @@ namespace ClusterKit.NodeManager
                     foreach (var error in collector.Errors)
                     {
                         log.Add(
-                            new MigrationError
+                            new MigrationLogRecord
                                 {
+                                    Type = EnMigrationLogRecordType.Error,
                                     ReleaseId = releaseId,
                                     MigrationId = this.StateData.Migration.Id,
                                     MigratorTemplateCode = plan.Template.Code,
@@ -601,8 +599,9 @@ namespace ClusterKit.NodeManager
             catch (Exception exception)
             {
                 log.Add(
-                    new MigrationError
+                        new MigrationLogRecord
                         {
+                            Type = EnMigrationLogRecordType.Error,
                             ReleaseId = releaseId,
                             MigrationId = this.StateData.Migration.Id,
                             MigratorTemplateCode = plan.Template.Code,
@@ -644,20 +643,16 @@ namespace ClusterKit.NodeManager
                         operation.MigratorTemplateCode = plan.Template.Code;
                         operation.MigratorTemplateName = plan.Template.Name;
 
-                        if (operation.Error != null)
+                        if (operation.Type.HasFlag(EnMigrationLogRecordType.Error))
                         {
-                            operation.Error.ReleaseId = this.StateData.Release.Id;
-                            operation.Error.MigratorTemplateCode = plan.Template.Code;
-                            operation.Error.MigratorTemplateName = plan.Template.Name;
-
                             Context.GetLogger()
                                 .Error(
                                     "{Type}: Error while executing migration for template {MigratorTemplateCode} of release {ReleaseId}: {ErrorMessage} \n {ErrorStackTrace}",
                                     this.GetType().Name,
                                     plan.Template.Code,
                                     this.StateData.Release.Id,
-                                    operation.Error.ErrorMessage,
-                                    operation.Error.ErrorStackTrace);
+                                    operation.ErrorMessage,
+                                    operation.ErrorStackTrace);
                         }
                     }
 
@@ -669,8 +664,9 @@ namespace ClusterKit.NodeManager
                     foreach (var error in collector.Errors)
                     {
                         log.Add(
-                            new MigrationError
+                            new MigrationLogRecord
                                 {
+                                    Type = EnMigrationLogRecordType.Error,
                                     ReleaseId = this.StateData.Release.Id,
                                     MigratorTemplateCode = plan.Template.Code,
                                     MigratorTemplateName = plan.Template.Name,
@@ -689,8 +685,9 @@ namespace ClusterKit.NodeManager
             catch (Exception exception)
             {
                 log.Add(
-                    new MigrationError
+                        new MigrationLogRecord
                         {
+                            Type = EnMigrationLogRecordType.Error,
                             ReleaseId = this.StateData.Release.Id,
                             MigratorTemplateCode = plan.Template.Code,
                             MigratorTemplateName = plan.Template.Name,
@@ -720,13 +717,13 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// the success of the operation
         /// </returns>
-        private async Task<List<MigrationError>> ExtractReleaseMigratorsAsync(
+        private async Task<List<MigrationLogRecord>> ExtractReleaseMigratorsAsync(
             Release release,
             string executionDirectory,
             int? migrationId,
             bool forceExtract = false)
         {
-            var errors = new List<MigrationError>();
+            var errors = new List<MigrationLogRecord>();
             if (!forceExtract && Directory.Exists(executionDirectory))
             {
                 return errors;
@@ -754,8 +751,9 @@ namespace ClusterKit.NodeManager
                     catch (Exception exception)
                     {
                         errors.Add(
-                            new MigrationError
+                            new MigrationLogRecord
                                 {
+                                    Type = EnMigrationLogRecordType.Error,
                                     ReleaseId = release.Id,
                                     MigrationId = migrationId,
                                     MigratorTemplateCode = migratorTemplate.Code,
@@ -801,7 +799,7 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// The async task
         /// </returns>
-        private async Task ExtractReleaseMigrationTemplateAsync(Release release, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationError> errors)
+        private async Task ExtractReleaseMigrationTemplateAsync(Release release, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationLogRecord> errors)
         {
             var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
             if (Directory.Exists(migratorExecutionDirectory))
@@ -822,15 +820,12 @@ namespace ClusterKit.NodeManager
 
             try
             {
-                if (!migratorTemplate.PackagesToInstall.TryGetValue(
-                        PackageRepositoryExtensions.CurrentRuntime,
-                        out var packagesToInstall))
+                if (!migratorTemplate.PackagesToInstall.TryGetValue(PackageRepositoryExtensions.CurrentRuntime, out var packagesToInstall))
                 {
                     throw new Exception($"Framework {PackageRepositoryExtensions.CurrentRuntime} is not supported");
                 }
 
-                var packages = packagesToInstall.Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version)))
-                    .ToList();
+                var packages = packagesToInstall.Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version))).ToList();
                 await this.nugetRepository.CreateServiceAsync(
                     packages,
                     this.runtime,
@@ -846,9 +841,11 @@ namespace ClusterKit.NodeManager
                     this.GetType().Name,
                     migratorTemplate.Code,
                     release.Id);
+
                 errors.Add(
-                    new MigrationError
+                    new MigrationLogRecord
                         {
+                            Type = EnMigrationLogRecordType.Error,
                             ReleaseId = release.Id,
                             MigrationId = migrationId,
                             MigratorTemplateCode = migratorTemplate.Code,
@@ -910,15 +907,20 @@ namespace ClusterKit.NodeManager
         /// <returns>
         /// The check success
         /// </returns>
-        private MigrationActorMigrationState GetMigrationState(Data data, out List<MigrationError> errors)
+        private MigrationActorMigrationState GetMigrationState(Data data, out List<MigrationLogRecord> errors)
         {
-            errors = new List<MigrationError>();
-            List<MigrationError> sourceErrors;
-            var sourceStates = this.GetReleaseResourcesState(data.Migration.FromRelease, data.FromReleaseExecutionDir, data.Migration.Id, out sourceErrors)
-                .ToList();
-            List<MigrationError> destinationErrors;
-            var destinationStates = this.GetReleaseResourcesState(data.Migration.ToRelease, data.ToReleaseExecutionDir, data.Migration.Id, out destinationErrors)
-                .ToList();
+            errors = new List<MigrationLogRecord>();
+            var sourceStates = this.GetReleaseResourcesState(
+                data.Migration.FromRelease,
+                data.FromReleaseExecutionDir,
+                data.Migration.Id,
+                out var sourceErrors).ToList();
+
+            var destinationStates = this.GetReleaseResourcesState(
+                data.Migration.ToRelease,
+                data.ToReleaseExecutionDir,
+                data.Migration.Id,
+                out var destinationErrors).ToList();
 
             if (sourceErrors.Any() || destinationErrors.Any())
             {
@@ -929,10 +931,8 @@ namespace ClusterKit.NodeManager
             var state = this.CreateMigrationState(sourceStates, destinationStates).ToList();
             EnMigrationActorMigrationPosition position;
 
-            var resourcePositions = state.SelectMany(s => s.Migrators)
-                .SelectMany(m => m.Resources)
-                .Select(r => r.Position)
-                .ToList();
+            var resourcePositions = state.SelectMany(s => s.Migrators).SelectMany(m => m.Resources)
+                .Select(r => r.Position).ToList();
 
             if (!resourcePositions.Any() || resourcePositions.All(p => p == EnResourcePosition.SourceAndDestination))
             {
@@ -1034,10 +1034,10 @@ namespace ClusterKit.NodeManager
             Release release,
             string executionDirectory,
             int? migrationId,
-            out List<MigrationError> errors)
+            out List<MigrationLogRecord> errors)
         {
             var result = new List<MigratorTemplateReleaseState>();
-            errors = new List<MigrationError>();
+            errors = new List<MigrationLogRecord>();
 
             foreach (var migratorTemplate in release.Configuration.MigratorTemplates.OrderByDescending(
                 mt => mt.Priority))
@@ -1081,8 +1081,9 @@ namespace ClusterKit.NodeManager
                 catch (Exception exception)
                 {
                     errors.Add(
-                        new MigrationError
+                        new MigrationLogRecord
                             {
+                                Type = EnMigrationLogRecordType.Error,
                                 ReleaseId = release.Id,
                                 MigrationId = migrationId,
                                 MigratorTemplateCode = migratorTemplate.Code,
@@ -1142,8 +1143,7 @@ namespace ClusterKit.NodeManager
                            ToReleaseExecutionDir = toReleaseExecutionDir
                        };
 
-            List<MigrationError> errors;
-            var state = this.GetMigrationState(data, out errors);
+            var state = this.GetMigrationState(data, out var errors);
 
             if (state == null)
             {
@@ -1183,8 +1183,7 @@ namespace ClusterKit.NodeManager
                 return new State<EnState, Data>(EnState.InitializationFailed, data);
             }
 
-            List<MigrationError> errors;
-            var releaseStates = this.GetReleaseResourcesState(release, releaseExecutionDir, null, out errors).ToList();
+            var releaseStates = this.GetReleaseResourcesState(release, releaseExecutionDir, null, out var errors).ToList();
             if (errors.Any())
             {
                 this.Parent.Tell(new MigrationActorInitializationFailed { Errors = errors });
@@ -1246,8 +1245,7 @@ namespace ClusterKit.NodeManager
         /// <returns>The next state</returns>
         private State<EnState, Data> StateIdleHandleResourceUpgrade(List<ResourceUpgrade> request)
         {
-            List<MigrationError> errors;
-            var plan = this.CreateReleasePlan(request, out errors);
+            var plan = this.CreateReleasePlan(request, out var errors);
 
             if (errors.Count != 0 || this.StateData.ReleaseState == null)
             {
@@ -1272,8 +1270,7 @@ namespace ClusterKit.NodeManager
         /// <returns>The next state</returns>
         private State<EnState, Data> StateMigrationHandleResourceUpgrade(List<ResourceUpgrade> request)
         {
-            List<MigrationError> errors;
-            var plan = this.CreateMigrationPlan(request, out errors);
+            var plan = this.CreateMigrationPlan(request, out var errors);
 
             if (errors.Count != 0 || this.StateData.MigrationState == null)
             {
@@ -1281,7 +1278,7 @@ namespace ClusterKit.NodeManager
                     .Error(
                         "{Type}: Failed to fulfill migration request. Could not create migration plan.",
                         this.GetType().Name);
-                this.Parent.Tell(errors.Cast<MigrationLogRecord>().ToList());
+                this.Parent.Tell(errors.ToList());
                 return this.Stay();
             }
 

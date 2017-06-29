@@ -19,7 +19,6 @@ namespace ClusterKit.NodeManager
     using ClusterKit.Core.Monads;
     using ClusterKit.Data;
     using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
     using ClusterKit.NodeManager.Launcher.Utils;
 

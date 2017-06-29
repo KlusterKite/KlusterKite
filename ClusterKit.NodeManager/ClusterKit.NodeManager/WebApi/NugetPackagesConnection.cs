@@ -17,7 +17,6 @@ namespace ClusterKit.NodeManager.WebApi
 
     using ClusterKit.API.Client;
     using ClusterKit.NodeManager.Client.ApiSurrogates;
-    using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Utils;
 
     /// <summary>

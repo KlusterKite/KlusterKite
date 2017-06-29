@@ -222,14 +222,13 @@ namespace ClusterKit.NodeManager.Tests
                 actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
-                var record = log[0] as MigrationOperation;
-                Assert.NotNull(record);
+                var record = log.First();
+                Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
                 Assert.Equal(1, record.MigrationId);
                 Assert.Equal(1, record.ReleaseId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("second", record.SourcePoint);
                 Assert.Equal("first", record.DestinationPoint);
-                Assert.Null(record.Error);
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
@@ -405,14 +404,13 @@ namespace ClusterKit.NodeManager.Tests
                 actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
-                var record = log[0] as MigrationOperation;
-                Assert.NotNull(record);
+                var record = log.First();
+                Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
                 Assert.Equal(1, record.MigrationId);
                 Assert.Equal(2, record.ReleaseId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("first", record.SourcePoint);
                 Assert.Equal("second", record.DestinationPoint);
-                Assert.Null(record.Error);
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
@@ -516,18 +514,14 @@ namespace ClusterKit.NodeManager.Tests
                 actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
-                var record = log[0] as MigrationOperation;
-                Assert.NotNull(record);
+                var record = log.First();
+                Assert.Equal(EnMigrationLogRecordType.OperationError, record.Type);
                 Assert.Equal(1, record.MigrationId);
                 Assert.Equal(2, record.ReleaseId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("first", record.SourcePoint);
                 Assert.Equal("second", record.DestinationPoint);
-                Assert.NotNull(record.Error);
-                Assert.Equal(1, record.Error.MigrationId);
-                Assert.Equal(2, record.Error.ReleaseId);
-                Assert.Equal("migrator", record.Error.MigratorTemplateCode);
-                Assert.Equal("Exception while migrating resource: Migrate failed", record.Error.ErrorMessage);
+                Assert.Equal("Exception while migrating resource: Migrate failed", record.ErrorMessage);
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
@@ -655,14 +649,13 @@ namespace ClusterKit.NodeManager.Tests
                 this.ExpectMsg<ProcessingTheRequest>();
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
                 Assert.Equal(1, log.Count);
-                var record = log[0] as MigrationOperation;
-                Assert.NotNull(record);
+                var record = log.First();
+                Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
                 Assert.Null(record.MigrationId);
                 Assert.Equal(1, record.ReleaseId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("first", record.SourcePoint);
                 Assert.Equal("second", record.DestinationPoint);
-                Assert.Null(record.Error);
 
                 state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(10));
                 this.ExpectNoMsg();
@@ -764,7 +757,7 @@ namespace ClusterKit.NodeManager.Tests
                 var activeRelease = this.CreateRelease(repo);
                 context.Releases.Add(activeRelease);
                 context.SaveChanges();
-                var errors = activeRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46 }.ToList())
+                var errors = activeRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46, ReleaseCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
@@ -778,7 +771,7 @@ namespace ClusterKit.NodeManager.Tests
                 var nextRelease = this.CreateRelease(repo);
                 context.Releases.Add(nextRelease);
                 context.SaveChanges();
-                errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46 }.ToList())
+                errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46, ReleaseCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
@@ -956,7 +949,7 @@ namespace ClusterKit.NodeManager.Tests
                     {
                         assemblies.Add(Assembly.ReflectionOnlyLoadFrom(file));
                     }
-                    catch(Exception exception)
+                    catch
                     {
                         // ignore
                     }
@@ -968,7 +961,7 @@ namespace ClusterKit.NodeManager.Tests
                     {
                         assemblies.Add(Assembly.ReflectionOnlyLoadFrom(file));
                     }
-                    catch (Exception exception)
+                    catch
                     {
                         // ignore
                     }
@@ -1056,6 +1049,11 @@ namespace ClusterKit.NodeManager.Tests
 
                 Func<string, string, string, IEnumerable<string>> extaction = (framework, destination, temp) =>
                     {
+                        if (string.IsNullOrWhiteSpace(assembly.Location))
+                        {
+                            throw new InvalidOperationException("Assembly has no location");
+                        }
+
                         var fileName = Path.GetFileName(assembly.Location);
                         File.Copy(assembly.Location, Path.Combine(destination, fileName));
                         return new[] { fileName };

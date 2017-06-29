@@ -38,7 +38,7 @@ namespace ClusterKit.Web.Authorization
                            RequestedLocalUrl = context.Request.Path,
                            Headers =
                                context.Request.Headers.ToList().Where(p => p.Key?.ToLower().Trim() != "authorization")
-                                   .ToDictionary(p => p.Key, p => string.Join("; ", p.Value))
+                                   .ToDictionary(p => p.Key, p => string.Join("; ", p.Value.ToArray()))
                        };
         }
 

@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Migrator.EF6.Tools" Version="1.1.3" Imposts="portable-net45+win8+dnxcore50" />
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.1.1" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.1.1" />

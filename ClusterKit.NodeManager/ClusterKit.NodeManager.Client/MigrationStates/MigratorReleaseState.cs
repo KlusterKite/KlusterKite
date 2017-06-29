@@ -9,7 +9,6 @@
 
 namespace ClusterKit.NodeManager.Client.MigrationStates
 {
-    using System;
     using System.Collections.Generic;
 
     using ClusterKit.API.Attributes;

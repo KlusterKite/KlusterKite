@@ -11,10 +11,8 @@ namespace ClusterKit.Web.NginxConfigurator
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
-    using System.Security.AccessControl;
-
+    
     using Akka.Actor;
     using Akka.Configuration;
 
@@ -80,8 +78,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// Checks the file access
         /// </summary>
         /// <param name="filePath">The file path</param>
-        /// <param name="permissionAccess">The permission to check</param>
-        private static void CheckFileAccess(string filePath, FileSystemRights permissionAccess)
+        private static void CheckFileAccess(string filePath)
         {
             if (!Path.IsPathRooted(filePath))
             {
@@ -126,7 +123,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig is not defined");
             }
 
-            CheckFileAccess(configPath, FileSystemRights.Write);
+            CheckFileAccess(configPath);
         }
 
         /// <summary>
@@ -144,8 +141,7 @@ namespace ClusterKit.Web.NginxConfigurator
                     throw new ConfigurationException("ClusterKit.Web.Nginx.ReloadCommand.Command is not defined");
                 }
 
-                CheckFileAccess(commandPath, FileSystemRights.Read);
-                CheckFileAccess(commandPath, FileSystemRights.ExecuteFile);
+                CheckFileAccess(commandPath);
             }
         }
     }

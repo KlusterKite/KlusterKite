@@ -99,6 +99,7 @@ namespace ClusterKit.Core
                 {
                     Console.WriteLine(loaderException.Message);
                 }
+
                 Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!");
                 throw;
             }

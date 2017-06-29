@@ -72,7 +72,7 @@ namespace ClusterKit.Data
         }
 
         /// <summary>
-        /// The DI component context
+        /// Gets the DI component context
         /// </summary>
         protected IComponentContext ComponentContext { get; }
 

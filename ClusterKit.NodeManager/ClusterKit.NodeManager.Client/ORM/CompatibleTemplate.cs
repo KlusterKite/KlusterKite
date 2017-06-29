@@ -9,7 +9,6 @@
 
 namespace ClusterKit.NodeManager.Client.ORM
 {
-    using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 

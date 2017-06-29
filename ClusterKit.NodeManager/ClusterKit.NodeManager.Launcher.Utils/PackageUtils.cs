@@ -20,14 +20,11 @@ namespace ClusterKit.NodeManager.Launcher.Utils
     using ClusterKit.NodeManager.Launcher.Utils.Exceptions;
 
     using NuGet.Client;
-    using NuGet.Commands;
     using NuGet.Common;
     using NuGet.Configuration;
     using NuGet.ContentModel;
     using NuGet.Frameworks;
-    using NuGet.LibraryModel;
     using NuGet.Packaging.Core;
-    using NuGet.ProjectModel;
     using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
     using NuGet.RuntimeModel;

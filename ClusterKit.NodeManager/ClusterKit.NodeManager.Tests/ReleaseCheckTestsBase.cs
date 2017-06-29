@@ -46,7 +46,7 @@ namespace ClusterKit.NodeManager.Tests
         /// <summary>
         /// The .NET Core 1.1 name
         /// </summary>
-        public const string NetCore = ".NET Core,Version=v1.1";
+        public const string NetCore = ".NETCoreApp,Version=v1.1";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseCheckTestsBase"/> class.

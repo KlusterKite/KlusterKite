@@ -35,7 +35,7 @@ namespace ClusterKit.NodeManager.Migrator.Executor
         /// <summary>
         /// Gets the list of errors
         /// </summary>
-        private static readonly List<MigrationError> Errors = new List<MigrationError>();
+        private static readonly List<MigrationLogRecord> Errors = new List<MigrationLogRecord>();
 
         /// <summary>
         /// Service main entry point
@@ -58,8 +58,9 @@ namespace ClusterKit.NodeManager.Migrator.Executor
                 if (type == null)
                 {
                     Errors.Add(
-                        new MigrationError
+                        new MigrationLogRecord
                             {
+                                Type = EnMigrationLogRecordType.Error,
                                 ErrorMessage = $"Migrator type {typeName} was not found",
                                 MigratorTypeName = typeName
                             });
@@ -69,8 +70,9 @@ namespace ClusterKit.NodeManager.Migrator.Executor
                 if (!type.GetTypeInfo().GetInterfaces().Contains(typeof(IMigrator)))
                 {
                     Errors.Add(
-                        new MigrationError
+                        new MigrationLogRecord
                             {
+                                Type = EnMigrationLogRecordType.Error,
                                 ErrorMessage = $"Type {typeName} doesn't implement IMigrator",
                                 MigratorTypeName = typeName
                             });

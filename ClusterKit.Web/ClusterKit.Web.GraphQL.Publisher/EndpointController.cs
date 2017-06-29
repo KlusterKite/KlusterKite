@@ -15,9 +15,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using System.Text;
     using System.Threading.Tasks;
 
-    using Akka.Actor;
-    using Akka.Configuration;
-
     using ClusterKit.Security.Attributes;
     using ClusterKit.Web.Authorization;
 
@@ -52,11 +49,6 @@ namespace ClusterKit.Web.GraphQL.Publisher
         private readonly IDocumentWriter writer;
 
         /// <summary>
-        /// The system.
-        /// </summary>
-        private readonly ActorSystem system;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="EndpointController"/> class.
         /// </summary>
         /// <param name="schemaProvider">
@@ -68,24 +60,15 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <param name="writer">
         /// The writer.
         /// </param>
-        /// <param name="system">
-        /// The system.
-        /// </param>
-        /// <param name="config">
-        /// The config.
-        /// </param>
         public EndpointController(
             SchemaProvider schemaProvider,
                                   IDocumentExecuter executor,
-                                  IDocumentWriter writer,
-                                  ActorSystem system,
-                                  Config config)
+                                  IDocumentWriter writer)
         {
             this.schemaProvider = schemaProvider;
             this.executor = executor;
             this.writer = writer;
-            this.system = system;
-
+            
             /*
             this.complexityConfiguration = new ComplexityConfiguration
                                                {

@@ -25,7 +25,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
         /// <summary>
         /// Gets the list of errors
         /// </summary>
-        public List<MigrationError> Errors { get; } = new List<MigrationError>();
+        public List<MigrationLogRecord> Errors { get; } = new List<MigrationLogRecord>();
 
         /// <summary>
         /// Gets or sets the result
@@ -46,7 +46,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
             }
             catch (Exception e)
             {
-                this.Errors.Add(new MigrationError { ErrorMessage = e.Message, Exception = e });
+                this.Errors.Add(new MigrationLogRecord { Type = EnMigrationLogRecordType.Error, ErrorMessage = e.Message, Exception = e });
             }
         }
 

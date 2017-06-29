@@ -9,7 +9,6 @@
 
 namespace ClusterKit.NodeManager.Launcher.Utils
 {
-    using System;
     using System.IO;
 
     using Newtonsoft.Json;

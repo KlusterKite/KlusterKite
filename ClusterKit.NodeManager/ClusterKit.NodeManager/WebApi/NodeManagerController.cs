@@ -66,11 +66,6 @@ namespace ClusterKit.NodeManager.WebApi
         [RequireClientPrivilege(Privileges.GetConfiguration)]
         public async Task<IActionResult> GetConfiguration([FromBody] NewNodeTemplateRequest request)
         {
-            this.System.Log.Info(
-                "{Type}: Serving GetConfiguration request {RequestData}",
-                this.GetType().Name,
-                JsonConvert.SerializeObject(request));
-
             object result;
             try
             {

@@ -9,7 +9,6 @@
 
 namespace ClusterKit.NodeManager.Launcher.Messages
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     using ClusterKit.API.Attributes;

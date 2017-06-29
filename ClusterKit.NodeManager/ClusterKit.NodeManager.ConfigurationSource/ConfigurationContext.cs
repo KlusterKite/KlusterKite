@@ -93,9 +93,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Release).WithMany(m => m.MigrationLogs)
                 .HasForeignKey(r => r.ReleaseId);
 
-            modelBuilder.Entity<MigrationError>();
-            modelBuilder.Entity<MigrationOperation>();
-
             modelBuilder.Entity<RoleUser>().HasKey(t => new { t.UserUid, t.RoleUid });
         }
     }

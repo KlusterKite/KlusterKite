@@ -21,6 +21,6 @@ namespace ClusterKit.NodeManager.Client.Messages.Migration
         /// <summary>
         /// Gets or sets the list of errors
         /// </summary>
-        public List<MigrationError> Errors { get; set; }
+        public List<MigrationLogRecord> Errors { get; set; }
     }
 }
