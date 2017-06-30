@@ -201,6 +201,11 @@ namespace ClusterKit.NodeManager
         private IActorRef workers;
 
         /// <summary>
+        /// Child actor to update releases
+        /// </summary>
+        private IActorRef releaseManager;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
         /// </summary>
         /// <param name="componentContext">
@@ -481,6 +486,15 @@ namespace ClusterKit.NodeManager
                         this.contextFactory,
                         this.Self)).WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                 "workers");
+
+            this.releaseManager = Context.ActorOf(
+                Props.Create(
+                    () => new ReleaseCheckActor(
+                        this.ComponentContext,
+                        this.contextFactory,
+                        this.router,
+                        this.nugetRepository)),
+                "release");
 
             var migrationActorSubstitute =
                 Context.System.Settings.Config.GetString("ClusterKit.NodeManager.MigrationActorSubstitute");
@@ -1323,210 +1337,6 @@ namespace ClusterKit.NodeManager
         }
 
         /// <summary>
-        /// Process the <see cref="ReleaseSetReadyRequest"/>
-        /// </summary>
-        /// <param name="request">
-        /// The request
-        /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        private async Task OnReleaseCheck(ReleaseCheckRequest request)
-        {
-            try
-            {
-                using (var ds = this.GetContext())
-                {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
-                        return;
-                    }
-
-                    if (release.State != EnReleaseState.Draft)
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception("Only draft releases can be checked"),
-                                null));
-                        return;
-                    }
-
-                    var supportedFrameworks =
-                        Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
-                    if (errors.Count > 0)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
-                        return;
-                    }
-
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
-                }
-            }
-            catch (Exception exception)
-            {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
-            }
-        }
-
-        /// <summary>
-        /// Process the <see cref="ReleaseSetObsoleteRequest"/>
-        /// </summary>
-        /// <param name="request">The request</param>
-        private void OnReleaseSetObsolete(ReleaseSetObsoleteRequest request)
-        {
-            try
-            {
-                using (var ds = this.GetContext())
-                {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
-                        return;
-                    }
-
-                    if (release.State != EnReleaseState.Ready)
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception("Only ready releases can be made obsolete manually"),
-                                null));
-                        return;
-                    }
-
-                    release.State = EnReleaseState.Obsolete;
-                    ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
-                    SecurityLog.CreateRecord(
-                        EnSecurityLogType.OperationGranted,
-                        EnSeverity.Crucial,
-                        request.Context,
-                        "Release {ReleaseId} marked as obsolete",
-                        release.Id);
-                }
-            }
-            catch (Exception exception)
-            {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
-            }
-        }
-
-        /// <summary>
-        /// Process the <see cref="ReleaseSetReadyRequest"/>
-        /// </summary>
-        /// <param name="request">
-        /// The request
-        /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        private async Task OnReleaseSetReady(ReleaseSetReadyRequest request)
-        {
-            try
-            {
-                using (var ds = this.GetContext())
-                {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
-                        return;
-                    }
-
-                    if (release.State != EnReleaseState.Draft)
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception("Only draft releases can be made ready"),
-                                null));
-                        return;
-                    }
-
-                    if (ds.Releases.Any(r => r.State == EnReleaseState.Ready))
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception(
-                                    "There is an already defined ready release. Please remove the previous one."),
-                                null));
-                        return;
-                    }
-
-                    var supportedFrameworks =
-                        Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
-                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
-                    if (errors.Count > 0)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
-                        return;
-                    }
-
-                    release.State = EnReleaseState.Ready;
-                    ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
-                    SecurityLog.CreateRecord(
-                        EnSecurityLogType.OperationGranted,
-                        EnSeverity.Crucial,
-                        request.Context,
-                        "Release {ReleaseId} marked as Ready",
-                        release.Id);
-                }
-            }
-            catch (Exception exception)
-            {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
-            }
-        }
-
-        /// <summary>
-        /// Process the <see cref="ReleaseSetStableRequest"/>
-        /// </summary>
-        /// <param name="request">The request</param>
-        private void OnReleaseSetStable(ReleaseSetStableRequest request)
-        {
-            try
-            {
-                using (var ds = this.GetContext())
-                {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
-                    {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
-                        return;
-                    }
-
-                    if (release.State != EnReleaseState.Active)
-                    {
-                        this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
-                                new Exception("Only active releases can be marked as stable"),
-                                null));
-                        return;
-                    }
-
-                    if (release.IsStable != request.IsStable)
-                    {
-                        var error = new ErrorDescription("isStable", "The value is not changed");
-                        var mutationException = new MutationException(error);
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(mutationException, null));
-                        return;
-                    }
-
-                    release.IsStable = request.IsStable;
-                    ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
-                }
-            }
-            catch (Exception exception)
-            {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
-            }
-        }
-
-        /// <summary>
         /// Sends new description request to foreign node
         /// </summary>
         /// <param name="message">Notification message</param>
@@ -1783,13 +1593,14 @@ namespace ClusterKit.NodeManager
             this.Receive<UserRoleRemoveRequest>(m => this.workers.Forward(m));
 
             this.Receive<CollectionRequest<Release>>(m => this.workers.Forward(m));
-            this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
-            this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
-            this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
-            this.Receive<ReleaseSetObsoleteRequest>(r => this.OnReleaseSetObsolete(r));
-            this.Receive<ReleaseSetStableRequest>(r => this.OnReleaseSetStable(r));
-            this.Receive<UpdateClusterRequest>(r => this.OnUpdateCluster(r));
 
+            this.Receive<CrudActionMessage<Release, int>>(m => this.releaseManager.Forward(m));
+            this.Receive<ReleaseCheckRequest>(m => this.releaseManager.Forward(m));
+            this.Receive<ReleaseSetReadyRequest>(m => this.releaseManager.Forward(m));
+            this.Receive<ReleaseSetObsoleteRequest>(m => this.releaseManager.Forward(m));
+            this.Receive<ReleaseSetStableRequest>(m => this.releaseManager.Forward(m));
+
+            this.Receive<UpdateClusterRequest>(r => this.OnUpdateCluster(r));
             this.Receive<CollectionRequest<Migration>>(m => this.workers.Forward(m));
 
             this.Receive<ProcessingTheRequest>(m => this.resourceState.OperationIsInProgress = true);

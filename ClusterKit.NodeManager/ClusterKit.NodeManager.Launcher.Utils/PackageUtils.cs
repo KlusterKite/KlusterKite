@@ -17,8 +17,6 @@ namespace ClusterKit.NodeManager.Launcher.Utils
     using System.Threading;
     using System.Threading.Tasks;
 
-    using ClusterKit.NodeManager.Launcher.Utils.Exceptions;
-
     using NuGet.Client;
     using NuGet.Common;
     using NuGet.Configuration;
@@ -89,7 +87,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
             var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
             var sourceCacheContext = new SourceCacheContext();
             
-            var downloadResource = sourceRepository.GetResource<DownloadResource>();
+            var downloadResource = await sourceRepository.GetResourceAsync<DownloadResource>().ConfigureAwait(false);
             var packageDownloadContext = new PackageDownloadContext(sourceCacheContext);
             var result = new Dictionary<PackageIdentity, IEnumerable<string>>();
             try
@@ -165,51 +163,46 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         /// <returns>
         /// The package metadata
         /// </returns>
-        public static Task<IPackageSearchMetadata> Search(string nugetUrl, string id, NuGetVersion version)
+        public static async Task<IPackageSearchMetadata> Search(string nugetUrl, string id, NuGetVersion version)
         {
             var source = new PackageSource(nugetUrl);
             var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
-            var listResource = sourceRepository.GetResource<ListResource>();
-            return listResource.Search(id, version);
-        }
+            var resource = await sourceRepository.GetResourceAsync<PackageSearchResource>().ConfigureAwait(false);
+            var result = new List<IPackageSearchMetadata>();
 
-        /// <summary>
-        /// Searches for a specific package
-        /// </summary>
-        /// <param name="listResource">
-        /// The resource to search
-        /// </param>
-        /// <param name="id">
-        /// The package id
-        /// </param>
-        /// <param name="version">
-        /// The package version.
-        /// </param>
-        /// <returns>
-        /// The package metadata
-        /// </returns>
-        public static async Task<IPackageSearchMetadata> Search(
-            this ListResource listResource,
-            string id,
-            NuGetVersion version)
-        {
-            var packages = await listResource.ListAsync(
-                               id,
-                               true,
-                               true,
-                               false,
-                               NullLogger.Instance,
-                               CancellationToken.None);
-            var enumerator = packages.GetEnumeratorAsync();
-            while (await enumerator.MoveNextAsync())
+            const int PageSize = 1000;
+            var position = 0;
+            while (true)
             {
-                if (enumerator.Current.Identity.Id == id && enumerator.Current.Identity.Version == version)
+                var searchMetadata = (await resource.SearchAsync(
+                                         id,
+                                         new SearchFilter(true, null),
+                                         position,
+                                         PageSize,
+                                         NullLogger.Instance,
+                                         CancellationToken.None)).ToList();
+                var previousCount = result.Count;
+                result.AddRange(searchMetadata);
+                position += PageSize;
+                if (searchMetadata.Any(s => s.Identity.Id == id))
                 {
-                    return enumerator.Current;
+                    break;
+                }
+
+                if (result.Count - previousCount < PageSize)
+                {
+                    break;
                 }
             }
 
-            return null;
+            var package = result.FirstOrDefault(s => s.Identity.Id == id);
+            if (package == null)
+            {
+                return null;
+            }
+
+            var versions = (await package.GetVersionsAsync()).ToList();
+            return versions.FirstOrDefault(v => v.Version == version)?.PackageSearchMetadata;
         }
 
         /// <summary>
@@ -222,7 +215,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
         {
             var source = new PackageSource(repository);
             var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
-            var resource = sourceRepository.GetResource<PackageSearchResource>();
+            var resource = await sourceRepository.GetResourceAsync<PackageSearchResource>().ConfigureAwait(false);
             var result = new List<IPackageSearchMetadata>();
 
             const int PageSize = 1000;
@@ -246,114 +239,6 @@ namespace ClusterKit.NodeManager.Launcher.Utils
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Searches the repository for specified packages and their dependencies
-        /// </summary>
-        /// <param name="packages">The list of packages id</param>
-        /// <param name="framework">The framework to check dependencies for</param>
-        /// <param name="nugetUrl">The url of nuget repository</param>
-        /// <returns>The list of found packages</returns>
-        /// <exception cref="PackageNotFoundException">In case of package or it's dependency is missing</exception>
-        public static IEnumerable<IPackageSearchMetadata> SearchLatestPackagesWithDependencies(
-            this IEnumerable<string> packages,
-            NuGetFramework framework,
-            string nugetUrl)
-        {
-            var source = new PackageSource(nugetUrl);
-            var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
-            var listResource = sourceRepository.GetResource<ListResource>();
-
-            var requiredPackages = Task.WhenAll(
-                packages.Select(
-                    async id =>
-                        {
-                            var result = await listResource.Search(id);
-                            if (result == null)
-                            {
-                                throw new PackageNotFoundException(id);
-                            }
-
-                            return result;
-                        })).GetAwaiter().GetResult().ToDictionary(p => p.Identity.Id.ToLower());
-
-            while (true)
-            {
-                var requirements = requiredPackages.Values
-                    .Select(
-                        p => new
-                                 {
-                                     DependencySet = NuGetFrameworkUtility.GetNearest(p.DependencySets, framework),
-                                     Source = p
-                                 }).Where(
-                        ds => ds.DependencySet != null && (ds.DependencySet.TargetFramework == null
-                                                           || NuGetFrameworkUtility.IsCompatibleWithFallbackCheck(
-                                                               framework,
-                                                               ds.DependencySet.TargetFramework)))
-                    .SelectMany(ds => ds.DependencySet.Packages).GroupBy(ds => ds.Id);
-
-                var additionalPackagesTasks = requirements.Select(
-                    async r =>
-                        {
-                            if (requiredPackages.TryGetValue(r.Key.ToLower(), out var currentPackage) && r.All(
-                                    rc => rc.VersionRange.Satisfies(currentPackage.Identity.Version)))
-                            {
-                                return currentPackage;
-                            }
-
-                            var dependenciesList = await listResource.ListAsync(
-                                                       r.Key,
-                                                       true,
-                                                       true,
-                                                       false,
-                                                       NullLogger.Instance,
-                                                       CancellationToken.None);
-
-                            var enumerator = dependenciesList.GetEnumeratorAsync();
-                            var possiblePackages = new List<IPackageSearchMetadata>();
-                            while (await enumerator.MoveNextAsync())
-                            {
-                                var p = enumerator.Current;
-                                if (r.Key == enumerator.Current.Identity.Id
-                                    && r.All(rq => rq.VersionRange.Satisfies(p.Identity.Version)))
-                                {
-                                    possiblePackages.Add(p);
-                                }
-                            }
-
-                            var dependency = possiblePackages.OrderBy(p => p.Identity.Version).FirstOrDefault();
-
-                            if (dependency == null)
-                            {
-                                throw new PackageNotFoundException(r.Key);
-                            }
-
-                            if (dependency.Identity.Id != r.Key)
-                            {
-                                Console.WriteLine($"!!! {dependency.Identity.Id} != {r.Key}");
-                            }
-
-                            return dependency;
-                        });
-
-                var additionalPackages = Task.WhenAll(additionalPackagesTasks).GetAwaiter().GetResult().ToList();
-                additionalPackages.RemoveAll(
-                    p => requiredPackages.TryGetValue(p.Identity.Id.ToLower(), out var currentPackage)
-                         && currentPackage == p);
-
-                if (additionalPackages.Count == 0)
-                {
-                    break;
-                }
-
-                foreach (var package in additionalPackages)
-                {
-                    requiredPackages[package.Identity.Id.ToLower()] = package;
-                }
-            }
-
-            return requiredPackages.Values;
         }
 
         /// <summary>
@@ -432,33 +317,6 @@ namespace ClusterKit.NodeManager.Launcher.Utils
             {
                 package.Dispose();
             }
-        }
-
-        /// <summary>
-        /// Searches for a specific package
-        /// </summary>
-        /// <param name="listResource">The resource to search</param>
-        /// <param name="id">The package id</param>
-        /// <returns>The package metadata</returns>
-        private static async Task<IPackageSearchMetadata> Search(this ListResource listResource, string id)
-        {
-            var packages = await listResource.ListAsync(
-                               id,
-                               true,
-                               false,
-                               false,
-                               NullLogger.Instance,
-                               CancellationToken.None);
-            var enumerator = packages.GetEnumeratorAsync();
-            while (await enumerator.MoveNextAsync())
-            {
-                if (enumerator.Current.Identity.Id == id)
-                {
-                    return enumerator.Current;
-                }
-            }
-
-            return null;
         }
     }
 }

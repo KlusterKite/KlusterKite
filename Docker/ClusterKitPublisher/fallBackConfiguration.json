@@ -457,7 +457,7 @@
     },
     {
       "Id": "System.Diagnostics.FileVersionInfo",
-      "Version": "4.0.0"
+      "Version": "4.3.0"
     },
     {
       "Id": "System.Diagnostics.Process",

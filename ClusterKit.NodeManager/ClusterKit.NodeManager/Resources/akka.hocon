@@ -5,7 +5,7 @@
 			PackageRepository = "http://nuget/"
 			SupportedFrameworks = [
 				".NETFramework,Version=v4.6",
-                ".NET Standard,Version=v1.1"
+                ".NETCoreApp,Version=v1.1"
 			]
 
 			//ConfigurationDatabaseConnectionString = ""

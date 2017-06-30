@@ -120,16 +120,13 @@ namespace ClusterKit.Security.SessionRedis
             var token = tokenUid.ToString("N");
 
             var data = ticket.SerializeToAkka(this.system);
-            this.system.Log.Info("{Type}: Refresh token prepared", this.GetType().Name);
             using (var connection = ConnectionMultiplexer.Connect(this.redisConnectionString))
             {
                 var db = connection.GetDatabase(this.redisDb);
-                this.system.Log.Info("{Type}: Database opened", this.GetType().Name);
                 var result = db.StringSet(
                     this.GetRedisRefreshKey(token),
                     data,
                     ticket.Expiring.HasValue ? (TimeSpan?)(ticket.Expiring.Value - DateTimeOffset.Now) : null);
-                this.system.Log.Info("{Type}: token saved", this.GetType().Name);
                 if (result)
                 {
                     return Task.FromResult(token);

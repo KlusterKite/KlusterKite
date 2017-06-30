@@ -237,8 +237,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 errors.Add(new ErrorDescription("configuration.packages", "Packages are not initialized"));
                 return errors;
             }
-             
-            var (packages, packagesErrors) = await CheckPackages(release, supportedFrameworks, nugetRepository);
+
+            var(packages, packagesErrors) = await CheckPackages(release, supportedFrameworks, nugetRepository);
             errors.AddRange(packagesErrors);
             errors.AddRange(await CheckTemplatesPackages(release, supportedFrameworks, packages, nugetRepository));
             return errors;
@@ -256,24 +256,25 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <param name="nugetRepository">
         /// The nuget repository.
         /// </param>
-        private static async Task<(Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>)>
+        /// <returns>
+        /// The list of defined packages along with list of possible errors
+        /// </returns>
+        private static async Task<Tuple<Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>>>
             CheckPackages(Release release, List<string> supportedFrameworks, IPackageRepository nugetRepository)
         {
             var definedPackages = new Dictionary<string, IPackageSearchMetadata>();
             var errors = new List<ErrorDescription>();
-
             var packages = await Task.WhenAll(
                                release.Configuration.Packages
-                               .Select(d => new { Description = d, Version = NuGetVersion.TryParse(d.Version,out var v) ? v : null})
+                               .Select(d => new { Description = d, Version = NuGetVersion.TryParse(d.Version, out var v) ? v : null })
                                .Select(
-                                   async p => new
-                                                            {
-                                                                p.Description,
-                                                                p.Version,
-                                                                Package = p.Version != null ? await nugetRepository.GetAsync(
-                                                                              p.Description.Id,
-                                                                              p.Version) : null
-                                                            }));
+                                       async p => new
+                                                      {
+                                                          p.Description, p.Version,
+                                                          Package = p.Version != null 
+                                                              ? await nugetRepository.GetAsync(p.Description.Id, p.Version) 
+                                                              : null
+                                                      }));
 
             foreach (var package in packages)
             {
@@ -328,7 +329,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                             return null;
                         })
                  .Where(e => e != null));
-            return (definedPackages, errors);
+            return Tuple.Create(definedPackages, errors);
         }
 
         /// <summary>
@@ -413,7 +414,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                     }
                 }
 
-                var (templatePackages, templateErrors) =
+                var(templatePackages, templateErrors) =
                     await GetTemplateDirectPackages(definedPackages, nugetRepository, template, templateField);
 
                 errors.AddRange(templateErrors);
@@ -506,7 +507,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <returns>
         ///  The list of possible errors
         /// </returns>
-        private static async Task<(Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>)> GetTemplateDirectPackages(
+        private static async Task<Tuple<Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>>> GetTemplateDirectPackages(
             Dictionary<string, IPackageSearchMetadata> definedPackages,
             IPackageRepository nugetRepository,
             ITemplate nodeTemplate,
@@ -563,7 +564,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 }
             }
 
-            return (directPackagesToFill, errors);
+            return Tuple.Create(directPackagesToFill, errors);
         }
     }
 }

@@ -12,13 +12,17 @@ namespace ClusterKit.NodeManager.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using ClusterKit.Data.EF.InMemory;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
+    using ClusterKit.NodeManager.Launcher.Utils;
 
     using Microsoft.EntityFrameworkCore;
+
+    using NuGet.Versioning;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -49,6 +53,18 @@ namespace ClusterKit.NodeManager.Tests
         public void Dispose()
         {
             this.CreateContext().Database.EnsureDeleted();
+        }
+
+        /// <summary>
+        /// Temp nuget test
+        /// </summary>
+        /// <returns>The async task</returns>
+        [Fact]
+        public async Task NugetTest()
+        {
+            var repository = new RemotePackageRepository("http://nuget/");
+            var package = await repository.GetAsync("Akka", NuGetVersion.Parse("1.3.0"));
+            Assert.NotNull(package);
         }
 
         /// <summary>
