@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class InitiateScanMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{ClusterKitMonitoring_clusterKitMonitoringApi_initiateScan}`
+    return Relay.QL`mutation{clusterKitMonitoring_clusterKitMonitoringApi_initiateScan}`
   }
 
   getFatQuery () {

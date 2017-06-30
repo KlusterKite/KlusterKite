@@ -1,6 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay'
 
+import { Link } from 'react-router';
+
 class FeedList extends React.Component {
   constructor (props) {
     super(props);
@@ -20,7 +22,16 @@ class FeedList extends React.Component {
         <div>
           <h3>Nuget feeds</h3>
 
-          <p>{this.props.configuration && this.props.configuration.nugetFeed}</p>
+          <p>
+            {this.props.canEdit &&
+              <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}`}>
+                {this.props.configuration && this.props.configuration.nugetFeed}
+              </Link>
+            }
+            {!this.props.canEdit &&
+              <span>{this.props.configuration && this.props.configuration.nugetFeed}</span>
+            }
+          </p>
         </div>
       </div>
     );

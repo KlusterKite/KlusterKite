@@ -151,7 +151,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         newNode = null
       }
 
-      if (this.props['migratorTemplateDeleteId'] === node.id) {
+      if (this.props['migratorTemplateDeleteId'] && this.props['migratorTemplateDeleteId'] === node.id) {
         console.log('trying to delete ', this.props['migratorTemplateDeleteId']);
       }
 
@@ -199,7 +199,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         configuration: {
           nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
           migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migratorTemplates'),
-          nugetFeed: this.props.configuration.nugetFeed,
+          nugetFeed: this.props.nugetFeed || this.props.configuration.nugetFeed,
           packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
           seedAddresses: this.updateSeedAddresses(this.props.configuration.seedAddresses),
         },
