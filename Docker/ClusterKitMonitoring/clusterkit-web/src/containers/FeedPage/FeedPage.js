@@ -2,9 +2,7 @@ import React from 'react'
 import Relay from 'react-relay'
 import { browserHistory } from 'react-router'
 
-// import CreateFeedMutation from './mutations/CreateFeedMutation'
 import UpdateFeedMutation from './mutations/UpdateFeedMutation'
-// import DeleteFeedMutation from './mutations/DeleteFeedMutation'
 
 import FeedForm from '../../components/FeedForm/FeedForm'
 
@@ -25,19 +23,11 @@ class FeedPage extends React.Component {
     }
   }
 
-  isAddNew = () => {
-    return !this.props.params.hasOwnProperty('id')
-  };
-
   onSubmit = (model) => {
-    if (this.isAddNew()){
-      this.editNode(model, null);
-    } else {
-      this.editNode(model, this.props.api.feed.id);
-    }
+    this.editNode(model);
   };
 
-  editNode = (model, editId) => {
+  editNode = (model) => {
     this.setState({
       saving: true
     });
@@ -48,13 +38,7 @@ class FeedPage extends React.Component {
           nodeId: this.props.params.releaseId,
           releaseId: this.props.api.release.__id,
           configuration: this.props.api.release.configuration,
-          nugetFeedId: editId,
-          nugetFeed: {
-            userName: model.userName,
-            password: model.password,
-            address: model.address,
-            type: model.type,
-          }
+          nugetFeed: model.nugetFeed,
         }),
       {
         onSuccess: (response) => {
@@ -83,55 +67,20 @@ class FeedPage extends React.Component {
     return edges.map(x => x.node).map(x => x.message);
   }
 
-  onDelete = () => {
-    this.setState({
-      deleting: true
-    });
-
-    Relay.Store.commitUpdate(
-      new UpdateFeedMutation(
-        {
-          nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.release.__id,
-          configuration: this.props.api.release.configuration,
-          nugetFeedId: this.props.api.feed.id,
-          nugetFeed: {},
-          nugetFeedDeleteId: this.props.api.feed.id,
-        }),
-      {
-        onSuccess: (response) => {
-          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
-            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
-
-            this.setState({
-              deleting: false,
-              saveErrors: messages
-            });
-          } else {
-            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
-          }
-        },
-        onFailure: (transaction) => {
-          this.setState({
-            deleting: false
-          });
-          console.log(transaction)},
-      },
-    )
-  };
-
   onCancel = () => {
     browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`)
   };
 
   render () {
-    const model = this.props.api.feed;
+    console.log('render', this.props.api);
+    const model = {
+      nugetFeed: this.props.api.release.configuration.nugetFeed,
+    };
+
     return (
       <div>
         <FeedForm
           onSubmit={this.onSubmit}
-          onDelete={model && this.onDelete}
           onCancel={this.onCancel}
           initialValues={model}
           saving={this.state.saving}
@@ -164,16 +113,8 @@ export default Relay.createContainer(
               __id
               configuration {
                 ${UpdateFeedMutation.getFragment('configuration')},
+                nugetFeed,
               }
-            }
-          }
-          feed:__node(id: $id) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_NugetFeed {
-              id
-              address
-              type
-              userName
-              password
             }
           }
         }

@@ -39,8 +39,7 @@ export default class RoutesList extends React.Component {
           <Route path='/clusterkit/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
           <Route path='/clusterkit/CopyConfig/:releaseId/:mode' component={ReleaseConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ReleaseConfigCopyPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/GraphQL' component={GraphQLPage} />
-          <Route path='/clusterkit/NugetFeeds/:releaseId/create' component={FeedPage} queries={ApiQueries} />
-          <Route path='/clusterkit/NugetFeeds/:releaseId/:id' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />
+          <Route path='/clusterkit/NugetFeeds/:releaseId' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Releases' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Releases/:page' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Release/create' component={ReleasePage} queries={ApiQueries} render={({ props }) => props ? <ReleasePage {...props} /> : <Loading />} />

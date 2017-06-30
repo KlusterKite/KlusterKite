@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, RadioGroup } from 'formsy-react-components';
+import { Input } from 'formsy-react-components';
 
 import Form from '../Form/Form';
 
@@ -29,11 +29,6 @@ export default class FeedForm extends React.Component {
   render() {
     const { initialValues } = this.props;
 
-    const options = [
-      { value: 'Public', label: 'Public' },
-      { value: 'Private', label: 'Private' },
-    ];
-
     return (
       <div>
         {initialValues &&
@@ -54,19 +49,7 @@ export default class FeedForm extends React.Component {
           saveErrors={this.props.saveErrors}
         >
           <fieldset>
-            <Input name="__id" value={(initialValues && initialValues.__id) || ""} type="hidden" />
-            <Input name="id" value={(initialValues && initialValues.id) || ""} type="hidden" />
-            <Input name="address" label="Address" value={(initialValues && initialValues.address) || ""} required />
-            <Input name="userName" label="User name" value={(initialValues && initialValues.userName) || ""} />
-            <Input name="password" label="Password" value={(initialValues && initialValues.password) || ""} />
-
-            <RadioGroup
-              name="type"
-              label="Type"
-              value={initialValues && initialValues.type && initialValues.type.toString()}
-              options={options}
-              required
-            />
+            <Input name="nugetFeed" label="NuGet Feed" value={(initialValues && initialValues.nugetFeed) || ""} />
           </fieldset>
         </Form>
       </div>

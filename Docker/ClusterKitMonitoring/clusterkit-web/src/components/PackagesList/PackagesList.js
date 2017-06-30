@@ -9,7 +9,17 @@ export class PackagesList extends React.Component { // eslint-disable-line react
   };
 
   render() {
-    const packages = this.props.configuration && this.props.configuration.packages && this.props.configuration.packages.edges;
+    let packages = this.props.configuration && this.props.configuration.packages && this.props.configuration.packages.edges;
+    // Sorting on client is disabled
+    // packages.sort((a, b) => {
+    //   if (a.node.__id.toLowerCase() > b.node.__id.toLowerCase()) {
+    //     return 1;
+    //   }
+    //   if (a.node.__id.toLowerCase() < b.node.__id.toLowerCase()) {
+    //     return -1;
+    //   }
+    //   return 0;
+    // });
 
     return (
       <div>
@@ -49,7 +59,7 @@ export default Relay.createContainer(
   {
     fragments: {
       configuration: () => Relay.QL`fragment on IClusterKitNodeApi_ReleaseConfiguration {
-        packages {
+        packages(sort: id_asc) {
           edges {
             node {
               version
