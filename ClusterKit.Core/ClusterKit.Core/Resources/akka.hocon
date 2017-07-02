@@ -17,6 +17,10 @@
         serialization-bindings {
            "System.Object" = "hyperion"           
     
+        }
+        
+        serialization-settings {
+            version-tolerance = false         
         } 
 
 
@@ -40,6 +44,8 @@
             type = "ClusterKit.Core.Cluster.ClusterLoggingActor, ClusterKit.Core"
           }          
         }
+
+
       }
 
       remote : {

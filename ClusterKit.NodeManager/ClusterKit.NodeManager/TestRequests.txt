@@ -1,7 +1,7 @@
 ﻿-- Create migration
 
 mutation newMigration {
-  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate(input: {newReleaseId: 2}) {
+  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate(input: {newReleaseId: 2}) {
     result {
       result {
         state,
@@ -25,7 +25,7 @@ mutation newMigration {
 
 
 --- Migration state
-query { 
+{
   api {
     clusterKitNodesApi {
       clusterManagement {
@@ -33,74 +33,62 @@ query {
           __id
         }
         currentMigration {
-          state,
-          direction,
-          started,
-          finished,          
-        },
+          state
+          direction
+          started
+          finished
+          logs {
+            edges {
+              node {
+                started
+                finished
+                type
+                sourcePoint
+                destinationPoint
+                errorMessage
+                errorStackTrace
+                migratorTemplateCode
+                migratorTemplateName
+                migratorTypeName
+                migratorName
+                resourceCode
+                resourceName
+              }
+            }
+          }
+        }
         resourceState {
-          operationIsInProgress,
-          canCreateMigration,
-          canMigrateResources,
-          canUpdateNodesToDestination,
-          canUpdateNodesToSource,
-          canCancelMigration,   
-          canFinishMigration,
+          operationIsInProgress
+          canCreateMigration
+          canMigrateResources
+          canUpdateNodesToDestination
+          canUpdateNodesToSource
+          canCancelMigration
+          canFinishMigration
           migrationState {
-            position,
+            position
             templateStates {
               edges {
                 node {
-                  code,
-                  position,
+                  code
+                  position
                   migrators {
                     edges {
                       node {
-                        typeName,
-                        name,
-                        position,
-                        direction,
+                        typeName
+                        name
+                        position
+                        direction
                         resources {
                           edges {
                             node {
-                              sourcePoint,
-                              destinationPoint,
-                              position,
-                              migrationToSourceExecutor,
-                              migrationToDestinationExecutor,
-                              name,
-                              code,
-                              currentPoint
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          releaseState {
-            states {
-              edges {
-                node {
-                  code,
-                  template {
-                    id
-                  },
-                  migratorsStates {
-                    edges {
-                      node {
-                        typeName,
-                        name,
-                        migrationPoints,
-                        lastDefinedPoint,
-                        resources {
-                          edges {
-                            node {
-                              name,
-                              code,
+                              sourcePoint
+                              destinationPoint
+                              position
+                              migrationToSourceExecutor
+                              migrationToDestinationExecutor
+                              name
+                              code
                               currentPoint
                             }
                           }
@@ -112,7 +100,37 @@ query {
               }
             }
           }
-          
+          releaseState {
+            states {
+              edges {
+                node {
+                  code
+                  template {
+                    id
+                  }
+                  migratorsStates {
+                    edges {
+                      node {
+                        typeName
+                        name
+                        migrationPoints
+                        lastDefinedPoint
+                        resources {
+                          edges {
+                            node {
+                              name
+                              code
+                              currentPoint
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -120,30 +138,31 @@ query {
 }
 
 
+
 -- Update nodes
 mutation {
-  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationNodesUpdate(input: {target: Destination}) {
+  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationNodesUpdate(input: {target: Destination}) {
     result
   }
 }
 
 -- Update resources 
 mutation {
-  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "ClusterKit", migratorTypeName: "ClusterKit.NodeManager.ConfigurationSource.Migrator.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
+  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "ClusterKit", migratorTypeName: "ClusterKit.NodeManager.ConfigurationSource.Migrator.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
     result 
   }
 }
 
 -- finish migration
 mutation {
-  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationFinish {
+  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationFinish {
     result
   }
 }
 
 -- cancel migration
 mutation {
-  ClusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel {
+  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel {
     result
   }
 }
@@ -161,39 +180,15 @@ mutation {
             direction
             started
             finished
-            operations {
+            logs {
               edges {
                 node {
                   started
                   finished
+                  type
                   sourcePoint
                   destinationPoint
-                  error {
-                    created
-                    errorMessage
-                    errorStackTrace
-                    migratorTemplateCode
-                    migratorTemplateName
-                    migratorTypeName
-                    migratorName
-                    resourceCode
-                    resourceName
-                  }
-                }
-              }
-            }
-            errors {
-              edges {
-                node {
-                  created
-                  errorMessage
-                  errorStackTrace
-                  migratorTemplateCode
-                  migratorTemplateName
-                  migratorTypeName
-                  migratorName
-                  resourceCode
-                  resourceName
+                  
                 }
               }
             }

@@ -12,6 +12,8 @@ namespace ClusterKit.NodeManager.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
     using ClusterKit.Data.EF.InMemory;
@@ -53,6 +55,19 @@ namespace ClusterKit.NodeManager.Tests
         public void Dispose()
         {
             this.CreateContext().Database.EnsureDeleted();
+        }
+
+        [Theory]
+        [InlineData(typeof(Release))]
+        [InlineData(typeof(List<Release>))]
+        public void TypeTest(Type type)
+        {
+            var regex = new Regex("(, Version=([\\d\\.]+))?(, Culture=[^,\\] \\t]+)?(, PublicKeyToken=(null|[\\da-f]+))?");
+            var typeName = regex.Replace(type.AssemblyQualifiedName, string.Empty);
+            this.output.WriteLine(typeName);
+            this.output.WriteLine(type.AssemblyQualifiedName);
+            var loadedType = Type.GetType(typeName, true);
+            Assert.Equal(type, loadedType);
         }
 
         /// <summary>
