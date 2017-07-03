@@ -11,6 +11,12 @@
 
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
+  <ItemGroup>
+    <None Remove="Resources\akka.hocon" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\akka.hocon" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Akka.TestKit" Version="1.3.0" />

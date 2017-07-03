@@ -368,3 +368,30 @@ module  Base =
     Target.Create "FinalPushAllPackages" (fun _ -> ())
     "FinalPushThirdPartyPackages" ==> "FinalPushAllPackages"
     "FinalPushLocalPackages" ==> "FinalPushAllPackages"
+
+    Target.Create "Tests" (fun _ -> 
+        let sourcesDir = Path.Combine(buildDir, "src") 
+        let outputTests = Path.Combine(buildDir, "tests") 
+        ensureDirectory outputTests
+        CleanDir outputTests
+        let runSingleProject project =
+            ExecProcess(fun info ->
+                info.FileName <- "dotnet"
+                info.WorkingDirectory <- (Directory.GetParent project).FullName
+                info.Arguments <- "restore") (TimeSpan.FromMinutes 30.) 
+                |> ignore
+            ExecProcess(fun info ->
+                info.FileName <- "dotnet"
+                info.WorkingDirectory <- (Directory.GetParent project).FullName
+                info.Arguments <- (sprintf "xunit -parallel none -teamcity -xml %s/%s_xunit.xml" outputTests (Path.GetFileNameWithoutExtension project))) (TimeSpan.FromMinutes 30.) 
+                |> ignore
+
+        filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))
+            |> Seq.map(fun (file:FileInfo) -> new Project(file.FullName, null, null, ProjectCollection.GlobalProjectCollection, ProjectLoadSettings.IgnoreMissingImports))
+            |> Seq.collect (fun proj -> proj.ItemsIgnoringCondition |> Seq.map (fun item -> (proj, item)))
+            |> Seq.filter (fun (_, item) -> item.ItemType = "DotNetCliToolReference" && item.EvaluatedInclude = "dotnet-xunit")
+            |> Seq.map (fun (proj, _) -> proj)
+            |> Seq.distinct
+            |> Seq.iter(fun f -> runSingleProject f.FullPath)
+    )
+    "PrepareSources" ==> "Tests"
