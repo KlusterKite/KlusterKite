@@ -89,18 +89,6 @@ services:
       default:
         ipv4_address: 172.18.0.8             
 
-  manager:
-    image: clusterkit/manager
-#    environment:
-#     - MONO_LOG_LEVEL=info
-    links:
-     - "seed"
-     - "configDb"
-     - "nuget"
-     - "entry"
-    logging:
-        driver: json-file
-
   monitoringUI:
     image: clusterkit/monitoring-ui
     ports:
@@ -128,6 +116,20 @@ services:
         ipv4_address: 172.18.0.13
 
 
+  manager:
+    image: clusterkit/manager
+#    environment:
+#     - MONO_LOG_LEVEL=info
+    links:
+     - "seed"
+     - "configDb"
+     - "nuget"
+     - "entry"
+     - "publisher1"
+     - "publisher2"
+    logging:
+        driver: json-file
+
   worker:
     image: clusterkit/worker
     links:
@@ -136,5 +138,7 @@ services:
      - "nuget"
      - "configDb"
      - "entry"
+     - "publisher1"
+     - "publisher2"
     logging:
         driver: json-file

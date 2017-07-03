@@ -148,7 +148,7 @@ mutation {
 
 -- Update resources 
 mutation {
-  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "ClusterKit", migratorTypeName: "ClusterKit.NodeManager.ConfigurationSource.Migrator.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
+  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "ClusterKit", migratorTypeName: "ClusterKit.NodeManager.ConfigurationSource.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
     result 
   }
 }

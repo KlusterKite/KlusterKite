@@ -84,6 +84,8 @@ namespace ClusterKit.NodeManager.RemoteDomain
                         continue;
                     }
 
+                    operation.ResourceName = resource.Name;
+
                     try
                     {
                         operation.SourcePoint = migrator.GetCurrentPoint(resource);

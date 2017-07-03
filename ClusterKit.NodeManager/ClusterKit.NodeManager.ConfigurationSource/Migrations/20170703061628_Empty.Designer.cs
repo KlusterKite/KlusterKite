@@ -9,8 +9,8 @@ using ClusterKit.NodeManager.Client.ORM;
 namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
 {
     [DbContext(typeof(ConfigurationContext))]
-    [Migration("20170629061834_Init")]
-    partial class Init
+    [Migration("20170703061628_Empty")]
+    partial class Empty
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

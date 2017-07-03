@@ -47,8 +47,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 columns: table => new
                                       {
                                           Id =
-                                          table.Column<int>(type: "serial", nullable: false)
-                                              .Annotation("Npgsql:ValueGenerationStrategy", 1),
+                                          table.Column<int>(type: "serial", nullable: false),
                                           ConfigurationJson = table.Column<string>(nullable: true),
                                           Created = table.Column<DateTimeOffset>(nullable: false),
                                           Finished = table.Column<DateTimeOffset>(nullable: true),
@@ -91,8 +90,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 name: "CompatibleTemplate",
                 columns: table => new
                                       {
-                                          Id = table.Column<int>(type: "serial", nullable: false)
-                                              .Annotation("Npgsql:ValueGenerationStrategy", 1),
+                                          Id = table.Column<int>(type: "serial", nullable: false),
                                           CompatibleReleaseId = table.Column<int>(nullable: false),
                                           ReleaseId = table.Column<int>(nullable: false),
                                           TemplateCode = table.Column<string>(nullable: true)
@@ -118,8 +116,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 name: "Migrations",
                 columns: table => new
                                       {
-                                          Id = table.Column<int>(type: "serial", nullable: false)
-                                              .Annotation("Npgsql:ValueGenerationStrategy", 1),
+                                          Id = table.Column<int>(type: "serial", nullable: false),
                                           Direction = table.Column<int>(nullable: true),
                                           Finished = table.Column<DateTimeOffset>(nullable: true),
                                           FromReleaseId = table.Column<int>(nullable: false),
@@ -152,7 +149,6 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                                           UserUid = table.Column<Guid>(nullable: false),
                                           RoleUid = table.Column<Guid>(nullable: false),
                                           Id = table.Column<int>(type: "serial", nullable: false)
-                                              .Annotation("Npgsql:ValueGenerationStrategy", 1)
                                       },
                 constraints: table =>
                     {
@@ -177,8 +173,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                 columns: table => new
                                       {
                                           Id =
-                                          table.Column<int>(type: "serial", nullable: false)
-                                              .Annotation("Npgsql:ValueGenerationStrategy", 1),
+                                          table.Column<int>(type: "serial", nullable: false),
                                           DestinationPoint = table.Column<string>(nullable: true),
                                           ErrorMessage = table.Column<string>(nullable: true),
                                           ErrorStackTrace = table.Column<string>(nullable: true),
