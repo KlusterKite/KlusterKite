@@ -11,6 +11,7 @@ namespace ClusterKit.Web
 {
     using System;
     using System.Diagnostics;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -118,9 +119,24 @@ namespace ClusterKit.Web
                 {
                     await this.next.Invoke(context);
                 }
+                catch (ReflectionTypeLoadException exception)
+                {
+                    this.system.Log.Error(
+                        exception,
+                        "{Type}: error resolving {RequestPath}",
+                        this.GetType().Name,
+                        context.Request.Path);
+                    foreach (var loaderException in exception.LoaderExceptions)
+                    {
+                        this.system.Log.Error(
+                            loaderException,
+                            "{Type}: loader exception",
+                            this.GetType().Name);
+                    }
+                    throw;
+                }
                 catch (Exception exception)
                 {
-                    Console.WriteLine($@"Web exception: {exception.Message} \n {exception.StackTrace}");
                     this.system.Log.Error(
                         exception,
                         "{Type}: error resolving {RequestPath}",

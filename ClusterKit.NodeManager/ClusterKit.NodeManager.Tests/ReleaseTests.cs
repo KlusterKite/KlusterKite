@@ -57,31 +57,6 @@ namespace ClusterKit.NodeManager.Tests
             this.CreateContext().Database.EnsureDeleted();
         }
 
-        [Theory]
-        [InlineData(typeof(Release))]
-        [InlineData(typeof(List<Release>))]
-        public void TypeTest(Type type)
-        {
-            var regex = new Regex("(, Version=([\\d\\.]+))?(, Culture=[^,\\] \\t]+)?(, PublicKeyToken=(null|[\\da-f]+))?");
-            var typeName = regex.Replace(type.AssemblyQualifiedName, string.Empty);
-            this.output.WriteLine(typeName);
-            this.output.WriteLine(type.AssemblyQualifiedName);
-            var loadedType = Type.GetType(typeName, true);
-            Assert.Equal(type, loadedType);
-        }
-
-        /// <summary>
-        /// Temp nuget test
-        /// </summary>
-        /// <returns>The async task</returns>
-        [Fact]
-        public async Task NugetTest()
-        {
-            var repository = new RemotePackageRepository("http://nuget/");
-            var package = await repository.GetAsync("Akka", NuGetVersion.Parse("1.3.0"));
-            Assert.NotNull(package);
-        }
-
         /// <summary>
         /// Tests the release compatibility set-up - templates with changed configurations are in compatible
         /// </summary>

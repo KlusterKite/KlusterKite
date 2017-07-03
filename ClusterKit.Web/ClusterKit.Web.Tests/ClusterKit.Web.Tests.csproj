@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <PackageReference Include="RestSharp" Version="105.2.3" />
+    <PackageReference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel" Version="11.0.0.0" />
   </ItemGroup>  
 
   <ItemGroup>
