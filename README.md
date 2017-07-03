@@ -1,28 +1,34 @@
 # ClusterKit
 
-Bundle of utils to create scalable and redundant services.
-Based on https://github.com/akkadotnet/akka.net
-Contains several subprojects to solve most typical service creation problems.
+A framework to create scalable and redundant services based on awesome [Akka.Net](https://github.com/akkadotnet/akka.net) project.
 
-## [ClusterKit.Core] (./ClusterKit.Core/Readme.md)
-Some most basic abstractions to assemble, configure and run service executable.
+Contains several subprojects to solve most typical service creation and managing problems.
 
-## [ClusterKit.Log] (./ClusterKit.Log/Readme.md)
-Centralized log writing configuration.
+## [ClusterKit.Core](./ClusterKit.Core/Readme.md)
+Packs the actor system into the executable. Provides start-up configuration and plug-in management system.
 
-## [ClusterKit.LargeObjects] (./ClusterKit.LargeObjects/Readme.md)
-Due to performance issue internal Akka.NET messaging system has limitation on message size. Sometimes you need to pass huge ammount of data (although this should be strongly avoided). This lib provides additional functionality to pass huge amount of data between cluster nodes.
+## [ClusterKit.Security](./ClusterKit.Security/Readme.md)
+Provides basic abstractions for authentication and athorization in service
 
-## [ClusterKit.Data] (./ClusterKit.Data/Readme.md)
-A bundle of generic actors and other abstractions to handle basic data work (ORM)
+## [ClusterKit.Log](./ClusterKit.Log/Readme.md)
+Centralized log management configuration.
 
-## [ClusterKit.Web] (./ClusterKit.Web/Readme.md)
-A bundle of generic actors and other abstractions to provide Web API (web - actor system integration)
+## [ClusterKit.API](./ClusterKit.API/Readme.md)
+Define your API for client applications / external servicies.
 
-## [ClusterKit.Monitoring] (./ClusterKit.Monitoring/Readme.md)
+## [ClusterKit.LargeObjects](./ClusterKit.LargeObjects/Readme.md)
+Due to performance issues internal Akka.NET messaging system has limitation on message size. Sometimes you need to pass huge ammount of data (although this should be strongly avoided). This lib provides additional functionality to pass huge amount of data between cluster nodes.
+
+## [ClusterKit.Data](./ClusterKit.Data/Readme.md)
+A bundle of generic actors and other abstractions to handle basic data work (mainly CRUD)
+
+## [ClusterKit.Web](./ClusterKit.Web/Readme.md)
+A bundle of generic actors and other abstractions to publish Web API (both REST and GraphQL). Also provides authentication and authorization for external applications.
+
+## [ClusterKit.Monitoring](./ClusterKit.Monitoring/Readme.md)
 Collecting diagnostics and monitoring information from cluster nodes.
 
-## [ClusterKit.NodeManager] (./ClusterKit.NodeManager/Readme.md)
-Cluster orchestration, remote node configuration, managing and updating.
+## [ClusterKit.NodeManager](./ClusterKit.NodeManager/Readme.md)
+Cluster configuration and orchestration, remote node configuration, managing and updating.
 
-## [Sources build instructions] (./BuildScript.md)
+## [Sources build instructions](./BuildScript.md)
