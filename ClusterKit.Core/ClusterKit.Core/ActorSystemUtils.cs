@@ -94,13 +94,11 @@ namespace ClusterKit.Core
             }
             catch (ReflectionTypeLoadException loadException)
             {
-                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!");
                 foreach (var loaderException in loadException.LoaderExceptions)
                 {
                     Console.WriteLine(loaderException.Message);
                 }
 
-                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!");
                 throw;
             }
 

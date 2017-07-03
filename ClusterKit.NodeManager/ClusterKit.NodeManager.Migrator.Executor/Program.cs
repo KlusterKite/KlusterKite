@@ -43,7 +43,20 @@ namespace ClusterKit.NodeManager.Migrator.Executor
         public static void Main()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterInstallers();
+            try
+            {
+                builder.RegisterInstallers();
+            }
+            catch (ReflectionTypeLoadException exception)
+            {
+                foreach (var loaderException in exception.LoaderExceptions)
+                {
+                    throw loaderException;
+                }
+
+                throw;
+            }
+
             var providedConfiguration = File.ReadAllText("config.hocon");
             var config = BaseInstaller.GetStackedConfig(
                 builder,

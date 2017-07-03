@@ -971,12 +971,17 @@ namespace ClusterKit.NodeManager
         private T ExecuteMigrator<T>(string installedPath, T instance) where T : MigrationCollector
         {
 #if APPDOMAIN
-            const string ExecutableFileName = "ClusterKit.NodeManager.Migrator.Executor.exe";
-            const string ExecutableArguments = "";
+            var isMono = Type.GetType("Mono.Runtime") != null;
+            // ReSharper disable once InconsistentNaming
+            var ExecutableFileName = isMono ? "mono" : Path.Combine(installedPath, "ClusterKit.NodeManager.Migrator.Executor.exe");
+            // ReSharper disable once InconsistentNaming
+            var ExecutableArguments = isMono ? "ClusterKit.NodeManager.Migrator.Executor.exe" : string.Empty;
 #elif CORECLR
             const string ExecutableFileName = "dotnet";
             const string ExecutableArguments = "ClusterKit.NodeManager.Migrator.Executor.dll";
 #endif
+
+
             var process = new Process
                               {
                                   StartInfo =
@@ -987,9 +992,12 @@ namespace ClusterKit.NodeManager
                                           Arguments = ExecutableArguments,
                                           RedirectStandardOutput = true,
                                           RedirectStandardInput = true,
-                                          RedirectStandardError = true
+                                          RedirectStandardError = true,
+#if APPDOMAIN
+                                          ErrorDialog = false,
+#endif
                                       }
-                              };
+            };
 
             process.Start();
 
@@ -1005,7 +1013,11 @@ namespace ClusterKit.NodeManager
             var error = process.StandardError.ReadToEnd();
             if (!string.IsNullOrWhiteSpace(error))
             {
-                Context.GetLogger().Error("{Type}: Migrator exited with error {Error}", this.GetType().Name, error);
+                Context.GetLogger().Error(
+                    "{Type}: runas Migrator exited with error {Error}. Installed on {InstalledPath}",
+                    this.GetType().Name,
+                    error,
+                    installedPath);
             }
 
             process.Dispose();
