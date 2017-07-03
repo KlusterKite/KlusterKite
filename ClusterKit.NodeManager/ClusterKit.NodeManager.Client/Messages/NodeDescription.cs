@@ -60,6 +60,8 @@ namespace ClusterKit.NodeManager.Client.Messages
         /// <summary>
         /// Gets or sets the list of descriptions of installed modules
         /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the list of descriptions of installed modules")]
         public List<Launcher.Messages.PackageDescription> Modules { get; set; }
 
         /// <summary>
