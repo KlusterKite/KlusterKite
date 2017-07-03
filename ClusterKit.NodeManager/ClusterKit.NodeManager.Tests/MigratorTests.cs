@@ -581,7 +581,7 @@ namespace ClusterKit.NodeManager.Tests
                         this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
-                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(10));
+                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
             }
             finally
