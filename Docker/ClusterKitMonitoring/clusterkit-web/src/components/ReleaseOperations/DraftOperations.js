@@ -7,8 +7,6 @@ import delay from 'lodash/delay'
 import CheckReleaseMutation from './mutations/CheckReleaseMutation';
 import SetReadyMutation from './mutations/SetReadyMutation';
 
-import CheckReleaseResult from './CheckReleaseResult';
-
 import './styles.css';
 
 export class DraftOperations extends React.Component {
@@ -64,7 +62,7 @@ export class DraftOperations extends React.Component {
                 isChecking: false,
                 checkErrors: null,
                 checkSuccess: true,
-                checkCompatibleTemplates: response.clusterKitNodeApi_clusterKitNodesApi_releases_check.node.compatibleTemplates.edges,
+                checkCompatibleTemplates: response.clusterKitNodeApi_clusterKitNodesApi_releases_check.node.compatibleTemplatesBackward.edges,
                 checkActiveNodes: response.clusterKitNodeApi_clusterKitNodesApi_releases_check.api.clusterKitNodesApi.getActiveNodeDescriptions.edges,
               });
             }
@@ -191,13 +189,6 @@ export class DraftOperations extends React.Component {
           {' '}
           Check successful!
         </div>
-
-        <CheckReleaseResult
-          activeNodes={this.state.checkActiveNodes}
-          compatibleTemplates={this.state.checkCompatibleTemplates}
-          newNodeTemplates={this.props.nodeTemplates}
-          newReleaseInnerId={this.props.releaseInnerId}
-        />
       </div>
       }
 

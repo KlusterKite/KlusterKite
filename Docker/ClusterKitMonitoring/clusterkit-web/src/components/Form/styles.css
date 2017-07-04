@@ -16,5 +16,6 @@
 }
 
 .static-modal-center .modal-dialog {
-  margin-top: calc(50% - 200px);
+  /* buggy: margin-top: calc(50% - 200px); */
+  margin-top: 300px;
 }

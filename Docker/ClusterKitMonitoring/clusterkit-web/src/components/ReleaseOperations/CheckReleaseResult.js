@@ -14,8 +14,8 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
   static propTypes = {
     newReleaseInnerId: React.PropTypes.number.isRequired,
     activeNodes: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-    compatibleTemplatesForward: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-    compatibleTemplatesBackward: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+    compatibleTemplatesForward: React.PropTypes.arrayOf(React.PropTypes.object),
+    compatibleTemplatesBackward: React.PropTypes.arrayOf(React.PropTypes.object),
     newNodeTemplates: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   };
 
