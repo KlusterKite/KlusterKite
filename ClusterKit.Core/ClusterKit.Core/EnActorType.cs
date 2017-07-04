@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Types of actors to generate from <seealso cref="NameSpaceActor" />
+//   Types of actors to generate by NameSpaceActor
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
