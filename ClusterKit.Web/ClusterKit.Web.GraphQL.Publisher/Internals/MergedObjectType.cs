@@ -9,6 +9,7 @@
 
 namespace ClusterKit.Web.GraphQL.Publisher.Internals
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -412,7 +413,14 @@ namespace ClusterKit.Web.GraphQL.Publisher.Internals
             public object Resolve(ResolveFieldContext context)
             {
                 var id = (context.Source as JObject)?.Property(GlobalIdPropertyName)?.Value;
-                return id?.PackGlobalId();
+
+                if (id == null)
+                {
+                    // relay doesn't like null id
+                    return new JObject { { "empty", Guid.NewGuid().ToString("N") } }.PackGlobalId();
+                }
+
+                return id.PackGlobalId();
             }
         }
     }
