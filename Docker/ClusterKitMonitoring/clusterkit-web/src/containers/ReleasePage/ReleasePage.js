@@ -48,6 +48,10 @@ class ReleasePage extends React.Component {
     }
   };
 
+  onStartMigration = () => {
+    browserHistory.push(`/clusterkit/Migration/`);
+  };
+
   addNode = (model) => {
     console.log('create', model);
     Relay.Store.commitUpdate(
@@ -145,6 +149,8 @@ class ReleasePage extends React.Component {
 
   render () {
     const model = this.props.api.release;
+    const nodeManagement = this.props.api.clusterKitNodesApi.clusterManagement;
+
     const canEdit = !model || model.state === 'Draft';
     return (
       <div>
@@ -160,11 +166,13 @@ class ReleasePage extends React.Component {
         <div>
           <ReleaseOperations
             configuration={model.configuration}
+            nodeManagement={nodeManagement}
             releaseId={this.props.params.id}
             releaseInnerId={model.__id}
             currentState={model.state}
             onForceFetch={this.props.relay.forceFetch}
             isStable={model.isStable}
+            onStartMigration={this.onStartMigration.bind(this)}
           />
           <FeedsList
             configuration={model.configuration}
@@ -233,6 +241,11 @@ export default Relay.createContainer(
                 ${ReleaseOperations.getFragment('configuration')}
                 id
               }
+            }
+          },
+          clusterKitNodesApi {
+            clusterManagement {
+              ${ReleaseOperations.getFragment('nodeManagement')}
             }
           }
         }

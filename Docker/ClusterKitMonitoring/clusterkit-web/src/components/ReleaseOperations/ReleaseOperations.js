@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 import Icon from 'react-fa';
 import { Link } from 'react-router';
 
-import delay from 'lodash/delay'
+// import delay from 'lodash/delay'
 
 import DraftOperations from './DraftOperations';
 import ReadyOperations from './ReadyOperations';
@@ -29,27 +29,13 @@ export class ReleaseOperations extends React.Component {
 
   static propTypes = {
     configuration: React.PropTypes.object,
+    nodeManagement: React.PropTypes.object,
     isStable: React.PropTypes.bool.isRequired,
     releaseId: React.PropTypes.string.isRequired,
     releaseInnerId: React.PropTypes.number.isRequired,
     currentState: React.PropTypes.string.isRequired,
     onForceFetch: React.PropTypes.func.isRequired,
-  };
-
-  /**
-   * Refetches data from GraphQL server after a delay
-   * @param delayTime {number} Delay in ms
-   */
-  refetchAfterDelay = (delayTime) => {
-    delay(() => {
-      this.props.relay.forceFetch();
-    }, delayTime);
-
-    delay(() => {
-      this.setState({
-        isChangingState: false
-      });
-    }, delayTime + 1000);
+    onStartMigration: React.PropTypes.func.isRequired,
   };
 
   getErrorMessagesFromEdge = (edges) => {
@@ -76,6 +62,9 @@ export class ReleaseOperations extends React.Component {
             releaseInnerId={this.props.releaseInnerId}
             currentState={this.props.currentState}
             onForceFetch={this.props.onForceFetch}
+            canCreateMigration={this.props.nodeManagement.resourceState.canCreateMigration}
+            currentMigration={this.props.nodeManagement.currentMigration}
+            onStartMigration={this.props.onStartMigration}
           />
 
           <ActiveOperations
@@ -130,8 +119,15 @@ export default Relay.createContainer(
             }
           }
         }
-      }
-      `,
+      }`,
+      nodeManagement: () => Relay.QL`fragment on IClusterKitNodeApi_ClusterManagement {
+        resourceState {
+          canCreateMigration
+        }
+        currentMigration {
+          state
+        }
+      }`,
     },
   },
 )

@@ -12,6 +12,7 @@ import GraphQLPage from './containers/GraphQL/GraphQLPage';
 import HomePage from './containers/Home/HomePage';
 import Loading from './components/Loading/index';
 import LogoutPage from './containers/LogoutPage/LogoutPage';
+import MigrationPage from './containers/MigrationPage/MigrationPage';
 import NotFoundPage from './containers/NotFoundPage/NotFoundPage';
 import ReleaseConfigCopyPage from './containers/ConfigCopyPage/ReleaseConfigCopyPage';
 import ReleasesListPage from './containers/ReleasesListPage/ReleasesListPage';
@@ -39,6 +40,7 @@ export default class RoutesList extends React.Component {
           <Route path='/clusterkit/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
           <Route path='/clusterkit/CopyConfig/:releaseId/:mode' component={ReleaseConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ReleaseConfigCopyPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/GraphQL' component={GraphQLPage} />
+          <Route path='/clusterkit/Migration' component={MigrationPage} queries={ApiQueries} />
           <Route path='/clusterkit/NugetFeeds/:releaseId' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Releases' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />
           <Route path='/clusterkit/Releases/:page' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />

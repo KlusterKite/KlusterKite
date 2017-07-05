@@ -6,7 +6,7 @@ import delay from 'lodash/delay'
 
 import Modal from '../Form/Modal'
 
-import UpdateClusterMutation from './mutations/UpdateClusterMutation';
+import CreateMigrationMutation from './mutations/CreateMigrationMutation';
 import SetObsoleteMutation from './mutations/SetObsoleteMutation';
 
 import './styles.css';
@@ -31,67 +31,73 @@ export class ReadyOperations extends React.Component {
     releaseInnerId: React.PropTypes.number.isRequired,
     currentState: React.PropTypes.string.isRequired,
     onForceFetch: React.PropTypes.func.isRequired,
+    canCreateMigration: React.PropTypes.bool.isRequired,
+    onStartMigration: React.PropTypes.func.isRequired,
+    currentMigration: React.PropTypes.object,
   };
 
-  onUpdateClusterConfirmation = () => {
+  onStartMigrationConfirmRequest = () => {
     this.setState({
       showConfirmationUpdate: true
     });
   };
 
-  onUpdateClusterCancel = () => {
+  onStartMigrationCancel = () => {
     this.setState({
       showConfirmationUpdate: false
     });
   };
 
-  onUpdateCluster = () => {
-    if (!this.state.isSettingStable){
-      console.log('update cluster');
+  onStartMigration = () => {
+    if (!this.state.isStartingMigration){
 
       this.setState({
-        isSettingStable: true,
+        isStartingMigration: true,
         setStableSuccessful: false,
         isChangingState: true
       });
 
       Relay.Store.commitUpdate(
-        new UpdateClusterMutation(
+        new CreateMigrationMutation(
           {
             releaseId: this.props.releaseInnerId,
           }),
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.clusterKitNodeApi_clusterKitNodesApi_releases_updateCluster.errors &&
-              response.clusterKitNodeApi_clusterKitNodesApi_releases_updateCluster.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_updateCluster.errors.edges);
+            if (response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.errors &&
+              response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.errors.edges);
 
               this.setState({
-                isSettingStable: false,
+                isStartingMigration: false,
                 setStableErrors: messages
               });
             } else {
-              console.log('result update cluster', response.clusterKitNodeApi_clusterKitNodesApi_releases_updateCluster);
+              console.log('result create migration', response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.result);
               // total success
               this.setState({
-                isSettingStable: false,
+                isStartingMigration: false,
                 setStableErrors: null,
                 setStableSuccessful: true,
                 showConfirmationUpdate: false
               });
 
-              this.refetchAfterDelay(10000);
+              this.props.onStartMigration();
             }
           },
           onFailure: (transaction) => {
             this.setState({
-              isSettingStable: false
+              isStartingMigration: false
             });
             console.log(transaction)},
         },
       );
     }
+  };
+
+  goToMigration = () => {
+    this.props.onStartMigration();
   };
 
   onSetObsoleteConfirmation = () => {
@@ -176,9 +182,9 @@ export class ReadyOperations extends React.Component {
   };
 
   render() {
-    let updateClusterClassName = '';
-    if (this.state.isSettingStable) {
-      updateClusterClassName += ' fa-spin';
+    let startMigrationClassName = '';
+    if (this.state.isStartingMigration) {
+      startMigrationClassName += ' fa-spin';
     }
 
     let setObsoleteClassName = '';
@@ -230,9 +236,15 @@ export class ReadyOperations extends React.Component {
       </div>
       }
 
-      {this.props.currentState && this.props.currentState === 'Ready' && !this.state.isChangingState &&
-      <button className="btn btn-primary" type="button" onClick={this.onUpdateClusterConfirmation}>
-        <Icon name="wrench" className={updateClusterClassName}/>{' '}Update cluster
+      {this.props.currentState && this.props.currentState === 'Ready' && this.props.canCreateMigration && !this.state.isChangingState &&
+      <button className="btn btn-primary" type="button" onClick={this.onStartMigrationConfirmRequest}>
+        <Icon name="wrench" className={startMigrationClassName}/>{' '}Start migration
+      </button>
+      }
+
+      {this.props.currentMigration &&
+      <button className="btn btn-primary" type="button" onClick={this.goToMigration}>
+        <Icon name="wrench" />{' '}Manage migration
       </button>
       }
 
@@ -251,12 +263,12 @@ export class ReadyOperations extends React.Component {
       }
 
       {this.state.showConfirmationUpdate &&
-      <Modal title="Are you sure?" confirmText="Update cluster"
-             onCancel={this.onUpdateClusterCancel.bind(this)}
-             onConfirm={this.onUpdateCluster.bind(this)}
+      <Modal title="Are you sure?" confirmText="Start migration"
+             onCancel={this.onStartMigrationCancel.bind(this)}
+             onConfirm={this.onStartMigration.bind(this)}
              confirmClass="primary"
       >
-        Updating cluster can lead to the system downtime.
+        Are you ready to start migration?
       </Modal>
       }
 

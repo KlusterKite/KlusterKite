@@ -15,7 +15,7 @@ export default class ObsoleteOperations extends React.Component {
 
     this.state = {
       isRollbacking: false,
-      rollbackSuccessful: false,
+      setObsoleteSuccessful: false,
       isChangingState: false,
       showConfirmationRollback: false,
     };
@@ -46,7 +46,7 @@ export default class ObsoleteOperations extends React.Component {
 
       this.setState({
         isRollbacking: true,
-        rollbackSuccessful: false,
+        setObsoleteSuccessful: false,
         isChangingState: true,
         showConfirmationRollback: false
       });
@@ -73,7 +73,7 @@ export default class ObsoleteOperations extends React.Component {
               this.setState({
                 isRollbacking: false,
                 rollbackErrors: null,
-                rollbackSuccessful: true,
+                setObsoleteSuccessful: true,
               });
 
               this.refetchAfterDelay(5000);
@@ -128,7 +128,7 @@ export default class ObsoleteOperations extends React.Component {
       })
       }
 
-      {this.state.rollbackSuccessful && !this.state.isChangingState &&
+      {this.state.setObsoleteSuccessful && !this.state.isChangingState &&
       <div>
         <div className="alert alert-success" role="alert">
           <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
