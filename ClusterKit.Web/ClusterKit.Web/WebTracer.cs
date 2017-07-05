@@ -133,6 +133,7 @@ namespace ClusterKit.Web
                             "{Type}: loader exception",
                             this.GetType().Name);
                     }
+
                     throw;
                 }
                 catch (Exception exception)

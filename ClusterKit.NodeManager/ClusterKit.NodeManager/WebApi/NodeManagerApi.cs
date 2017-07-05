@@ -61,8 +61,6 @@ namespace ClusterKit.NodeManager.WebApi
             this.ClusterManagement = new ClusterManagement(this.actorSystem);
         }
 
-        // todo: put converter 
-
         /// <summary>
         /// Gets the list of defined system privileges
         /// </summary>

@@ -9,7 +9,10 @@
 
 namespace ClusterKit.NodeManager.Client.Messages.Migration
 {
+    using System.Collections.Generic;
+
     using ClusterKit.API.Attributes;
+    using ClusterKit.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
 
@@ -81,5 +84,19 @@ namespace ClusterKit.NodeManager.Client.Messages.Migration
         [UsedImplicitly]
         [DeclareField("a value indicating whether current migration can be finished at this stage")]
         public bool CanFinishMigration { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of migration steps
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the list of migration steps")]
+        public List<EnMigrationSteps> MigrationSteps { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current migration step
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the current migration step")]
+        public EnMigrationSteps? CurrentMigrationStep { get; set; }
     }
 }

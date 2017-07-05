@@ -19,7 +19,6 @@ namespace ClusterKit.NodeManager
     using Autofac;
 
     using ClusterKit.API.Client;
-    using ClusterKit.Core;
     using ClusterKit.Data;
     using ClusterKit.Data.CRUD.ActionMessages;
     using ClusterKit.Data.CRUD.Exceptions;
@@ -47,11 +46,6 @@ namespace ClusterKit.NodeManager
         private readonly IPackageRepository nugetRepository;
 
         /// <summary>
-        /// The node message router
-        /// </summary>
-        private readonly IMessageRouter router;
-
-        /// <summary>
         /// The database connection string
         /// </summary>
         private string connectionString;
@@ -75,20 +69,15 @@ namespace ClusterKit.NodeManager
         /// <param name="contextFactory">
         /// Configuration context factory
         /// </param>
-        /// <param name="router">
-        /// The node message router
-        /// </param>
         /// <param name="nugetRepository">
         /// The nuget repository
         /// </param>
         public ReleaseCheckActor(
             IComponentContext componentContext,
             UniversalContextFactory contextFactory,
-            IMessageRouter router,
             IPackageRepository nugetRepository) : base(componentContext)
         {
             this.contextFactory = contextFactory;
-            this.router = router;
             this.nugetRepository = nugetRepository;
             this.connectionString = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);

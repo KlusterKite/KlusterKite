@@ -492,7 +492,6 @@ namespace ClusterKit.NodeManager
                     () => new ReleaseCheckActor(
                         this.ComponentContext,
                         this.contextFactory,
-                        this.router,
                         this.nugetRepository)),
                 "release");
 
@@ -532,6 +531,8 @@ namespace ClusterKit.NodeManager
                 this.resourceState.CanMigrateResources = false;
                 this.resourceState.CanUpdateNodesToDestination = false;
                 this.resourceState.CanUpdateNodesToSource = false;
+                this.resourceState.MigrationSteps = new List<EnMigrationSteps> { EnMigrationSteps.Broken };
+                this.resourceState.CurrentMigrationStep = EnMigrationSteps.Broken;
                 return;
             }
 
@@ -571,6 +572,8 @@ namespace ClusterKit.NodeManager
                 this.resourceState.CanMigrateResources = false;
                 this.resourceState.CanUpdateNodesToDestination = false;
                 this.resourceState.CanUpdateNodesToSource = false;
+                this.resourceState.CurrentMigrationStep = null;
+                this.resourceState.MigrationSteps = null;
                 return;
             }
 
@@ -592,8 +595,12 @@ namespace ClusterKit.NodeManager
                 this.resourceState.CanMigrateResources = false;
                 this.resourceState.CanUpdateNodesToDestination = false;
                 this.resourceState.CanUpdateNodesToSource = false;
+                this.resourceState.MigrationSteps = new List<EnMigrationSteps> { EnMigrationSteps.Broken };
+                this.resourceState.CurrentMigrationStep = EnMigrationSteps.Broken;
                 return;
             }
+
+            this.resourceState.MigrationSteps = this.GetMigrationSteps().ToList();
 
             this.resourceState.CanCancelMigration =
                 (this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.Source
@@ -639,6 +646,89 @@ namespace ClusterKit.NodeManager
                                                                     .Position == EnMigrationActorMigrationPosition
                                                                     .Source) || this.currentMigration.Direction
                                                             == EnMigrationDirection.Upgrade);
+
+            this.resourceState.CurrentMigrationStep = this.GetCurrentMigrationStep();
+        }
+
+        /// <summary>
+        /// Gets the current migration step
+        /// </summary>
+        /// <returns>The migration step</returns>
+        private EnMigrationSteps? GetCurrentMigrationStep()
+        {
+            if (this.resourceState.CanCancelMigration)
+            {
+                return EnMigrationSteps.Start;
+            }
+
+            if (this.resourceState.CanFinishMigration)
+            {
+                return EnMigrationSteps.Finish;
+            }
+
+            switch (this.currentMigration.Direction)
+            {
+                case EnMigrationDirection.Upgrade:
+                    if (this.resourceState.MigrationState.Position != EnMigrationActorMigrationPosition.Destination)
+                    {
+                        return EnMigrationSteps.ResourcesUpdating;
+                    }
+                    else if (this.nodeDescriptions.Values.Any(n => n.IsObsolete))
+                    {
+                        return EnMigrationSteps.NodesUpdating;
+                    }
+                    else
+                    {
+                        return EnMigrationSteps.ResourcesUpdated;
+                    }
+
+                case EnMigrationDirection.Downgrade:
+                    if (this.nodeDescriptions.Values.Any(n => n.IsObsolete))
+                    {
+                        return EnMigrationSteps.NodesUpdating;
+                    }
+                    else if (this.resourceState.MigrationState.Position != EnMigrationActorMigrationPosition.Source)
+                    {
+                        return EnMigrationSteps.ResourcesUpdating;
+                    }
+                    else
+                    {
+                        return EnMigrationSteps.NodesUpdated;
+                    }
+
+                case EnMigrationDirection.Stay: return EnMigrationSteps.NodesUpdating;
+                default: return EnMigrationSteps.Broken;
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of migration steps
+        /// </summary>
+        /// <returns>the list of migration steps</returns>
+        private IEnumerable<EnMigrationSteps> GetMigrationSteps()
+        {
+            switch (this.currentMigration.Direction)
+            {
+                case EnMigrationDirection.Upgrade:
+                    yield return EnMigrationSteps.Start;
+                    yield return EnMigrationSteps.ResourcesUpdating;
+                    yield return EnMigrationSteps.ResourcesUpdated;
+                    yield return EnMigrationSteps.NodesUpdating;
+                    yield return EnMigrationSteps.Finish;
+                    break;
+                case EnMigrationDirection.Downgrade:
+                    yield return EnMigrationSteps.Start;
+                    yield return EnMigrationSteps.NodesUpdating;
+                    yield return EnMigrationSteps.NodesUpdated;
+                    yield return EnMigrationSteps.ResourcesUpdating;
+                    yield return EnMigrationSteps.Finish;
+                    break;
+                case EnMigrationDirection.Stay:
+                    yield return EnMigrationSteps.Start;
+                    yield return EnMigrationSteps.NodesUpdating;
+                    yield return EnMigrationSteps.Finish;
+                    break;
+            }
         }
 
         /// <summary>
@@ -647,6 +737,8 @@ namespace ClusterKit.NodeManager
         private void InitResourceReleaseState()
         {
             this.resourceState.MigrationState = null;
+            this.resourceState.CurrentMigrationStep = null;
+            this.resourceState.MigrationSteps = null;
 
             this.resourceState.CanUpdateNodesToDestination = false;
             this.resourceState.CanUpdateNodesToSource = false;
@@ -1022,6 +1114,7 @@ namespace ClusterKit.NodeManager
             this.resourceState.CanMigrateResources = false;
             this.resourceState.CanUpdateNodesToDestination = false;
             this.resourceState.CanUpdateNodesToSource = false;
+            this.resourceState.CurrentMigrationStep = EnMigrationSteps.ResourcesUpdating;
         }
 
         /// <summary>

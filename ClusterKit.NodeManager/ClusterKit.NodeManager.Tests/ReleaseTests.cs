@@ -12,19 +12,13 @@ namespace ClusterKit.NodeManager.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
-    using System.Threading.Tasks;
 
     using ClusterKit.Data.EF.InMemory;
     using ClusterKit.NodeManager.Client.ORM;
     using ClusterKit.NodeManager.ConfigurationSource;
     using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
 
     using Microsoft.EntityFrameworkCore;
-
-    using NuGet.Versioning;
 
     using Xunit;
     using Xunit.Abstractions;

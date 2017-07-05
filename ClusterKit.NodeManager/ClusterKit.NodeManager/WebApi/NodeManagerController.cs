@@ -24,8 +24,6 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Microsoft.AspNetCore.Mvc;
 
-    using Newtonsoft.Json;
-
     /// <summary>
     /// Serves node management api functions
     /// </summary>

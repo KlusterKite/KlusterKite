@@ -286,6 +286,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             Assert.True(await actor.Ask<bool>(new MigrationCancel(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
             this.ExpectNoMsg();
@@ -337,6 +340,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationFinish(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -393,6 +399,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             Assert.True(
                 await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
@@ -406,6 +415,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -427,6 +439,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -475,6 +490,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             Assert.True(
                 await actor.Ask<bool>(
                     new NodesUpgrade { Target = EnMigrationSide.Destination },
@@ -490,6 +508,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -511,6 +532,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -559,6 +583,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
@@ -582,6 +609,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             migrationState = this.CreateMigrationActorMigrationState(
                 new[] { "second" },
                 new[] { new[] { "first", "second" } },
@@ -600,6 +630,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -648,6 +681,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
@@ -671,6 +707,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            
             migrationState = this.CreateMigrationActorMigrationState(
                 new[] { "first" },
                 new[] { new[] { "first", "second" } },
@@ -689,6 +728,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -732,6 +774,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationCancel(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -784,6 +829,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationFinish(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -841,6 +889,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             Assert.True(
                 await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
@@ -854,6 +905,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -875,6 +929,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -923,6 +980,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             Assert.True(
                 await actor.Ask<bool>(
                     new NodesUpgrade { Target = EnMigrationSide.Destination },
@@ -938,6 +998,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -959,6 +1022,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1002,6 +1068,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationCancel(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -1054,6 +1123,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationFinish(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -1111,6 +1183,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             Assert.True(
                 await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
             this.ExpectNoMsg();
@@ -1124,6 +1199,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -1145,6 +1223,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+            
+            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1193,6 +1274,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             Assert.True(
                 await actor.Ask<bool>(
                     new NodesUpgrade { Target = EnMigrationSide.Destination },
@@ -1208,6 +1292,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -1229,6 +1316,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.True(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1273,6 +1363,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
@@ -1296,6 +1389,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             migrationState = this.CreateMigrationActorMigrationState(
                 new[] { "first" },
                 new[] { new[] { "first" } },
@@ -1314,6 +1410,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1358,6 +1457,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
@@ -1381,6 +1483,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
+            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
             migrationState = this.CreateMigrationActorMigrationState(
                 new[] { "second" },
                 new[] { new[] { "first" } },
@@ -1399,6 +1504,9 @@ namespace ClusterKit.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>

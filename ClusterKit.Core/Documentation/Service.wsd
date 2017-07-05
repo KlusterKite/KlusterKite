@@ -1,0 +1,9 @@
+@startuml
+
+start
+
+:Service scan local directory for all dll files and load them into the current AppDomain;
+:Service scans all loaded assemblies for all subtypes of **ClusterKit.Core.BaseInstaller**;
+
+stop
+@enduml

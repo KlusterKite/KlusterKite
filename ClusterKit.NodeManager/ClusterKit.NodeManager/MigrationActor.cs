@@ -910,17 +910,19 @@ namespace ClusterKit.NodeManager
         private MigrationActorMigrationState GetMigrationState(Data data, out List<MigrationLogRecord> errors)
         {
             errors = new List<MigrationLogRecord>();
+            List<MigrationLogRecord> sourceErrors;
             var sourceStates = this.GetReleaseResourcesState(
                 data.Migration.FromRelease,
                 data.FromReleaseExecutionDir,
                 data.Migration.Id,
-                out var sourceErrors).ToList();
+                out sourceErrors).ToList();
 
+            List<MigrationLogRecord> destinationErrors;
             var destinationStates = this.GetReleaseResourcesState(
                 data.Migration.ToRelease,
                 data.ToReleaseExecutionDir,
                 data.Migration.Id,
-                out var destinationErrors).ToList();
+                out destinationErrors).ToList();
 
             if (sourceErrors.Any() || destinationErrors.Any())
             {
@@ -980,7 +982,6 @@ namespace ClusterKit.NodeManager
             const string ExecutableFileName = "dotnet";
             const string ExecutableArguments = "ClusterKit.NodeManager.Migrator.Executor.dll";
 #endif
-
 
             var process = new Process
                               {
