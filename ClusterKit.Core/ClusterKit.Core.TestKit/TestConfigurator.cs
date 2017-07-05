@@ -16,7 +16,7 @@ namespace ClusterKit.Core.TestKit
     using Autofac;
 
     /// <summary>
-    /// Configures base data for tests. Such as Akka config and list of used WindsorInstallers
+    /// Configures base data for tests. Such as Akka config and list of used installers
     /// </summary>
     public class TestConfigurator
     {

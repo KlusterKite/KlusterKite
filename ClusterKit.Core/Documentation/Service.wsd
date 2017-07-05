@@ -4,6 +4,16 @@ start
 
 :Service scan local directory for all dll files and load them into the current AppDomain;
 :Service scans all loaded assemblies for all subtypes of **ClusterKit.Core.BaseInstaller**;
+:Service assembles the configuration from all installers and provided additional file;
+:Service runs **ClusterKit.Core.BaseInstaller.RegisterComponents** for each installer;
+:Service Actor system created;
+:Service Dependency injection container is build;
+:Service initializes logging system;
+:Service runs **ClusterKit.Core.BaseInstaller.RunPreCheck** for each installer;
+:Service registers dependency injection with actor system;
+:Service starts all **NameSpaceActor** defined in the configuration;
+:Service runs **ClusterKit.Core.BaseInstaller.RunPostStart** for each installer;
+:Service waits for actor system termination;
 
 stop
 @enduml
