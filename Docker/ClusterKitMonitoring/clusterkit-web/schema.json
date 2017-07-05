@@ -980,16 +980,6 @@
               "description": "Gets the list of nodes",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -1004,11 +994,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1029,6 +1019,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitMonitoring_Pair_System_String_Node__Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1335,16 +1335,6 @@
               "description": "the actor's children",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -1359,11 +1349,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1384,6 +1374,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitMonitoring_Node_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3389,16 +3389,6 @@
               "description": "The packages in the Nuget repository",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -3413,11 +3403,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3441,6 +3431,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -3456,16 +3456,6 @@
               "description": "The list of known active nodes",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -3480,11 +3470,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Uid",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3505,6 +3495,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_NodeDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3535,16 +3535,6 @@
               "description": "the cluster migration management",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -3559,7 +3549,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -3587,6 +3577,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -3602,16 +3602,6 @@
               "description": "ClusterKit managing system security roles",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -3626,7 +3616,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -3654,6 +3644,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -3669,16 +3669,6 @@
               "description": "ClusterKit managing system security roles",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -3693,11 +3683,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Uid",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3721,6 +3711,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -3736,16 +3736,6 @@
               "description": "ClusterKit managing system users",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -3760,11 +3750,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Uid",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3785,6 +3775,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_User_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4029,16 +4029,6 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -4053,7 +4043,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4078,6 +4068,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_CompatibleTemplate_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4096,16 +4096,6 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -4120,7 +4110,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4148,6 +4138,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -4163,16 +4163,6 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -4187,7 +4177,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4212,6 +4202,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigrationLogRecord_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4300,16 +4300,6 @@
               "description": "the list of available packages with their versions",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -4324,11 +4314,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4352,6 +4342,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -4367,16 +4367,6 @@
               "description": "the list of configured node templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -4391,11 +4381,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4419,6 +4409,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -4434,16 +4434,6 @@
               "description": "the list of configured cluster migrator templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -4458,11 +4448,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4483,6 +4473,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorTemplate_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -5349,16 +5349,6 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -5373,11 +5363,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -5401,6 +5391,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -5416,16 +5416,6 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -5440,11 +5430,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -5465,6 +5455,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -6227,16 +6227,6 @@
               "description": "Gets a dictionary value",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -6251,11 +6241,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -6276,6 +6266,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -7861,16 +7861,6 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -7885,11 +7875,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -7913,6 +7903,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -7928,16 +7928,6 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -7952,11 +7942,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -7977,6 +7967,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -12658,6 +12658,34 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "migrationSteps",
+              "description": "the list of migration steps",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "ClusterKitNodeApi_EnMigrationSteps",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "currentMigrationStep",
+              "description": "the current migration step",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "ClusterKitNodeApi_EnMigrationSteps",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -12705,16 +12733,6 @@
               "description": "the list of migration states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -12729,11 +12747,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -12754,6 +12772,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -12976,16 +13004,6 @@
               "description": "the list of states of migratorsn",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -13000,11 +13018,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13025,6 +13043,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorMigrationState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13223,16 +13251,6 @@
               "description": "the list of resources states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -13247,11 +13265,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13272,6 +13290,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ResourceMigrationState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -15661,16 +15689,6 @@
               "description": "the list of template states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -15685,11 +15703,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -15710,6 +15728,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -15867,16 +15895,6 @@
               "description": "the migrator states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -15891,11 +15909,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -15916,6 +15934,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorReleaseState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16101,16 +16129,6 @@
               "description": "the state of defined resources",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -16125,11 +16143,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16150,6 +16168,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ResourceReleaseState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -17937,6 +17965,59 @@
           "possibleTypes": null
         },
         {
+          "kind": "ENUM",
+          "name": "ClusterKitNodeApi_EnMigrationSteps",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "Start",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NodesUpdating",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "NodesUpdated",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ResourcesUpdating",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ResourcesUpdated",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "Finish",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "Broken",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
           "kind": "INTERFACE",
           "name": "IClusterKitNodeApi_Migration",
           "description": "The history record describing cluster migration",
@@ -18030,16 +18111,6 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -18054,7 +18125,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -18079,6 +18150,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigrationLogRecord_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -19206,6 +19287,73 @@
               "deprecationReason": null
             },
             {
+              "name": "modules",
+              "description": "the list of descriptions of installed modules",
+              "args": [
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_PackageDescription_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IClusterKitNodeApi_PackageDescription_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "nodeAddress",
               "description": "The node's address",
               "args": [],
@@ -20152,16 +20300,6 @@
               "description": "node templates statistics data",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -20176,11 +20314,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -20201,6 +20339,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_TemplatesStatisticsData_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -22907,16 +23055,6 @@
               "description": "The list of users assigned to this role",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -22931,7 +23069,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -22956,6 +23094,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_RoleUser_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -23178,16 +23326,6 @@
               "description": "The list of roles assigned to this user",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -23202,7 +23340,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -23227,6 +23365,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_RoleUser_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -24564,16 +24712,6 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -24588,7 +24726,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -24613,6 +24751,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ErrorDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -25361,16 +25509,6 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -25385,7 +25523,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -25410,6 +25548,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ErrorDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -25729,16 +25877,6 @@
               "description": "Gets the list of nodes",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -25753,11 +25891,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -25778,6 +25916,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitMonitoring_Pair_System_String_Node__Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26094,16 +26242,6 @@
               "description": "the actor's children",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26118,11 +26256,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26143,6 +26281,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitMonitoring_Node_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26293,16 +26441,6 @@
               "description": "The packages in the Nuget repository",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26317,11 +26455,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26345,6 +26483,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -26360,16 +26508,6 @@
               "description": "The list of known active nodes",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26384,11 +26522,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Uid",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26409,6 +26547,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_NodeDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26439,16 +26587,6 @@
               "description": "the cluster migration management",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26463,7 +26601,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -26491,6 +26629,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -26506,16 +26654,6 @@
               "description": "ClusterKit managing system security roles",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26530,7 +26668,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -26558,6 +26696,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -26573,16 +26721,6 @@
               "description": "ClusterKit managing system security roles",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26597,11 +26735,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Uid",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26625,6 +26763,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -26640,16 +26788,6 @@
               "description": "ClusterKit managing system users",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26664,11 +26802,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Uid",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26689,6 +26827,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_User_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -26943,16 +27091,6 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -26967,7 +27105,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -26992,6 +27130,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_CompatibleTemplate_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27010,16 +27158,6 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -27034,7 +27172,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -27062,6 +27200,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -27077,16 +27225,6 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -27101,7 +27239,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -27126,6 +27264,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigrationLogRecord_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27178,16 +27326,6 @@
               "description": "the list of available packages with their versions",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -27202,11 +27340,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27230,6 +27368,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -27245,16 +27393,6 @@
               "description": "the list of configured node templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -27269,11 +27407,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27297,6 +27435,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -27312,16 +27460,6 @@
               "description": "the list of configured cluster migrator templates",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -27336,11 +27474,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27361,6 +27499,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorTemplate_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27771,16 +27919,6 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -27795,11 +27933,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27823,6 +27961,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -27838,16 +27986,6 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -27862,11 +28000,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27887,6 +28025,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28193,16 +28341,6 @@
               "description": "Gets a dictionary value",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -28217,11 +28355,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28242,6 +28380,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28440,16 +28588,6 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -28464,11 +28602,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28492,6 +28630,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -28507,16 +28655,6 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -28531,11 +28669,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28556,6 +28694,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_Pair_System_String_List_PackageDescription___Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29228,6 +29376,34 @@
               "deprecationReason": null
             },
             {
+              "name": "migrationSteps",
+              "description": "the list of migration steps",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "ClusterKitNodeApi_EnMigrationSteps",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "currentMigrationStep",
+              "description": "the current migration step",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "ClusterKitNodeApi_EnMigrationSteps",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "id",
               "description": null,
               "args": [],
@@ -29278,16 +29454,6 @@
               "description": "the list of migration states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -29302,11 +29468,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29327,6 +29493,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorTemplateMigrationState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29513,16 +29689,6 @@
               "description": "the list of states of migratorsn",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -29537,11 +29703,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29562,6 +29728,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorMigrationState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29736,16 +29912,6 @@
               "description": "the list of resources states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -29760,11 +29926,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29785,6 +29951,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ResourceMigrationState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30065,16 +30241,6 @@
               "description": "the list of template states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -30089,11 +30255,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30114,6 +30280,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorTemplateReleaseState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30276,16 +30452,6 @@
               "description": "the migrator states",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -30300,11 +30466,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30325,6 +30491,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigratorReleaseState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30515,16 +30691,6 @@
               "description": "the state of defined resources",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -30539,11 +30705,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30564,6 +30730,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ResourceReleaseState_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30844,16 +31020,6 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -30868,7 +31034,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -30893,6 +31059,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_MigrationLogRecord_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31311,6 +31487,73 @@
               "deprecationReason": null
             },
             {
+              "name": "modules",
+              "description": "the list of descriptions of installed modules",
+              "args": [
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "ClusterKitNodeApi_PackageDescription_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ClusterKitNodeApi_PackageDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterKitNodeApi_PackageDescription_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "nodeAddress",
               "description": "The node's address",
               "args": [],
@@ -31519,16 +31762,6 @@
               "description": "node templates statistics data",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -31543,11 +31776,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31568,6 +31801,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_TemplatesStatisticsData_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32138,16 +32381,6 @@
               "description": "The list of users assigned to this role",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -32162,7 +32395,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -32187,6 +32420,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_RoleUser_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32419,16 +32662,6 @@
               "description": "The list of roles assigned to this user",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -32443,7 +32676,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -32468,6 +32701,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ClusterKit_NodeManager_Client_ORM_RoleUser_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -33540,16 +33783,6 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -33564,7 +33797,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -33589,6 +33822,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ErrorDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -35472,16 +35715,6 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
                   "name": "sort",
                   "description": null,
                   "type": {
@@ -35496,7 +35729,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -35521,6 +35754,16 @@
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "ClusterKitNodeApi_ErrorDescription_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
                     "ofType": null
                   },
                   "defaultValue": null

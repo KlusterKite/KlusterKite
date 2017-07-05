@@ -5,11 +5,7 @@ import Relay from 'react-relay'
 import delay from 'lodash/delay'
 // import isEqual from 'lodash/isEqual'
 
-// import CreateReleaseMutation from './mutations/CreateReleaseMutation'
-
-import CancelMigration from '../../components/MigrationOperations/CancelMigration'
-import FinishMigration from '../../components/MigrationOperations/FinishMigration'
-import UpdateNodes from '../../components/MigrationOperations/UpdateNodes'
+import MigrationSteps from '../../components/MigrationOperations/MigrationSteps'
 
 import DateFormat from '../../utils/date';
 
@@ -29,6 +25,7 @@ class MigrationPage extends React.Component {
     this.state = {
       operationIsInProgress: false,
       migrationHasFinished: false,
+      processErrors: null,
     };
 
     this.onStateChange = this.onStateChange.bind(this);
@@ -80,6 +77,15 @@ class MigrationPage extends React.Component {
 
     this.setState({
       operationIsInProgress: true,
+      processErrors: null,
+    });
+  }
+
+  onError(errors) {
+    console.log('onError', errors);
+
+    this.setState({
+      processErrors: errors,
     });
   }
 
@@ -87,18 +93,20 @@ class MigrationPage extends React.Component {
     const clusterManagement = this.props.api.clusterKitNodesApi.clusterManagement;
     const currentMigration = clusterManagement.currentMigration;
     const resourceState = clusterManagement.resourceState;
+    const nodesUpdating = resourceState.currentMigrationStep === 'NodesUpdating';
 
     return (
       <div>
         {currentMigration &&
           <div>
-            <h2>Migration {currentMigration.started && DateFormat.formatDateTime(new Date(currentMigration.started))}</h2>
+            <h2>Migration {currentMigration.fromRelease.name} → {currentMigration.toRelease.name}</h2>
+            <p>Created: {currentMigration.started && DateFormat.formatDateTime(new Date(currentMigration.started))}</p>
 
-            {this.state.operationIsInProgress && !this.state.migrationHasFinished &&
+            {(nodesUpdating || this.state.operationIsInProgress) && !this.state.migrationHasFinished &&
             <div className="alert alert-warning" role="alert">
-              <span className="glyphicon glyphicon-time" aria-hidden="true"></span>
+              <span className="glyphicon glyphicon-time fa-spin" aria-hidden="true"></span>
               {' '}
-              Operation is in progress, please wait…
+              Operation in progress, please wait…
             </div>
             }
 
@@ -110,7 +118,18 @@ class MigrationPage extends React.Component {
             </div>
             }
 
-            {!this.state.operationIsInProgress && !this.state.migrationHasFinished && !resourceState.canUpdateNodesToDestination && !resourceState.canFinishMigration &&
+            {this.state.processErrors && this.state.processErrors.map((error, index) => {
+              return (
+                <div className="alert alert-danger" role="alert" key={`error-${index}`}>
+                  <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                  {' '}
+                  {error}
+                </div>
+              );
+            })
+            }
+
+            {!nodesUpdating && !this.state.operationIsInProgress && !this.state.migrationHasFinished && !resourceState.canUpdateNodesToDestination && !resourceState.canFinishMigration &&
             <div className="alert alert-warning" role="alert">
               <span className="glyphicon glyphicon-time" aria-hidden="true"></span>
               {' '}
@@ -118,7 +137,7 @@ class MigrationPage extends React.Component {
             </div>
             }
 
-            {!this.state.operationIsInProgress && !this.state.migrationHasFinished && resourceState.canUpdateNodesToDestination && !resourceState.canMigrateResources && !resourceState.canCancelMigration &&
+            {!nodesUpdating && !this.state.operationIsInProgress && !this.state.migrationHasFinished && resourceState.canUpdateNodesToDestination && !resourceState.canMigrateResources && !resourceState.canCancelMigration &&
             <div className="alert alert-warning" role="alert">
               <span className="glyphicon glyphicon-time" aria-hidden="true"></span>
               {' '}
@@ -128,84 +147,25 @@ class MigrationPage extends React.Component {
           </div>
         }
 
-
-
         {!currentMigration &&
           <p>No active migration found.</p>
         }
 
-        {currentMigration &&
-          <div>
-            <table className="table">
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>State</th>
-                <th>Action</th>
-              </tr>
-              </thead>
-              <tbody>
-              {resourceState.canMigrateResources &&
-              <tr className="success">
-                <th scope="row">1</th>
-                <td>Database</td>
-                <td>Resource</td>
-                <td>Updated</td>
-                <td></td>
-              </tr>
-              }
-              <tr>
-                <th scope="row">1</th>
-                <td>Nodes</td>
-                <td>Nodes</td>
-                <td>
-                  {resourceState.canUpdateNodesToDestination &&
-                  <span className="label label-warning">Needs update</span>
-                  }
-                  {resourceState.canUpdateNodesToSource &&
-                  <span className="label label-success">Updated</span>
-                  }
-                  {!resourceState.canUpdateNodesToDestination && !resourceState.canUpdateNodesToSource &&
-                  <span className="label label-default">Not available</span>
-                  }
-                </td>
-                <td>
-                  <UpdateNodes
-                    onStateChange={this.onStateChange}
-                    canUpdateForward={resourceState.canUpdateNodesToDestination}
-                    canUpdateBackward={resourceState.canUpdateNodesToSource}
-                    operationIsInProgress={this.state.operationIsInProgress}
-                  />
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        }
-
-        <CancelMigration
+        <MigrationSteps
+          migrationSteps={resourceState.migrationSteps}
+          currentMigrationStep={resourceState.currentMigrationStep}
+          onStateChange={this.onStateChange}
+          onError={this.onError}
+          canUpdateForward={resourceState.canUpdateNodesToDestination}
+          canUpdateBackward={resourceState.canUpdateNodesToSource}
           canCancelMigration={resourceState.canCancelMigration}
-          onStateChange={this.onStateChange}
-          operationIsInProgress={this.state.operationIsInProgress}
-        />
-
-        <FinishMigration
           canFinishMigration={resourceState.canFinishMigration}
-          onStateChange={this.onStateChange}
           operationIsInProgress={this.state.operationIsInProgress}
         />
       </div>
     )
   }
 }
-
-/*<div className="panel panel-default">
- <div className="panel-body">
- Panel content
- </div>
- </div>*/
 
 export default Relay.createContainer(
   MigrationPage,
@@ -218,6 +178,12 @@ export default Relay.createContainer(
               currentMigration {
                 state
                 started
+                fromRelease {
+                  name
+                }
+                toRelease {
+                  name
+                }
               }
               resourceState {
                 operationIsInProgress
@@ -226,6 +192,8 @@ export default Relay.createContainer(
                 canCancelMigration
                 canFinishMigration
                 canMigrateResources
+                migrationSteps
+                currentMigrationStep
               }
             }
           }
