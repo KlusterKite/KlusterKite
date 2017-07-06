@@ -1,4 +1,5 @@
 import React from 'react';
+import Relay from 'react-relay'
 
 import CancelMigration from '../../components/MigrationOperations/CancelMigration'
 import FinishMigration from '../../components/MigrationOperations/FinishMigration'
@@ -12,6 +13,7 @@ export class MigrationSteps extends React.Component {
 
     this.state = {
       migrationSteps: null,
+      currentMigrationStep: null,
     };
 
     this.replacements = {
@@ -20,34 +22,49 @@ export class MigrationSteps extends React.Component {
   }
 
   static propTypes = {
-    migrationSteps: React.PropTypes.arrayOf(React.PropTypes.string),
-    currentMigrationStep: React.PropTypes.string,
-    canUpdateForward: React.PropTypes.bool,
-    canUpdateBackward: React.PropTypes.bool,
+    resourceState: React.PropTypes.object,
     onStateChange: React.PropTypes.func.isRequired,
     onError: React.PropTypes.func.isRequired,
     operationIsInProgress: React.PropTypes.bool,
   };
 
+  componentWillMount() {
+    this.onReceiveProps(this.props);
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (nextProps.migrationSteps) {
+    this.onReceiveProps(nextProps);
+  }
+
+  onReceiveProps(nextProps) {
+    // We are mapping those props into state because we want to cache them in case of server downtime
+    if (nextProps.resourceState.migrationSteps && nextProps.resourceState.migrationSteps.length > 0) {
       this.setState({
-        migrationSteps: nextProps.migrationSteps
+        migrationSteps: nextProps.resourceState.migrationSteps
+      });
+    }
+
+    if (nextProps.resourceState.currentMigrationStep) {
+      this.setState({
+        currentMigrationStep: nextProps.resourceState.currentMigrationStep
       });
     }
   }
 
   render() {
-    const activeIndex = this.state.migrationSteps ? this.state.migrationSteps.indexOf(this.props.currentMigrationStep) : -1;
-    const lastIndex = this.state.migrationSteps ? this.state.migrationSteps.length - 1 : -1;
-    const nodesUpdating = this.props.currentMigrationStep === 'NodesUpdating';
+    const migrationSteps = this.state.migrationSteps;
+    const currentMigrationStep = this.state.currentMigrationStep;
+    const activeIndex = migrationSteps ? migrationSteps.indexOf(currentMigrationStep) : -1;
+    const lastIndex = migrationSteps ? migrationSteps.length - 1 : -1;
+    const nodesUpdating = currentMigrationStep === 'NodesUpdating';
+    const operationIsInProgress = nodesUpdating || this.props.operationIsInProgress || this.props.resourceState.operationIsInProgress;
 
     return (
       <div className="panel panel-default">
         <div className="panel-body">
 
           <ul className="migration-steps">
-            {this.state.migrationSteps && this.state.migrationSteps.map((step, index) => {
+            {migrationSteps && migrationSteps.map((step, index) => {
               const className = index === activeIndex ? 'active' : '';
               const classNameHrLeft = index === 0 ? 'empty' : (index <= activeIndex ? 'active' : '');
               const classNameHrRight = index === lastIndex ? 'empty' : (activeIndex > index ? 'active' : '');
@@ -67,15 +84,15 @@ export class MigrationSteps extends React.Component {
                       <CancelMigration
                         onStateChange={this.props.onStateChange}
                         onError={this.props.onError}
-                        canCancelMigration={this.props.canCancelMigration}
-                        operationIsInProgress={nodesUpdating || this.props.operationIsInProgress}
+                        canCancelMigration={this.props.resourceState.canCancelMigration}
+                        operationIsInProgress={operationIsInProgress}
                       />
 
                       <UpdateNodes
                         onStateChange={this.props.onStateChange}
                         onError={this.props.onError}
-                        canUpdateBackward={this.props.canUpdateBackward}
-                        operationIsInProgress={nodesUpdating || this.props.operationIsInProgress}
+                        canUpdateBackward={this.props.resourceState.canUpdateNodesToSource}
+                        operationIsInProgress={operationIsInProgress}
                       />
                     </div>
                   }
@@ -85,15 +102,15 @@ export class MigrationSteps extends React.Component {
                       <UpdateNodes
                         onStateChange={this.props.onStateChange}
                         onError={this.props.onError}
-                        canUpdateForward={this.props.canUpdateForward}
-                        operationIsInProgress={nodesUpdating || this.props.operationIsInProgress}
+                        canUpdateForward={this.props.resourceState.canUpdateNodesToDestination}
+                        operationIsInProgress={operationIsInProgress}
                       />
 
                       <FinishMigration
                         onStateChange={this.props.onStateChange}
                         onError={this.props.onError}
-                        canFinishMigration={this.props.canFinishMigration}
-                        operationIsInProgress={nodesUpdating || this.props.operationIsInProgress}
+                        canFinishMigration={this.props.resourceState.canFinishMigration}
+                        operationIsInProgress={operationIsInProgress}
                       />
                     </div>
                   }
@@ -107,4 +124,22 @@ export class MigrationSteps extends React.Component {
   }
 }
 
-export default MigrationSteps
+export default Relay.createContainer(
+  MigrationSteps,
+  {
+    fragments: {
+      resourceState: () => Relay.QL`fragment on IClusterKitNodeApi_ResourceState {
+        operationIsInProgress
+        canUpdateNodesToDestination
+        canUpdateNodesToSource
+        canCancelMigration
+        canFinishMigration
+        canMigrateResources
+        migrationSteps
+        currentMigrationStep
+      }
+      `,
+    },
+  },
+)
+

@@ -26,6 +26,7 @@ export class NodesList extends React.Component {
     hasError: React.PropTypes.bool.isRequired,
     upgradeNodePrivilege: React.PropTypes.bool.isRequired,
     testMode: React.PropTypes.bool,
+    hideDetails: React.PropTypes.bool,
   };
 
   drawRole(node, role) {
@@ -150,8 +151,12 @@ export class NodesList extends React.Component {
               <th>Address</th>
               <th>Template</th>
               <th>Container</th>
-              <th>Modules</th>
-              <th>Roles</th>
+              {!this.props.hideDetails &&
+                <th>Modules</th>
+              }
+              {!this.props.hideDetails &&
+                <th>Roles</th>
+              }
               <th>Status</th>
             </tr>
           </thead>
@@ -170,18 +175,22 @@ export class NodesList extends React.Component {
                 <td>
                   {node.containerType}
                 </td>
-                <td>
-                  {node.isInitialized &&
-                  <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={this.nodePopover(node)}>
-                    <Button className="btn-info btn-xs">
-                      <Icon name="search"/>
-                    </Button>
-                  </OverlayTrigger>
-                  }
-                </td>
-                <td>
-                  {node.roles.map((role) => this.drawRole(node, role))}
-                </td>
+                {!this.props.hideDetails &&
+                  <td>
+                    {node.isInitialized &&
+                    <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={this.nodePopover(node)}>
+                      <Button className="btn-info btn-xs">
+                        <Icon name="search"/>
+                      </Button>
+                    </OverlayTrigger>
+                    }
+                  </td>
+                }
+                {!this.props.hideDetails &&
+                  <td>
+                    {node.roles.map((role) => this.drawRole(node, role))}
+                  </td>
+                }
                 {node.isInitialized &&
                 <td>
                   <span className="label">{node.isInitialized}</span>

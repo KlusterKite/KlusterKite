@@ -5,8 +5,11 @@ import Relay from 'react-relay'
 import delay from 'lodash/delay'
 // import isEqual from 'lodash/isEqual'
 
+import NodesList from '../../components/NodesList/NodesList';
 import MigrationSteps from '../../components/MigrationOperations/MigrationSteps'
+import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 
+import { hasPrivilege } from '../../utils/privileges';
 import DateFormat from '../../utils/date';
 
 class MigrationPage extends React.Component {
@@ -48,8 +51,6 @@ class MigrationPage extends React.Component {
   }
 
   onReceiveProps(nextProps) {
-    console.log('nextProps', nextProps);
-
     if (this.props.api && this.props.api.clusterKitNodesApi.clusterManagement.currentMigration && !nextProps.api.clusterKitNodesApi.clusterManagement.currentMigration) {
       // Migration just finshed
       console.log('Migration has been finished!');
@@ -60,7 +61,6 @@ class MigrationPage extends React.Component {
     }
 
     if (nextProps.api) {
-      console.log('operationIsInProgress: ', nextProps.api.clusterKitNodesApi.clusterManagement.resourceState.operationIsInProgress);
       this.setState({
         operationIsInProgress: nextProps.api.clusterKitNodesApi.clusterManagement.resourceState.operationIsInProgress
       });
@@ -97,6 +97,14 @@ class MigrationPage extends React.Component {
 
     return (
       <div>
+        {this.state.migrationHasFinished &&
+          <div className="alert alert-success" role="alert">
+            <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            {' '}
+            Migration finished successfully!
+          </div>
+        }
+
         {currentMigration &&
           <div>
             <h2>Migration {currentMigration.fromRelease.name} → {currentMigration.toRelease.name}</h2>
@@ -107,14 +115,6 @@ class MigrationPage extends React.Component {
               <span className="glyphicon glyphicon-time fa-spin" aria-hidden="true"></span>
               {' '}
               Operation in progress, please wait…
-            </div>
-            }
-
-            {this.state.migrationHasFinished &&
-            <div className="alert alert-success" role="alert">
-              <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
-              {' '}
-              Migration finished successfully!
             </div>
             }
 
@@ -151,17 +151,26 @@ class MigrationPage extends React.Component {
           <p>No active migration found.</p>
         }
 
-        <MigrationSteps
-          migrationSteps={resourceState.migrationSteps}
-          currentMigrationStep={resourceState.currentMigrationStep}
-          onStateChange={this.onStateChange}
-          onError={this.onError}
-          canUpdateForward={resourceState.canUpdateNodesToDestination}
-          canUpdateBackward={resourceState.canUpdateNodesToSource}
-          canCancelMigration={resourceState.canCancelMigration}
-          canFinishMigration={resourceState.canFinishMigration}
-          operationIsInProgress={this.state.operationIsInProgress}
-        />
+        {currentMigration &&
+          <MigrationSteps
+            resourceState={resourceState}
+            onStateChange={this.onStateChange}
+            onError={this.onError}
+            operationIsInProgress={this.state.operationIsInProgress}
+          />
+        }
+
+        {currentMigration &&
+          <NodesWithTemplates data={this.props.api.clusterKitNodesApi}/>
+        }
+
+        {resourceState.currentMigrationStep === 'NodesUpdating' &&
+          <NodesList hasError={false}
+                     upgradeNodePrivilege={hasPrivilege('ClusterKit.NodeManager.UpgradeNode')}
+                     nodeDescriptions={this.props.api.clusterKitNodesApi}
+                     hideDetails={true}
+          />
+        }
       </div>
     )
   }
@@ -188,14 +197,15 @@ export default Relay.createContainer(
               resourceState {
                 operationIsInProgress
                 canUpdateNodesToDestination
-                canUpdateNodesToSource
                 canCancelMigration
                 canFinishMigration
                 canMigrateResources
-                migrationSteps
                 currentMigrationStep
+                ${MigrationSteps.getFragment('resourceState')},
               }
             }
+            ${NodesWithTemplates.getFragment('data')},
+            ${NodesList.getFragment('nodeDescriptions')},
           }
         }
       `,
