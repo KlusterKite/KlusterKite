@@ -4,6 +4,7 @@ import Relay from 'react-relay'
 import CancelMigration from '../../components/MigrationOperations/CancelMigration'
 import FinishMigration from '../../components/MigrationOperations/FinishMigration'
 import UpdateNodes from '../../components/MigrationOperations/UpdateNodes'
+import UpdateResources from '../../components/MigrationOperations/UpdateResources'
 
 import './styles.css';
 
@@ -17,7 +18,9 @@ export class MigrationSteps extends React.Component {
     };
 
     this.replacements = {
-      NodesUpdating: 'Updating Nodes'
+      NodesUpdating: 'Updating Nodes',
+      ResourcesUpdating: 'Updating Resources',
+      ResourcesUpdated: 'Resources Updated',
     };
   }
 
@@ -60,65 +63,73 @@ export class MigrationSteps extends React.Component {
     const operationIsInProgress = nodesUpdating || this.props.operationIsInProgress || this.props.resourceState.operationIsInProgress;
 
     return (
-      <div className="panel panel-default">
-        <div className="panel-body">
+      <div>
+        <div className="panel panel-default">
+          <div className="panel-body">
 
-          <ul className="migration-steps">
-            {migrationSteps && migrationSteps.map((step, index) => {
-              const className = index === activeIndex ? 'active' : '';
-              const classNameHrLeft = index === 0 ? 'empty' : (index <= activeIndex ? 'active' : '');
-              const classNameHrRight = index === lastIndex ? 'empty' : (activeIndex > index ? 'active' : '');
-              const title = this.replacements[step] ? this.replacements[step] : step;
+            <ul className="migration-steps">
+              {migrationSteps && migrationSteps.map((step, index) => {
+                const className = index === activeIndex ? 'active' : '';
+                const classNameHrLeft = index === 0 ? 'empty' : (index <= activeIndex ? 'active' : '');
+                const classNameHrRight = index === lastIndex ? 'empty' : (activeIndex > index ? 'active' : '');
+                const title = this.replacements[step] ? this.replacements[step] : step;
 
-              return (
-                <li key={step} className={className}>
-                  <hr className={classNameHrLeft} />
-                  <hr className={classNameHrRight} />
-                  <div>
-                    <span className="index">{index + 1}</span>
-                  </div>
-                  <p className="title">{title}</p>
-
-                  {index === 0 &&
-                    <div className="migration-controls">
-                      <CancelMigration
-                        onStateChange={this.props.onStateChange}
-                        onError={this.props.onError}
-                        canCancelMigration={this.props.resourceState.canCancelMigration}
-                        operationIsInProgress={operationIsInProgress}
-                      />
-
-                      <UpdateNodes
-                        onStateChange={this.props.onStateChange}
-                        onError={this.props.onError}
-                        canUpdateBackward={this.props.resourceState.canUpdateNodesToSource}
-                        operationIsInProgress={operationIsInProgress}
-                      />
+                return (
+                  <li key={step} className={className}>
+                    <hr className={classNameHrLeft} />
+                    <hr className={classNameHrRight} />
+                    <div>
+                      <span className="index">{index + 1}</span>
                     </div>
-                  }
+                    <p className="title">{title}</p>
 
-                  {index === lastIndex &&
-                    <div className="migration-controls">
-                      <UpdateNodes
-                        onStateChange={this.props.onStateChange}
-                        onError={this.props.onError}
-                        canUpdateForward={this.props.resourceState.canUpdateNodesToDestination}
-                        operationIsInProgress={operationIsInProgress}
-                      />
+                    {index === 0 &&
+                      <div className="migration-controls">
+                        <CancelMigration
+                          onStateChange={this.props.onStateChange}
+                          onError={this.props.onError}
+                          canCancelMigration={this.props.resourceState.canCancelMigration}
+                          operationIsInProgress={operationIsInProgress}
+                        />
 
-                      <FinishMigration
-                        onStateChange={this.props.onStateChange}
-                        onError={this.props.onError}
-                        canFinishMigration={this.props.resourceState.canFinishMigration}
-                        operationIsInProgress={operationIsInProgress}
-                      />
-                    </div>
-                  }
-                </li>
-              )
-            })}
-          </ul>
+                        <UpdateNodes
+                          onStateChange={this.props.onStateChange}
+                          onError={this.props.onError}
+                          canUpdateBackward={this.props.resourceState.canUpdateNodesToSource}
+                          operationIsInProgress={operationIsInProgress}
+                        />
+                      </div>
+                    }
+
+                    {index === lastIndex &&
+                      <div className="migration-controls">
+                        <UpdateNodes
+                          onStateChange={this.props.onStateChange}
+                          onError={this.props.onError}
+                          canUpdateForward={this.props.resourceState.canUpdateNodesToDestination}
+                          operationIsInProgress={operationIsInProgress}
+                        />
+
+                        <FinishMigration
+                          onStateChange={this.props.onStateChange}
+                          onError={this.props.onError}
+                          canFinishMigration={this.props.resourceState.canFinishMigration}
+                          operationIsInProgress={operationIsInProgress}
+                        />
+                      </div>
+                    }
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
         </div>
+        <UpdateResources
+          onStateChange={this.props.onStateChange}
+          onError={this.props.onError}
+          migrationState={this.props.resourceState.migrationState}
+          canMigrateResources={this.props.resourceState.canMigrateResources}
+        />
       </div>
     );
   }
@@ -137,6 +148,9 @@ export default Relay.createContainer(
         canMigrateResources
         migrationSteps
         currentMigrationStep
+        migrationState {
+          ${UpdateResources.getFragment('migrationState')},
+        }
       }
       `,
     },

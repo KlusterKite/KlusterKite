@@ -5,12 +5,13 @@ import Relay from 'react-relay'
 import delay from 'lodash/delay'
 // import isEqual from 'lodash/isEqual'
 
-import NodesList from '../../components/NodesList/NodesList';
+import NodesList from '../../components/NodesList/NodesList'
+import MigrationLogs from '../../components/MigrationOperations/MigrationLogs'
 import MigrationSteps from '../../components/MigrationOperations/MigrationSteps'
-import NodesWithTemplates from '../../components/NodesWithTemplates/index';
+import NodesWithTemplates from '../../components/NodesWithTemplates/index'
 
-import { hasPrivilege } from '../../utils/privileges';
-import DateFormat from '../../utils/date';
+import { hasPrivilege } from '../../utils/privileges'
+import DateFormat from '../../utils/date'
 
 class MigrationPage extends React.Component {
 
@@ -107,7 +108,7 @@ class MigrationPage extends React.Component {
 
         {currentMigration &&
           <div>
-            <h2>Migration {currentMigration.fromRelease.name} → {currentMigration.toRelease.name}</h2>
+            <h2>Migration {currentMigration.fromRelease && currentMigration.fromRelease.name} → {currentMigration.toRelease && currentMigration.toRelease.name}</h2>
             <p>Created: {currentMigration.started && DateFormat.formatDateTime(new Date(currentMigration.started))}</p>
 
             {(nodesUpdating || this.state.operationIsInProgress) && !this.state.migrationHasFinished &&
@@ -129,7 +130,7 @@ class MigrationPage extends React.Component {
             })
             }
 
-            {!nodesUpdating && !this.state.operationIsInProgress && !this.state.migrationHasFinished && !resourceState.canUpdateNodesToDestination && !resourceState.canFinishMigration &&
+            {!nodesUpdating && !this.state.operationIsInProgress && !this.state.migrationHasFinished && resourceState.currentMigrationStep === 'Finish' && !resourceState.canFinishMigration &&
             <div className="alert alert-warning" role="alert">
               <span className="glyphicon glyphicon-time" aria-hidden="true"></span>
               {' '}
@@ -137,7 +138,7 @@ class MigrationPage extends React.Component {
             </div>
             }
 
-            {!nodesUpdating && !this.state.operationIsInProgress && !this.state.migrationHasFinished && resourceState.canUpdateNodesToDestination && !resourceState.canMigrateResources && !resourceState.canCancelMigration &&
+            {!nodesUpdating && !this.state.operationIsInProgress && !this.state.migrationHasFinished && resourceState.currentMigrationStep === 'Start' && !resourceState.canCancelMigration &&
             <div className="alert alert-warning" role="alert">
               <span className="glyphicon glyphicon-time" aria-hidden="true"></span>
               {' '}
@@ -171,6 +172,12 @@ class MigrationPage extends React.Component {
                      hideDetails={true}
           />
         }
+
+        {currentMigration &&
+          <MigrationLogs
+            currentMigration={currentMigration}
+          />
+        }
       </div>
     )
   }
@@ -193,6 +200,7 @@ export default Relay.createContainer(
                 toRelease {
                   name
                 }
+                ${MigrationLogs.getFragment('currentMigration')},
               }
               resourceState {
                 operationIsInProgress

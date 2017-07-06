@@ -63,3 +63,11 @@ ul.migration-steps li hr.empty {
 .migration-controls p {
   color: #000;
 }
+
+.table>tbody>tr>td.migration-resources {
+  vertical-align: middle;
+}
+
+.migration-logs {
+  margin-top: 20px;
+}
