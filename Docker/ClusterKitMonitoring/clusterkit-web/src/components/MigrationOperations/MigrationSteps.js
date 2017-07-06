@@ -19,6 +19,7 @@ export class MigrationSteps extends React.Component {
 
     this.replacements = {
       NodesUpdating: 'Updating Nodes',
+      NodesUpdated: 'Nodes Updated',
       ResourcesUpdating: 'Updating Resources',
       ResourcesUpdated: 'Resources Updated',
     };

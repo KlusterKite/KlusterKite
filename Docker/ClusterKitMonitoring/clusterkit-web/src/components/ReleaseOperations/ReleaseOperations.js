@@ -80,6 +80,9 @@ export class ReleaseOperations extends React.Component {
             releaseInnerId={this.props.releaseInnerId}
             currentState={this.props.currentState}
             onForceFetch={this.props.onForceFetch}
+            canCreateMigration={this.props.nodeManagement.resourceState.canCreateMigration}
+            currentMigration={this.props.nodeManagement.currentMigration}
+            onStartMigration={this.props.onStartMigration}
           />
         </div>
         {this.props.currentState && this.props.currentState === 'Draft' && !this.state.isChangingState &&
