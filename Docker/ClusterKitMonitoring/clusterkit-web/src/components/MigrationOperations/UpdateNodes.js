@@ -18,7 +18,8 @@ export class UpdateNodes extends React.Component {
   static propTypes = {
     canUpdateForward: React.PropTypes.bool,
     canUpdateBackward: React.PropTypes.bool,
-    onStateChange: React.PropTypes.func,
+    onStateChange: React.PropTypes.func.isRequired,
+    onError: React.PropTypes.func.isRequired,
     operationIsInProgress: React.PropTypes.bool,
   };
 
@@ -52,6 +53,7 @@ export class UpdateNodes extends React.Component {
             if (responsePayload.errors &&
               responsePayload.errors.edges) {
               const messages = this.getErrorMessagesFromEdge(responsePayload.errors.edges);
+              this.props.onError(messages);
 
               this.setState({
                 processSuccessful: false,
@@ -91,17 +93,6 @@ export class UpdateNodes extends React.Component {
 
     return (
     <div>
-      {this.state.processErrors && this.state.processErrors.map((error, index) => {
-        return (
-          <div className="alert alert-danger" role="alert" key={`error-${index}`}>
-            <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            {' '}
-            {error}
-          </div>
-        );
-      })
-      }
-
       {this.props.canUpdateForward && !this.state.isProcessing && !this.props.operationIsInProgress &&
         <button className="btn btn-primary" type="button" onClick={this.onStartUpdateDestination}>
           <Icon name="forward" className={processClassName}/>{' '}Update nodes

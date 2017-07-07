@@ -1,0 +1,77 @@
+import React from 'react';
+import Relay from 'react-relay'
+
+import DateFormat from '../../utils/date'
+
+import './styles.css';
+
+export class MigrationLogs extends React.Component {
+  static propTypes = {
+    currentMigration: React.PropTypes.object,
+  };
+
+  render() {
+    return (
+      <div className="migration-logs">
+        <h3>Logs</h3>
+        {this.props.currentMigration.logs && this.props.currentMigration.logs.edges.length > 0 &&
+        <table className="table table-hover">
+          <thead>
+          <tr>
+            <th>Started</th>
+            <th>Finished</th>
+            <th>Template</th>
+            <th>Resource</th>
+            <th>Error</th>
+          </tr>
+          </thead>
+          <tbody>
+            {this.props.currentMigration.logs.edges.map((edge, index) => {
+              const node = edge.node;
+              return (
+                <tr key={`migration-log-${index}`}>
+                  <td>{node.started && DateFormat.formatTime(new Date(node.started))}</td>
+                  <td>{node.started && DateFormat.formatTime(new Date(node.finished))}</td>
+                  <td>{node.migratorTemplateName}</td>
+                  <td>{node.resourceName}</td>
+                  <td>{node.errorMessage}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        }
+      </div>
+    );
+  }
+}
+
+export default Relay.createContainer(
+  MigrationLogs,
+  {
+    fragments: {
+      currentMigration: () => Relay.QL`fragment on IClusterKitNodeApi_Migration {
+        logs {
+          edges {
+            node {
+              started
+              finished
+              type
+              sourcePoint
+              destinationPoint
+              errorMessage
+              errorStackTrace
+              migratorTemplateCode
+              migratorTemplateName
+              migratorTypeName
+              migratorName
+              resourceCode
+              resourceName
+            }
+          }
+        }
+      }
+      `,
+    },
+  },
+)

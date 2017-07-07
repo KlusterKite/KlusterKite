@@ -19,7 +19,8 @@ export class FinishMigration extends React.Component {
 
   static propTypes = {
     canCancelMigration: React.PropTypes.bool,
-    onStateChange: React.PropTypes.func,
+    onStateChange: React.PropTypes.func.isRequired,
+    onError: React.PropTypes.func.isRequired,
     operationIsInProgress: React.PropTypes.bool,
   };
 
@@ -43,6 +44,7 @@ export class FinishMigration extends React.Component {
             if (responsePayload.errors &&
               responsePayload.errors.edges) {
               const messages = this.getErrorMessagesFromEdge(responsePayload.errors.edges);
+              this.props.onError(messages);
 
               this.setState({
                 processSuccessful: false,
@@ -83,23 +85,12 @@ export class FinishMigration extends React.Component {
 
     return (
       <div className="buttons-block-margin">
-        {this.state.processErrors && this.state.processErrors.map((error, index) => {
-          return (
-            <div className="alert alert-danger" role="alert" key={`error-${index}`}>
-              <span className="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-              {' '}
-              {error}
-            </div>
-          );
-        })
-      }
-
-      {this.props.canCancelMigration && !this.state.isProcessing && !this.props.operationIsInProgress &&
-        <button className="btn btn-danger" type="button" onClick={this.onFinishMigration}>
-          <Icon name="flag-checkered" className={processClassName}/>{' '}Cancel migration
-        </button>
-      }
-    </div>
+        {this.props.canCancelMigration && !this.state.isProcessing && !this.props.operationIsInProgress &&
+          <button className="btn btn-danger" type="button" onClick={this.onFinishMigration}>
+            <Icon name="trash" className={processClassName}/>{' '}Cancel migration
+          </button>
+        }
+      </div>
     );
   }
 }
