@@ -48,26 +48,6 @@ open Fake.Core.Process
 open Fake.DotNet.MsBuild
 open Fake.IO.FileSystem.Shell
 
-Target.Create "Rename" (fun _ ->
-    let rec renameRecursive (dir:DirectoryInfo) =
-        dir.GetDirectories "*"
-            |> Seq.iter (fun (subDir:DirectoryInfo) -> 
-                renameRecursive subDir
-                if subDir.Name.Contains("KlusterKite") then
-                    printfn "%s| %s -> %s" subDir.Parent.FullName subDir.Name (subDir.Name.Replace("KlusterKite", "KlusterKite"))
-                    subDir.MoveTo((Path.Combine(subDir.Parent.FullName, subDir.Name.Replace("KlusterKite", "KlusterKite"))))                        
-                )
-        dir.GetFiles "*"
-            |> Seq.iter (fun (file:FileInfo) ->
-                if file.Name.Contains("KlusterKite") then
-                    printfn "%s| %s -> %s" file.DirectoryName file.Name (file.Name.Replace("KlusterKite", "KlusterKite"))
-                    file.MoveTo((Path.Combine(file.DirectoryName, file.Name.Replace("KlusterKite", "KlusterKite"))))                        
-                )
-
-    renameRecursive (new DirectoryInfo("."))
-)
-
-
 // builds base (system) docker images
 Target.Create "DockerBase" (fun _ ->
     buildDocker "klusterkite/baseworker" "Docker/KlusterKiteBaseWorkerNode"

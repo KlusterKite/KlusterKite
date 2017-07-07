@@ -37,12 +37,13 @@
       <Value>urls</Value>
       <Value>untyped</Value>
       <Value>web-api</Value>
+      <Value>KlusterKite</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>
     <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
       <AnalyzerSettings>
-        <StringProperty Name="CompanyName">ClusterKit</StringProperty>
+        <StringProperty Name="CompanyName">KlusterKite</StringProperty>
         <StringProperty Name="Copyright">All rights reserved</StringProperty>
       </AnalyzerSettings>
     </Analyzer>
@@ -79,7 +80,7 @@
   </Analyzers>
   <SourceFileList>
     <!-- Excluding files with C#7 from style cop in order to stop generating false errors -->
-    <SourceFile>ClusterKit.NodeManager/ClusterKit.NodeManager.ConfigurationSource/ReleaseExtensions.cs</SourceFile>
+    <SourceFile>KlusterKite.NodeManager/KlusterKite.NodeManager.ConfigurationSource/ReleaseExtensions.cs</SourceFile>
     <Settings>
       <GlobalSettings>
         <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>

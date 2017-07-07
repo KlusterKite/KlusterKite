@@ -10,7 +10,7 @@ networks:
 services:
   #set of abstract utility servers
   vpn:
-    image: clusterkit/vpn
+    image: klusterkite/vpn
     networks:
       default:
         ipv4_address: 172.18.0.253
@@ -23,29 +23,29 @@ services:
 
   nuget:
     #image: sunside/simple-nuget-server
-    image: clusterkit/nuget
+    image: klusterkite/nuget
     ports:
      - "81:80"
     environment:
-     - NUGET_API_KEY=ClusterKit
+     - NUGET_API_KEY=KlusterKite
     networks:
       default:
         ipv4_address: 172.18.0.2 
 
   configDb:
-    image: clusterkit/postgres
+    image: klusterkite/postgres
     networks:
       default:
         ipv4_address: 172.18.0.3
   redis:
-    image: clusterkit/redis
+    image: klusterkite/redis
     privileged: true
     networks:
       default:
         ipv4_address: 172.18.0.4
      
   entry:
-    image: clusterkit/entry
+    image: klusterkite/entry
     links:
      - "seed"
      - "publisher1"
@@ -58,7 +58,7 @@ services:
 
   #Cluster servers
   seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes
-    image: clusterkit/seed
+    image: klusterkite/seed
     environment:
      - NETWORK_NAME=seed
      - SELF_JOIN=true
@@ -69,7 +69,7 @@ services:
         ipv4_address: 172.18.0.6               
 
   publisher1: 
-    image: clusterkit/publisher
+    image: klusterkite/publisher
     environment:
      - NETWORK_NAME=publisher1
     logging:
@@ -80,7 +80,7 @@ services:
 
 
   publisher2: 
-    image: clusterkit/publisher
+    image: klusterkite/publisher
     environment:
      - NETWORK_NAME=publisher2
     logging:
@@ -90,7 +90,7 @@ services:
         ipv4_address: 172.18.0.8             
 
   monitoringUI:
-    image: clusterkit/monitoring-ui
+    image: klusterkite/monitoring-ui
     ports:
      - "82:8080"
     logging:
@@ -100,7 +100,7 @@ services:
         ipv4_address: 172.18.0.9 
   
   elk:
-    image: clusterkit/elk
+    image: klusterkite/elk
     logging:
         driver: json-file
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: 172.18.0.12
   
   seeder:
-    image: clusterkit/seeder
+    image: klusterkite/seeder
     logging:
         driver: json-file
     networks:
@@ -117,7 +117,7 @@ services:
 
 
   manager:
-    image: clusterkit/manager
+    image: klusterkite/manager
 #    environment:
 #     - MONO_LOG_LEVEL=info
     links:
@@ -131,7 +131,7 @@ services:
         driver: json-file
 
   worker:
-    image: clusterkit/worker
+    image: klusterkite/worker
     links:
      - "seed"
      - "manager"
