@@ -89,7 +89,7 @@ namespace KlusterKite.NodeManager.Tests
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
 
-                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -103,7 +103,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -156,7 +156,7 @@ namespace KlusterKite.NodeManager.Tests
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
 
-                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -170,7 +170,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -262,7 +262,7 @@ namespace KlusterKite.NodeManager.Tests
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
 
-                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -276,7 +276,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -337,7 +337,7 @@ namespace KlusterKite.NodeManager.Tests
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
 
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -351,7 +351,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -444,7 +444,7 @@ namespace KlusterKite.NodeManager.Tests
                 var activeRelease = context.Releases.First(r => r.Id == 1);
                 var nextRelease = context.Releases.First(r => r.Id == 2);
 
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -458,7 +458,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                nextRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -551,7 +551,7 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -601,7 +601,7 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.GetContext())
             {
                 var activeRelease = context.Releases.First(r => r.Id == 1);
-                activeRelease.Configuration.MigratorTemplates.First().Configuration = $@"
+                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -679,8 +679,8 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         State = EnMigrationState.Preparing
                                     };
@@ -694,7 +694,7 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <param name="repo">The package repository</param>
         /// <returns>The release</returns>
-        private Release CreateRelease(IPackageRepository repo)
+        private Configuration CreateRelease(IPackageRepository repo)
         {
             var template = new NodeTemplate
                                {
@@ -732,7 +732,7 @@ namespace KlusterKite.NodeManager.Tests
                 .Select(p => p.Identity).Select(
                     p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList();
 
-            var configuration = new ReleaseConfiguration
+            var configuration = new ConfigurationSettings
                                     {
                                         NodeTemplates = new[] { template }.ToList(),
                                         MigratorTemplates = new[] { migrator }.ToList(),
@@ -741,7 +741,7 @@ namespace KlusterKite.NodeManager.Tests
                                         SeedAddresses = new[] { "http://seed" }.ToList()
                                     };
 
-            var release = new Release { Configuration = configuration };
+            var release = new Configuration { Settings = configuration };
             return release;
         }
 
@@ -928,7 +928,7 @@ namespace KlusterKite.NodeManager.Tests
                 container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
                     .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
 
-                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
+                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
 
                 container.RegisterInstance(this.CreateTestRepository()).As<IPackageRepository>();
                 container.RegisterType<TestMessageRouter>().As<IMessageRouter>();

@@ -58,7 +58,7 @@ namespace KlusterKite.NodeManager.Client.ORM
         /// <summary>
         /// Gets or sets the release id
         /// </summary>
-        [ForeignKey(nameof(Release))]
+        [ForeignKey(nameof(Configuration))]
         [DeclareField("the release id")]
         [UsedImplicitly]
         public int ReleaseId { get; set; }
@@ -68,7 +68,7 @@ namespace KlusterKite.NodeManager.Client.ORM
         /// </summary>
         [DeclareField("the release")]
         [UsedImplicitly]
-        public Release Release { get; set; }
+        public Configuration Configuration { get; set; }
 
         /// <summary>
         /// Gets or sets the migrator template code

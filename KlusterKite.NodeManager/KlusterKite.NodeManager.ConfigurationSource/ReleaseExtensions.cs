@@ -30,61 +30,61 @@ namespace KlusterKite.NodeManager.ConfigurationSource
     using NuGet.Versioning;
 
     /// <summary>
-    /// Extending the work with <see cref="Release"/>
+    /// Extending the work with <see cref="Configuration"/>
     /// </summary>
     public static class ReleaseExtensions
     {
         /// <summary>
         /// Creates full release check and fills it values with actual data
         /// </summary>
-        /// <param name="release">The release</param>
+        /// <param name="configuration">The release</param>
         /// <param name="context">The data context</param>
         /// <param name="nugetRepository">The access to the nuget repository</param>
         /// <param name="supportedFrameworks">The list of supported frameworks</param>
         /// <returns>The list of possible errors</returns>
         public static async Task<List<ErrorDescription>> CheckAll(
-            this Release release,
+            this Configuration configuration,
             ConfigurationContext context,
             IPackageRepository nugetRepository,
             List<string> supportedFrameworks)
         {
-            release.CompatibleTemplatesBackward = release.GetCompatibleTemplates(context).ToList();
+            configuration.CompatibleTemplatesBackward = configuration.GetCompatibleTemplates(context).ToList();
             var errors = new List<ErrorDescription>();
-            errors.AddRange(await release.SetPackagesDescriptionsForTemplates(nugetRepository, supportedFrameworks));
-            errors.AddRange(release.CheckTemplatesConfigurations());
+            errors.AddRange(await configuration.SetPackagesDescriptionsForTemplates(nugetRepository, supportedFrameworks));
+            errors.AddRange(configuration.CheckTemplatesConfigurations());
             return errors;
         }
          
         /// <summary>
         /// Checks release node templates for correct configuration sections
         /// </summary>
-        /// <param name="release">The release</param>
+        /// <param name="configuration">The release</param>
         /// <returns>The list of errors</returns>
-        public static IEnumerable<ErrorDescription> CheckTemplatesConfigurations(this Release release)
+        public static IEnumerable<ErrorDescription> CheckTemplatesConfigurations(this Configuration configuration)
         {
-            if (release?.Configuration?.SeedAddresses == null || release.Configuration.SeedAddresses.Count == 0)
+            if (configuration?.Settings?.SeedAddresses == null || configuration.Settings.SeedAddresses.Count == 0)
             {
                 yield return new ErrorDescription(
                     "configuration.seedAddresses",
                     "Seeds addresses is empty");
             }
 
-            if (string.IsNullOrWhiteSpace(release?.Configuration?.NugetFeed))
+            if (string.IsNullOrWhiteSpace(configuration?.Settings?.NugetFeed))
             {
                 yield return new ErrorDescription(
                     "configuration.nugetFeed",
                     "Nuget feed is empty");
             }
 
-            if (release?.Configuration?.NodeTemplates == null 
-                || release.Configuration.NodeTemplates.Count == 0
-                || release.Configuration.MigratorTemplates == null
-                || release.Configuration.MigratorTemplates.Count == 0)
+            if (configuration?.Settings?.NodeTemplates == null 
+                || configuration.Settings.NodeTemplates.Count == 0
+                || configuration.Settings.MigratorTemplates == null
+                || configuration.Settings.MigratorTemplates.Count == 0)
             {
                 yield break;
             }
 
-            foreach (var template in release.Configuration.GetAllTemplates())
+            foreach (var template in configuration.Settings.GetAllTemplates())
             {
                 try
                 {
@@ -109,7 +109,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// <summary>
         /// Gets the list of compatible templates
         /// </summary>
-        /// <param name="release">
+        /// <param name="configuration">
         /// The release to check
         /// </param>
         /// <param name="context">
@@ -119,26 +119,26 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// The list of compatible templates
         /// </returns> 
         public static IEnumerable<CompatibleTemplate> GetCompatibleTemplates(
-            this Release release,
+            this Configuration configuration,
             ConfigurationContext context)
         {
-            if (release?.Configuration?.NodeTemplates == null)
+            if (configuration?.Settings?.NodeTemplates == null)
             {
                 yield break;
             }
 
             var currentRelease =
-                context.Releases.Include(nameof(Release.CompatibleTemplatesBackward))
+                context.Releases.Include(nameof(Configuration.CompatibleTemplatesBackward))
                     .FirstOrDefault(r => r.State == EnReleaseState.Active);
 
-            if (currentRelease?.Configuration?.NodeTemplates == null)
+            if (currentRelease?.Settings?.NodeTemplates == null)
             {
                 yield break;
             }
 
-            foreach (var template in currentRelease.Configuration.NodeTemplates)
+            foreach (var template in currentRelease.Settings.NodeTemplates)
             {
-                var currentTemplate = release.Configuration.NodeTemplates.FirstOrDefault(t => t.Code == template.Code);
+                var currentTemplate = configuration.Settings.NodeTemplates.FirstOrDefault(t => t.Code == template.Code);
                 if (currentTemplate == null)
                 {
                     continue;
@@ -164,8 +164,8 @@ namespace KlusterKite.NodeManager.ConfigurationSource
                 var needPackageUpdate = false;
                 foreach (var requirement in currentTemplate.PackageRequirements.Where(r => r.SpecificVersion == null))
                 {
-                    var oldVersion = release.Configuration.Packages.FirstOrDefault(p => p.Id == requirement.Id);
-                    var newVersion = currentRelease.Configuration.Packages.FirstOrDefault(p => p.Id == requirement.Id);
+                    var oldVersion = configuration.Settings.Packages.FirstOrDefault(p => p.Id == requirement.Id);
+                    var newVersion = currentRelease.Settings.Packages.FirstOrDefault(p => p.Id == requirement.Id);
                     if (newVersion == null || oldVersion?.Version != newVersion.Version)
                     {
                         needPackageUpdate = true;
@@ -182,7 +182,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
                     new CompatibleTemplate
                         {
                             CompatibleReleaseId = currentRelease.Id,
-                            ReleaseId = release.Id,
+                            ReleaseId = configuration.Id,
                             TemplateCode = template.Code
                         };
 
@@ -193,7 +193,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
                         new CompatibleTemplate
                             {
                                 CompatibleReleaseId = compatible.CompatibleReleaseId,
-                                ReleaseId = release.Id,
+                                ReleaseId = configuration.Id,
                                 TemplateCode = template.Code
                             };
                 }
@@ -201,9 +201,9 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         }
 
         /// <summary>
-        /// Checks the <see cref="Release"/> data and sets the <see cref="NodeTemplate.PackagesToInstall"/>
+        /// Checks the <see cref="Configuration"/> data and sets the <see cref="NodeTemplate.PackagesToInstall"/>
         /// </summary>
-        /// <param name="release">
+        /// <param name="configuration">
         /// The object to update
         /// </param>
         /// <param name="nugetRepository">
@@ -216,39 +216,39 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// The list of possible errors
         /// </returns>
         public static async Task<List<ErrorDescription>> SetPackagesDescriptionsForTemplates(
-            this Release release,
+            this Configuration configuration,
             IPackageRepository nugetRepository,
             List<string> supportedFrameworks)
         {
             var errors = new List<ErrorDescription>();
-            if (release?.Configuration?.NodeTemplates == null || release.Configuration.NodeTemplates.Count == 0)
+            if (configuration?.Settings?.NodeTemplates == null || configuration.Settings.NodeTemplates.Count == 0)
             {
                 errors.Add(new ErrorDescription("configuration.nodeTemplates", "Node templates are not initialized"));
                 return errors;
             }
 
-            if (release.Configuration?.MigratorTemplates == null || release.Configuration.MigratorTemplates.Count == 0)
+            if (configuration.Settings?.MigratorTemplates == null || configuration.Settings.MigratorTemplates.Count == 0)
             {
                 errors.Add(new ErrorDescription("configuration.migratorTemplates", "Migrator templates are not initialized"));
                 return errors;
             }
 
-            if (release.Configuration.Packages == null || release.Configuration.Packages.Count == 0)
+            if (configuration.Settings.Packages == null || configuration.Settings.Packages.Count == 0)
             {
                 errors.Add(new ErrorDescription("configuration.packages", "Packages are not initialized"));
                 return errors;
             }
 
-            var(packages, packagesErrors) = await CheckPackages(release, supportedFrameworks, nugetRepository);
+            var(packages, packagesErrors) = await CheckPackages(configuration, supportedFrameworks, nugetRepository);
             errors.AddRange(packagesErrors);
-            errors.AddRange(await CheckTemplatesPackages(release, supportedFrameworks, packages, nugetRepository));
+            errors.AddRange(await CheckTemplatesPackages(configuration, supportedFrameworks, packages, nugetRepository));
             return errors;
         }
 
         /// <summary>
         /// Checks the list of defined packages in the release and fills provided dictionary with precise package data
         /// </summary>
-        /// <param name="release">
+        /// <param name="configuration">
         /// The release.
         /// </param>
         /// <param name="supportedFrameworks">
@@ -261,12 +261,12 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// The list of defined packages along with list of possible errors
         /// </returns>
         private static async Task<Tuple<Dictionary<string, IPackageSearchMetadata>, List<ErrorDescription>>>
-            CheckPackages(Release release, List<string> supportedFrameworks, IPackageRepository nugetRepository)
+            CheckPackages(Configuration configuration, List<string> supportedFrameworks, IPackageRepository nugetRepository)
         {
             var definedPackages = new Dictionary<string, IPackageSearchMetadata>();
             var errors = new List<ErrorDescription>();
             var packages = await Task.WhenAll(
-                               release.Configuration.Packages
+                               configuration.Settings.Packages
                                .Select(d => new { Description = d, Version = NuGetVersion.TryParse(d.Version, out var v) ? v : null })
                                .Select(
                                        async p => new
@@ -336,7 +336,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// <summary>
         /// Checks package requirements in release templates and fills the <see cref="NodeTemplate.PackagesToInstall"/> field in templates
         /// </summary>
-        /// <param name="release">
+        /// <param name="configuration">
         /// The release.
         /// </param>
         /// <param name="supportedFrameworks">
@@ -352,24 +352,24 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// The list of possible errors
         /// </returns>
         private static async Task<List<ErrorDescription>> CheckTemplatesPackages(
-            [NotNull] Release release,
+            [NotNull] Configuration configuration,
             [NotNull] List<string> supportedFrameworks,
             [NotNull] Dictionary<string, IPackageSearchMetadata> definedPackages,
             [NotNull] IPackageRepository nugetRepository)
         {
-            if (release == null)
+            if (configuration == null)
             {
-                throw new ArgumentNullException(nameof(release));
+                throw new ArgumentNullException(nameof(configuration));
             }
 
-            if (release.Configuration == null)
+            if (configuration.Settings == null)
             {
-                throw new ArgumentNullException(nameof(release.Configuration));
+                throw new ArgumentNullException(nameof(configuration.Settings));
             }
 
-            if (release.Configuration.NodeTemplates == null)
+            if (configuration.Settings.NodeTemplates == null)
             {
-                throw new ArgumentNullException(nameof(release.Configuration.NodeTemplates));
+                throw new ArgumentNullException(nameof(configuration.Settings.NodeTemplates));
             }
 
             if (supportedFrameworks == null)
@@ -389,7 +389,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
 
             var errors = new List<ErrorDescription>();
 
-            foreach (var template in release.Configuration.GetAllTemplates())
+            foreach (var template in configuration.Settings.GetAllTemplates())
             {
                 if (template == null)
                 {

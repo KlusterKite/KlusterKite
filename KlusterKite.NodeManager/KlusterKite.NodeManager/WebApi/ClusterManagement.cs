@@ -62,7 +62,7 @@ namespace KlusterKite.NodeManager.WebApi
         [RequireUser]
         [RequirePrivilege(Privileges.GetResourceState)]
         [UsedImplicitly]
-        public Task<Release> CurrentRelease => this.Actor.Ask<Release>(new CurrentReleaseRequest(), this.AkkaTimeout);
+        public Task<Configuration> CurrentRelease => this.Actor.Ask<Configuration>(new CurrentReleaseRequest(), this.AkkaTimeout);
 
         /// <summary>
         /// Gets current cluster resources state

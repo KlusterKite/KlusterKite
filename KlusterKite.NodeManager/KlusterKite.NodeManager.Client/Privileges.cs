@@ -43,7 +43,7 @@ namespace KlusterKite.NodeManager.Client
         public const string UserRole = "KlusterKite.NodeManager.UserRole";
 
         /// <summary>
-        /// The privilege to manage <see cref="ORM.Release"/>
+        /// The privilege to manage <see cref="Configuration"/>
         /// </summary>
         [PrivilegeDescription("Release management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
         public const string Release = "KlusterKite.NodeManager.Release";

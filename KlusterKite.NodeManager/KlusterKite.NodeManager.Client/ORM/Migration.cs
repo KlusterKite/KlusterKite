@@ -81,31 +81,31 @@ namespace KlusterKite.NodeManager.Client.ORM
         /// Gets or sets the previous release id
         /// </summary>
         [UsedImplicitly]
-        [ForeignKey(nameof(FromRelease))]
-        [DeclareField("the previous release id")]
-        public int FromReleaseId { get; set; }
+        [ForeignKey(nameof(FromConfiguration))]
+        [DeclareField("the previous configuration id")]
+        public int FromConfigurationId { get; set; }
 
         /// <summary>
         /// Gets or sets the new release id
         /// </summary>
         [UsedImplicitly]
-        [ForeignKey(nameof(ToRelease))]
-        [DeclareField("the new release id")]
-        public int ToReleaseId { get; set; }
+        [ForeignKey(nameof(ToConfiguration))]
+        [DeclareField("the new configuration id")]
+        public int ToConfigurationId { get; set; }
 
         /// <summary>
         /// Gets or sets the previous release
         /// </summary>
         [UsedImplicitly]
         [DeclareField("the previous release")]
-        public Release FromRelease { get; set; }
+        public Configuration FromConfiguration { get; set; }
 
         /// <summary>
         /// Gets or sets the new release
         /// </summary>
         [UsedImplicitly]
         [DeclareField("the new release")]
-        public Release ToRelease { get; set; }
+        public Configuration ToConfiguration { get; set; }
 
         /// <inheritdoc />
         public int GetId()

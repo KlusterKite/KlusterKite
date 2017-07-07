@@ -118,7 +118,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                 
                 this.SetupUsers(context);
                 var configuration =
-                    new ReleaseConfiguration
+                    new ConfigurationSettings
                         {
                             NodeTemplates = this.GetNodeTemplates().ToList(),
                             MigratorTemplates = this.GetMigratorTemplates().ToList(),
@@ -127,12 +127,12 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                             NugetFeed = this.Config.GetString("KlusterKite.NodeManager.PackageRepository")
                         };
 
-                var initialRelease = new Release
+                var initialRelease = new Configuration
                                          {
                                              State = EnReleaseState.Active,
                                              Name = "Initial configuration",
                                              Started = DateTimeOffset.Now,
-                                             Configuration = configuration
+                                             Settings = configuration
                                          };
 
                 var supportedFrameworks = this.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");

@@ -46,7 +46,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
             container.RegisterType<RoleFactory>().As<DataFactory<ConfigurationContext, Role, Guid>>();
             container.RegisterType<UserFactoryByLogin>().As<DataFactory<ConfigurationContext, User, string>>();
             container.RegisterType<UserFactoryByUid>().As<DataFactory<ConfigurationContext, User, Guid>>();
-            container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
+            container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
             container.RegisterType<MigrationDataFactory>().As<DataFactory<ConfigurationContext, Migration, int>>();
 
             var nugetUrl = config.GetString("KlusterKite.NodeManager.PackageRepository");

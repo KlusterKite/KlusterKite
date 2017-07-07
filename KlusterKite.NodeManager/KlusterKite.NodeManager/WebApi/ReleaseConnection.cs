@@ -30,7 +30,7 @@ namespace KlusterKite.NodeManager.WebApi
     /// <summary>
     /// The release management
     /// </summary>
-    public class ReleaseConnection : Connection<Release, int>
+    public class ReleaseConnection : Connection<Configuration, int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReleaseConnection"/> class.
@@ -66,13 +66,13 @@ namespace KlusterKite.NodeManager.WebApi
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ReleaseFinish)]
-        public async Task<MutationResult<Release>> Check(int id)
+        public async Task<MutationResult<Configuration>> Check(int id)
         {
             try
             {
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
-                        .Ask<CrudActionResponse<Release>>(
+                        .Ask<CrudActionResponse<Configuration>>(
                             new ReleaseCheckRequest { Id = id, Context = this.Context },
                             this.Timeout);
                 return CreateResponse(response);
@@ -80,12 +80,12 @@ namespace KlusterKite.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on check", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
+                return new MutationResult<Configuration> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
 
         /// <summary>
-        /// Mutation that moves <see cref="Release.State"/> from <see cref="EnReleaseState.Draft"/> to <see cref="EnReleaseState.Ready"/>
+        /// Mutation that moves <see cref="Configuration.State"/> from <see cref="EnReleaseState.Draft"/> to <see cref="EnReleaseState.Ready"/>
         /// </summary>
         /// <param name="id">The id of release draft</param>
         /// <returns>The mutation result</returns>
@@ -94,13 +94,13 @@ namespace KlusterKite.NodeManager.WebApi
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ReleaseFinish)]
-        public async Task<MutationResult<Release>> SetReady(int id)
+        public async Task<MutationResult<Configuration>> SetReady(int id)
         {
             try
             {
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
-                        .Ask<CrudActionResponse<Release>>(
+                        .Ask<CrudActionResponse<Configuration>>(
                             new ReleaseSetReadyRequest { Id = id, Context = this.Context },
                             this.Timeout);
                 return CreateResponse(response);
@@ -108,12 +108,12 @@ namespace KlusterKite.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on SetReady", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
+                return new MutationResult<Configuration> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
 
         /// <summary>
-        /// Mutation that moves <see cref="Release.State"/> from <see cref="EnReleaseState.Ready"/> to <see cref="EnReleaseState.Obsolete"/>
+        /// Mutation that moves <see cref="Configuration.State"/> from <see cref="EnReleaseState.Ready"/> to <see cref="EnReleaseState.Obsolete"/>
         /// </summary>
         /// <param name="id">The id of release draft</param>
         /// <returns>The mutation result</returns>
@@ -122,13 +122,13 @@ namespace KlusterKite.NodeManager.WebApi
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ReleaseFinish)]
-        public async Task<MutationResult<Release>> SetObsolete(int id)
+        public async Task<MutationResult<Configuration>> SetObsolete(int id)
         {
             try
             {
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
-                        .Ask<CrudActionResponse<Release>>(
+                        .Ask<CrudActionResponse<Configuration>>(
                             new ReleaseSetObsoleteRequest { Id = id, Context = this.Context },
                             this.Timeout);
                 return CreateResponse(response);
@@ -136,28 +136,28 @@ namespace KlusterKite.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on SetObsolete", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
+                return new MutationResult<Configuration> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
 
         /// <summary>
-        /// Mutation that sets the <see cref="Release.IsStable"/>
+        /// Mutation that sets the <see cref="Configuration.IsStable"/>
         /// </summary>
         /// <param name="id">The id of release draft</param>
-        /// <param name="isStable">A value indicating the new <see cref="Release.IsStable"/> value</param>
+        /// <param name="isStable">A value indicating the new <see cref="Configuration.IsStable"/> value</param>
         /// <returns>The mutation result</returns>-
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ClusterUpdate)]
         [DeclareMutation("moves release state from \"draft\" to \"ready\"")]
-        public async Task<MutationResult<Release>> SetStable(int id, bool isStable)
+        public async Task<MutationResult<Configuration>> SetStable(int id, bool isStable)
         {
             try
             {
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
-                        .Ask<CrudActionResponse<Release>>(
+                        .Ask<CrudActionResponse<Configuration>>(
                             new ReleaseSetStableRequest { Id = id, Context = this.Context, IsStable = isStable },
                             this.Timeout);
                 return CreateResponse(response);
@@ -165,7 +165,7 @@ namespace KlusterKite.NodeManager.WebApi
             catch (Exception exception)
             {
                 this.System.Log.Error(exception, "{Type}: error on SetStable", this.GetType().Name);
-                return new MutationResult<Release> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
+                return new MutationResult<Configuration> { Errors = new[] { new ErrorDescription(null, exception.Message) }.ToList() };
             }
         }
     }

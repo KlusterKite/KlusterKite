@@ -196,15 +196,15 @@ namespace KlusterKite.NodeManager.Tests
 
                 var newRelease = ReleaseCheckTestsBase.CreateRelease();
                 newRelease.State = EnReleaseState.Active;
-                newRelease.Configuration.SeedAddresses = new List<string>();
-                newRelease.Configuration.NugetFeed = "http://nuget/";
-                newRelease.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
-                newRelease.Configuration.NodeTemplates[0].PackagesToInstall =
+                newRelease.Settings.SeedAddresses = new List<string>();
+                newRelease.Settings.NugetFeed = "http://nuget/";
+                newRelease.Settings.NodeTemplates[0].MinimumRequiredInstances = 2;
+                newRelease.Settings.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
                             [ReleaseCheckTestsBase.Net46] =
                             new List<PackageDescription>(
-                                newRelease.Configuration.Packages)
+                                newRelease.Settings.Packages)
                         };
 
                 newRelease.CompatibleTemplatesBackward =
@@ -256,8 +256,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Downgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -307,8 +307,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Downgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -362,8 +362,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Downgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -456,8 +456,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Downgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -549,8 +549,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Downgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -647,8 +647,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Downgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -745,8 +745,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Stay,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -796,8 +796,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Stay,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -851,8 +851,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Stay,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -946,8 +946,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Stay,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -1039,8 +1039,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Upgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -1090,8 +1090,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Upgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -1145,8 +1145,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Upgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -1240,8 +1240,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Upgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -1333,8 +1333,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Upgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -1427,8 +1427,8 @@ namespace KlusterKite.NodeManager.Tests
                 var migration = new Migration
                                     {
                                         Direction = EnMigrationDirection.Upgrade,
-                                        FromReleaseId = 1,
-                                        ToReleaseId = 2,
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
@@ -1576,8 +1576,8 @@ namespace KlusterKite.NodeManager.Tests
                      TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             this.ExpectMsg<RecheckState>("/user/migrationActor");
             this.ExpectNoMsg();
@@ -1596,8 +1596,8 @@ namespace KlusterKite.NodeManager.Tests
 
             migration = this.GetActiveMigrationFromDatabase();
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
 
             var migrationState = this.CreateMigrationActorMigrationState(
@@ -1621,8 +1621,8 @@ namespace KlusterKite.NodeManager.Tests
             migration = this.GetMigrationFromDatabase(migrationId);
             Assert.NotNull(migration);
             Assert.True(migration.IsActive);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             Assert.Equal(null, migration.Direction);
         }
@@ -1647,8 +1647,8 @@ namespace KlusterKite.NodeManager.Tests
                      TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             this.ExpectMsg<RecheckState>("/user/migrationActor");
             this.ExpectNoMsg();
@@ -1666,8 +1666,8 @@ namespace KlusterKite.NodeManager.Tests
 
             migration = this.GetActiveMigrationFromDatabase();
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             var migrationId = migration.Id;
 
@@ -1692,8 +1692,8 @@ namespace KlusterKite.NodeManager.Tests
             migration = this.GetMigrationFromDatabase(migrationId);
             Assert.NotNull(migration);
             Assert.True(migration.IsActive);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Ready, migration.State);
             Assert.Equal(EnMigrationDirection.Downgrade, migration.Direction);
         }
@@ -1720,8 +1720,8 @@ namespace KlusterKite.NodeManager.Tests
                      TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             this.ExpectMsg<RecheckState>("/user/migrationActor");
             this.ExpectNoMsg();
@@ -1740,8 +1740,8 @@ namespace KlusterKite.NodeManager.Tests
 
             migration = this.GetActiveMigrationFromDatabase();
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
 
             actor.Tell(new MigrationActorInitializationFailed { Errors = new List<MigrationLogRecord>() });
@@ -1760,8 +1760,8 @@ namespace KlusterKite.NodeManager.Tests
             migration = this.GetMigrationFromDatabase(migrationId);
             Assert.NotNull(migration);
             Assert.True(migration.IsActive);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             Assert.Null(migration.Direction);
         }
@@ -1785,8 +1785,8 @@ namespace KlusterKite.NodeManager.Tests
                      TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             this.ExpectMsg<RecheckState>("/user/migrationActor");
             this.ExpectNoMsg();
@@ -1804,8 +1804,8 @@ namespace KlusterKite.NodeManager.Tests
 
             migration = this.GetActiveMigrationFromDatabase();
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             var migrationId = migration.Id;
 
@@ -1830,8 +1830,8 @@ namespace KlusterKite.NodeManager.Tests
             migration = this.GetMigrationFromDatabase(migrationId);
             Assert.NotNull(migration);
             Assert.True(migration.IsActive);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Ready, migration.State);
         }
 
@@ -1854,8 +1854,8 @@ namespace KlusterKite.NodeManager.Tests
                      TimeSpan.FromSeconds(1))).Data;
 
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             this.ExpectMsg<RecheckState>("/user/migrationActor");
             this.ExpectNoMsg();
@@ -1873,8 +1873,8 @@ namespace KlusterKite.NodeManager.Tests
 
             migration = this.GetActiveMigrationFromDatabase();
             Assert.NotNull(migration);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
             var migrationId = migration.Id;
 
@@ -1899,8 +1899,8 @@ namespace KlusterKite.NodeManager.Tests
             migration = this.GetMigrationFromDatabase(migrationId);
             Assert.NotNull(migration);
             Assert.True(migration.IsActive);
-            Assert.Equal(1, migration.FromReleaseId);
-            Assert.Equal(2, migration.ToReleaseId);
+            Assert.Equal(1, migration.FromConfigurationId);
+            Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Ready, migration.State);
             Assert.Equal(EnMigrationDirection.Upgrade, migration.Direction);
         }
@@ -1941,7 +1941,7 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.GetContext())
             {
                 var release = context.Releases.First(r => r.State == EnReleaseState.Active);
-                release.Configuration.NodeTemplates.First().MinimumRequiredInstances = 100;
+                release.Settings.NodeTemplates.First().MinimumRequiredInstances = 100;
                 context.SaveChanges();
             }
 
@@ -2002,7 +2002,7 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var release = context.Releases.First(r => r.State == EnReleaseState.Active);
 
-                var template1 = ReleaseCheckTestsBase.CreateRelease().Configuration.NodeTemplates.First();
+                var template1 = ReleaseCheckTestsBase.CreateRelease().Settings.NodeTemplates.First();
                 template1.Code = "t1";
                 template1.Priority = 1;
                 template1.PackagesToInstall =
@@ -2014,7 +2014,7 @@ namespace KlusterKite.NodeManager.Tests
                             }
                         };
 
-                var template2 = ReleaseCheckTestsBase.CreateRelease().Configuration.NodeTemplates.First();
+                var template2 = ReleaseCheckTestsBase.CreateRelease().Settings.NodeTemplates.First();
                 template2.Code = "t2";
                 template2.Priority = 1000000;
                 template2.PackagesToInstall =
@@ -2026,7 +2026,7 @@ namespace KlusterKite.NodeManager.Tests
                             }
                         };
 
-                release.Configuration.NodeTemplates = new[] { template1, template2 }.ToList();
+                release.Settings.NodeTemplates = new[] { template1, template2 }.ToList();
                 context.SaveChanges();
             }
 
@@ -2506,7 +2506,7 @@ namespace KlusterKite.NodeManager.Tests
                 container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
                     .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
 
-                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
+                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
                 var packageRepository = this.CreateTestRepository();
                 container.RegisterInstance(packageRepository).As<IPackageRepository>();
                 container.RegisterType<TestMessageRouter>().As<IMessageRouter>().SingleInstance();
@@ -2516,19 +2516,19 @@ namespace KlusterKite.NodeManager.Tests
             /// Creates a new release object
             /// </summary>
             /// <returns>The release object</returns>
-            private static Release CreateRelease()
+            private static Configuration CreateRelease()
             {
                 var release = ReleaseCheckTestsBase.CreateRelease();
                 release.State = EnReleaseState.Active;
-                release.Configuration.SeedAddresses = new List<string>();
-                release.Configuration.NugetFeed = "http://nuget/";
-                release.Configuration.NodeTemplates[0].MinimumRequiredInstances = 2;
-                release.Configuration.NodeTemplates[0].PackagesToInstall =
+                release.Settings.SeedAddresses = new List<string>();
+                release.Settings.NugetFeed = "http://nuget/";
+                release.Settings.NodeTemplates[0].MinimumRequiredInstances = 2;
+                release.Settings.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
                             [ReleaseCheckTestsBase.Net46] =
                             new List<PackageDescription>(
-                                release.Configuration.Packages)
+                                release.Settings.Packages)
                         };
                 return release;
             }

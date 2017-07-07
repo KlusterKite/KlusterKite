@@ -83,7 +83,7 @@ namespace KlusterKite.NodeManager
             this.databaseName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
             this.databaseProviderName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
 
-            this.ReceiveAsync<CrudActionMessage<Release, int>>(this.OnRequest);
+            this.ReceiveAsync<CrudActionMessage<Configuration, int>>(this.OnRequest);
             this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
             this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
             this.Receive<ReleaseSetObsoleteRequest>(r => this.OnReleaseSetObsolete(r));
@@ -118,7 +118,7 @@ namespace KlusterKite.NodeManager
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                        this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         Context.GetLogger().Info(
                             "{Type}: checking release {ReleaseId} - not found",
                             this.GetType().Name,
@@ -129,7 +129,7 @@ namespace KlusterKite.NodeManager
                     if (release.State != EnReleaseState.Draft)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
+                            CrudActionResponse<Configuration>.Error(
                                 new Exception("Only draft releases can be checked"),
                                 null));
                         Context.GetLogger().Info(
@@ -151,7 +151,7 @@ namespace KlusterKite.NodeManager
                     if (errors.Count > 0)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
+                            CrudActionResponse<Configuration>.Error(new MutationException(errors.ToArray()), null));
                         Context.GetLogger().Info(
                             "{Type}: checking release {ReleaseId} completed",
                             this.GetType().Name,
@@ -159,12 +159,12 @@ namespace KlusterKite.NodeManager
                         return;
                     }
 
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
                 }
             }
             catch (Exception exception)
             {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                this.Sender.Tell(CrudActionResponse<Configuration>.Error(exception, null));
             }
         }
 
@@ -181,14 +181,14 @@ namespace KlusterKite.NodeManager
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                        this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         return;
                     }
 
                     if (release.State != EnReleaseState.Ready)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
+                            CrudActionResponse<Configuration>.Error(
                                 new Exception("Only ready releases can be made obsolete manually"),
                                 null));
                         return;
@@ -196,7 +196,7 @@ namespace KlusterKite.NodeManager
 
                     release.State = EnReleaseState.Obsolete;
                     ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
                     SecurityLog.CreateRecord(
                         EnSecurityLogType.OperationGranted,
                         EnSeverity.Crucial,
@@ -207,7 +207,7 @@ namespace KlusterKite.NodeManager
             }
             catch (Exception exception)
             {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                this.Sender.Tell(CrudActionResponse<Configuration>.Error(exception, null));
             }
         }
 
@@ -229,14 +229,14 @@ namespace KlusterKite.NodeManager
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                        this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         return;
                     }
 
                     if (release.State != EnReleaseState.Draft)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
+                            CrudActionResponse<Configuration>.Error(
                                 new Exception("Only draft releases can be made ready"),
                                 null));
                         return;
@@ -245,7 +245,7 @@ namespace KlusterKite.NodeManager
                     if (ds.Releases.Any(r => r.State == EnReleaseState.Ready))
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
+                            CrudActionResponse<Configuration>.Error(
                                 new Exception(
                                     "There is an already defined ready release. Please remove the previous one."),
                                 null));
@@ -257,13 +257,13 @@ namespace KlusterKite.NodeManager
                     var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
                     if (errors.Count > 0)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new MutationException(errors.ToArray()), null));
+                        this.Sender.Tell(CrudActionResponse<Configuration>.Error(new MutationException(errors.ToArray()), null));
                         return;
                     }
 
                     release.State = EnReleaseState.Ready;
                     ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
                     SecurityLog.CreateRecord(
                         EnSecurityLogType.OperationGranted,
                         EnSeverity.Crucial,
@@ -274,7 +274,7 @@ namespace KlusterKite.NodeManager
             }
             catch (Exception exception)
             {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                this.Sender.Tell(CrudActionResponse<Configuration>.Error(exception, null));
             }
         }
 
@@ -291,14 +291,14 @@ namespace KlusterKite.NodeManager
                     var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(new EntityNotFoundException(), null));
+                        this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         return;
                     }
 
                     if (release.State != EnReleaseState.Active)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Release>.Error(
+                            CrudActionResponse<Configuration>.Error(
                                 new Exception("Only active releases can be marked as stable"),
                                 null));
                         return;
@@ -308,18 +308,18 @@ namespace KlusterKite.NodeManager
                     {
                         var error = new ErrorDescription("isStable", "The value is not changed");
                         var mutationException = new MutationException(error);
-                        this.Sender.Tell(CrudActionResponse<Release>.Error(mutationException, null));
+                        this.Sender.Tell(CrudActionResponse<Configuration>.Error(mutationException, null));
                         return;
                     }
 
                     release.IsStable = request.IsStable;
                     ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Release>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
                 }
             }
             catch (Exception exception)
             {
-                this.Sender.Tell(CrudActionResponse<Release>.Error(exception, null));
+                this.Sender.Tell(CrudActionResponse<Configuration>.Error(exception, null));
             }
         }
     }

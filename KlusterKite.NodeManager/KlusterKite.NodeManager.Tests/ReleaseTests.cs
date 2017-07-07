@@ -24,7 +24,7 @@ namespace KlusterKite.NodeManager.Tests
     using Xunit.Abstractions;
 
     /// <summary>
-    /// Testing basic work with <see cref="Release"/>
+    /// Testing basic work with <see cref="Configuration"/>
     /// </summary>
     [Collection("KlusterKite.NodeManager.Tests.ConfigurationContext")]
     public class ReleaseTests : IDisposable
@@ -73,13 +73,13 @@ namespace KlusterKite.NodeManager.Tests
                                     PackageRequirements = this.GetPackageRequirements("p2; p3")
                                 };
 
-            var release = new Release
+            var release = new Configuration
                               {
                                   MinorVersion = 1,
                                   Name = "1",
                                   State = EnReleaseState.Active,
-                                  Configuration =
-                                      new ReleaseConfiguration
+                                  Settings =
+                                      new ConfigurationSettings
                                           {
                                               NodeTemplates =
                                                   this.GetList(template1, template2),
@@ -131,13 +131,13 @@ namespace KlusterKite.NodeManager.Tests
                                     PackageRequirements = this.GetPackageRequirements("p1; p2; p3")
                                 };
 
-            var release = new Release
+            var release = new Configuration
                               {
                                   MinorVersion = 1,
                                   Name = "1",
                                   State = EnReleaseState.Active,
-                                  Configuration =
-                                      new ReleaseConfiguration
+                                  Settings =
+                                      new ConfigurationSettings
                                           {
                                               NodeTemplates =
                                                   this.GetList(template1, template2),
@@ -189,13 +189,13 @@ namespace KlusterKite.NodeManager.Tests
                                     PackageRequirements = this.GetPackageRequirements("p2; p3")
                                 };
 
-            var release = new Release
+            var release = new Configuration
                               {
                                   MinorVersion = 1,
                                   Name = "1",
                                   State = EnReleaseState.Active,
-                                  Configuration =
-                                      new ReleaseConfiguration
+                                  Settings =
+                                      new ConfigurationSettings
                                           {
                                               NodeTemplates =
                                                   this.GetList(template1, template2),
@@ -279,13 +279,13 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var context = this.CreateContext())
             {
-                var release1 = new Release
+                var release1 = new Configuration
                                    {
                                        MinorVersion = 1,
                                        Name = "1",
                                        State = EnReleaseState.Obsolete,
-                                       Configuration =
-                                           new ReleaseConfiguration
+                                       Settings =
+                                           new ConfigurationSettings
                                                {
                                                    NodeTemplates =
                                                        this.GetList(template1, template2),
@@ -302,13 +302,13 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.CreateContext())
             {
                 var oldRelease = context.Releases.First();
-                var activeRelease = new Release
+                var activeRelease = new Configuration
                                         {
                                             MinorVersion = 2,
                                             Name = "active",
                                             State = EnReleaseState.Active,
-                                            Configuration =
-                                                new ReleaseConfiguration
+                                            Settings =
+                                                new ConfigurationSettings
                                                     {
                                                         NodeTemplates =
                                                             this.GetList(

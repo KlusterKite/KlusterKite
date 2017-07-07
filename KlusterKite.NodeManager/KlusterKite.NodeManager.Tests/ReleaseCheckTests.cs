@@ -63,7 +63,7 @@ namespace KlusterKite.NodeManager.Tests
             this.WriteErrors(errors);
             Assert.Equal(0, errors.Count);
 
-            var template = release.Configuration.NodeTemplates.First();
+            var template = release.Settings.NodeTemplates.First();
             Assert.NotNull(template.PackagesToInstall);
             Assert.True(template.PackagesToInstall.ContainsKey(CurrentRuntime));
             var packagesToInstall = template.PackagesToInstall[CurrentRuntime];
@@ -99,7 +99,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task NoTemplatesError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates.Clear();
+            release.Settings.NodeTemplates.Clear();
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
             this.WriteErrors(errors);
@@ -117,8 +117,8 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleasePackageDependencyInvalidVersionError()
         {
             var release = CreateRelease();
-            release.Configuration.Packages.Add(new PackageDescription("p3", "1.0.0"));
-            release.Configuration.Packages.Add(new PackageDescription("dp3", "1.0.0"));
+            release.Settings.Packages.Add(new PackageDescription("p3", "1.0.0"));
+            release.Settings.Packages.Add(new PackageDescription("dp3", "1.0.0"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
             this.WriteErrors(errors);
@@ -137,7 +137,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleasePackageDependencyNotDefinedError()
         {
             var release = CreateRelease();
-            release.Configuration.Packages.Add(new PackageDescription("p3", "1.0.0"));
+            release.Settings.Packages.Add(new PackageDescription("p3", "1.0.0"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
             this.WriteErrors(errors);
@@ -156,7 +156,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleasePackageNotFoundError()
         {
             var release = CreateRelease();
-            release.Configuration.Packages.Add(new PackageDescription("test", "1.0.0"));
+            release.Settings.Packages.Add(new PackageDescription("test", "1.0.0"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
             this.WriteErrors(errors);
@@ -175,7 +175,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleasePackageVersionFormatError()
         {
             var release = CreateRelease();
-            release.Configuration.Packages.Add(new PackageDescription("test", "strange-version"));
+            release.Settings.Packages.Add(new PackageDescription("test", "strange-version"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
             this.WriteErrors(errors);
@@ -194,7 +194,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleaseTemplateNoPackagesError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates.Add(new NodeTemplate { Code = "t2" });
+            release.Settings.NodeTemplates.Add(new NodeTemplate { Code = "t2" });
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
             this.WriteErrors(errors);
@@ -213,7 +213,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleaseTemplatePackageRequirementDependencyNotFoundError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates[0].PackageRequirements.Add(
+            release.Settings.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("p3", "1.0.0"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
@@ -235,9 +235,9 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleaseTemplatePackageRequirementDependencyWrongVersionError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates[0].PackageRequirements.Add(
+            release.Settings.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("p3", "1.0.0"));
-            release.Configuration.NodeTemplates[0].PackageRequirements.Add(
+            release.Settings.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("dp3", "1.0.0"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
@@ -259,7 +259,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleaseTemplatePackageRequirementVersionFormatError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates[0].PackageRequirements.Add(
+            release.Settings.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("test", "strange-version"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
@@ -279,7 +279,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleaseTemplateUnknownPackagesError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates[0].PackageRequirements.Add(
+            release.Settings.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("test", null));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();
@@ -299,7 +299,7 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ReleaseTemplateUnknownPackagesWithVersionError()
         {
             var release = CreateRelease();
-            release.Configuration.NodeTemplates[0].PackageRequirements.Add(
+            release.Settings.NodeTemplates[0].PackageRequirements.Add(
                 new NodeTemplate.PackageRequirement("test", "1.0.0"));
             var errors =
                 (await release.SetPackagesDescriptionsForTemplates(CreateRepository(), new List<string> { Net46, NetCore })).ToList();

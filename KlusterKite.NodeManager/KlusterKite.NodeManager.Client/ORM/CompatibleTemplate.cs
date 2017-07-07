@@ -59,7 +59,7 @@ namespace KlusterKite.NodeManager.Client.ORM
         [UsedImplicitly]
         [DeclareField("the compatible release")]
         [ForeignKey(nameof(CompatibleReleaseId))]
-        public Release CompatibleRelease { get; set; }
+        public Configuration CompatibleConfiguration { get; set; }
 
         /// <summary>
         /// Gets or sets the parent release
@@ -67,6 +67,6 @@ namespace KlusterKite.NodeManager.Client.ORM
         [UsedImplicitly]
         [DeclareField("the parent release")]
         [ForeignKey(nameof(ReleaseId))]
-        public Release Release { get; set; }
+        public Configuration Configuration { get; set; }
     }
 }

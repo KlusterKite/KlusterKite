@@ -126,7 +126,7 @@ namespace KlusterKite.NodeManager.Tests
         /// <param name="packages">The list of defined packages to override</param>
         /// <param name="templatePackageRequirements">The template package requirements</param>
         /// <returns>The release</returns>
-        internal static Release CreateRelease(string[] packages = null, string[] templatePackageRequirements = null)
+        internal static Configuration CreateRelease(string[] packages = null, string[] templatePackageRequirements = null)
         {
             if (packages == null)
             {
@@ -161,14 +161,14 @@ namespace KlusterKite.NodeManager.Tests
             migratorTemplates.Add(m1);
 
             var releaseConfiguration =
-                new ReleaseConfiguration
+                new ConfigurationSettings
                     {
                         Packages = packageDescriptions,
                         NodeTemplates = nodeTemplates,
                         MigratorTemplates = migratorTemplates
                     };
 
-            return new Release { Configuration = releaseConfiguration };
+            return new Configuration { Settings = releaseConfiguration };
         }
 
         /// <summary>

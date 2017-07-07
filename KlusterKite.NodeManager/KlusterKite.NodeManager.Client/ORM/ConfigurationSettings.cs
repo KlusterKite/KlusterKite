@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseConfiguration.cs" company="KlusterKite">
+// <copyright file="ConfigurationSettings.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -18,8 +18,8 @@ namespace KlusterKite.NodeManager.Client.ORM
     /// <summary>
     /// The release configuration description
     /// </summary>
-    [ApiDescription("The release configuration description", Name = "ReleaseConfiguration")]
-    public class ReleaseConfiguration
+    [ApiDescription("The release configuration description", Name = "ConfigurationSettings")]
+    public class ConfigurationSettings
     { 
         /// <summary>
         /// Gets or sets the list of available packages with their versions

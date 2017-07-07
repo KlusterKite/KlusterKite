@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Release.cs" company="KlusterKite">
+// <copyright file="Configuration.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -24,8 +24,8 @@ namespace KlusterKite.NodeManager.Client.ORM
     /// <summary>
     /// The cluster configuration with all program modules versions, node templates and configurations
     /// </summary>
-    [ApiDescription("The cluster configuration with all program modules versions, node templates and configurations", Name = "Release")]
-    public class Release : IObjectWithId<int>
+    [ApiDescription("The cluster configuration with all program modules versions, node templates and configurations", Name = "Configuration")]
+    public class Configuration : IObjectWithId<int>
     {
         /// <summary>
         /// Gets or sets the release id
@@ -101,11 +101,11 @@ namespace KlusterKite.NodeManager.Client.ORM
         public bool IsStable { get; set; }
 
         /// <summary>
-        /// Gets or sets the release configuration
+        /// Gets or sets the configuration settings
         /// </summary>
-        [DeclareField("the release configuration")]
+        [DeclareField("the configuration settings")]
         [NotMapped]
-        public ReleaseConfiguration Configuration { get; set; }
+        public ConfigurationSettings Settings { get; set; }
 
         /// <summary>
         /// Gets or sets the list of backward-compatible node templates
@@ -134,13 +134,13 @@ namespace KlusterKite.NodeManager.Client.ORM
         ///  Gets or sets the release configuration as json to store in database
         /// </summary>
         [UsedImplicitly]
-        public string ConfigurationJson
+        public string SettingsJson
         {
-            get => this.Configuration != null ? JsonConvert.SerializeObject(this.Configuration, Formatting.None) : null;
+            get => this.Settings != null ? JsonConvert.SerializeObject(this.Settings, Formatting.None) : null;
 
-            set => this.Configuration = value == null
+            set => this.Settings = value == null
                                             ? null
-                                            : JsonConvert.DeserializeObject<ReleaseConfiguration>(value);
+                                            : JsonConvert.DeserializeObject<ConfigurationSettings>(value);
         }
 
         /// <inheritdoc />

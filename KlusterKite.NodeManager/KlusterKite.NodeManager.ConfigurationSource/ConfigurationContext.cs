@@ -66,7 +66,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// Gets or sets the list of releases
         /// </summary>
         [UsedImplicitly]
-        public DbSet<Release> Releases { get; set; }
+        public DbSet<Configuration> Releases { get; set; }
 
         /// <summary>
         /// Gets or sets the global resource migration log
@@ -77,20 +77,20 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Release>().Property(r => r.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<Configuration>().Property(r => r.Id).ValueGeneratedOnAdd();
 
             modelBuilder.Entity<User>().HasIndex(u => u.Login);
 
-            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.Release)
+            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.Configuration)
                 .WithMany(r => r.CompatibleTemplatesBackward).HasForeignKey(t => t.ReleaseId);
 
-            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.CompatibleRelease)
+            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.CompatibleConfiguration)
                 .WithMany(r => r.CompatibleTemplatesForward).HasForeignKey(t => t.CompatibleReleaseId);
 
             modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Migration).WithMany(m => m.Logs)
                 .HasForeignKey(r => r.MigrationId);
 
-            modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Release).WithMany(m => m.MigrationLogs)
+            modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Configuration).WithMany(m => m.MigrationLogs)
                 .HasForeignKey(r => r.ReleaseId);
 
             modelBuilder.Entity<RoleUser>().HasKey(t => new { t.UserUid, t.RoleUid });
