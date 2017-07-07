@@ -128,7 +128,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
             }
 
             var currentRelease =
-                context.Releases.Include(nameof(Configuration.CompatibleTemplatesBackward))
+                context.Configurations.Include(nameof(Configuration.CompatibleTemplatesBackward))
                     .FirstOrDefault(r => r.State == EnReleaseState.Active);
 
             if (currentRelease?.Settings?.NodeTemplates == null)

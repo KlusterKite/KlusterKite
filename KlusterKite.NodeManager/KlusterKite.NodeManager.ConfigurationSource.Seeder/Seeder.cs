@@ -144,7 +144,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                     Console.WriteLine($@"error in {errorDescription.Field} - {errorDescription.Message}");
                 }
 
-                context.Releases.Add(initialRelease);
+                context.Configurations.Add(initialRelease);
                 context.SaveChanges();
             }
 

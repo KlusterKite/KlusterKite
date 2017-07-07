@@ -93,7 +93,7 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.CreateContext())
             {
                 // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
-                var ids = context.Releases.Select(r => r.Id).OrderByDescending(id => id).ToList();
+                var ids = context.Configurations.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
                 var compatibleTemplates = release.GetCompatibleTemplates(context)
                     .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
@@ -151,7 +151,7 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.CreateContext())
             {
                 // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
-                var ids = context.Releases.Select(r => r.Id).OrderByDescending(id => id).ToList();
+                var ids = context.Configurations.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
                 var compatibleTemplates = release.GetCompatibleTemplates(context)
                     .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
@@ -209,7 +209,7 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.CreateContext())
             {
                 // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
-                var ids = context.Releases.Select(r => r.Id).OrderByDescending(id => id).ToList();
+                var ids = context.Configurations.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
                 var compatibleTemplates = release.GetCompatibleTemplates(context)
                     .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
@@ -295,13 +295,13 @@ namespace KlusterKite.NodeManager.Tests
                                                        "p3;0.0.1")
                                                }
                                    };
-                context.Releases.Add(release1);
+                context.Configurations.Add(release1);
                 context.SaveChanges();
             }
 
             using (var context = this.CreateContext())
             {
-                var oldRelease = context.Releases.First();
+                var oldRelease = context.Configurations.First();
                 var activeRelease = new Configuration
                                         {
                                             MinorVersion = 2,
@@ -321,7 +321,7 @@ namespace KlusterKite.NodeManager.Tests
                                                     }
                                         };
 
-                context.Releases.Add(activeRelease);
+                context.Configurations.Add(activeRelease);
                 activeRelease.CompatibleTemplatesBackward = new List<CompatibleTemplate>();
                 activeRelease.CompatibleTemplatesBackward.Add(
                     new CompatibleTemplate { CompatibleReleaseId = oldRelease.Id, TemplateCode = template1.Code });

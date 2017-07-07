@@ -63,10 +63,10 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         public DbSet<RoleUser> RoleUsers { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of releases
+        /// Gets or sets the list of configurations
         /// </summary>
         [UsedImplicitly]
-        public DbSet<Configuration> Releases { get; set; }
+        public DbSet<Configuration> Configurations { get; set; }
 
         /// <summary>
         /// Gets or sets the global resource migration log

@@ -191,7 +191,7 @@ namespace KlusterKite.NodeManager.Tests
             int newReleaseId;
             using (var context = this.GetContext())
             {
-                var oldRelease = context.Releases.First(r => r.State == EnReleaseState.Active);
+                var oldRelease = context.Configurations.First(r => r.State == EnReleaseState.Active);
                 oldRelease.State = EnReleaseState.Obsolete;
 
                 var newRelease = ReleaseCheckTestsBase.CreateRelease();
@@ -217,7 +217,7 @@ namespace KlusterKite.NodeManager.Tests
                                 }
                         };
 
-                context.Releases.Add(newRelease);
+                context.Configurations.Add(newRelease);
                 context.SaveChanges();
                 newReleaseId = newRelease.Id;
             }
@@ -314,8 +314,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -369,8 +369,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -421,8 +421,8 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 Assert.Equal(EnReleaseState.Active, sourceRelease.State);
                 Assert.Equal(EnReleaseState.Obsolete, destinationRelease.State);
             }
@@ -514,8 +514,8 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 Assert.Equal(EnReleaseState.Faulted, sourceRelease.State);
                 Assert.Equal(EnReleaseState.Active, destinationRelease.State);
             }
@@ -556,8 +556,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -654,8 +654,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -803,8 +803,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -858,8 +858,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -911,8 +911,8 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 Assert.Equal(EnReleaseState.Active, sourceRelease.State);
                 Assert.Equal(EnReleaseState.Faulted, destinationRelease.State);
             }
@@ -1004,8 +1004,8 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 Assert.Equal(EnReleaseState.Obsolete, sourceRelease.State);
                 Assert.Equal(EnReleaseState.Active, destinationRelease.State);
             }
@@ -1097,8 +1097,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -1152,8 +1152,8 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 sourceRelease.State = EnReleaseState.Obsolete;
                 destinationRelease.State = EnReleaseState.Active;
                 ds.SaveChanges();
@@ -1205,8 +1205,8 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 Assert.Equal(EnReleaseState.Active, sourceRelease.State);
                 Assert.Equal(EnReleaseState.Faulted, destinationRelease.State);
             }
@@ -1298,8 +1298,8 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Releases.First(r => r.Id == 1);
-                var destinationRelease = ds.Releases.First(r => r.Id == 2);
+                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
+                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
                 Assert.Equal(EnReleaseState.Obsolete, sourceRelease.State);
                 Assert.Equal(EnReleaseState.Active, destinationRelease.State);
             }
@@ -1624,7 +1624,7 @@ namespace KlusterKite.NodeManager.Tests
             Assert.Equal(1, migration.FromConfigurationId);
             Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
-            Assert.Equal(null, migration.Direction);
+            Assert.Null(migration.Direction);
         }
 
         /// <summary>
@@ -1940,7 +1940,7 @@ namespace KlusterKite.NodeManager.Tests
         {
             using (var context = this.GetContext())
             {
-                var release = context.Releases.First(r => r.State == EnReleaseState.Active);
+                var release = context.Configurations.First(r => r.State == EnReleaseState.Active);
                 release.Settings.NodeTemplates.First().MinimumRequiredInstances = 100;
                 context.SaveChanges();
             }
@@ -2000,7 +2000,7 @@ namespace KlusterKite.NodeManager.Tests
         {
             using (var context = this.GetContext())
             {
-                var release = context.Releases.First(r => r.State == EnReleaseState.Active);
+                var release = context.Configurations.First(r => r.State == EnReleaseState.Active);
 
                 var template1 = ReleaseCheckTestsBase.CreateRelease().Settings.NodeTemplates.First();
                 template1.Code = "t1";
@@ -2486,10 +2486,10 @@ namespace KlusterKite.NodeManager.Tests
                     context.ResetValueGenerators();
                     context.Database.EnsureDeleted();
 
-                    context.Releases.Add(CreateRelease());
+                    context.Configurations.Add(CreateRelease());
                     var release = CreateRelease();
                     release.State = EnReleaseState.Ready;
-                    context.Releases.Add(release);
+                    context.Configurations.Add(release);
                     context.SaveChanges();
                     componentContext.Resolve<ActorSystem>().Log.Info(
                         "!!! Created release with id {ReleaseId} in Database {ConnectionString}",

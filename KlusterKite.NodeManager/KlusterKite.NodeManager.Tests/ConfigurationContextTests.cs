@@ -37,7 +37,7 @@ namespace KlusterKite.NodeManager.Tests
                 Assert.NotNull(context.Roles.ToList());
                 Assert.NotNull(context.Migrations.ToList());
                 Assert.NotNull(context.MigrationLogs.ToList());
-                Assert.NotNull(context.Releases.ToList());
+                Assert.NotNull(context.Configurations.ToList());
             }
         }
 

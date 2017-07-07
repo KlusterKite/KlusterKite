@@ -86,8 +86,8 @@ namespace KlusterKite.NodeManager.Tests
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                var nextRelease = context.Releases.First(r => r.Id == 2);
+                var activeRelease = context.Configurations.First(r => r.Id == 1);
+                var nextRelease = context.Configurations.First(r => r.Id == 2);
 
                 nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
@@ -153,8 +153,8 @@ namespace KlusterKite.NodeManager.Tests
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                var nextRelease = context.Releases.First(r => r.Id == 2);
+                var activeRelease = context.Configurations.First(r => r.Id == 1);
+                var nextRelease = context.Configurations.First(r => r.Id == 2);
 
                 nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
@@ -259,8 +259,8 @@ namespace KlusterKite.NodeManager.Tests
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                var nextRelease = context.Releases.First(r => r.Id == 2);
+                var activeRelease = context.Configurations.First(r => r.Id == 1);
+                var nextRelease = context.Configurations.First(r => r.Id == 2);
 
                 nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
@@ -334,8 +334,8 @@ namespace KlusterKite.NodeManager.Tests
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                var nextRelease = context.Releases.First(r => r.Id == 2);
+                var activeRelease = context.Configurations.First(r => r.Id == 1);
+                var nextRelease = context.Configurations.First(r => r.Id == 2);
 
                 activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
@@ -441,8 +441,8 @@ namespace KlusterKite.NodeManager.Tests
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
-                var nextRelease = context.Releases.First(r => r.Id == 2);
+                var activeRelease = context.Configurations.First(r => r.Id == 1);
+                var nextRelease = context.Configurations.First(r => r.Id == 2);
 
                 activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
@@ -550,7 +550,7 @@ namespace KlusterKite.NodeManager.Tests
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
+                var activeRelease = context.Configurations.First(r => r.Id == 1);
                 activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
@@ -600,7 +600,7 @@ namespace KlusterKite.NodeManager.Tests
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Releases.First(r => r.Id == 1);
+                var activeRelease = context.Configurations.First(r => r.Id == 1);
                 activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
@@ -755,7 +755,7 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.GetContext())
             {
                 var activeRelease = this.CreateRelease(repo);
-                context.Releases.Add(activeRelease);
+                context.Configurations.Add(activeRelease);
                 context.SaveChanges();
                 var errors = activeRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46, ReleaseCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();
@@ -769,7 +769,7 @@ namespace KlusterKite.NodeManager.Tests
                 context.SaveChanges();
 
                 var nextRelease = this.CreateRelease(repo);
-                context.Releases.Add(nextRelease);
+                context.Configurations.Add(nextRelease);
                 context.SaveChanges();
                 errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46, ReleaseCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();

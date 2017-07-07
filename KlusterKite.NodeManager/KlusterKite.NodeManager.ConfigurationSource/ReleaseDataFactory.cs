@@ -53,6 +53,6 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// Gets the data set from current context
         /// </summary>
         /// <returns>The data set</returns>
-        protected override DbSet<Configuration> GetDbSet() => this.Context.Releases;
+        protected override DbSet<Configuration> GetDbSet() => this.Context.Configurations;
     }
 }

@@ -1246,7 +1246,7 @@ namespace KlusterKite.NodeManager
                     return this.LoadMigrationState(currentMigration, forceExtract, data);
                 }
 
-                var release = ds.Releases.First(r => r.State == EnReleaseState.Active);
+                var release = ds.Configurations.First(r => r.State == EnReleaseState.Active);
                 return this.LoadReleaseState(release, forceExtract, data);
             }
         }

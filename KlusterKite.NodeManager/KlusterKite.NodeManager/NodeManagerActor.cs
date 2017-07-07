@@ -355,7 +355,7 @@ namespace KlusterKite.NodeManager
         /// <param name="context">The data context</param>
         private void GetCurrentRelease(ConfigurationContext context)
         {
-            var releases = context.Releases
+            var releases = context.Configurations
                 .Include(nameof(Configuration.CompatibleTemplatesBackward))
                 .Include($"{nameof(Configuration.MigrationLogs)}")
                 .Where(r => r.State == EnReleaseState.Active).ToList();
@@ -1038,8 +1038,8 @@ namespace KlusterKite.NodeManager
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Releases.First(r => r.Id == this.currentMigration.FromConfigurationId);
-                var destinationRelease = ds.Releases.First(r => r.Id == this.currentMigration.ToConfigurationId);
+                var sourceRelease = ds.Configurations.First(r => r.Id == this.currentMigration.FromConfigurationId);
+                var destinationRelease = ds.Configurations.First(r => r.Id == this.currentMigration.ToConfigurationId);
 
                 if (request.Target == EnMigrationSide.Source)
                 {
@@ -1592,7 +1592,7 @@ namespace KlusterKite.NodeManager
                         return;
                     }
 
-                    var newRelease = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                    var newRelease = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
                     if (newRelease == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Migration>.Error(new EntityNotFoundException(), null));

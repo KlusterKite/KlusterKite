@@ -115,7 +115,7 @@ namespace KlusterKite.NodeManager
                 using (var ds = this.GetContext())
                 {
                     Context.GetLogger().Info("{Type}: checking release {ReleaseId}", this.GetType().Name, request.Id);
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
@@ -178,7 +178,7 @@ namespace KlusterKite.NodeManager
             {
                 using (var ds = this.GetContext())
                 {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
@@ -226,7 +226,7 @@ namespace KlusterKite.NodeManager
             {
                 using (var ds = this.GetContext())
                 {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
@@ -242,7 +242,7 @@ namespace KlusterKite.NodeManager
                         return;
                     }
 
-                    if (ds.Releases.Any(r => r.State == EnReleaseState.Ready))
+                    if (ds.Configurations.Any(r => r.State == EnReleaseState.Ready))
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Configuration>.Error(
@@ -288,7 +288,7 @@ namespace KlusterKite.NodeManager
             {
                 using (var ds = this.GetContext())
                 {
-                    var release = ds.Releases.FirstOrDefault(r => r.Id == request.Id);
+                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
                     if (release == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
