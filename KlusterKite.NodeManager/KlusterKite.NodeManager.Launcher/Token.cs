@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Token.cs" company="ClusterKit">
+// <copyright file="Token.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher
+namespace KlusterKite.NodeManager.Launcher
 {
     using System;
 

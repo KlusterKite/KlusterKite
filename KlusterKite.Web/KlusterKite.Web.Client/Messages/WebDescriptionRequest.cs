@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebDescriptionRequest.cs" company="ClusterKit">
+// <copyright file="WebDescriptionRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Client.Messages
+namespace KlusterKite.Web.Client.Messages
 {
     using JetBrains.Annotations;
 

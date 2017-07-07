@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UserChangePasswordRequest.cs" company="ClusterKit">
+// <copyright file="UserChangePasswordRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages
+namespace KlusterKite.NodeManager.Messages
 {
     using Akka.Routing;
 
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The request to change the user password

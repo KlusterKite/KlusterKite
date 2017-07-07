@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProcessingTheRequest.cs" company="ClusterKit">
+// <copyright file="ProcessingTheRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages.Migration
+namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
     /// <summary>
     /// The notification from MigrationActor that it started the request process

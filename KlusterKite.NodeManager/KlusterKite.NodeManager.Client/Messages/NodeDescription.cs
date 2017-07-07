@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeDescription.cs" company="ClusterKit">
+// <copyright file="NodeDescription.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages
+namespace KlusterKite.NodeManager.Client.Messages
 {
     using System;
     using System.Collections.Generic;
 
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Client.ApiSurrogates;
 
     using JetBrains.Annotations;
 

@@ -14,25 +14,25 @@ export class ReleasesList extends React.Component {
   // }
 
   static propTypes = {
-    clusterKitNodesApi: React.PropTypes.object,
+    klusterKiteNodesApi: React.PropTypes.object,
     itemsPerPage: React.PropTypes.number,
     currentPage: React.PropTypes.number,
   };
 
   onPageChange(page) {
-    browserHistory.push(`/clusterkit/Releases/${page}`);
+    browserHistory.push(`/klusterkite/Releases/${page}`);
   }
 
   render() {
-    if (!this.props.clusterKitNodesApi.releases){
+    if (!this.props.klusterKiteNodesApi.releases){
       return (<div></div>);
     }
-    const edges = this.props.clusterKitNodesApi.releases.edges;
+    const edges = this.props.klusterKiteNodesApi.releases.edges;
 
     return (
       <div>
         <h3>Releases list</h3>
-        <Link to={`/clusterkit/Release/create`} className="btn btn-primary" role="button">Add a new release</Link>
+        <Link to={`/klusterkite/Release/create`} className="btn btn-primary" role="button">Add a new release</Link>
         <table className="table table-hover">
           <thead>
             <tr>
@@ -52,7 +52,7 @@ export class ReleasesList extends React.Component {
             return (
               <tr key={`${node.id}`}>
                 <td>
-                  <Link to={`/clusterkit/Release/${encodeURIComponent(node.id)}`}>
+                  <Link to={`/klusterkite/Release/${encodeURIComponent(node.id)}`}>
                     {node.name}
                   </Link>
                 </td>
@@ -67,7 +67,7 @@ export class ReleasesList extends React.Component {
           </tbody>
         </table>
         <Paginator
-          totalItems={this.props.clusterKitNodesApi.releases.count}
+          totalItems={this.props.klusterKiteNodesApi.releases.count}
           currentPage={this.props.currentPage}
           itemsPerPage={this.props.itemsPerPage}
           onSelect={this.onPageChange}
@@ -86,7 +86,7 @@ export default Relay.createContainer(
       offset: null,
     },
     fragments: {
-      clusterKitNodesApi: (variables) => Relay.QL`fragment on IClusterKitNodeApi_Root {
+      klusterKiteNodesApi: (variables) => Relay.QL`fragment on IKlusterKiteNodeApi_Root {
         releases(sort: created_desc, limit: $itemsPerPage, offset: $offset) {
           edges {
             node {

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PongMessage.cs" company="ClusterKit">
+// <copyright file="PongMessage.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Ping
+namespace KlusterKite.Core.Ping
 {
     /// <summary>
     /// Standard response message for <seealso cref="PingActor"/>

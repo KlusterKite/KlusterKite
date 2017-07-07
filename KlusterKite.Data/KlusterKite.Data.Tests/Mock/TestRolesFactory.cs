@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestRolesFactory.cs" company="ClusterKit">
+// <copyright file="TestRolesFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.Tests.Mock
+namespace KlusterKite.Data.Tests.Mock
 {
     using System;
     
     using System.Linq.Expressions;
 
-    using ClusterKit.Data.EF;
+    using KlusterKite.Data.EF;
 
     using Microsoft.EntityFrameworkCore;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.NginxConfigurator
+namespace KlusterKite.Web.NginxConfigurator
 {
     using System.Collections.Generic;
     using System.IO;
@@ -18,7 +18,7 @@ namespace ClusterKit.Web.NginxConfigurator
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 #if CORECLR
     using Microsoft.Extensions.PlatformAbstractions;
 #endif
@@ -44,9 +44,9 @@ namespace ClusterKit.Web.NginxConfigurator
         /// </exception>
         public override void PreCheck(Config config)
         {
-            if (config.GetConfig("ClusterKit.Web.Nginx.Configuration") == null)
+            if (config.GetConfig("KlusterKite.Web.Nginx.Configuration") == null)
             {
-                throw new ConfigurationException("ClusterKit.Web.Nginx.Configuration is not defined");
+                throw new ConfigurationException("KlusterKite.Web.Nginx.Configuration is not defined");
             }
 
             CheckNginxConfigAccess(config);
@@ -57,7 +57,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.NginxConfigurator.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Web.NginxConfigurator.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -100,7 +100,7 @@ namespace ClusterKit.Web.NginxConfigurator
             var configDirectory = Path.GetDirectoryName(filePath);
             if (string.IsNullOrWhiteSpace(configDirectory))
             {
-                throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig has no defined directory");
+                throw new ConfigurationException("KlusterKite.Web.Nginx.PathToConfig has no defined directory");
             }
 
             if (!Directory.Exists(configDirectory))
@@ -117,10 +117,10 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <param name="config">Akka configuration</param>
         private static void CheckNginxConfigAccess(Config config)
         {
-            var configPath = config.GetString("ClusterKit.Web.Nginx.PathToConfig");
+            var configPath = config.GetString("KlusterKite.Web.Nginx.PathToConfig");
             if (string.IsNullOrWhiteSpace(configPath))
             {
-                throw new ConfigurationException("ClusterKit.Web.Nginx.PathToConfig is not defined");
+                throw new ConfigurationException("KlusterKite.Web.Nginx.PathToConfig is not defined");
             }
 
             CheckFileAccess(configPath);
@@ -132,13 +132,13 @@ namespace ClusterKit.Web.NginxConfigurator
         /// <param name="config">Akka configuration</param>
         private static void CheckNginxReloadCommandAccess(Config config)
         {
-            var reloadCommandConfig = config.GetConfig("ClusterKit.Web.Nginx.ReloadCommand");
+            var reloadCommandConfig = config.GetConfig("KlusterKite.Web.Nginx.ReloadCommand");
             if (reloadCommandConfig != null)
             {
                 var commandPath = reloadCommandConfig.GetString("Command");
                 if (string.IsNullOrWhiteSpace(commandPath))
                 {
-                    throw new ConfigurationException("ClusterKit.Web.Nginx.ReloadCommand.Command is not defined");
+                    throw new ConfigurationException("KlusterKite.Web.Nginx.ReloadCommand.Command is not defined");
                 }
 
                 CheckFileAccess(commandPath);

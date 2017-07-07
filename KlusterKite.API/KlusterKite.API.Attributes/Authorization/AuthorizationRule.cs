@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthorizationRule.cs" company="ClusterKit">
+// <copyright file="AuthorizationRule.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes.Authorization
+namespace KlusterKite.API.Attributes.Authorization
 {
     /// <summary>
     /// A directive to describe authorization requirements

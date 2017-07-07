@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Configurator.cs" company="ClusterKit">
+// <copyright file="Configurator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Log.ElasticSearch
+namespace KlusterKite.Log.ElasticSearch
 {
     using System;
     using System.Linq;
 
     using Akka.Configuration;
 
-    using ClusterKit.Core.Log;
+    using KlusterKite.Core.Log;
 
     using JetBrains.Annotations;
 
@@ -52,7 +52,7 @@ namespace ClusterKit.Log.ElasticSearch
         /// <returns>The updated log configuration</returns>
         private LoggerConfiguration ConfigureStandardLog(LoggerConfiguration configuration, Config config)
         {
-            var minimumLevel = config.GetString("ClusterKit.Log.ElasticSearch.minimumLevel", "none")?.Trim();
+            var minimumLevel = config.GetString("KlusterKite.Log.ElasticSearch.minimumLevel", "none")?.Trim();
 
             LogEventLevel level;
             if (!Enum.TryParse(minimumLevel, true, out level))
@@ -60,9 +60,9 @@ namespace ClusterKit.Log.ElasticSearch
                 return configuration;
             }
 
-            var nodes = config.GetStringList("ClusterKit.Log.ElasticSearch.nodes");
+            var nodes = config.GetStringList("KlusterKite.Log.ElasticSearch.nodes");
 
-            var indexFormat = config.GetString("ClusterKit.Log.ElasticSearch.indexFormat", "logstash-{0:yyyy.MM.dd}");
+            var indexFormat = config.GetString("KlusterKite.Log.ElasticSearch.indexFormat", "logstash-{0:yyyy.MM.dd}");
 
             Log.Information(
                 "{Type} Standard log: \n\tMinimum level: {MinimumLevel}\n\tIndex format: {IndexFormat}\n\tNodes:\n\t\t{NodeList}\n",
@@ -98,7 +98,7 @@ namespace ClusterKit.Log.ElasticSearch
         /// <returns>The updated log configuration</returns>
         private LoggerConfiguration ConfigureSecurityLog(LoggerConfiguration configuration, Config config)
         {
-            var minimumLevel = config.GetString("ClusterKit.Log.ElasticSearch.securityMinimumLevel", "none")?.Trim();
+            var minimumLevel = config.GetString("KlusterKite.Log.ElasticSearch.securityMinimumLevel", "none")?.Trim();
 
             LogEventLevel level;
             if (!Enum.TryParse(minimumLevel, true, out level))
@@ -106,9 +106,9 @@ namespace ClusterKit.Log.ElasticSearch
                 return configuration;
             }
 
-            var nodes = config.GetStringList("ClusterKit.Log.ElasticSearch.securityNodes");
+            var nodes = config.GetStringList("KlusterKite.Log.ElasticSearch.securityNodes");
 
-            var indexFormat = config.GetString("ClusterKit.Log.ElasticSearch.securityIndexFormat", "security-{0:yyyy.MM.dd}");
+            var indexFormat = config.GetString("KlusterKite.Log.ElasticSearch.securityIndexFormat", "security-{0:yyyy.MM.dd}");
 
             Log.Information(
                 "{Type} Security log: \n\tMinimum level: {MinimumLevel}\n\tIndex format: {IndexFormat}\n\tNodes:\n\t\t{NodeList}\n",

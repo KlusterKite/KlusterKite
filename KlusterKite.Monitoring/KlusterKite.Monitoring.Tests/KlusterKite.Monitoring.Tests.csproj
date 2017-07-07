@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.Monitoring.Tests</PackageId>
+    <PackageId>KlusterKite.Monitoring.Tests</PackageId>
     <Version>0.0.0.0-local</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
@@ -11,8 +11,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Web\ClusterKit.Web.GraphQL.Publisher\ClusterKit.Web.GraphQL.Publisher.csproj" />
-    <ProjectReference Include="..\ClusterKit.Monitoring\ClusterKit.Monitoring.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Web\KlusterKite.Web.GraphQL.Publisher\KlusterKite.Web.GraphQL.Publisher.csproj" />
+    <ProjectReference Include="..\KlusterKite.Monitoring\KlusterKite.Monitoring.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />

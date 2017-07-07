@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnPrivilegeScope.cs" company="ClusterKit">
+// <copyright file="EnPrivilegeScope.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes.Authorization
+namespace KlusterKite.API.Attributes.Authorization
 {
     /// <summary>
     /// The scope to look for privilege

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationDataFactory.cs" company="ClusterKit">
+// <copyright file="MigrationDataFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace KlusterKite.NodeManager.ConfigurationSource
 {
     using System;
     using System.Linq.Expressions;
 
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client.ORM;
+    using KlusterKite.Data.EF;
+    using KlusterKite.NodeManager.Client.ORM;
 
     using Microsoft.EntityFrameworkCore;
 

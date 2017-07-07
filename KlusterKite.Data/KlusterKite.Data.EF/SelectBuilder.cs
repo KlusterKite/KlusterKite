@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SelectBuilder.cs" company="ClusterKit">
+// <copyright file="SelectBuilder.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.EF
+namespace KlusterKite.Data.EF
 {
     using System;
     using System.Collections.Generic;
@@ -15,8 +15,8 @@ namespace ClusterKit.Data.EF
     using System.Linq;
     using System.Reflection;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
 
     using Microsoft.EntityFrameworkCore;
 

@@ -58,7 +58,7 @@ export default Relay.createContainer(
   PackagesList,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IClusterKitNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
         packages(sort: id_asc) {
           edges {
             node {

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ILoggerConfigurator.cs" company="ClusterKit">
+// <copyright file="ILoggerConfigurator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Log
+namespace KlusterKite.Core.Log
 {
     using Akka.Configuration;
 

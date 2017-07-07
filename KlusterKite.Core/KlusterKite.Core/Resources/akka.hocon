@@ -37,11 +37,11 @@
           }
 
           /Core/Ping {
-            type = "ClusterKit.Core.Ping.PingActor, ClusterKit.Core"
+            type = "KlusterKite.Core.Ping.PingActor, KlusterKite.Core"
           }
 
           /Core/ClusterLog {
-            type = "ClusterKit.Core.Cluster.ClusterLoggingActor, ClusterKit.Core"
+            type = "KlusterKite.Core.Cluster.ClusterLoggingActor, KlusterKite.Core"
           }          
         }
 

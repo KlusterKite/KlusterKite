@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationContext.cs" company="ClusterKit">
+// <copyright file="ConfigurationContext.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace KlusterKite.NodeManager.ConfigurationSource
 {
-    using ClusterKit.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
 

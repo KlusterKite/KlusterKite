@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SurrogatableJObject.cs" company="ClusterKit">
+// <copyright file="SurrogatableJObject.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client.Messages
+namespace KlusterKite.API.Client.Messages
 {
     using Akka.Actor;
     using Akka.Util;

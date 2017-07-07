@@ -3,12 +3,12 @@ import Relay from 'react-relay'
 export default class CreateMigrationMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCreate}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_MutationResult_Migration__MutationPayload {
+      fragment on KlusterKiteNodeApi_MutationResult_Migration__MutationPayload {
         result {
           result {
             state
@@ -31,7 +31,7 @@ export default class CreateMigrationMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
           Relay.QL`
-          fragment on ClusterKitNodeApi_MutationResult_Migration__MutationPayload {
+          fragment on KlusterKiteNodeApi_MutationResult_Migration__MutationPayload {
             result {
               result {
                 state

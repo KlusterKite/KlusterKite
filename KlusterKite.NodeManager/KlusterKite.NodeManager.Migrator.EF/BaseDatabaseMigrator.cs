@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseDatabaseMigrator.cs" company="ClusterKit">
+// <copyright file="BaseDatabaseMigrator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Migrator.EF
+namespace KlusterKite.NodeManager.Migrator.EF
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.Data.EF;
+    using KlusterKite.Data.EF;
 
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Infrastructure;

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationLogRecord.cs" company="ClusterKit">
+// <copyright file="MigrationLogRecord.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
     using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     using JetBrains.Annotations;
 

@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.Core.Service</PackageId>
+    <PackageId>KlusterKite.Core.Service</PackageId>
     <Version>0.0.0.0-local</Version>
     <Description>Bundle of utils to create scalable and redundant services</Description>
     <OutputTypeEx>exe</OutputTypeEx>
@@ -18,7 +18,7 @@
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.Core\ClusterKit.Core.csproj" />
+    <ProjectReference Include="..\KlusterKite.Core\KlusterKite.Core.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
     <Reference Include="System.Configuration" />

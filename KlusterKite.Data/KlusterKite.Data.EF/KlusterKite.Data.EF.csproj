@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
-    <PackageId>ClusterKit.Data.EF</PackageId>
+    <PackageId>KlusterKite.Data.EF</PackageId>
     <Version>0.0.0.0-local</Version>    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
@@ -14,10 +14,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.API\ClusterKit.API.Client\ClusterKit.API.Client.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data\ClusterKit.Data.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.API\KlusterKite.API.Attributes\KlusterKite.API.Attributes.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.API\KlusterKite.API.Client\KlusterKite.API.Client.csproj" />
+    <ProjectReference Include="..\KlusterKite.Data.CRUD\KlusterKite.Data.CRUD.csproj" />
+    <ProjectReference Include="..\KlusterKite.Data\KlusterKite.Data.csproj" />
   </ItemGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">

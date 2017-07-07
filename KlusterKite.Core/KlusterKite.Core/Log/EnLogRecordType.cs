@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnLogRecordType.cs" company="ClusterKit">
+// <copyright file="EnLogRecordType.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Log
+namespace KlusterKite.Core.Log
 {
     /// <summary>
     /// The type of log record

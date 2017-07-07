@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseCrudActor.cs" company="ClusterKit">
+// <copyright file="BaseCrudActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data
+namespace KlusterKite.Data
 {
     using System;
     using System.Collections.Generic;
@@ -20,15 +20,15 @@ namespace ClusterKit.Data
 
     using Autofac;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
-    using ClusterKit.Data.CRUD;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.CRUD.Exceptions;
-    using ClusterKit.LargeObjects;
-    using ClusterKit.LargeObjects.Client;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Data.CRUD;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.Exceptions;
+    using KlusterKite.LargeObjects;
+    using KlusterKite.LargeObjects.Client;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
 
     using JetBrains.Annotations;
 
@@ -57,7 +57,7 @@ namespace ClusterKit.Data
             this.ComponentContext = componentContext;
             this.Receive<ParcelException>(m => this.OnParcelException(m));
 
-            var configSection = Context.System.Settings.Config.GetConfig("ClusterKit.Data.Crud.Query.Limits");
+            var configSection = Context.System.Settings.Config.GetConfig("KlusterKite.Data.Crud.Query.Limits");
             this.defaultQueryLimit = configSection?.GetInt("Default", 100) ?? 100;
             var classLimits = new Dictionary<string, int>();
             if (configSection != null)

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateMessage.cs" company="ClusterKit">
+// <copyright file="UpdateMessage.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data
+namespace KlusterKite.Data
 {
-    using ClusterKit.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.ActionMessages;
 
     /// <summary>
     /// NodeTemplate update notification

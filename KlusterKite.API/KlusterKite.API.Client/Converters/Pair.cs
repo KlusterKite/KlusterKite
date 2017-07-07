@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Pair.cs" company="ClusterKit">
+// <copyright file="Pair.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client.Converters
+namespace KlusterKite.API.Client.Converters
 {
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     using JetBrains.Annotations;
 

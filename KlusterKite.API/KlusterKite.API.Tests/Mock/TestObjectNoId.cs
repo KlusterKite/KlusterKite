@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestObjectNoId.cs" company="ClusterKit">
+// <copyright file="TestObjectNoId.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Tests.Mock
+namespace KlusterKite.API.Tests.Mock
 {
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     using JetBrains.Annotations;
 

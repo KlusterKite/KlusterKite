@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ActiveNodeDescriptionsRequest.cs" company="ClusterKit">
+// <copyright file="ActiveNodeDescriptionsRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages
+namespace KlusterKite.NodeManager.Messages
 {
     /// <summary>
     /// Request of active node descriptions

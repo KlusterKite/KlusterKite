@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Seeder.cs" company="ClusterKit">
+// <copyright file="Seeder.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
+namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
 {
     using System;
     using System.Collections.Generic;
@@ -17,13 +17,13 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
 
     using Akka.Configuration;
 
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Migrator;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Data.EF;
+    using KlusterKite.NodeManager.Client;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Migrator;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
@@ -41,19 +41,19 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         /// Akka configuration path to connection string
         /// </summary>
         [UsedImplicitly]
-        protected const string ConfigConnectionStringPath = "ClusterKit.NodeManager.ConfigurationDatabaseConnectionString";
+        protected const string ConfigConnectionStringPath = "KlusterKite.NodeManager.ConfigurationDatabaseConnectionString";
 
         /// <summary>
         /// Akka configuration path to database name
         /// </summary>
         [UsedImplicitly]
-        protected const string ConfigDatabaseNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseName";
+        protected const string ConfigDatabaseNamePath = "KlusterKite.NodeManager.ConfigurationDatabaseName";
 
         /// <summary>
         /// Akka configuration path to database provider name
         /// </summary>
         [UsedImplicitly]
-        protected const string ConfigDatabaseProviderNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseProviderName";
+        protected const string ConfigDatabaseProviderNamePath = "KlusterKite.NodeManager.ConfigurationDatabaseProviderName";
 
         /// <summary>
         /// The context factory
@@ -110,7 +110,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
 
                 if (databaseCreator.Exists())
                 {
-                    Console.WriteLine(@"ClusterKit configuration database is already existing");
+                    Console.WriteLine(@"KlusterKite configuration database is already existing");
                     return;
                 }
 
@@ -124,7 +124,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                             MigratorTemplates = this.GetMigratorTemplates().ToList(),
                             Packages = this.GetPackageDescriptions().GetAwaiter().GetResult(),
                             SeedAddresses = this.GetSeeds().ToList(),
-                            NugetFeed = this.Config.GetString("ClusterKit.NodeManager.PackageRepository")
+                            NugetFeed = this.Config.GetString("KlusterKite.NodeManager.PackageRepository")
                         };
 
                 var initialRelease = new Release
@@ -135,7 +135,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                              Configuration = configuration
                                          };
 
-                var supportedFrameworks = this.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                var supportedFrameworks = this.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");
                 var initialErrors =
                     initialRelease.SetPackagesDescriptionsForTemplates(this.packageRepository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
 
@@ -148,7 +148,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                 context.SaveChanges();
             }
 
-            Console.WriteLine(@"ClusterKit configuration database created");
+            Console.WriteLine(@"KlusterKite configuration database created");
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         [UsedImplicitly]
         protected virtual IEnumerable<string> GetSeeds()
         {
-            return this.Config.GetStringList("ClusterKit.NodeManager.Seeds");
+            return this.Config.GetStringList("KlusterKite.NodeManager.Seeds");
         }
 
         /// <summary>
@@ -179,14 +179,14 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                  PackageRequirements =
                                      new[]
                                          {
-                                             "ClusterKit.Core.Service",
-                                             "ClusterKit.Web.NginxConfigurator",
-                                             "ClusterKit.NodeManager.Client",
-                                             "ClusterKit.Log.Console",
-                                             "ClusterKit.Log.ElasticSearch",
-                                             "ClusterKit.Monitoring.Client",
+                                             "KlusterKite.Core.Service",
+                                             "KlusterKite.Web.NginxConfigurator",
+                                             "KlusterKite.NodeManager.Client",
+                                             "KlusterKite.Log.Console",
+                                             "KlusterKite.Log.ElasticSearch",
+                                             "KlusterKite.Monitoring.Client",
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.publisher.hocon")
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "KlusterKite.NodeManager.ConfigurationSource.Seeder.Resources.publisher.hocon")
                              };
             yield return new NodeTemplate
                              {
@@ -199,21 +199,21 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                  PackageRequirements =
                                      new[]
                                          {
-                                             "ClusterKit.Core.Service",
-                                             "ClusterKit.NodeManager.Client",
-                                             "ClusterKit.Monitoring.Client",
-                                             "ClusterKit.Monitoring",
-                                             "ClusterKit.NodeManager",
-                                             "ClusterKit.Data.EF.Npgsql",
-                                             "ClusterKit.Log.Console",
-                                             "ClusterKit.Log.ElasticSearch",
-                                             "ClusterKit.Web.Authentication",
-                                             "ClusterKit.NodeManager.Authentication",
-                                             "ClusterKit.Security.SessionRedis",
-                                             "ClusterKit.API.Endpoint",
-                                             "ClusterKit.Web.GraphQL.Publisher"
+                                             "KlusterKite.Core.Service",
+                                             "KlusterKite.NodeManager.Client",
+                                             "KlusterKite.Monitoring.Client",
+                                             "KlusterKite.Monitoring",
+                                             "KlusterKite.NodeManager",
+                                             "KlusterKite.Data.EF.Npgsql",
+                                             "KlusterKite.Log.Console",
+                                             "KlusterKite.Log.ElasticSearch",
+                                             "KlusterKite.Web.Authentication",
+                                             "KlusterKite.NodeManager.Authentication",
+                                             "KlusterKite.Security.SessionRedis",
+                                             "KlusterKite.API.Endpoint",
+                                             "KlusterKite.Web.GraphQL.Publisher"
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.clusterManager.hocon")
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "KlusterKite.NodeManager.ConfigurationSource.Seeder.Resources.clusterManager.hocon")
             };
 
             yield return new NodeTemplate
@@ -227,11 +227,11 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
                                  PackageRequirements =
                                      new[]
                                          {
-                                             "ClusterKit.Core.Service",
-                                             "ClusterKit.NodeManager.Client",
-                                             "ClusterKit.Monitoring.Client"
+                                             "KlusterKite.Core.Service",
+                                             "KlusterKite.NodeManager.Client",
+                                             "KlusterKite.Monitoring.Client"
                                          }.Select(p => new NodeTemplate.PackageRequirement(p, null)).ToList(),
-                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.empty.hocon")
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "KlusterKite.NodeManager.ConfigurationSource.Seeder.Resources.empty.hocon")
             };
         }
 
@@ -243,17 +243,17 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Seeder
         {
             yield return new MigratorTemplate
                              {
-                                 Name = "ClusterKit Migrator",
-                                 Code = "ClusterKit",
-                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "ClusterKit.NodeManager.ConfigurationSource.Seeder.Resources.migrator.hocon"),
+                                 Name = "KlusterKite Migrator",
+                                 Code = "KlusterKite",
+                                 Configuration = ConfigurationUtils.ReadTextResource(this.GetType().GetTypeInfo().Assembly, "KlusterKite.NodeManager.ConfigurationSource.Seeder.Resources.migrator.hocon"),
                                  PackageRequirements =
                                      new[]
                                          {
                                             new NodeTemplate.PackageRequirement(
-                                                 "ClusterKit.NodeManager",
+                                                 "KlusterKite.NodeManager",
                                                  null),
                                              new NodeTemplate.PackageRequirement(
-                                                 "ClusterKit.Data.EF.Npgsql",
+                                                 "KlusterKite.Data.EF.Npgsql",
                                                  null),
                                          }.ToList(),
                                  Priority = 1d

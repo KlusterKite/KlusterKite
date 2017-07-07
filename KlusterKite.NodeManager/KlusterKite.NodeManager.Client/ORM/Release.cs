@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Release.cs" company="ClusterKit">
+// <copyright file="Release.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.Data.CRUD;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.Data.CRUD;
 
     using JetBrains.Annotations;
 

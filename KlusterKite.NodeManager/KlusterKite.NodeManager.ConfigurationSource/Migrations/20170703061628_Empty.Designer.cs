@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using ClusterKit.NodeManager.ConfigurationSource;
-using ClusterKit.NodeManager.Client.ORM;
+using KlusterKite.NodeManager.ConfigurationSource;
+using KlusterKite.NodeManager.Client.ORM;
 
-namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
+namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 {
     [DbContext(typeof(ConfigurationContext))]
     [Migration("20170703061628_Empty")]
@@ -17,7 +17,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2");
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.CompatibleTemplate", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.CompatibleTemplate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("CompatibleTemplate");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Migration", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.Migration", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,7 +67,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("Migrations");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.MigrationLogRecord", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -112,7 +112,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("MigrationLogRecords");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Release", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.Release", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,7 +143,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("Releases");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Role", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.Role", b =>
                 {
                     b.Property<Guid>("Uid")
                         .ValueGeneratedOnAdd();
@@ -159,7 +159,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.RoleUser", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.RoleUser", b =>
                 {
                     b.Property<Guid>("UserUid");
 
@@ -178,7 +178,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("RoleUsers");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.User", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.User", b =>
                 {
                     b.Property<Guid>("Uid")
                         .ValueGeneratedOnAdd();
@@ -202,52 +202,52 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.CompatibleTemplate", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.CompatibleTemplate", b =>
                 {
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "CompatibleRelease")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Release", "CompatibleRelease")
                         .WithMany("CompatibleTemplatesForward")
                         .HasForeignKey("CompatibleReleaseId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "Release")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Release", "Release")
                         .WithMany("CompatibleTemplatesBackward")
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.Migration", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.Migration", b =>
                 {
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "FromRelease")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Release", "FromRelease")
                         .WithMany()
                         .HasForeignKey("FromReleaseId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "ToRelease")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Release", "ToRelease")
                         .WithMany()
                         .HasForeignKey("ToReleaseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.MigrationLogRecord", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.MigrationLogRecord", b =>
                 {
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Migration", "Migration")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Migration", "Migration")
                         .WithMany("Logs")
                         .HasForeignKey("MigrationId");
 
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Release", "Release")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Release", "Release")
                         .WithMany("MigrationLogs")
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ClusterKit.NodeManager.Client.ORM.RoleUser", b =>
+            modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.RoleUser", b =>
                 {
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.Role", "Role")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleUid")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ClusterKit.NodeManager.Client.ORM.User", "User")
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.User", "User")
                         .WithMany("Roles")
                         .HasForeignKey("UserUid")
                         .OnDelete(DeleteBehavior.Cascade);

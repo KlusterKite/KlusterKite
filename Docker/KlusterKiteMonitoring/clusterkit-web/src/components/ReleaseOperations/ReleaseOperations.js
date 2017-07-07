@@ -87,11 +87,11 @@ export class ReleaseOperations extends React.Component {
         </div>
         {this.props.currentState && this.props.currentState === 'Draft' && !this.state.isChangingState &&
           <div className="buttons-block-margin">
-            <Link to={`/clusterkit/CopyConfig/${this.props.releaseId}/update`} className="btn btn-success" role="button">
+            <Link to={`/klusterkite/CopyConfig/${this.props.releaseId}/update`} className="btn btn-success" role="button">
               <Icon name="clone"/>{' '}Clone configuration (update packages)
             </Link>
 
-            <Link to={`/clusterkit/CopyConfig/${this.props.releaseId}/exact`} className="btn btn-success btn-margined"
+            <Link to={`/klusterkite/CopyConfig/${this.props.releaseId}/exact`} className="btn btn-success btn-margined"
                   role="button">
               <Icon name="clone"/>{' '}Clone configuration (exact)
             </Link>
@@ -114,7 +114,7 @@ export default Relay.createContainer(
   ReleaseOperations,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IClusterKitNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
         nodeTemplates {
           edges {
             node {
@@ -123,7 +123,7 @@ export default Relay.createContainer(
           }
         }
       }`,
-      nodeManagement: () => Relay.QL`fragment on IClusterKitNodeApi_ClusterManagement {
+      nodeManagement: () => Relay.QL`fragment on IKlusterKiteNodeApi_ClusterManagement {
         resourceState {
           canCreateMigration
         }

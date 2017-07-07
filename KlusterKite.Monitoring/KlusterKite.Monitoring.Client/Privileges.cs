@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Privileges.cs" company="ClusterKit">
+// <copyright file="Privileges.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Client
+namespace KlusterKite.Monitoring.Client
 {
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The list of defined module privileges
@@ -21,12 +21,12 @@ namespace ClusterKit.Monitoring.Client
         /// The privilege to get the last cluster scan result
         /// </summary>
         [PrivilegeDescription("Get the last cluster scan result", Target = EnPrivilegeTarget.User)]
-        public const string GetClusterTree = "ClusterKit.Monitoring.GetClusterTree";
+        public const string GetClusterTree = "KlusterKite.Monitoring.GetClusterTree";
 
         /// <summary>
         /// The privilege to initiate the new actor system scan
         /// </summary>
         [PrivilegeDescription("Initiate the new actor system scan", Target = EnPrivilegeTarget.User)]
-        public const string InitiateScan = "ClusterKit.Monitoring.InitiateScan";
+        public const string InitiateScan = "KlusterKite.Monitoring.InitiateScan";
     }
 }

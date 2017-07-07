@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
+namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 {
     public partial class Empty : Migration
     {

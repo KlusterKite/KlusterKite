@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CurrentReleaseRequest.cs" company="ClusterKit">
+// <copyright file="CurrentReleaseRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages.Migration
+namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
     /// <summary>
     /// The request to acquire current active release

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ITemplate.cs" company="ClusterKit">
+// <copyright file="ITemplate.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
     using System.Collections.Generic;
 
-    using ClusterKit.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Messages;
 
     /// <summary>
     /// The union for <see cref="MigratorTemplate"/> and <see cref="NodeTemplate"/>

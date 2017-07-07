@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DictionaryConverter.cs" company="ClusterKit">
+// <copyright file="DictionaryConverter.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client.Converters
+namespace KlusterKite.API.Client.Converters
 {
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Converts dictionary to the api list

@@ -47,23 +47,23 @@ export class DraftOperations extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.clusterKitNodeApi_clusterKitNodesApi_releases_check.errors &&
-              response.clusterKitNodeApi_clusterKitNodesApi_releases_check.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_check.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.errors.edges);
 
               this.setState({
                 isChecking: false,
                 checkErrors: messages
               });
             } else {
-              console.log('result check', response.clusterKitNodeApi_clusterKitNodesApi_releases_check);
+              console.log('result check', response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check);
               // total success
               this.setState({
                 isChecking: false,
                 checkErrors: null,
                 checkSuccess: true,
-                checkCompatibleTemplates: response.clusterKitNodeApi_clusterKitNodesApi_releases_check.node.compatibleTemplatesBackward.edges,
-                checkActiveNodes: response.clusterKitNodeApi_clusterKitNodesApi_releases_check.api.clusterKitNodesApi.getActiveNodeDescriptions.edges,
+                checkCompatibleTemplates: response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.node.compatibleTemplatesBackward.edges,
+                checkActiveNodes: response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.api.klusterKiteNodesApi.getActiveNodeDescriptions.edges,
               });
             }
           },
@@ -95,9 +95,9 @@ export class DraftOperations extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.clusterKitNodeApi_clusterKitNodesApi_releases_setReady.errors &&
-              response.clusterKitNodeApi_clusterKitNodesApi_releases_setReady.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_setReady.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady.errors.edges);
 
               this.setState({
                 isSettingReady: false,
@@ -105,7 +105,7 @@ export class DraftOperations extends React.Component {
                 isChangingState: false
               });
             } else {
-              console.log('result set ready', response.clusterKitNodeApi_clusterKitNodesApi_releases_setReady);
+              console.log('result set ready', response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady);
               // total success
               this.setState({
                 isSettingReady: false,

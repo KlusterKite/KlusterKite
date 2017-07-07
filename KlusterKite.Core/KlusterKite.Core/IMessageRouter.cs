@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMessageRouter.cs" company="ClusterKit">
+// <copyright file="IMessageRouter.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -8,7 +8,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core
+namespace KlusterKite.Core
 {
     using System;
     using System.Threading.Tasks;

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseCheckActor.cs" company="ClusterKit">
+// <copyright file="ReleaseCheckActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace KlusterKite.NodeManager
 {
     using System;
     using System.Linq;
@@ -18,17 +18,17 @@ namespace ClusterKit.NodeManager
 
     using Autofac;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Data;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.CRUD.Exceptions;
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
+    using KlusterKite.API.Client;
+    using KlusterKite.Data;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.Exceptions;
+    using KlusterKite.Data.EF;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Messages;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
 
     /// <summary>
     /// The actor to work with releases
@@ -140,7 +140,7 @@ namespace ClusterKit.NodeManager
                     }
 
                     var supportedFrameworks =
-                        Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                        Context.System.Settings.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");
 
                     Context.GetLogger().Info(
                         "{Type}: checking release {ReleaseId} against frameworks {Frameworks}",
@@ -253,7 +253,7 @@ namespace ClusterKit.NodeManager
                     }
 
                     var supportedFrameworks =
-                        Context.System.Settings.Config.GetStringList("ClusterKit.NodeManager.SupportedFrameworks");
+                        Context.System.Settings.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");
                     var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
                     if (errors.Count > 0)
                     {

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationContextTests.cs" company="ClusterKit">
+// <copyright file="ConfigurationContextTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests
+namespace KlusterKite.NodeManager.Tests
 {
     using System;
     using System.Linq;
 
-    using ClusterKit.Data.EF.InMemory;
-    using ClusterKit.NodeManager.ConfigurationSource;
+    using KlusterKite.Data.EF.InMemory;
+    using KlusterKite.NodeManager.ConfigurationSource;
 
     using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +22,7 @@ namespace ClusterKit.NodeManager.Tests
     /// <summary>
     /// Validating the <see cref="ConfigurationContext"/>
     /// </summary>
-    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
+    [Collection("KlusterKite.NodeManager.Tests.ConfigurationContext")]
     public class ConfigurationContextTests : IDisposable
     {
         /// <summary>
@@ -54,7 +54,7 @@ namespace ClusterKit.NodeManager.Tests
         private ConfigurationContext CreateContext()
         {
             var builder = new DbContextOptionsBuilder<ConfigurationContext>();
-            builder.UseInMemoryDatabase("ClusterKit.NodeManager.Tests.ConfigurationContextTests");
+            builder.UseInMemoryDatabase("KlusterKite.NodeManager.Tests.ConfigurationContextTests");
             var configurationContext = new ConfigurationContext(builder.Options);
             configurationContext.ResetValueGenerators();
             return configurationContext;

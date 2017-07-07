@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiHandlerActor.cs" company="ClusterKit">
+// <copyright file="ApiHandlerActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,16 +7,16 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Endpoint
+namespace KlusterKite.API.Endpoint
 {
     using System;
 
     using Akka.Actor;
     using Akka.Event;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Messages;
-    using ClusterKit.API.Provider;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Client.Messages;
+    using KlusterKite.API.Provider;
 
     using Newtonsoft.Json.Linq;
 

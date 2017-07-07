@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequireSessionAttribute.cs" company="ClusterKit">
+// <copyright file="RequireSessionAttribute.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes.Authorization
+namespace KlusterKite.API.Attributes.Authorization
 {
     using System;
 

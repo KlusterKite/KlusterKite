@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects
+namespace KlusterKite.LargeObjects
 {
     using System.Reflection;
 
@@ -16,7 +16,7 @@ namespace ClusterKit.LargeObjects
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 
     /// <summary>
     /// Installing components from current library
@@ -33,7 +33,7 @@ namespace ClusterKit.LargeObjects
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.LargeObjects.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.LargeObjects.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Extensions.cs" company="ClusterKit">
+// <copyright file="Extensions.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD
+namespace KlusterKite.Data.CRUD
 {
     using Akka.Actor;
 
-    using ClusterKit.Core.Utils;
+    using KlusterKite.Core.Utils;
 
     /// <summary>
     /// A bundle of extension methods

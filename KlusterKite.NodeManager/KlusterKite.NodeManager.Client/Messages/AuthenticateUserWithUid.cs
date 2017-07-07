@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthenticateUserWithUid.cs" company="ClusterKit">
+// <copyright file="AuthenticateUserWithUid.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages
+namespace KlusterKite.NodeManager.Client.Messages
 {
     using System;
 

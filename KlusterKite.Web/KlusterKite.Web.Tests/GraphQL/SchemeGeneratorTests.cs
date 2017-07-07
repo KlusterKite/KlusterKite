@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SchemeGeneratorTests.cs" company="ClusterKit">
+// <copyright file="SchemeGeneratorTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests.GraphQL
+namespace KlusterKite.Web.Tests.GraphQL
 {
     using System;
     using System.Collections.Generic;
@@ -15,10 +15,10 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Core;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.GraphQL.Publisher;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using global::GraphQL;
     using global::GraphQL.Http;
@@ -533,7 +533,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             Assert.False(hasErrors);
             var query = BaseInstaller.ReadTextResource(
                 this.GetType().GetTypeInfo().Assembly,
-                "ClusterKit.Web.Tests.GraphQL.Resources.IntrospectionQuery.txt");
+                "KlusterKite.Web.Tests.GraphQL.Resources.IntrospectionQuery.txt");
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
@@ -547,7 +547,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var expectedResponse = BaseInstaller.ReadTextResource(
                 this.GetType().GetTypeInfo().Assembly,
-                "ClusterKit.Web.Tests.GraphQL.Resources.SchemaDescriptionTestSnapshot.txt");
+                "KlusterKite.Web.Tests.GraphQL.Resources.SchemaDescriptionTestSnapshot.txt");
 
             Assert.Equal(CleanResponse(expectedResponse), CleanResponse(response));
         }

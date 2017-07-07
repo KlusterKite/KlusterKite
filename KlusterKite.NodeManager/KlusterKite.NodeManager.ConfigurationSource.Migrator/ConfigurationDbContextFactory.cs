@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationDbContextFactory.cs" company="ClusterKit">
+// <copyright file="ConfigurationDbContextFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource.Migrator
+namespace KlusterKite.NodeManager.ConfigurationSource.Migrator
 {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -21,7 +21,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource.Migrator
         public ConfigurationContext Create(DbContextFactoryOptions options)
         {
             var builder = new DbContextOptionsBuilder<ConfigurationContext>();
-            builder.UseNpgsql("configurationContext", b => b.MigrationsAssembly("ClusterKit.NodeManager.ConfigurationSource"));
+            builder.UseNpgsql("configurationContext", b => b.MigrationsAssembly("KlusterKite.NodeManager.ConfigurationSource"));
             return new ConfigurationContext(builder.Options);
         }
     }

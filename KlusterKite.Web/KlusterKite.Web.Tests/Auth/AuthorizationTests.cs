@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthorizationTests.cs" company="ClusterKit">
+// <copyright file="AuthorizationTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Testing authorization process
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Web.Tests.Auth
+namespace KlusterKite.Web.Tests.Auth
 {
     using System;
     using System.Collections.Generic;
@@ -18,10 +18,10 @@ namespace ClusterKit.Web.Tests.Auth
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.Tests.Controllers;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.Tests.Controllers;
 
     using RestSharp;
     using RestSharp.Authenticators;
@@ -69,7 +69,7 @@ namespace ClusterKit.Web.Tests.Auth
         /// <summary>
         /// Current server bind port
         /// </summary>
-        private int Port => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
+        private int Port => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
 
         /// <summary>
         /// Checks various authorization combinations
@@ -211,7 +211,7 @@ namespace ClusterKit.Web.Tests.Auth
                 // todo: move connection string to external config or environment
                 return ConfigurationFactory.ParseString($@"
                 {{
-                    ClusterKit {{
+                    KlusterKite {{
  		                Web {{
                             Authentication.RedisConnection = ""docker:6379""
                             WebHostPort = {port},

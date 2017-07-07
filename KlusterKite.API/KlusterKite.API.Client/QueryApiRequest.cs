@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="QueryApiRequest.cs" company="ClusterKit">
+// <copyright file="QueryApiRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client
+namespace KlusterKite.API.Client
 {
     using System.Collections.Generic;
 
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The read-only query api request

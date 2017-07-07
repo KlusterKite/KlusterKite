@@ -5,10 +5,10 @@
                         "second",
                     ]
                     TestMigrator.Resources = [
-                        "C:\\Dropbox\\Sources\\Git\\ClusterKit\\ClusterKit.NodeManager\\ClusterKit.NodeManager.Tests\\bin\\Debug\\netcoreapp1.1\\c8e329466147459db17c4ab797974145"
+                        "C:\\Dropbox\\Sources\\Git\\KlusterKite\\KlusterKite.NodeManager\\KlusterKite.NodeManager.Tests\\bin\\Debug\\netcoreapp1.1\\c8e329466147459db17c4ab797974145"
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        "ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests"
+                    KlusterKite.NodeManager.Migrators = [
+                        "KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests"
                     ]
                 }
                 

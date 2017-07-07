@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DirectProvider.cs" company="ClusterKit">
+// <copyright file="DirectProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,20 +7,20 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Direct publish of <see cref="ClusterKit.API.Provider.ApiProvider"/>
+    /// Direct publish of <see cref="KlusterKite.API.Provider.ApiProvider"/>
     /// </summary>
     public class DirectProvider : ApiProvider
     {

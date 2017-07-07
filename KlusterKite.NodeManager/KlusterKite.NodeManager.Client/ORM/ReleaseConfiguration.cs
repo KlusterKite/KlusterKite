@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseConfiguration.cs" company="ClusterKit">
+// <copyright file="ReleaseConfiguration.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Launcher.Messages;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Launcher.Messages;
 
     /// <summary>
     /// The release configuration description

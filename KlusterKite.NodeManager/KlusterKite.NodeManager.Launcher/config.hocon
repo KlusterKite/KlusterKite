@@ -1,4 +1,4 @@
-nodeManagerUrl = "http://entry/api/1.x/clusterkit/nodemanager/getConfiguration"
+nodeManagerUrl = "http://entry/api/1.x/klusterkite/nodemanager/getConfiguration"
 authenticationUrl = "http://entry/api/1.x/security/token"
 workingDirectory = "node"
 stopMode = "CleanRestart"
@@ -7,7 +7,7 @@ stopAction = "echo stopped"
 containerType = "worker"
 runtime = "win7-x64"
 
-apiClientId = "ClusterKit.NodeManager.Launcher"
+apiClientId = "KlusterKite.NodeManager.Launcher"
 apiClientSecret = "{49F20BD7-DA51-4A7B-B13F-44881D71D395}"
 
 fallbackConfiguration = "fallBackConfiguration.json"

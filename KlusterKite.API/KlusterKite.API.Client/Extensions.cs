@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Extensions.cs" company="ClusterKit">
+// <copyright file="Extensions.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client
+namespace KlusterKite.API.Client
 {
     using System;
 
@@ -33,7 +33,7 @@ namespace ClusterKit.API.Client
                 throw new ArgumentNullException(nameof(nodeAddress));
             }
 
-            return context.ActorSelection($"{nodeAddress}/user/ClusterKit/API/Publisher");
+            return context.ActorSelection($"{nodeAddress}/user/KlusterKite/API/Publisher");
         }
     }
 }

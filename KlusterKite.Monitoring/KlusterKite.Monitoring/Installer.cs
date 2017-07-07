@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring
+namespace KlusterKite.Monitoring
 {
     using System.Collections.Generic;
     using System.Reflection;
@@ -17,8 +17,8 @@ namespace ClusterKit.Monitoring
 
     using Autofac;
 
-    using ClusterKit.API.Provider;
-    using ClusterKit.Core;
+    using KlusterKite.API.Provider;
+    using KlusterKite.Core;
 
     /// <summary>
     /// Installing components from current library
@@ -36,7 +36,7 @@ namespace ClusterKit.Monitoring
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Monitoring.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Monitoring.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.

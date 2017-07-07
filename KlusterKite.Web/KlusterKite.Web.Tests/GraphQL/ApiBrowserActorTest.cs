@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiBrowserActorTest.cs" company="ClusterKit">
+// <copyright file="ApiBrowserActorTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests.GraphQL
+namespace KlusterKite.Web.Tests.GraphQL
 {
     using System;
     using System.Collections.Generic;
@@ -23,10 +23,10 @@ namespace ClusterKit.Web.Tests.GraphQL
 
     using Autofac;
 
-    using ClusterKit.API.Client.Messages;
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Web.GraphQL.Publisher;
+    using KlusterKite.API.Client.Messages;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using JetBrains.Annotations;
 
@@ -66,10 +66,10 @@ namespace ClusterKit.Web.Tests.GraphQL
             this.ExpectNoMsg();
             Assert.Null(schemaProvider.CurrentSchema);
 
-            var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
+            var nodeAddress = new UniqueAddress(new Address("akka.tcp", "KlusterKite", "testNode1", 1), 1);
             var remoteActorRef =
                 new FakeActorRef(
-                    ActorPath.Parse($"{nodeAddress.Address}/user/ClusterKit/API/Publisher"),
+                    ActorPath.Parse($"{nodeAddress.Address}/user/KlusterKite/API/Publisher"),
                     this.TestActor);
 
             browser.Tell(
@@ -84,17 +84,17 @@ namespace ClusterKit.Web.Tests.GraphQL
                         nodeAddress,
                         1,
                         MemberStatus.Up,
-                        ImmutableHashSet.Create("ClusterKit.API.Endpoint"))));
+                        ImmutableHashSet.Create("KlusterKite.API.Endpoint"))));
 
             var discoverRequest = this.ExpectMsg<RemoteTestMessage<ApiDiscoverRequest>>();
-            Assert.Equal("/user/ClusterKit/API/Publisher", discoverRequest.ReceiverPath);
+            Assert.Equal("/user/KlusterKite/API/Publisher", discoverRequest.ReceiverPath);
             Assert.Equal(nodeAddress.Address, discoverRequest.RecipientAddress);
             this.ExpectNoMsg();
             Assert.Null(schemaProvider.CurrentSchema);
 
             this.TestScheduler.Advance(TimeSpan.FromSeconds(30));
             discoverRequest = this.ExpectMsg<RemoteTestMessage<ApiDiscoverRequest>>();
-            Assert.Equal("/user/ClusterKit/API/Publisher", discoverRequest.ReceiverPath);
+            Assert.Equal("/user/KlusterKite/API/Publisher", discoverRequest.ReceiverPath);
             Assert.Equal(nodeAddress.Address, discoverRequest.RecipientAddress);
             this.ExpectNoMsg();
             Assert.Null(schemaProvider.CurrentSchema);
@@ -120,7 +120,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                         nodeAddress,
                         1,
                         MemberStatus.Removed,
-                        ImmutableHashSet.Create("ClusterKit.API.Endpoint")),
+                        ImmutableHashSet.Create("KlusterKite.API.Endpoint")),
                     MemberStatus.Up));
 
             this.ExpectNoMsg();
@@ -250,7 +250,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <returns>Akka configuration</returns>
             protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(@"
             {
-                ClusterKit.NodeManager.ConfigurationDatabaseName = ""TestConfigurationDatabase""
+                KlusterKite.NodeManager.ConfigurationDatabaseName = ""TestConfigurationDatabase""
 
                 akka : {
                   actor: {

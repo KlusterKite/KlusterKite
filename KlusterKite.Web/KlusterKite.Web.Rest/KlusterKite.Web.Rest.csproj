@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
-    <PackageId>ClusterKit.Web.Rest</PackageId>
+    <PackageId>KlusterKite.Web.Rest</PackageId>
     <Version>0.0.0.0-local</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
@@ -10,11 +10,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects.Client\ClusterKit.LargeObjects.Client.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.LargeObjects\ClusterKit.LargeObjects\ClusterKit.LargeObjects.csproj" />
-    <ProjectReference Include="..\ClusterKit.Web.Authorization\ClusterKit.Web.Authorization.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Core\KlusterKite.Core\KlusterKite.Core.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data.CRUD\KlusterKite.Data.CRUD.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.LargeObjects\KlusterKite.LargeObjects.Client\KlusterKite.LargeObjects.Client.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.LargeObjects\KlusterKite.LargeObjects\KlusterKite.LargeObjects.csproj" />
+    <ProjectReference Include="..\KlusterKite.Web.Authorization\KlusterKite.Web.Authorization.csproj" />
   </ItemGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">

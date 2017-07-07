@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PublicTestController.cs" company="ClusterKit">
+// <copyright file="PublicTestController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests.Controllers
+namespace KlusterKite.Web.Tests.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
 

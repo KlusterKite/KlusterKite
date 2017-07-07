@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.TestKit
+namespace KlusterKite.Core.TestKit
 {
     using System.Reflection;
 
@@ -31,7 +31,7 @@ namespace ClusterKit.Core.TestKit
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Core.TestKit.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Core.TestKit.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)

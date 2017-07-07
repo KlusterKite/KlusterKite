@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthenticationProvider.cs" company="ClusterKit">
+// <copyright file="AuthenticationProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authentication
+namespace KlusterKite.Web.Authentication
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -16,7 +16,7 @@ namespace ClusterKit.Web.Authentication
 
     using Autofac;
 
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 

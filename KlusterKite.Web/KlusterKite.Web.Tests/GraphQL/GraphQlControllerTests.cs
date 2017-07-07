@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GraphQlControllerTests.cs" company="ClusterKit">
+// <copyright file="GraphQlControllerTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Testing authorization process
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Web.Tests.GraphQL
+namespace KlusterKite.Web.Tests.GraphQL
 {
     using System;
     using System.Collections.Generic;
@@ -20,11 +20,11 @@ namespace ClusterKit.Web.Tests.GraphQL
 
     using Autofac;
 
-    using ClusterKit.API.Tests.Mock;
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.GraphQL.Publisher;
+    using KlusterKite.API.Tests.Mock;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using Newtonsoft.Json;
 
@@ -58,7 +58,7 @@ namespace ClusterKit.Web.Tests.GraphQL
         /// <summary>
         /// Current bind port
         /// </summary>
-        private int OwinPort => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
+        private int OwinPort => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
 
         /// <summary>
         /// Just generic test
@@ -400,7 +400,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
                 return ConfigurationFactory.ParseString($@"
                 {{
-                    ClusterKit {{
+                    KlusterKite {{
  		                Web {{
                             WebHostPort = {port},
  			                BindAddress = ""http://*:{port}"",
@@ -422,7 +422,7 @@ namespace ClusterKit.Web.Tests.GraphQL
             /// <inheritdoc />
             protected override Config GetAkkaConfig()
             {
-                return ConfigurationFactory.ParseString("{ ClusterKit.Web.Debug.Trace = true }");
+                return ConfigurationFactory.ParseString("{ KlusterKite.Web.Debug.Trace = true }");
             }
 
             /// <inheritdoc />

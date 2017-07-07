@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Navigation.cs" company="ClusterKit">
+// <copyright file="Navigation.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client
+namespace KlusterKite.NodeManager.Client
 {
     using Akka.Actor;
     using Akka.Configuration;
@@ -81,7 +81,7 @@ namespace ClusterKit.NodeManager.Client
             var path = GetPath(
                 ref nodeManagerPath,
                 config,
-                "ClusterKit.NodeManager.NodeManagerPath",
+                "KlusterKite.NodeManager.NodeManagerPath",
                 "/user/NodeManager/NodeManagerProxy");
             return path;
         }

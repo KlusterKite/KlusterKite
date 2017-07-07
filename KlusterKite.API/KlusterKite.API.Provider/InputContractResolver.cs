@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="InputContractResolver.cs" company="ClusterKit">
+// <copyright file="InputContractResolver.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Provider
+namespace KlusterKite.API.Provider
 {
     using System.Collections.Generic;
     using System.Reflection;

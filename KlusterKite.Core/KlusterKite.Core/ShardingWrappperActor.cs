@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ShardingWrappperActor.cs" company="ClusterKit">
+// <copyright file="ShardingWrappperActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core
+namespace KlusterKite.Core
 {
     using System;
     using System.Linq;

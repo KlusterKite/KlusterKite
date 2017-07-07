@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CheckTokenMiddleware.cs" company="ClusterKit">
+// <copyright file="CheckTokenMiddleware.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authorization
+namespace KlusterKite.Web.Authorization
 {
     using System;
     using System.Threading.Tasks;
 
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 

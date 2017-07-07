@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="ClusterKit">
+// <copyright file="Program.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Service
+namespace KlusterKite.Core.Service
 {
     using System;
     using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace ClusterKit.Core.Service
         /// Help description for command run
         /// </summary>
         private const string CommandUsage =
-@"Usage: ClusterKit.Core.Service.exe [--config=<file>]
+@"Usage: KlusterKite.Core.Service.exe [--config=<file>]
 --config=<file> file to load as top-level config
 ";
 

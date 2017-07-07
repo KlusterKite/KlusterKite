@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NestedProvider.cs" company="ClusterKit">
+// <copyright file="NestedProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Tests.Mock
+namespace KlusterKite.API.Tests.Mock
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
 
     using JetBrains.Annotations;
 

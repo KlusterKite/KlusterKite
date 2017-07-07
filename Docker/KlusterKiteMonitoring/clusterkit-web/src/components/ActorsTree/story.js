@@ -8,13 +8,13 @@ import ActorsTreeButtons from './buttons';
 storiesOf('Actor tree')
   .add('graph', () => {
     const data = getScanResult();
-    return <ActorsTree tree={data.data.api.clusterKitMonitoringApi.getClusterTree.nodes.edges} />;
+    return <ActorsTree tree={data.data.api.klusterKiteMonitoringApi.getClusterTree.nodes.edges} />;
   })
   // .add('graph', () => {
   //   const data = getScanResult();
   //
   //   const props = {
-  //     data: data.data.api.clusterKitMonitoringApi
+  //     data: data.data.api.klusterKiteMonitoringApi
   //   };
   //   return <StubContainer Component={ActorsTree} props={props} />;
   // })
@@ -30,7 +30,7 @@ const getScanResult = () => {
   return {
     "data": {
       "api": {
-        "clusterKitMonitoringApi": {
+        "klusterKiteMonitoringApi": {
           "getClusterTree": {
             "nodes": {
               "edges": [
@@ -173,8 +173,8 @@ const getScanResult = () => {
                                 "edges": [
                                   {
                                     "node": {
-                                      "name": "ClusterKit",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "name": "KlusterKite",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -185,7 +185,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Core",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -196,7 +196,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Monitoring",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -207,7 +207,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "NodeManager",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -218,7 +218,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Web",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -374,8 +374,8 @@ const getScanResult = () => {
                                 "edges": [
                                   {
                                     "node": {
-                                      "name": "ClusterKit",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "name": "KlusterKite",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -386,7 +386,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Core",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -397,7 +397,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Monitoring",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -408,7 +408,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "NodeManager",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -419,7 +419,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Web",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -586,8 +586,8 @@ const getScanResult = () => {
                                 "edges": [
                                   {
                                     "node": {
-                                      "name": "ClusterKit",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "name": "KlusterKite",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -598,7 +598,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Core",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -609,7 +609,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Monitoring",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -776,8 +776,8 @@ const getScanResult = () => {
                                 "edges": [
                                   {
                                     "node": {
-                                      "name": "ClusterKit",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "name": "KlusterKite",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -788,7 +788,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Core",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -799,7 +799,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Monitoring",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -810,7 +810,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "NodeManager",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -821,7 +821,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Web",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -988,8 +988,8 @@ const getScanResult = () => {
                                 "edges": [
                                   {
                                     "node": {
-                                      "name": "ClusterKit",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "name": "KlusterKite",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -1000,7 +1000,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Core",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -1011,7 +1011,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Monitoring",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -1022,7 +1022,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "NodeManager",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,
@@ -1033,7 +1033,7 @@ const getScanResult = () => {
                                   {
                                     "node": {
                                       "name": "Web",
-                                      "actorType": "ClusterKit.Core.NameSpaceActor",
+                                      "actorType": "KlusterKite.Core.NameSpaceActor",
                                       "dispatcherType": "Dispatcher",
                                       "currentMessage": null,
                                       "queueSize": 0,

@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Installing components from current library
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Security.SessionRedis
+namespace KlusterKite.Security.SessionRedis
 {
     using System.Collections.Generic;
     using System.Reflection;
@@ -15,8 +15,8 @@ namespace ClusterKit.Security.SessionRedis
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Core;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// Installing components from current library
@@ -33,7 +33,7 @@ namespace ClusterKit.Security.SessionRedis
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Security.SessionRedis.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Security.SessionRedis.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.

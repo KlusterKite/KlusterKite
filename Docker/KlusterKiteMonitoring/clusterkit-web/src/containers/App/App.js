@@ -20,49 +20,49 @@ export default class App extends React.Component {
         <Navbar fixedTop>
           <Navbar.Header>
             <Navbar.Brand>
-              <IndexLink to="/clusterkit/" activeStyle={{ color: '#333' }}>
+              <IndexLink to="/klusterkite/" activeStyle={{ color: '#333' }}>
                 <div className="topLogo" />
-                <span>ClusterKit</span>
+                <span>KlusterKite</span>
               </IndexLink>
             </Navbar.Brand>
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav navbar>
-              <LinkContainer to="/clusterkit/GraphQL">
+              <LinkContainer to="/klusterkite/GraphQL">
                 <NavItem>GraphQL</NavItem>
               </LinkContainer>
             </Nav>
             <Nav navbar>
-              {hasPrivilege('ClusterKit.NodeManager.Release.GetList') &&
-              <LinkContainer to="/clusterkit/Releases">
+              {hasPrivilege('KlusterKite.NodeManager.Release.GetList') &&
+              <LinkContainer to="/klusterkite/Releases">
                 <NavItem>Releases</NavItem>
               </LinkContainer>
               }
             </Nav>
             <Nav navbar>
-              {false && hasPrivilege('ClusterKit.NodeManager.User.GetList') &&
-              <LinkContainer to="/clusterkit/Users">
+              {false && hasPrivilege('KlusterKite.NodeManager.User.GetList') &&
+              <LinkContainer to="/klusterkite/Users">
                 <NavItem>Users</NavItem>
               </LinkContainer>
               }
             </Nav>
             <Nav navbar>
-              {false && hasPrivilege('ClusterKit.NodeManager.Role.GetList') &&
-              <LinkContainer to="/clusterkit/Roles">
+              {false && hasPrivilege('KlusterKite.NodeManager.Role.GetList') &&
+              <LinkContainer to="/klusterkite/Roles">
                 <NavItem>Roles</NavItem>
               </LinkContainer>
               }
             </Nav>
             <Nav navbar>
-              {hasPrivilege('ClusterKit.Monitoring.GetClusterTree') &&
-              <LinkContainer to="/clusterkit/ActorsTree">
+              {hasPrivilege('KlusterKite.Monitoring.GetClusterTree') &&
+              <LinkContainer to="/klusterkite/ActorsTree">
                 <NavItem>Actors Tree</NavItem>
               </LinkContainer>
               }
             </Nav>
             {username &&
             <Nav pullRight>
-              <LinkContainer to="/clusterkit/Logout">
+              <LinkContainer to="/klusterkite/Logout">
                 <NavItem href="#">Logout ({username})</NavItem>
               </LinkContainer>
             </Nav>

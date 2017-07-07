@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataUpdater.cs" company="ClusterKit">
+// <copyright file="DataUpdater.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client
+namespace KlusterKite.API.Client
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace ClusterKit.API.Client
     using System.Linq.Expressions;
     using System.Reflection;
 
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     using JetBrains.Annotations;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequireUserAttribute.cs" company="ClusterKit">
+// <copyright file="RequireUserAttribute.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authorization.Attributes
+namespace KlusterKite.Web.Authorization.Attributes
 {
     using System;
 
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
 
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Controllers;

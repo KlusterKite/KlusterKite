@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestProvider.cs" company="ClusterKit">
+// <copyright file="TestProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Tests.Mock
+namespace KlusterKite.API.Tests.Mock
 {
     using System;
     using System.Collections.Generic;
@@ -15,12 +15,12 @@ namespace ClusterKit.API.Tests.Mock
     using System.Linq;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Attributes.Authorization;
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Converters;
-    using ClusterKit.API.Provider;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Attributes.Authorization;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Client.Converters;
+    using KlusterKite.API.Provider;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 

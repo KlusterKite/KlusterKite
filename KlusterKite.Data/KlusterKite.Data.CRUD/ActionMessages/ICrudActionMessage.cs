@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICrudActionMessage.cs" company="ClusterKit">
+// <copyright file="ICrudActionMessage.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD.ActionMessages
+namespace KlusterKite.Data.CRUD.ActionMessages
 {
     using JetBrains.Annotations;
 

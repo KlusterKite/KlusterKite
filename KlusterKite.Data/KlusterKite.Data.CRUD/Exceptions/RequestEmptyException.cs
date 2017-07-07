@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequestEmptyException.cs" company="ClusterKit">
+// <copyright file="RequestEmptyException.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD.Exceptions
+namespace KlusterKite.Data.CRUD.Exceptions
 {
     using System;
 

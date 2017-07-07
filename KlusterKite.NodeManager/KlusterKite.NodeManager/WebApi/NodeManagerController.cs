@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeManagerController.cs" company="ClusterKit">
+// <copyright file="NodeManagerController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,18 +7,18 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System;
     using System.Threading.Tasks;
 
     using Akka.Actor;
 
-    using ClusterKit.Core;
-    using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Web.Authorization.Attributes;
+    using KlusterKite.Core;
+    using KlusterKite.NodeManager.Client;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Messages;
+    using KlusterKite.Web.Authorization.Attributes;
 
     using JetBrains.Annotations;
 
@@ -29,7 +29,7 @@ namespace ClusterKit.NodeManager.WebApi
     /// </summary>
     [UsedImplicitly]
     [RequireSession]
-    [Route("api/1.x/clusterkit/nodemanager")]
+    [Route("api/1.x/klusterkite/nodemanager")]
     public class NodeManagerController : Controller
     {
         /// <summary>

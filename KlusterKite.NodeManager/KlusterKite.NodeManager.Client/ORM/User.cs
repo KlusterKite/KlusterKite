@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="User.cs" company="ClusterKit">
+// <copyright file="User.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Defines the User type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
     using System;
     using System.Collections.Generic;
@@ -15,8 +15,8 @@ namespace ClusterKit.NodeManager.Client.ORM
 
     using BCrypt.Net;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.Data.CRUD;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.Data.CRUD;
 
     using JetBrains.Annotations;
 

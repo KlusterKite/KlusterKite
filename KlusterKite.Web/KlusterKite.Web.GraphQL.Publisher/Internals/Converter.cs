@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Converter.cs" company="ClusterKit">
+// <copyright file="Converter.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.Internals
+namespace KlusterKite.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
     using System.Linq;

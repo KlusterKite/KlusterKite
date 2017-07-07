@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ScanActor.cs" company="ClusterKit">
+// <copyright file="ScanActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Client
+namespace KlusterKite.Monitoring.Client
 {
     using System;
     using System.Linq;
@@ -16,8 +16,8 @@ namespace ClusterKit.Monitoring.Client
     using Akka.Actor;
     using Akka.Cluster;
 
-    using ClusterKit.LargeObjects;
-    using ClusterKit.Monitoring.Client.Messages;
+    using KlusterKite.LargeObjects;
+    using KlusterKite.Monitoring.Client.Messages;
 
     using JetBrains.Annotations;
 
@@ -57,16 +57,16 @@ namespace ClusterKit.Monitoring.Client
         /// </summary>
         public ScanActor()
         {
-            // ClusterKit.NodeManager writes some properties to config... but this is not necessary
-            var releaseId = Context.System.Settings.Config.GetInt("ClusterKit.NodeManager.ReleaseId");
-            var templateName = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.NodeTemplate");
+            // KlusterKite.NodeManager writes some properties to config... but this is not necessary
+            var releaseId = Context.System.Settings.Config.GetInt("KlusterKite.NodeManager.ReleaseId");
+            var templateName = Context.System.Settings.Config.GetString("KlusterKite.NodeManager.NodeTemplate");
 
             this.nodeTemplateName = string.IsNullOrWhiteSpace(templateName)
                                         ? null
                                         : $"{templateName}-v{releaseId}";
 
             this.scanMemoize = Context.System.Settings.Config.GetTimeSpan(
-                "ClusterKit.Monitoring.ScanMemoize",
+                "KlusterKite.Monitoring.ScanMemoize",
                 TimeSpan.FromSeconds(10));
             this.Receive<ActorSystemScanRequest>(m => this.OnScanRequest());
         }

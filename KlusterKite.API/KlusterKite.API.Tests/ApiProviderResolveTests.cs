@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiProviderResolveTests.cs" company="ClusterKit">
+// <copyright file="ApiProviderResolveTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Tests
+namespace KlusterKite.API.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -15,10 +15,10 @@ namespace ClusterKit.API.Tests
     using System.Linq;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Provider;
-    using ClusterKit.API.Tests.Mock;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Provider;
+    using KlusterKite.API.Tests.Mock;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

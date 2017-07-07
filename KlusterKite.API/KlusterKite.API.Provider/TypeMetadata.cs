@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TypeMetadata.cs" company="ClusterKit">
+// <copyright file="TypeMetadata.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Provider
+namespace KlusterKite.API.Provider
 {
     using System;
     using System.Collections.Generic;
@@ -15,8 +15,8 @@ namespace ClusterKit.API.Provider
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
 
     /// <summary>
     /// Property or method return type description
@@ -244,7 +244,7 @@ namespace ClusterKit.API.Provider
         }
 
         /// <summary>
-        /// Gets the <see cref="ClusterKit.API.Client.EnFieldFlags"/> from metadata
+        /// Gets the <see cref="KlusterKite.API.Client.EnFieldFlags"/> from metadata
         /// </summary>
         /// <returns>The field flags</returns>
         public EnFieldFlags GetFlags()

@@ -65,16 +65,16 @@ export class ReadyOperations extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.errors &&
-              response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCreate.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCreate.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCreate.errors.edges);
 
               this.setState({
                 isStartingMigration: false,
                 setStableErrors: messages
               });
             } else {
-              console.log('result create migration', response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate.result);
+              console.log('result create migration', response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCreate.result);
               // total success
               this.setState({
                 isStartingMigration: false,
@@ -130,16 +130,16 @@ export class ReadyOperations extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.clusterKitNodeApi_clusterKitNodesApi_releases_setObsolete.errors &&
-              response.clusterKitNodeApi_clusterKitNodesApi_releases_setObsolete.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_setObsolete.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete.errors.edges);
 
               this.setState({
                 isRollbacking: false,
                 rollbackErrors: messages
               });
             } else {
-              console.log('result set obsolete', response.clusterKitNodeApi_clusterKitNodesApi_releases_setObsolete);
+              console.log('result set obsolete', response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete);
               // total success
               this.setState({
                 isRollbacking: false,

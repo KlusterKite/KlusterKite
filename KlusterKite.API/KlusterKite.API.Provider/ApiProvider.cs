@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiProvider.cs" company="ClusterKit">
+// <copyright file="ApiProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Provider
+namespace KlusterKite.API.Provider
 {
     using System;
     using System.Collections.Generic;
@@ -15,9 +15,9 @@ namespace ClusterKit.API.Provider
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Provider.Resolvers;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Provider.Resolvers;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

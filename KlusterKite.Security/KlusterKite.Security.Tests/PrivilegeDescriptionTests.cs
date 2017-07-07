@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PrivilegeDescriptionTests.cs" company="ClusterKit">
+// <copyright file="PrivilegeDescriptionTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.Tests
+namespace KlusterKite.Security.Tests
 {
     using System.Linq;
 
     using Akka.Configuration;
 
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
 
     using JetBrains.Annotations;
 

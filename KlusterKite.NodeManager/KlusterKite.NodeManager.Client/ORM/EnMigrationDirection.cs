@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnMigrationDirection.cs" company="ClusterKit">
+// <copyright file="EnMigrationDirection.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// The direction of cluster migration

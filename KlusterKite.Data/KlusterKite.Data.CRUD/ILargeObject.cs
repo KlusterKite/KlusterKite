@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ILargeObject.cs" company="ClusterKit">
+// <copyright file="ILargeObject.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD
+namespace KlusterKite.Data.CRUD
 {
     /// <summary>
     /// Indicates that ORM object can contain large amount of data

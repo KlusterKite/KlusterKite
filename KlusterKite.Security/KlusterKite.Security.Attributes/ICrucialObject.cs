@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICrucialObject.cs" company="ClusterKit">
+// <copyright file="ICrucialObject.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.Attributes
+namespace KlusterKite.Security.Attributes
 {
     /// <summary>
     /// Places a flag on data object to mark it crucial. Used in logging and some other scenarios.

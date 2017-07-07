@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Rest
+namespace KlusterKite.Web.Rest
 {
     using Akka.Configuration;
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 
     /// <summary>
     /// Installing components from current library

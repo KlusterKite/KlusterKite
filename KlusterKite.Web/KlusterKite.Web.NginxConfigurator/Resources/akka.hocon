@@ -1,5 +1,5 @@
  {
-	ClusterKit {
+	KlusterKite {
  		Web {
           
  			Nginx {
@@ -28,11 +28,11 @@
             IsNameSpace = true
         }
  		 /Web/Nginx {
-            type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+            type = "KlusterKite.Core.NameSpaceActor, KlusterKite.Core"
         }                
 
         /Web/Nginx/Configurator {
-            type = "ClusterKit.Web.NginxConfigurator.NginxConfiguratorActor, ClusterKit.Web.NginxConfigurator"
+            type = "KlusterKite.Web.NginxConfigurator.NginxConfiguratorActor, KlusterKite.Web.NginxConfigurator"
         }
  	}
  }

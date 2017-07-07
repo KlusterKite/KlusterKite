@@ -1,12 +1,12 @@
-﻿namespace ClusterKit.NodeManager.Tests
+﻿namespace KlusterKite.NodeManager.Tests
 {
     using System.IO;
     using System.Linq;
 
     using Akka.Configuration;
 
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     using Newtonsoft.Json;
 
@@ -52,7 +52,7 @@
                 "win7-x64",
                 PackageRepositoryExtensions.CurrentRuntime,
                 serviceDir,
-                "ClusterKit.Core.Service",
+                "KlusterKite.Core.Service",
                 this.output.WriteLine).GetAwaiter().GetResult();
         }
 

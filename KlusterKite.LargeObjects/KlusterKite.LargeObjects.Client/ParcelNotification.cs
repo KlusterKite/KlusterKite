@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelNotification.cs" company="ClusterKit">
+// <copyright file="ParcelNotification.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects.Client
+namespace KlusterKite.LargeObjects.Client
 {
     using System;
     using System.Linq;
@@ -76,9 +76,9 @@ namespace ClusterKit.LargeObjects.Client
         public virtual async Task<object> Receive(ActorSystem system)
         {
             this.ReceiveAttempt++;
-            var timeOut = system.Settings.Config.GetTimeSpan("ClusterKit.LargeObjects.TcpReadTimeout", TimeSpan.FromSeconds(10));
+            var timeOut = system.Settings.Config.GetTimeSpan("KlusterKite.LargeObjects.TcpReadTimeout", TimeSpan.FromSeconds(10));
 
-            if (system.Settings.Config.GetBoolean("ClusterKit.LargeObjects.LogReceive"))
+            if (system.Settings.Config.GetBoolean("KlusterKite.LargeObjects.LogReceive"))
             {
                 system.Log.Info("{Type}: Receiving {PayloadType} payload", this.GetType().Name, this.PayloadTypeName);
             }
@@ -194,10 +194,10 @@ namespace ClusterKit.LargeObjects.Client
                 .With<ParcelTimeoutException>(
                 () =>
                     {
-                        var maxNumberOfAttempts = system.Settings.Config.GetInt("ClusterKit.LargeObjects.MaxReadAttempts", 5);
+                        var maxNumberOfAttempts = system.Settings.Config.GetInt("KlusterKite.LargeObjects.MaxReadAttempts", 5);
                         if (this.ReceiveAttempt < maxNumberOfAttempts)
                         {
-                            var rereadInterval = system.Settings.Config.GetTimeSpan("ClusterKit.LargeObjects.RereadInterval", TimeSpan.FromSeconds(5));
+                            var rereadInterval = system.Settings.Config.GetTimeSpan("KlusterKite.LargeObjects.RereadInterval", TimeSpan.FromSeconds(5));
                             system.Scheduler.ScheduleTellOnce(rereadInterval, recipient, this, sender);
                         }
                         else

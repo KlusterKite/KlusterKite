@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataNoProtectionProvider.cs" company="ClusterKit">
+// <copyright file="DataNoProtectionProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authentication
+namespace KlusterKite.Web.Authentication
 {
     using Microsoft.AspNetCore.DataProtection;
 
     /// <summary>
-    /// Substitute for data protection as data protection is provided by <see cref="ClusterKit.Security.Attributes.ITokenManager"/>
+    /// Substitute for data protection as data protection is provided by <see cref="KlusterKite.Security.Attributes.ITokenManager"/>
     /// </summary>
     public class DataNoProtectionProvider : IDataProtectionProvider
     {
@@ -23,7 +23,7 @@ namespace ClusterKit.Web.Authentication
         }
 
         /// <summary>
-        /// Substitute for data protection as data protection is provided by <see cref="ClusterKit.Security.Attributes.ITokenManager"/>
+        /// Substitute for data protection as data protection is provided by <see cref="KlusterKite.Security.Attributes.ITokenManager"/>
         /// </summary>
         private class DataNotProtector : IDataProtector
         {

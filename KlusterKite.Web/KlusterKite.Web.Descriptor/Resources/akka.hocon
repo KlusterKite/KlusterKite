@@ -1,5 +1,5 @@
  {
- 	ClusterKit {
+ 	KlusterKite {
  		Web {
  			OwinBindAddress = "http://*:8080" 
  			Services {
@@ -19,7 +19,7 @@
         }
 
         /Web/Descriptor {
-            type = "ClusterKit.Web.Descriptor.WebDescriptorActor, ClusterKit.Web.Descriptor"
+            type = "KlusterKite.Web.Descriptor.WebDescriptorActor, KlusterKite.Web.Descriptor"
         }
 
  	}

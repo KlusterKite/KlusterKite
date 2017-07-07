@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RedisSessionTokenManager.cs" company="ClusterKit">
+// <copyright file="RedisSessionTokenManager.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.SessionRedis
+namespace KlusterKite.Security.SessionRedis
 {
     using System;
     using System.Diagnostics;
@@ -18,8 +18,8 @@ namespace ClusterKit.Security.SessionRedis
 
     using Akka.Actor;
 
-    using ClusterKit.Core.Utils;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Core.Utils;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
@@ -63,7 +63,7 @@ namespace ClusterKit.Security.SessionRedis
         public RedisSessionTokenManager(ActorSystem system)
         {
             this.system = system;
-            var connectionString = system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.RedisConnection");
+            var connectionString = system.Settings.Config.GetString("KlusterKite.Security.SessionRedis.RedisConnection");
 
             var config = ConfigurationOptions.Parse(connectionString);
             var addressEndpoint = (DnsEndPoint)config.EndPoints.First();
@@ -79,8 +79,8 @@ namespace ClusterKit.Security.SessionRedis
 
             this.redisConnectionString = config;
 
-            this.redisDb = system.Settings.Config.GetInt("ClusterKit.Security.SessionRedis.RedisDb");
-            this.tokenKeyPrefix = system.Settings.Config.GetString("ClusterKit.Security.SessionRedis.TokenKeyPrefix");
+            this.redisDb = system.Settings.Config.GetInt("KlusterKite.Security.SessionRedis.RedisDb");
+            this.tokenKeyPrefix = system.Settings.Config.GetString("KlusterKite.Security.SessionRedis.TokenKeyPrefix");
         }
 
         /// <inheritdoc />

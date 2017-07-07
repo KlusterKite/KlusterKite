@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMigrator.cs" company="ClusterKit">
+// <copyright file="IMigrator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Migrator
+namespace KlusterKite.NodeManager.Migrator
 {
     using System.Collections.Generic;
 

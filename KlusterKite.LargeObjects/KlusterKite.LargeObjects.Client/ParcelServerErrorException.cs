@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelServerErrorException.cs" company="ClusterKit">
+// <copyright file="ParcelServerErrorException.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects.Client
+namespace KlusterKite.LargeObjects.Client
 {
     using System;
 

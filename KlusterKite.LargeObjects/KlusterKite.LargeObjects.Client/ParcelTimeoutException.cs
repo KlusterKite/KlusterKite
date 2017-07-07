@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelTimeoutException.cs" company="ClusterKit">
+// <copyright file="ParcelTimeoutException.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects.Client
+namespace KlusterKite.LargeObjects.Client
 {
     /// <summary>
     /// Timeout happened in parcel receive process

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Authentication
+namespace KlusterKite.NodeManager.Authentication
 {
     using System.Reflection;
 
@@ -16,8 +16,8 @@ namespace ClusterKit.NodeManager.Authentication
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Core;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
@@ -37,7 +37,7 @@ namespace ClusterKit.NodeManager.Authentication
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.NodeManager.Authentication.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.NodeManager.Authentication.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)

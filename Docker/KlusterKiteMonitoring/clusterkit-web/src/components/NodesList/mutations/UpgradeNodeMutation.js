@@ -3,12 +3,12 @@ import Relay from 'react-relay'
 export default class UpgradeNodeMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_upgradeNode}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_upgradeNode}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload {
+      fragment on KlusterKiteNodeApi_MutationResult_System_Boolean__MutationPayload {
         result {
           result
         }
@@ -21,7 +21,7 @@ export default class UpgradeNodeMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
           Relay.QL`
-          fragment on ClusterKitNodeApi_MutationResult_System_Boolean__MutationPayload {
+          fragment on KlusterKiteNodeApi_MutationResult_System_Boolean__MutationPayload {
             result {
               result
             }

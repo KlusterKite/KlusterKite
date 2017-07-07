@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiBrowserActor.cs" company="ClusterKit">
+// <copyright file="ApiBrowserActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System;
     using System.Collections.Generic;
@@ -17,9 +17,9 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using Akka.Cluster;
     using Akka.Event;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Messages;
-    using ClusterKit.Core;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Client.Messages;
+    using KlusterKite.Core;
 
     using JetBrains.Annotations;
 
@@ -32,7 +32,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <summary>
         /// The publisher actor local path
         /// </summary>
-        private const string PublisherActorLocalPath = "/user/ClusterKit/API/Publisher";
+        private const string PublisherActorLocalPath = "/user/KlusterKite/API/Publisher";
 
         /// <summary>
         /// The message router to mock discover requests in tests
@@ -84,7 +84,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
             this.schemaProvider = schemaProvider;
             this.discoverTimeout =
                 Context.System.Settings.Config.GetTimeSpan(
-                    "ClusterKit.Web.GraphQL.ApiDiscoverTimeout",
+                    "KlusterKite.Web.GraphQL.ApiDiscoverTimeout",
                     TimeSpan.FromSeconds(30));
 
             Cluster.Get(Context.System)
@@ -95,11 +95,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                     typeof(ClusterEvent.MemberRemoved));
 
             this.Receive<ClusterEvent.MemberUp>(
-                m => m.Member.Roles.Contains("ClusterKit.API.Endpoint"),
+                m => m.Member.Roles.Contains("KlusterKite.API.Endpoint"),
                 m => this.OnApiEndpointUp(m.Member.Address));
 
             this.Receive<ClusterEvent.MemberRemoved>(
-                m => m.Member.Roles.Contains("ClusterKit.API.Endpoint"),
+                m => m.Member.Roles.Contains("KlusterKite.API.Endpoint"),
                 m => this.OnApiEndpointDown(m.Member.Address));
 
             this.Receive<SendDiscoverRequest>(m => this.OnDiscoverRequestTimeout());

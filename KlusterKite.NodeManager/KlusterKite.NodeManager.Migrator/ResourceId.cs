@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ResourceId.cs" company="ClusterKit">
+// <copyright file="ResourceId.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Migrator
+namespace KlusterKite.NodeManager.Migrator
 {
     /// <summary>
     /// The description of some migratable resource

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiProviderTests.cs" company="ClusterKit">
+// <copyright file="ApiProviderTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Tests
+namespace KlusterKite.API.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -16,10 +16,10 @@ namespace ClusterKit.API.Tests
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Provider;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Provider;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 

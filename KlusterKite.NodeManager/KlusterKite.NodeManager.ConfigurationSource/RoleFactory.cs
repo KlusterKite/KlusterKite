@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RoleFactory.cs" company="ClusterKit">
+// <copyright file="RoleFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace KlusterKite.NodeManager.ConfigurationSource
 {
     using System;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using ClusterKit.Core.Monads;
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client.ORM;
+    using KlusterKite.Core.Monads;
+    using KlusterKite.Data.EF;
+    using KlusterKite.NodeManager.Client.ORM;
 
     using Microsoft.EntityFrameworkCore;
 

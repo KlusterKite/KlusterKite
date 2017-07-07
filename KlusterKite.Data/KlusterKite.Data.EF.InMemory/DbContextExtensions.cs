@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DbContextExtensions.cs" company="ClusterKit">
+// <copyright file="DbContextExtensions.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.EF.InMemory
+namespace KlusterKite.Data.EF.InMemory
 {
     using System.Linq;
 

@@ -58,7 +58,7 @@ export class UpdateResources extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            const responsePayload = response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate;
+            const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate;
 
             if (responsePayload.errors &&
               responsePayload.errors.edges) {
@@ -162,7 +162,7 @@ export default Relay.createContainer(
   UpdateResources,
   {
     fragments: {
-      migrationState: () => Relay.QL`fragment on IClusterKitNodeApi_MigrationActorMigrationState {
+      migrationState: () => Relay.QL`fragment on IKlusterKiteNodeApi_MigrationActorMigrationState {
         templateStates {
           edges {
             node {

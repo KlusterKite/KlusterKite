@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationExecutor.cs" company="ClusterKit">
+// <copyright file="MigrationExecutor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.RemoteDomain
+namespace KlusterKite.NodeManager.RemoteDomain
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace ClusterKit.NodeManager.RemoteDomain
 
     using Autofac;
 
-    using ClusterKit.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Client.ORM;
 
     using JetBrains.Annotations;
 

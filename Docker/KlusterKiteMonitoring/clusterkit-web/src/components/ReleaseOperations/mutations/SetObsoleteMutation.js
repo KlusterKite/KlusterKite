@@ -3,12 +3,12 @@ import Relay from 'react-relay'
 export default class SetObsoleteMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_releases_setObsolete}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_Release_NodeMutationPayload {
+      fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
         node
         edge
         errors {
@@ -28,7 +28,7 @@ export default class SetObsoleteMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
           Relay.QL`
-          fragment on ClusterKitNodeApi_Release_NodeMutationPayload {
+          fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
             errors {
               edges {
                 node {

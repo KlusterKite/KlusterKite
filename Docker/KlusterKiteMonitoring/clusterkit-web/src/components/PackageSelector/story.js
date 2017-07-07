@@ -7,7 +7,7 @@ import PackagesMultiSelector from './multiselector';
 
 storiesOf('Packages')
   .add('name and version input, empty', () => {
-    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const packagesList = getPackages().data.api.klusterKiteNodesApi.nugetPackages;
     return <PackagesSelector
             packages={packagesList}
             onChange={action('changed')}
@@ -16,9 +16,9 @@ storiesOf('Packages')
            />;
   })
   .add('name and version input, package', () => {
-    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const packagesList = getPackages().data.api.klusterKiteNodesApi.nugetPackages;
     const initialValues = {
-      id: 'ClusterKit.API.Client',
+      id: 'KlusterKite.API.Client',
       specificVersion: null
     };
     return <PackagesSelector
@@ -30,9 +30,9 @@ storiesOf('Packages')
            />;
   })
   .add('name and version input, version', () => {
-    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const packagesList = getPackages().data.api.klusterKiteNodesApi.nugetPackages;
     const initialValues = {
-      id: 'ClusterKit.API.Client',
+      id: 'KlusterKite.API.Client',
       specificVersion: '0.1.1'
     };
     return <PackagesSelector
@@ -44,20 +44,20 @@ storiesOf('Packages')
     />;
   })
   .add('multiselector empty', () => {
-    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const packagesList = getPackages().data.api.klusterKiteNodesApi.nugetPackages;
     return <PackagesMultiSelector
             packages={packagesList}
             />;
   })
   .add('multiselector filled', () => {
-    const packagesList = getPackages().data.api.clusterKitNodesApi.nugetPackages;
+    const packagesList = getPackages().data.api.klusterKiteNodesApi.nugetPackages;
     const values = [
       {
-        id: 'ClusterKit.API.Client',
+        id: 'KlusterKite.API.Client',
         specificVersion: '0.1.0'
       },
       {
-        id: 'ClusterKit.API.Provider',
+        id: 'KlusterKite.API.Provider',
         specificVersion: ''
       },
       {
@@ -86,12 +86,12 @@ const getPackages = () => {
   return {
     "data": {
       "api": {
-        "clusterKitNodesApi": {
+        "klusterKiteNodesApi": {
           "nugetPackages": {
             "edges": [
               {
                 "node": {
-                  "name": "ClusterKit.API.Client",
+                  "name": "KlusterKite.API.Client",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local",
@@ -106,7 +106,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Core",
+                  "name": "KlusterKite.Core",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -115,7 +115,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Core.Service",
+                  "name": "KlusterKite.Core.Service",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -124,7 +124,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Data.CRUD",
+                  "name": "KlusterKite.Data.CRUD",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -133,7 +133,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.LargeObjects",
+                  "name": "KlusterKite.LargeObjects",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -142,7 +142,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.LargeObjects.Client",
+                  "name": "KlusterKite.LargeObjects.Client",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -151,7 +151,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Log.Console",
+                  "name": "KlusterKite.Log.Console",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -160,7 +160,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Log.ElasticSearch",
+                  "name": "KlusterKite.Log.ElasticSearch",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -169,7 +169,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Monitoring.Client",
+                  "name": "KlusterKite.Monitoring.Client",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -178,7 +178,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.NodeManager.Client",
+                  "name": "KlusterKite.NodeManager.Client",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -187,7 +187,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.NodeManager.Launcher.Messages",
+                  "name": "KlusterKite.NodeManager.Launcher.Messages",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -196,7 +196,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Security.Client",
+                  "name": "KlusterKite.Security.Client",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -205,7 +205,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Client",
+                  "name": "KlusterKite.Web.Client",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -214,7 +214,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.API.Endpoint",
+                  "name": "KlusterKite.API.Endpoint",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -223,7 +223,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.API.Provider",
+                  "name": "KlusterKite.API.Provider",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -232,7 +232,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Data",
+                  "name": "KlusterKite.Data",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -241,7 +241,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Data.EF",
+                  "name": "KlusterKite.Data.EF",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -250,7 +250,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Data.EF.Npgsql",
+                  "name": "KlusterKite.Data.EF.Npgsql",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -259,7 +259,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Monitoring",
+                  "name": "KlusterKite.Monitoring",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -268,7 +268,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.NodeManager",
+                  "name": "KlusterKite.NodeManager",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -277,7 +277,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.NodeManager.Authentication",
+                  "name": "KlusterKite.NodeManager.Authentication",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -286,7 +286,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.NodeManager.ConfigurationSource",
+                  "name": "KlusterKite.NodeManager.ConfigurationSource",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -295,7 +295,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Security.SessionRedis",
+                  "name": "KlusterKite.Security.SessionRedis",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -304,7 +304,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web",
+                  "name": "KlusterKite.Web",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -313,7 +313,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Authentication",
+                  "name": "KlusterKite.Web.Authentication",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -322,7 +322,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Authorization",
+                  "name": "KlusterKite.Web.Authorization",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -331,7 +331,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Descriptor",
+                  "name": "KlusterKite.Web.Descriptor",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -340,7 +340,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.GraphQL.Publisher",
+                  "name": "KlusterKite.Web.GraphQL.Publisher",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -349,7 +349,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.NginxConfigurator",
+                  "name": "KlusterKite.Web.NginxConfigurator",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -358,7 +358,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Rest",
+                  "name": "KlusterKite.Web.Rest",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -367,7 +367,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Swagger",
+                  "name": "KlusterKite.Web.Swagger",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -376,7 +376,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Swagger.Messages",
+                  "name": "KlusterKite.Web.Swagger.Messages",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -385,7 +385,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.Swagger.Monitor",
+                  "name": "KlusterKite.Web.Swagger.Monitor",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -538,7 +538,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.API.Tests",
+                  "name": "KlusterKite.API.Tests",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -547,7 +547,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Build",
+                  "name": "KlusterKite.Build",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -556,7 +556,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Core.TestKit",
+                  "name": "KlusterKite.Core.TestKit",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -565,7 +565,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Data.EF.TestKit",
+                  "name": "KlusterKite.Data.EF.TestKit",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -574,7 +574,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Data.TestKit",
+                  "name": "KlusterKite.Data.TestKit",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -583,7 +583,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.NodeManager.FallbackPackageDependencyFixer",
+                  "name": "KlusterKite.NodeManager.FallbackPackageDependencyFixer",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -592,7 +592,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.NodeManager.Launcher",
+                  "name": "KlusterKite.NodeManager.Launcher",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"
@@ -601,7 +601,7 @@ const getPackages = () => {
               },
               {
                 "node": {
-                  "name": "ClusterKit.Web.SignalR",
+                  "name": "KlusterKite.Web.SignalR",
                   "version": "0.0.0-local",
                   "availableVersions": [
                     "0.0.0-local"

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Privileges.cs" company="ClusterKit">
+// <copyright file="Privileges.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authorization
+namespace KlusterKite.Web.Authorization
 {
     /// <summary>
     /// The list of defined privileges
@@ -17,6 +17,6 @@ namespace ClusterKit.Web.Authorization
         /// <summary>
         /// The privilege to use "grant password" authentication
         /// </summary>
-        public const string ImplicitGrantPassword = "ClusterKit.Web.Authorization.ImplicitGrantPassword";
+        public const string ImplicitGrantPassword = "KlusterKite.Web.Authorization.ImplicitGrantPassword";
     }
 }

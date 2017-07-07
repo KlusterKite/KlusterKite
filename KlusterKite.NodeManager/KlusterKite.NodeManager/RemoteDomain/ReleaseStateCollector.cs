@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseStateCollector.cs" company="ClusterKit">
+// <copyright file="ReleaseStateCollector.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.RemoteDomain
+namespace KlusterKite.NodeManager.RemoteDomain
 {
     using System;
     using System.Collections.Generic;
@@ -15,9 +15,9 @@ namespace ClusterKit.NodeManager.RemoteDomain
 
     using Autofac;
 
-    using ClusterKit.NodeManager.Client.MigrationStates;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Migrator;
+    using KlusterKite.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Migrator;
 
     /// <summary>
     /// Gathers the state of resources

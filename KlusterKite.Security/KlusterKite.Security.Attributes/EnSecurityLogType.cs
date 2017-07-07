@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnSecurityLogType.cs" company="ClusterKit">
+// <copyright file="EnSecurityLogType.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.Attributes
+namespace KlusterKite.Security.Attributes
 {
     /// <summary>
     /// The log record type

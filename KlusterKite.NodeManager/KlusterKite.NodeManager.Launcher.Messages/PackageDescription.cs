@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PackageDescription.cs" company="ClusterKit">
+// <copyright file="PackageDescription.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Messages
+namespace KlusterKite.NodeManager.Launcher.Messages
 {
     using System.Diagnostics.CodeAnalysis;
 
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Short description of NuGet package

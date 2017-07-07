@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClusterTree.cs" company="ClusterKit">
+// <copyright file="ClusterTree.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Messages
+namespace KlusterKite.Monitoring.Messages
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client.Converters;
-    using ClusterKit.Monitoring.Client.Messages;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client.Converters;
+    using KlusterKite.Monitoring.Client.Messages;
 
     using JetBrains.Annotations;
 

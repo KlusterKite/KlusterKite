@@ -32,7 +32,7 @@ export default class AuthPage extends React.Component {
     });
 
     const url = process.env.REACT_APP_AUTH_URL;
-    const payload = `grant_type=password&client_id=ClusterKit.NodeManager.WebApplication&username=${data.Username}&password=${data.Password}`;
+    const payload = `grant_type=password&client_id=KlusterKite.NodeManager.WebApplication&username=${data.Username}&password=${data.Password}`;
 
     fetch(url, {
       method: 'post',
@@ -98,7 +98,7 @@ export default class AuthPage extends React.Component {
 
     // const host = 'http://192.168.99.100/';
     const host = 'http://entry/';
-    const url = `${host}api/1.x/clusterkit/nodemanager/authentication/userScope`;
+    const url = `${host}api/1.x/klusterkite/nodemanager/authentication/userScope`;
 
     fetch(url, {
       method: 'get',
@@ -142,7 +142,7 @@ export default class AuthPage extends React.Component {
     if (this.props.location && this.props.location.query && this.props.location.query.from) {
       browserHistory.push(decodeURIComponent(this.props.location.query.from));
     } else {
-      browserHistory.push('/clusterkit/');
+      browserHistory.push('/klusterkite/');
     }
   }
 

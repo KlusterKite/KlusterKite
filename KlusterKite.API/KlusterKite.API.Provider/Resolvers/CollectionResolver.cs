@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CollectionResolver.cs" company="ClusterKit">
+// <copyright file="CollectionResolver.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Provider.Resolvers
+namespace KlusterKite.API.Provider.Resolvers
 {
     using System;
     using System.Collections.Generic;
@@ -17,11 +17,11 @@ namespace ClusterKit.API.Provider.Resolvers
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Attributes.Authorization;
-    using ClusterKit.API.Client;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Attributes.Authorization;
+    using KlusterKite.API.Client;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

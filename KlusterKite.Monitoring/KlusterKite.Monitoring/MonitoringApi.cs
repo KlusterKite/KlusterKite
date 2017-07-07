@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MonitoringApi.cs" company="ClusterKit">
+// <copyright file="MonitoringApi.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,25 +7,25 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring
+namespace KlusterKite.Monitoring
 {
     using System;
     using System.Threading.Tasks;
 
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Attributes.Authorization;
-    using ClusterKit.LargeObjects.Client;
-    using ClusterKit.Monitoring.Client;
-    using ClusterKit.Monitoring.Messages;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Attributes.Authorization;
+    using KlusterKite.LargeObjects.Client;
+    using KlusterKite.Monitoring.Client;
+    using KlusterKite.Monitoring.Messages;
 
     using JetBrains.Annotations;
 
     /// <summary>
     /// Monitoring api
     /// </summary>
-    [ApiDescription(Description = "ClusterKit monitoring api", Name = "Root")]
+    [ApiDescription(Description = "KlusterKite monitoring api", Name = "Root")]
     public class MonitoringApi
     {
         /// <summary>
@@ -47,7 +47,7 @@ namespace ClusterKit.Monitoring
         public MonitoringApi(ActorSystem system)
         {
             this.system = system;
-            this.systemTimeout = system.Settings.Config.GetTimeSpan("ClusterKit.AskTimeout", TimeSpan.FromSeconds(5));
+            this.systemTimeout = system.Settings.Config.GetTimeSpan("KlusterKite.AskTimeout", TimeSpan.FromSeconds(5));
         }
 
         /// <summary>

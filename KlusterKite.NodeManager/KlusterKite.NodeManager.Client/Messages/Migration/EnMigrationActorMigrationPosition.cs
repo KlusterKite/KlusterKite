@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnMigrationActorMigrationPosition.cs" company="ClusterKit">
+// <copyright file="EnMigrationActorMigrationPosition.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages.Migration
+namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// The list of possible resource migration position according to cluster migration

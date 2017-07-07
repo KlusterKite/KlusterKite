@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiProvider.cs" company="ClusterKit">
+// <copyright file="ApiProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,21 +7,21 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace KlusterKite.NodeManager
 {
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.WebApi;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.WebApi;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
     /// <summary>
     /// The node manager API provider
     /// </summary>
-    [ApiDescription("The root provider", Name = "ClusterKitNodeApi")]
+    [ApiDescription("The root provider", Name = "KlusterKiteNodeApi")]
     public class ApiProvider : API.Provider.ApiProvider
     {
         /// <summary>
@@ -39,15 +39,15 @@ namespace ClusterKit.NodeManager
         public ApiProvider(ActorSystem actorSystem, IPackageRepository packageRepository)
         {
             this.actorSystem = actorSystem;
-            this.ClusterKitNodesApi = new NodeManagerApi(actorSystem, packageRepository);
+            this.KlusterKiteNodesApi = new NodeManagerApi(actorSystem, packageRepository);
         }
 
         /// <summary>
         /// Gets the main node manager api
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("The ClusterKit node managing API")]
-        public NodeManagerApi ClusterKitNodesApi { get; }
+        [DeclareField("The KlusterKite node managing API")]
+        public NodeManagerApi KlusterKiteNodesApi { get; }
 
         /// <summary>
         /// Gets the current user data API

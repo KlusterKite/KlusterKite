@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AkkaUtils.cs" company="ClusterKit">
+// <copyright file="AkkaUtils.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Utils
+namespace KlusterKite.Core.Utils
 {
     using System;
     using System.Linq;

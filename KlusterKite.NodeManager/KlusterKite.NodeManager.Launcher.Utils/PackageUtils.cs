@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PackageUtils.cs" company="ClusterKit">
+// <copyright file="PackageUtils.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Utils
+namespace KlusterKite.NodeManager.Launcher.Utils
 {
     using System;
     using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
             // the additional documentation: https://docs.microsoft.com/en-us/dotnet/core/rid-catalog
             runtimeGraph = JsonRuntimeFormat.ReadRuntimeGraph(
                 typeof(PackageUtils).GetTypeInfo().Assembly
-                    .GetManifestResourceStream("ClusterKit.NodeManager.Launcher.Utils.Resources.runtimes.json"));
+                    .GetManifestResourceStream("KlusterKite.NodeManager.Launcher.Utils.Resources.runtimes.json"));
         }
 
         /// <summary>

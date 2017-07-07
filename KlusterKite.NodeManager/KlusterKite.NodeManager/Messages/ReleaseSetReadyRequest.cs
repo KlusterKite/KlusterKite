@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseSetReadyRequest.cs" company="ClusterKit">
+// <copyright file="ReleaseSetReadyRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages
+namespace KlusterKite.NodeManager.Messages
 {
     using Akka.Actor;
     using Akka.Routing;
 
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnReleaseState.Draft"/> to <see cref="EnReleaseState.Ready"/>

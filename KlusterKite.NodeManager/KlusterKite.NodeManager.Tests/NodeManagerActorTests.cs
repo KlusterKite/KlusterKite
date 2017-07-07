@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeManagerActorTests.cs" company="ClusterKit">
+// <copyright file="NodeManagerActorTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests
+namespace KlusterKite.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -26,33 +26,33 @@ namespace ClusterKit.NodeManager.Tests
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.Ping;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Data;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.EF;
-    using ClusterKit.Data.EF.InMemory;
-    using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.Client.Messages.Migration;
-    using ClusterKit.NodeManager.Client.MigrationStates;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Messages;
+    using KlusterKite.Core;
+    using KlusterKite.Core.Ping;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Data;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.EF;
+    using KlusterKite.Data.EF.InMemory;
+    using KlusterKite.NodeManager.Client.Messages;
+    using KlusterKite.NodeManager.Client.Messages.Migration;
+    using KlusterKite.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Messages;
 
     using JetBrains.Annotations;
 
     using Xunit;
     using Xunit.Abstractions;
 
-    using Installer = ClusterKit.Core.TestKit.Installer;
+    using Installer = KlusterKite.Core.TestKit.Installer;
 
     /// <summary>
     ///     Testing node manager actor
     /// </summary>
-    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
+    [Collection("KlusterKite.NodeManager.Tests.ConfigurationContext")]
     public class NodeManagerActorTests : BaseActorTest<NodeManagerActorTests.Configurator>
     {
         /// <summary>
@@ -93,7 +93,7 @@ namespace ClusterKit.NodeManager.Tests
             // ReSharper disable once StringLiteralTypo
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
 
-            var nodeAddress = new UniqueAddress(new Address("akka.tcp", "ClusterKit", "testNode1", 1), 1);
+            var nodeAddress = new UniqueAddress(new Address("akka.tcp", "KlusterKite", "testNode1", 1), 1);
 
             this.SetAutoPilot(
                 new DelegateAutoPilot(
@@ -2423,10 +2423,10 @@ namespace ClusterKit.NodeManager.Tests
                 return ConfigurationFactory.ParseString(
                     $@"
             {{
-                ClusterKit.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
-                ClusterKit.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
-                ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = """"
-                ClusterKit.NodeManager.MigrationActorSubstitute = ""/user/migrationActor""
+                KlusterKite.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
+                KlusterKite.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
+                KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = """"
+                KlusterKite.NodeManager.MigrationActorSubstitute = ""/user/migrationActor""
 
                 akka : {{
                   actor: {{
@@ -2691,7 +2691,7 @@ namespace ClusterKit.NodeManager.Tests
                 this.nodeManager = nodeManager;
                 this.Number = num;
                 this.NodeId = Guid.NewGuid();
-                this.Address = new UniqueAddress(new Address("akka.tcp", "ClusterKit", $"testNode{num}", num), num);
+                this.Address = new UniqueAddress(new Address("akka.tcp", "KlusterKite", $"testNode{num}", num), num);
                 this.Description = new NodeDescription
                                        {
                                            ContainerType = "test",

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiDiscoverRequest.cs" company="ClusterKit">
+// <copyright file="ApiDiscoverRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client.Messages
+namespace KlusterKite.API.Client.Messages
 {
     /// <summary>
     /// Request message to discover api providers

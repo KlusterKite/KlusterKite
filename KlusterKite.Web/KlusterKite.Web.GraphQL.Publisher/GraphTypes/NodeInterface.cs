@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeInterface.cs" company="ClusterKit">
+// <copyright file="NodeInterface.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
+namespace KlusterKite.Web.GraphQL.Publisher.GraphTypes
 {
     using global::GraphQL.Types;
 

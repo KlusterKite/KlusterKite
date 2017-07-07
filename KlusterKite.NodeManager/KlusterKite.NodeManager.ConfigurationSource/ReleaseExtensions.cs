@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseExtensions.cs" company="ClusterKit">
+// <copyright file="ReleaseExtensions.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace KlusterKite.NodeManager.ConfigurationSource
 {
     using System;
     using System.Collections.Generic;
@@ -16,10 +16,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using Akka.Configuration;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.API.Client;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
@@ -408,9 +408,9 @@ namespace ClusterKit.NodeManager.ConfigurationSource
                 if (template is MigratorTemplate)
                 {
                     // Every MigratorTemplate should contain this package for execution
-                    if (template.PackageRequirements.All(p => p.Id != "ClusterKit.NodeManager.Migrator.Executor"))
+                    if (template.PackageRequirements.All(p => p.Id != "KlusterKite.NodeManager.Migrator.Executor"))
                     {
-                        template.PackageRequirements.Add(new NodeTemplate.PackageRequirement("ClusterKit.NodeManager.Migrator.Executor", null));
+                        template.PackageRequirements.Add(new NodeTemplate.PackageRequirement("KlusterKite.NodeManager.Migrator.Executor", null));
                     }
                 }
 

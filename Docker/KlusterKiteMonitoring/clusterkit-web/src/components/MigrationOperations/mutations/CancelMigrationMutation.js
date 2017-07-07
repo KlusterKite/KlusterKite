@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class CancelMigrationMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCancel}`
   }
 
   getFatQuery () {

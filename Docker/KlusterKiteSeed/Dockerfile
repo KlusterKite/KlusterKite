@@ -1,8 +1,8 @@
-FROM clusterkit/baseworker:latest
+FROM klusterkite/baseworker:latest
 MAINTAINER Mikhail Kantarovskiy <kantoramob@gmail.com>
 EXPOSE 3090
-WORKDIR /opt/clusterkit/
-COPY build/ /opt/clusterkit/
-COPY akka.hocon /opt/clusterkit/
-CMD dotnet ClusterKit.Core.Service.dll
+WORKDIR /opt/klusterkite/
+COPY build/ /opt/klusterkite/
+COPY akka.hocon /opt/klusterkite/
+CMD dotnet KlusterKite.Core.Service.dll
 

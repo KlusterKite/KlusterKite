@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MonitoringApiProvider.cs" company="ClusterKit">
+// <copyright file="MonitoringApiProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring
+namespace KlusterKite.Monitoring
 {
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Provider;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Provider;
 
     using JetBrains.Annotations;
 
@@ -20,7 +20,7 @@ namespace ClusterKit.Monitoring
     /// Provides API access to the monitoring functions
     /// </summary>
     [UsedImplicitly]
-    [ApiDescription("ClusterKit node monitoring", Name = "ClusterKitMonitoring")]
+    [ApiDescription("KlusterKite node monitoring", Name = "KlusterKiteMonitoring")]
     public class MonitoringApiProvider : ApiProvider
     {
         /// <summary>
@@ -31,14 +31,14 @@ namespace ClusterKit.Monitoring
         /// </param>
         public MonitoringApiProvider(ActorSystem system)
         {
-            this.ClusterKitMonitoringApi = new MonitoringApi(system);
+            this.KlusterKiteMonitoringApi = new MonitoringApi(system);
         }
 
         /// <summary>
         /// Gets an access to the monitoring api
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("ClusterKit node monitoring")]
-        public MonitoringApi ClusterKitMonitoringApi { get; }
+        [DeclareField("KlusterKite node monitoring")]
+        public MonitoringApi KlusterKiteMonitoringApi { get; }
     }
 }

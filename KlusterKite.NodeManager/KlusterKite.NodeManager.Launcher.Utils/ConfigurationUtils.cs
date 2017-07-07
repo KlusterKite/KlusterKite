@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationUtils.cs" company="ClusterKit">
+// <copyright file="ConfigurationUtils.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Utils
+namespace KlusterKite.NodeManager.Launcher.Utils
 {
     using System.Collections.Generic;
     using System.IO;
@@ -117,7 +117,7 @@ namespace ClusterKit.NodeManager.Launcher.Utils
             // creating runtime config
             File.WriteAllText(
                 Path.Combine(serviceFolder, $"{executionFileName}.runtimeconfig.json"),
-                ReadTextResource(typeof(ConfigurationUtils).GetTypeInfo().Assembly, "ClusterKit.NodeManager.Launcher.Utils.Resources.runtimeconfig.json"));
+                ReadTextResource(typeof(ConfigurationUtils).GetTypeInfo().Assembly, "KlusterKite.NodeManager.Launcher.Utils.Resources.runtimeconfig.json"));
 
             // creating deps.json
             var writer = new DependencyContextWriter();

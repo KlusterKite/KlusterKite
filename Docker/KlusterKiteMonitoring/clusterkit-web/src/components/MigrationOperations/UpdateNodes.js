@@ -48,7 +48,7 @@ export class UpdateNodes extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            const responsePayload = response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationNodesUpdate;
+            const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationNodesUpdate;
 
             if (responsePayload.errors &&
               responsePayload.errors.edges) {

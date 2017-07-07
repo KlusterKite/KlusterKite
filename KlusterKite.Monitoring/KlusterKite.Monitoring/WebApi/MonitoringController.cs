@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MonitoringController.cs" company="ClusterKit">
+// <copyright file="MonitoringController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,24 +7,24 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.WebApi
+namespace KlusterKite.Monitoring.WebApi
 {
     using System;
     using System.Threading.Tasks;
 
     using Akka.Actor;
 
-    using ClusterKit.LargeObjects.Client;
-    using ClusterKit.Monitoring.Client;
-    using ClusterKit.Monitoring.Messages;
-    using ClusterKit.Web.Authorization.Attributes;
+    using KlusterKite.LargeObjects.Client;
+    using KlusterKite.Monitoring.Client;
+    using KlusterKite.Monitoring.Messages;
+    using KlusterKite.Web.Authorization.Attributes;
 
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// Manages web requests to describe current cluster health state
     /// </summary>
-    [Route("api/1.x/clusterkit/monitoring")]
+    [Route("api/1.x/klusterkite/monitoring")]
     [RequireUser]
     public class MonitoringController : Controller
     {
@@ -47,7 +47,7 @@ namespace ClusterKit.Monitoring.WebApi
         public MonitoringController(ActorSystem system)
         {
             this.system = system;
-            this.systemTimeout = system.Settings.Config.GetTimeSpan("ClusterKit.AskTimeout", TimeSpan.FromSeconds(5));
+            this.systemTimeout = system.Settings.Config.GetTimeSpan("KlusterKite.AskTimeout", TimeSpan.FromSeconds(5));
         }
 
         /// <summary>

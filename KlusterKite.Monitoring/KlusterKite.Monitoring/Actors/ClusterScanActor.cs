@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClusterScanActor.cs" company="ClusterKit">
+// <copyright file="ClusterScanActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Actors
+namespace KlusterKite.Monitoring.Actors
 {
     using System;
     using System.Collections.Generic;
@@ -16,10 +16,10 @@ namespace ClusterKit.Monitoring.Actors
     using Akka.Actor;
     using Akka.Cluster;
 
-    using ClusterKit.LargeObjects;
-    using ClusterKit.LargeObjects.Client;
-    using ClusterKit.Monitoring.Client.Messages;
-    using ClusterKit.Monitoring.Messages;
+    using KlusterKite.LargeObjects;
+    using KlusterKite.LargeObjects.Client;
+    using KlusterKite.Monitoring.Client.Messages;
+    using KlusterKite.Monitoring.Messages;
 
     using JetBrains.Annotations;
 

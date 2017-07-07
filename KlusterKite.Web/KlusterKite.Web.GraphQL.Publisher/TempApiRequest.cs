@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TempApiRequest.cs" company="ClusterKit">
+// <copyright file="TempApiRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System.Collections.Generic;
 

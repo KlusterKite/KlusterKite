@@ -50,7 +50,7 @@ export default Relay.createContainer(
   MigrationLogs,
   {
     fragments: {
-      currentMigration: () => Relay.QL`fragment on IClusterKitNodeApi_Migration {
+      currentMigration: () => Relay.QL`fragment on IKlusterKiteNodeApi_Migration {
         logs {
           edges {
             node {

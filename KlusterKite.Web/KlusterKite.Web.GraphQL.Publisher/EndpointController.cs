@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EndpointController.cs" company="ClusterKit">
+// <copyright file="EndpointController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System;
     using System.Linq;
@@ -15,8 +15,8 @@ namespace ClusterKit.Web.GraphQL.Publisher
     using System.Text;
     using System.Threading.Tasks;
 
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.Authorization;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.Authorization;
 
     using global::GraphQL;
     using global::GraphQL.Http;
@@ -74,11 +74,11 @@ namespace ClusterKit.Web.GraphQL.Publisher
                                                {
                                                    MaxDepth =
                                                        config.GetInt(
-                                                           "ClusterKit.Web.GraphQL.MaxDepth"),
+                                                           "KlusterKite.Web.GraphQL.MaxDepth"),
                                                    FieldImpact = 2.0,
                                                    MaxComplexity =
                                                        config.GetInt(
-                                                           "ClusterKit.Web.GraphQL.MaxComplexity")
+                                                           "KlusterKite.Web.GraphQL.MaxComplexity")
                                                };
                                                */
         }

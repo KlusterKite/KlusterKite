@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationActorReleaseState.cs" company="ClusterKit">
+// <copyright file="MigrationActorReleaseState.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages.Migration
+namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
     using System.Collections.Generic;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Client.MigrationStates;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Client.MigrationStates;
 
     /// <summary>
     /// The MigrationActor state with no active migration

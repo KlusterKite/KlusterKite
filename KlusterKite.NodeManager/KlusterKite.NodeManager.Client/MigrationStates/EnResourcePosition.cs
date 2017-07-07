@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnResourcePosition.cs" company="ClusterKit">
+// <copyright file="EnResourcePosition.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.MigrationStates
+namespace KlusterKite.NodeManager.Client.MigrationStates
 {
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
     
     /// <summary>
     /// The possible resource migration position according to current migration

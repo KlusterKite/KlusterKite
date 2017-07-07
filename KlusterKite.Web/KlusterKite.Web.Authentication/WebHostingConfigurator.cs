@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebHostingConfigurator.cs" company="ClusterKit">
+// <copyright file="WebHostingConfigurator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authentication
+namespace KlusterKite.Web.Authentication
 {
     using Akka.Configuration;
 

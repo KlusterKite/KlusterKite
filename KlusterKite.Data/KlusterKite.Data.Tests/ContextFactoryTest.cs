@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ContextFactoryTest.cs" company="ClusterKit">
+// <copyright file="ContextFactoryTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.Tests
+namespace KlusterKite.Data.Tests
 {
-    using ClusterKit.Data.EF;
-    using ClusterKit.Data.EF.InMemory;
-    using ClusterKit.Data.Tests.Mock;
+    using KlusterKite.Data.EF;
+    using KlusterKite.Data.EF.InMemory;
+    using KlusterKite.Data.Tests.Mock;
     using Xunit;
 
     /// <summary>

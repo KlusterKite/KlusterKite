@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IPackageRepository.cs" company="ClusterKit">
+// <copyright file="IPackageRepository.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Utils
+namespace KlusterKite.NodeManager.Launcher.Utils
 {
     using System;
     using System.Collections.Generic;

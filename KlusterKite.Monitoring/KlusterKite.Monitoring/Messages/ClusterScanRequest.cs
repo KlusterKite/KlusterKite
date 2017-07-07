@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClusterScanRequest.cs" company="ClusterKit">
+// <copyright file="ClusterScanRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Messages
+namespace KlusterKite.Monitoring.Messages
 {
     /// <summary>
     /// Request to scan whole cluster in order to build global actor tree

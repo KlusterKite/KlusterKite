@@ -57,9 +57,9 @@ class UserPage extends React.Component {
     //   {
     //     onSuccess: (response) => {
     //       console.log('response', response);
-    //       if (response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors &&
-    //         response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors.edges) {
-    //         const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors.edges);
+    //       if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors &&
+    //         response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges) {
+    //         const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges);
     //
     //         this.setState({
     //           saving: false,
@@ -71,7 +71,7 @@ class UserPage extends React.Component {
     //           saving: false,
     //           saveErrors: null
     //         });
-    //         browserHistory.push(`/clusterkit/Release/${response.clusterKitNodeApi_clusterKitNodesApi_releases_create.node.id}`);
+    //         browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.node.id}`);
     //       }
     //     },
     //     onFailure: (transaction) => console.log(transaction),
@@ -96,9 +96,9 @@ class UserPage extends React.Component {
       {
         onSuccess: (response) => {
           console.log('response', response);
-          if (response.clusterKitNodeApi_clusterKitNodesApi_users_update.errors &&
-            response.clusterKitNodeApi_clusterKitNodesApi_users_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_users_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_users_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_users_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_users_update.errors.edges);
 
             this.setState({
               saving: false,
@@ -109,7 +109,7 @@ class UserPage extends React.Component {
               saving: false,
               saveErrors: null
             });
-            browserHistory.push(`/clusterkit/Users/`);
+            browserHistory.push(`/klusterkite/Users/`);
           }
         },
         onFailure: (transaction) => {
@@ -131,7 +131,7 @@ class UserPage extends React.Component {
     // Relay.Store.commitUpdate(
     //   new DeleteFeedMutation({deletedId: this.props.api.__node.__id}),
     //   {
-    //     onSuccess: () => this.context.router.replace('/clusterkit/NugetFeeds'),
+    //     onSuccess: () => this.context.router.replace('/klusterkite/NugetFeeds'),
     //     onFailure: (transaction) => console.log(transaction),
     //   },
     // )
@@ -139,8 +139,8 @@ class UserPage extends React.Component {
 
   render () {
     const model = this.props.api.user;
-    const canEdit = hasPrivilege('ClusterKit.NodeManager.User.Update');
-    const roles = this.props.api.clusterKitNodesApi.roles && this.props.api.clusterKitNodesApi.roles.edges.map(x => x.node.name);
+    const canEdit = hasPrivilege('KlusterKite.NodeManager.User.Update');
+    const roles = this.props.api.klusterKiteNodesApi.roles && this.props.api.klusterKiteNodesApi.roles.edges.map(x => x.node.name);
 
     return (
       <div>
@@ -170,10 +170,10 @@ export default Relay.createContainer(
     }),
     fragments: {
       api: () => Relay.QL`
-        fragment on IClusterKitNodeApi {
+        fragment on IKlusterKiteNodeApi {
           id
           user: __node(id: $id) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_User {
+            ...on IKlusterKiteNodeApi_User {
               id
               uid
               login
@@ -186,7 +186,7 @@ export default Relay.createContainer(
               }
             }
           }
-          clusterKitNodesApi {
+          klusterKiteNodesApi {
             roles {
               edges {
                 node {

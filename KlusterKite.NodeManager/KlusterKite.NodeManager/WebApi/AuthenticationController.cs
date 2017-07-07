@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthenticationController.cs" company="ClusterKit">
+// <copyright file="AuthenticationController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,21 +7,21 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System.Collections.Generic;
     
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.Authorization;
-    using ClusterKit.Web.Authorization.Attributes;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.Authorization;
+    using KlusterKite.Web.Authorization.Attributes;
 
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// Authenticate web api users
     /// </summary>
-    [Route("api/1.x/clusterkit/nodemanager/authentication")]
+    [Route("api/1.x/klusterkite/nodemanager/authentication")]
     [RequireUser]
     public class AuthenticationController : Controller
     {

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SecurityLog.cs" company="ClusterKit">
+// <copyright file="SecurityLog.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.Client
+namespace KlusterKite.Security.Client
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.Core.Log;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Core.Log;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json;
 

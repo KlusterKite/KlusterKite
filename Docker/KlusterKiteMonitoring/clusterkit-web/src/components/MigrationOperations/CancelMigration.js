@@ -39,7 +39,7 @@ export class FinishMigration extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            const responsePayload = response.clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel;
+            const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCancel;
 
             if (responsePayload.errors &&
               responsePayload.errors.edges) {

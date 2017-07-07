@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMessageWithExtraData.cs" company="ClusterKit">
+// <copyright file="IMessageWithExtraData.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD
+namespace KlusterKite.Data.CRUD
 {
     using JetBrains.Annotations;
 

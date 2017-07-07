@@ -1,12 +1,12 @@
 #r ".fake/build.fsx/packages/netcorebuild/Fake.Core.Environment/lib/netstandard1.6/Fake.Core.Environment.dll"
-namespace ClusterKit.Build
+namespace KlusterKite.Build
 
 open System.IO
 open Fake.Core.Environment
 
 module Config =
 
-    let testPackageName = "ClusterKit.Core"
+    let testPackageName = "KlusterKite.Core"
     let buildDir = Path.GetFullPath("./build")
     let mutable packageDir = Path.GetFullPath("./packageOut")
     let packagePushDir = Path.GetFullPath("./packagePush")

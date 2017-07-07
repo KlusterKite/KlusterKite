@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebDescriptionResponse.cs" company="ClusterKit">
+// <copyright file="WebDescriptionResponse.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Client.Messages
+namespace KlusterKite.Web.Client.Messages
 {
     using System.Collections.Generic;
 

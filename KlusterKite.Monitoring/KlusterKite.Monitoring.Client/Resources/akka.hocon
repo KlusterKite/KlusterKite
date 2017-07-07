@@ -1,5 +1,5 @@
 {
-    ClusterKit.Monitoring.ScanMemoize = 10s
+    KlusterKite.Monitoring.ScanMemoize = 10s
 	akka.actor.deployment {
 
 		/Monitoring {
@@ -7,7 +7,7 @@
 		}
 
 		/Monitoring/Scanner {
-            type = "ClusterKit.Monitoring.Client.ScanActor, ClusterKit.Monitoring.Client"
+            type = "KlusterKite.Monitoring.Client.ScanActor, KlusterKite.Monitoring.Client"
         }
 	}
 }

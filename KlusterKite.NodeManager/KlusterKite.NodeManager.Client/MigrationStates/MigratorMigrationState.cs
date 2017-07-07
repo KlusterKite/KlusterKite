@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigratorMigrationState.cs" company="ClusterKit">
+// <copyright file="MigratorMigrationState.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.MigrationStates
+namespace KlusterKite.NodeManager.Client.MigrationStates
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Migrator;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Migrator;
 
     /// <summary>
     /// The migrator state according to the migration

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Startup.cs" company="ClusterKit">
+// <copyright file="Startup.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web
+namespace KlusterKite.Web
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace ClusterKit.Web
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 
     using JetBrains.Annotations;
 
@@ -107,7 +107,7 @@ namespace ClusterKit.Web
         {
             try
             {
-                if (Config.GetBoolean("ClusterKit.Web.Debug.Trace"))
+                if (Config.GetBoolean("KlusterKite.Web.Debug.Trace"))
                 {
                     loggerFactory.AddSerilog();
                 }
@@ -176,7 +176,7 @@ namespace ClusterKit.Web
         /// <returns>The list of configurators</returns>
         private IEnumerable<IWebHostingConfigurator> GetConfigurators(Config config)
         {
-            var configSection = config.GetConfig("ClusterKit.Web.Configurators");
+            var configSection = config.GetConfig("KlusterKite.Web.Configurators");
             if (configSection == null)
             {
                 yield break;

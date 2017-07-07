@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiPublisherActor.cs" company="ClusterKit">
+// <copyright file="ApiPublisherActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Endpoint
+namespace KlusterKite.API.Endpoint
 {
     using System;
     using System.Collections.Generic;
@@ -16,8 +16,8 @@ namespace ClusterKit.API.Endpoint
 
     using Autofac;
 
-    using ClusterKit.API.Client.Messages;
-    using ClusterKit.API.Provider;
+    using KlusterKite.API.Client.Messages;
+    using KlusterKite.API.Provider;
 
     using JetBrains.Annotations;
 

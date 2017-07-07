@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiTests.cs" company="ClusterKit">
+// <copyright file="ApiTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Tests
+namespace KlusterKite.Monitoring.Tests
 {
     using System.Collections.Generic;
 
     using Akka.Actor;
 
-    using ClusterKit.Web.GraphQL.Publisher;
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using GraphQL.Utilities;
 

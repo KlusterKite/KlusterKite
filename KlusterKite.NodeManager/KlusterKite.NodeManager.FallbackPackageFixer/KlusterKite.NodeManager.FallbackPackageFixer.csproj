@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.NodeManager.FallbackPackageFixer</PackageId>
+    <PackageId>KlusterKite.NodeManager.FallbackPackageFixer</PackageId>
     <Version>0.0.0.0-local</Version>
     <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
@@ -20,7 +20,7 @@
     <PackageReference Include="NuGet.Versioning" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj" Pack="true" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Launcher.Messages\KlusterKite.NodeManager.Launcher.Messages.csproj" Pack="true" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />

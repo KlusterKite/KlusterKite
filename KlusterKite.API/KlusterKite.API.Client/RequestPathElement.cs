@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequestPathElement.cs" company="ClusterKit">
+// <copyright file="RequestPathElement.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client
+namespace KlusterKite.API.Client
 {
     using JetBrains.Annotations;
 

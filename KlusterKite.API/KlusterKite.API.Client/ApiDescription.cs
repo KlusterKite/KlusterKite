@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiDescription.cs" company="ClusterKit">
+// <copyright file="ApiDescription.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client
+namespace KlusterKite.API.Client
 {
     using System;
     using System.Collections.Generic;

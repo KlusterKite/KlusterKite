@@ -1,8 +1,8 @@
 {
-	ClusterKit.Web.Authentication.AuthorizeEndpointPath = "/api/1.x/security/authorization"
-	ClusterKit.Web.AuthenticationTokenEndpointPath = "/api/1.x/security/token"
+	KlusterKite.Web.Authentication.AuthorizeEndpointPath = "/api/1.x/security/authorization"
+	KlusterKite.Web.AuthenticationTokenEndpointPath = "/api/1.x/security/token"
 
-	ClusterKit.Web {
+	KlusterKite.Web {
 		Services {
 			Authentication { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
 				Port = 8080 // current node listening port for server access
@@ -13,7 +13,7 @@
 		}
 
 		Configurators {
- 				Cors = "ClusterKit.Web.Authentication.WebHostingConfigurator, ClusterKit.Web.Authentication"
+ 				Cors = "KlusterKite.Web.Authentication.WebHostingConfigurator, KlusterKite.Web.Authentication"
  		}
 	}
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NginxConfiguratorActor.cs" company="ClusterKit">
+// <copyright file="NginxConfiguratorActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.NginxConfigurator
+namespace KlusterKite.Web.NginxConfigurator
 {
     using System;
     using System.Collections.Generic;
@@ -21,8 +21,8 @@ namespace ClusterKit.Web.NginxConfigurator
     using Akka.Configuration;
     using Akka.Event;
 
-    using ClusterKit.Web.Client;
-    using ClusterKit.Web.Client.Messages;
+    using KlusterKite.Web.Client;
+    using KlusterKite.Web.Client.Messages;
 
     using JetBrains.Annotations;
 
@@ -47,8 +47,8 @@ namespace ClusterKit.Web.NginxConfigurator
         /// </summary>
         public NginxConfiguratorActor()
         {
-            this.configPath = Context.System.Settings.Config.GetString("ClusterKit.Web.Nginx.PathToConfig");
-            this.reloadCommand = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.ReloadCommand");
+            this.configPath = Context.System.Settings.Config.GetString("KlusterKite.Web.Nginx.PathToConfig");
+            this.reloadCommand = Context.System.Settings.Config.GetConfig("KlusterKite.Web.Nginx.ReloadCommand");
             this.InitFromConfiguration();
 
             Cluster.Get(Context.System)
@@ -101,7 +101,7 @@ namespace ClusterKit.Web.NginxConfigurator
                 throw new ArgumentNullException(nameof(serviceName));
             }
 
-            return $"ClusterKitWeb_{hostName.Replace('.', '_')}_{serviceName.Replace('/', '_').Replace('.', '_')}";
+            return $"KlusterKiteWeb_{hostName.Replace('.', '_')}_{serviceName.Replace('/', '_').Replace('.', '_')}";
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace ClusterKit.Web.NginxConfigurator
         /// </summary>
         private void InitFromConfiguration()
         {
-            var config = Context.System.Settings.Config.GetConfig("ClusterKit.Web.Nginx.Configuration");
+            var config = Context.System.Settings.Config.GetConfig("KlusterKite.Web.Nginx.Configuration");
             if (config == null)
             {
                 return;

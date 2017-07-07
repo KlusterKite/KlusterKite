@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="mAYBEtESTS.cs" company="ClusterKit">
+// <copyright file="mAYBEtESTS.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Tests.Monads
+namespace KlusterKite.Core.Tests.Monads
 {
     using System.Diagnostics.CodeAnalysis;
 
-    using ClusterKit.Core.Monads;
+    using KlusterKite.Core.Monads;
 
     using Xunit;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigratorTemplateReleaseState.cs" company="ClusterKit">
+// <copyright file="MigratorTemplateReleaseState.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.MigrationStates
+namespace KlusterKite.NodeManager.Client.MigrationStates
 {
     using System.Collections.Generic;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Client.ORM;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Client.ORM;
 
     /// <summary>
     /// The state of resources of the migrator template

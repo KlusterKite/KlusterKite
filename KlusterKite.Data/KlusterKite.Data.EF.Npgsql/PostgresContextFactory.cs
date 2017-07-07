@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PostgresContextFactory.cs" company="ClusterKit">
+// <copyright file="PostgresContextFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.EF.Npgsql
+namespace KlusterKite.Data.EF.Npgsql
 {
     using Microsoft.EntityFrameworkCore;
     using global::Npgsql;

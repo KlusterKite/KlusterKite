@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthenticationResult.cs" company="ClusterKit">
+// <copyright file="AuthenticationResult.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.Attributes
+namespace KlusterKite.Security.Attributes
 {
     using JetBrains.Annotations;
 

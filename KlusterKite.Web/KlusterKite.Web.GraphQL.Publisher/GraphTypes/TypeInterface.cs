@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TypeInterface.cs" company="ClusterKit">
+// <copyright file="TypeInterface.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
+namespace KlusterKite.Web.GraphQL.Publisher.GraphTypes
 {
     /// <summary>
     /// The interface representing strict type from api

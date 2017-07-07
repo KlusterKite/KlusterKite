@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CurrentUserApi.cs" company="ClusterKit">
+// <copyright file="CurrentUserApi.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -15,13 +15,13 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
-    using ClusterKit.Core;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.Authorization.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Messages;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.Authorization.Attributes;
 
     using JetBrains.Annotations;
 
@@ -61,21 +61,21 @@ namespace ClusterKit.NodeManager.WebApi
         /// </summary>
         [UsedImplicitly]
         [DeclareField("Authenticated user")]
-        public UserDescription ClusterKitUser => this.context?.Authentication?.User as UserDescription;
+        public UserDescription KlusterKiteUser => this.context?.Authentication?.User as UserDescription;
 
         /// <summary>
         /// Gets the current user privileges
         /// </summary>
         [UsedImplicitly]
         [DeclareField("The current user privileges")]
-        public List<string> ClusterKitUserPrivileges => this.context?.Authentication?.UserScope.ToList();
+        public List<string> KlusterKiteUserPrivileges => this.context?.Authentication?.UserScope.ToList();
 
         /// <summary>
         /// Gets the current user privileges
         /// </summary>
         [UsedImplicitly]
         [DeclareField("The current application privileges")]
-        public List<string> ClusterKitClientPrivileges => this.context?.Authentication?.ClientScope.ToList();
+        public List<string> KlusterKiteClientPrivileges => this.context?.Authentication?.ClientScope.ToList();
 
         /// <summary>
         /// Changes the current user password

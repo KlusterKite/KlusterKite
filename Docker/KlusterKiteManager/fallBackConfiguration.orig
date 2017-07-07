@@ -1,58 +1,58 @@
 {
-  "Configuration": "{\n   ClusterKit {\n    NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n    NodeManager.ConfigurationDatabaseName = \"ClusterKit.NodeManagerConfiguration\"\n    NodeManager.ConfigurationDatabaseProviderName = \"Npgsql\"\n    NodeManager.PackageRepository = \"http://nuget/\"\n	NodeManager.DefaultNugetFeeds {\n      privateFeed {\n              address = \"http://nuget/\"\n              type = private\n      }          \n    }  \n  }\n}",
+  "Configuration": "{\n   KlusterKite {\n    NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n    NodeManager.ConfigurationDatabaseName = \"KlusterKite.NodeManagerConfiguration\"\n    NodeManager.ConfigurationDatabaseProviderName = \"Npgsql\"\n    NodeManager.PackageRepository = \"http://nuget/\"\n	NodeManager.DefaultNugetFeeds {\n      privateFeed {\n              address = \"http://nuget/\"\n              type = private\n      }          \n    }  \n  }\n}",
   "NodeTemplate": "clusterManager",
   "ReleaseId": 1,
   "Packages": [
     {
-      "Id": "ClusterKit.Core.Service",
+      "Id": "KlusterKite.Core.Service",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Client",
+      "Id": "KlusterKite.NodeManager.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Monitoring.Client",
+      "Id": "KlusterKite.Monitoring.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Monitoring",
+      "Id": "KlusterKite.Monitoring",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager",
+      "Id": "KlusterKite.NodeManager",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Data.EF.Npgsql",
+      "Id": "KlusterKite.Data.EF.Npgsql",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Log.Console",
+      "Id": "KlusterKite.Log.Console",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Log.ElasticSearch",
+      "Id": "KlusterKite.Log.ElasticSearch",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.Authentication",
+      "Id": "KlusterKite.Web.Authentication",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Authentication",
+      "Id": "KlusterKite.NodeManager.Authentication",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Security.SessionRedis",
+      "Id": "KlusterKite.Security.SessionRedis",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.API.Endpoint",
+      "Id": "KlusterKite.API.Endpoint",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.GraphQL.Publisher",
+      "Id": "KlusterKite.Web.GraphQL.Publisher",
       "Version": "0.0.0-local"
     },
 
@@ -61,6 +61,6 @@
 
   "PackageSource": "http://nuget/",
   "Seeds": [
-    "akka.tcp://ClusterKit@seed:3090"
+    "akka.tcp://KlusterKite@seed:3090"
   ]
 }

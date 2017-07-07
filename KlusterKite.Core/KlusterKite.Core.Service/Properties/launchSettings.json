@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "ClusterKit.Core.Service": {
+    "KlusterKite.Core.Service": {
       "commandName": "Project"
     }
   }

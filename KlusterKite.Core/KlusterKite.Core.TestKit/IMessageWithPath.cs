@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMessageWithPath.cs" company="ClusterKit">
+// <copyright file="IMessageWithPath.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.TestKit
+namespace KlusterKite.Core.TestKit
 {
     /// <summary>
     /// Message with receiver address description

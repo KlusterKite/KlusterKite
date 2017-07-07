@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ResourceUpgrade.cs" company="ClusterKit">
+// <copyright file="ResourceUpgrade.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages.Migration
+namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Client.MigrationStates;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Migrator;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Migrator;
 
     using JetBrains.Annotations;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeDescriptionRequest.cs" company="ClusterKit">
+// <copyright file="NodeDescriptionRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages
+namespace KlusterKite.NodeManager.Client.Messages
 {
     using JetBrains.Annotations;
 

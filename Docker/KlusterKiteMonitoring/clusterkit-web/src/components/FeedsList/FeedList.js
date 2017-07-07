@@ -24,7 +24,7 @@ class FeedList extends React.Component {
 
           <p>
             {this.props.canEdit &&
-              <Link to={`/clusterkit/NugetFeeds/${this.props.releaseId}`}>
+              <Link to={`/klusterkite/NugetFeeds/${this.props.releaseId}`}>
                 {this.props.configuration && this.props.configuration.nugetFeed}
               </Link>
             }
@@ -42,7 +42,7 @@ export default Relay.createContainer(
   FeedList,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IClusterKitNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
         nugetFeed
       }
       `,

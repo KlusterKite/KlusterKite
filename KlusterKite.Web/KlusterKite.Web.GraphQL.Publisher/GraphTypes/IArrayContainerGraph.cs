@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IArrayContainerGraph.cs" company="ClusterKit">
+// <copyright file="IArrayContainerGraph.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
+namespace KlusterKite.Web.GraphQL.Publisher.GraphTypes
 {
     /// <summary>
     /// Graph type flag to mark array containers

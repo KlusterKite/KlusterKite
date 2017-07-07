@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiProvider.cs" company="ClusterKit">
+// <copyright file="ApiProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json.Linq;
 

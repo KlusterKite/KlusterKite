@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="INotificationEnveloper.cs" company="ClusterKit">
+// <copyright file="INotificationEnveloper.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects
+namespace KlusterKite.LargeObjects
 {
-    using ClusterKit.LargeObjects.Client;
+    using KlusterKite.LargeObjects.Client;
 
     /// <summary>
     /// Factory class that envelopes <see cref="ParcelNotification"/> for proper delivery

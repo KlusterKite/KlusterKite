@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientProvider.cs" company="ClusterKit">
+// <copyright file="ClientProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Authentication
+namespace KlusterKite.NodeManager.Authentication
 {
     using System.Threading.Tasks;
 
     using Akka.Actor;
 
-    using ClusterKit.NodeManager.Authentication.Clients;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.NodeManager.Authentication.Clients;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
@@ -38,7 +38,7 @@ namespace ClusterKit.NodeManager.Authentication
         public ClientProvider(ActorSystem system)
         {
             this.system = system;
-            this.launcherSecret = system.Settings.Config.GetString("ClusterKit.NodeManager.Authentication.LauncherSecret");
+            this.launcherSecret = system.Settings.Config.GetString("KlusterKite.NodeManager.Authentication.LauncherSecret");
         }
 
         /// <inheritdoc />

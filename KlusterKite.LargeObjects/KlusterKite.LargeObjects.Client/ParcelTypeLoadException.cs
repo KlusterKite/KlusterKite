@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelTypeLoadException.cs" company="ClusterKit">
+// <copyright file="ParcelTypeLoadException.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects.Client
+namespace KlusterKite.LargeObjects.Client
 {
     /// <summary>
     /// Could not load type for parcel's payload

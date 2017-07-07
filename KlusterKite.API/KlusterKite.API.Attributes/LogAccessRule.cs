@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LogAccessRule.cs" company="ClusterKit">
+// <copyright file="LogAccessRule.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,10 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes
+namespace KlusterKite.API.Attributes
 {
-    using ClusterKit.API.Attributes.Authorization;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes.Authorization;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The action description to log a field / method access

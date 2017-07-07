@@ -25,13 +25,13 @@ const getFeedsListRelay = () => {
               "node": {
                 "address": "/opt/packageCache",
                 "type": "Private",
-                "id": "{\"p\":[{\"f\":\"nodeManagerData\",\"a\":{}},{\"f\":\"nugetFeeds\"}],\"api\":\"ClusterKitNodeApi\",\"id\":1}"
+                "id": "{\"p\":[{\"f\":\"nodeManagerData\",\"a\":{}},{\"f\":\"nugetFeeds\"}],\"api\":\"KlusterKiteNodeApi\",\"id\":1}"
               }, "cursor": null
             }, {
               "node": {
                 "address": "http://nuget/",
                 "type": "Private",
-                "id": "{\"p\":[{\"f\":\"nodeManagerData\",\"a\":{}},{\"f\":\"nugetFeeds\"}],\"api\":\"ClusterKitNodeApi\",\"id\":2}"
+                "id": "{\"p\":[{\"f\":\"nodeManagerData\",\"a\":{}},{\"f\":\"nugetFeeds\"}],\"api\":\"KlusterKiteNodeApi\",\"id\":2}"
               }, "cursor": null
             }]
           }

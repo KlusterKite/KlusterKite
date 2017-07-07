@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequestDeclined.cs" company="ClusterKit">
+// <copyright file="RequestDeclined.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages.Migration
+namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
     using System.Collections.Generic;
 
-    using ClusterKit.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Client.ORM;
 
     /// <summary>
     /// The response from the MigrationActor that request was declined

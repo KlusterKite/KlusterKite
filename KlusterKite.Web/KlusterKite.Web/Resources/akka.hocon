@@ -1,6 +1,6 @@
  {
-	ClusterKit.Core.RestTimeout = 10s
- 	ClusterKit {
+	KlusterKite.Core.RestTimeout = 10s
+ 	KlusterKite {
  		Web {
  			Debug.Trace = false #outputs to log every start and finish request events
  			BindAddress = "http://*:8080"
@@ -15,7 +15,7 @@
 
  			// add needed configurators. If you want to remove configurator from fallback config - just put empty string with same name
  			Configurators {
- 				WebTracer = "ClusterKit.Web.WebTracer, ClusterKit.Web"
+ 				WebTracer = "KlusterKite.Web.WebTracer, KlusterKite.Web"
  			}
  		}
  	}

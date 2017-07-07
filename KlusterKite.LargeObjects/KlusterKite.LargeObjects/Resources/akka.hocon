@@ -1,14 +1,14 @@
 ﻿{
-	ClusterKit.LargeObjects.TcpReadTimeout = 10s
+	KlusterKite.LargeObjects.TcpReadTimeout = 10s
 	
 	akka.actor.deployment {
 
-          /ClusterKit {
+          /KlusterKite {
             IsNameSpace = true
           }	
 
-          /ClusterKit/Parcels {
-            type = "ClusterKit.LargeObjects.ParcelManagerActor, ClusterKit.LargeObjects"
+          /KlusterKite/Parcels {
+            type = "KlusterKite.LargeObjects.ParcelManagerActor, KlusterKite.LargeObjects"
           }	
 	}
 }

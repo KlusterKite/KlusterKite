@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="XunitOutputWriter.cs" company="ClusterKit">
+// <copyright file="XunitOutputWriter.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.TestKit
+namespace KlusterKite.Core.TestKit
 {
     using System.IO;
     using System.Text;

@@ -56,9 +56,9 @@ class RolePage extends React.Component {
     //   {
     //     onSuccess: (response) => {
     //       console.log('response', response);
-    //       if (response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors &&
-    //         response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors.edges) {
-    //         const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_create.errors.edges);
+    //       if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors &&
+    //         response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges) {
+    //         const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges);
     //
     //         this.setState({
     //           saving: false,
@@ -70,7 +70,7 @@ class RolePage extends React.Component {
     //           saving: false,
     //           saveErrors: null
     //         });
-    //         browserHistory.push(`/clusterkit/Release/${response.clusterKitNodeApi_clusterKitNodesApi_releases_create.node.id}`);
+    //         browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.node.id}`);
     //       }
     //     },
     //     onFailure: (transaction) => console.log(transaction),
@@ -98,9 +98,9 @@ class RolePage extends React.Component {
       {
         onSuccess: (response) => {
           console.log('response', response);
-          if (response.ClusterKitNodeApi_clusterKitNodesApi_roles_update.errors &&
-            response.ClusterKitNodeApi_clusterKitNodesApi_roles_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.ClusterKitNodeApi_clusterKitNodesApi_roles_update.errors.edges);
+          if (response.KlusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors &&
+            response.KlusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.KlusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors.edges);
 
             this.setState({
               saving: false,
@@ -111,7 +111,7 @@ class RolePage extends React.Component {
               saving: false,
               saveErrors: null
             });
-            browserHistory.push(`/clusterkit/Users/`);
+            browserHistory.push(`/klusterkite/Users/`);
           }
         },
         onFailure: (transaction) => {
@@ -133,7 +133,7 @@ class RolePage extends React.Component {
     // Relay.Store.commitUpdate(
     //   new DeleteFeedMutation({deletedId: this.props.api.__node.__id}),
     //   {
-    //     onSuccess: () => this.context.router.replace('/clusterkit/NugetFeeds'),
+    //     onSuccess: () => this.context.router.replace('/klusterkite/NugetFeeds'),
     //     onFailure: (transaction) => console.log(transaction),
     //   },
     // )
@@ -141,7 +141,7 @@ class RolePage extends React.Component {
 
   render () {
     const model = this.props.api.role;
-    const canEdit = hasPrivilege('ClusterKit.NodeManager.User.Update');
+    const canEdit = hasPrivilege('KlusterKite.NodeManager.User.Update');
 
     return (
       <div>
@@ -170,10 +170,10 @@ export default Relay.createContainer(
     }),
     fragments: {
       api: () => Relay.QL`
-        fragment on IClusterKitNodeApi {
+        fragment on IKlusterKiteNodeApi {
           id
           role: __node(id: $id) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_Role {
+            ...on IKlusterKiteNodeApi_Role {
               id
               uid
               name

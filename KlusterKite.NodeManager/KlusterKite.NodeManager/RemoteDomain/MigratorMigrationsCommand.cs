@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigratorMigrationsCommand.cs" company="ClusterKit">
+// <copyright file="MigratorMigrationsCommand.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.RemoteDomain
+namespace KlusterKite.NodeManager.RemoteDomain
 {
     using System.Collections.Generic;
 

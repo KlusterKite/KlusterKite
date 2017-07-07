@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthenticationExtensionsController.cs" company="ClusterKit">
+// <copyright file="AuthenticationExtensionsController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authentication
+namespace KlusterKite.Web.Authentication
 {
     using System.Threading.Tasks;
 
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.Authorization;
-    using ClusterKit.Web.Authorization.Attributes;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.Authorization;
+    using KlusterKite.Web.Authorization.Attributes;
 
     using Microsoft.AspNetCore.Mvc;
 

@@ -1,17 +1,17 @@
 {	
 	akka.actor.deployment {	
-        /ClusterKit {
+        /KlusterKite {
 	        IsNameSpace = true
 	    }
-        /ClusterKit/Web {
-	        type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+        /KlusterKite/Web {
+	        type = "KlusterKite.Core.NameSpaceActor, KlusterKite.Core"
 	    }
-        /ClusterKit/Web/GraphQLBrowser {
-	        type = "ClusterKit.Web.GraphQL.Publisher.ApiBrowserActor, ClusterKit.Web.GraphQL.Publisher"
+        /KlusterKite/Web/GraphQLBrowser {
+	        type = "KlusterKite.Web.GraphQL.Publisher.ApiBrowserActor, KlusterKite.Web.GraphQL.Publisher"
 	    }	    	    
 	}
 
-	ClusterKit.Web {
+	KlusterKite.Web {
 
 		GraphQL {
 			MaxDepth = 15,
@@ -28,7 +28,7 @@
 		}
 	}	
 
-	ClusterKit.Web.Configurators {
-		Cors = "ClusterKit.Web.GraphQL.Publisher.WebHostingConfigurator, ClusterKit.Web.GraphQL.Publisher"
+	KlusterKite.Web.Configurators {
+		Cors = "KlusterKite.Web.GraphQL.Publisher.WebHostingConfigurator, KlusterKite.Web.GraphQL.Publisher"
 	}	
 }

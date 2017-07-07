@@ -30,12 +30,12 @@ class HomePage extends React.Component {
     return (
       <div>
         <h1>Monitoring</h1>
-        {hasPrivilege('ClusterKit.NodeManager.GetTemplateStatistics') && this.props.api.clusterKitNodesApi &&
-          <NodesWithTemplates data={this.props.api.clusterKitNodesApi}/>
+        {hasPrivilege('KlusterKite.NodeManager.GetTemplateStatistics') && this.props.api.klusterKiteNodesApi &&
+          <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
         }
-        {hasPrivilege('ClusterKit.NodeManager.GetActiveNodeDescriptions') && this.props.api.clusterKitNodesApi &&
-          <NodesList hasError={false} upgradeNodePrivilege={hasPrivilege('ClusterKit.NodeManager.UpgradeNode')}
-                     nodeDescriptions={this.props.api.clusterKitNodesApi}/>
+        {hasPrivilege('KlusterKite.NodeManager.GetActiveNodeDescriptions') && this.props.api.klusterKiteNodesApi &&
+          <NodesList hasError={false} upgradeNodePrivilege={hasPrivilege('KlusterKite.NodeManager.UpgradeNode')}
+                     nodeDescriptions={this.props.api.klusterKiteNodesApi}/>
         }
       </div>
     )
@@ -46,9 +46,9 @@ export default Relay.createContainer(
   HomePage,
   {
     fragments: {
-      api: () => Relay.QL`fragment on IClusterKitNodeApi {
+      api: () => Relay.QL`fragment on IKlusterKiteNodeApi {
         __typename
-        clusterKitNodesApi {
+        klusterKiteNodesApi {
           id
           ${NodesWithTemplates.getFragment('data')},
           ${NodesList.getFragment('nodeDescriptions')},

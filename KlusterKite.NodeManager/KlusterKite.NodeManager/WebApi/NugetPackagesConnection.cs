@@ -1,5 +1,5 @@
  // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NugetPackagesConnection.cs" company="ClusterKit">
+// <copyright file="NugetPackagesConnection.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
@@ -15,9 +15,9 @@ namespace ClusterKit.NodeManager.WebApi
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.NodeManager.Client.ApiSurrogates;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.API.Client;
+    using KlusterKite.NodeManager.Client.ApiSurrogates;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     /// <summary>
     /// The connection to the nuget server

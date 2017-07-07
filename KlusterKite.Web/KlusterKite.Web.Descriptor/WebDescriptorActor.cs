@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebDescriptorActor.cs" company="ClusterKit">
+// <copyright file="WebDescriptorActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Descriptor
+namespace KlusterKite.Web.Descriptor
 {
     using System.Collections.Generic;
 
     using Akka.Actor;
     using Akka.Event;
 
-    using ClusterKit.Web.Client.Messages;
+    using KlusterKite.Web.Client.Messages;
 
     using JetBrains.Annotations;
 
@@ -32,7 +32,7 @@ namespace ClusterKit.Web.Descriptor
             var description = new WebDescriptionResponse();
 
             var config = Context?.System?.Settings?.Config;
-            var servicesConfig = config?.GetConfig("ClusterKit.Web.Services");
+            var servicesConfig = config?.GetConfig("KlusterKite.Web.Services");
 
             var services = new List<ServiceDescription>();
 
@@ -42,7 +42,7 @@ namespace ClusterKit.Web.Descriptor
                 {
                     if (!pair.Value.IsObject())
                     {
-                        Context.GetLogger().Error($"ClusterKit.Web.Services configuration is broken, {pair.Key} is not a valid configuration");
+                        Context.GetLogger().Error($"KlusterKite.Web.Services configuration is broken, {pair.Key} is not a valid configuration");
                         continue;
                     }
 
@@ -64,7 +64,7 @@ namespace ClusterKit.Web.Descriptor
 
                     if (serviceDescription.Route == null)
                     {
-                        Context.GetLogger().Error($"ClusterKit.Web.Services configuration is broken, {pair.Key} is not a valid configuration");
+                        Context.GetLogger().Error($"KlusterKite.Web.Services configuration is broken, {pair.Key} is not a valid configuration");
                         continue;
                     }
 

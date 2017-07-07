@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseTests.cs" company="ClusterKit">
+// <copyright file="ReleaseTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,16 +7,16 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests
+namespace KlusterKite.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.Data.EF.InMemory;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Messages;
+    using KlusterKite.Data.EF.InMemory;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Messages;
 
     using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +26,7 @@ namespace ClusterKit.NodeManager.Tests
     /// <summary>
     /// Testing basic work with <see cref="Release"/>
     /// </summary>
-    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
+    [Collection("KlusterKite.NodeManager.Tests.ConfigurationContext")]
     public class ReleaseTests : IDisposable
     {
         /// <summary>
@@ -232,7 +232,7 @@ namespace ClusterKit.NodeManager.Tests
         private ConfigurationContext CreateContext()
         {
             var builder = new DbContextOptionsBuilder<ConfigurationContext>();
-            builder.UseInMemoryDatabase("ClusterKit.NodeManager.Tests.ReleaseTests");
+            builder.UseInMemoryDatabase("KlusterKite.NodeManager.Tests.ReleaseTests");
             return new ConfigurationContext(builder.Options);
         }
 

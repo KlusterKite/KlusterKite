@@ -1,5 +1,5 @@
 {
-  "name": "clusterkit-boilerplate",
+  "name": "klusterkite-boilerplate",
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
@@ -37,6 +37,6 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "homepage": "http://entry/clusterkit",
+  "homepage": "http://entry/klusterkite",
   "proxy": "http://entry/"
 }

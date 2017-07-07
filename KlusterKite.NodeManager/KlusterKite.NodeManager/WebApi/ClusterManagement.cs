@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClusterManagement.cs" company="ClusterKit">
+// <copyright file="ClusterManagement.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
@@ -15,19 +15,19 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Attributes.Authorization;
-    using ClusterKit.API.Client;
-    using ClusterKit.Core;
-    using ClusterKit.Core.Monads;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.CRUD.Exceptions;
-    using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.Messages.Migration;
-    using ClusterKit.NodeManager.Client.MigrationStates;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Attributes.Authorization;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core;
+    using KlusterKite.Core.Monads;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.Exceptions;
+    using KlusterKite.NodeManager.Client;
+    using KlusterKite.NodeManager.Client.Messages.Migration;
+    using KlusterKite.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Messages;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 

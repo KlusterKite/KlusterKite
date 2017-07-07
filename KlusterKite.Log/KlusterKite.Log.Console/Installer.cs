@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Log.Console
+namespace KlusterKite.Log.Console
 {
     using System.Reflection;
 
@@ -15,8 +15,8 @@ namespace ClusterKit.Log.Console
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.Log;
+    using KlusterKite.Core;
+    using KlusterKite.Core.Log;
 
     /// <summary>
     /// Installing components from current library
@@ -33,7 +33,7 @@ namespace ClusterKit.Log.Console
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Log.Console.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Log.Console.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)

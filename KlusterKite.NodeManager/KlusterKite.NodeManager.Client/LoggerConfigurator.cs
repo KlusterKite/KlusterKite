@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LoggerConfigurator.cs" company="ClusterKit">
+// <copyright file="LoggerConfigurator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client
+namespace KlusterKite.NodeManager.Client
 {
     using Akka.Configuration;
 
-    using ClusterKit.Core.Log;
+    using KlusterKite.Core.Log;
 
     using JetBrains.Annotations;
 
@@ -31,7 +31,7 @@ namespace ClusterKit.NodeManager.Client
         /// <returns>Updated configuration</returns>
         public LoggerConfiguration Configure(LoggerConfiguration configuration, Config config)
         {
-            var templateName = config.GetString("ClusterKit.NodeManager.NodeTemplate");
+            var templateName = config.GetString("KlusterKite.NodeManager.NodeTemplate");
             return string.IsNullOrWhiteSpace(templateName)
                        ? configuration
                        : configuration.Enrich.WithProperty("nodeTemplate", templateName);

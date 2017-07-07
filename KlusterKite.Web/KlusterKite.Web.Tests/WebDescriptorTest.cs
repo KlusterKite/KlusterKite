@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebDescriptorTest.cs" company="ClusterKit">
+// <copyright file="WebDescriptorTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests
+namespace KlusterKite.Web.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -19,11 +19,11 @@ namespace ClusterKit.Web.Tests
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Web.Client;
-    using ClusterKit.Web.Client.Messages;
-    using ClusterKit.Web.Descriptor;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Web.Client;
+    using KlusterKite.Web.Client.Messages;
+    using KlusterKite.Web.Descriptor;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -80,7 +80,7 @@ namespace ClusterKit.Web.Tests
             {
                 return ConfigurationFactory.ParseString(@"
                 {
-                    ClusterKit {
+                    KlusterKite {
  		                Web {
  			                OwinBindAddress = ""http://*:8085""
                             Services {

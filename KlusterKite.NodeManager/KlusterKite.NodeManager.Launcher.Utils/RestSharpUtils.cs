@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RestSharpUtils.cs" company="ClusterKit">
+// <copyright file="RestSharpUtils.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Utils 
+namespace KlusterKite.NodeManager.Launcher.Utils 
 {
 #if CORECLR
     using System;

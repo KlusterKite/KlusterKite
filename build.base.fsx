@@ -28,7 +28,7 @@
 
 #load "./build.config.fsx"
 
-namespace ClusterKit.Build
+namespace KlusterKite.Build
 
 open System
 open System.IO
@@ -80,7 +80,7 @@ module  Base =
         let packageLocal = package.Replace(localPath, ".");
         execProcess (fun info ->
             info.FileName <- "nuget.exe";
-            info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" packageLocal "http://docker:81/" "ClusterKit")
+            info.Arguments <- sprintf "push %s -Source %s -ApiKey %s" packageLocal "http://docker:81/" "KlusterKite")
             (TimeSpan.FromMinutes 30.0)
             |> ignore;
 

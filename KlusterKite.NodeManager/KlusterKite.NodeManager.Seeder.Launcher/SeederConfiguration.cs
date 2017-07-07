@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SeederConfiguration.cs" company="ClusterKit">
+// <copyright file="SeederConfiguration.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Seeder.Launcher
+namespace KlusterKite.NodeManager.Seeder.Launcher
 {
     using System.Collections.Generic;
 

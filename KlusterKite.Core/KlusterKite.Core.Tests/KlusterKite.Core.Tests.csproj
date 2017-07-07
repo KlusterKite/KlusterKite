@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.Core.Tests</PackageId>
+    <PackageId>KlusterKite.Core.Tests</PackageId>
     <Version>0.0.0.0-local</Version>    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
@@ -10,8 +10,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
-    <ProjectReference Include="..\ClusterKit.Core\ClusterKit.Core.csproj" />
+    <ProjectReference Include="..\KlusterKite.Core.TestKit\KlusterKite.Core.TestKit.csproj" />
+    <ProjectReference Include="..\KlusterKite.Core\KlusterKite.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />

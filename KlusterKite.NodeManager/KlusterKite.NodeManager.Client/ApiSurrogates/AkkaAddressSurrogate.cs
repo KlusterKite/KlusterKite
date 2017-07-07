@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AkkaAddressSurrogate.cs" company="ClusterKit">
+// <copyright file="AkkaAddressSurrogate.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ApiSurrogates
+namespace KlusterKite.NodeManager.Client.ApiSurrogates
 {
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
+    using KlusterKite.API.Attributes;
 
     using JetBrains.Annotations;
 

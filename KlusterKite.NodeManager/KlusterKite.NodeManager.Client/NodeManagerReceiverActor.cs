@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeManagerReceiverActor.cs" company="ClusterKit">
+// <copyright file="NodeManagerReceiverActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client
+namespace KlusterKite.NodeManager.Client
 {
     using System;
     using System.Collections.Generic;
@@ -18,9 +18,9 @@ namespace ClusterKit.NodeManager.Client
     using Akka.Cluster;
     using Akka.Event;
 
-    using ClusterKit.Core;
-    using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.Launcher.Messages;
+    using KlusterKite.Core;
+    using KlusterKite.NodeManager.Client.Messages;
+    using KlusterKite.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
 
@@ -44,7 +44,7 @@ namespace ClusterKit.NodeManager.Client
         public NodeManagerReceiverActor(IEnumerable<BaseInstaller> baseInstallers)
         {
             var config = Context.System.Settings.Config;
-            var nodeIdString = config.GetString("ClusterKit.NodeManager.NodeId");
+            var nodeIdString = config.GetString("KlusterKite.NodeManager.NodeId");
             Guid nodeId;
             if (!Guid.TryParse(nodeIdString, out nodeId))
             {
@@ -58,9 +58,9 @@ namespace ClusterKit.NodeManager.Client
                 {
                     IsInitialized = true,
                     NodeAddress = Cluster.Get(Context.System).SelfAddress,
-                    NodeTemplate = config.GetString("ClusterKit.NodeManager.NodeTemplate"),
-                    ContainerType = config.GetString("ClusterKit.NodeManager.ContainerType"),
-                    ReleaseId = config.GetInt("ClusterKit.NodeManager.ReleaseId"),
+                    NodeTemplate = config.GetString("KlusterKite.NodeManager.NodeTemplate"),
+                    ContainerType = config.GetString("KlusterKite.NodeManager.ContainerType"),
+                    ReleaseId = config.GetInt("KlusterKite.NodeManager.ReleaseId"),
                     NodeId = nodeId,
                     StartTimeStamp = this.startTimeStamp,
                     Roles = config.GetStringList("akka.cluster.roles")?.ToList() ?? new List<string>(),

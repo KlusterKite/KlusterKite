@@ -52,7 +52,7 @@ class MigrationPage extends React.Component {
   }
 
   onReceiveProps(nextProps) {
-    if (this.props.api && this.props.api.clusterKitNodesApi.clusterManagement.currentMigration && !nextProps.api.clusterKitNodesApi.clusterManagement.currentMigration) {
+    if (this.props.api && this.props.api.klusterKiteNodesApi.clusterManagement.currentMigration && !nextProps.api.klusterKiteNodesApi.clusterManagement.currentMigration) {
       // Migration just finshed
       console.log('Migration has been finished!');
 
@@ -63,7 +63,7 @@ class MigrationPage extends React.Component {
 
     if (nextProps.api) {
       this.setState({
-        operationIsInProgress: nextProps.api.clusterKitNodesApi.clusterManagement.resourceState.operationIsInProgress
+        operationIsInProgress: nextProps.api.klusterKiteNodesApi.clusterManagement.resourceState.operationIsInProgress
       });
     }
   }
@@ -91,7 +91,7 @@ class MigrationPage extends React.Component {
   }
 
   render () {
-    const clusterManagement = this.props.api.clusterKitNodesApi.clusterManagement;
+    const clusterManagement = this.props.api.klusterKiteNodesApi.clusterManagement;
     const currentMigration = clusterManagement.currentMigration;
     const resourceState = clusterManagement.resourceState;
     const nodesUpdating = resourceState.currentMigrationStep === 'NodesUpdating';
@@ -162,13 +162,13 @@ class MigrationPage extends React.Component {
         }
 
         {currentMigration &&
-          <NodesWithTemplates data={this.props.api.clusterKitNodesApi}/>
+          <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
         }
 
         {resourceState.currentMigrationStep === 'NodesUpdating' &&
           <NodesList hasError={false}
-                     upgradeNodePrivilege={hasPrivilege('ClusterKit.NodeManager.UpgradeNode')}
-                     nodeDescriptions={this.props.api.clusterKitNodesApi}
+                     upgradeNodePrivilege={hasPrivilege('KlusterKite.NodeManager.UpgradeNode')}
+                     nodeDescriptions={this.props.api.klusterKiteNodesApi}
                      hideDetails={true}
           />
         }
@@ -188,8 +188,8 @@ export default Relay.createContainer(
   {
     fragments: {
       api: () => Relay.QL`
-        fragment on IClusterKitNodeApi {
-          clusterKitNodesApi {
+        fragment on IKlusterKiteNodeApi {
+          klusterKiteNodesApi {
             clusterManagement {
               currentMigration {
                 state

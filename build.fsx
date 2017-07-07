@@ -35,7 +35,7 @@ group netcorebuild
 #r @".fake/build.fsx/packages/netcorebuild/NuGet.Packaging.Core.Types/lib/netstandard1.3/NuGet.Packaging.Core.Types.dll"
 
 #load "./build.base.fsx"
-open ClusterKit.Build.Base
+open KlusterKite.Build.Base
 
 open System
 open System.IO
@@ -53,15 +53,15 @@ Target.Create "Rename" (fun _ ->
         dir.GetDirectories "*"
             |> Seq.iter (fun (subDir:DirectoryInfo) -> 
                 renameRecursive subDir
-                if subDir.Name.Contains("ClusterKit") then
-                    printfn "%s| %s -> %s" subDir.Parent.FullName subDir.Name (subDir.Name.Replace("ClusterKit", "KlusterKite"))
-                    subDir.MoveTo((Path.Combine(subDir.Parent.FullName, subDir.Name.Replace("ClusterKit", "KlusterKite"))))                        
+                if subDir.Name.Contains("KlusterKite") then
+                    printfn "%s| %s -> %s" subDir.Parent.FullName subDir.Name (subDir.Name.Replace("KlusterKite", "KlusterKite"))
+                    subDir.MoveTo((Path.Combine(subDir.Parent.FullName, subDir.Name.Replace("KlusterKite", "KlusterKite"))))                        
                 )
         dir.GetFiles "*"
             |> Seq.iter (fun (file:FileInfo) ->
-                if file.Name.Contains("ClusterKit") then
-                    printfn "%s| %s -> %s" file.DirectoryName file.Name (file.Name.Replace("ClusterKit", "KlusterKite"))
-                    file.MoveTo((Path.Combine(file.DirectoryName, file.Name.Replace("ClusterKit", "KlusterKite"))))                        
+                if file.Name.Contains("KlusterKite") then
+                    printfn "%s| %s -> %s" file.DirectoryName file.Name (file.Name.Replace("KlusterKite", "KlusterKite"))
+                    file.MoveTo((Path.Combine(file.DirectoryName, file.Name.Replace("KlusterKite", "KlusterKite"))))                        
                 )
 
     renameRecursive (new DirectoryInfo("."))
@@ -70,14 +70,14 @@ Target.Create "Rename" (fun _ ->
 
 // builds base (system) docker images
 Target.Create "DockerBase" (fun _ ->
-    buildDocker "clusterkit/baseworker" "Docker/ClusterKitBaseWorkerNode"
-    buildDocker "clusterkit/baseweb" "Docker/ClusterKitBaseWebNode"
-    buildDocker "clusterkit/nuget" "Docker/ClusterKitNuget"
-    buildDocker "clusterkit/postgres" "Docker/ClusterKitPostgres"
-    buildDocker "clusterkit/entry" "Docker/ClusterKitEntry"
-    buildDocker "clusterkit/vpn" "Docker/ClusterKitVpn"
-    buildDocker "clusterkit/elk" "Docker/ClusterKitELK"
-    buildDocker "clusterkit/redis" "Docker/ClusterKit.Redis"
+    buildDocker "klusterkite/baseworker" "Docker/KlusterKiteBaseWorkerNode"
+    buildDocker "klusterkite/baseweb" "Docker/KlusterKiteBaseWebNode"
+    buildDocker "klusterkite/nuget" "Docker/KlusterKiteNuget"
+    buildDocker "klusterkite/postgres" "Docker/KlusterKitePostgres"
+    buildDocker "klusterkite/entry" "Docker/KlusterKiteEntry"
+    buildDocker "klusterkite/vpn" "Docker/KlusterKiteVpn"
+    buildDocker "klusterkite/elk" "Docker/KlusterKiteELK"
+    buildDocker "klusterkite/redis" "Docker/KlusterKite.Redis"
 )
 
 // builds standard docker images
@@ -101,14 +101,14 @@ Target.Create "DockerContainers" (fun _ ->
         dotNetBuild setParams projectPath
 
     CleanDirs [|"./build/launcher"; "./build/launcherpublish"; "./build/seed"; "./build/seedpublish"; "./build/seeder"; "./build/seederpublish";|]
-    buildProject (Path.GetFullPath "./build/launcher") "./build/src/ClusterKit.NodeManager/ClusterKit.NodeManager.Launcher/ClusterKit.NodeManager.Launcher.csproj"
+    buildProject (Path.GetFullPath "./build/launcher") "./build/src/KlusterKite.NodeManager/KlusterKite.NodeManager.Launcher/KlusterKite.NodeManager.Launcher.csproj"
     
-    // MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.Console/ClusterKit.Log.Console.csproj"|] |> ignore
-    // MSBuildRelease "./build/seed" "Build" [|"./ClusterKit.Log/ClusterKit.Log.ElasticSearch/ClusterKit.Log.ElasticSearch.csproj"|] |> ignore
-    // buildProject (Path.GetFullPath "./build/seed") "./ClusterKit.Monitoring/ClusterKit.Monitoring.Client/ClusterKit.Monitoring.Client.csproj"
-    buildProject (Path.GetFullPath "./build/seed") "./ClusterKit.Core/ClusterKit.Core.Service/ClusterKit.Core.Service.csproj"
+    // MSBuildRelease "./build/seed" "Build" [|"./KlusterKite.Log/KlusterKite.Log.Console/KlusterKite.Log.Console.csproj"|] |> ignore
+    // MSBuildRelease "./build/seed" "Build" [|"./KlusterKite.Log/KlusterKite.Log.ElasticSearch/KlusterKite.Log.ElasticSearch.csproj"|] |> ignore
+    // buildProject (Path.GetFullPath "./build/seed") "./KlusterKite.Monitoring/KlusterKite.Monitoring.Client/KlusterKite.Monitoring.Client.csproj"
+    buildProject (Path.GetFullPath "./build/seed") "./KlusterKite.Core/KlusterKite.Core.Service/KlusterKite.Core.Service.csproj"
 
-    buildProject (Path.GetFullPath "./build/seeder") "./ClusterKit.NodeManager/ClusterKit.NodeManager.Seeder.Launcher/ClusterKit.NodeManager.Seeder.Launcher.csproj"
+    buildProject (Path.GetFullPath "./build/seeder") "./KlusterKite.NodeManager/KlusterKite.NodeManager.Seeder.Launcher/KlusterKite.NodeManager.Seeder.Launcher.csproj"
     
 
     let copyLauncherData (path : string) =
@@ -122,24 +122,24 @@ Target.Create "DockerContainers" (fun _ ->
         CopyTo buildDir [|"./nuget.exe"|]
         
 
-    CleanDirs [|"./Docker/ClusterKitSeed/build"|]
-    CopyDir "./Docker/ClusterKitSeed/build" "./build/seedpublish" (fun _ -> true)
-    buildDocker "clusterkit/seed" "Docker/ClusterKitSeed"
+    CleanDirs [|"./Docker/KlusterKiteSeed/build"|]
+    CopyDir "./Docker/KlusterKiteSeed/build" "./build/seedpublish" (fun _ -> true)
+    buildDocker "klusterkite/seed" "Docker/KlusterKiteSeed"
 
-    CleanDirs [|"./Docker/ClusterKitSeeder/build"|]
-    CopyDir "./Docker/ClusterKitSeeder/build" "./build/seederpublish" (fun _ -> true)
-    buildDocker "clusterkit/seeder" "Docker/ClusterKitSeeder"
+    CleanDirs [|"./Docker/KlusterKiteSeeder/build"|]
+    CopyDir "./Docker/KlusterKiteSeeder/build" "./build/seederpublish" (fun _ -> true)
+    buildDocker "klusterkite/seeder" "Docker/KlusterKiteSeeder"
 
-    copyLauncherData "./Docker/ClusterKitWorker" |> ignore
-    copyLauncherData "./Docker/ClusterKitPublisher" |> ignore
-    buildDocker "clusterkit/worker" "Docker/ClusterKitWorker"
-    buildDocker "clusterkit/manager" "Docker/ClusterKitManager"
+    copyLauncherData "./Docker/KlusterKiteWorker" |> ignore
+    copyLauncherData "./Docker/KlusterKitePublisher" |> ignore
+    buildDocker "klusterkite/worker" "Docker/KlusterKiteWorker"
+    buildDocker "klusterkite/manager" "Docker/KlusterKiteManager"
 
-    buildDocker "clusterkit/publisher" "Docker/ClusterKitPublisher"
+    buildDocker "klusterkite/publisher" "Docker/KlusterKitePublisher"
     
     // building node.js web sites
-    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
-    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build"
+    Rename "./Docker/KlusterKiteMonitoring/klusterkite-web/.env-local" "./Docker/KlusterKiteMonitoring/klusterkite-web/.env"
+    Rename "./Docker/KlusterKiteMonitoring/klusterkite-web/.env" "./Docker/KlusterKiteMonitoring/klusterkite-web/.env-build"
     
     /// Default paths to Npm
     let npmFileName =
@@ -168,20 +168,20 @@ Target.Create "DockerContainers" (fun _ ->
     printfn "Running: %s install" npmFileName
     if not(execProcess (fun info -> 
                 info.UseShellExecute <- false
-                info.WorkingDirectory <- "./Docker/ClusterKitMonitoring/clusterkit-web" 
+                info.WorkingDirectory <- "./Docker/KlusterKiteMonitoring/klusterkite-web" 
                 info.FileName <- npmFileName
                 info.Arguments <- "install") (TimeSpan.FromDays 2.0)) then failwith "Could not install npm modules"
     printfn "Running: %s run build" npmFileName
     if not(execProcess (fun info -> 
                 info.UseShellExecute <- false
-                info.WorkingDirectory <- "./Docker/ClusterKitMonitoring/clusterkit-web" 
+                info.WorkingDirectory <- "./Docker/KlusterKiteMonitoring/klusterkite-web" 
                 info.FileName <- npmFileName
-                info.Arguments <- "run build") (TimeSpan.FromDays 2.0)) then failwith "Could build clusterkit-web"
+                info.Arguments <- "run build") (TimeSpan.FromDays 2.0)) then failwith "Could build klusterkite-web"
 
-    buildDocker "clusterkit/monitoring-ui" "Docker/ClusterKitMonitoring"
+    buildDocker "klusterkite/monitoring-ui" "Docker/KlusterKiteMonitoring"
     
-    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env-build" "./Docker/ClusterKitMonitoring/clusterkit-web/.env"
-    Rename "./Docker/ClusterKitMonitoring/clusterkit-web/.env" "./Docker/ClusterKitMonitoring/clusterkit-web/.env-local"
+    Rename "./Docker/KlusterKiteMonitoring/klusterkite-web/.env-build" "./Docker/KlusterKiteMonitoring/klusterkite-web/.env"
+    Rename "./Docker/KlusterKiteMonitoring/klusterkite-web/.env" "./Docker/KlusterKiteMonitoring/klusterkite-web/.env-local"
 )
 
 "PrepareSources" ==> "DockerContainers"

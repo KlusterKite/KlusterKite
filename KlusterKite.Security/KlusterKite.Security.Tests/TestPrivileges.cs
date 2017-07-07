@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestPrivileges.cs" company="ClusterKit">
+// <copyright file="TestPrivileges.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.Tests
+namespace KlusterKite.Security.Tests
 {
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 

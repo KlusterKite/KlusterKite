@@ -42,16 +42,16 @@ class FeedPage extends React.Component {
         }),
       {
         onSuccess: (response) => {
-          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
-            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
 
             this.setState({
               saving: false,
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -68,7 +68,7 @@ class FeedPage extends React.Component {
   }
 
   onCancel = () => {
-    browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`)
+    browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`)
   };
 
   render () {
@@ -105,11 +105,11 @@ export default Relay.createContainer(
     }),
     fragments: {
       api: () => Relay.QL`
-        fragment on IClusterKitNodeApi {
+        fragment on IKlusterKiteNodeApi {
           __typename
           id
           release:__node(id: $releaseId) {
-            ...on IClusterKitNodeApi_Release {
+            ...on IKlusterKiteNodeApi_Release {
               __id
               configuration {
                 ${UpdateFeedMutation.getFragment('configuration')},

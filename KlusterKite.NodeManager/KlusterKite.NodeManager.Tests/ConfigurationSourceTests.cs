@@ -1,13 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationSourceTests.cs" company="ClusterKit">
+// <copyright file="ConfigurationSourceTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Tests for ClusterKit.NodeManager.ConfigurationSource
+//   Tests for KlusterKite.NodeManager.ConfigurationSource
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests
+namespace KlusterKite.NodeManager.Tests
 {
     using System.Collections.Generic;
 
@@ -15,16 +15,16 @@ namespace ClusterKit.NodeManager.Tests
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
 
     using Xunit;
     using Xunit.Abstractions;
 
     /// <summary>
-    /// Tests for ClusterKit.NodeManager.ConfigurationSource
+    /// Tests for KlusterKite.NodeManager.ConfigurationSource
     /// </summary>
-    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
+    [Collection("KlusterKite.NodeManager.Tests.ConfigurationContext")]
     public class ConfigurationSourceTests : BaseActorTest<ConfigurationSourceTests.Configurator>
     {
         /// <summary>
@@ -44,7 +44,7 @@ namespace ClusterKit.NodeManager.Tests
         [Fact]
         public void SeederOverrideTest()
         {
-            Assert.Equal("Test.NodeTemplateSeeder, Test", this.Sys.Settings.Config.GetString("ClusterKit.NodeManager.ConfigurationSeederType"));
+            Assert.Equal("Test.NodeTemplateSeeder, Test", this.Sys.Settings.Config.GetString("KlusterKite.NodeManager.ConfigurationSeederType"));
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace ClusterKit.NodeManager.Tests
             /// <inheritdoc />
             protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(@"
             {
-                ClusterKit.NodeManager.ConfigurationSeederType = ""Test.NodeTemplateSeeder, Test""
+                KlusterKite.NodeManager.ConfigurationSeederType = ""Test.NodeTemplateSeeder, Test""
             }");
 
             /// <inheritdoc />

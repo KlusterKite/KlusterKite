@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationTest.cs" company="ClusterKit">
+// <copyright file="ConfigurationTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Core.Tests.Configuration
+namespace KlusterKite.Core.Tests.Configuration
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -15,7 +15,7 @@ namespace ClusterKit.Core.Tests.Configuration
 
     using Autofac;
 
-    using ClusterKit.Core.TestKit;
+    using KlusterKite.Core.TestKit;
 
     using JetBrains.Annotations;
 
@@ -121,26 +121,26 @@ namespace ClusterKit.Core.Tests.Configuration
                     }
 
                     /testNameSpace/forwarder {
-                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        type = ""KlusterKite.Core.TestKit.TestActorForwarder, KlusterKite.Core.TestKit""
                         dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /testNameSpace/second {
-                        type = ""ClusterKit.Core.NameSpaceActor, ClusterKit.Core""
+                        type = ""KlusterKite.Core.NameSpaceActor, KlusterKite.Core""
                         dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /testNameSpace/second/forwarder {
-                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        type = ""KlusterKite.Core.TestKit.TestActorForwarder, KlusterKite.Core.TestKit""
                         dispatcher = akka.test.calling-thread-dispatcher
                     }
 
                     /testNameSpace/sharding {
                         actor-type = Sharding
                         type-name = test-shard
-                        type = ""ClusterKit.Core.TestKit.TestActorForwarder, ClusterKit.Core.TestKit""
+                        type = ""KlusterKite.Core.TestKit.TestActorForwarder, KlusterKite.Core.TestKit""
                         role = test
-                        message-extractor = ""ClusterKit.Core.Tests.Configuration.ConfigurationTest+TestMessageExtractor, ClusterKit.Core.Tests""
+                        message-extractor = ""KlusterKite.Core.Tests.Configuration.ConfigurationTest+TestMessageExtractor, KlusterKite.Core.Tests""
                         dispatcher = akka.test.calling-thread-dispatcher
                     }
                  }

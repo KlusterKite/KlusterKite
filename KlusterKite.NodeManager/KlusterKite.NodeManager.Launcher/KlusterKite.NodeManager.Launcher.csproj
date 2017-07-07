@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.NodeManager.Launcher</PackageId>
+    <PackageId>KlusterKite.NodeManager.Launcher</PackageId>
     <Version>0.0.0.0-local</Version>
     <OutputTypeEx>exe</OutputTypeEx>
     <OutputType>exe</OutputType>
@@ -25,8 +25,8 @@
     <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Messages\ClusterKit.NodeManager.Launcher.Messages.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Utils\ClusterKit.NodeManager.Launcher.Utils.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Launcher.Messages\KlusterKite.NodeManager.Launcher.Messages.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Launcher.Utils\KlusterKite.NodeManager.Launcher.Utils.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46'">
     <Reference Include="System.Configuration" />

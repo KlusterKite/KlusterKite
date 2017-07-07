@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DeclareMutationAttribute.cs" company="ClusterKit">
+// <copyright file="DeclareMutationAttribute.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes
+namespace KlusterKite.API.Attributes
 {
     using System;
 

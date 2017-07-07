@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationConnection.cs" company="ClusterKit">
+// <copyright file="MigrationConnection.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System;
 
     using Akka.Actor;
 
-    using ClusterKit.Data.CRUD;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Data.CRUD;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The cluster migration management

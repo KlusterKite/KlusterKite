@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodesUpgrade.cs" company="ClusterKit">
+// <copyright file="NodesUpgrade.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages.Migration
+namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
-    using ClusterKit.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.MigrationStates;
 
     /// <summary>
     /// The command to the node manager to upgrade cluster node

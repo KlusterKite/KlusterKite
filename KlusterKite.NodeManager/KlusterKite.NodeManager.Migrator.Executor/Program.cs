@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="ClusterKit">
+// <copyright file="Program.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Migrator.Executor
+namespace KlusterKite.NodeManager.Migrator.Executor
 {
     using System;
     using System.Collections.Generic;
@@ -19,10 +19,10 @@ namespace ClusterKit.NodeManager.Migrator.Executor
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.RemoteDomain;
+    using KlusterKite.Core;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.RemoteDomain;
 
     using JetBrains.Annotations;
 
@@ -64,7 +64,7 @@ namespace ClusterKit.NodeManager.Migrator.Executor
             builder.RegisterInstance(config).As<Config>();
             BaseInstaller.RunComponentRegistration(builder, config);
 
-            var migratorTypeNames = config.GetStringList("ClusterKit.NodeManager.Migrators");
+            var migratorTypeNames = config.GetStringList("KlusterKite.NodeManager.Migrators");
             foreach (var typeName in migratorTypeNames)
             {
                 var type = Type.GetType(typeName, false);

@@ -12,77 +12,77 @@ storiesOf('Packages')
 ;
 
 let getPackagesList = function () {
-  const packages = [{"BuildDate": null, "Id": "ClusterKit.Core", "Version": "0.0.0-local"}, {
+  const packages = [{"BuildDate": null, "Id": "KlusterKite.Core", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Core.Service",
+    "Id": "KlusterKite.Core.Service",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.LargeObjects", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.LargeObjects", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.LargeObjects.Client",
+    "Id": "KlusterKite.LargeObjects.Client",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Log.Console", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Log.Console", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Log.ElasticSearch",
+    "Id": "KlusterKite.Log.ElasticSearch",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Monitoring.Client", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Monitoring.Client", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.NodeManager.Client",
+    "Id": "KlusterKite.NodeManager.Client",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.NodeManager.Launcher.Messages", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.NodeManager.Launcher.Messages", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Security.Client",
+    "Id": "KlusterKite.Security.Client",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Web.Client", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Web.Client", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Web.NginxConfigurator",
+    "Id": "KlusterKite.Web.NginxConfigurator",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Data", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Data", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Data.CRUD",
+    "Id": "KlusterKite.Data.CRUD",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Data.EF", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Data.EF", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Data.EF.Npgsql",
+    "Id": "KlusterKite.Data.EF.Npgsql",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Monitoring", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Monitoring", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.NodeManager",
+    "Id": "KlusterKite.NodeManager",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.NodeManager.Authentication", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.NodeManager.Authentication", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.NodeManager.ConfigurationSource",
+    "Id": "KlusterKite.NodeManager.ConfigurationSource",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Security.SessionRedis", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Security.SessionRedis", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Web",
+    "Id": "KlusterKite.Web",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Web.Authentication", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Web.Authentication", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Web.Authorization",
+    "Id": "KlusterKite.Web.Authorization",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Web.Descriptor", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Web.Descriptor", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Web.Rest",
+    "Id": "KlusterKite.Web.Rest",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Web.Swagger", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Web.Swagger", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Web.Swagger.Messages",
+    "Id": "KlusterKite.Web.Swagger.Messages",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Web.Swagger.Monitor", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Web.Swagger.Monitor", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Build",
+    "Id": "KlusterKite.Build",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Core.TestKit", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Core.TestKit", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Data.EF.TestKit",
+    "Id": "KlusterKite.Data.EF.TestKit",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.Data.TestKit", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.Data.TestKit", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.NodeManager.FallbackPackageDependencyFixer",
+    "Id": "KlusterKite.NodeManager.FallbackPackageDependencyFixer",
     "Version": "0.0.0-local"
-  }, {"BuildDate": null, "Id": "ClusterKit.NodeManager.Launcher", "Version": "0.0.0-local"}, {
+  }, {"BuildDate": null, "Id": "KlusterKite.NodeManager.Launcher", "Version": "0.0.0-local"}, {
     "BuildDate": null,
-    "Id": "ClusterKit.Web.SignalR",
+    "Id": "KlusterKite.Web.SignalR",
     "Version": "0.0.0-local"
   }];
   return packages;

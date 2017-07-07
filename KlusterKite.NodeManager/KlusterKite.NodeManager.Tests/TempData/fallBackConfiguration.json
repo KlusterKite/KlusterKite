@@ -1,5 +1,5 @@
 {
-  "Configuration": "{\n   ClusterKit {\n    NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n\tNodeManager.DefaultNugetFeeds {\n      publicFeed {\n              address = \"/opt/packageCache\"\n              type = public\n      } \n      privateFeed {\n              address = \"http://nuget/\"\n              type = private\n      }          \n    }  \n  }\n}",
+  "Configuration": "{\n   KlusterKite {\n    NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n\tNodeManager.DefaultNugetFeeds {\n      publicFeed {\n              address = \"/opt/packageCache\"\n              type = public\n      } \n      privateFeed {\n              address = \"http://nuget/\"\n              type = private\n      }          \n    }  \n  }\n}",
   "NodeTemplate": "clusterManager",
   "ReleaseId": 1,
   "Packages": [
@@ -56,135 +56,135 @@
       "Version": "2.1.1"
     },
     {
-      "Id": "ClusterKit.API.Attributes",
+      "Id": "KlusterKite.API.Attributes",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.API.Client",
+      "Id": "KlusterKite.API.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.API.Endpoint",
+      "Id": "KlusterKite.API.Endpoint",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.API.Provider",
+      "Id": "KlusterKite.API.Provider",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Core",
+      "Id": "KlusterKite.Core",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Core.Service",
+      "Id": "KlusterKite.Core.Service",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Data",
+      "Id": "KlusterKite.Data",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Data.CRUD",
+      "Id": "KlusterKite.Data.CRUD",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Data.EF",
+      "Id": "KlusterKite.Data.EF",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Data.EF.Npgsql",
+      "Id": "KlusterKite.Data.EF.Npgsql",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.LargeObjects",
+      "Id": "KlusterKite.LargeObjects",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.LargeObjects.Client",
+      "Id": "KlusterKite.LargeObjects.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Log.Console",
+      "Id": "KlusterKite.Log.Console",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Log.ElasticSearch",
+      "Id": "KlusterKite.Log.ElasticSearch",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Monitoring",
+      "Id": "KlusterKite.Monitoring",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Monitoring.Client",
+      "Id": "KlusterKite.Monitoring.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager",
+      "Id": "KlusterKite.NodeManager",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Authentication",
+      "Id": "KlusterKite.NodeManager.Authentication",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Client",
+      "Id": "KlusterKite.NodeManager.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.ConfigurationSource",
+      "Id": "KlusterKite.NodeManager.ConfigurationSource",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Launcher.Messages",
+      "Id": "KlusterKite.NodeManager.Launcher.Messages",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Launcher.Utils",
+      "Id": "KlusterKite.NodeManager.Launcher.Utils",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Migrator",
+      "Id": "KlusterKite.NodeManager.Migrator",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.NodeManager.Migrator.EF",
+      "Id": "KlusterKite.NodeManager.Migrator.EF",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Security.Attributes",
+      "Id": "KlusterKite.Security.Attributes",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Security.Client",
+      "Id": "KlusterKite.Security.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Security.SessionRedis",
+      "Id": "KlusterKite.Security.SessionRedis",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web",
+      "Id": "KlusterKite.Web",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.Authentication",
+      "Id": "KlusterKite.Web.Authentication",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.Authorization",
+      "Id": "KlusterKite.Web.Authorization",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.Client",
+      "Id": "KlusterKite.Web.Client",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.Descriptor",
+      "Id": "KlusterKite.Web.Descriptor",
       "Version": "0.0.0-local"
     },
     {
-      "Id": "ClusterKit.Web.GraphQL.Publisher",
+      "Id": "KlusterKite.Web.GraphQL.Publisher",
       "Version": "0.0.0-local"
     },
     {
@@ -1124,6 +1124,6 @@
     "http://nuget/"
   ],
   "Seeds": [
-    "akka.tcp://ClusterKit@seed:3090"
+    "akka.tcp://KlusterKite@seed:3090"
   ]
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiDiscoverResponse.cs" company="ClusterKit">
+// <copyright file="ApiDiscoverResponse.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client.Messages
+namespace KlusterKite.API.Client.Messages
 {
     using Akka.Actor;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PingTest.cs" company="ClusterKit">
+// <copyright file="PingTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Tests.Ping
+namespace KlusterKite.Core.Tests.Ping
 {
     using System;
 
     using Akka.Actor;
     using Akka.Cluster;
 
-    using ClusterKit.Core.Ping;
-    using ClusterKit.Core.TestKit;
+    using KlusterKite.Core.Ping;
+    using KlusterKite.Core.TestKit;
 
     using Xunit;
     using Xunit.Abstractions;

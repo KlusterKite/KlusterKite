@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationMigrator.cs" company="ClusterKit">
+// <copyright file="ConfigurationMigrator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace KlusterKite.NodeManager.ConfigurationSource
 {
     using System.Collections.Generic;
 
     using Akka.Configuration;
 
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Migrator;
-    using ClusterKit.NodeManager.Migrator.EF;
+    using KlusterKite.Data.EF;
+    using KlusterKite.NodeManager.Migrator;
+    using KlusterKite.NodeManager.Migrator.EF;
 
     using JetBrains.Annotations;
 
@@ -28,12 +28,12 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        private const string ConfigConnectionStringPath = "ClusterKit.NodeManager.ConfigurationDatabaseConnectionString";
+        private const string ConfigConnectionStringPath = "KlusterKite.NodeManager.ConfigurationDatabaseConnectionString";
 
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        private const string ConfigDatabaseProviderNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseProviderName";
+        private const string ConfigDatabaseProviderNamePath = "KlusterKite.NodeManager.ConfigurationDatabaseProviderName";
 
         /// <summary>
         /// The migrator config.
@@ -55,7 +55,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         }
 
         /// <inheritdoc />
-        public override string Name => "ClusterKit configuration database";
+        public override string Name => "KlusterKite configuration database";
 
         /// <inheritdoc />
         public override IEnumerable<ResourceId> GetMigratableResources()
@@ -70,7 +70,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             var providerName = this.config.GetString(ConfigDatabaseProviderNamePath);
             return new ResourceId
                        {
-                           Name = "ClusterKit configuration database",
+                           Name = "KlusterKite configuration database",
                            ConnectionString = connectionString,
                            ProviderName = providerName,
                            Code = "configDB"

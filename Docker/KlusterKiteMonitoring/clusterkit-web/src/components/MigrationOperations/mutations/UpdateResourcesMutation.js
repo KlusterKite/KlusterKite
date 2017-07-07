@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class UpdateResourcesMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate}`
   }
 
   getFatQuery () {

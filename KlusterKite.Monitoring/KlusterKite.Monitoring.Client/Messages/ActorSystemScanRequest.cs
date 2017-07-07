@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ActorSystemScanRequest.cs" company="ClusterKit">
+// <copyright file="ActorSystemScanRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Client.Messages
+namespace KlusterKite.Monitoring.Client.Messages
 {
     /// <summary>
     /// The request to scan local actor tree

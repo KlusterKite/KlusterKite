@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace KlusterKite.NodeManager
 {
     using System.Collections.Generic;
     using System.Reflection;
@@ -17,7 +17,7 @@ namespace ClusterKit.NodeManager
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
     
     using JetBrains.Annotations;
 
@@ -67,7 +67,7 @@ namespace ClusterKit.NodeManager
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.NodeManager.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.NodeManager.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -86,7 +86,7 @@ namespace ClusterKit.NodeManager
             // container.RegisterType<NugetPackagesFactory>().As<DataFactory<string, IPackage, string>>();
             container.RegisterType<ApiProvider>().As<API.Provider.ApiProvider>();
             
-            // var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
+            // var nugetUrl = config.GetString("KlusterKite.NodeManager.PackageRepository");
             // container.Register(c => PackageRepositoryFactory.Default.CreateRepository(nugetUrl)).As<IPackageRepository>();
         }
     }

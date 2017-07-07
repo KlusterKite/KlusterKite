@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Installing components from current library
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Security.Client
+namespace KlusterKite.Security.Client
 {
     using System.Collections.Generic;
 
@@ -14,8 +14,8 @@ namespace ClusterKit.Security.Client
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Core;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// Installing components from current library

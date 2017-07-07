@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationCollector.cs" company="ClusterKit">
+// <copyright file="MigrationCollector.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.RemoteDomain
+namespace KlusterKite.NodeManager.RemoteDomain
 {
     using System;
     using System.Collections.Generic;
 
     using Autofac;
 
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Migrator;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Migrator;
 
     /// <summary>
     /// Base class to launch <see cref="IMigrator"/> in remote domain

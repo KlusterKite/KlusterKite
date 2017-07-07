@@ -4,7 +4,7 @@ RUN apt-get update && \
 	apt-get -y upgrade
 
 #RUN rm /etc/nginx/sites-enabled/default
-COPY clusterkit-web/.nginx.conf /etc/nginx/conf.d/default.conf
-COPY clusterkit-web/build /var/www/clusterkit
+COPY klusterkite-web/.nginx.conf /etc/nginx/conf.d/default.conf
+COPY klusterkite-web/build /var/www/klusterkite
 
 

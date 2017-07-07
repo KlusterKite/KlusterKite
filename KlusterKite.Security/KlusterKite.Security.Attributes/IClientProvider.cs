@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IClientProvider.cs" company="ClusterKit">
+// <copyright file="IClientProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Provides API for oAuth 2 authentication to get and check clients (client applications)
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Security.Attributes
+namespace KlusterKite.Security.Attributes
 {
     using System.Threading.Tasks;
 

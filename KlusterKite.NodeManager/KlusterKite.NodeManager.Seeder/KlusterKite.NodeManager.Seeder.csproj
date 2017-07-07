@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.NodeManager.Seeder</PackageId>
+    <PackageId>KlusterKite.NodeManager.Seeder</PackageId>
     <Version>0.0.0.0-local</Version>
     <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
@@ -14,8 +14,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.Migrator\ClusterKit.NodeManager.Migrator.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Core\KlusterKite.Core\KlusterKite.Core.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Migrator\KlusterKite.NodeManager.Migrator.csproj" />
   </ItemGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">

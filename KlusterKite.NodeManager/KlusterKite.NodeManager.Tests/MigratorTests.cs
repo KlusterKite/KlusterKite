@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigratorTests.cs" company="ClusterKit">
+// <copyright file="MigratorTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests
+namespace KlusterKite.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -20,18 +20,18 @@ namespace ClusterKit.NodeManager.Tests
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Data;
-    using ClusterKit.Data.EF;
-    using ClusterKit.Data.EF.InMemory;
-    using ClusterKit.NodeManager.Client.Messages.Migration;
-    using ClusterKit.NodeManager.Client.MigrationStates;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Tests.Migrations;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Data;
+    using KlusterKite.Data.EF;
+    using KlusterKite.Data.EF.InMemory;
+    using KlusterKite.NodeManager.Client.Messages.Migration;
+    using KlusterKite.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Tests.Migrations;
 
 #if CORECLR
     using Microsoft.Extensions.DependencyModel;
@@ -45,12 +45,12 @@ namespace ClusterKit.NodeManager.Tests
     using Xunit;
     using Xunit.Abstractions;
 
-    using Installer = ClusterKit.Core.TestKit.Installer;
+    using Installer = KlusterKite.Core.TestKit.Installer;
 
     /// <summary>
     /// Testing the <see cref="MigrationActor"/>
     /// </summary>
-    [Collection("ClusterKit.NodeManager.Tests.ConfigurationContext")]
+    [Collection("KlusterKite.NodeManager.Tests.ConfigurationContext")]
     public class MigratorTests : BaseActorTest<MigratorTests.Configurator>
     {
         /// <summary>
@@ -97,8 +97,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -111,8 +111,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
 
                     TestMigrator.ThrowOnGetMigratableResources = true
@@ -164,8 +164,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -179,8 +179,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -214,7 +214,7 @@ namespace ClusterKit.NodeManager.Tests
                                           {
                                               TemplateCode = "migrator",
                                               MigratorTypeName =
-                                                  "ClusterKit.NodeManager.Tests.Migrations.TestMigrator",
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
                                               ResourceCode = Path.GetFileName(resourceName),
                                               Target = EnMigrationSide.Destination
                                           };
@@ -270,8 +270,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -284,8 +284,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -345,8 +345,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -360,8 +360,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -396,7 +396,7 @@ namespace ClusterKit.NodeManager.Tests
                                           {
                                               TemplateCode = "migrator",
                                               MigratorTypeName =
-                                                  "ClusterKit.NodeManager.Tests.Migrations.TestMigrator",
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
                                               ResourceCode = Path.GetFileName(resourceName),
                                               Target = EnMigrationSide.Destination
                                           };
@@ -452,8 +452,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -468,8 +468,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
 
                     TestMigrator.ThrowOnMigrate = true
@@ -506,7 +506,7 @@ namespace ClusterKit.NodeManager.Tests
                                           {
                                               TemplateCode = "migrator",
                                               MigratorTypeName =
-                                                  "ClusterKit.NodeManager.Tests.Migrations.TestMigrator",
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
                                               ResourceCode = Path.GetFileName(resourceName),
                                               Target = EnMigrationSide.Destination
                                           };
@@ -560,8 +560,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
 
                     TestMigrator.ThrowOnGetMigratableResources = true
@@ -610,8 +610,8 @@ namespace ClusterKit.NodeManager.Tests
                     TestMigrator.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
-                    ClusterKit.NodeManager.Migrators = [
-                        ""ClusterKit.NodeManager.Tests.Migrations.TestMigrator, ClusterKit.NodeManager.Tests""
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -640,7 +640,7 @@ namespace ClusterKit.NodeManager.Tests
                                           {
                                               TemplateCode = "migrator",
                                               MigratorTypeName =
-                                                  "ClusterKit.NodeManager.Tests.Migrations.TestMigrator",
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
                                               ResourceCode = Path.GetFileName(resourceName),
                                               Target = EnMigrationSide.Destination
                                           };
@@ -706,7 +706,7 @@ namespace ClusterKit.NodeManager.Tests
                                        new[]
                                            {
                                                new NodeTemplate.PackageRequirement(
-                                                   "ClusterKit.NodeManager",
+                                                   "KlusterKite.NodeManager",
                                                    null)
                                            }.ToList()
                                };
@@ -720,7 +720,7 @@ namespace ClusterKit.NodeManager.Tests
                                        new[]
                                            {
                                                new NodeTemplate.PackageRequirement(
-                                                   "ClusterKit.NodeManager.Tests",
+                                                   "KlusterKite.NodeManager.Tests",
                                                    null),
                                                new NodeTemplate.PackageRequirement(
                                                    "Akka.Logger.Serilog",
@@ -859,10 +859,10 @@ namespace ClusterKit.NodeManager.Tests
                 return ConfigurationFactory.ParseString(
                     $@"
             {{
-                ClusterKit.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
-                ClusterKit.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
-                ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = """"
-                ClusterKit.NodeManager.FrameworkType = ""{ReleaseCheckTestsBase.Net46}""
+                KlusterKite.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
+                KlusterKite.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
+                KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = """"
+                KlusterKite.NodeManager.FrameworkType = ""{ReleaseCheckTestsBase.Net46}""
 
                 akka : {{
                   actor: {{

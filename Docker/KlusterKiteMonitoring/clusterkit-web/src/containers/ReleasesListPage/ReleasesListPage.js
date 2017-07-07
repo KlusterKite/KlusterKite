@@ -17,7 +17,7 @@ class ReleasesListPage extends React.Component {
     return (
       <div>
         <ReleasesList
-          clusterKitNodesApi={this.props.api.clusterKitNodesApi}
+          klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
           loaded={false}
           itemsPerPage={itemsPerPage}
           offset={offset}
@@ -47,11 +47,11 @@ export default Relay.createContainer(
         return variables;
     },
     fragments: {
-      api: (variables) => Relay.QL`fragment on IClusterKitNodeApi {
+      api: (variables) => Relay.QL`fragment on IKlusterKiteNodeApi {
         __typename
-        clusterKitNodesApi {
+        klusterKiteNodesApi {
           id
-          ${ReleasesList.getFragment('clusterKitNodesApi', { itemsPerPage: variables.itemsPerPage, offset: variables.offset})},
+          ${ReleasesList.getFragment('klusterKiteNodesApi', { itemsPerPage: variables.itemsPerPage, offset: variables.offset})},
         }
       }
       `,

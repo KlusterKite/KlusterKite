@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="ClusterKit">
+// <copyright file="Program.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Seeder
+namespace KlusterKite.NodeManager.Seeder
 {
     using System;
     using System.Collections.Generic;
@@ -19,8 +19,8 @@ namespace ClusterKit.NodeManager.Seeder
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.NodeManager.Migrator;
+    using KlusterKite.Core;
+    using KlusterKite.NodeManager.Migrator;
 
     using JetBrains.Annotations;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebTracer.cs" company="ClusterKit">
+// <copyright file="WebTracer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web
+namespace KlusterKite.Web
 {
     using System;
     using System.Diagnostics;
@@ -75,7 +75,7 @@ namespace ClusterKit.Web
             {
                 this.next = next;
                 this.system = system;
-                this.traceRequests = system.Settings.Config.GetBoolean("ClusterKit.Web.Debug.Trace");
+                this.traceRequests = system.Settings.Config.GetBoolean("KlusterKite.Web.Debug.Trace");
             }
 
             /// <summary>Process an individual request.</summary>

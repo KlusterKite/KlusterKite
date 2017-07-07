@@ -5,7 +5,7 @@
 	       }
 
                /NodeManager/Receiver {
-                        type = "ClusterKit.NodeManager.Client.NodeManagerReceiverActor, ClusterKit.NodeManager.Client"
+                        type = "KlusterKite.NodeManager.Client.NodeManagerReceiverActor, KlusterKite.NodeManager.Client"
                }
         
                 /NodeManager/NodeManagerProxy {

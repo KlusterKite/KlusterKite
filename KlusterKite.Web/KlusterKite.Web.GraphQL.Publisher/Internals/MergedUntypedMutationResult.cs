@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MergedUntypedMutationResult.cs" company="ClusterKit">
+// <copyright file="MergedUntypedMutationResult.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.Internals
+namespace KlusterKite.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
 
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;

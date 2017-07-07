@@ -1,7 +1,7 @@
 ﻿{
-	ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true;Database=ClusterKit.NodeManagerConfiguration"	  
-	ClusterKit.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"	
-    ClusterKit.NodeManager.Migrators = [
-        "ClusterKit.NodeManager.ConfigurationSource.ConfigurationMigrator, ClusterKit.NodeManager.ConfigurationSource"
+	KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true;Database=KlusterKite.NodeManagerConfiguration"	  
+	KlusterKite.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"	
+    KlusterKite.NodeManager.Migrators = [
+        "KlusterKite.NodeManager.ConfigurationSource.ConfigurationMigrator, KlusterKite.NodeManager.ConfigurationSource"
     ]
 }

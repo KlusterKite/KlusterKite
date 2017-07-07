@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource
+namespace KlusterKite.NodeManager.ConfigurationSource
 {
     using System;
 
@@ -15,10 +15,10 @@ namespace ClusterKit.NodeManager.ConfigurationSource
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Data;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.Core;
+    using KlusterKite.Data;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
 
@@ -38,7 +38,7 @@ namespace ClusterKit.NodeManager.ConfigurationSource
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{ClusterKit.NodeManager.ConfigurationSeederType = \"ClusterKit.NodeManager.ConfigurationSource.ConfigurationSeeder, ClusterKit.NodeManager.ConfigurationSource\"}");
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString("{KlusterKite.NodeManager.ConfigurationSeederType = \"KlusterKite.NodeManager.ConfigurationSource.ConfigurationSeeder, KlusterKite.NodeManager.ConfigurationSource\"}");
 
         /// <inheritdoc />
         protected override void RegisterComponents(ContainerBuilder container, Config config)
@@ -49,8 +49,8 @@ namespace ClusterKit.NodeManager.ConfigurationSource
             container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Release, int>>();
             container.RegisterType<MigrationDataFactory>().As<DataFactory<ConfigurationContext, Migration, int>>();
 
-            var nugetUrl = config.GetString("ClusterKit.NodeManager.PackageRepository");
-            if (config.GetBoolean("ClusterKit.NodeManager.RegisterNuget", true)
+            var nugetUrl = config.GetString("KlusterKite.NodeManager.PackageRepository");
+            if (config.GetBoolean("KlusterKite.NodeManager.RegisterNuget", true)
                 && !string.IsNullOrWhiteSpace(nugetUrl))
             {
                 container.RegisterInstance(new RemotePackageRepository(nugetUrl)).As<IPackageRepository>();

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LogAccessAttribute.cs" company="ClusterKit">
+// <copyright file="LogAccessAttribute.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes.Authorization
+namespace KlusterKite.API.Attributes.Authorization
 {
     using System;
     using System.Reflection;
 
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The access to the marked field will be logged to security log with specified severity

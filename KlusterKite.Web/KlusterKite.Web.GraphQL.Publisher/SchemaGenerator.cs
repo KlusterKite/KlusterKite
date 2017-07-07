@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SchemaGenerator.cs" company="ClusterKit">
+// <copyright file="SchemaGenerator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System;
     using System.Collections.Generic;
@@ -15,10 +15,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
     using Akka.Util.Internal;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.GraphQL.Publisher.GraphTypes;
-    using ClusterKit.Web.GraphQL.Publisher.Internals;
+    using KlusterKite.API.Client;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
+    using KlusterKite.Web.GraphQL.Publisher.Internals;
 
     using global::GraphQL;
     using global::GraphQL.Http;

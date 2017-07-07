@@ -1,13 +1,13 @@
 ﻿{
 	akka.actor.deployment {	
-        /ClusterKit {
+        /KlusterKite {
 	        IsNameSpace = true
 	    }
-        /ClusterKit/API {
-	        type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+        /KlusterKite/API {
+	        type = "KlusterKite.Core.NameSpaceActor, KlusterKite.Core"
 	    }
-        /ClusterKit/API/Publisher {
-	        type = "ClusterKit.API.Endpoint.ApiPublisherActor, ClusterKit.API.Endpoint"
+        /KlusterKite/API/Publisher {
+	        type = "KlusterKite.API.Endpoint.ApiPublisherActor, KlusterKite.API.Endpoint"
 	    }	    	    
 	}
 }

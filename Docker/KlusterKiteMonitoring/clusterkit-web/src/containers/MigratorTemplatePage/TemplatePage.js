@@ -51,16 +51,16 @@ class TemplatePage extends React.Component {
         }),
       {
         onSuccess: (response) => {
-          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
-            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
 
             this.setState({
               saving: false,
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -93,16 +93,16 @@ class TemplatePage extends React.Component {
         }),
       {
         onSuccess: (response) => {
-          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
-            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
 
             this.setState({
               deleting: false,
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -115,12 +115,12 @@ class TemplatePage extends React.Component {
   };
 
   onCancel = () => {
-    browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`)
+    browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`)
   };
 
   render () {
     const model = this.props.api.template;
-    const packages = this.props.api.clusterKitNodesApi.nugetPackages;
+    const packages = this.props.api.klusterKiteNodesApi.nugetPackages;
     return (
       <div>
         <MigratorTemplateForm
@@ -151,10 +151,10 @@ export default Relay.createContainer(
     }),
     fragments: {
       api: () => Relay.QL`
-        fragment on IClusterKitNodeApi {
+        fragment on IKlusterKiteNodeApi {
           id
           __typename
-          clusterKitNodesApi {
+          klusterKiteNodesApi {
             nugetPackages {
               edges {
                 node {
@@ -166,7 +166,7 @@ export default Relay.createContainer(
             }
           }
           release:__node(id: $releaseId) {
-            ...on IClusterKitNodeApi_Release {
+            ...on IKlusterKiteNodeApi_Release {
               __id
               configuration {
                 ${UpdateFeedMutation.getFragment('configuration')},
@@ -174,7 +174,7 @@ export default Relay.createContainer(
             }
           }
           template:__node(id: $id) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_MigratorTemplate {
+            ...on IKlusterKiteNodeApi_MigratorTemplate {
               id
               code
               configuration

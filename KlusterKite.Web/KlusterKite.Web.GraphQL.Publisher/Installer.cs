@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Installing components from current library
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System.Collections.Generic;
     using System.Reflection;
@@ -16,7 +16,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 
     using global::GraphQL;
     using global::GraphQL.Http;
@@ -36,7 +36,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.GraphQL.Publisher.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Web.GraphQL.Publisher.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -44,7 +44,7 @@ namespace ClusterKit.Web.GraphQL.Publisher
         /// <returns>The list of roles</returns>
         protected override IEnumerable<string> GetRoles() => new[]
                                                                  {
-                                                                     "ClusterKit.Web.GraphQL.Publisher"
+                                                                     "KlusterKite.Web.GraphQL.Publisher"
                                                                  };
 
         /// <inheritdoc />

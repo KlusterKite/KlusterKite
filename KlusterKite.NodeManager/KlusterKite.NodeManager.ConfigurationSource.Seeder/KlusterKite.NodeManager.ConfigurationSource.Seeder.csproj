@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
-    <PackageId>ClusterKit.NodeManager.ConfigurationSource.Seeder</PackageId>
+    <PackageId>KlusterKite.NodeManager.ConfigurationSource.Seeder</PackageId>
     <Version>0.0.0.0-local</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
@@ -22,8 +22,8 @@
     <EmbeddedResource Include="Resources\publisher.hocon" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Monitoring\ClusterKit.Monitoring.Client\ClusterKit.Monitoring.Client.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.ConfigurationSource\ClusterKit.NodeManager.ConfigurationSource.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Monitoring\KlusterKite.Monitoring.Client\KlusterKite.Monitoring.Client.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.ConfigurationSource\KlusterKite.NodeManager.ConfigurationSource.csproj" />
   </ItemGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">

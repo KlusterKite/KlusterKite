@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestMessage.cs" company="ClusterKit">
+// <copyright file="TestMessage.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.TestKit
+namespace KlusterKite.Core.TestKit
 {
     /// <summary>
     /// Message wrapper to include original receiver address

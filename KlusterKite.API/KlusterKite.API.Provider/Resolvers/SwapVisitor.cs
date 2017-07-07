@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SwapVisitor.cs" company="ClusterKit">
+// <copyright file="SwapVisitor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Provider.Resolvers
+namespace KlusterKite.API.Provider.Resolvers
 {
     using System.Linq.Expressions;
 

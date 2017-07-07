@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebApplication.cs" company="ClusterKit">
+// <copyright file="WebApplication.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The ClusterKit nodmanager web UI
+//   The KlusterKite nodmanager web UI
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.NodeManager.Authentication.Clients
+namespace KlusterKite.NodeManager.Authentication.Clients
 {
     using System;
     using System.Collections.Generic;
@@ -14,22 +14,22 @@ namespace ClusterKit.NodeManager.Authentication.Clients
 
     using Akka.Actor;
 
-    using ClusterKit.Core;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Core;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.NodeManager.Client;
+    using KlusterKite.NodeManager.Client.Messages;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
-    /// The ClusterKit node manager web UI
+    /// The KlusterKite node manager web UI
     /// </summary>
     public class WebApplication : IClient
     {
         /// <summary>
         /// The web application client id
         /// </summary>
-        public const string WebApplicationClientId = "ClusterKit.NodeManager.WebApplication";
+        public const string WebApplicationClientId = "KlusterKite.NodeManager.WebApplication";
 
         /// <summary>
         /// The actor system
@@ -46,7 +46,7 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         public string ClientId => WebApplicationClientId;
 
         /// <inheritdoc />
-        public string Name => "The ClusterKit nodmanager web UI";
+        public string Name => "The KlusterKite nodmanager web UI";
 
         /// <inheritdoc />
         public IEnumerable<string> OwnScope => new string[0];
@@ -91,10 +91,10 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         }
 
         /// <summary>
-        /// Creates <see cref="ClusterKit.Security.Attributes.AuthenticationResult"/> from user data
+        /// Creates <see cref="KlusterKite.Security.Attributes.AuthenticationResult"/> from user data
         /// </summary>
         /// <param name="user">The user</param>
-        /// <returns>The <see cref="ClusterKit.Security.Attributes.AuthenticationResult"/></returns>
+        /// <returns>The <see cref="KlusterKite.Security.Attributes.AuthenticationResult"/></returns>
         private AuthenticationResult CreateUserAuthenticationResult(User user)
         {
             // ReSharper disable ArrangeRedundantParentheses

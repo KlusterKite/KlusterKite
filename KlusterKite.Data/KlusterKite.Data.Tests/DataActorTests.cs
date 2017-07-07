@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataActorTests.cs" company="ClusterKit">
+// <copyright file="DataActorTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.Tests
+namespace KlusterKite.Data.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -21,12 +21,12 @@ namespace ClusterKit.Data.Tests
 
     using Autofac;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.EF;
-    using ClusterKit.Data.Tests.Mock;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.EF;
+    using KlusterKite.Data.Tests.Mock;
 
     using Newtonsoft.Json.Linq;
 

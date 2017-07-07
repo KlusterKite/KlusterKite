@@ -1,13 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseInstaller.cs" company="ClusterKit">
+// <copyright file="BaseInstaller.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Base class to install ClusterKit plugin components
+//   Base class to install KlusterKite plugin components
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core
+namespace KlusterKite.Core
 {
     using System;
     using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace ClusterKit.Core
     using JetBrains.Annotations;
 
     /// <summary>
-    /// Base class to install ClusterKit plugin components
+    /// Base class to install KlusterKite plugin components
     /// </summary>
     [UsedImplicitly]
     public abstract class BaseInstaller
@@ -91,7 +91,7 @@ namespace ClusterKit.Core
         /// </returns>
         public static Config GetStackedConfig(ContainerBuilder container, Config config)
         {
-            Serilog.Log.Information("ClusterKit starting plugin manager");
+            Serilog.Log.Information("KlusterKite starting plugin manager");
 
             List<BaseInstaller> list;
             if (!RegisteredInstallers.TryGetValue(container, out list))

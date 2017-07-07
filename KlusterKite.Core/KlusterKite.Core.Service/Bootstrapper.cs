@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Bootstrapper.cs" company="ClusterKit">
+// <copyright file="Bootstrapper.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Service
+namespace KlusterKite.Core.Service
 {
     using System;
     using System.Collections.Generic;
@@ -23,7 +23,7 @@ namespace ClusterKit.Core.Service
 
     using Autofac;
 
-    using ClusterKit.Core.Log;
+    using KlusterKite.Core.Log;
 
     using JetBrains.Annotations;
 
@@ -71,12 +71,12 @@ namespace ClusterKit.Core.Service
 
             // log configuration
             LogEventLevel level;
-            if (!Enum.TryParse(config.GetString("ClusterKit.Log.minimumLevel"), true, out level))
+            if (!Enum.TryParse(config.GetString("KlusterKite.Log.minimumLevel"), true, out level))
             {
                 level = LogEventLevel.Verbose;
             }
 
-            var actorSystem = ActorSystem.Create("ClusterKit", config);
+            var actorSystem = ActorSystem.Create("KlusterKite", config);
             containerBuilder.RegisterInstance(actorSystem).As<ActorSystem>();
             var container = containerBuilder.Build();
 

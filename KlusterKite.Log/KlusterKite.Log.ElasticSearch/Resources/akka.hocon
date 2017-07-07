@@ -1,7 +1,7 @@
 ﻿{
-	ClusterKit.Log.ElasticSearch {
+	KlusterKite.Log.ElasticSearch {
 		# you can use 'none' value or any other invalid value to disable log
-		# this level should be no lower then "ClusterKit.Log.minimumLevel" (that is "Verbose" by default)
+		# this level should be no lower then "KlusterKite.Log.minimumLevel" (that is "Verbose" by default)
 		minimumLevel = "Information"
 
 		#the list of connection urls for standard log
@@ -11,7 +11,7 @@
 		indexFormat = "logstash-{0:yyyy.MM.dd}"
 
 		# you can use 'none' value or any other invalid value to disable log
-		# this level should be no lower then "ClusterKit.Log.minimumLevel" (that is "Verbose" by default)
+		# this level should be no lower then "KlusterKite.Log.minimumLevel" (that is "Verbose" by default)
 		# Usialy log level of security log defined as:
 		# - Verbose  - none
 		# - Debug - for read access of non crucial data

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeStartUpConfiguration.cs" company="ClusterKit">
+// <copyright file="NodeStartUpConfiguration.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Messages
+namespace KlusterKite.NodeManager.Launcher.Messages
 {
     using System.Collections.Generic;
 

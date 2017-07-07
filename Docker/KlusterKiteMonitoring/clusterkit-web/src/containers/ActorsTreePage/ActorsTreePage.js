@@ -27,7 +27,7 @@ class ActorsTreePage extends React.Component {
       new InitiateScanMutation({}),
       {
         onSuccess: (response) => {
-          const result = response.clusterKitMonitoring_clusterKitMonitoringApi_initiateScan.result;
+          const result = response.klusterKiteMonitoring_klusterKiteMonitoringApi_initiateScan.result;
 
           console.log('response', response);
           if (result) {
@@ -73,8 +73,8 @@ class ActorsTreePage extends React.Component {
     return (
       <div>
         <ActorsTreeButtons handleScan={this.onInitiateScan} handleReload={this.onReload} isLoading={this.state.isScanning} />
-        {this.props.api.clusterKitMonitoringApi && this.props.api.clusterKitMonitoringApi.getClusterTree &&  this.props.api.clusterKitMonitoringApi.getClusterTree.nodes &&
-          <ActorsTree tree={this.props.api.clusterKitMonitoringApi.getClusterTree.nodes.edges} />
+        {this.props.api.klusterKiteMonitoringApi && this.props.api.klusterKiteMonitoringApi.getClusterTree &&  this.props.api.klusterKiteMonitoringApi.getClusterTree.nodes &&
+          <ActorsTree tree={this.props.api.klusterKiteMonitoringApi.getClusterTree.nodes.edges} />
         }
       </div>
     )
@@ -86,9 +86,9 @@ export default Relay.createContainer(
   {
     fragments: {
       api: () => Relay.QL`
-        fragment on IClusterKitMonitoring {
+        fragment on IKlusterKiteMonitoring {
           __typename
-          clusterKitMonitoringApi {
+          klusterKiteMonitoringApi {
             getClusterTree {
               nodes {
                 edges {

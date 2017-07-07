@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebTest.cs" company="ClusterKit">
+// <copyright file="WebTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests
+namespace KlusterKite.Web.Tests
 {
-    using ClusterKit.Core.TestKit;
+    using KlusterKite.Core.TestKit;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -20,7 +20,7 @@ namespace ClusterKit.Web.Tests
     /// <typeparam name="TConfigurator">
     /// Class, that describes test configuration
     /// </typeparam>
-    [Collection("ClusterKit.Web.Tests")]
+    [Collection("KlusterKite.Web.Tests")]
     public abstract class WebTest<TConfigurator> : BaseActorTest<TConfigurator> where TConfigurator : TestConfigurator, new()
     {
         /// <summary>

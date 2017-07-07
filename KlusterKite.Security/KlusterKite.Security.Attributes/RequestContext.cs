@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequestContext.cs" company="ClusterKit">
+// <copyright file="RequestContext.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Security.Attributes
+namespace KlusterKite.Security.Attributes
 {
     using System.Collections.Generic;
 

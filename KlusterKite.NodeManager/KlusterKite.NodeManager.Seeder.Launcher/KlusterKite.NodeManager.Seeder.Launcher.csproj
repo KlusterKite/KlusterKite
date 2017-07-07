@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.NodeManager.Seeder.Launcher</PackageId>
+    <PackageId>KlusterKite.NodeManager.Seeder.Launcher</PackageId>
     <Version>0.0.0.0-local</Version>
     <ApplicationIcon />
     <OutputTypeEx>exe</OutputTypeEx>
@@ -18,7 +18,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Utils\ClusterKit.NodeManager.Launcher.Utils.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Launcher.Utils\KlusterKite.NodeManager.Launcher.Utils.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="seeder.hocon">

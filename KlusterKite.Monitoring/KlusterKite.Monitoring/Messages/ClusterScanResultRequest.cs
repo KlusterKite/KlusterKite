@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClusterScanResultRequest.cs" company="ClusterKit">
+// <copyright file="ClusterScanResultRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Monitoring.Messages
+namespace KlusterKite.Monitoring.Messages
 {
     /// <summary>
     /// Request to acquire the cluster system scan results

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Connection.cs" company="ClusterKit">
+// <copyright file="Connection.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD
+namespace KlusterKite.Data.CRUD
 {
     using System;
     using System.Collections.Generic;
@@ -18,11 +18,11 @@ namespace ClusterKit.Data.CRUD
     using Akka;
     using Akka.Actor;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.CRUD.Exceptions;
-    using ClusterKit.LargeObjects.Client;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.Exceptions;
+    using KlusterKite.LargeObjects.Client;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The base connection using data actors

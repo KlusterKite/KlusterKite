@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelsTest.cs" company="ClusterKit">
+// <copyright file="ParcelsTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects.Tests
+namespace KlusterKite.LargeObjects.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -21,9 +21,9 @@ namespace ClusterKit.LargeObjects.Tests
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.LargeObjects.Client;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.LargeObjects.Client;
 
     using JetBrains.Annotations;
 

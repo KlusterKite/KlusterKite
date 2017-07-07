@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HostConfiguration.cs" company="ClusterKit">
+// <copyright file="HostConfiguration.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.NginxConfigurator
+namespace KlusterKite.Web.NginxConfigurator
 {
     using System.Collections;
     using System.Collections.Generic;

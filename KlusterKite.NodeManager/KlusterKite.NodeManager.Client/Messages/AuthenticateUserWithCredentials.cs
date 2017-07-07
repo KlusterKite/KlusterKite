@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthenticateUserWithCredentials.cs" company="ClusterKit">
+// <copyright file="AuthenticateUserWithCredentials.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.Messages
+namespace KlusterKite.NodeManager.Client.Messages
 {
     using Akka.Routing;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MutationException.cs" company="ClusterKit">
+// <copyright file="MutationException.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD.Exceptions
+namespace KlusterKite.Data.CRUD.Exceptions
 {
     using System;
     using System.Collections.Generic;
 
-    using ClusterKit.API.Client;
+    using KlusterKite.API.Client;
 
     /// <summary>
     /// The mutation exception

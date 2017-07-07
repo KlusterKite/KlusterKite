@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseCheckTestsBase.cs" company="ClusterKit">
+// <copyright file="ReleaseCheckTestsBase.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests
+namespace KlusterKite.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -17,11 +17,11 @@ namespace ClusterKit.NodeManager.Tests
     using System.Runtime.Versioning;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.API.Client;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
 
@@ -130,7 +130,7 @@ namespace ClusterKit.NodeManager.Tests
         {
             if (packages == null)
             {
-                packages = new[] { "p1 1.0.0", "p2 1.0.0", "dp1 1.0.0", "dp2 1.0.0", "ClusterKit.NodeManager.Migrator.Executor 1.0.0" };
+                packages = new[] { "p1 1.0.0", "p2 1.0.0", "dp1 1.0.0", "dp2 1.0.0", "KlusterKite.NodeManager.Migrator.Executor 1.0.0" };
             }
 
             if (templatePackageRequirements == null)
@@ -218,7 +218,7 @@ namespace ClusterKit.NodeManager.Tests
 
             var dp3 = new TestPackage("dp3", "1.0.0");
 
-            var executor = new TestPackage("ClusterKit.NodeManager.Migrator.Executor", "1.0.0");
+            var executor = new TestPackage("KlusterKite.NodeManager.Migrator.Executor", "1.0.0");
 
             return new TestRepository(p1, p2, p3, dp1, dp2, dp3, executor);
         }

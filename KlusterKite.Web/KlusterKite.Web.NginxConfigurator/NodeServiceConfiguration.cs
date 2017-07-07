@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeServiceConfiguration.cs" company="ClusterKit">
+// <copyright file="NodeServiceConfiguration.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.NginxConfigurator
+namespace KlusterKite.Web.NginxConfigurator
 {
     using System.Diagnostics.CodeAnalysis;
 
     using Akka.Actor;
 
-    using ClusterKit.Web.Client.Messages;
+    using KlusterKite.Web.Client.Messages;
 
     using JetBrains.Annotations;
 

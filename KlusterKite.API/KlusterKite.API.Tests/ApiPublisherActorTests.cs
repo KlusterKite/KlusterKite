@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiPublisherActorTests.cs" company="ClusterKit">
+// <copyright file="ApiPublisherActorTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Tests
+namespace KlusterKite.API.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -19,12 +19,12 @@ namespace ClusterKit.API.Tests
 
     using Autofac;
 
-    using ClusterKit.API.Client.Messages;
-    using ClusterKit.API.Endpoint;
-    using ClusterKit.API.Provider;
-    using ClusterKit.API.Tests.Mock;
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
+    using KlusterKite.API.Client.Messages;
+    using KlusterKite.API.Endpoint;
+    using KlusterKite.API.Provider;
+    using KlusterKite.API.Tests.Mock;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -56,7 +56,7 @@ namespace ClusterKit.API.Tests
             this.ExpectNoMsg();
 
             var descriptions =
-                await this.Sys.ActorSelection("/user/ClusterKit/API/Publisher")
+                await this.Sys.ActorSelection("/user/KlusterKite/API/Publisher")
                     .Ask<List<ApiDiscoverResponse>>(new ApiDiscoverRequest(), TimeSpan.FromSeconds(5));
 
             Assert.NotNull(descriptions);

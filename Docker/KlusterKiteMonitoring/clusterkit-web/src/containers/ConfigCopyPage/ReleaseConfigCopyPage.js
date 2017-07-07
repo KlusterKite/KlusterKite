@@ -34,11 +34,11 @@ class ReleaseConfigCopyPage extends React.Component {
   };
 
   copyConfiguration = () => {
-    if (this.props.api.clusterKitNodesApi.releases.edges && this.props.api.clusterKitNodesApi.releases.edges.length > 0){
-      let oldConfiguration = this.props.api.clusterKitNodesApi.releases.edges[0].node.configuration;
+    if (this.props.api.klusterKiteNodesApi.releases.edges && this.props.api.klusterKiteNodesApi.releases.edges.length > 0){
+      let oldConfiguration = this.props.api.klusterKiteNodesApi.releases.edges[0].node.configuration;
 
       if (this.props.params.mode === 'update') {
-        oldConfiguration.packages = this.convertNameToId(this.props.api.clusterKitNodesApi.nugetPackages);
+        oldConfiguration.packages = this.convertNameToId(this.props.api.klusterKiteNodesApi.nugetPackages);
       }
 
       this.setState({
@@ -64,9 +64,9 @@ class ReleaseConfigCopyPage extends React.Component {
       {
         onSuccess: (response) => {
           console.log('response', response);
-          if (response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors &&
-            response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.clusterKitNodeApi_clusterKitNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
 
             this.setState({
               processing: false,
@@ -77,7 +77,7 @@ class ReleaseConfigCopyPage extends React.Component {
               processing: false,
               saveErrors: null
             });
-            browserHistory.push(`/clusterkit/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
           }
         },
         onFailure: (transaction) => {
@@ -125,9 +125,9 @@ export default Relay.createContainer(
     }),
     fragments: {
       api: () => Relay.QL`
-        fragment on IClusterKitNodeApi {
+        fragment on IKlusterKiteNodeApi {
           id
-          clusterKitNodesApi {
+          klusterKiteNodesApi {
             releases(filter: { state: Active }, limit: 1) {
               edges {
                 node {
@@ -216,7 +216,7 @@ export default Relay.createContainer(
             }
           }
           release: __node(id: $releaseId) @include( if: $nodeExists ) {
-            ...on IClusterKitNodeApi_Release {
+            ...on IKlusterKiteNodeApi_Release {
               __id
               name
               notes

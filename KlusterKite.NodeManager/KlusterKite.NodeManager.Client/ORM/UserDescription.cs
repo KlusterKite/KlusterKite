@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UserDescription.cs" company="ClusterKit">
+// <copyright file="UserDescription.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,19 +7,19 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
     using System;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
     /// <summary>
     /// The short public user description
     /// </summary>
-    [ApiDescription(Description = "Short user description", Name = "ClusterKitUserDescription")]
+    [ApiDescription(Description = "Short user description", Name = "KlusterKiteUserDescription")]
     public class UserDescription : IUser
     {
         /// <summary>

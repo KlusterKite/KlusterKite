@@ -140,7 +140,7 @@ export default Relay.createContainer(
   MigrationSteps,
   {
     fragments: {
-      resourceState: () => Relay.QL`fragment on IClusterKitNodeApi_ResourceState {
+      resourceState: () => Relay.QL`fragment on IKlusterKiteNodeApi_ResourceState {
         operationIsInProgress
         canUpdateNodesToDestination
         canUpdateNodesToSource

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateClusterRequest.cs" company="ClusterKit">
+// <copyright file="UpdateClusterRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,10 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages
+namespace KlusterKite.NodeManager.Messages
 {
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// Performs the cluster update

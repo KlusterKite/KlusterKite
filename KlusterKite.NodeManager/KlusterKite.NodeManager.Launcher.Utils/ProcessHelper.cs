@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProcessHelper.cs" company="ClusterKit">
+// <copyright file="ProcessHelper.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Utils
+namespace KlusterKite.NodeManager.Launcher.Utils
 {
     using System.IO;
 

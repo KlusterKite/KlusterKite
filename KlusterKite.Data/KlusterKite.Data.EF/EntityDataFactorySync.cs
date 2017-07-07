@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EntityDataFactorySync.cs" company="ClusterKit">
+// <copyright file="EntityDataFactorySync.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -10,7 +10,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.EF
+namespace KlusterKite.Data.EF
 {
     using System;
     using System.Collections.Generic;
@@ -18,9 +18,9 @@ namespace ClusterKit.Data.EF
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Core.Monads;
-    using ClusterKit.Data.CRUD.ActionMessages;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core.Monads;
+    using KlusterKite.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
 

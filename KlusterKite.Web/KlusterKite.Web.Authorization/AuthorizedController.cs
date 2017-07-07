@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthorizedController.cs" company="ClusterKit">
+// <copyright file="AuthorizedController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authorization
+namespace KlusterKite.Web.Authorization
 {
     using System.Linq;
     
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 

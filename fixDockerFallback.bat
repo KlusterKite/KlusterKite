@@ -1,9 +1,9 @@
-dotnet build /t:Publish -f netcoreapp1.1 .\ClusterKit.NodeManager\ClusterKit.NodeManager.FallbackPackageFixer\ClusterKit.NodeManager.FallbackPackageFixer.csproj
+dotnet build /t:Publish -f netcoreapp1.1 .\KlusterKite.NodeManager\KlusterKite.NodeManager.FallbackPackageFixer\KlusterKite.NodeManager.FallbackPackageFixer.csproj
 
-del Docker\ClusterKitManager\fallBackConfiguration.json
-copy Docker\ClusterKitManager\fallBackConfiguration.orig Docker\ClusterKitManager\fallBackConfiguration.json
-dotnet .\ClusterKit.NodeManager\ClusterKit.NodeManager.FallbackPackageFixer\bin\Debug\netcoreapp1.1\publish\ClusterKit.NodeManager.FallbackPackageFixer.dll Docker\ClusterKitManager\fallBackConfiguration.json packageOut packageThirdPartyDir 
+del Docker\KlusterKiteManager\fallBackConfiguration.json
+copy Docker\KlusterKiteManager\fallBackConfiguration.orig Docker\KlusterKiteManager\fallBackConfiguration.json
+dotnet .\KlusterKite.NodeManager\KlusterKite.NodeManager.FallbackPackageFixer\bin\Debug\netcoreapp1.1\publish\KlusterKite.NodeManager.FallbackPackageFixer.dll Docker\KlusterKiteManager\fallBackConfiguration.json packageOut packageThirdPartyDir 
 
-del Docker\ClusterKitPublisher\fallBackConfiguration.json
-copy Docker\ClusterKitPublisher\fallBackConfiguration.orig Docker\ClusterKitPublisher\fallBackConfiguration.json
-dotnet .\ClusterKit.NodeManager\ClusterKit.NodeManager.FallbackPackageFixer\bin\Debug\netcoreapp1.1\publish\ClusterKit.NodeManager.FallbackPackageFixer.dll Docker\ClusterKitPublisher\fallBackConfiguration.json packageOut packageThirdPartyDir 
+del Docker\KlusterKitePublisher\fallBackConfiguration.json
+copy Docker\KlusterKitePublisher\fallBackConfiguration.orig Docker\KlusterKitePublisher\fallBackConfiguration.json
+dotnet .\KlusterKite.NodeManager\KlusterKite.NodeManager.FallbackPackageFixer\bin\Debug\netcoreapp1.1\publish\KlusterKite.NodeManager.FallbackPackageFixer.dll Docker\KlusterKitePublisher\fallBackConfiguration.json packageOut packageThirdPartyDir 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ActorSystemApiProvider.cs" company="ClusterKit">
+// <copyright file="ActorSystemApiProvider.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher
+namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System;
     using System.Collections.Concurrent;
@@ -17,10 +17,10 @@ namespace ClusterKit.Web.GraphQL.Publisher
 
     using Akka.Actor;
     
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Client.Messages;
-    using ClusterKit.Core;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Client.Messages;
+    using KlusterKite.Core;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json.Linq;
 

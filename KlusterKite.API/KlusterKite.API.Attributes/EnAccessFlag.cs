@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnAccessFlag.cs" company="ClusterKit">
+// <copyright file="EnAccessFlag.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes
+namespace KlusterKite.API.Attributes
 {
     /// <summary>
     /// The type of allowed api property access

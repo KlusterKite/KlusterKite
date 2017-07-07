@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="20170629061834_Init.cs" company="ClusterKit">
+// <copyright file="20170629061834_Init.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.ConfigurationSource.Migrations
+namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

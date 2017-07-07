@@ -3,12 +3,12 @@ import Relay from 'react-relay'
 export default class CreateUserMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{clusterKitNodeApi_clusterKitNodesApi_users_create}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_users_create}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on ClusterKitNodeApi_User_NodeMutationPayload {
+      fragment on KlusterKiteNodeApi_User_NodeMutationPayload {
         node
         edge
         errors
@@ -21,7 +21,7 @@ export default class CreateUserMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
         Relay.QL`
-          fragment on ClusterKitNodeApi_User_NodeMutationPayload {
+          fragment on KlusterKiteNodeApi_User_NodeMutationPayload {
             errors {
               edges {
                 node {

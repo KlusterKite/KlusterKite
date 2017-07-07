@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeTemplate.cs" company="ClusterKit">
+// <copyright file="NodeTemplate.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.ORM
+namespace KlusterKite.NodeManager.Client.ORM
 {
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client.Converters;
-    using ClusterKit.NodeManager.Launcher.Messages;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client.Converters;
+    using KlusterKite.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
 

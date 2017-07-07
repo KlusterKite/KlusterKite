@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataFactory.cs" company="ClusterKit">
+// <copyright file="DataFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data
+namespace KlusterKite.Data
 {
     using System;
     using System.Collections.Generic;
@@ -16,9 +16,9 @@ namespace ClusterKit.Data
 
     using Autofac;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Core.Monads;
-    using ClusterKit.Data.CRUD.ActionMessages;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core.Monads;
+    using KlusterKite.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
 

@@ -1,18 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequireUserPrivilegeAttribute.cs" company="ClusterKit">
+// <copyright file="RequireUserPrivilegeAttribute.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Checks session for authorization
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Web.Authorization.Attributes
+namespace KlusterKite.Web.Authorization.Attributes
 {
     using System;
     using System.Linq;
 
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
 
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Controllers;
@@ -55,7 +55,7 @@ namespace ClusterKit.Web.Authorization.Attributes
         /// Gets or sets a value indicating whether the resulting privilege test will be run against combined string of specified privilege and action method name.
         /// </summary>
         /// <example>
-        /// For example specified privilege is "ClusterKit.Object" and controller action called is "Get", then user will require privilege "ClusterKit.Object.Get" in order to call this method
+        /// For example specified privilege is "KlusterKite.Object" and controller action called is "Get", then user will require privilege "KlusterKite.Object.Get" in order to call this method
         /// </example>
         public bool CombinePrivilegeWithActionName { get; set; }
 

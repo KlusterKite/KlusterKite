@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeManagerApi.cs" company="ClusterKit">
+// <copyright file="NodeManagerApi.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System;
     using System.Collections.Generic;
@@ -16,24 +16,24 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Attributes.Authorization;
-    using ClusterKit.API.Client;
-    using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Attributes.Authorization;
+    using KlusterKite.API.Client;
+    using KlusterKite.NodeManager.Client;
+    using KlusterKite.NodeManager.Client.Messages;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Messages;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
-    using ConfigurationUtils = ClusterKit.Core.ConfigurationUtils;
+    using ConfigurationUtils = KlusterKite.Core.ConfigurationUtils;
 
     /// <summary>
     /// The node manager api
     /// </summary>
-    [ApiDescription("The main ClusterKit node managing methods", Name = "Root")]
+    [ApiDescription("The main KlusterKite node managing methods", Name = "Root")]
     public class NodeManagerApi
     {
         /// <summary>
@@ -167,7 +167,7 @@ namespace ClusterKit.NodeManager.WebApi
             UpdateDescription = "Updates the draft release",
             CanDelete = true,
             DeleteDescription = "Removes the draft release",
-            Description = "ClusterKit managing system security roles")]
+            Description = "KlusterKite managing system security roles")]
         [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public ReleaseConnection Releases(RequestContext context)
         {
@@ -185,7 +185,7 @@ namespace ClusterKit.NodeManager.WebApi
             CreateDescription = "Creates the new managing system role",
             CanUpdate = true,
             UpdateDescription = "Updates the managing system role",
-            Description = "ClusterKit managing system security roles")]
+            Description = "KlusterKite managing system security roles")]
         [RequirePrivilege(Privileges.Role, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public RolesConnection Roles(RequestContext context)
         {
@@ -221,7 +221,7 @@ namespace ClusterKit.NodeManager.WebApi
             CreateDescription = "Creates the new user",
             CanUpdate = true,
             UpdateDescription = "Updates the user",
-            Description = "ClusterKit managing system users")]
+            Description = "KlusterKite managing system users")]
         [RequirePrivilege(Privileges.User, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
         public UsersConnection Users(RequestContext context)
         {

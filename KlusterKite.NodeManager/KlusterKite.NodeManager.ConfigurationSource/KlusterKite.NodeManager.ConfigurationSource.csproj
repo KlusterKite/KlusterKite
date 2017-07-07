@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
-    <PackageId>ClusterKit.NodeManager.ConfigurationSource</PackageId>
+    <PackageId>KlusterKite.NodeManager.ConfigurationSource</PackageId>
     <Version>0.0.0.0-local</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
@@ -18,12 +18,12 @@
     <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data.EF\ClusterKit.Data.EF.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Data\ClusterKit.Data\ClusterKit.Data.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.Client\ClusterKit.NodeManager.Client.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.Launcher.Utils\ClusterKit.NodeManager.Launcher.Utils.csproj" />
-    <ProjectReference Include="..\ClusterKit.NodeManager.Migrator.EF\ClusterKit.NodeManager.Migrator.EF.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data.CRUD\KlusterKite.Data.CRUD.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data.EF\KlusterKite.Data.EF.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data\KlusterKite.Data.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Client\KlusterKite.NodeManager.Client.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Launcher.Utils\KlusterKite.NodeManager.Launcher.Utils.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Migrator.EF\KlusterKite.NodeManager.Migrator.EF.csproj" />
   </ItemGroup>
   
   <ItemGroup>

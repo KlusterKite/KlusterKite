@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Endpoint
+namespace KlusterKite.API.Endpoint
 {
     using System.Collections.Generic;
     using System.Reflection;
@@ -17,7 +17,7 @@ namespace ClusterKit.API.Endpoint
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 
     /// <summary>
     /// Installing components from current library
@@ -34,12 +34,12 @@ namespace ClusterKit.API.Endpoint
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.API.Endpoint.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.API.Endpoint.Resources.akka.hocon"));
 
         /// <inheritdoc />
         protected override IEnumerable<string> GetRoles()
         {
-            yield return "ClusterKit.API.Endpoint";
+            yield return "KlusterKite.API.Endpoint";
         }
 
         /// <inheritdoc />

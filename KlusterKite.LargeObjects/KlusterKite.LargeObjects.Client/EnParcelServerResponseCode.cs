@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnParcelServerResponseCode.cs" company="ClusterKit">
+// <copyright file="EnParcelServerResponseCode.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects.Client
+namespace KlusterKite.LargeObjects.Client
 {
     /// <summary>
     /// The list of possible response codes from parcels server

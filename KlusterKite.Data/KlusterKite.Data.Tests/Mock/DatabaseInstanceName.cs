@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DatabaseInstanceName.cs" company="ClusterKit">
+// <copyright file="DatabaseInstanceName.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.Tests.Mock
+namespace KlusterKite.Data.Tests.Mock
 {
     using System;
 

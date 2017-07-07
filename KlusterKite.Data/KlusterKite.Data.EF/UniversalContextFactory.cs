@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UniversalContextFactory.cs" company="ClusterKit">
+// <copyright file="UniversalContextFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.EF
+namespace KlusterKite.Data.EF
 {
     using System;
     using System.Collections.Generic;

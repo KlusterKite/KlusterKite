@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnMigratorPosition.cs" company="ClusterKit">
+// <copyright file="EnMigratorPosition.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,10 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Client.MigrationStates
+namespace KlusterKite.NodeManager.Client.MigrationStates
 {
-    using ClusterKit.API.Attributes;
-    using ClusterKit.NodeManager.Migrator;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Migrator;
 
     /// <summary>
     /// The <see cref="IMigrator"/> or <see cref="MigratorTemplateMigrationState"/> position in the migration

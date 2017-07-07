@@ -2,10 +2,10 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
-    <PackageId>ClusterKit.Build</PackageId>
+    <PackageId>KlusterKite.Build</PackageId>
     <Version>0.0.0.0-local</Version>    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageTags>$(ClusterKitPackageTags)</PackageTags>    
+    <PackageTags>$(KlusterKitePackageTags)</PackageTags>    
   </PropertyGroup>
   <ItemGroup>
     <Content Include="..\..\build.base.fsx" Link="build.base.fsx">

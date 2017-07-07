@@ -12,5 +12,5 @@ storiesOf('Homepage')
 ;
 
 let getSwaggerList = function () {
-  return ["clusterkit/manager/swagger/ui"];
+  return ["klusterkite/manager/swagger/ui"];
 };

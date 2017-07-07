@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PackageNotFoundException.cs" company="ClusterKit">
+// <copyright file="PackageNotFoundException.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher.Utils.Exceptions
+namespace KlusterKite.NodeManager.Launcher.Utils.Exceptions
 {
     using System;
 

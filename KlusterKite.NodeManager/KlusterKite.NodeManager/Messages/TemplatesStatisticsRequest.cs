@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TemplatesStatisticsRequest.cs" company="ClusterKit">
+// <copyright file="TemplatesStatisticsRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages
+namespace KlusterKite.NodeManager.Messages
 {
     /// <summary>
     /// The request to <seealso cref="NodeManagerActor"/> to obtain <seealso cref="TemplatesUsageStatistics"/>

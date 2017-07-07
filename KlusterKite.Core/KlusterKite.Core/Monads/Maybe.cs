@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Maybe.cs" company="ClusterKit">
+// <copyright file="Maybe.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Monads
+namespace KlusterKite.Core.Monads
 {
     using JetBrains.Annotations;
 

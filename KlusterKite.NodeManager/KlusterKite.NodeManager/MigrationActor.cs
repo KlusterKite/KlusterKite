@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationActor.cs" company="ClusterKit">
+// <copyright file="MigrationActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace KlusterKite.NodeManager
 {
     using System;
     using System.Collections.Generic;
@@ -20,13 +20,13 @@ namespace ClusterKit.NodeManager
     using Akka.Actor;
     using Akka.Event;
 
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client.Messages.Migration;
-    using ClusterKit.NodeManager.Client.MigrationStates;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.RemoteDomain;
+    using KlusterKite.Data.EF;
+    using KlusterKite.NodeManager.Client.Messages.Migration;
+    using KlusterKite.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.RemoteDomain;
 
     using JetBrains.Annotations;
 
@@ -89,7 +89,7 @@ namespace ClusterKit.NodeManager
                 Context.System.Settings.Config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
             this.databaseProviderName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
-            this.runtime = Context.System.Settings.Config.GetString("ClusterKit.NodeManager.Runtime");
+            this.runtime = Context.System.Settings.Config.GetString("KlusterKite.NodeManager.Runtime");
         }
 
         /// <summary>
@@ -831,7 +831,7 @@ namespace ClusterKit.NodeManager
                     this.runtime,
                     PackageRepositoryExtensions.CurrentRuntime,
                     migratorExecutionDirectory,
-                    "ClusterKit.NodeManager.Migrator.Executor");
+                    "KlusterKite.NodeManager.Migrator.Executor");
             }
             catch (Exception exception)
             {
@@ -975,12 +975,12 @@ namespace ClusterKit.NodeManager
 #if APPDOMAIN
             var isMono = Type.GetType("Mono.Runtime") != null;
             // ReSharper disable once InconsistentNaming
-            var ExecutableFileName = isMono ? "mono" : Path.Combine(installedPath, "ClusterKit.NodeManager.Migrator.Executor.exe");
+            var ExecutableFileName = isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.Executor.exe");
             // ReSharper disable once InconsistentNaming
-            var ExecutableArguments = isMono ? "ClusterKit.NodeManager.Migrator.Executor.exe" : string.Empty;
+            var ExecutableArguments = isMono ? "KlusterKite.NodeManager.Migrator.Executor.exe" : string.Empty;
 #elif CORECLR
             const string ExecutableFileName = "dotnet";
-            const string ExecutableArguments = "ClusterKit.NodeManager.Migrator.Executor.dll";
+            const string ExecutableArguments = "KlusterKite.NodeManager.Migrator.Executor.dll";
 #endif
 
             var process = new Process

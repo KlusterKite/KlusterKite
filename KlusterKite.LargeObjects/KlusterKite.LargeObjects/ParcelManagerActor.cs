@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParcelManagerActor.cs" company="ClusterKit">
+// <copyright file="ParcelManagerActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects
+namespace KlusterKite.LargeObjects
 {
     using System;
     using System.Collections.Concurrent;
@@ -24,8 +24,8 @@ namespace ClusterKit.LargeObjects
 
     using Autofac;
 
-    using ClusterKit.Core.Utils;
-    using ClusterKit.LargeObjects.Client;
+    using KlusterKite.Core.Utils;
+    using KlusterKite.LargeObjects.Client;
 
     using JetBrains.Annotations;
 
@@ -91,7 +91,7 @@ namespace ClusterKit.LargeObjects
         public ParcelManagerActor(IComponentContext container)
         {
             this.readTimeout = Context.System.Settings.Config.GetTimeSpan(
-                "ClusterKit.LargeObjects.TcpReadTimeout",
+                "KlusterKite.LargeObjects.TcpReadTimeout",
                 TimeSpan.FromSeconds(10));
             this.envelopers =
                 container.Resolve<IEnumerable<INotificationEnveloper>>()

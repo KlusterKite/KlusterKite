@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ControllerTests.cs" company="ClusterKit">
+// <copyright file="ControllerTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests
+namespace KlusterKite.Web.Tests
 {
     using System.Collections.Generic;
     using System.Net;
@@ -18,8 +18,8 @@ namespace ClusterKit.Web.Tests
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
 
     using RestSharp;
     
@@ -40,7 +40,7 @@ namespace ClusterKit.Web.Tests
         /// <summary>
         /// Current web server bind port
         /// </summary>
-        private int Port => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
+        private int Port => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
 
         /// <summary>
         /// Testing published controller method
@@ -81,7 +81,7 @@ namespace ClusterKit.Web.Tests
                 return ConfigurationFactory.ParseString(
                         $@"
                 {{
-                    ClusterKit {{
+                    KlusterKite {{
  		                Web {{
                             WebHostPort = {port},
  			                BindAddress = ""http://*:{port}"",

@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.Data.Tests</PackageId>
+    <PackageId>KlusterKite.Data.Tests</PackageId>
     <Version>0.0.0.0-local</Version>    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
@@ -10,11 +10,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data.CRUD\ClusterKit.Data.CRUD.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data.EF.InMemory\ClusterKit.Data.EF.InMemory.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data.EF\ClusterKit.Data.EF.csproj" />
-    <ProjectReference Include="..\ClusterKit.Data\ClusterKit.Data.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Core\KlusterKite.Core.TestKit\KlusterKite.Core.TestKit.csproj" />
+    <ProjectReference Include="..\KlusterKite.Data.CRUD\KlusterKite.Data.CRUD.csproj" />
+    <ProjectReference Include="..\KlusterKite.Data.EF.InMemory\KlusterKite.Data.EF.InMemory.csproj" />
+    <ProjectReference Include="..\KlusterKite.Data.EF\KlusterKite.Data.EF.csproj" />
+    <ProjectReference Include="..\KlusterKite.Data\KlusterKite.Data.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />

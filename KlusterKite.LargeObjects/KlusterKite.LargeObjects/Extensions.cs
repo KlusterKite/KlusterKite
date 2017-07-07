@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Extensions.cs" company="ClusterKit">
+// <copyright file="Extensions.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.LargeObjects
+namespace KlusterKite.LargeObjects
 {
     using Akka.Actor;
 
@@ -50,8 +50,8 @@ namespace ClusterKit.LargeObjects
         private static string GetParcelManagerPath(ActorSystem system)
         {
             return system.Settings.Config.GetString(
-                "ClusterKit.ParcelsPath",
-                "/user/ClusterKit/Parcels");
+                "KlusterKite.ParcelsPath",
+                "/user/KlusterKite/Parcels");
         }
     }
 }

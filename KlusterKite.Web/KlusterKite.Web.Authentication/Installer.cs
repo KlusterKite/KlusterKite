@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Installing components from current library
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Web.Authentication
+namespace KlusterKite.Web.Authentication
 {
     using System.Collections.Generic;
     using System.Reflection;
@@ -16,7 +16,7 @@ namespace ClusterKit.Web.Authentication
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 
     /// <summary>
     /// Installing components from current library
@@ -33,7 +33,7 @@ namespace ClusterKit.Web.Authentication
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.Authentication.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Web.Authentication.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -41,7 +41,7 @@ namespace ClusterKit.Web.Authentication
         /// <returns>The list of roles</returns>
         protected override IEnumerable<string> GetRoles() => new[]
                                                                  {
-                                                                     "ClusterKit.Web.Authentication"
+                                                                     "KlusterKite.Web.Authentication"
                                                                  };
 
         /// <inheritdoc />

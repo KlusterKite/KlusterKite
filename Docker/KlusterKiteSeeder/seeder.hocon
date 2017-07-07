@@ -10,25 +10,25 @@
 	Seeders {
 		Postgres {
 			RequiredPackages = [
-				"ClusterKit.Data.EF.Npgsql",
-				"ClusterKit.NodeManager.Seeder",
-				"ClusterKit.NodeManager.ConfigurationSource.Seeder"
+				"KlusterKite.Data.EF.Npgsql",
+				"KlusterKite.NodeManager.Seeder",
+				"KlusterKite.NodeManager.ConfigurationSource.Seeder"
 			]
 
 			Seeders = [
-				"ClusterKit.NodeManager.ConfigurationSource.Seeder.Seeder, ClusterKit.NodeManager.ConfigurationSource.Seeder"
+				"KlusterKite.NodeManager.ConfigurationSource.Seeder.Seeder, KlusterKite.NodeManager.ConfigurationSource.Seeder"
 			]
 		}
 	}
 
-	ClusterKit.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
-	ClusterKit.NodeManager.ConfigurationDatabaseName = "ClusterKit.NodeManagerConfiguration"
-        ClusterKit.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"
-	ClusterKit.NodeManager.PackageRepository = "http://nuget/"
-	ClusterKit.NodeManager.Seeds = [
-		"akka.tcp://ClusterKit@seed:3090"
+	KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
+	KlusterKite.NodeManager.ConfigurationDatabaseName = "KlusterKite.NodeManagerConfiguration"
+        KlusterKite.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"
+	KlusterKite.NodeManager.PackageRepository = "http://nuget/"
+	KlusterKite.NodeManager.Seeds = [
+		"akka.tcp://KlusterKite@seed:3090"
 	]
-	ClusterKit.NodeManager.NugetFeeds {
+	KlusterKite.NodeManager.NugetFeeds {
 		publicFeed {
                        address = "/opt/packageCache"
                        type = public
@@ -40,7 +40,7 @@
 	
 	}
 
-	ClusterKit.NodeManager.SupportedFrameworks = [
+	KlusterKite.NodeManager.SupportedFrameworks = [
 		".NETFramework,Version=v4.6",
 		".NETCoreApp,Version=v1.1"
 	]

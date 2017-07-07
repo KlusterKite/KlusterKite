@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiTests.cs" company="ClusterKit">
+// <copyright file="ApiTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,21 +7,21 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests
+namespace KlusterKite.NodeManager.Tests
 {
     using System.Collections.Generic;
 
     using Akka.Actor;
 
-    using ClusterKit.NodeManager.Tests.Mock;
-    using ClusterKit.Web.GraphQL.Publisher;
+    using KlusterKite.NodeManager.Tests.Mock;
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using GraphQL.Utilities;
 
     using Xunit;
     using Xunit.Abstractions;
 
-    using ApiProvider = ClusterKit.NodeManager.ApiProvider;
+    using ApiProvider = KlusterKite.NodeManager.ApiProvider;
 
     /// <summary>
     /// Testing <see cref="NodeManager.ApiProvider"/>

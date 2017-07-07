@@ -1,13 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="ClusterKit">
+// <copyright file="Program.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   ClusterKit Node launcher
+//   KlusterKite Node launcher
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Launcher
+namespace KlusterKite.NodeManager.Launcher
 {
     using System;
     using System.Collections.Generic;
@@ -19,8 +19,8 @@ namespace ClusterKit.NodeManager.Launcher
 
     using Akka.Configuration;
 
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     using Newtonsoft.Json;
 
@@ -31,7 +31,7 @@ namespace ClusterKit.NodeManager.Launcher
     using RestSharp.Authenticators;
 
     /// <summary>
-    /// ClusterKit Node launcher
+    /// KlusterKite Node launcher
     /// </summary>
     public class Program
     {
@@ -405,7 +405,7 @@ namespace ClusterKit.NodeManager.Launcher
                 this.Runtime,
                 PackageRepositoryExtensions.CurrentRuntime,
                 serviceDir,
-                "ClusterKit.Core.Service",
+                "KlusterKite.Core.Service",
                 Console.WriteLine).GetAwaiter().GetResult();
 
             File.WriteAllText(Path.Combine(serviceDir, "akka.hocon"), configuration.Configuration);
@@ -414,11 +414,11 @@ namespace ClusterKit.NodeManager.Launcher
             // cluster self-join is not welcomed
             var seeds = configuration.Seeds?.ToList() ?? new List<string>();
             string startConfig = $@"{{
-                ClusterKit.NodeManager.ReleaseId = {configuration.ReleaseId}
-                ClusterKit.NodeManager.NodeTemplate = {configuration.NodeTemplate}
-                ClusterKit.NodeManager.ContainerType = {this.ContainerType}
-                ClusterKit.NodeManager.Runtime = ""{this.Runtime.Replace("\"", "\\\"")}""
-                ClusterKit.NodeManager.NodeId = {this.Uid}
+                KlusterKite.NodeManager.ReleaseId = {configuration.ReleaseId}
+                KlusterKite.NodeManager.NodeTemplate = {configuration.NodeTemplate}
+                KlusterKite.NodeManager.ContainerType = {this.ContainerType}
+                KlusterKite.NodeManager.Runtime = ""{this.Runtime.Replace("\"", "\\\"")}""
+                KlusterKite.NodeManager.NodeId = {this.Uid}
                 akka.cluster.seed-nodes = [{string.Join(", ", seeds.Select(s => $"\"{s}\""))}]
             }}";
             File.WriteAllText(Path.Combine(serviceDir, "start.hocon"), startConfig);
@@ -446,7 +446,7 @@ namespace ClusterKit.NodeManager.Launcher
                                               Path.Combine(
                                                   Path.GetFullPath(this.WorkingDirectory),
                                                   "service",
-                                                  "ClusterKit.Core.Service.exe"),
+                                                  "KlusterKite.Core.Service.exe"),
                                           Arguments = "--config=start.hocon"
                                       }
                               };
@@ -462,7 +462,7 @@ namespace ClusterKit.NodeManager.Launcher
                                                   Path.GetFullPath(this.WorkingDirectory),
                                                   "service"),
                                           FileName = "dotnet",
-                                          Arguments = "ClusterKit.Core.Service.dll --config=start.hocon"
+                                          Arguments = "KlusterKite.Core.Service.dll --config=start.hocon"
                                       }
                               };
             process.Start();

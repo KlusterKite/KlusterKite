@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Installer.cs" company="ClusterKit">
+// <copyright file="Installer.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
 //   Installing components from current library
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace ClusterKit.Web
+namespace KlusterKite.Web
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace ClusterKit.Web
 
     using Autofac;
 
-    using ClusterKit.Core;
+    using KlusterKite.Core;
 
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
@@ -45,7 +45,7 @@ namespace ClusterKit.Web
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Web.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Web.Resources.akka.hocon"));
 
         /// <summary>
         /// Gets list of roles, that would be assign to cluster node with this plugin installed.
@@ -97,7 +97,7 @@ namespace ClusterKit.Web
                     }, 
                 this.service.Token);
 
-            var timeout = config.GetTimeSpan("ClusterKit.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
+            var timeout = config.GetTimeSpan("KlusterKite.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
             if (!Startup.ServiceConfigurationWaiter.Wait(timeout))
             {
                 throw new Exception("Web server initialization timeout", Startup.LastException);
@@ -111,7 +111,7 @@ namespace ClusterKit.Web
             actorSystem.RegisterOnTermination(() => this.service.Cancel());
             actorSystem.Log.Info("{Type}: post start started", this.GetType().FullName);
             Startup.ContainerWaiter.SetResult(context);
-            var timeout = actorSystem.Settings.Config.GetTimeSpan("ClusterKit.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
+            var timeout = actorSystem.Settings.Config.GetTimeSpan("KlusterKite.Web.InitializationTimeout", TimeSpan.FromSeconds(15));
             if (!Startup.ServiceStartWaiter.Wait(timeout))
             {
                 throw new Exception("Web server start timeout", Startup.LastException);
@@ -127,7 +127,7 @@ namespace ClusterKit.Web
         /// <returns>The Url to bind web hosting</returns>
         private static string GetWebHostingBindUrl(Config config)
         {
-            return config.GetString("ClusterKit.Web.BindAddress", "http://*:80");
+            return config.GetString("KlusterKite.Web.BindAddress", "http://*:80");
         }
     }
 }

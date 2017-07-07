@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseConnection.cs" company="ClusterKit">
+// <copyright file="ReleaseConnection.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.WebApi
+namespace KlusterKite.NodeManager.WebApi
 {
     using System;
     using System.Linq;
@@ -15,15 +15,15 @@ namespace ClusterKit.NodeManager.WebApi
 
     using Akka.Actor;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
-    using ClusterKit.Data.CRUD;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.NodeManager.Client;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.Authorization.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Data.CRUD;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.NodeManager.Client;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.Messages;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.Authorization.Attributes;
 
     using JetBrains.Annotations;
 

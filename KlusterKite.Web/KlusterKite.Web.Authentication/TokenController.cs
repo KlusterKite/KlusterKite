@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TokenController.cs" company="ClusterKit">
+// <copyright file="TokenController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Authentication
+namespace KlusterKite.Web.Authentication
 {
     using System;
     using System.Threading.Tasks;
 
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
-    using ClusterKit.Web.Authorization;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
+    using KlusterKite.Web.Authorization;
 
     using Microsoft.AspNetCore.Mvc;
 

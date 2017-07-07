@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ForwarderResolver.cs" company="ClusterKit">
+// <copyright file="ForwarderResolver.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Provider.Resolvers
+namespace KlusterKite.API.Provider.Resolvers
 {
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

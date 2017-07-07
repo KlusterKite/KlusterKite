@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnumResolver.cs" company="ClusterKit">
+// <copyright file="EnumResolver.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Provider.Resolvers
+namespace KlusterKite.API.Provider.Resolvers
 {
     using System;
     using System.Collections.Generic;
@@ -15,9 +15,9 @@ namespace ClusterKit.API.Provider.Resolvers
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

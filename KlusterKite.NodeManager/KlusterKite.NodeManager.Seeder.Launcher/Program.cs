@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="ClusterKit">
+// <copyright file="Program.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Seeder.Launcher
+namespace KlusterKite.NodeManager.Seeder.Launcher
 {
     using System;
     using System.Collections.Generic;
@@ -19,8 +19,8 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
 
     using Akka.Configuration;
 
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Launcher.Utils.Exceptions;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Launcher.Utils.Exceptions;
 
     using JetBrains.Annotations;
 
@@ -79,7 +79,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                             configuration.Runtime,
                             PackageRepositoryExtensions.CurrentRuntime,
                             executionDir,
-                            "ClusterKit.NodeManager.Seeder",
+                            "KlusterKite.NodeManager.Seeder",
                             Console.WriteLine).GetAwaiter().GetResult();
                             
                         Console.WriteLine("Packages installed");
@@ -111,7 +111,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                         File.Copy(configuration.ConfigFile, Path.Combine(executionDir, "seeder.hocon"), true);
                         
                         // todo: move to CreateServiceAsync
-                        // ConfigurationUtils.FixAssemblyVersions(Path.Combine(executionDir, "ClusterKit.NodeManager.Seeder.exe.config"));
+                        // ConfigurationUtils.FixAssemblyVersions(Path.Combine(executionDir, "KlusterKite.NodeManager.Seeder.exe.config"));
                         Console.WriteLine($"Seeder prepared in {executionDir}");
 #if APPDOMAIN
                         var process = new Process
@@ -120,7 +120,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                                                   {
                                                       UseShellExecute = false,
                                                       WorkingDirectory =executionDir,
-                                                      FileName = "ClusterKit.NodeManager.Seeder.exe",
+                                                      FileName = "KlusterKite.NodeManager.Seeder.exe",
                                                       Arguments = seederConfiguration.Name
                                                   }
                                           };
@@ -132,7 +132,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
                                                       UseShellExecute = false,
                                                       WorkingDirectory = executionDir,
                                                       FileName = "dotnet",
-                                                      Arguments = $"ClusterKit.NodeManager.Seeder.dll {seederConfiguration.Name}"
+                                                      Arguments = $"KlusterKite.NodeManager.Seeder.dll {seederConfiguration.Name}"
                                                   }
                                           };
 #endif
@@ -246,7 +246,7 @@ namespace ClusterKit.NodeManager.Seeder.Launcher
             }
 
             configuration.Config = ConfigurationFactory.ParseString(File.ReadAllText(configuration.ConfigFile));
-            configuration.Nuget = configuration.Config.GetString("ClusterKit.NodeManager.PackageRepository");
+            configuration.Nuget = configuration.Config.GetString("KlusterKite.NodeManager.PackageRepository");
             if (string.IsNullOrWhiteSpace(configuration.Nuget))
             {
                 Console.WriteLine("Nuget is not properly defined");

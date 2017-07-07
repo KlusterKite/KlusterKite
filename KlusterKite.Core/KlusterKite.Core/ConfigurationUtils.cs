@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConfigurationUtils.cs" company="ClusterKit">
+// <copyright file="ConfigurationUtils.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core
+namespace KlusterKite.Core
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace ClusterKit.Core
         /// <returns>Default timeout</returns>
         public static TimeSpan GetRestTimeout(Config config)
         {
-            return config.GetTimeSpan("ClusterKit.Core.RestTimeout", TimeSpan.FromSeconds(10), false);
+            return config.GetTimeSpan("KlusterKite.Core.RestTimeout", TimeSpan.FromSeconds(10), false);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SelectBuilderTests.cs" company="ClusterKit">
+// <copyright file="SelectBuilderTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.Tests
+namespace KlusterKite.Data.Tests
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Data.EF;
-    using ClusterKit.Data.Tests.Mock;
+    using KlusterKite.API.Client;
+    using KlusterKite.Data.EF;
+    using KlusterKite.Data.Tests.Mock;
 
     using Microsoft.EntityFrameworkCore;
 

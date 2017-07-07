@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Configurator.cs" company="ClusterKit">
+// <copyright file="Configurator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Log.Console
+namespace KlusterKite.Log.Console
 {
     using System;
 
     using Akka.Configuration;
 
-    using ClusterKit.Core.Log;
+    using KlusterKite.Core.Log;
 
     using JetBrains.Annotations;
 
@@ -34,7 +34,7 @@ namespace ClusterKit.Log.Console
         /// <returns>Updated configuration</returns>
         public LoggerConfiguration Configure(LoggerConfiguration configuration, Config config)
         {
-            var minimumLevel = config.GetString("ClusterKit.Log.Console.minimumLevel", "none")?.Trim();
+            var minimumLevel = config.GetString("KlusterKite.Log.Console.minimumLevel", "none")?.Trim();
 
             LogEventLevel level;
             if (!Enum.TryParse(minimumLevel, true, out level))

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestMigrator.cs" company="ClusterKit">
+// <copyright file="TestMigrator.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests.Migrations
+namespace KlusterKite.NodeManager.Tests.Migrations
 {
     using System;
     using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace ClusterKit.NodeManager.Tests.Migrations
 
     using Akka.Configuration;
 
-    using ClusterKit.NodeManager.Migrator;
+    using KlusterKite.NodeManager.Migrator;
 
     using JetBrains.Annotations;
 

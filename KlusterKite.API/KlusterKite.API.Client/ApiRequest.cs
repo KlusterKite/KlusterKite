@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiRequest.cs" company="ClusterKit">
+// <copyright file="ApiRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Client
+namespace KlusterKite.API.Client
 {
     using System.Collections.Generic;
 
-    using ClusterKit.API.Client.Messages;
+    using KlusterKite.API.Client.Messages;
 
     /// <summary>
     /// The request partial description

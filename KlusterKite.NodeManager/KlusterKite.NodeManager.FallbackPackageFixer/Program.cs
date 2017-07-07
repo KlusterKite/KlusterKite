@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="ClusterKit">
+// <copyright file="Program.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.FallbackPackageFixer
+namespace KlusterKite.NodeManager.FallbackPackageFixer
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
-    using ClusterKit.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Messages;
 
     using JetBrains.Annotations;
 

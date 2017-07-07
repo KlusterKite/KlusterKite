@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClusterLoggingActor.cs" company="ClusterKit">
+// <copyright file="ClusterLoggingActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Cluster
+namespace KlusterKite.Core.Cluster
 {
     using System.Linq;
 

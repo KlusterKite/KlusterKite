@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IObjectWithId.cs" company="ClusterKit">
+// <copyright file="IObjectWithId.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.CRUD
+namespace KlusterKite.Data.CRUD
 {
     /// <summary>
     /// Interface on objects with id

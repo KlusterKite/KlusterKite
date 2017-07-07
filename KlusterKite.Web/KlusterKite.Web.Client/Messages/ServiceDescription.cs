@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ServiceDescription.cs" company="ClusterKit">
+// <copyright file="ServiceDescription.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Client.Messages
+namespace KlusterKite.Web.Client.Messages
 {
     using System.Diagnostics.CodeAnalysis;
 

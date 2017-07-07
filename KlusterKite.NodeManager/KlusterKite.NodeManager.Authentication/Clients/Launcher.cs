@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Launcher.cs" company="ClusterKit">
+// <copyright file="Launcher.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Authentication.Clients
+namespace KlusterKite.NodeManager.Authentication.Clients
 {
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using ClusterKit.NodeManager.Client;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.NodeManager.Client;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The launcher program, that configures and starts individual nodes
@@ -24,7 +24,7 @@ namespace ClusterKit.NodeManager.Authentication.Clients
         /// <summary>
         /// The web application client id
         /// </summary>
-        public const string LauncherClientId = "ClusterKit.NodeManager.Launcher";
+        public const string LauncherClientId = "KlusterKite.NodeManager.Launcher";
 
         /// <inheritdoc />
         public string ClientId => LauncherClientId;

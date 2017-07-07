@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NugetPackagesFactory.cs" company="ClusterKit">
+// <copyright file="NugetPackagesFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace KlusterKite.NodeManager
 {
     using System;
     using System.Collections.Generic;
@@ -15,12 +15,12 @@ namespace ClusterKit.NodeManager
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Core.Monads;
-    using ClusterKit.Data;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core.Monads;
+    using KlusterKite.Data;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     using JetBrains.Annotations;
 

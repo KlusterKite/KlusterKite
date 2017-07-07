@@ -11,20 +11,20 @@ class UsersList extends React.Component {
   }
 
   static propTypes = {
-    clusterKitNodesApi: React.PropTypes.object,
+    klusterKiteNodesApi: React.PropTypes.object,
     canCreate: React.PropTypes.bool,
     canEdit: React.PropTypes.bool,
   };
 
   render() {
-    const users = this.props.clusterKitNodesApi && this.props.clusterKitNodesApi.users;
+    const users = this.props.klusterKiteNodesApi && this.props.klusterKiteNodesApi.users;
 
     return (
       <div>
         <div>
           <h3>Users list</h3>
           {this.props.canCreate &&
-            <Link to={`/clusterkit/Users/create`} className="btn btn-primary" role="button">Add a new
+            <Link to={`/klusterkite/Users/create`} className="btn btn-primary" role="button">Add a new
               user</Link>
           }
           {users && users.edges.length > 0 &&
@@ -41,7 +41,7 @@ class UsersList extends React.Component {
               <tr key={item.node.id}>
                 <td>
                   {this.props.canEdit &&
-                    <Link to={`/clusterkit/Users/${item.node.id}`}>
+                    <Link to={`/klusterkite/Users/${item.node.id}`}>
                       {item.node.login}
                     </Link>
                   }
@@ -67,7 +67,7 @@ export default Relay.createContainer(
   UsersList,
   {
     fragments: {
-      clusterKitNodesApi: () => Relay.QL`fragment on IClusterKitNodeApi_Root {
+      klusterKiteNodesApi: () => Relay.QL`fragment on IKlusterKiteNodeApi_Root {
         users {
           edges {
             node {

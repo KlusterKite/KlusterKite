@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MockPackageRepository.cs" company="ClusterKit">
+// <copyright file="MockPackageRepository.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Tests.Mock
+namespace KlusterKite.NodeManager.Tests.Mock
 {
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using ClusterKit.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Launcher.Utils;
 
     using NuGet.Packaging.Core;
     using NuGet.Protocol.Core.Types;

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ApiProviderPublishResolveIntegration.cs" company="ClusterKit">
+// <copyright file="ApiProviderPublishResolveIntegration.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests.GraphQL
+namespace KlusterKite.Web.Tests.GraphQL
 {
     using System;
     using System.Collections.Generic;
@@ -15,13 +15,13 @@ namespace ClusterKit.Web.Tests.GraphQL
     using System.Reflection;
     using System.Threading.Tasks;
 
-    using ClusterKit.API.Attributes;
-    using ClusterKit.API.Client;
-    using ClusterKit.API.Tests.Mock;
-    using ClusterKit.Core;
-    using ClusterKit.Core.Log;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Web.GraphQL.Publisher;
+    using KlusterKite.API.Attributes;
+    using KlusterKite.API.Client;
+    using KlusterKite.API.Tests.Mock;
+    using KlusterKite.Core;
+    using KlusterKite.Core.Log;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using global::GraphQL;
     using global::GraphQL.Http;
@@ -40,7 +40,7 @@ namespace ClusterKit.Web.Tests.GraphQL
     using Xunit;
     using Xunit.Abstractions;
 
-    using Constants = ClusterKit.Core.Log.Constants;
+    using Constants = KlusterKite.Core.Log.Constants;
 
     /// <summary>
     /// Testing publishing and resolving integration
@@ -2660,7 +2660,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             var query = BaseInstaller.ReadTextResource(
                 this.GetType().GetTypeInfo().Assembly,
-                "ClusterKit.Web.Tests.GraphQL.Resources.IntrospectionQuery.txt");
+                "KlusterKite.Web.Tests.GraphQL.Resources.IntrospectionQuery.txt");
 
             var result = await new DocumentExecuter().ExecuteAsync(
                              r =>
@@ -3035,7 +3035,7 @@ namespace ClusterKit.Web.Tests.GraphQL
                 events.Any(
                     e =>
                         e.RenderMessage()
-                        == "The property LoggedNoMessageField of ClusterKit.API.Tests.Mock.TestProvider with id null was accessed"));
+                        == "The property LoggedNoMessageField of KlusterKite.API.Tests.Mock.TestProvider with id null was accessed"));
         }
 
         /// <summary>
@@ -3121,7 +3121,7 @@ namespace ClusterKit.Web.Tests.GraphQL
 
             Assert.Equal(4, sink.LogEvents.Count);
             Assert.Equal(
-                "The property LoggedMutation of ClusterKit.API.Tests.Mock.TestProvider with id null was accessed",
+                "The property LoggedMutation of KlusterKite.API.Tests.Mock.TestProvider with id null was accessed",
                 sink.LogEvents[0].RenderMessage());
             Assert.Equal(
                 "Connection created",

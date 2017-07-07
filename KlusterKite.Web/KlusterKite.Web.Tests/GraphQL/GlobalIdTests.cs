@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GlobalIdTests.cs" company="ClusterKit">
+// <copyright file="GlobalIdTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,9 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests.GraphQL
+namespace KlusterKite.Web.Tests.GraphQL
 {
-    using ClusterKit.Web.GraphQL.Publisher;
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

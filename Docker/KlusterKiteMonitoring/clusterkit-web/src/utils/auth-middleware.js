@@ -17,8 +17,8 @@ const redirectToAuth = (reject) => {
   Storage.remove('refreshToken');
   Storage.remove('username');
 
-  if (currentLocation.indexOf('/clusterkit/Login') === -1 && doRedirect) {
-    browserHistory.push(`/clusterkit/Login/?from=${encodeURIComponent(currentLocation + currentSearch)}`);
+  if (currentLocation.indexOf('/klusterkite/Login') === -1 && doRedirect) {
+    browserHistory.push(`/klusterkite/Login/?from=${encodeURIComponent(currentLocation + currentSearch)}`);
   }
   if (reject){
     reject();
@@ -32,7 +32,7 @@ const redirectToAuth = (reject) => {
  */
 const requestNewToken = (refreshToken => {
   const url = process.env.REACT_APP_AUTH_URL;
-  const payload = `grant_type=refresh_token&client_id=ClusterKit.NodeManager.WebApplication&refresh_token=${refreshToken}`;
+  const payload = `grant_type=refresh_token&client_id=KlusterKite.NodeManager.WebApplication&refresh_token=${refreshToken}`;
 
   return fetch(url, {
     method: 'post',

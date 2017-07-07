@@ -2,7 +2,7 @@
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
-    <PackageId>ClusterKit.API.Tests</PackageId>
+    <PackageId>KlusterKite.API.Tests</PackageId>
     <Version>0.0.0.0-local</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
@@ -11,13 +11,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
   <ItemGroup>
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core.TestKit\ClusterKit.Core.TestKit.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Core\ClusterKit.Core\ClusterKit.Core.csproj" />
-    <ProjectReference Include="..\..\ClusterKit.Security\ClusterKit.Security.Attributes\ClusterKit.Security.Attributes.csproj" />
-    <ProjectReference Include="..\ClusterKit.API.Attributes\ClusterKit.API.Attributes.csproj" />
-    <ProjectReference Include="..\ClusterKit.API.Client\ClusterKit.API.Client.csproj" />
-    <ProjectReference Include="..\ClusterKit.API.Endpoint\ClusterKit.API.Endpoint.csproj" />
-    <ProjectReference Include="..\ClusterKit.API.Provider\ClusterKit.API.Provider.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Core\KlusterKite.Core.TestKit\KlusterKite.Core.TestKit.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Core\KlusterKite.Core\KlusterKite.Core.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Security\KlusterKite.Security.Attributes\KlusterKite.Security.Attributes.csproj" />
+    <ProjectReference Include="..\KlusterKite.API.Attributes\KlusterKite.API.Attributes.csproj" />
+    <ProjectReference Include="..\KlusterKite.API.Client\KlusterKite.API.Client.csproj" />
+    <ProjectReference Include="..\KlusterKite.API.Endpoint\KlusterKite.API.Endpoint.csproj" />
+    <ProjectReference Include="..\KlusterKite.API.Provider\KlusterKite.API.Provider.csproj" />
   </ItemGroup>
 
   <ItemGroup>

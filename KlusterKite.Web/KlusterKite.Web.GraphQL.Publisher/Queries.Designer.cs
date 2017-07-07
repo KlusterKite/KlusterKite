@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher {
+namespace KlusterKite.Web.GraphQL.Publisher {
     using System;
     using System.Reflection;
 
@@ -39,7 +39,7 @@ namespace ClusterKit.Web.GraphQL.Publisher {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ClusterKit.Web.GraphQL.Publisher.Queries", typeof(Queries).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KlusterKite.Web.GraphQL.Publisher.Queries", typeof(Queries).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

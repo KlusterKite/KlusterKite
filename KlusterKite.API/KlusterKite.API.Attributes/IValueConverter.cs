@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IValueConverter.cs" company="ClusterKit">
+// <copyright file="IValueConverter.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.API.Attributes
+namespace KlusterKite.API.Attributes
 {
     /// <summary>
     /// The interface for value converters

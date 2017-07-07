@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseTypeInterface.cs" company="ClusterKit">
+// <copyright file="BaseTypeInterface.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
+namespace KlusterKite.Web.GraphQL.Publisher.GraphTypes
 {
     using System;
     using System.Collections.Generic;

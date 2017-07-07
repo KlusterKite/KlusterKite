@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="VirtualGraphType.cs" company="ClusterKit">
+// <copyright file="VirtualGraphType.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.GraphQL.Publisher.GraphTypes
+namespace KlusterKite.Web.GraphQL.Publisher.GraphTypes
 {
     using System.Collections.Generic;
 
-    using ClusterKit.API.Client;
+    using KlusterKite.API.Client;
 
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;

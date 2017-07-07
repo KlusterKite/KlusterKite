@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NodeManagerActor.cs" company="ClusterKit">
+// <copyright file="NodeManagerActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager
+namespace KlusterKite.NodeManager
 {
     using System;
     using System.Collections.Generic;
@@ -22,25 +22,25 @@ namespace ClusterKit.NodeManager
 
     using Autofac;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Core;
-    using ClusterKit.Core.Monads;
-    using ClusterKit.Core.Ping;
-    using ClusterKit.Core.Utils;
-    using ClusterKit.Data;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.CRUD.Exceptions;
-    using ClusterKit.Data.EF;
-    using ClusterKit.NodeManager.Client.Messages;
-    using ClusterKit.NodeManager.Client.Messages.Migration;
-    using ClusterKit.NodeManager.Client.MigrationStates;
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.NodeManager.ConfigurationSource;
-    using ClusterKit.NodeManager.Launcher.Messages;
-    using ClusterKit.NodeManager.Launcher.Utils;
-    using ClusterKit.NodeManager.Messages;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core;
+    using KlusterKite.Core.Monads;
+    using KlusterKite.Core.Ping;
+    using KlusterKite.Core.Utils;
+    using KlusterKite.Data;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.Exceptions;
+    using KlusterKite.Data.EF;
+    using KlusterKite.NodeManager.Client.Messages;
+    using KlusterKite.NodeManager.Client.Messages.Migration;
+    using KlusterKite.NodeManager.Client.MigrationStates;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Messages;
+    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Messages;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
 
     using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
@@ -54,22 +54,22 @@ namespace ClusterKit.NodeManager
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        public const string ConfigConnectionStringPath = "ClusterKit.NodeManager.ConfigurationDatabaseConnectionString";
+        public const string ConfigConnectionStringPath = "KlusterKite.NodeManager.ConfigurationDatabaseConnectionString";
 
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        public const string ConfigDatabaseNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseName";
+        public const string ConfigDatabaseNamePath = "KlusterKite.NodeManager.ConfigurationDatabaseName";
 
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        public const string ConfigDatabaseProviderNamePath = "ClusterKit.NodeManager.ConfigurationDatabaseProviderName";
+        public const string ConfigDatabaseProviderNamePath = "KlusterKite.NodeManager.ConfigurationDatabaseProviderName";
 
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        public const string PackageRepositoryUrlPath = "ClusterKit.NodeManager.PackageRepository";
+        public const string PackageRepositoryUrlPath = "KlusterKite.NodeManager.PackageRepository";
 
         /// <summary>
         /// List of node by templates
@@ -231,22 +231,22 @@ namespace ClusterKit.NodeManager
             this.nugetRepository = nugetRepository;
 
             this.fullClusterWaitTimeout = Context.System.Settings.Config.GetTimeSpan(
-                "ClusterKit.NodeManager.FullClusterWaitTimeout",
+                "KlusterKite.NodeManager.FullClusterWaitTimeout",
                 TimeSpan.FromSeconds(60),
                 false);
             this.newNodeJoinTimeout = Context.System.Settings.Config.GetTimeSpan(
-                "ClusterKit.NodeManager.NewNodeJoinTimeout",
+                "KlusterKite.NodeManager.NewNodeJoinTimeout",
                 TimeSpan.FromSeconds(30),
                 false);
             this.newNodeRequestDescriptionNotificationTimeout = Context.System.Settings.Config.GetTimeSpan(
-                "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationTimeout",
+                "KlusterKite.NodeManager.NewNodeRequestDescriptionNotificationTimeout",
                 TimeSpan.FromSeconds(10),
                 false);
             this.newNodeRequestDescriptionNotificationMaxRequests = Context.System.Settings.Config.GetInt(
-                "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
+                "KlusterKite.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
                 10);
             this.upgradablePart = Context.System.Settings.Config.GetDecimal(
-                "ClusterKit.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
+                "KlusterKite.NodeManager.NewNodeRequestDescriptionNotificationMaxRequests",
                 10);
 
             this.Receive<InitializationMessage>(m => this.Initialize());
@@ -496,7 +496,7 @@ namespace ClusterKit.NodeManager
                 "release");
 
             var migrationActorSubstitute =
-                Context.System.Settings.Config.GetString("ClusterKit.NodeManager.MigrationActorSubstitute");
+                Context.System.Settings.Config.GetString("KlusterKite.NodeManager.MigrationActorSubstitute");
 
             this.resourceMigrator = string.IsNullOrWhiteSpace(migrationActorSubstitute)
                                         ? (ICanTell)Context.ActorOf(

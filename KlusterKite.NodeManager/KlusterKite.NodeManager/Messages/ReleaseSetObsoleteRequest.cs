@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseSetObsoleteRequest.cs" company="ClusterKit">
+// <copyright file="ReleaseSetObsoleteRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,12 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Messages
+namespace KlusterKite.NodeManager.Messages
 {
     using Akka.Actor;
 
-    using ClusterKit.NodeManager.Client.ORM;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.NodeManager.Client.ORM;
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnReleaseState.Ready"/> to <see cref="EnReleaseState.Obsolete"/>

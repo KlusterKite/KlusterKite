@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseRestController.cs" company="ClusterKit">
+// <copyright file="BaseRestController.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Rest
+namespace KlusterKite.Web.Rest
 {
     using System;
     using System.Collections.Generic;
@@ -18,16 +18,16 @@ namespace ClusterKit.Web.Rest
 
     using Akka.Actor;
 
-    using ClusterKit.API.Client;
-    using ClusterKit.Core;
-    using ClusterKit.Data.CRUD;
-    using ClusterKit.Data.CRUD.ActionMessages;
-    using ClusterKit.Data.CRUD.Exceptions;
-    using ClusterKit.LargeObjects;
-    using ClusterKit.LargeObjects.Client;
-    using ClusterKit.Security.Attributes;
-    using ClusterKit.Security.Client;
-    using ClusterKit.Web.Authorization;
+    using KlusterKite.API.Client;
+    using KlusterKite.Core;
+    using KlusterKite.Data.CRUD;
+    using KlusterKite.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.Exceptions;
+    using KlusterKite.LargeObjects;
+    using KlusterKite.LargeObjects.Client;
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Security.Client;
+    using KlusterKite.Web.Authorization;
 
     using JetBrains.Annotations;
 

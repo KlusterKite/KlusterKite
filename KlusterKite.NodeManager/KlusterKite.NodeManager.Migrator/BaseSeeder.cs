@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseSeeder.cs" company="ClusterKit">
+// <copyright file="BaseSeeder.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.NodeManager.Migrator
+namespace KlusterKite.NodeManager.Migrator
 {
     /// <summary>
     /// Creates the initial resources for cluster to run new configuration

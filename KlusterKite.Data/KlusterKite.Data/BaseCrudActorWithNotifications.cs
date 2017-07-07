@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseCrudActorWithNotifications.cs" company="ClusterKit">
+// <copyright file="BaseCrudActorWithNotifications.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data
+namespace KlusterKite.Data
 {
     using System;
 
@@ -15,7 +15,7 @@ namespace ClusterKit.Data
 
     using Autofac;
 
-    using ClusterKit.Data.CRUD.ActionMessages;
+    using KlusterKite.Data.CRUD.ActionMessages;
 
     using JetBrains.Annotations;
 

@@ -11,13 +11,13 @@ class UsersListPage extends React.Component {
   };
 
   render () {
-    const canCreate = hasPrivilege('ClusterKit.NodeManager.User.Create');
-    const canEdit = hasPrivilege('ClusterKit.NodeManager.User.Update');
+    const canCreate = hasPrivilege('KlusterKite.NodeManager.User.Create');
+    const canEdit = hasPrivilege('KlusterKite.NodeManager.User.Update');
 
     return (
       <div>
         <UserList
-          clusterKitNodesApi={this.props.api.clusterKitNodesApi}
+          klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
           canCreate={canCreate}
           canEdit={canEdit}
         />
@@ -30,10 +30,10 @@ export default Relay.createContainer(
   UsersListPage,
   {
     fragments: {
-      api: () => Relay.QL`fragment on IClusterKitNodeApi {
+      api: () => Relay.QL`fragment on IKlusterKiteNodeApi {
         __typename
-        clusterKitNodesApi {
-          ${UserList.getFragment('clusterKitNodesApi')},
+        klusterKiteNodesApi {
+          ${UserList.getFragment('klusterKiteNodesApi')},
         }
       }
       `,

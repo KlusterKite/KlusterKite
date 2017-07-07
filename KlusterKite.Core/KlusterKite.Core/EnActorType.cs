@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnActorType.cs" company="ClusterKit">
+// <copyright file="EnActorType.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core
+namespace KlusterKite.Core
 {
     /// <summary>
     /// Types of actors to generate from <seealso cref="NameSpaceActor"/>

@@ -11,20 +11,20 @@ class RolesList extends React.Component {
   }
 
   static propTypes = {
-    clusterKitNodesApi: React.PropTypes.object,
+    klusterKiteNodesApi: React.PropTypes.object,
     canCreate: React.PropTypes.bool,
     canEdit: React.PropTypes.bool,
   };
 
   render() {
-    const users = this.props.clusterKitNodesApi && this.props.clusterKitNodesApi.roles;
+    const users = this.props.klusterKiteNodesApi && this.props.klusterKiteNodesApi.roles;
 
     return (
       <div>
         <div>
           <h3>Roles list</h3>
           {this.props.canCreate &&
-            <Link to={`/clusterkit/Roles/create`} className="btn btn-primary" role="button">Add a new
+            <Link to={`/klusterkite/Roles/create`} className="btn btn-primary" role="button">Add a new
               role</Link>
           }
           {users && users.edges.length > 0 &&
@@ -39,7 +39,7 @@ class RolesList extends React.Component {
               <tr key={item.node.id}>
                 <td>
                   {this.props.canEdit &&
-                    <Link to={`/clusterkit/Roles/${item.node.id}`}>
+                    <Link to={`/klusterkite/Roles/${item.node.id}`}>
                       {item.node.name}
                     </Link>
                   }
@@ -63,7 +63,7 @@ export default Relay.createContainer(
   RolesList,
   {
     fragments: {
-      clusterKitNodesApi: () => Relay.QL`fragment on IClusterKitNodeApi_Root {
+      klusterKiteNodesApi: () => Relay.QL`fragment on IKlusterKiteNodeApi_Root {
         roles {
           edges {
             node {

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AuthenticationTests.cs" company="ClusterKit">
+// <copyright file="AuthenticationTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Web.Tests.Auth
+namespace KlusterKite.Web.Tests.Auth
 {
     using System;
     using System.Collections.Generic;
@@ -19,9 +19,9 @@ namespace ClusterKit.Web.Tests.Auth
 
     using Autofac;
 
-    using ClusterKit.Core;
-    using ClusterKit.Core.TestKit;
-    using ClusterKit.Security.Attributes;
+    using KlusterKite.Core;
+    using KlusterKite.Core.TestKit;
+    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
 
@@ -51,7 +51,7 @@ namespace ClusterKit.Web.Tests.Auth
         /// <summary>
         /// Current server bind port
         /// </summary>
-        private int Port => this.Sys.Settings.Config.GetInt("ClusterKit.Web.WebHostPort");
+        private int Port => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
 
         /// <summary>
         /// Basic authorization test
@@ -221,7 +221,7 @@ namespace ClusterKit.Web.Tests.Auth
                 return ConfigurationFactory.ParseString(
                     $@"
                 {{
-                    ClusterKit {{
+                    KlusterKite {{
  		                Web {{
                             WebHostPort = {port},
  			                BindAddress = ""http://*:{port}"",

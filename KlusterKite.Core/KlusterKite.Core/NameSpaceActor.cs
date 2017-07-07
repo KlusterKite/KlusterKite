@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NameSpaceActor.cs" company="ClusterKit">
+// <copyright file="NameSpaceActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core
+namespace KlusterKite.Core
 {
     using System;
     using System.Linq;

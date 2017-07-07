@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RoleUser.cs" company="ClusterKit">
+// <copyright file="RoleUser.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Data.Tests.Mock
+namespace KlusterKite.Data.Tests.Mock
 {
     using System;
     using System.ComponentModel.DataAnnotations.Schema;

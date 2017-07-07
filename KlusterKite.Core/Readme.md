@@ -1,22 +1,22 @@
-# ClusterKit.Core
+# KlusterKite.Core
 Packs the actor system into the executable. Provides start-up configuration and plug-in management system.
 
 The main idea is to get rid of writing custom service start-up code and concentrate on business logic. 
 
-By default, you have the `ClusterKit.Core.Service` that will start the almost empty actor system, configure logging (with a use of [Serilog](https://serilog.net/)) and dependency injection (with a use of [Autofac](https://autofac.org/)).
+By default, you have the `KlusterKite.Core.Service` that will start the almost empty actor system, configure logging (with a use of [Serilog](https://serilog.net/)) and dependency injection (with a use of [Autofac](https://autofac.org/)).
 All you need is to extend the service functions by providing the plugin. Just put your plugin dll (and all it's dependencies) in the service directory and it will be loaded automatically on service start. Also, you can provide an end-level configuration with an additional file. 
 
 ## Service start procedure
 ![service run](./Documentation/Service.png "service run")
 
-## `ClusterKit.Core.BaseInstaller`
-Every ClusterKit plugin should define the subtype of this type in order to be loaded properly.
+## `KlusterKite.Core.BaseInstaller`
+Every KlusterKite plugin should define the subtype of this type in order to be loaded properly.
 
 ### `AkkaConfigLoadPriority`
 The installer load priority. The methods from installers with higher priorities will be run earlier than from lower ones. For example, during config assembling - parameters from higher priority installers will override parameters from lower priority installers.
-There are two predefined constants for priorities that are used in ClusterKit packages:
-* `ClusterKit.Core.BaseInstaller.PrioritySharedLib` - used for packages providing message classes and utilities for communication with other nodes functions.
-* `ClusterKit.Core.BaseInstaller.PriorityClusterRole` - used for packages with end-level functions. This priority is highe then `ClusterKit.Core.BaseInstaller.PrioritySharedLib`.
+There are two predefined constants for priorities that are used in KlusterKite packages:
+* `KlusterKite.Core.BaseInstaller.PrioritySharedLib` - used for packages providing message classes and utilities for communication with other nodes functions.
+* `KlusterKite.Core.BaseInstaller.PriorityClusterRole` - used for packages with end-level functions. This priority is highe then `KlusterKite.Core.BaseInstaller.PrioritySharedLib`.
 
 ### `Config GetAkkaConfig()`
 Gets default akka configuration for current module.
@@ -26,7 +26,7 @@ The usual way to provide such configuration is to make embedded resource in the 
         /// Gets default akka configuration for current module
         /// </summary>
         /// <returns>Akka configuration</returns>
-        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "ClusterKit.Core.Resources.akka.hocon"));
+        protected override Config GetAkkaConfig() => ConfigurationFactory.ParseString(ReadTextResource(typeof(Installer).GetTypeInfo().Assembly, "KlusterKite.Core.Resources.akka.hocon"));
 ```
 
 Also this configuration should define all needed actors to start (see [NameSpaceActor](#namespaceactor))
@@ -86,7 +86,7 @@ So to start the root actors - they need to be defined in the configuration in th
 				}
 				/Core/Ping {
 					actor-type = "Simple" # this is the value by default
-					type = "ClusterKit.Core.Ping.PingActor, ClusterKit.Core" # Full type name of actor to create. The actor is created via DI infrastructure, so type shoul be registered
+					type = "KlusterKite.Core.Ping.PingActor, KlusterKite.Core" # Full type name of actor to create. The actor is created via DI infrastructure, so type shoul be registered
 				}
 			}
 		}
@@ -103,11 +103,11 @@ To bring some structure to the actors tree the nested `NameSpaceActor` can be cr
 		}
 
 		/Web/Nginx {
-			type = "ClusterKit.Core.NameSpaceActor, ClusterKit.Core"
+			type = "KlusterKite.Core.NameSpaceActor, KlusterKite.Core"
 		}                
 
 		/Web/Nginx/Configurator {
-			type = "ClusterKit.Web.NginxConfigurator.NginxConfiguratorActor, ClusterKit.Web.NginxConfigurator"
+			type = "KlusterKite.Web.NginxConfigurator.NginxConfiguratorActor, KlusterKite.Web.NginxConfigurator"
 		}
 	}
 ```
@@ -126,8 +126,8 @@ Please check Akka.NET documentation for Akka.Cluster singleton actors
                 /NodeManager/Manager {
                         actor-type = Singleton # defines that Akka.Cluster singleton actor is created here
                         singleton-name = NodeManager # Akka.Cluster singleton name. Please check Akka.NET documentation
-                        singleton-node-role = NodeManager # the cluster nodes role where singleton actor is rised. This roles should be defined in ClusterKit.Core.BaseInstaller.GetRoles method. Please check Akka.NET documentation for further information. 
-                        type = "ClusterKit.NodeManager.NodeManagerActor, ClusterKit.NodeManager"  # Full type name of actor to create. The actor is created via DI infrastructure, so type shoul be registered     
+                        singleton-node-role = NodeManager # the cluster nodes role where singleton actor is rised. This roles should be defined in KlusterKite.Core.BaseInstaller.GetRoles method. Please check Akka.NET documentation for further information. 
+                        type = "KlusterKite.NodeManager.NodeManagerActor, KlusterKite.NodeManager"  # Full type name of actor to create. The actor is created via DI infrastructure, so type shoul be registered     
                 }
         }
 ```
@@ -161,10 +161,10 @@ Please check Akka.NET documentation for Akka.Cluster.Sharding
 
 		/Sharding/Sharded {
 			actor-type = Sharding # defines that Akka.Cluster.Sharding actors are created here
-			type-name = clusterkit-sharding # the unique type name for this sharding family. Please check Akka.NET documentation for further information. 
-			role = clusterkit-sharding # the cluster nodes role where actors are rised. Pleasee check Akka.NET documentation for further information.  
-			type = "ClusterKit.Core.Example.ShardedActor, ClusterKit.Core.Example" # Full type name of actor to create. The actor is created via DI infrastructure, so type shoul be registered
-			message-extractor = "ClusterKit.Core.Example.RegionMessageExtractor, ClusterKit.Core.Example" # Full type name for sharding message extractor. Please check Akka.NET documentation for further information. 
+			type-name = klusterkite-sharding # the unique type name for this sharding family. Please check Akka.NET documentation for further information. 
+			role = klusterkite-sharding # the cluster nodes role where actors are rised. Pleasee check Akka.NET documentation for further information.  
+			type = "KlusterKite.Core.Example.ShardedActor, KlusterKite.Core.Example" # Full type name of actor to create. The actor is created via DI infrastructure, so type shoul be registered
+			message-extractor = "KlusterKite.Core.Example.RegionMessageExtractor, KlusterKite.Core.Example" # Full type name for sharding message extractor. Please check Akka.NET documentation for further information. 
 		}
 	}
 
@@ -181,9 +181,9 @@ Please check Akka.NET documentation for Akka.Cluster.Sharding
 
 		/Sharding/Sharded {
 			actor-type = ShardingProxy # defines that Akka.Cluster.Sharding proxy actors are created here
-			type-name = clusterkit-sharding # the unique type name for this sharding family. Please check Akka.NET documentation for further information. 
+			type-name = klusterkite-sharding # the unique type name for this sharding family. Please check Akka.NET documentation for further information. 
 			role = lusterkit-sharding # the cluster nodes role where actors are rised. Pleasee check Akka.NET documentation for further information.  
-			message-extractor = "ClusterKit.Core.Example.RegionMessageExtractor, ClusterKit.Core.Example" # Full type name for sharding message extractor. Please check Akka.NET documentation for further information. 
+			message-extractor = "KlusterKite.Core.Example.RegionMessageExtractor, KlusterKite.Core.Example" # Full type name for sharding message extractor. Please check Akka.NET documentation for further information. 
 		}
 	}
 
@@ -193,9 +193,9 @@ Please check Akka.NET documentation for Akka.Cluster.Sharding
 
 
 ## Testing
-In order to help create tests `ClusterKit.Core.TestKit` brings some extensions to the regular `Akka.TestKit` package.
+In order to help create tests `KlusterKite.Core.TestKit` brings some extensions to the regular `Akka.TestKit` package.
 
-### `ClusterKit.Core.TestKit.BaseActorTest<TConfigurator>`
+### `KlusterKite.Core.TestKit.BaseActorTest<TConfigurator>`
 This is the extended class that helps to configure the ActorSystem and overall test environment.
 
 ```csharp

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DeployerFallbackTest.cs" company="ClusterKit">
+// <copyright file="DeployerFallbackTest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ClusterKit.Core.Tests.AkkaTest
+namespace KlusterKite.Core.Tests.AkkaTest
 {
     using System;
     
@@ -15,7 +15,7 @@ namespace ClusterKit.Core.Tests.AkkaTest
     using Akka.Configuration;
     using Akka.Routing;
 
-    using ClusterKit.Core.TestKit;
+    using KlusterKite.Core.TestKit;
 
     using Serilog;
 
