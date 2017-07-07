@@ -13,10 +13,10 @@ namespace KlusterKite.Data.Tests.Mock
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Data.CRUD.ActionMessages;
     using KlusterKite.Data.EF;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Testing working with data

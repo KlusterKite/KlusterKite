@@ -13,9 +13,9 @@ namespace KlusterKite.Web.NginxConfigurator
 
     using Akka.Actor;
 
-    using KlusterKite.Web.Client.Messages;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Web.Client.Messages;
 
     /// <summary>
     /// Node service description

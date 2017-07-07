@@ -16,12 +16,13 @@ namespace KlusterKite.NodeManager.ConfigurationSource
 
     using Akka.Configuration;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Launcher.Utils;
 
-    using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
 
     using NuGet.Frameworks;

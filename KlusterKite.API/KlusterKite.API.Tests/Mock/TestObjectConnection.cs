@@ -15,10 +15,10 @@ namespace KlusterKite.API.Tests.Mock
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client;
-
-    using JetBrains.Annotations;
 
     using Newtonsoft.Json.Linq;
 

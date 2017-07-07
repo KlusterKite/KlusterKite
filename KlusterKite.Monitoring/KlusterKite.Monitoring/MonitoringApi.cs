@@ -14,13 +14,13 @@ namespace KlusterKite.Monitoring
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Attributes.Authorization;
     using KlusterKite.LargeObjects.Client;
     using KlusterKite.Monitoring.Client;
     using KlusterKite.Monitoring.Messages;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Monitoring api

@@ -18,6 +18,8 @@ namespace KlusterKite.Web.Rest
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.Core;
     using KlusterKite.Data.CRUD;
@@ -28,8 +30,6 @@ namespace KlusterKite.Web.Rest
     using KlusterKite.Security.Attributes;
     using KlusterKite.Security.Client;
     using KlusterKite.Web.Authorization;
-
-    using JetBrains.Annotations;
 
     using Microsoft.AspNetCore.Mvc;
 

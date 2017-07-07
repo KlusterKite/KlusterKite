@@ -16,12 +16,12 @@ namespace KlusterKite.API.Tests
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client;
     using KlusterKite.API.Provider;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

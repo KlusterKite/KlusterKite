@@ -13,9 +13,9 @@ namespace KlusterKite.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// The base class for migration log records

@@ -9,9 +9,9 @@
 
 namespace KlusterKite.API.Client.Converters
 {
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Represents a dictionary key-value pair

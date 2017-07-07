@@ -18,11 +18,11 @@ namespace KlusterKite.Data.EF
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.Core.Monads;
     using KlusterKite.Data.CRUD.ActionMessages;
-
-    using JetBrains.Annotations;
 
     using Microsoft.EntityFrameworkCore;
 

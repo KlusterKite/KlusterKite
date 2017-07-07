@@ -13,15 +13,15 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
     using System.Collections.Generic;
     using System.Linq;
 
+    using global::GraphQL.Language.AST;
+    using global::GraphQL.Resolvers;
+    using global::GraphQL.Types;
+
     using KlusterKite.API.Attributes.Authorization;
     using KlusterKite.API.Client;
     using KlusterKite.Security.Attributes;
     using KlusterKite.Security.Client;
     using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
-
-    using global::GraphQL.Language.AST;
-    using global::GraphQL.Resolvers;
-    using global::GraphQL.Types;
 
     using Newtonsoft.Json.Linq;
 

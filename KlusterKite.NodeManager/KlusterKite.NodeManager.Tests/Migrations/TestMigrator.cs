@@ -17,9 +17,9 @@ namespace KlusterKite.NodeManager.Tests.Migrations
 
     using Akka.Configuration;
 
-    using KlusterKite.NodeManager.Migrator;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.NodeManager.Migrator;
 
     /// <summary>
     /// The test migrator

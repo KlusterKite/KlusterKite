@@ -20,6 +20,8 @@ namespace KlusterKite.Data
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client;
     using KlusterKite.Data.CRUD;
@@ -29,8 +31,6 @@ namespace KlusterKite.Data
     using KlusterKite.LargeObjects.Client;
     using KlusterKite.Security.Attributes;
     using KlusterKite.Security.Client;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Generic actor to perform basic crud operation on data objects

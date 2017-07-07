@@ -11,7 +11,6 @@ namespace KlusterKite.Core.Service
 {
     using System;
     using System.Collections.Generic;
-
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -23,9 +22,9 @@ namespace KlusterKite.Core.Service
 
     using Autofac;
 
-    using KlusterKite.Core.Log;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Core.Log;
 
     using Serilog;
     using Serilog.Events;

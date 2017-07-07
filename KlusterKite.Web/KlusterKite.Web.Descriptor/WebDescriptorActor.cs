@@ -14,9 +14,9 @@ namespace KlusterKite.Web.Descriptor
     using Akka.Actor;
     using Akka.Event;
 
-    using KlusterKite.Web.Client.Messages;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Web.Client.Messages;
 
     /// <summary>
     /// Standard actor, that describes current node web services to other nodes

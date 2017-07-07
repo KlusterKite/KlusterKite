@@ -19,9 +19,9 @@ namespace KlusterKite.Web
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
 
-    using KlusterKite.Core;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Core;
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;

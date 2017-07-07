@@ -13,11 +13,11 @@ namespace KlusterKite.Monitoring.Messages
     using System.Collections.Generic;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client.Converters;
     using KlusterKite.Monitoring.Client.Messages;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Global cluster actors tree scan result

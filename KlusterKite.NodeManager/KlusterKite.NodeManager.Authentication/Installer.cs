@@ -16,10 +16,10 @@ namespace KlusterKite.NodeManager.Authentication
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Installing components from current library

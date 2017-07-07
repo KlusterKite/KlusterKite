@@ -13,10 +13,10 @@ namespace KlusterKite.Security.Tests
 
     using Akka.Configuration;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Security.Attributes;
     using KlusterKite.Security.Client;
-
-    using JetBrains.Annotations;
 
     using Xunit;
 

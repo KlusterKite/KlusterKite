@@ -16,10 +16,10 @@ namespace KlusterKite.Web.GraphQL.Publisher
 
     using Autofac;
 
-    using KlusterKite.Core;
-
     using global::GraphQL;
     using global::GraphQL.Http;
+
+    using KlusterKite.Core;
 
     /// <summary>
     /// Installing components from current library

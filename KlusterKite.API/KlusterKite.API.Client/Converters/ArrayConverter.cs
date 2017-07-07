@@ -12,9 +12,9 @@ namespace KlusterKite.API.Client.Converters
     using System.Collections.Generic;
     using System.Linq;
 
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Generic converter for arrays

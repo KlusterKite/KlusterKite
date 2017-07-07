@@ -9,9 +9,9 @@
 
 namespace KlusterKite.NodeManager.ConfigurationSource
 {
-    using KlusterKite.NodeManager.Client.ORM;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.NodeManager.Client.ORM;
 
     using Microsoft.EntityFrameworkCore;
 

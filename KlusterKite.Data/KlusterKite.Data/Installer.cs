@@ -16,8 +16,9 @@ namespace KlusterKite.Data
 
     using Autofac;
 
-    using KlusterKite.Core;
     using JetBrains.Annotations;
+
+    using KlusterKite.Core;
 
     /// <summary>
     /// Installing components from current library

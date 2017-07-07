@@ -11,11 +11,11 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
 
-    using KlusterKite.API.Client;
-    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
-
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
+
+    using KlusterKite.API.Client;
+    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
 
     using Newtonsoft.Json.Linq;
 

@@ -11,10 +11,10 @@ namespace KlusterKite.Data.CRUD.ActionMessages
 {
     using Akka.Routing;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Request to process some data action

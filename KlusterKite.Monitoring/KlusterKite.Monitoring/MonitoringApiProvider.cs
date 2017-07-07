@@ -11,10 +11,10 @@ namespace KlusterKite.Monitoring
 {
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Provider;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Provides API access to the monitoring functions

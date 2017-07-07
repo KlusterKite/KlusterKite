@@ -15,9 +15,9 @@ namespace KlusterKite.API.Client
     using System.Linq.Expressions;
     using System.Reflection;
 
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     using Newtonsoft.Json.Linq;
 

@@ -11,10 +11,10 @@ namespace KlusterKite.NodeManager.Client.ORM
 {
     using System;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The short public user description

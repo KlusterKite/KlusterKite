@@ -11,17 +11,16 @@ namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System;
     using System.Linq;
-
     using System.Text;
     using System.Threading.Tasks;
 
-    using KlusterKite.Security.Attributes;
-    using KlusterKite.Web.Authorization;
-
     using global::GraphQL;
     using global::GraphQL.Http;
-    
+
     using JetBrains.Annotations;
+
+    using KlusterKite.Security.Attributes;
+    using KlusterKite.Web.Authorization;
 
     using Microsoft.AspNetCore.Mvc;
 

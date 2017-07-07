@@ -9,10 +9,10 @@
 
 namespace KlusterKite.API.Tests.Mock
 {
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Provider;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The second provider to test multiple provider configurations

@@ -12,9 +12,9 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
     using System.Collections.Generic;
     using System.Linq;
 
-    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
-
     using global::GraphQL.Types;
+
+    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
 
     /// <summary>
     /// The type used for arguments

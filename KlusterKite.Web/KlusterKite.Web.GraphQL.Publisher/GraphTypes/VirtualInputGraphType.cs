@@ -11,9 +11,9 @@ namespace KlusterKite.Web.GraphQL.Publisher.GraphTypes
 {
     using System.Collections.Generic;
 
-    using KlusterKite.API.Client;
-    
     using global::GraphQL.Types;
+
+    using KlusterKite.API.Client;
 
     /// <summary>
     /// The virtual graph type used to convert <see cref="ApiObjectType"/> to <see cref="InputObjectGraphType"/>

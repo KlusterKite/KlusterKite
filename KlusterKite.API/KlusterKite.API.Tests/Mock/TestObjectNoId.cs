@@ -9,9 +9,9 @@
 
 namespace KlusterKite.API.Tests.Mock
 {
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Testing object with id of other name

@@ -17,6 +17,8 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
 
     using Akka.Configuration;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Data.EF;
     using KlusterKite.NodeManager.Client;
     using KlusterKite.NodeManager.Client.ORM;
@@ -24,8 +26,6 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.Migrator;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Infrastructure;

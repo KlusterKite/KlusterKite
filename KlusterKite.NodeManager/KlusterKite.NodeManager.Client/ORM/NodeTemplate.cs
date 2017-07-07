@@ -12,11 +12,11 @@ namespace KlusterKite.NodeManager.Client.ORM
     using System.Collections.Generic;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client.Converters;
     using KlusterKite.NodeManager.Launcher.Messages;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// A cluster node template description

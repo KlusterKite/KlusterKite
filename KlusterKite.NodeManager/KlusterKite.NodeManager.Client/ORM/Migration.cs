@@ -14,10 +14,10 @@ namespace KlusterKite.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.Data.CRUD;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The history record describing cluster migration

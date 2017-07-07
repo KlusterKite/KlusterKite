@@ -11,12 +11,12 @@ namespace KlusterKite.NodeManager
 {
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.WebApi;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The node manager API provider

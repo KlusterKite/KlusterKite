@@ -15,9 +15,9 @@ namespace KlusterKite.Data
 
     using Autofac;
 
-    using KlusterKite.Data.CRUD.ActionMessages;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Data.CRUD.ActionMessages;
 
     /// <summary>
     /// Generic actor to perform basic crud operation on EF objects and sends <seealso cref="UpdateMessage{TObject}"/> of successful operations

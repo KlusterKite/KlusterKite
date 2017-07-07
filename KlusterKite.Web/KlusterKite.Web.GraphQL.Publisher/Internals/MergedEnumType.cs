@@ -11,10 +11,10 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
 
+    using global::GraphQL.Types;
+
     using KlusterKite.API.Client;
     using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
-
-    using global::GraphQL.Types;
 
     /// <summary>
     /// The merged type representing some enum value

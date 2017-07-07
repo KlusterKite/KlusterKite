@@ -13,12 +13,12 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
     using System.Linq;
     using System.Text.RegularExpressions;
 
-    using KlusterKite.API.Client;
-    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
-
     using global::GraphQL.Language.AST;
     using global::GraphQL.Resolvers;
     using global::GraphQL.Types;
+
+    using KlusterKite.API.Client;
+    using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
 
     using Newtonsoft.Json.Linq;
 

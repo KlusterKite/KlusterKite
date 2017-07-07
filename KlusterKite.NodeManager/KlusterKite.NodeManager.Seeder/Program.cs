@@ -19,10 +19,10 @@ namespace KlusterKite.NodeManager.Seeder
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.NodeManager.Migrator;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Service main entry point

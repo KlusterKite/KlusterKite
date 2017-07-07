@@ -16,10 +16,10 @@ namespace KlusterKite.API.Endpoint
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client.Messages;
     using KlusterKite.API.Provider;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Publishes defined API to the cluster

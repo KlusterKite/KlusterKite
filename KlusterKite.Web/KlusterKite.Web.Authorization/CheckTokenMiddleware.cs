@@ -12,9 +12,9 @@ namespace KlusterKite.Web.Authorization
     using System;
     using System.Threading.Tasks;
 
-    using KlusterKite.Security.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Security.Attributes;
 
     using Microsoft.AspNetCore.Http;
 

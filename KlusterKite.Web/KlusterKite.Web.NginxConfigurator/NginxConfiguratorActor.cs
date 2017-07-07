@@ -21,10 +21,10 @@ namespace KlusterKite.Web.NginxConfigurator
     using Akka.Configuration;
     using Akka.Event;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Web.Client;
     using KlusterKite.Web.Client.Messages;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Follows cluster changes for adding / removing new nodes with "web" role and configures local nginx for supported services

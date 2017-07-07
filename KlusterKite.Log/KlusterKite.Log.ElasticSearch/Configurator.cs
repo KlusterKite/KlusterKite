@@ -14,9 +14,9 @@ namespace KlusterKite.Log.ElasticSearch
 
     using Akka.Configuration;
 
-    using KlusterKite.Core.Log;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Core.Log;
 
     using Serilog;
     using Serilog.Debugging;

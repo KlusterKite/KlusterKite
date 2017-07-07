@@ -10,10 +10,10 @@
 namespace KlusterKite.Web.Authorization
 {
     using System.Linq;
-    
-    using KlusterKite.Security.Attributes;
 
     using JetBrains.Annotations;
+
+    using KlusterKite.Security.Attributes;
 
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;

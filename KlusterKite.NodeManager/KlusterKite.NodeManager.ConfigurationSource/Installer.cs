@@ -15,12 +15,12 @@ namespace KlusterKite.NodeManager.ConfigurationSource
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.Data;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.Launcher.Utils;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Installing components from current library

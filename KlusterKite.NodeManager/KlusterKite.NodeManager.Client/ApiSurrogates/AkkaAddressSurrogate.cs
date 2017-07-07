@@ -11,9 +11,9 @@ namespace KlusterKite.NodeManager.Client.ApiSurrogates
 {
     using Akka.Actor;
 
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Represents <see cref="Address"/> for public API

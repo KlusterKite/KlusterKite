@@ -15,14 +15,14 @@ namespace KlusterKite.NodeManager
     using System.Linq.Expressions;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.Core.Monads;
     using KlusterKite.Data;
     using KlusterKite.Data.CRUD.ActionMessages;
     using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Launcher.Utils;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Data factory to read packages from nuget feed

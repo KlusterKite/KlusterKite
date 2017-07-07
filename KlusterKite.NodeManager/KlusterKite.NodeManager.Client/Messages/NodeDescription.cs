@@ -14,10 +14,10 @@ namespace KlusterKite.NodeManager.Client.Messages
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.NodeManager.Client.ApiSurrogates;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Description of node configuration

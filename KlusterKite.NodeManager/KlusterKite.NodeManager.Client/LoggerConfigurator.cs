@@ -11,9 +11,9 @@ namespace KlusterKite.NodeManager.Client
 {
     using Akka.Configuration;
 
-    using KlusterKite.Core.Log;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Core.Log;
 
     using Serilog;
 

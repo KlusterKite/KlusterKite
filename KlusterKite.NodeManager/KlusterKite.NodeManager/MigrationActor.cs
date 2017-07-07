@@ -20,6 +20,8 @@ namespace KlusterKite.NodeManager
     using Akka.Actor;
     using Akka.Event;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Data.EF;
     using KlusterKite.NodeManager.Client.Messages.Migration;
     using KlusterKite.NodeManager.Client.MigrationStates;
@@ -27,8 +29,6 @@ namespace KlusterKite.NodeManager
     using KlusterKite.NodeManager.ConfigurationSource;
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.RemoteDomain;
-
-    using JetBrains.Annotations;
 
     using Microsoft.EntityFrameworkCore;
 

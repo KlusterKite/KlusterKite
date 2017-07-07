@@ -19,10 +19,10 @@ namespace KlusterKite.NodeManager.Seeder.Launcher
 
     using Akka.Configuration;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.Launcher.Utils.Exceptions;
-
-    using JetBrains.Annotations;
 
     using NuGet.Frameworks;
     using NuGet.Packaging.Core;

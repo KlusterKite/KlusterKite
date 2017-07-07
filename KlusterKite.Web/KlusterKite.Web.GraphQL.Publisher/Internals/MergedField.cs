@@ -13,11 +13,11 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
     using System.Collections.Immutable;
     using System.Linq;
 
-    using KlusterKite.API.Client;
-
     using global::GraphQL.Resolvers;
 
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Client;
 
     /// <summary>
     /// The field in the <see cref="MergedType"/>

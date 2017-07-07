@@ -11,9 +11,9 @@ namespace KlusterKite.NodeManager.Messages
 {
     using System.Collections.Generic;
 
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Overall debug data of current cluster node template use

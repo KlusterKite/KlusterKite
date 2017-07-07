@@ -9,9 +9,9 @@
 
 namespace KlusterKite.Monitoring.Client.Messages
 {
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// The actor's description

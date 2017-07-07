@@ -11,9 +11,9 @@ namespace KlusterKite.NodeManager.Client.ApiSurrogates
 {
     using System.Collections.Generic;
 
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     using Newtonsoft.Json;
 

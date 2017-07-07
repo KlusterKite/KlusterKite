@@ -13,9 +13,9 @@ namespace KlusterKite.Monitoring.Tests
 
     using Akka.Actor;
 
-    using KlusterKite.Web.GraphQL.Publisher;
-
     using GraphQL.Utilities;
+
+    using KlusterKite.Web.GraphQL.Publisher;
 
     using Xunit;
     using Xunit.Abstractions;

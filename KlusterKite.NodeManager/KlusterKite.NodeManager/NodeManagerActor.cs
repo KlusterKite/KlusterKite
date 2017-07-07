@@ -22,6 +22,8 @@ namespace KlusterKite.NodeManager
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.Core;
     using KlusterKite.Core.Monads;
@@ -42,7 +44,6 @@ namespace KlusterKite.NodeManager
     using KlusterKite.Security.Attributes;
     using KlusterKite.Security.Client;
 
-    using JetBrains.Annotations;
     using Microsoft.EntityFrameworkCore;
 
     /// <summary>

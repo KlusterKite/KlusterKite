@@ -15,10 +15,10 @@ namespace KlusterKite.NodeManager.Client.ORM
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Xml.Serialization;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.Data.CRUD;
-
-    using JetBrains.Annotations;
 
     using Newtonsoft.Json;
 

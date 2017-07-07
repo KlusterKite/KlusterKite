@@ -26,6 +26,8 @@ namespace KlusterKite.NodeManager.Tests
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.Core.Ping;
     using KlusterKite.Core.TestKit;
@@ -41,8 +43,6 @@ namespace KlusterKite.NodeManager.Tests
     using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.Messages;
-
-    using JetBrains.Annotations;
 
     using Xunit;
     using Xunit.Abstractions;

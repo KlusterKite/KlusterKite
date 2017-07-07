@@ -14,11 +14,11 @@ namespace KlusterKite.API.Client
     using System.Linq;
     using System.Reflection;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Attributes.Authorization;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The field provider

@@ -15,10 +15,10 @@ namespace KlusterKite.NodeManager.Client.ORM
 
     using BCrypt.Net;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.Data.CRUD;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The web ui user

@@ -24,10 +24,10 @@ namespace KlusterKite.LargeObjects
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core.Utils;
     using KlusterKite.LargeObjects.Client;
-
-    using JetBrains.Annotations;
 
     using Serilog;
 

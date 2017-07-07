@@ -17,13 +17,13 @@ namespace KlusterKite.NodeManager.Tests
     using System.Runtime.Versioning;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.ConfigurationSource;
     using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Launcher.Utils;
-
-    using JetBrains.Annotations;
 
     using NuGet.Frameworks;
     using NuGet.Packaging;

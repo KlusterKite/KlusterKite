@@ -15,14 +15,14 @@ namespace KlusterKite.Web.Tests.GraphQL
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using global::GraphQL;
+    using global::GraphQL.Http;
+    using global::GraphQL.Utilities;
+
     using KlusterKite.API.Client;
     using KlusterKite.Core;
     using KlusterKite.Security.Attributes;
     using KlusterKite.Web.GraphQL.Publisher;
-
-    using global::GraphQL;
-    using global::GraphQL.Http;
-    using global::GraphQL.Utilities;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

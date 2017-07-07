@@ -15,6 +15,8 @@ namespace KlusterKite.NodeManager.WebApi
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Attributes.Authorization;
     using KlusterKite.API.Client;
@@ -28,8 +30,6 @@ namespace KlusterKite.NodeManager.WebApi
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.Messages;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Gets the access to current cluster state management

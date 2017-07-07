@@ -13,10 +13,10 @@ namespace KlusterKite.NodeManager.Authentication
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.NodeManager.Authentication.Clients;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Creates predefined client applications

@@ -12,9 +12,9 @@ namespace KlusterKite.API.Tests.Mock
     using System;
     using System.Collections.Generic;
 
-    using KlusterKite.API.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
 
     /// <summary>
     /// Test object

@@ -15,14 +15,14 @@ namespace KlusterKite.Web.GraphQL.Publisher
 
     using Akka.Util.Internal;
 
+    using global::GraphQL;
+    using global::GraphQL.Http;
+    using global::GraphQL.Types;
+
     using KlusterKite.API.Client;
     using KlusterKite.Security.Attributes;
     using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
     using KlusterKite.Web.GraphQL.Publisher.Internals;
-
-    using global::GraphQL;
-    using global::GraphQL.Http;
-    using global::GraphQL.Types;
 
     using Newtonsoft.Json.Linq;
 

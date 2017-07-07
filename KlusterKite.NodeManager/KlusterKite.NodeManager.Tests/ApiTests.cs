@@ -13,10 +13,10 @@ namespace KlusterKite.NodeManager.Tests
 
     using Akka.Actor;
 
+    using GraphQL.Utilities;
+
     using KlusterKite.NodeManager.Tests.Mock;
     using KlusterKite.Web.GraphQL.Publisher;
-
-    using GraphQL.Utilities;
 
     using Xunit;
     using Xunit.Abstractions;

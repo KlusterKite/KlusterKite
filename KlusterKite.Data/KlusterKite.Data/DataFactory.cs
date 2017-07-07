@@ -16,11 +16,11 @@ namespace KlusterKite.Data
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.Core.Monads;
     using KlusterKite.Data.CRUD.ActionMessages;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Base factory to work with data objects

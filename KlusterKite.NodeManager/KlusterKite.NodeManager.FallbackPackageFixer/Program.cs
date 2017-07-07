@@ -14,9 +14,9 @@ namespace KlusterKite.NodeManager.FallbackPackageFixer
     using System.IO;
     using System.Linq;
 
-    using KlusterKite.NodeManager.Launcher.Messages;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.NodeManager.Launcher.Messages;
 
     using Newtonsoft.Json;
 

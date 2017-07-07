@@ -16,9 +16,9 @@ namespace KlusterKite.Web.Authentication
 
     using Autofac;
 
-    using KlusterKite.Security.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// Provides methods for authentication

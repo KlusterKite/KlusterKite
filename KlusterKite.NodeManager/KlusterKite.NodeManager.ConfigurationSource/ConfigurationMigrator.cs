@@ -13,11 +13,11 @@ namespace KlusterKite.NodeManager.ConfigurationSource
 
     using Akka.Configuration;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Data.EF;
     using KlusterKite.NodeManager.Migrator;
     using KlusterKite.NodeManager.Migrator.EF;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The migrator for configuration database

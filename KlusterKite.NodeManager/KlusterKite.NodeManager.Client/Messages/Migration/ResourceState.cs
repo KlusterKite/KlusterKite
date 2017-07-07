@@ -11,10 +11,10 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
     using System.Collections.Generic;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.NodeManager.Client.ORM;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The overall resource migration state

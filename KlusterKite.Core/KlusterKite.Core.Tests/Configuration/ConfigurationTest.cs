@@ -15,9 +15,9 @@ namespace KlusterKite.Core.Tests.Configuration
 
     using Autofac;
 
-    using KlusterKite.Core.TestKit;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Core.TestKit;
 
     using Xunit;
     using Xunit.Abstractions;

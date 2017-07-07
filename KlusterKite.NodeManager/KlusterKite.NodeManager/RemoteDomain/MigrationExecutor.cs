@@ -15,9 +15,9 @@ namespace KlusterKite.NodeManager.RemoteDomain
 
     using Autofac;
 
-    using KlusterKite.NodeManager.Client.ORM;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.NodeManager.Client.ORM;
 
     /// <summary>
     /// Executes migrations for the specified resources

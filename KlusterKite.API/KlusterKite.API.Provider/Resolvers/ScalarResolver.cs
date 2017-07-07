@@ -13,10 +13,10 @@ namespace KlusterKite.API.Provider.Resolvers
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

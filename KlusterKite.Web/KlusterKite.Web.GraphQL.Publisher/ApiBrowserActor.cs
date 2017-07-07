@@ -17,11 +17,11 @@ namespace KlusterKite.Web.GraphQL.Publisher
     using Akka.Cluster;
     using Akka.Event;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client;
     using KlusterKite.API.Client.Messages;
     using KlusterKite.Core;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Scans cluster for the API publishers and generates the cluster schema

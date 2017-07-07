@@ -21,11 +21,11 @@ namespace KlusterKite.LargeObjects.Tests
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.Core.TestKit;
     using KlusterKite.LargeObjects.Client;
-
-    using JetBrains.Annotations;
 
     using Xunit;
     using Xunit.Abstractions;

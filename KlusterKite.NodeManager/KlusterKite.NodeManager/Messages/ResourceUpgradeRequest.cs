@@ -10,11 +10,11 @@
 namespace KlusterKite.NodeManager.Messages
 {
     using System.Collections.Generic;
-    
-    using KlusterKite.API.Attributes;
-    using KlusterKite.NodeManager.Client.Messages.Migration;
 
     using JetBrains.Annotations;
+
+    using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Client.Messages.Migration;
 
     /// <summary>
     /// The request to update resources

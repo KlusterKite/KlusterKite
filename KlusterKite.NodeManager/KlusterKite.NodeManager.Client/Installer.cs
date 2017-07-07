@@ -16,10 +16,10 @@ namespace KlusterKite.NodeManager.Client
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.Core.Log;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Installing components from current library

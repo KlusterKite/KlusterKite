@@ -18,11 +18,11 @@ namespace KlusterKite.NodeManager.Client
     using Akka.Cluster;
     using Akka.Event;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.NodeManager.Client.Messages;
     using KlusterKite.NodeManager.Launcher.Messages;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Small client actor for node managing. Provides current node configuration information and executes update related commands

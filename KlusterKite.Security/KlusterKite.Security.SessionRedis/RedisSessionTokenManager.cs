@@ -18,10 +18,10 @@ namespace KlusterKite.Security.SessionRedis
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core.Utils;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     using StackExchange.Redis;
 

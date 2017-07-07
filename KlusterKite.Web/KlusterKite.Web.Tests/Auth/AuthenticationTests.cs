@@ -19,11 +19,11 @@ namespace KlusterKite.Web.Tests.Auth
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.Core.TestKit;
     using KlusterKite.Security.Attributes;
-
-    using JetBrains.Annotations;
 
     using Newtonsoft.Json;
 

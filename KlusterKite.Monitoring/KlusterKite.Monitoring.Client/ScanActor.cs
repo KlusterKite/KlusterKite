@@ -16,10 +16,10 @@ namespace KlusterKite.Monitoring.Client
     using Akka.Actor;
     using Akka.Cluster;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.LargeObjects;
     using KlusterKite.Monitoring.Client.Messages;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// Actor scans current system for full actor tree

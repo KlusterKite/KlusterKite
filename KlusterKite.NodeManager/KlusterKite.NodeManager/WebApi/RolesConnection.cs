@@ -14,6 +14,8 @@ namespace KlusterKite.NodeManager.WebApi
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client;
     using KlusterKite.Data.CRUD;
@@ -23,8 +25,6 @@ namespace KlusterKite.NodeManager.WebApi
     using KlusterKite.NodeManager.Messages;
     using KlusterKite.Security.Attributes;
     using KlusterKite.Web.Authorization.Attributes;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The <see cref="Role"/> management

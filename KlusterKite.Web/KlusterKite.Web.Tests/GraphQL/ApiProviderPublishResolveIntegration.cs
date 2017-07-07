@@ -15,6 +15,13 @@ namespace KlusterKite.Web.Tests.GraphQL
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using global::GraphQL;
+    using global::GraphQL.Http;
+    using global::GraphQL.Utilities;
+    using global::GraphQL.Validation.Complexity;
+
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client;
     using KlusterKite.API.Tests.Mock;
@@ -22,13 +29,6 @@ namespace KlusterKite.Web.Tests.GraphQL
     using KlusterKite.Core.Log;
     using KlusterKite.Security.Attributes;
     using KlusterKite.Web.GraphQL.Publisher;
-
-    using global::GraphQL;
-    using global::GraphQL.Http;
-    using global::GraphQL.Utilities;
-    using global::GraphQL.Validation.Complexity;
-
-    using JetBrains.Annotations;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

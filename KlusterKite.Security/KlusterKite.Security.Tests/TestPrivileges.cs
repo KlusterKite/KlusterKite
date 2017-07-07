@@ -9,9 +9,9 @@
 
 namespace KlusterKite.Security.Tests
 {
-    using KlusterKite.Security.Attributes;
-
     using JetBrains.Annotations;
+
+    using KlusterKite.Security.Attributes;
 
     /// <summary>
     /// The test privileges

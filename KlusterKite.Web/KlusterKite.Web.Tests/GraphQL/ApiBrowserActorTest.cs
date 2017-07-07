@@ -23,12 +23,12 @@ namespace KlusterKite.Web.Tests.GraphQL
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Client.Messages;
     using KlusterKite.Core;
     using KlusterKite.Core.TestKit;
     using KlusterKite.Web.GraphQL.Publisher;
-
-    using JetBrains.Annotations;
 
     using Xunit;
     using Xunit.Abstractions;

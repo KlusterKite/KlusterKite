@@ -19,12 +19,12 @@ namespace KlusterKite.NodeManager.Migrator.Executor
 
     using Autofac;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.RemoteDomain;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The code launcher

@@ -14,13 +14,13 @@ namespace KlusterKite.NodeManager.WebApi
 
     using Akka.Actor;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.Core;
     using KlusterKite.NodeManager.Client;
     using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Messages;
     using KlusterKite.Web.Authorization.Attributes;
-
-    using JetBrains.Annotations;
 
     using Microsoft.AspNetCore.Mvc;
 

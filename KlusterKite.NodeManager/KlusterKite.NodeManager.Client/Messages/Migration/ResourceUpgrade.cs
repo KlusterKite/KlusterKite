@@ -9,12 +9,12 @@
 
 namespace KlusterKite.NodeManager.Client.Messages.Migration
 {
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.NodeManager.Client.MigrationStates;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.Migrator;
-
-    using JetBrains.Annotations;
 
     /// <summary>
     /// The request to migrate specific resource
