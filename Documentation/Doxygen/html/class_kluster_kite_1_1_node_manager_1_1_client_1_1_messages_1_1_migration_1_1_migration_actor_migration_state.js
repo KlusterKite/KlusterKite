@@ -1,0 +1,5 @@
+var class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state =
+[
+    [ "Position", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#a6b598356f80fbdbac4b10a0ebc49e679", null ],
+    [ "TemplateStates", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#ac6dbf71f4a30bf762383c0500b708bd7", null ]
+];

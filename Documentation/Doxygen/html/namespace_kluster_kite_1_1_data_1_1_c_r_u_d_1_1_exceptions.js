@@ -1,0 +1,9 @@
+var namespace_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions =
+[
+    [ "BeforeActionException", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_before_action_exception.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_before_action_exception" ],
+    [ "DatasourceInnerException", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_datasource_inner_exception.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_datasource_inner_exception" ],
+    [ "EntityNotFoundException", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_entity_not_found_exception.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_entity_not_found_exception" ],
+    [ "InsertDuplicateIdException", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_insert_duplicate_id_exception.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_insert_duplicate_id_exception" ],
+    [ "MutationException", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_mutation_exception.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_mutation_exception" ],
+    [ "RequestEmptyException", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_request_empty_exception.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_request_empty_exception" ]
+];
