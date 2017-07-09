@@ -3,18 +3,18 @@ import Relay from 'react-relay'
 export default class UpdateReleaseMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_releases_create}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_create}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+      fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
         node
         edge
         errors
         api {
           klusterKiteNodesApi {
-            releases
+            configurations
           }
         }
       }
@@ -26,7 +26,7 @@ export default class UpdateReleaseMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
         Relay.QL`
-          fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+          fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
             errors {
               edges {
                 node {

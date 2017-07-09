@@ -51,9 +51,9 @@ class TemplatePage extends React.Component {
         }),
       {
         onSuccess: (response) => {
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges);
 
             this.setState({
               saving: false,
@@ -93,9 +93,9 @@ class TemplatePage extends React.Component {
         }),
       {
         onSuccess: (response) => {
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges);
 
             this.setState({
               deleting: false,

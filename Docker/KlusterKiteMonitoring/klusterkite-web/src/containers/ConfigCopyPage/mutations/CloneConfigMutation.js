@@ -2,12 +2,12 @@ import Relay from 'react-relay'
 
 export default class CloneConfigMutation extends Relay.Mutation {
   getMutation () {
-    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_releases_update}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_update}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+      fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
         node
         edge
         errors {
@@ -20,7 +20,7 @@ export default class CloneConfigMutation extends Relay.Mutation {
         }
         api {
           klusterKiteNodesApi {
-            releases
+            configurations
           }
         }
       }
@@ -32,7 +32,7 @@ export default class CloneConfigMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
         Relay.QL`
-          fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+          fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
             errors {
               edges {
                 node {
@@ -93,15 +93,15 @@ export default class CloneConfigMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.releaseId,
+      id: this.props.configurationId,
       newNode: {
-        id: this.props.releaseId,
-        configuration: {
-          migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migrationTemplates'),
-          nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
-          nugetFeed: this.props.configuration.nugetFeed,
-          packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
-          seedAddresses: this.props.configuration.seedAddresses
+        id: this.props.configurationId,
+        settings: {
+          migratorTemplates: this.convertEdgesToArray(this.props.settings.migratorTemplates.edges, 'migrationTemplates'),
+          nodeTemplates: this.convertEdgesToArray(this.props.settings.nodeTemplates.edges, 'nodeTemplates'),
+          nugetFeed: this.props.settings.nugetFeed,
+          packages: this.convertEdgesToArray(this.props.settings.packages.edges, 'packages'),
+          seedAddresses: this.props.settings.seedAddresses
         },
       }
     }
@@ -111,13 +111,13 @@ export default class CloneConfigMutation extends Relay.Mutation {
     return {
       model: {
         id: this.props.nodeId,
-        configuration: {
-          migratorTemplates: this.props.configuration.migratorTemplates,
-          nodeTemplates: this.props.configuration.nodeTemplates,
-          nugetFeed: this.props.configuration.nugetFeed,
-          packages: this.props.configuration.packages,
-          seedAddresses: this.props.configuration.seedAddresses,
-          id: this.props.configuration.id
+        settings: {
+          migratorTemplates: this.props.settings.migratorTemplates,
+          nodeTemplates: this.props.settings.nodeTemplates,
+          nugetFeed: this.props.settings.nugetFeed,
+          packages: this.props.settings.packages,
+          seedAddresses: this.props.settings.seedAddresses,
+          id: this.props.settings.id
         },
       },
     }

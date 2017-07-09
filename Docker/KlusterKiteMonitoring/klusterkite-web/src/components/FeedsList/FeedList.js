@@ -42,7 +42,7 @@ export default Relay.createContainer(
   FeedList,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ConfigurationSettings {
         nugetFeed
       }
       `,

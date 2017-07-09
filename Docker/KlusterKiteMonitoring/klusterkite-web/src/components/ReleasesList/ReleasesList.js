@@ -24,10 +24,10 @@ export class ReleasesList extends React.Component {
   }
 
   render() {
-    if (!this.props.klusterKiteNodesApi.releases){
+    if (!this.props.klusterKiteNodesApi.configurations){
       return (<div></div>);
     }
-    const edges = this.props.klusterKiteNodesApi.releases.edges;
+    const edges = this.props.klusterKiteNodesApi.configurations.edges;
 
     return (
       <div>
@@ -67,7 +67,7 @@ export class ReleasesList extends React.Component {
           </tbody>
         </table>
         <Paginator
-          totalItems={this.props.klusterKiteNodesApi.releases.count}
+          totalItems={this.props.klusterKiteNodesApi.configurations.count}
           currentPage={this.props.currentPage}
           itemsPerPage={this.props.itemsPerPage}
           onSelect={this.onPageChange}
@@ -87,7 +87,7 @@ export default Relay.createContainer(
     },
     fragments: {
       klusterKiteNodesApi: (variables) => Relay.QL`fragment on IKlusterKiteNodeApi_Root {
-        releases(sort: created_desc, limit: $itemsPerPage, offset: $offset) {
+        configurations(sort: created_desc, limit: $itemsPerPage, offset: $offset) {
           edges {
             node {
               id

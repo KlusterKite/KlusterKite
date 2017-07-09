@@ -65,9 +65,9 @@ class ReleasePage extends React.Component {
       {
         onSuccess: (response) => {
           console.log('response', response);
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges);
 
             this.setState({
               saving: false,
@@ -79,7 +79,7 @@ class ReleasePage extends React.Component {
               saving: false,
               saveErrors: null
             });
-            browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.node.id}`);
+            browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
           }
         },
         onFailure: (transaction) => console.log(transaction),
@@ -107,9 +107,9 @@ class ReleasePage extends React.Component {
       {
         onSuccess: (response) => {
           console.log('response', response);
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges);
 
             this.setState({
               saving: false,
@@ -148,7 +148,7 @@ class ReleasePage extends React.Component {
   }
 
   render () {
-    const model = this.props.api.release;
+    const model = this.props.api.configuration;
     const nodeManagement = this.props.api.klusterKiteNodesApi.clusterManagement;
 
     const canEdit = !model || model.state === 'Draft';
@@ -165,7 +165,7 @@ class ReleasePage extends React.Component {
         {model &&
         <div>
           <ReleaseOperations
-            configuration={model.configuration}
+            configuration={model.settings}
             nodeManagement={nodeManagement}
             releaseId={this.props.params.id}
             releaseInnerId={model.__id}
@@ -175,31 +175,31 @@ class ReleasePage extends React.Component {
             onStartMigration={this.onStartMigration.bind(this)}
           />
           <FeedsList
-            configuration={model.configuration}
+            configuration={model.settings}
             releaseId={this.props.params.id}
             canEdit={canEdit}
           />
           <NodeTemplatesList
-            configuration={model.configuration}
+            configuration={model.settings}
             createNodeTemplatePrivilege={true}
             getNodeTemplatePrivilege={true}
             releaseId={this.props.params.id}
             canEdit={canEdit}
           />
           <MigratorTemplatesList
-            configuration={model.configuration}
+            configuration={model.settings}
             createMigratorTemplatePrivilege={true}
             getMigratorTemplatePrivilege={true}
             releaseId={this.props.params.id}
             canEdit={canEdit}
           />
           <SeedsList
-            configuration={model.configuration}
+            configuration={model.settings}
             releaseId={this.props.params.id}
             canEdit={canEdit}
           />
           <PackagesList
-            configuration={model.configuration}
+            configuration={model.settings}
             releaseId={this.props.params.id}
           />
         </div>
@@ -223,8 +223,8 @@ export default Relay.createContainer(
       api: () => Relay.QL`
         fragment on IKlusterKiteNodeApi {
           id
-          release: __node(id: $id) @include( if: $nodeExists ) {
-            ...on IKlusterKiteNodeApi_Release {
+          configuration: __node(id: $id) @include( if: $nodeExists ) {
+            ...on IKlusterKiteNodeApi_Configuration {
               __id
               name
               notes
@@ -232,7 +232,7 @@ export default Relay.createContainer(
               majorVersion
               state
               isStable
-              configuration {
+              settings {
                 ${FeedsList.getFragment('configuration')},
                 ${MigratorTemplatesList.getFragment('configuration')}
                 ${NodeTemplatesList.getFragment('configuration')}

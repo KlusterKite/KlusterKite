@@ -8,7 +8,7 @@ export default class SetObsoleteMutation extends Relay.Mutation {
 
   getFatQuery () {
     return Relay.QL`
-      fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+      fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
         node
         edge
         errors {
@@ -28,7 +28,7 @@ export default class SetObsoleteMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
           Relay.QL`
-          fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+          fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
             errors {
               edges {
                 node {

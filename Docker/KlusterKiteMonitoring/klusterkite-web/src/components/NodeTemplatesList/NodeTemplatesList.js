@@ -77,7 +77,7 @@ export default Relay.createContainer(
   NodeTemplatesList,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ConfigurationSettings {
         nodeTemplates {
           edges {
             node {

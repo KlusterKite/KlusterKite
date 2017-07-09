@@ -36,15 +36,15 @@ class FeedPage extends React.Component {
       new UpdateFeedMutation(
         {
           nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.release.__id,
-          configuration: this.props.api.release.configuration,
+          releaseId: this.props.api.configuration.__id,
+          configuration: this.props.api.configuration.configuration,
           nugetFeed: model.nugetFeed,
         }),
       {
         onSuccess: (response) => {
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges);
 
             this.setState({
               saving: false,
@@ -74,7 +74,7 @@ class FeedPage extends React.Component {
   render () {
     console.log('render', this.props.api);
     const model = {
-      nugetFeed: this.props.api.release.configuration.nugetFeed,
+      nugetFeed: this.props.api.configuration.settings.nugetFeed,
     };
 
     return (
@@ -108,10 +108,10 @@ export default Relay.createContainer(
         fragment on IKlusterKiteNodeApi {
           __typename
           id
-          release:__node(id: $releaseId) {
-            ...on IKlusterKiteNodeApi_Release {
+          configuration:__node(id: $releaseId) {
+            ...on IKlusterKiteNodeApi_Configuration {
               __id
-              configuration {
+              settings {
                 ${UpdateFeedMutation.getFragment('configuration')},
                 nugetFeed,
               }

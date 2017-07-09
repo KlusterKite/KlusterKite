@@ -63,7 +63,7 @@ export default Relay.createContainer(
   SeedsList,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ConfigurationSettings {
         seedAddresses
       }
       `,

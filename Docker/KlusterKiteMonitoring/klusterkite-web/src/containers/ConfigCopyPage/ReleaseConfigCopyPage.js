@@ -34,18 +34,18 @@ class ReleaseConfigCopyPage extends React.Component {
   };
 
   copyConfiguration = () => {
-    if (this.props.api.klusterKiteNodesApi.releases.edges && this.props.api.klusterKiteNodesApi.releases.edges.length > 0){
-      let oldConfiguration = this.props.api.klusterKiteNodesApi.releases.edges[0].node.configuration;
+    if (this.props.api.klusterKiteNodesApi.configurations.edges && this.props.api.klusterKiteNodesApi.configurations.edges.length > 0){
+      let oldSettings = this.props.api.klusterKiteNodesApi.configurations.edges[0].node.settings;
 
       if (this.props.params.mode === 'update') {
-        oldConfiguration.packages = this.convertNameToId(this.props.api.klusterKiteNodesApi.nugetPackages);
+        oldSettings.packages = this.convertNameToId(this.props.api.klusterKiteNodesApi.nugetPackages);
       }
 
       this.setState({
         processing: true
       });
 
-      this.cloneConfig(oldConfiguration);
+      this.cloneConfig(oldSettings);
     } else {
       this.setState({
         oldConifgNotFoundError: true
@@ -53,20 +53,20 @@ class ReleaseConfigCopyPage extends React.Component {
     }
   };
 
-  cloneConfig = (config) => {
+  cloneConfig = (setting) => {
     Relay.Store.commitUpdate(
       new CloneConfigMutation(
         {
           nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.release.__id,
-          configuration: config,
+          configurationId: this.props.api.configuration.__id,
+          settings: setting,
         }),
       {
         onSuccess: (response) => {
           console.log('response', response);
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges);
 
             this.setState({
               processing: false,
@@ -128,10 +128,10 @@ export default Relay.createContainer(
         fragment on IKlusterKiteNodeApi {
           id
           klusterKiteNodesApi {
-            releases(filter: { state: Active }, limit: 1) {
+            configurations(filter: { state: Active }, limit: 1) {
               edges {
                 node {
-                  configuration {
+                  settings {
                     nugetFeed
                     nodeTemplates {
                       edges {
@@ -215,8 +215,8 @@ export default Relay.createContainer(
               }
             }
           }
-          release: __node(id: $releaseId) @include( if: $nodeExists ) {
-            ...on IKlusterKiteNodeApi_Release {
+          configuration: __node(id: $releaseId) @include( if: $nodeExists ) {
+            ...on IKlusterKiteNodeApi_Configuration {
               __id
               name
               notes

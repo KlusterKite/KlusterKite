@@ -57,9 +57,9 @@ class UserPage extends React.Component {
     //   {
     //     onSuccess: (response) => {
     //       console.log('response', response);
-    //       if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors &&
-    //         response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges) {
-    //         const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges);
+    //       if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors &&
+    //         response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges) {
+    //         const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges);
     //
     //         this.setState({
     //           saving: false,
@@ -71,7 +71,7 @@ class UserPage extends React.Component {
     //           saving: false,
     //           saveErrors: null
     //         });
-    //         browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.node.id}`);
+    //         browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
     //       }
     //     },
     //     onFailure: (transaction) => console.log(transaction),

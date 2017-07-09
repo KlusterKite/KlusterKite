@@ -36,8 +36,8 @@ export class NodesWithTemplates extends React.Component {
       return (<div></div>);
     }
     const activeNodes = this.props.data.getActiveNodeDescriptions.edges;
-    const templates = this.props.data.releases && this.props.data.releases.edges.length > 0 &&
-      this.props.data.releases.edges[0].node.configuration.nodeTemplates && this.props.data.releases.edges[0].node.configuration.nodeTemplates.edges;
+    const templates = this.props.data.configurations && this.props.data.configurations.edges.length > 0 &&
+      this.props.data.configurations.edges[0].node.settings.nodeTemplates && this.props.data.configurations.edges[0].node.settings.nodeTemplates.edges;
 
     return (
       <div className="templates">
@@ -66,10 +66,10 @@ export default Relay.createContainer(
             }
           }
         }
-        releases(filter: { state: Active }){
+        configurations(filter: { state: Active }){
           edges {
             node {
-              configuration {
+              settings {
                 nodeTemplates {
                   edges {
                     node {
