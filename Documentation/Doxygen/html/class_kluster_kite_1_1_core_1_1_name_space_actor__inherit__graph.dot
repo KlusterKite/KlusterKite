@@ -1,0 +1,10 @@
+digraph "KlusterKite.Core.NameSpaceActor"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node0 [label="KlusterKite.Core.NameSpace\lActor",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node1 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="UntypedActor",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node0 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="KlusterKite.Core.TestKit.\lNameSpaceForwarder",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_core_1_1_test_kit_1_1_name_space_forwarder.html",tooltip="The namespace actor, that also forwards all it&#39;s messages to the test actor "];
+}

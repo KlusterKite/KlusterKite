@@ -1,0 +1,5 @@
+var namespace_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_migrations =
+[
+    [ "ConfigurationContextModelSnapshot", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_migrations_1_1_configuration_context_model_snapshot.html", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_migrations_1_1_configuration_context_model_snapshot" ],
+    [ "Init", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_migrations_1_1_init.html", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_migrations_1_1_init" ]
+];

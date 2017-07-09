@@ -1,0 +1,25 @@
+var class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests =
+[
+    [ "ApiProviderResolveTests", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a30ed4af77d2d8ab44aeba1315c4fdf24", null ],
+    [ "AsyncArrayOfScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#aea5bea454c6229e9c8c76ec78ae0e612", null ],
+    [ "AsyncFrowardedScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a6013e93ffa3fe2369bc3d5e139cb42bb", null ],
+    [ "AsyncNestedScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#aec5e5c4020e11208f80c7881299e034c", null ],
+    [ "AsyncObjectMethodTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a8dffc9412e0336bc84bfbd854f08f5a3", null ],
+    [ "AsyncScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a8ecf4d2411b0b264d599f09adc214808", null ],
+    [ "CollectionQueryTests", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a5c4e0eddb26c7ae2ebc31769e225a9fd", null ],
+    [ "ConnectionMutationTests", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a714f046df05d3fa0a446db15949f3b0e", null ],
+    [ "ConnectionQueryTests", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a35c02ddc0773db241dcc9e26173386c5", null ],
+    [ "ConverterListTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a7356f6c37647ac8282a329462003a94a", null ],
+    [ "ConverterTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a413830442b3f1a78462bf35092d99baf", null ],
+    [ "FaultedASyncMethodTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#ad5a2a2acae6e2874cae39b5558fb7421", null ],
+    [ "MutationTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#af0564a4d17e01e265cd3e3d0e21b3889", null ],
+    [ "RecursionFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a54d02568f6546ce777e7cf214c238aba", null ],
+    [ "SyncArrayOfScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a39f74e8b59b4a18d03ac91b6323ec3d7", null ],
+    [ "SyncFaultedScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#ae7a475e6f7ce68f0825a008d484e3a53", null ],
+    [ "SyncFrowardedArrayOfScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#af5f6434d9101ac286e02a647ddefbcdd", null ],
+    [ "SyncNestedScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a3775852ba7657c8599c8b4545f707e65", null ],
+    [ "SyncScalarEnumFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#aa6a5146b85f8f9b62f00d4120b0bc341", null ],
+    [ "SyncScalarFieldTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#aa0524cfca47256863cc1b49805f962cf", null ],
+    [ "SyncScalarMethodTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#ada99db29c00c3bbaed19567ea1bdaff1", null ],
+    [ "TypedCollectionTest", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#a589b99b172cc375380a9229233d58269", null ]
+];
