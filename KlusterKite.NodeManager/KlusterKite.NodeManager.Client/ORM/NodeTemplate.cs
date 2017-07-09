@@ -95,10 +95,10 @@ namespace KlusterKite.NodeManager.Client.ORM
         public Dictionary<string, List<PackageDescription>> PackagesToInstall { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether no other nodes from previous releases are compatible
+        /// Gets or sets a value indicating whether no other nodes from previous configurations are compatible
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("A value indicating whether no other nodes from previous releases are compatible")]
+        [DeclareField("A value indicating whether no other nodes from previous configurations are compatible")]
         public bool ForceUpdate { get; set; }
 
         /// <summary>
@@ -197,10 +197,10 @@ namespace KlusterKite.NodeManager.Client.ORM
             public string Id { get; set; }
 
             /// <summary>
-            /// Gets or sets the required specific version (in case of null the default version for release will be used)
+            /// Gets or sets the required specific version (in case of null the default version for configuration will be used)
             /// </summary>
             [UsedImplicitly]
-            [DeclareField("the required specific version (in case of null the default version for release will be used)")]
+            [DeclareField("the required specific version (in case of null the default version for configuration will be used)")]
             public string SpecificVersion { get; set; }
 
             /// <summary>

@@ -162,16 +162,16 @@ namespace KlusterKite.NodeManager.WebApi
         [RequireUser]
         [DeclareConnection(
             CanCreate = true,
-            CreateDescription = "Creates the new draft release",
+            CreateDescription = "Creates the new draft configuration",
             CanUpdate = true,
-            UpdateDescription = "Updates the draft release",
+            UpdateDescription = "Updates the draft configuration",
             CanDelete = true,
-            DeleteDescription = "Removes the draft release",
+            DeleteDescription = "Removes the draft configuration",
             Description = "KlusterKite managing system security roles")]
-        [RequirePrivilege(Privileges.Release, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
-        public ReleaseConnection Releases(RequestContext context)
+        [RequirePrivilege(Privileges.Configuration, Scope = EnPrivilegeScope.User, AddActionNameToRequiredPrivilege = true)]
+        public ConfigurationConnection Configurations(RequestContext context)
         {
-            return new ReleaseConnection(this.actorSystem, GetManagerActorProxyPath(), this.AkkaTimeout, context);
+            return new ConfigurationConnection(this.actorSystem, GetManagerActorProxyPath(), this.AkkaTimeout, context);
         }
 
         /// <summary>

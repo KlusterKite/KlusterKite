@@ -43,16 +43,16 @@ namespace KlusterKite.NodeManager.Client
         public const string UserRole = "KlusterKite.NodeManager.UserRole";
 
         /// <summary>
-        /// The privilege to manage <see cref="Configuration"/>
+        /// The privilege to manage <see cref="ORM.Configuration"/>
         /// </summary>
-        [PrivilegeDescription("Release management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
-        public const string Release = "KlusterKite.NodeManager.Release";
+        [PrivilegeDescription("Configuration management", "Get", "GetList", "Create", "Delete", "Update", "Query", Target = EnPrivilegeTarget.User)]
+        public const string Configuration = "KlusterKite.NodeManager.Configuration";
 
         /// <summary>
-        /// The privilege to set <see cref="EnReleaseState.Ready"/> state for draft releases
+        /// The privilege to set <see cref="EnConfigurationState.Ready"/> state for draft configurations
         /// </summary>
-        [PrivilegeDescription("The privilege to set ready state for draft releases", Target = EnPrivilegeTarget.User)]
-        public const string ReleaseFinish = "KlusterKite.NodeManager.ReleaseFinish";
+        [PrivilegeDescription("The privilege to set ready state for draft configurations", Target = EnPrivilegeTarget.User)]
+        public const string ConfigurationFinish = "KlusterKite.NodeManager.ConfigurationFinish";
 
         /// <summary>
         /// The privilege to manage global cluster configuration

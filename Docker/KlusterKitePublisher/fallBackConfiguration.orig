@@ -1,7 +1,7 @@
 {
   "Configuration": "{\n   KlusterKite {\n     Web {\n       Nginx {\n         PathToConfig = \"/etc/nginx/sites-enabled/klusterkite.config\"\n         ReloadCommand {\n           Command = /etc/init.d/nginx\n           Arguments = reload\n         } \n         Configuration {\n           default {\n             \"location /klusterkite\" { \n               proxy_pass = \"http://monitoringUI/klusterkite\"\n             }\n           }\n         }\n       }\n     }\n   }\n}",
   "NodeTemplate": "publisher",
-  "ReleaseId": 1,
+  "ConfigurationId": 1,
   "Packages": [
     {
       "Id": "KlusterKite.Core.Service",

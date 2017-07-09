@@ -127,9 +127,9 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                             NugetFeed = this.Config.GetString("KlusterKite.NodeManager.PackageRepository")
                         };
 
-                var initialRelease = new Configuration
+                var initialConfiguration = new Configuration
                                          {
-                                             State = EnReleaseState.Active,
+                                             State = EnConfigurationState.Active,
                                              Name = "Initial configuration",
                                              Started = DateTimeOffset.Now,
                                              Settings = configuration
@@ -137,14 +137,14 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
 
                 var supportedFrameworks = this.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");
                 var initialErrors =
-                    initialRelease.SetPackagesDescriptionsForTemplates(this.packageRepository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
+                    initialConfiguration.SetPackagesDescriptionsForTemplates(this.packageRepository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
 
                 foreach (var errorDescription in initialErrors)
                 {
                     Console.WriteLine($@"error in {errorDescription.Field} - {errorDescription.Message}");
                 }
 
-                context.Configurations.Add(initialRelease);
+                context.Configurations.Add(initialConfiguration);
                 context.SaveChanges();
             }
 
@@ -253,6 +253,9 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                                                  "KlusterKite.NodeManager",
                                                  null),
                                              new NodeTemplate.PackageRequirement(
+                                                 "KlusterKite.NodeManager.Mock",
+                                                 null),
+                                             new NodeTemplate.PackageRequirement(
                                                  "KlusterKite.Data.EF.Npgsql",
                                                  null),
                                          }.ToList(),
@@ -307,7 +310,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                                             {
                                                 Privileges.GetActiveNodeDescriptions,
                                                 Privileges.GetTemplateStatistics,
-                                                $"{Privileges.Release}.Query"
+                                                $"{Privileges.Configuration}.Query"
                                             }
                                 };
             context.Roles.Add(adminRole);

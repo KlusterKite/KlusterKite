@@ -1,7 +1,7 @@
 ﻿-- Create migration
 
 mutation newMigration {
-  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCreate(input: {newReleaseId: 2}) {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCreate(input: {newConfigurationId: 2}) {
     result {
       result {
         state,
@@ -27,9 +27,9 @@ mutation newMigration {
 --- Migration state
 {
   api {
-    clusterKitNodesApi {
+    klusterKiteNodesApi {
       clusterManagement {
-        currentRelease {
+        currentConfiguration {
           __id
         }
         currentMigration {
@@ -100,7 +100,7 @@ mutation newMigration {
               }
             }
           }
-          releaseState {
+          configurationState {
             states {
               edges {
                 node {
@@ -141,28 +141,28 @@ mutation newMigration {
 
 -- Update nodes
 mutation {
-  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationNodesUpdate(input: {target: Destination}) {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationNodesUpdate(input: {target: Destination}) {
     result
   }
 }
 
 -- Update resources 
 mutation {
-  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "ClusterKit", migratorTypeName: "ClusterKit.NodeManager.ConfigurationSource.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "KlusterKite", migratorTypeName: "KlusterKite.NodeManager.ConfigurationSource.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
     result 
   }
 }
 
 -- finish migration
 mutation {
-  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationFinish {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationFinish {
     result
   }
 }
 
 -- cancel migration
 mutation {
-  clusterKitNodeApi_clusterKitNodesApi_clusterManagement_migrationCancel {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCancel {
     result
   }
 }
@@ -170,7 +170,7 @@ mutation {
 -- migrations data
 {
   api {
-    clusterKitNodesApi {
+    klusterKiteNodesApi {
       migrations {
         count
         edges {

@@ -33,18 +33,18 @@ namespace KlusterKite.NodeManager.Client.ORM
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the compatible release id
+        /// Gets or sets the compatible configuration id
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the compatible release id")]
-        public int CompatibleReleaseId { get; set; }
+        [DeclareField("the compatible configuration id")]
+        public int CompatibleConfigurationId { get; set; }
 
         /// <summary>
-        /// Gets or sets the parent release id
+        /// Gets or sets the parent configuration id
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the parent release id")]
-        public int ReleaseId { get; set; }
+        [DeclareField("the parent configuration id")]
+        public int ConfigurationId { get; set; }
 
         /// <summary>
         /// Gets or sets the template code
@@ -54,19 +54,19 @@ namespace KlusterKite.NodeManager.Client.ORM
         public string TemplateCode { get; set; }
 
         /// <summary>
-        /// Gets or sets the compatible release
+        /// Gets or sets the compatible configuration
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the compatible release")]
-        [ForeignKey(nameof(CompatibleReleaseId))]
+        [DeclareField("the compatible configuration")]
+        [ForeignKey(nameof(CompatibleConfigurationId))]
         public Configuration CompatibleConfiguration { get; set; }
 
         /// <summary>
-        /// Gets or sets the parent release
+        /// Gets or sets the parent configuration
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the parent release")]
-        [ForeignKey(nameof(ReleaseId))]
+        [DeclareField("the parent configuration")]
+        [ForeignKey(nameof(ConfigurationId))]
         public Configuration Configuration { get; set; }
     }
 }

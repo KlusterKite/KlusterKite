@@ -15,7 +15,7 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     /// The resource state according to the migration
     /// </summary>
     [ApiDescription("The resource state according to the migration", Name = "ResourceMigrationState")]
-    public class ResourceMigrationState : ResourceReleaseState
+    public class ResourceMigrationState : ResourceConfigurationState
     {
         /// <summary>
         /// Gets or sets the migration source position for this resource type
@@ -67,15 +67,15 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         }
 
         /// <summary>
-        /// Gets or sets a value indicating what release can execute migration to source release point
+        /// Gets or sets a value indicating what configuration can execute migration to source configuration point
         /// </summary>
-        [DeclareField("a value indicating what release can execute migration to source release point")]
+        [DeclareField("a value indicating what configuration can execute migration to source configuration point")]
         public EnMigrationSide? MigrationToSourceExecutor { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating what release can execute migration to destination release point
+        /// Gets or sets a value indicating what configuration can execute migration to destination configuration point
         /// </summary>
-        [DeclareField("a value indicating what release can execute migration to destination release point")]
+        [DeclareField("a value indicating what configuration can execute migration to destination configuration point")]
         public EnMigrationSide? MigrationToDestinationExecutor { get; set; }
 
         /// <summary>
@@ -86,8 +86,8 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// <param name="position">The migrator position</param>
         /// <returns>The <see cref="ResourceMigrationState"/></returns>
         public static ResourceMigrationState CreateFrom(
-            MigratorReleaseState state,
-            ResourceReleaseState resource,
+            MigratorConfigurationState state,
+            ResourceConfigurationState resource,
             EnMigratorPosition position)
         {
             var sourcePoint = position == EnMigratorPosition.New ? null : state.LastDefinedPoint;
@@ -122,25 +122,25 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// Creates <see cref="ResourceMigrationState"/>
         /// </summary>
         /// <param name="sourceMigratorState">
-        /// The migrator state in source release
+        /// The migrator state in source configuration
         /// </param>
         /// <param name="sourceState">
-        /// The resource state in source release
+        /// The resource state in source configuration
         /// </param>
         /// <param name="destinationMigratorState">
-        /// The migrator state in destination release
+        /// The migrator state in destination configuration
         /// </param>
         /// <param name="destinationState">
-        /// The resource state in destination release
+        /// The resource state in destination configuration
         /// </param>
         /// <returns>
         /// The <see cref="ResourceMigrationState"/>
         /// </returns>
         public static ResourceMigrationState CreateFrom(
-            MigratorReleaseState sourceMigratorState,
-            ResourceReleaseState sourceState,
-            MigratorReleaseState destinationMigratorState,
-            ResourceReleaseState destinationState)
+            MigratorConfigurationState sourceMigratorState,
+            ResourceConfigurationState sourceState,
+            MigratorConfigurationState destinationMigratorState,
+            ResourceConfigurationState destinationState)
         {
             var currentPoint = destinationState.CurrentPoint ?? sourceState.CurrentPoint;
 

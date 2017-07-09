@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationActorReleaseState.cs" company="KlusterKite">
+// <copyright file="MigrationActorConfigurationState.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -17,13 +17,13 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
     /// <summary>
     /// The MigrationActor state with no active migration
     /// </summary>
-    [ApiDescription("The MigrationActor state with no active migration", Name = "MigrationActorReleaseState")] 
-    public class MigrationActorReleaseState
+    [ApiDescription("The MigrationActor state with no active migration", Name = "MigrationActorConfigurationState")] 
+    public class MigrationActorConfigurationState
     {
         /// <summary>
         /// Gets or sets the list of template states
         /// </summary>
         [DeclareField("the list of template states")]
-        public List<MigratorTemplateReleaseState> States { get; set; }
+        public List<MigratorTemplateConfigurationState> States { get; set; }
     }
 }

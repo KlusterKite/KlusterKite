@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigratorReleaseState.cs" company="KlusterKite">
+// <copyright file="MigratorConfigurationState.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -16,8 +16,8 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     /// <summary>
     /// The state of migrators resources
     /// </summary>
-    [ApiDescription("The state of migrators resources", Name = "MigratorReleaseState")]
-    public class MigratorReleaseState
+    [ApiDescription("The state of migrators resources", Name = "MigratorConfigurationState")]
+    public class MigratorConfigurationState
     {
         /// <summary>
         /// Gets or sets the migrator type name
@@ -38,15 +38,15 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         public List<string> MigrationPoints { get; set; }
 
         /// <summary>
-        /// Gets or sets the last defined point for current release
+        /// Gets or sets the last defined point for current configuration
         /// </summary>
-        [DeclareField("the last defined point for current release")]
+        [DeclareField("the last defined point for current configuration")]
         public string LastDefinedPoint { get; set; }
 
         /// <summary>
         /// Gets or sets the state of defined resources
         /// </summary>
         [DeclareField("the state of defined resources")]
-        public List<ResourceReleaseState> Resources { get; set; }
+        public List<ResourceConfigurationState> Resources { get; set; }
     }
 }

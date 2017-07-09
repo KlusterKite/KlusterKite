@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseTests.cs" company="KlusterKite">
+// <copyright file="ConfigurationTests.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Testing basic work with <see cref="Release" />
+//   Testing basic work with <see cref="Configuration" />
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ namespace KlusterKite.NodeManager.Tests
     /// Testing basic work with <see cref="Configuration"/>
     /// </summary>
     [Collection("KlusterKite.NodeManager.Tests.ConfigurationContext")]
-    public class ReleaseTests : IDisposable
+    public class ConfigurationTests : IDisposable
     {
         /// <summary>
         /// The output.
@@ -35,12 +35,12 @@ namespace KlusterKite.NodeManager.Tests
         private readonly ITestOutputHelper output;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReleaseTests"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationTests"/> class.
         /// </summary>
         /// <param name="output">
         /// The output.
         /// </param>
-        public ReleaseTests(ITestOutputHelper output)
+        public ConfigurationTests(ITestOutputHelper output)
         {
             this.output = output;
         }
@@ -52,10 +52,10 @@ namespace KlusterKite.NodeManager.Tests
         }
 
         /// <summary>
-        /// Tests the release compatibility set-up - templates with changed configurations are in compatible
+        /// Tests the configuration compatibility set-up - templates with changed configurations are in compatible
         /// </summary>
         [Fact]
-        public void TestReleaseCompatibilityConfigurationsSet()
+        public void TestConfigurationCompatibilityConfigurationsSet()
         {
             this.CreateTestDatabase();
 
@@ -73,11 +73,11 @@ namespace KlusterKite.NodeManager.Tests
                                     PackageRequirements = this.GetPackageRequirements("p2; p3")
                                 };
 
-            var release = new Configuration
+            var configuration = new Configuration
                               {
                                   MinorVersion = 1,
                                   Name = "1",
-                                  State = EnReleaseState.Active,
+                                  State = EnConfigurationState.Active,
                                   Settings =
                                       new ConfigurationSettings
                                           {
@@ -95,25 +95,25 @@ namespace KlusterKite.NodeManager.Tests
                 // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
                 var ids = context.Configurations.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
-                var compatibleTemplates = release.GetCompatibleTemplates(context)
-                    .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
+                var compatibleTemplates = configuration.GetCompatibleTemplates(context)
+                    .OrderByDescending(t => t.CompatibleConfigurationId).ThenBy(o => o.TemplateCode).ToList();
                 Assert.Equal(2, compatibleTemplates.Count);
                 Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
 
-                this.output.WriteLine($"Database release ids: {string.Join(", ", ids)}");
+                this.output.WriteLine($"Database configuration ids: {string.Join(", ", ids)}");
                 this.output.WriteLine(
-                    $"Compatible templates release ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleReleaseId))}");
+                    $"Compatible templates configuration ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleConfigurationId))}");
 
-                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
-                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
+                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleConfigurationId).First());
+                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleConfigurationId).Skip(1).First());
             }
         }
 
         /// <summary>
-        /// Tests the release compatibility set-up - templates with changed modules list are incompatible
+        /// Tests the configuration compatibility set-up - templates with changed modules list are incompatible
         /// </summary>
         [Fact]
-        public void TestReleaseCompatibilityModuleListSet()
+        public void TestConfigurationCompatibilityModuleListSet()
         {
             this.CreateTestDatabase();
 
@@ -131,11 +131,11 @@ namespace KlusterKite.NodeManager.Tests
                                     PackageRequirements = this.GetPackageRequirements("p1; p2; p3")
                                 };
 
-            var release = new Configuration
+            var configuration = new Configuration
                               {
                                   MinorVersion = 1,
                                   Name = "1",
-                                  State = EnReleaseState.Active,
+                                  State = EnConfigurationState.Active,
                                   Settings =
                                       new ConfigurationSettings
                                           {
@@ -153,25 +153,25 @@ namespace KlusterKite.NodeManager.Tests
                 // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
                 var ids = context.Configurations.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
-                var compatibleTemplates = release.GetCompatibleTemplates(context)
-                    .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
+                var compatibleTemplates = configuration.GetCompatibleTemplates(context)
+                    .OrderByDescending(t => t.CompatibleConfigurationId).ThenBy(o => o.TemplateCode).ToList();
                 Assert.Equal(2, compatibleTemplates.Count);
                 Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
 
-                this.output.WriteLine($"Database release ids: {string.Join(", ", ids)}");
+                this.output.WriteLine($"Database configuration ids: {string.Join(", ", ids)}");
                 this.output.WriteLine(
-                    $"Compatible templates release ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleReleaseId))}");
+                    $"Compatible templates configuration ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleConfigurationId))}");
 
-                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
-                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
+                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleConfigurationId).First());
+                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleConfigurationId).Skip(1).First());
             }
         }
 
         /// <summary>
-        /// Tests the release compatibility set-up - templates with changed modules versions are incompatible
+        /// Tests the configuration compatibility set-up - templates with changed modules versions are incompatible
         /// </summary>
         [Fact]
-        public void TestReleaseCompatibilityModuleVersionSet()
+        public void TestConfigurationCompatibilityModuleVersionSet()
         {
             this.CreateTestDatabase();
 
@@ -189,11 +189,11 @@ namespace KlusterKite.NodeManager.Tests
                                     PackageRequirements = this.GetPackageRequirements("p2; p3")
                                 };
 
-            var release = new Configuration
+            var configuration = new Configuration
                               {
                                   MinorVersion = 1,
                                   Name = "1",
-                                  State = EnReleaseState.Active,
+                                  State = EnConfigurationState.Active,
                                   Settings =
                                       new ConfigurationSettings
                                           {
@@ -211,17 +211,17 @@ namespace KlusterKite.NodeManager.Tests
                 // facepalm - https://github.com/aspnet/EntityFramework/issues/6872
                 var ids = context.Configurations.Select(r => r.Id).OrderByDescending(id => id).ToList();
 
-                var compatibleTemplates = release.GetCompatibleTemplates(context)
-                    .OrderByDescending(t => t.CompatibleReleaseId).ThenBy(o => o.TemplateCode).ToList();
+                var compatibleTemplates = configuration.GetCompatibleTemplates(context)
+                    .OrderByDescending(t => t.CompatibleConfigurationId).ThenBy(o => o.TemplateCode).ToList();
                 Assert.Equal(2, compatibleTemplates.Count);
                 Assert.Equal("template1", compatibleTemplates.Select(t => t.TemplateCode).First());
 
-                this.output.WriteLine($"Database release ids: {string.Join(", ", ids)}");
+                this.output.WriteLine($"Database configuration ids: {string.Join(", ", ids)}");
                 this.output.WriteLine(
-                    $"Compatible templates release ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleReleaseId))}");
+                    $"Compatible templates configuration ids: {string.Join(", ", compatibleTemplates.Select(t => t.CompatibleConfigurationId))}");
 
-                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleReleaseId).First());
-                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleReleaseId).Skip(1).First());
+                Assert.Equal(ids[0], compatibleTemplates.Select(t => t.CompatibleConfigurationId).First());
+                Assert.Equal(ids[1], compatibleTemplates.Select(t => t.CompatibleConfigurationId).Skip(1).First());
             }
         }
 
@@ -232,7 +232,7 @@ namespace KlusterKite.NodeManager.Tests
         private ConfigurationContext CreateContext()
         {
             var builder = new DbContextOptionsBuilder<ConfigurationContext>();
-            builder.UseInMemoryDatabase("KlusterKite.NodeManager.Tests.ReleaseTests");
+            builder.UseInMemoryDatabase("KlusterKite.NodeManager.Tests.ConfigurationTests");
             return new ConfigurationContext(builder.Options);
         }
 
@@ -279,11 +279,11 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var context = this.CreateContext())
             {
-                var release1 = new Configuration
+                var configuration1 = new Configuration
                                    {
                                        MinorVersion = 1,
                                        Name = "1",
-                                       State = EnReleaseState.Obsolete,
+                                       State = EnConfigurationState.Obsolete,
                                        Settings =
                                            new ConfigurationSettings
                                                {
@@ -295,18 +295,18 @@ namespace KlusterKite.NodeManager.Tests
                                                        "p3;0.0.1")
                                                }
                                    };
-                context.Configurations.Add(release1);
+                context.Configurations.Add(configuration1);
                 context.SaveChanges();
             }
 
             using (var context = this.CreateContext())
             {
-                var oldRelease = context.Configurations.First();
-                var activeRelease = new Configuration
+                var oldConfiguration = context.Configurations.First();
+                var activeConfiguration = new Configuration
                                         {
                                             MinorVersion = 2,
                                             Name = "active",
-                                            State = EnReleaseState.Active,
+                                            State = EnConfigurationState.Active,
                                             Settings =
                                                 new ConfigurationSettings
                                                     {
@@ -321,12 +321,12 @@ namespace KlusterKite.NodeManager.Tests
                                                     }
                                         };
 
-                context.Configurations.Add(activeRelease);
-                activeRelease.CompatibleTemplatesBackward = new List<CompatibleTemplate>();
-                activeRelease.CompatibleTemplatesBackward.Add(
-                    new CompatibleTemplate { CompatibleReleaseId = oldRelease.Id, TemplateCode = template1.Code });
-                activeRelease.CompatibleTemplatesBackward.Add(
-                    new CompatibleTemplate { CompatibleReleaseId = oldRelease.Id, TemplateCode = template2.Code });
+                context.Configurations.Add(activeConfiguration);
+                activeConfiguration.CompatibleTemplatesBackward = new List<CompatibleTemplate>();
+                activeConfiguration.CompatibleTemplatesBackward.Add(
+                    new CompatibleTemplate { CompatibleConfigurationId = oldConfiguration.Id, TemplateCode = template1.Code });
+                activeConfiguration.CompatibleTemplatesBackward.Add(
+                    new CompatibleTemplate { CompatibleConfigurationId = oldConfiguration.Id, TemplateCode = template2.Code });
                 context.SaveChanges();
             }
         }

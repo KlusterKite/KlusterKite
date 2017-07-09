@@ -83,10 +83,10 @@ namespace KlusterKite.NodeManager.Client.Messages
         public string NodeTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the installed release id
+        /// Gets or sets the installed configuration id
         /// </summary>
-        [DeclareField("the installed release id")]
-        public int ReleaseId { get; set; }
+        [DeclareField("the installed configuration id")]
+        public int ConfigurationId { get; set; }
 
         /// <summary>
         /// Gets or sets the list of cluster roles

@@ -13,6 +13,7 @@
     <Compile Remove="TempTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="1.2.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="xunit" Version="$(XunitVersion)" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="$(XunitVersion)" />
@@ -35,6 +36,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="System.Runtime" Version="4.3.0" />    
+  </ItemGroup>  
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>

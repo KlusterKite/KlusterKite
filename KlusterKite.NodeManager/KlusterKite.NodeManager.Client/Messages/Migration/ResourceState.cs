@@ -34,7 +34,7 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
         /// </summary>
         [UsedImplicitly]
         [DeclareField("the current resource state without active migration")]
-        public MigrationActorReleaseState ReleaseState { get; set; }
+        public MigrationActorConfigurationState ConfigurationState { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether some resource operation is in progress
@@ -58,17 +58,17 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
         public bool CanMigrateResources { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether node update can be initiated. The nodes will be updated to the destination release.
+        /// Gets or sets a value indicating whether node update can be initiated. The nodes will be updated to the destination configuration.
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("a value indicating whether node update can be initiated. The nodes will be updated to the destination release.")]
+        [DeclareField("a value indicating whether node update can be initiated. The nodes will be updated to the destination configuration.")]
         public bool CanUpdateNodesToDestination { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether node update can be initiated. The nodes will be updated to the source release.
+        /// Gets or sets a value indicating whether node update can be initiated. The nodes will be updated to the source configuration.
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("a value indicating whether node update can be initiated. The nodes will be updated to the source release.")]
+        [DeclareField("a value indicating whether node update can be initiated. The nodes will be updated to the source configuration.")]
         public bool CanUpdateNodesToSource { get; set; }
 
         /// <summary>

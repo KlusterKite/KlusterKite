@@ -55,14 +55,14 @@ namespace KlusterKite.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Gets the current cluster release
+        /// Gets the current cluster configuration
         /// </summary>
-        [DeclareField("The current cluster release")]
+        [DeclareField("The current cluster configuration")]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetResourceState)]
         [UsedImplicitly]
-        public Task<Configuration> CurrentRelease => this.Actor.Ask<Configuration>(new CurrentReleaseRequest(), this.AkkaTimeout);
+        public Task<Configuration> CurrentConfiguration => this.Actor.Ask<Configuration>(new CurrentConfigurationRequest(), this.AkkaTimeout);
 
         /// <summary>
         /// Gets current cluster resources state
@@ -87,12 +87,12 @@ namespace KlusterKite.NodeManager.WebApi
         private TimeSpan AkkaTimeout { get; }
 
         /// <summary>
-        /// Gets the current cluster release
+        /// Gets the current cluster migration
         /// </summary>
         /// <returns>
         /// The current migration
         /// </returns>
-        [DeclareField("The current cluster release")]
+        [DeclareField("The current cluster migration")]
         [RequireSession]
         [RequireUser]
         [RequirePrivilege(Privileges.GetResourceState)]
@@ -120,8 +120,8 @@ namespace KlusterKite.NodeManager.WebApi
         /// <summary>
         /// Creates a new cluster migration
         /// </summary>
-        /// <param name="newReleaseId">
-        /// The destination release id
+        /// <param name="newConfigurationId">
+        /// The destination configuration id
         /// </param>
         /// <returns>
         /// The result of operation
@@ -132,10 +132,10 @@ namespace KlusterKite.NodeManager.WebApi
         [RequirePrivilege(Privileges.MigrateCluster)]
         [LogAccess(Severity = EnSeverity.Crucial, LogMessage = "A new cluster migration created")]
         [DeclareMutation("Creates a new migration")]
-        public async Task<MutationResult<Migration>> MigrationCreate(int newReleaseId)
+        public async Task<MutationResult<Migration>> MigrationCreate(int newConfigurationId)
         {
             var result = await this.Actor.Ask<CrudActionResponse<Migration>>(
-                             new UpdateClusterRequest { Id = newReleaseId },
+                             new UpdateClusterRequest { Id = newConfigurationId },
                              this.AkkaTimeout);
 
             var mutationException = result.Exception as MutationException;

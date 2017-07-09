@@ -1,28 +1,27 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseSetReadyRequest.cs" company="KlusterKite">
+// <copyright file="ConfigurationSetObsoleteRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Moves <see cref="FSMBase.State{TS,TD}" /> from <see cref="Release.EnReleaseState.Draft" /> to <see cref="Release.EnReleaseState.Ready" />
+//   Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnConfigurationState.Ready"/> to <see cref="EnConfigurationState.Obsolete"/>
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace KlusterKite.NodeManager.Messages
 {
     using Akka.Actor;
-    using Akka.Routing;
 
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.Security.Attributes;
 
     /// <summary>
-    /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnReleaseState.Draft"/> to <see cref="EnReleaseState.Ready"/>
+    /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnConfigurationState.Ready"/> to <see cref="EnConfigurationState.Obsolete"/>
     /// </summary>
     /// <returns>The mutation result</returns>
-    public class ReleaseSetReadyRequest : IConsistentHashable
+    public class ConfigurationSetObsoleteRequest
     {
         /// <summary>
-        /// Gets or sets the release id
+        /// Gets or sets the configuration id
         /// </summary>
         public int Id { get; set; }
 
@@ -30,8 +29,5 @@ namespace KlusterKite.NodeManager.Messages
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Context { get; set; }
-
-        /// <inheritdoc />
-        public object ConsistentHashKey => this.Id;
     }
 }

@@ -18,9 +18,9 @@ namespace KlusterKite.NodeManager.Client.ORM
     public enum EnMigrationState
     {
         /// <summary>
-        /// The migration is in preparing state. The release compatibility check is in process
+        /// The migration is in preparing state. The configuration compatibility check is in process
         /// </summary>
-        [ApiDescription("The migration is in preparing state. The release compatibility check is in process")]
+        [ApiDescription("The migration is in preparing state. The configuration compatibility check is in process")]
         Preparing,
 
         /// <summary>

@@ -202,9 +202,9 @@ namespace KlusterKite.NodeManager
         private IActorRef workers;
 
         /// <summary>
-        /// Child actor to update releases
+        /// Child actor to update configurations
         /// </summary>
-        private IActorRef releaseManager;
+        private IActorRef configurationManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
@@ -284,9 +284,9 @@ namespace KlusterKite.NodeManager
         {
             if (typeof(TObject) == typeof(Configuration))
             {
-                if (((Configuration)(object)oldObject).State != EnReleaseState.Draft)
+                if (((Configuration)(object)oldObject).State != EnConfigurationState.Draft)
                 {
-                    throw new Exception("Only draft releases can be updated");
+                    throw new Exception("Only draft configurations can be updated");
                 }
             }
 
@@ -343,28 +343,28 @@ namespace KlusterKite.NodeManager
                 return;
             }
 
-            nodeDescription.IsObsolete = nodeDescription.ReleaseId != this.currentConfiguration.Id
+            nodeDescription.IsObsolete = nodeDescription.ConfigurationId != this.currentConfiguration.Id
                                          && this.currentConfiguration.CompatibleTemplatesBackward.All(
                                              ct => ct.TemplateCode != nodeDescription.NodeTemplate
-                                                   || ct.CompatibleReleaseId != nodeDescription.ReleaseId);
+                                                   || ct.CompatibleConfigurationId != nodeDescription.ConfigurationId);
         }
 
         /// <summary>
-        /// Gets the active release from data source
+        /// Gets the active configuration from data source
         /// </summary>
         /// <param name="context">The data context</param>
-        private void GetCurrentRelease(ConfigurationContext context)
+        private void GetCurrentConfiguration(ConfigurationContext context)
         {
-            var releases = context.Configurations
+            var configurations = context.Configurations
                 .Include(nameof(Configuration.CompatibleTemplatesBackward))
                 .Include($"{nameof(Configuration.MigrationLogs)}")
-                .Where(r => r.State == EnReleaseState.Active).ToList();
-            this.currentConfiguration = releases.SingleOrDefault();
+                .Where(r => r.State == EnConfigurationState.Active).ToList();
+            this.currentConfiguration = configurations.SingleOrDefault();
 
             if (this.currentConfiguration == null)
             {
                 Context.GetLogger().Error(
-                    "{Type}: Could not find any active release in database",
+                    "{Type}: Could not find any active configuration in database",
                     this.GetType().Name);
             }
         }
@@ -444,7 +444,7 @@ namespace KlusterKite.NodeManager
                 this.connectionString,
                 this.databaseName))
             {
-                this.GetCurrentRelease(context);
+                this.GetCurrentConfiguration(context);
                 this.currentMigration = context.Migrations.Include(nameof(Migration.FromConfiguration))
                     .Include(nameof(Migration.ToConfiguration))
                     .Include($"{nameof(Migration.Logs)}")
@@ -488,13 +488,13 @@ namespace KlusterKite.NodeManager
                         this.Self)).WithRouter(this.Self.GetFromConfiguration(Context.System, "workers")),
                 "workers");
 
-            this.releaseManager = Context.ActorOf(
+            this.configurationManager = Context.ActorOf(
                 Props.Create(
-                    () => new ReleaseCheckActor(
+                    () => new ConfigurationCheckActor(
                         this.ComponentContext,
                         this.contextFactory,
                         this.nugetRepository)),
-                "release");
+                "configuration");
 
             var migrationActorSubstitute =
                 Context.System.Settings.Config.GetString("KlusterKite.NodeManager.MigrationActorSubstitute");
@@ -563,7 +563,7 @@ namespace KlusterKite.NodeManager
         /// </summary>
         private void InitResourceMigrationState()
         {
-            this.resourceState.ReleaseState = null;
+            this.resourceState.ConfigurationState = null;
             this.resourceState.CanCreateMigration = false;
 
             if (this.resourceState.MigrationState == null)
@@ -735,7 +735,7 @@ namespace KlusterKite.NodeManager
         /// <summary>
         /// Checks current resource state without active migration and/or some resource operation in progress
         /// </summary>
-        private void InitResourceReleaseState()
+        private void InitResourceConfigurationState()
         {
             this.resourceState.MigrationState = null;
             this.resourceState.CurrentMigrationStep = null;
@@ -754,14 +754,14 @@ namespace KlusterKite.NodeManager
                 this.resourceState.CanCreateMigration = false;
             }
 
-            if (this.resourceState.ReleaseState == null)
+            if (this.resourceState.ConfigurationState == null)
             {
                 this.resourceState.CanCreateMigration = false;
                 return;
             }
 
-            // checking if there is any resource that is not of the current release state
-            var unmigratedTemplates = this.resourceState.ReleaseState.States
+            // checking if there is any resource that is not of the current configuration state
+            var unmigratedTemplates = this.resourceState.ConfigurationState.States
                 .Where(t => t.MigratorsStates.Any(m => m.Resources.Any(r => r.CurrentPoint != m.LastDefinedPoint)))
                 .ToList();
 
@@ -771,7 +771,7 @@ namespace KlusterKite.NodeManager
             }
 
             this.resourceState.CanCreateMigration = false;
-            this.resourceState.CanMigrateResources = this.resourceState.ReleaseState.States.All(
+            this.resourceState.CanMigrateResources = this.resourceState.ConfigurationState.States.All(
                 t => t.MigratorsStates.All(m => m.Resources.All(r => m.MigrationPoints.Contains(r.CurrentPoint))));
         }
 
@@ -797,7 +797,7 @@ namespace KlusterKite.NodeManager
             }
             else
             {
-                this.InitResourceReleaseState();
+                this.InitResourceConfigurationState();
             }
         }
 
@@ -851,7 +851,7 @@ namespace KlusterKite.NodeManager
 
             this.OnMigrationLogRecords(state.Errors.ToList());
             this.resourceState.OperationIsInProgress = false;
-            this.resourceState.ReleaseState = null;
+            this.resourceState.ConfigurationState = null;
             this.resourceState.MigrationState = null;
             this.InitDatabase();
         }
@@ -872,7 +872,7 @@ namespace KlusterKite.NodeManager
             }
 
             Context.GetLogger().Info("{Type}: received a MigrationActorMigrationState", this.GetType().Name);
-            this.resourceState.ReleaseState = null;
+            this.resourceState.ConfigurationState = null;
             this.resourceState.MigrationState = state;
             this.InitDatabase();
         }
@@ -881,20 +881,20 @@ namespace KlusterKite.NodeManager
         /// The <see cref="MigrationActor"/> updated resource state without active migration
         /// </summary>
         /// <param name="state">The initialization error</param>
-        private void OnMigrationActorReleaseState(MigrationActorReleaseState state)
+        private void OnMigrationActorConfigurationState(MigrationActorConfigurationState state)
         {
             this.resourceState.OperationIsInProgress = false;
             if (this.currentMigration != null)
             {
                 Context.GetLogger().Error(
-                    "{Type}: received a MigrationActorReleaseState with active migration in progress",
+                    "{Type}: received a MigrationActorConfigurationState with active migration in progress",
                     this.GetType().Name);
                 return;
             }
 
-            this.resourceState.ReleaseState = state;
+            this.resourceState.ConfigurationState = state;
             this.resourceState.MigrationState = null;
-            Context.GetLogger().Info("{Type}: received a MigrationActorReleaseState", this.GetType().Name);
+            Context.GetLogger().Info("{Type}: received a MigrationActorConfigurationState", this.GetType().Name);
             this.InitDatabase();
         }
 
@@ -940,7 +940,7 @@ namespace KlusterKite.NodeManager
             this.currentMigration = null;
             this.resourceMigrator.Tell(new RecheckState(), this.Self);
             this.resourceState.MigrationState = null;
-            this.resourceState.ReleaseState = null;
+            this.resourceState.ConfigurationState = null;
             this.resourceState.OperationIsInProgress = true;
             this.resourceState.CanCreateMigration = false;
             this.resourceState.CanCancelMigration = false;
@@ -992,7 +992,7 @@ namespace KlusterKite.NodeManager
             this.currentMigration = null;
             this.resourceMigrator.Tell(new RecheckState(), this.Self);
             this.resourceState.MigrationState = null;
-            this.resourceState.ReleaseState = null;
+            this.resourceState.ConfigurationState = null;
             this.resourceState.OperationIsInProgress = true;
             this.resourceState.CanCreateMigration = false;
             this.resourceState.CanCancelMigration = false;
@@ -1038,26 +1038,26 @@ namespace KlusterKite.NodeManager
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Configurations.First(r => r.Id == this.currentMigration.FromConfigurationId);
-                var destinationRelease = ds.Configurations.First(r => r.Id == this.currentMigration.ToConfigurationId);
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == this.currentMigration.FromConfigurationId);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == this.currentMigration.ToConfigurationId);
 
                 if (request.Target == EnMigrationSide.Source)
                 {
-                    destinationRelease.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
-                                                   ? EnReleaseState.Obsolete
-                                                   : EnReleaseState.Faulted;
-                    sourceRelease.State = EnReleaseState.Active;
+                    destinationConfiguration.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
+                                                   ? EnConfigurationState.Obsolete
+                                                   : EnConfigurationState.Faulted;
+                    sourceConfiguration.State = EnConfigurationState.Active;
                 }
                 else
                 {
-                    destinationRelease.State = EnReleaseState.Active;
-                    sourceRelease.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
-                                              ? EnReleaseState.Faulted
-                                              : EnReleaseState.Obsolete;
+                    destinationConfiguration.State = EnConfigurationState.Active;
+                    sourceConfiguration.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
+                                              ? EnConfigurationState.Faulted
+                                              : EnConfigurationState.Obsolete;
                 }
 
                 ds.SaveChanges();
-                this.GetCurrentRelease(ds);
+                this.GetCurrentConfiguration(ds);
             }
 
             this.Sender.Tell(true);
@@ -1159,7 +1159,7 @@ namespace KlusterKite.NodeManager
                 new NodeStartUpConfiguration
                     {
                         NodeTemplate = selectedNodeTemplate.Code,
-                        ReleaseId = this.currentConfiguration.Id,
+                        ConfigurationId = this.currentConfiguration.Id,
                         Configuration = selectedNodeTemplate.Configuration,
                         Seeds = this.currentConfiguration.Settings.SeedAddresses
                             .OrderBy(s => this.random.NextDouble()).ToList(),
@@ -1543,7 +1543,7 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Initiates the cluster migration process to the new release
+        /// Initiates the cluster migration process to the new configuration
         /// </summary>
         /// <param name="request">The request</param>
         private void OnUpdateCluster(UpdateClusterRequest request)
@@ -1555,7 +1555,7 @@ namespace KlusterKite.NodeManager
                 return;
             }
 
-            if (this.resourceState.ReleaseState == null)
+            if (this.resourceState.ConfigurationState == null)
             {
                 this.Sender.Tell(
                     CrudActionResponse<Migration>.Error(new Exception("Resources state is unknown"), null));
@@ -1588,22 +1588,22 @@ namespace KlusterKite.NodeManager
                     if (request.Id == this.currentConfiguration.Id)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Migration>.Error(new Exception("This release is already set"), null));
+                            CrudActionResponse<Migration>.Error(new Exception("This configuration is already set"), null));
                         return;
                     }
 
-                    var newRelease = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
-                    if (newRelease == null)
+                    var newConfiguration = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
+                    if (newConfiguration == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Migration>.Error(new EntityNotFoundException(), null));
                         return;
                     }
 
-                    if (newRelease.State == EnReleaseState.Draft)
+                    if (newConfiguration.State == EnConfigurationState.Draft)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Migration>.Error(
-                                new Exception("cluster cannot be migrated to draft release"),
+                                new Exception("cluster cannot be migrated to draft configuration"),
                                 null));
                         return;
                     }
@@ -1614,7 +1614,7 @@ namespace KlusterKite.NodeManager
                                             Started = DateTimeOffset.Now,
                                             IsActive = true,
                                             FromConfigurationId = this.currentConfiguration.Id,
-                                            ToConfigurationId = newRelease.Id
+                                            ToConfigurationId = newConfiguration.Id
                                         };
                     ds.Migrations.Add(migration);
                     ds.SaveChanges();
@@ -1626,7 +1626,7 @@ namespace KlusterKite.NodeManager
                     this.resourceState.CanMigrateResources = false;
                     this.resourceState.CanUpdateNodesToDestination = false;
                     this.resourceState.CanUpdateNodesToSource = false;
-                    this.resourceState.ReleaseState = null;
+                    this.resourceState.ConfigurationState = null;
                     this.resourceState.MigrationState = null;
                     this.resourceMigrator.Tell(new RecheckState(), this.Self);
                     this.Sender.Tell(CrudActionResponse<Migration>.Success(migration, null));
@@ -1688,18 +1688,18 @@ namespace KlusterKite.NodeManager
 
             this.Receive<CollectionRequest<Configuration>>(m => this.workers.Forward(m));
 
-            this.Receive<CrudActionMessage<Configuration, int>>(m => this.releaseManager.Forward(m));
-            this.Receive<ReleaseCheckRequest>(m => this.releaseManager.Forward(m));
-            this.Receive<ReleaseSetReadyRequest>(m => this.releaseManager.Forward(m));
-            this.Receive<ReleaseSetObsoleteRequest>(m => this.releaseManager.Forward(m));
-            this.Receive<ReleaseSetStableRequest>(m => this.releaseManager.Forward(m));
+            this.Receive<CrudActionMessage<Configuration, int>>(m => this.configurationManager.Forward(m));
+            this.Receive<ConfigurationCheckRequest>(m => this.configurationManager.Forward(m));
+            this.Receive<ConfigurationSetReadyRequest>(m => this.configurationManager.Forward(m));
+            this.Receive<ConfigurationSetObsoleteRequest>(m => this.configurationManager.Forward(m));
+            this.Receive<ConfigurationSetStableRequest>(m => this.configurationManager.Forward(m));
 
             this.Receive<UpdateClusterRequest>(r => this.OnUpdateCluster(r));
             this.Receive<CollectionRequest<Migration>>(m => this.workers.Forward(m));
 
             this.Receive<ProcessingTheRequest>(m => this.resourceState.OperationIsInProgress = true);
             this.Receive<MigrationActorMigrationState>(s => this.OnMigrationActorMigrationState(s));
-            this.Receive<MigrationActorReleaseState>(s => this.OnMigrationActorReleaseState(s));
+            this.Receive<MigrationActorConfigurationState>(s => this.OnMigrationActorConfigurationState(s));
             this.Receive<MigrationActorInitializationFailed>(r => this.OnMigrationActorInitializationFailed(r));
             this.Receive<List<MigrationLogRecord>>(r => this.OnMigrationLogRecords(r));
             this.Receive<MigrationCancel>(r => this.OnMigrationCancel());
@@ -1708,7 +1708,7 @@ namespace KlusterKite.NodeManager
             this.Receive<NodesUpgrade>(r => this.OnMigrationNodesUpgrade(r));
 
             this.Receive<ResourceStateRequest>(r => this.Sender.Tell(this.resourceState));
-            this.Receive<CurrentReleaseRequest>(r => this.Sender.Tell(this.currentConfiguration));
+            this.Receive<CurrentConfigurationRequest>(r => this.Sender.Tell(this.currentConfiguration));
             this.Receive<CurrentMigrationRequest>(r => this.Sender.Tell(new Maybe<Migration>(this.currentMigration)));
         }
 

@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseCheckActor.cs" company="KlusterKite">
+// <copyright file="ConfigurationCheckActor.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The actor to work with releases
+//   The actor to work with configurations
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,9 +31,9 @@ namespace KlusterKite.NodeManager
     using KlusterKite.Security.Client;
 
     /// <summary>
-    /// The actor to work with releases
+    /// The actor to work with configurations
     /// </summary>
-    public class ReleaseCheckActor : BaseCrudActor<ConfigurationContext>
+    public class ConfigurationCheckActor : BaseCrudActor<ConfigurationContext>
     {
         /// <summary>
         /// The data source context factory
@@ -48,20 +48,20 @@ namespace KlusterKite.NodeManager
         /// <summary>
         /// The database connection string
         /// </summary>
-        private string connectionString;
+        private readonly string connectionString;
 
         /// <summary>
         /// The database name
         /// </summary>
-        private string databaseName;
+        private readonly string databaseName;
 
         /// <summary>
         /// The database provider name
         /// </summary>
-        private string databaseProviderName;
+        private readonly string databaseProviderName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReleaseCheckActor"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationCheckActor"/> class.
         /// </summary>
         /// <param name="componentContext">
         /// The DI context
@@ -72,7 +72,7 @@ namespace KlusterKite.NodeManager
         /// <param name="nugetRepository">
         /// The nuget repository
         /// </param>
-        public ReleaseCheckActor(
+        public ConfigurationCheckActor(
             IComponentContext componentContext,
             UniversalContextFactory contextFactory,
             IPackageRepository nugetRepository) : base(componentContext)
@@ -84,10 +84,10 @@ namespace KlusterKite.NodeManager
             this.databaseProviderName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
 
             this.ReceiveAsync<CrudActionMessage<Configuration, int>>(this.OnRequest);
-            this.ReceiveAsync<ReleaseCheckRequest>(this.OnReleaseCheck);
-            this.ReceiveAsync<ReleaseSetReadyRequest>(this.OnReleaseSetReady);
-            this.Receive<ReleaseSetObsoleteRequest>(r => this.OnReleaseSetObsolete(r));
-            this.Receive<ReleaseSetStableRequest>(r => this.OnReleaseSetStable(r));
+            this.ReceiveAsync<ConfigurationCheckRequest>(this.OnConfigurationCheck);
+            this.ReceiveAsync<ConfigurationSetReadyRequest>(this.OnConfigurationSetReady);
+            this.Receive<ConfigurationSetObsoleteRequest>(r => this.OnConfigurationSetObsolete(r));
+            this.Receive<ConfigurationSetStableRequest>(r => this.OnConfigurationSetStable(r));
         }
 
         /// <inheritdoc />
@@ -100,7 +100,7 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Process the <see cref="ReleaseSetReadyRequest"/>
+        /// Process the <see cref="ConfigurationSetReadyRequest"/>
         /// </summary>
         /// <param name="request">
         /// The request
@@ -108,32 +108,32 @@ namespace KlusterKite.NodeManager
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task OnReleaseCheck(ReleaseCheckRequest request)
+        private async Task OnConfigurationCheck(ConfigurationCheckRequest request)
         {
             try
             {
                 using (var ds = this.GetContext())
                 {
-                    Context.GetLogger().Info("{Type}: checking release {ReleaseId}", this.GetType().Name, request.Id);
-                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
+                    Context.GetLogger().Info("{Type}: checking configuration {ConfigurationId}", this.GetType().Name, request.Id);
+                    var configuration = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
+                    if (configuration == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         Context.GetLogger().Info(
-                            "{Type}: checking release {ReleaseId} - not found",
+                            "{Type}: checking configuration {ConfigurationId} - not found",
                             this.GetType().Name,
                             request.Id);
                         return;
                     }
 
-                    if (release.State != EnReleaseState.Draft)
+                    if (configuration.State != EnConfigurationState.Draft)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Configuration>.Error(
-                                new Exception("Only draft releases can be checked"),
+                                new Exception("Only draft configurations can be checked"),
                                 null));
                         Context.GetLogger().Info(
-                            "{Type}: checking release {ReleaseId} - not draft",
+                            "{Type}: checking configuration {ConfigurationId} - not draft",
                             this.GetType().Name,
                             request.Id);
                         return;
@@ -143,23 +143,23 @@ namespace KlusterKite.NodeManager
                         Context.System.Settings.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");
 
                     Context.GetLogger().Info(
-                        "{Type}: checking release {ReleaseId} against frameworks {Frameworks}",
+                        "{Type}: checking configuration {ConfigurationId} against frameworks {Frameworks}",
                         this.GetType().Name,
                         request.Id,
                         string.Join(", ", supportedFrameworks));
-                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
+                    var errors = await configuration.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
                     if (errors.Count > 0)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Configuration>.Error(new MutationException(errors.ToArray()), null));
                         Context.GetLogger().Info(
-                            "{Type}: checking release {ReleaseId} completed",
+                            "{Type}: checking configuration {ConfigurationId} completed",
                             this.GetType().Name,
                             request.Id);
                         return;
                     }
 
-                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(configuration, null));
                 }
             }
             catch (Exception exception)
@@ -169,40 +169,40 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Process the <see cref="ReleaseSetObsoleteRequest"/>
+        /// Process the <see cref="ConfigurationSetObsoleteRequest"/>
         /// </summary>
         /// <param name="request">The request</param>
-        private void OnReleaseSetObsolete(ReleaseSetObsoleteRequest request)
+        private void OnConfigurationSetObsolete(ConfigurationSetObsoleteRequest request)
         {
             try
             {
                 using (var ds = this.GetContext())
                 {
-                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
+                    var configuration = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
+                    if (configuration == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         return;
                     }
 
-                    if (release.State != EnReleaseState.Ready)
+                    if (configuration.State != EnConfigurationState.Ready)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Configuration>.Error(
-                                new Exception("Only ready releases can be made obsolete manually"),
+                                new Exception("Only ready configurations can be made obsolete manually"),
                                 null));
                         return;
                     }
 
-                    release.State = EnReleaseState.Obsolete;
+                    configuration.State = EnConfigurationState.Obsolete;
                     ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(configuration, null));
                     SecurityLog.CreateRecord(
                         EnSecurityLogType.OperationGranted,
                         EnSeverity.Crucial,
                         request.Context,
-                        "Release {ReleaseId} marked as obsolete",
-                        release.Id);
+                        "Configuration {ConfigurationId} marked as obsolete",
+                        configuration.Id);
                 }
             }
             catch (Exception exception)
@@ -212,7 +212,7 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Process the <see cref="ReleaseSetReadyRequest"/>
+        /// Process the <see cref="ConfigurationSetReadyRequest"/>
         /// </summary>
         /// <param name="request">
         /// The request
@@ -220,56 +220,56 @@ namespace KlusterKite.NodeManager
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task OnReleaseSetReady(ReleaseSetReadyRequest request)
+        private async Task OnConfigurationSetReady(ConfigurationSetReadyRequest request)
         {
             try
             {
                 using (var ds = this.GetContext())
                 {
-                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
+                    var configuration = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
+                    if (configuration == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         return;
                     }
 
-                    if (release.State != EnReleaseState.Draft)
+                    if (configuration.State != EnConfigurationState.Draft)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Configuration>.Error(
-                                new Exception("Only draft releases can be made ready"),
+                                new Exception("Only draft configurations can be made ready"),
                                 null));
                         return;
                     }
 
-                    if (ds.Configurations.Any(r => r.State == EnReleaseState.Ready))
+                    if (ds.Configurations.Any(r => r.State == EnConfigurationState.Ready))
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Configuration>.Error(
                                 new Exception(
-                                    "There is an already defined ready release. Please remove the previous one."),
+                                    "There is an already defined ready configuration. Please remove the previous one."),
                                 null));
                         return;
                     }
 
                     var supportedFrameworks =
                         Context.System.Settings.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");
-                    var errors = await release.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
+                    var errors = await configuration.CheckAll(ds, this.nugetRepository, supportedFrameworks.ToList());
                     if (errors.Count > 0)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new MutationException(errors.ToArray()), null));
                         return;
                     }
 
-                    release.State = EnReleaseState.Ready;
+                    configuration.State = EnConfigurationState.Ready;
                     ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(configuration, null));
                     SecurityLog.CreateRecord(
                         EnSecurityLogType.OperationGranted,
                         EnSeverity.Crucial,
                         request.Context,
-                        "Release {ReleaseId} marked as Ready",
-                        release.Id);
+                        "Configuration {ConfigurationId} marked as Ready",
+                        configuration.Id);
                 }
             }
             catch (Exception exception)
@@ -279,32 +279,32 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Process the <see cref="ReleaseSetStableRequest"/>
+        /// Process the <see cref="ConfigurationSetStableRequest"/>
         /// </summary>
         /// <param name="request">The request</param>
-        private void OnReleaseSetStable(ReleaseSetStableRequest request)
+        private void OnConfigurationSetStable(ConfigurationSetStableRequest request)
         {
             try
             {
                 using (var ds = this.GetContext())
                 {
-                    var release = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
-                    if (release == null)
+                    var configuration = ds.Configurations.FirstOrDefault(r => r.Id == request.Id);
+                    if (configuration == null)
                     {
                         this.Sender.Tell(CrudActionResponse<Configuration>.Error(new EntityNotFoundException(), null));
                         return;
                     }
 
-                    if (release.State != EnReleaseState.Active)
+                    if (configuration.State != EnConfigurationState.Active)
                     {
                         this.Sender.Tell(
                             CrudActionResponse<Configuration>.Error(
-                                new Exception("Only active releases can be marked as stable"),
+                                new Exception("Only active configurations can be marked as stable"),
                                 null));
                         return;
                     }
 
-                    if (release.IsStable != request.IsStable)
+                    if (configuration.IsStable != request.IsStable)
                     {
                         var error = new ErrorDescription("isStable", "The value is not changed");
                         var mutationException = new MutationException(error);
@@ -312,9 +312,9 @@ namespace KlusterKite.NodeManager
                         return;
                     }
 
-                    release.IsStable = request.IsStable;
+                    configuration.IsStable = request.IsStable;
                     ds.SaveChanges();
-                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(release, null));
+                    this.Sender.Tell(CrudActionResponse<Configuration>.Success(configuration, null));
                 }
             }
             catch (Exception exception)

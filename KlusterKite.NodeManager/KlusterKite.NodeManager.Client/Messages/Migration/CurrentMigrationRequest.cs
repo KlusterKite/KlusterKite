@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The request to acquire current active release
+//   The request to acquire current active migration
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 

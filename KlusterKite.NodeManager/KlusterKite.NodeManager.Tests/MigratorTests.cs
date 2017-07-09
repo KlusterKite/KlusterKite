@@ -82,14 +82,14 @@ namespace KlusterKite.NodeManager.Tests
         [Fact]
         public void MigrationCheckFailed()
         {
-            this.CreateReleases();
+            this.CreateConfiguration();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Configurations.First(r => r.Id == 1);
-                var nextRelease = context.Configurations.First(r => r.Id == 2);
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                var nextConfiguration = context.Configurations.First(r => r.Id == 2);
 
-                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -103,7 +103,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -149,14 +149,14 @@ namespace KlusterKite.NodeManager.Tests
         [Fact]
         public void MigrationDownGradeCheckTest()
         {
-            this.CreateReleases();
+            this.CreateConfiguration();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Configurations.First(r => r.Id == 1);
-                var nextRelease = context.Configurations.First(r => r.Id == 2);
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                var nextConfiguration = context.Configurations.First(r => r.Id == 2);
 
-                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -170,7 +170,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -225,7 +225,7 @@ namespace KlusterKite.NodeManager.Tests
                 var record = log.First();
                 Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
                 Assert.Equal(1, record.MigrationId);
-                Assert.Equal(1, record.ReleaseId);
+                Assert.Equal(1, record.ConfigurationId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("second", record.SourcePoint);
                 Assert.Equal("first", record.DestinationPoint);
@@ -255,14 +255,14 @@ namespace KlusterKite.NodeManager.Tests
         [Fact]
         public void MigrationNoChangeTest()
         {
-            this.CreateReleases();
+            this.CreateConfiguration();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Configurations.First(r => r.Id == 1);
-                var nextRelease = context.Configurations.First(r => r.Id == 2);
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                var nextConfiguration = context.Configurations.First(r => r.Id == 2);
 
-                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -276,7 +276,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -330,14 +330,14 @@ namespace KlusterKite.NodeManager.Tests
         [Fact]
         public void MigrationUpgradeCheckTest()
         {
-            this.CreateReleases();
+            this.CreateConfiguration();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Configurations.First(r => r.Id == 1);
-                var nextRelease = context.Configurations.First(r => r.Id == 2);
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                var nextConfiguration = context.Configurations.First(r => r.Id == 2);
 
-                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -351,7 +351,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -407,7 +407,7 @@ namespace KlusterKite.NodeManager.Tests
                 var record = log.First();
                 Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
                 Assert.Equal(1, record.MigrationId);
-                Assert.Equal(2, record.ReleaseId);
+                Assert.Equal(2, record.ConfigurationId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("first", record.SourcePoint);
                 Assert.Equal("second", record.DestinationPoint);
@@ -437,14 +437,14 @@ namespace KlusterKite.NodeManager.Tests
         [Fact]
         public void MigrationUpgradeMigrationFailedTest()
         {
-            this.CreateReleases();
+            this.CreateConfiguration();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Configurations.First(r => r.Id == 1);
-                var nextRelease = context.Configurations.First(r => r.Id == 2);
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                var nextConfiguration = context.Configurations.First(r => r.Id == 2);
 
-                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first""
@@ -458,7 +458,7 @@ namespace KlusterKite.NodeManager.Tests
                 }}
                 ";
 
-                nextRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -517,7 +517,7 @@ namespace KlusterKite.NodeManager.Tests
                 var record = log.First();
                 Assert.Equal(EnMigrationLogRecordType.OperationError, record.Type);
                 Assert.Equal(1, record.MigrationId);
-                Assert.Equal(2, record.ReleaseId);
+                Assert.Equal(2, record.ConfigurationId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("first", record.SourcePoint);
                 Assert.Equal("second", record.DestinationPoint);
@@ -544,14 +544,14 @@ namespace KlusterKite.NodeManager.Tests
         /// <see cref="MigrationActor"/> checks the upgrade migration
         /// </summary>
         [Fact]
-        public void ReleaseCheckFailedTest()
+        public void ConfigurationCheckFailedTest()
         {
-            this.CreateReleases();
+            this.CreateConfiguration();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Configurations.First(r => r.Id == 1);
-                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -594,14 +594,14 @@ namespace KlusterKite.NodeManager.Tests
         /// <see cref="MigrationActor"/> checks the upgrade migration
         /// </summary>
         [Fact]
-        public void ReleaseUpgradeCheckTest()
+        public void ConfigurationUpgradeCheckTest()
         {
-            this.CreateReleases();
+            this.CreateConfiguration();
             var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
             using (var context = this.GetContext())
             {
-                var activeRelease = context.Configurations.First(r => r.Id == 1);
-                activeRelease.Settings.MigratorTemplates.First().Configuration = $@"
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
                     TestMigrator.DefinedMigrationPoints = [
                         ""first"",
@@ -629,7 +629,7 @@ namespace KlusterKite.NodeManager.Tests
                         this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
-                var state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(45));
+                var state = this.ExpectMsg<MigrationActorConfigurationState>(TimeSpan.FromSeconds(45));
                 this.ExpectNoMsg();
                 Assert.Equal(1, state.States.Count);
                 Assert.Equal(1, state.States[0].MigratorsStates.Count);
@@ -652,12 +652,12 @@ namespace KlusterKite.NodeManager.Tests
                 var record = log.First();
                 Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
                 Assert.Null(record.MigrationId);
-                Assert.Equal(1, record.ReleaseId);
+                Assert.Equal(1, record.ConfigurationId);
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("first", record.SourcePoint);
                 Assert.Equal("second", record.DestinationPoint);
 
-                state = this.ExpectMsg<MigrationActorReleaseState>(TimeSpan.FromSeconds(10));
+                state = this.ExpectMsg<MigrationActorConfigurationState>(TimeSpan.FromSeconds(10));
                 this.ExpectNoMsg();
                 Assert.Equal(1, state.States.Count);
                 Assert.Equal(1, state.States[0].MigratorsStates.Count);
@@ -690,11 +690,11 @@ namespace KlusterKite.NodeManager.Tests
         }
 
         /// <summary>
-        /// Creates test release
+        /// Creates test configuration
         /// </summary>
         /// <param name="repo">The package repository</param>
-        /// <returns>The release</returns>
-        private Configuration CreateRelease(IPackageRepository repo)
+        /// <returns>The configuration</returns>
+        private Configuration CreateConfiguration(IPackageRepository repo)
         {
             var template = new NodeTemplate
                                {
@@ -732,7 +732,7 @@ namespace KlusterKite.NodeManager.Tests
                 .Select(p => p.Identity).Select(
                     p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList();
 
-            var configuration = new ConfigurationSettings
+            var configurationSettings = new ConfigurationSettings
                                     {
                                         NodeTemplates = new[] { template }.ToList(),
                                         MigratorTemplates = new[] { migrator }.ToList(),
@@ -741,45 +741,45 @@ namespace KlusterKite.NodeManager.Tests
                                         SeedAddresses = new[] { "http://seed" }.ToList()
                                     };
 
-            var release = new Configuration { Settings = configuration };
-            return release;
+            var configuration = new Configuration { Settings = configurationSettings };
+            return configuration;
         }
 
         /// <summary>
-        /// Creates the test releases in test database
+        /// Creates the test configurations in test database
         /// </summary>
-        private void CreateReleases()
+        private void CreateConfiguration()
         {
             var repo = this.Container.Resolve<IPackageRepository>();
 
             using (var context = this.GetContext())
             {
-                var activeRelease = this.CreateRelease(repo);
-                context.Configurations.Add(activeRelease);
+                var activeConfiguration = this.CreateConfiguration(repo);
+                context.Configurations.Add(activeConfiguration);
                 context.SaveChanges();
-                var errors = activeRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46, ReleaseCheckTestsBase.NetCore }.ToList())
+                var errors = activeConfiguration.CheckAll(context, repo, new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
-                    this.Sys.Log.Error("Error in active release {Field}: {Message}", error.Field, error.Message);
+                    this.Sys.Log.Error("Error in active configuration {Field}: {Message}", error.Field, error.Message);
                 }
 
                 Assert.Equal(0, errors.Count);
-                activeRelease.State = EnReleaseState.Active;
+                activeConfiguration.State = EnConfigurationState.Active;
                 context.SaveChanges();
 
-                var nextRelease = this.CreateRelease(repo);
-                context.Configurations.Add(nextRelease);
+                var nextConfiguration = this.CreateConfiguration(repo);
+                context.Configurations.Add(nextConfiguration);
                 context.SaveChanges();
-                errors = nextRelease.CheckAll(context, repo, new[] { ReleaseCheckTestsBase.Net46, ReleaseCheckTestsBase.NetCore }.ToList())
+                errors = nextConfiguration.CheckAll(context, repo, new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
-                    this.Sys.Log.Error("Error in next release {Field}: {Message}", error.Field, error.Message);
+                    this.Sys.Log.Error("Error in next configuration {Field}: {Message}", error.Field, error.Message);
                 }
 
                 Assert.Equal(0, errors.Count);
-                nextRelease.State = EnReleaseState.Ready;
+                nextConfiguration.State = EnConfigurationState.Ready;
                 context.SaveChanges();
             }
         }
@@ -862,7 +862,7 @@ namespace KlusterKite.NodeManager.Tests
                 KlusterKite.NodeManager.ConfigurationDatabaseName = ""{Guid.NewGuid():N}""
                 KlusterKite.NodeManager.ConfigurationDatabaseProviderName = ""InMemory""
                 KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = """"
-                KlusterKite.NodeManager.FrameworkType = ""{ReleaseCheckTestsBase.Net46}""
+                KlusterKite.NodeManager.FrameworkType = ""{ConfigurationCheckTestsBase.Net46}""
 
                 akka : {{
                   actor: {{
@@ -928,7 +928,7 @@ namespace KlusterKite.NodeManager.Tests
                 container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
                     .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
 
-                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
+                container.RegisterType<ConfigurationDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
 
                 container.RegisterInstance(this.CreateTestRepository()).As<IPackageRepository>();
                 container.RegisterType<TestMessageRouter>().As<IMessageRouter>();
@@ -994,7 +994,7 @@ namespace KlusterKite.NodeManager.Tests
             /// <param name="assembly">The source assembly</param>
             /// <param name="allAssemblies">The list of all defined assemblies</param>
             /// <returns>The test package</returns>
-            private ReleaseCheckTestsBase.TestPackage CreateTestPackage(Assembly assembly, Assembly[] allAssemblies)
+            private ConfigurationCheckTestsBase.TestPackage CreateTestPackage(Assembly assembly, Assembly[] allAssemblies)
             {
                 /*
                 Action<IFileSystem, string> extractContentsAction = (system, destination) =>
@@ -1009,7 +1009,7 @@ namespace KlusterKite.NodeManager.Tests
 
                 /*
                 Func<IEnumerable<IPackageFile>> filesAction = () => assembly.GetFiles().Select(
-                    fs => new ReleaseCheckTestsBase.TestPackageFile
+                    fs => new ConfigurationCheckTestsBase.TestPackageFile
                               {
                                   EffectivePath =
                                       Path.Combine(
@@ -1038,12 +1038,12 @@ namespace KlusterKite.NodeManager.Tests
 
                 var standardDependencies = new PackageDependencyGroup(
                     NuGetFramework.ParseFrameworkName(
-                        ReleaseCheckTestsBase.NetCore,
+                        ConfigurationCheckTestsBase.NetCore,
                         DefaultFrameworkNameProvider.Instance),
                     dependencies);
                 var net46Dependencies = new PackageDependencyGroup(
                     NuGetFramework.ParseFrameworkName(
-                        ReleaseCheckTestsBase.Net46,
+                        ConfigurationCheckTestsBase.Net46,
                         DefaultFrameworkNameProvider.Instance),
                     dependencies);
 
@@ -1059,7 +1059,7 @@ namespace KlusterKite.NodeManager.Tests
                         return new[] { fileName };
                     };
 
-                return new ReleaseCheckTestsBase.TestPackage(
+                return new ConfigurationCheckTestsBase.TestPackage(
                            assembly.GetName().Name,
                            assembly.GetName().Version.ToString())
                            {
@@ -1095,7 +1095,7 @@ namespace KlusterKite.NodeManager.Tests
                     .Where(a => !ignoredAssemblies.Contains(a.FullName))
                     .Select(p => this.CreateTestPackage(p, assemblies)).GroupBy(a => a.Identity.Id)
                     .Select(g => g.OrderByDescending(a => a.Identity.Id).First()).ToArray();
-                return new ReleaseCheckTestsBase.TestRepository(packages);
+                return new ConfigurationCheckTestsBase.TestRepository(packages);
             }
         }
     }

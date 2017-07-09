@@ -48,9 +48,9 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         SourceAndDestination,
 
         /// <summary>
-        /// The resource is no more supported in the target release
+        /// The resource is no more supported in the target configuration
         /// </summary>
-        [ApiDescription("The resource is no more supported in the target release")]
+        [ApiDescription("The resource is no more supported in the target configuration")]
         Obsolete
     }
 }

@@ -414,7 +414,7 @@ namespace KlusterKite.NodeManager.Launcher
             // cluster self-join is not welcomed
             var seeds = configuration.Seeds?.ToList() ?? new List<string>();
             string startConfig = $@"{{
-                KlusterKite.NodeManager.ReleaseId = {configuration.ReleaseId}
+                KlusterKite.NodeManager.ConfigurationId = {configuration.ConfigurationId}
                 KlusterKite.NodeManager.NodeTemplate = {configuration.NodeTemplate}
                 KlusterKite.NodeManager.ContainerType = {this.ContainerType}
                 KlusterKite.NodeManager.Runtime = ""{this.Runtime.Replace("\"", "\\\"")}""

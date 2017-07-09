@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The release configuration description
+//   The configuration settings description
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,9 +16,9 @@ namespace KlusterKite.NodeManager.Client.ORM
     using KlusterKite.NodeManager.Launcher.Messages;
 
     /// <summary>
-    /// The release configuration description
+    /// The configuration settings description
     /// </summary>
-    [ApiDescription("The release configuration description", Name = "ConfigurationSettings")]
+    [ApiDescription("The configuration settings description", Name = "ConfigurationSettings")]
     public class ConfigurationSettings
     { 
         /// <summary>

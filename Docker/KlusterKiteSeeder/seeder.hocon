@@ -12,11 +12,13 @@
 			RequiredPackages = [
 				"KlusterKite.Data.EF.Npgsql",
 				"KlusterKite.NodeManager.Seeder",
-				"KlusterKite.NodeManager.ConfigurationSource.Seeder"
+				"KlusterKite.NodeManager.ConfigurationSource.Seeder",
+				"KlusterKite.NodeManager.Mock"
 			]
 
 			Seeders = [
-				"KlusterKite.NodeManager.ConfigurationSource.Seeder.Seeder, KlusterKite.NodeManager.ConfigurationSource.Seeder"
+				"KlusterKite.NodeManager.ConfigurationSource.Seeder.Seeder, KlusterKite.NodeManager.ConfigurationSource.Seeder",
+				"KlusterKite.NodeManager.Mock.MockResourceSeeder, KlusterKite.NodeManager.Mock"
 			]
 		}
 	}
@@ -44,4 +46,16 @@
 		".NETFramework,Version=v4.6",
 		".NETCoreApp,Version=v1.1"
 	]
+
+	KlusterKite.NodeManager.Mock {
+		RedisConnection = "172.18.0.4:6379"
+		ResourcePoints = [
+			"first"
+		]
+		Resources = [
+			"resource-1",
+			"resource-2",
+			"resource-3"
+		]
+	}
 }

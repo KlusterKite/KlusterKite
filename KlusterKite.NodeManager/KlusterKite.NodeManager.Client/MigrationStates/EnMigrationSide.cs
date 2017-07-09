@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The type of release in the migration
+//   The type of configuration in the migration
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,21 +12,21 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     using KlusterKite.API.Attributes;
 
     /// <summary>
-    /// The type of release in the migration
+    /// The type of configuration in the migration
     /// </summary>
-    [ApiDescription("The type of release in the migration", Name = "EnMigrationSide")]
+    [ApiDescription("The type of configuration in the migration", Name = "EnMigrationSide")]
     public enum EnMigrationSide
     {
         /// <summary>
-        /// The source release
+        /// The source configuration
         /// </summary>
-        [ApiDescription("The source release")]
+        [ApiDescription("The source configuration")]
         Source,
 
         /// <summary>
-        /// The destination release
+        /// The destination configuration
         /// </summary>
-        [ApiDescription("The destination release")]
+        [ApiDescription("The destination configuration")]
         Destination
     }
 }

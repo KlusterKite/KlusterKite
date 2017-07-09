@@ -1,9 +1,9 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseCheckTestsBase.cs" company="KlusterKite">
+// <copyright file="ConfigurationCheckTestsBase.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Prepares the test environment to test  <see cref="ReleaseExtensions" />
+//   Prepares the test environment to test  <see cref="ConfigurationExtensions" />
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,9 +34,9 @@ namespace KlusterKite.NodeManager.Tests
     using Xunit.Abstractions;
 
     /// <summary>
-    /// Prepares the test environment to test  <see cref="ReleaseExtensions"/>
+    /// Prepares the test environment to test  <see cref="ConfigurationExtensions"/>
     /// </summary>
-    public abstract class ReleaseCheckTestsBase
+    public abstract class ConfigurationCheckTestsBase
     {
         /// <summary>
         /// The .NET Framework 4.6 name
@@ -49,12 +49,12 @@ namespace KlusterKite.NodeManager.Tests
         public const string NetCore = ".NETCoreApp,Version=v1.1";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReleaseCheckTestsBase"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationCheckTestsBase"/> class.
         /// </summary>
         /// <param name="output">
         /// The output.
         /// </param>
-        protected ReleaseCheckTestsBase(ITestOutputHelper output)
+        protected ConfigurationCheckTestsBase(ITestOutputHelper output)
         {
             this.Output = output;
         }
@@ -121,12 +121,12 @@ namespace KlusterKite.NodeManager.Tests
         }
 
         /// <summary>
-        /// Creates the default release
+        /// Creates the default configuration
         /// </summary>
         /// <param name="packages">The list of defined packages to override</param>
         /// <param name="templatePackageRequirements">The template package requirements</param>
-        /// <returns>The release</returns>
-        internal static Configuration CreateRelease(string[] packages = null, string[] templatePackageRequirements = null)
+        /// <returns>The configuration</returns>
+        internal static Configuration CreateConfiguration(string[] packages = null, string[] templatePackageRequirements = null)
         {
             if (packages == null)
             {
@@ -160,7 +160,7 @@ namespace KlusterKite.NodeManager.Tests
                          };
             migratorTemplates.Add(m1);
 
-            var releaseConfiguration =
+            var configurationSettings =
                 new ConfigurationSettings
                     {
                         Packages = packageDescriptions,
@@ -168,7 +168,7 @@ namespace KlusterKite.NodeManager.Tests
                         MigratorTemplates = migratorTemplates
                     };
 
-            return new Configuration { Settings = releaseConfiguration };
+            return new Configuration { Settings = configurationSettings };
         }
 
         /// <summary>

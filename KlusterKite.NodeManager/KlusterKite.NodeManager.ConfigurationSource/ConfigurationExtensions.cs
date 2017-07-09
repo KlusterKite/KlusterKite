@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseExtensions.cs" company="KlusterKite">
+// <copyright file="ConfigurationExtensions.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Extending the work with <see cref="Release" />
+//   Extending the work with Configuration
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,12 +32,12 @@ namespace KlusterKite.NodeManager.ConfigurationSource
     /// <summary>
     /// Extending the work with <see cref="Configuration"/>
     /// </summary>
-    public static class ReleaseExtensions
+    public static class ConfigurationExtensions
     {
         /// <summary>
-        /// Creates full release check and fills it values with actual data
+        /// Creates full configuration check and fills it values with actual data
         /// </summary>
-        /// <param name="configuration">The release</param>
+        /// <param name="configuration">The configuration</param>
         /// <param name="context">The data context</param>
         /// <param name="nugetRepository">The access to the nuget repository</param>
         /// <param name="supportedFrameworks">The list of supported frameworks</param>
@@ -54,11 +54,11 @@ namespace KlusterKite.NodeManager.ConfigurationSource
             errors.AddRange(configuration.CheckTemplatesConfigurations());
             return errors;
         }
-         
+
         /// <summary>
-        /// Checks release node templates for correct configuration sections
+        /// Checks configuration node templates for correct configuration sections
         /// </summary>
-        /// <param name="configuration">The release</param>
+        /// <param name="configuration">The configuration</param>
         /// <returns>The list of errors</returns>
         public static IEnumerable<ErrorDescription> CheckTemplatesConfigurations(this Configuration configuration)
         {
@@ -110,7 +110,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// Gets the list of compatible templates
         /// </summary>
         /// <param name="configuration">
-        /// The release to check
+        /// The configuration to check
         /// </param>
         /// <param name="context">
         /// The configuration data context
@@ -127,16 +127,16 @@ namespace KlusterKite.NodeManager.ConfigurationSource
                 yield break;
             }
 
-            var currentRelease =
+            var currentConfiguration =
                 context.Configurations.Include(nameof(Configuration.CompatibleTemplatesBackward))
-                    .FirstOrDefault(r => r.State == EnReleaseState.Active);
+                    .FirstOrDefault(r => r.State == EnConfigurationState.Active);
 
-            if (currentRelease?.Settings?.NodeTemplates == null)
+            if (currentConfiguration?.Settings?.NodeTemplates == null)
             {
                 yield break;
             }
 
-            foreach (var template in currentRelease.Settings.NodeTemplates)
+            foreach (var template in currentConfiguration.Settings.NodeTemplates)
             {
                 var currentTemplate = configuration.Settings.NodeTemplates.FirstOrDefault(t => t.Code == template.Code);
                 if (currentTemplate == null)
@@ -165,7 +165,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
                 foreach (var requirement in currentTemplate.PackageRequirements.Where(r => r.SpecificVersion == null))
                 {
                     var oldVersion = configuration.Settings.Packages.FirstOrDefault(p => p.Id == requirement.Id);
-                    var newVersion = currentRelease.Settings.Packages.FirstOrDefault(p => p.Id == requirement.Id);
+                    var newVersion = currentConfiguration.Settings.Packages.FirstOrDefault(p => p.Id == requirement.Id);
                     if (newVersion == null || oldVersion?.Version != newVersion.Version)
                     {
                         needPackageUpdate = true;
@@ -181,19 +181,19 @@ namespace KlusterKite.NodeManager.ConfigurationSource
                 yield return
                     new CompatibleTemplate
                         {
-                            CompatibleReleaseId = currentRelease.Id,
-                            ReleaseId = configuration.Id,
+                            CompatibleConfigurationId = currentConfiguration.Id,
+                            ConfigurationId = configuration.Id,
                             TemplateCode = template.Code
                         };
 
                 foreach (
-                    var compatible in currentRelease.CompatibleTemplatesBackward.Where(ct => ct.TemplateCode == template.Code))
+                    var compatible in currentConfiguration.CompatibleTemplatesBackward.Where(ct => ct.TemplateCode == template.Code))
                 {
                     yield return
                         new CompatibleTemplate
                             {
-                                CompatibleReleaseId = compatible.CompatibleReleaseId,
-                                ReleaseId = configuration.Id,
+                                CompatibleConfigurationId = compatible.CompatibleConfigurationId,
+                                ConfigurationId = configuration.Id,
                                 TemplateCode = template.Code
                             };
                 }
@@ -246,10 +246,10 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         }
 
         /// <summary>
-        /// Checks the list of defined packages in the release and fills provided dictionary with precise package data
+        /// Checks the list of defined packages in the configuration and fills provided dictionary with precise package data
         /// </summary>
         /// <param name="configuration">
-        /// The release.
+        /// The configuration
         /// </param>
         /// <param name="supportedFrameworks">
         /// The list of supported frameworks.
@@ -334,16 +334,16 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         }
 
         /// <summary>
-        /// Checks package requirements in release templates and fills the <see cref="NodeTemplate.PackagesToInstall"/> field in templates
+        /// Checks package requirements in configuration templates and fills the <see cref="NodeTemplate.PackagesToInstall"/> field in templates
         /// </summary>
         /// <param name="configuration">
-        /// The release.
+        /// The configuration
         /// </param>
         /// <param name="supportedFrameworks">
         /// The list of supported frameworks.
         /// </param>
         /// <param name="definedPackages">
-        /// The list of defined packages in the release.
+        /// The list of defined packages in the configuration
         /// </param>
         /// <param name="nugetRepository">
         /// The nuget repository.
@@ -494,7 +494,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         /// Fills the provided dictionary with packages directly linked in nodeTemplate requirements
         /// </summary>
         /// <param name="definedPackages">
-        /// The list defined packages defined in release.
+        /// The list defined packages defined in configuration
         /// </param>
         /// <param name="nugetRepository">
         /// The nuget repository.
@@ -526,7 +526,7 @@ namespace KlusterKite.NodeManager.ConfigurationSource
                     errors.Add(
                         new ErrorDescription(
                             requirementField,
-                            "Package requirement is not defined in release packages"));
+                            "Package requirement is not defined in configuration packages"));
                 }
                 else
                 {

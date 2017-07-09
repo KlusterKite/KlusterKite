@@ -174,7 +174,7 @@ namespace KlusterKite.NodeManager
                                     Id = errorId--,
                                     Type = EnMigrationLogRecordType.Error,
                                     Started = DateTimeOffset.Now,
-                                    ReleaseId = this.StateData.Migration.ToConfigurationId,
+                                    ConfigurationId = this.StateData.Migration.ToConfigurationId,
                                     MigratorTemplateCode = resourceUpgrade.TemplateCode,
                                     MigratorTypeName = resourceUpgrade.MigratorTypeName,
                                     ResourceCode = resourceUpgrade.ResourceCode
@@ -258,14 +258,14 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Creates migration state from release states
+        /// Creates migration state from configuration states
         /// </summary>
-        /// <param name="sourceMigratorTemplateStates">The resource state according to source release</param>
-        /// <param name="destinationMigratorTemplateStates">The resource state according to destination release</param>
+        /// <param name="sourceMigratorTemplateStates">The resource state according to source configuration</param>
+        /// <param name="destinationMigratorTemplateStates">The resource state according to destination configuration</param>
         /// <returns>The overall resource migration state</returns>
         private IEnumerable<MigratorTemplateMigrationState> CreateMigrationState(
-            IReadOnlyCollection<MigratorTemplateReleaseState> sourceMigratorTemplateStates,
-            IReadOnlyCollection<MigratorTemplateReleaseState> destinationMigratorTemplateStates)
+            IReadOnlyCollection<MigratorTemplateConfigurationState> sourceMigratorTemplateStates,
+            IReadOnlyCollection<MigratorTemplateConfigurationState> destinationMigratorTemplateStates)
         {
             foreach (var destinationMigratorTemplateState in destinationMigratorTemplateStates)
             {
@@ -307,14 +307,14 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Creates migration state from release states
+        /// Creates migration state from configuration states
         /// </summary>
-        /// <param name="sourceMigratorStates">The resource state according to source release</param>
-        /// <param name="destinationMigratorStates">The resource state according to destination release</param>
+        /// <param name="sourceMigratorStates">The resource state according to source configuration</param>
+        /// <param name="destinationMigratorStates">The resource state according to destination configuration</param>
         /// <returns>The overall resource migration state</returns>
         private IEnumerable<MigratorMigrationState> CreateMigrationState(
-            IReadOnlyCollection<MigratorReleaseState> sourceMigratorStates,
-            IReadOnlyCollection<MigratorReleaseState> destinationMigratorStates)
+            IReadOnlyCollection<MigratorConfigurationState> sourceMigratorStates,
+            IReadOnlyCollection<MigratorConfigurationState> destinationMigratorStates)
         {
             foreach (var destinationMigratorState in destinationMigratorStates)
             {
@@ -351,47 +351,47 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Creates migration state from release states
+        /// Creates migration state from configuration states
         /// </summary>
-        /// <param name="sourceMigratorReleaseState">
-        /// The migrator state according to source release
+        /// <param name="sourceMigratorConfigurationState">
+        /// The migrator state according to source configuration
         /// </param>
-        /// <param name="destinationMigratorReleaseState">
-        /// The migrator state according to destination release
+        /// <param name="destinationMigratorConfigurationState">
+        /// The migrator state according to destination configuration
         /// </param>
         /// <returns>
         /// The overall resource migration state
         /// </returns>
         private IEnumerable<ResourceMigrationState> CreateMigrationState(
-            MigratorReleaseState sourceMigratorReleaseState,
-            MigratorReleaseState destinationMigratorReleaseState)
+            MigratorConfigurationState sourceMigratorConfigurationState,
+            MigratorConfigurationState destinationMigratorConfigurationState)
         {
-            foreach (var destinationResourceState in destinationMigratorReleaseState.Resources)
+            foreach (var destinationResourceState in destinationMigratorConfigurationState.Resources)
             {
                 var sourceResourceState =
-                    sourceMigratorReleaseState.Resources.FirstOrDefault(s => s.Code == destinationResourceState.Code);
+                    sourceMigratorConfigurationState.Resources.FirstOrDefault(s => s.Code == destinationResourceState.Code);
 
                 if (sourceResourceState == null)
                 {
                     yield return ResourceMigrationState.CreateFrom(
-                        destinationMigratorReleaseState,
+                        destinationMigratorConfigurationState,
                         destinationResourceState,
                         EnMigratorPosition.New);
                     continue;
                 }
 
                 yield return ResourceMigrationState.CreateFrom(
-                    sourceMigratorReleaseState,
+                    sourceMigratorConfigurationState,
                     sourceResourceState,
-                    destinationMigratorReleaseState,
+                    destinationMigratorConfigurationState,
                     destinationResourceState);
             }
 
-            foreach (var sourceResourceState in sourceMigratorReleaseState.Resources.Where(
-                s => destinationMigratorReleaseState.Resources.All(d => d.Code != s.Code)))
+            foreach (var sourceResourceState in sourceMigratorConfigurationState.Resources.Where(
+                s => destinationMigratorConfigurationState.Resources.All(d => d.Code != s.Code)))
             {
                 yield return ResourceMigrationState.CreateFrom(
-                    sourceMigratorReleaseState,
+                    sourceMigratorConfigurationState,
                     sourceResourceState,
                     EnMigratorPosition.Obsolete);
             }
@@ -403,7 +403,7 @@ namespace KlusterKite.NodeManager
         /// <param name="request">The list of migrating resources</param>
         /// <param name="errors">The list of processing errors</param>
         /// <returns>The migration plan</returns>
-        private MigrationPlan CreateReleasePlan(List<ResourceUpgrade> request, out List<MigrationLogRecord> errors)
+        private MigrationPlan CreateConfigurationPlan(List<ResourceUpgrade> request, out List<MigrationLogRecord> errors)
         {
             var plan = new MigrationPlan();
             errors = new List<MigrationLogRecord>();
@@ -413,14 +413,14 @@ namespace KlusterKite.NodeManager
                                 {
                                     Started = DateTimeOffset.Now,
                                     Type = EnMigrationLogRecordType.Error,
-                                    ReleaseId = this.StateData.Configuration.Id,
+                                    ConfigurationId = this.StateData.Configuration.Id,
                                     MigratorTemplateCode = resourceUpgrade.TemplateCode,
                                     MigratorTypeName = resourceUpgrade.MigratorTypeName,
                                     ResourceCode = resourceUpgrade.ResourceCode
                                 };
 
                 var template =
-                    this.StateData.ReleaseState.States.FirstOrDefault(
+                    this.StateData.ConfigurationState.States.FirstOrDefault(
                         t => t.Template.Code == resourceUpgrade.TemplateCode);
                 if (template == null)
                 {
@@ -493,19 +493,19 @@ namespace KlusterKite.NodeManager
         private List<MigrationLogRecord> ExecuteMigration(EnMigrationSide side, MigratorTemplatePlan plan)
         {
             var log = new List<MigrationLogRecord>();
-            var releaseDir = side == EnMigrationSide.Source
-                                 ? Path.Combine(this.StateData.FromReleaseExecutionDir, plan.Template.Code)
-                                 : Path.Combine(this.StateData.ToReleaseExecutionDir, plan.Template.Code);
+            var configurationDir = side == EnMigrationSide.Source
+                                 ? Path.Combine(this.StateData.FromConfigurationExecutionDir, plan.Template.Code)
+                                 : Path.Combine(this.StateData.ToConfigurationExecutionDir, plan.Template.Code);
 
-            var releaseId = side == EnMigrationSide.Source
+            var configurationId = side == EnMigrationSide.Source
                                 ? this.StateData.Migration.FromConfiguration.Id
                                 : this.StateData.Migration.ToConfigurationId;
 
             Context.GetLogger().Info(
-                "{Type}: preparing for migration resources of {MigratorTemplateCode} of release {ReleaseId}. {ResourceCount} resources will be migrated",
+                "{Type}: preparing for migration resources of {MigratorTemplateCode} of configuration {ConfigurationId}. {ResourceCount} resources will be migrated",
                 this.GetType().Name,
                 plan.Template.Code,
-                releaseId,
+                configurationId,
                 plan.MigratorPlans.Values.SelectMany(m => m.Resources.Values).Count());
 
             try
@@ -513,12 +513,12 @@ namespace KlusterKite.NodeManager
                 var collector = new MigrationExecutor { Commands = plan.MigratorPlans.Values.ToList() };
 
                 Context.GetLogger().Info(
-                    "{Type}: {MigratorTemplateCode} of release {ReleaseId} migration executor was created",
+                    "{Type}: {MigratorTemplateCode} of configuration {ConfigurationId} migration executor was created",
                     this.GetType().Name,
                     plan.Template.Code,
-                    releaseId);
+                    configurationId);
 
-                collector = this.ExecuteMigrator(releaseDir, collector);
+                collector = this.ExecuteMigrator(configurationDir, collector);
                 var operations = collector.Result;
                 foreach (var logMessage in collector.Logs)
                 {
@@ -529,16 +529,16 @@ namespace KlusterKite.NodeManager
                 }
 
                 Context.GetLogger().Info(
-                    "{Type}: {MigratorTemplateCode} of release {ReleaseId} migration executor was executed",
+                    "{Type}: {MigratorTemplateCode} of configuration {ConfigurationId} migration executor was executed",
                     this.GetType().Name,
                     plan.Template.Code,
-                    releaseId);
+                    configurationId);
 
                 if (operations != null)
                 {
                     foreach (var operation in operations)
                     {
-                        operation.ReleaseId = releaseId;
+                        operation.ConfigurationId = configurationId;
                         operation.MigrationId = this.StateData.Migration.Id;
                         operation.MigratorTemplateCode = plan.Template.Code;
                         operation.MigratorTemplateName = plan.Template.Name;
@@ -547,10 +547,10 @@ namespace KlusterKite.NodeManager
                         {
                             Context.GetLogger()
                                 .Error(
-                                    "{Type}: Error while executing migration for template {MigratorTemplateCode} of release {ReleaseId}: {ErrorMessage} \n {ErrorStackTrace}",
+                                    "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage} \n {ErrorStackTrace}",
                                     this.GetType().Name,
                                     plan.Template.Code,
-                                    releaseId,
+                                    configurationId,
                                     operation.ErrorMessage,
                                     operation.ErrorStackTrace);
                         }
@@ -558,10 +558,10 @@ namespace KlusterKite.NodeManager
                         {
                             Context.GetLogger()
                                 .Info(
-                                    "{Type}: Migration for template {MigratorTemplateCode} of release {ReleaseId} {ResourceCode} was successfully migrated from {SourcePoint} to {DestinationPoint}",
+                                    "{Type}: Migration for template {MigratorTemplateCode} of configuration {ConfigurationId} {ResourceCode} was successfully migrated from {SourcePoint} to {DestinationPoint}",
                                     this.GetType().Name,
                                     plan.Template.Code,
-                                    releaseId,
+                                    configurationId,
                                     operation.ResourceCode,
                                     operation.SourcePoint,
                                     operation.DestinationPoint);
@@ -579,7 +579,7 @@ namespace KlusterKite.NodeManager
                             new MigrationLogRecord
                                 {
                                     Type = EnMigrationLogRecordType.Error,
-                                    ReleaseId = releaseId,
+                                    ConfigurationId = configurationId,
                                     MigrationId = this.StateData.Migration.Id,
                                     MigratorTemplateCode = plan.Template.Code,
                                     MigratorTemplateName = plan.Template.Name,
@@ -588,10 +588,10 @@ namespace KlusterKite.NodeManager
 
                         Context.GetLogger()
                             .Error(
-                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of release {ReleaseId}: {ErrorMessage}",
+                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}",
                                 this.GetType().Name,
                                 plan.Template.Code,
-                                releaseId,
+                                configurationId,
                                 error);
                     }
                 }
@@ -602,7 +602,7 @@ namespace KlusterKite.NodeManager
                         new MigrationLogRecord
                         {
                             Type = EnMigrationLogRecordType.Error,
-                            ReleaseId = releaseId,
+                            ConfigurationId = configurationId,
                             MigrationId = this.StateData.Migration.Id,
                             MigratorTemplateCode = plan.Template.Code,
                             MigratorTemplateName = plan.Template.Name,
@@ -626,20 +626,20 @@ namespace KlusterKite.NodeManager
         private List<MigrationLogRecord> ExecuteMigration(MigratorTemplatePlan plan)
         {
             var log = new List<MigrationLogRecord>();
-            var releaseDir = Path.Combine(this.StateData.ReleaseExecutionDir, plan.Template.Code);
+            var configurationDir = Path.Combine(this.StateData.ConfigurationExecutionDir, plan.Template.Code);
 
             try
             {
                 var collector = new MigrationExecutor();
                 collector.Commands = plan.MigratorPlans.Values.ToList();
-                collector = this.ExecuteMigrator(releaseDir, collector);
+                collector = this.ExecuteMigrator(configurationDir, collector);
 
                 var operations = collector.Result;
                 if (operations != null)
                 {
                     foreach (var operation in operations)
                     {
-                        operation.ReleaseId = this.StateData.Configuration.Id;
+                        operation.ConfigurationId = this.StateData.Configuration.Id;
                         operation.MigratorTemplateCode = plan.Template.Code;
                         operation.MigratorTemplateName = plan.Template.Name;
 
@@ -647,7 +647,7 @@ namespace KlusterKite.NodeManager
                         {
                             Context.GetLogger()
                                 .Error(
-                                    "{Type}: Error while executing migration for template {MigratorTemplateCode} of release {ReleaseId}: {ErrorMessage} \n {ErrorStackTrace}",
+                                    "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage} \n {ErrorStackTrace}",
                                     this.GetType().Name,
                                     plan.Template.Code,
                                     this.StateData.Configuration.Id,
@@ -667,14 +667,14 @@ namespace KlusterKite.NodeManager
                             new MigrationLogRecord
                                 {
                                     Type = EnMigrationLogRecordType.Error,
-                                    ReleaseId = this.StateData.Configuration.Id,
+                                    ConfigurationId = this.StateData.Configuration.Id,
                                     MigratorTemplateCode = plan.Template.Code,
                                     MigratorTemplateName = plan.Template.Name,
                                     ErrorMessage = $"Error while executing migration: {error}"
                                 });
                         Context.GetLogger()
                             .Error(
-                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of release {ReleaseId}: {ErrorMessage}",
+                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}",
                                 this.GetType().Name,
                                 plan.Template.Code,
                                 this.StateData.Configuration.Id,
@@ -688,7 +688,7 @@ namespace KlusterKite.NodeManager
                         new MigrationLogRecord
                         {
                             Type = EnMigrationLogRecordType.Error,
-                            ReleaseId = this.StateData.Configuration.Id,
+                            ConfigurationId = this.StateData.Configuration.Id,
                             MigratorTemplateCode = plan.Template.Code,
                             MigratorTemplateName = plan.Template.Name,
                             ErrorMessage = exception.Message,
@@ -700,10 +700,10 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Extracts the specified packages for the release migrators
+        /// Extracts the specified packages for the configuration migrators
         /// </summary>
         /// <param name="configuration">
-        /// The release
+        /// The configuration
         /// </param>
         /// <param name="executionDirectory">
         /// The execution Directory.
@@ -717,7 +717,7 @@ namespace KlusterKite.NodeManager
         /// <returns>
         /// the success of the operation
         /// </returns>
-        private async Task<List<MigrationLogRecord>> ExtractReleaseMigratorsAsync(
+        private async Task<List<MigrationLogRecord>> ExtractConfigurationMigratorsAsync(
             Configuration configuration,
             string executionDirectory,
             int? migrationId,
@@ -739,7 +739,7 @@ namespace KlusterKite.NodeManager
                 {
                     try
                     {
-                        await this.ExtractReleaseMigrationTemplateAsync(
+                        await this.ExtractConfigurationMigrationTemplateAsync(
                             configuration,
                             migrationId,
                             migratorTemplate,
@@ -754,7 +754,7 @@ namespace KlusterKite.NodeManager
                             new MigrationLogRecord
                                 {
                                     Type = EnMigrationLogRecordType.Error,
-                                    ReleaseId = configuration.Id,
+                                    ConfigurationId = configuration.Id,
                                     MigrationId = migrationId,
                                     MigratorTemplateCode = migratorTemplate.Code,
                                     MigratorTemplateName = migratorTemplate.Name,
@@ -776,7 +776,7 @@ namespace KlusterKite.NodeManager
         /// Extracts packages for the <see cref="MigratorTemplate"/>
         /// </summary>
         /// <param name="configuration">
-        /// The release
+        /// The configuration
         /// </param>
         /// <param name="migrationId">
         /// The possible migration id
@@ -799,7 +799,7 @@ namespace KlusterKite.NodeManager
         /// <returns>
         /// The async task
         /// </returns>
-        private async Task ExtractReleaseMigrationTemplateAsync(Configuration configuration, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationLogRecord> errors)
+        private async Task ExtractConfigurationMigrationTemplateAsync(Configuration configuration, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationLogRecord> errors)
         {
             var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
             if (Directory.Exists(migratorExecutionDirectory))
@@ -837,7 +837,7 @@ namespace KlusterKite.NodeManager
             {
                 Context.GetLogger().Error(
                     exception,
-                    "{Type} Error on creating service for migrator template {MigratorTemplateCode} of release {ReleaseId}",
+                    "{Type} Error on creating service for migrator template {MigratorTemplateCode} of configuration {ConfigurationId}",
                     this.GetType().Name,
                     migratorTemplate.Code,
                     configuration.Id);
@@ -846,7 +846,7 @@ namespace KlusterKite.NodeManager
                     new MigrationLogRecord
                         {
                             Type = EnMigrationLogRecordType.Error,
-                            ReleaseId = configuration.Id,
+                            ConfigurationId = configuration.Id,
                             MigrationId = migrationId,
                             MigratorTemplateCode = migratorTemplate.Code,
                             MigratorTemplateName = migratorTemplate.Name,
@@ -867,8 +867,8 @@ namespace KlusterKite.NodeManager
         /// <summary>
         /// Calculates the migration direction according to the defined migration points
         /// </summary>
-        /// <param name="sourcePoints">The list of migration points in the source release</param>
-        /// <param name="destinationPoints">The list of migration points in the destination release</param>
+        /// <param name="sourcePoints">The list of migration points in the source configuration</param>
+        /// <param name="destinationPoints">The list of migration points in the destination configuration</param>
         /// <returns>The migration direction</returns>
         private EnMigrationDirection GetDirection(
             IEnumerable<string> sourcePoints,
@@ -911,16 +911,16 @@ namespace KlusterKite.NodeManager
         {
             errors = new List<MigrationLogRecord>();
             List<MigrationLogRecord> sourceErrors;
-            var sourceStates = this.GetReleaseResourcesState(
+            var sourceStates = this.GetConfigurationResourcesState(
                 data.Migration.FromConfiguration,
-                data.FromReleaseExecutionDir,
+                data.FromConfigurationExecutionDir,
                 data.Migration.Id,
                 out sourceErrors).ToList();
 
             List<MigrationLogRecord> destinationErrors;
-            var destinationStates = this.GetReleaseResourcesState(
+            var destinationStates = this.GetConfigurationResourcesState(
                 data.Migration.ToConfiguration,
-                data.ToReleaseExecutionDir,
+                data.ToConfigurationExecutionDir,
                 data.Migration.Id,
                 out destinationErrors).ToList();
 
@@ -977,10 +977,10 @@ namespace KlusterKite.NodeManager
             // ReSharper disable once InconsistentNaming
             var ExecutableFileName = isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.Executor.exe");
             // ReSharper disable once InconsistentNaming
-            var ExecutableArguments = isMono ? "KlusterKite.NodeManager.Migrator.Executor.exe" : string.Empty;
+            var ExecutableArguments = isMono ? "./KlusterKite.NodeManager.Migrator.Executor.exe" : string.Empty;
 #elif CORECLR
             const string ExecutableFileName = "dotnet";
-            const string ExecutableArguments = "KlusterKite.NodeManager.Migrator.Executor.dll";
+            const string ExecutableArguments = "./KlusterKite.NodeManager.Migrator.Executor.dll";
 #endif
 
             var process = new Process
@@ -1008,14 +1008,34 @@ namespace KlusterKite.NodeManager
                 readLine = process.StandardOutput.ReadLine();
             }
 
-            process.StandardInput.Send(instance);
-            var output = process.StandardOutput.Receive() as T;
-            process.WaitForExit();
-            var error = process.StandardError.ReadToEnd();
+            T output;
+            string error;
+            try
+            {
+                process.StandardInput.Send(instance);
+                output = process.StandardOutput.Receive() as T;
+                process.WaitForExit();
+            }
+            catch (Exception exception)
+            {
+                Context.GetLogger().Error(
+                    exception,
+                    "{Type}: Migrator communication failed",
+                    this.GetType().Name);
+                error = process.StandardError.ReadToEnd();
+                Context.GetLogger().Error(
+                    "{Type}: Migrator exited with error {Error}. Installed on {InstalledPath}",
+                    this.GetType().Name,
+                    error,
+                    installedPath);
+                throw;
+            }
+
+            error = process.StandardError.ReadToEnd();
             if (!string.IsNullOrWhiteSpace(error))
             {
                 Context.GetLogger().Error(
-                    "{Type}: runas Migrator exited with error {Error}. Installed on {InstalledPath}",
+                    "{Type}: Migrator exited with error {Error}. Installed on {InstalledPath}",
                     this.GetType().Name,
                     error,
                     installedPath);
@@ -1026,10 +1046,10 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Gets the state of the release
+        /// Gets the state of the configuration
         /// </summary>
         /// <param name="configuration">
-        /// The release to check
+        /// The configuration to check
         /// </param>
         /// <param name="executionDirectory">
         /// The execution Directory.
@@ -1041,34 +1061,34 @@ namespace KlusterKite.NodeManager
         /// The list of execution errors
         /// </param>
         /// <returns>
-        /// The state of release resources
+        /// The state of configuration resources
         /// </returns>
-        private List<MigratorTemplateReleaseState> GetReleaseResourcesState(
+        private List<MigratorTemplateConfigurationState> GetConfigurationResourcesState(
             Configuration configuration,
             string executionDirectory,
             int? migrationId,
             out List<MigrationLogRecord> errors)
         {
-            var result = new List<MigratorTemplateReleaseState>();
+            var result = new List<MigratorTemplateConfigurationState>();
             errors = new List<MigrationLogRecord>();
 
             foreach (var migratorTemplate in configuration.Settings.MigratorTemplates.OrderByDescending(
                 mt => mt.Priority))
             {
-                var state = new MigratorTemplateReleaseState { Code = migratorTemplate.Code, Template = migratorTemplate };
-                var releaseDir = Path.Combine(executionDirectory, migratorTemplate.Code);
+                var state = new MigratorTemplateConfigurationState { Code = migratorTemplate.Code, Template = migratorTemplate };
+                var configurationDir = Path.Combine(executionDirectory, migratorTemplate.Code);
                 try
                 {
-                    var collector = new ReleaseStateCollector();
-                    collector = this.ExecuteMigrator(releaseDir, collector);
+                    var collector = new ConfigurationStateCollector();
+                    collector = this.ExecuteMigrator(configurationDir, collector);
                     var collectorErrors = collector.Errors;
-                    var migratorReleaseStates = collector.Result;
+                    var migratorConfigurationStates = collector.Result;
 
                     if (collectorErrors.Any())
                     {
                         foreach (var error in collector.Errors)
                         {
-                            error.ReleaseId = configuration.Id;
+                            error.ConfigurationId = configuration.Id;
                             error.MigrationId = migrationId;
                             error.MigratorTemplateCode = migratorTemplate.Code;
                             error.MigratorTemplateName = migratorTemplate.Name;
@@ -1077,7 +1097,7 @@ namespace KlusterKite.NodeManager
                             Context.GetLogger()
                                 .Error(
                                     "{Type}: Error while requesting migration state for migrator "
-                                    + "template {MigratorTemplateCode} of release {ReleaseId}: {ErrorMessage}\n {ErrorStackTrace}",
+                                    + "template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}\n {ErrorStackTrace}",
                                     this.GetType().Name,
                                     migratorTemplate.Code,
                                     configuration.Id,
@@ -1088,7 +1108,7 @@ namespace KlusterKite.NodeManager
                         continue;
                     }
 
-                    state.MigratorsStates = migratorReleaseStates;
+                    state.MigratorsStates = migratorConfigurationStates;
                     result.Add(state);
                 }
                 catch (Exception exception)
@@ -1097,7 +1117,7 @@ namespace KlusterKite.NodeManager
                         new MigrationLogRecord
                             {
                                 Type = EnMigrationLogRecordType.Error,
-                                ReleaseId = configuration.Id,
+                                ConfigurationId = configuration.Id,
                                 MigrationId = migrationId,
                                 MigratorTemplateCode = migratorTemplate.Code,
                                 MigratorTemplateName = migratorTemplate.Name,
@@ -1108,7 +1128,7 @@ namespace KlusterKite.NodeManager
                     Context.GetLogger()
                         .Error(
                             exception,
-                            "{Type}: Error while requesting migration state for migrator template {MigratorTemplateCode} of release { ReleaseId}",
+                            "{Type}: Error while requesting migration state for migrator template {MigratorTemplateCode} of configuration {ConfigurationId}",
                             this.GetType().Name,
                             migratorTemplate.Code,
                             configuration.Id);
@@ -1122,23 +1142,23 @@ namespace KlusterKite.NodeManager
         /// Loads current state for active migration
         /// </summary>
         /// <param name="migration">The current migration</param>
-        /// <param name="forceExtract">A value indicating whether release Nuget packages should be overwritten</param>
+        /// <param name="forceExtract">A value indicating whether configuration Nuget packages should be overwritten</param>
         /// <param name="data">Current actor state data</param>
         /// <returns>The next actor state</returns>
         private State<EnState, Data> LoadMigrationState(Migration migration, bool forceExtract, Data data)
         {
-            var fromReleaseExecutionDir = data?.FromReleaseExecutionDir
+            var fromConfigurationExecutionDir = data?.FromConfigurationExecutionDir
                                           ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            var toReleaseExecutionDir = data?.ToReleaseExecutionDir
+            var toConfigurationExecutionDir = data?.ToConfigurationExecutionDir
                                         ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
 
             var extractionErrors = this
-                .ExtractReleaseMigratorsAsync(migration.FromConfiguration, fromReleaseExecutionDir, migration.Id, forceExtract)
+                .ExtractConfigurationMigratorsAsync(migration.FromConfiguration, fromConfigurationExecutionDir, migration.Id, forceExtract)
                 .GetAwaiter().GetResult()
                 .Union(
-                    this.ExtractReleaseMigratorsAsync(
+                    this.ExtractConfigurationMigratorsAsync(
                         migration.ToConfiguration,
-                        toReleaseExecutionDir,
+                        toConfigurationExecutionDir,
                         migration.Id,
                         forceExtract).GetAwaiter().GetResult())
                 .ToList();
@@ -1152,8 +1172,8 @@ namespace KlusterKite.NodeManager
             data = new Data
                        {
                            Migration = migration,
-                           FromReleaseExecutionDir = fromReleaseExecutionDir,
-                           ToReleaseExecutionDir = toReleaseExecutionDir
+                           FromConfigurationExecutionDir = fromConfigurationExecutionDir,
+                           ToConfigurationExecutionDir = toConfigurationExecutionDir
                        };
 
             var state = this.GetMigrationState(data, out var errors);
@@ -1173,10 +1193,10 @@ namespace KlusterKite.NodeManager
         /// Loads current state without active migration
         /// </summary>
         /// <param name="configuration">
-        /// The currently active release
+        /// The currently active configuration
         /// </param>
         /// <param name="forceExtract">
-        /// A value indicating whether release Nuget packages should be overwritten
+        /// A value indicating whether configuration Nuget packages should be overwritten
         /// </param>
         /// <param name="data">
         /// Current actor state data
@@ -1184,33 +1204,33 @@ namespace KlusterKite.NodeManager
         /// <returns>
         /// The next actor state
         /// </returns>
-        private State<EnState, Data> LoadReleaseState(Configuration configuration, bool forceExtract, Data data)
+        private State<EnState, Data> LoadConfigurationState(Configuration configuration, bool forceExtract, Data data)
         {
-            var releaseExecutionDir = data?.ReleaseExecutionDir
+            var configurationExecutionDir = data?.ConfigurationExecutionDir
                                       ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            data = new Data { ReleaseExecutionDir = releaseExecutionDir, Configuration = configuration };
-            var extractionErrors = this.ExtractReleaseMigratorsAsync(configuration, releaseExecutionDir, null, forceExtract).GetAwaiter().GetResult();
+            data = new Data { ConfigurationExecutionDir = configurationExecutionDir, Configuration = configuration };
+            var extractionErrors = this.ExtractConfigurationMigratorsAsync(configuration, configurationExecutionDir, null, forceExtract).GetAwaiter().GetResult();
             if (extractionErrors.Any())
             {
                 this.Parent.Tell(new MigrationActorInitializationFailed { Errors = extractionErrors });
                 return new State<EnState, Data>(EnState.InitializationFailed, data);
             }
 
-            var releaseStates = this.GetReleaseResourcesState(configuration, releaseExecutionDir, null, out var errors).ToList();
+            var configurationStates = this.GetConfigurationResourcesState(configuration, configurationExecutionDir, null, out var errors).ToList();
             if (errors.Any())
             {
                 this.Parent.Tell(new MigrationActorInitializationFailed { Errors = errors });
                 return new State<EnState, Data>(EnState.InitializationFailed, data);
             }
 
-            data.ReleaseState =
-                new MigrationActorReleaseState
+            data.ConfigurationState =
+                new MigrationActorConfigurationState
                     {
                         States =
-                            releaseStates
+                            configurationStates
                     };
 
-            this.Parent.Tell(data.ReleaseState);
+            this.Parent.Tell(data.ConfigurationState);
             return new State<EnState, Data>(EnState.Idle, data);
         }
 
@@ -1246,8 +1266,8 @@ namespace KlusterKite.NodeManager
                     return this.LoadMigrationState(currentMigration, forceExtract, data);
                 }
 
-                var release = ds.Configurations.First(r => r.State == EnReleaseState.Active);
-                return this.LoadReleaseState(release, forceExtract, data);
+                var configuration = ds.Configurations.First(r => r.State == EnConfigurationState.Active);
+                return this.LoadConfigurationState(configuration, forceExtract, data);
             }
         }
 
@@ -1258,9 +1278,9 @@ namespace KlusterKite.NodeManager
         /// <returns>The next state</returns>
         private State<EnState, Data> StateIdleHandleResourceUpgrade(List<ResourceUpgrade> request)
         {
-            var plan = this.CreateReleasePlan(request, out var errors);
+            var plan = this.CreateConfigurationPlan(request, out var errors);
 
-            if (errors.Count != 0 || this.StateData.ReleaseState == null)
+            if (errors.Count != 0 || this.StateData.ConfigurationState == null)
             {
                 this.Sender.Tell(new RequestDeclined { Errors = errors });
                 return this.Stay();
@@ -1313,9 +1333,9 @@ namespace KlusterKite.NodeManager
         public class Data
         {
             /// <summary>
-            /// Gets or sets the directory to extract migrator code for the initial release configuration
+            /// Gets or sets the directory to extract migrator code for the initial configuration configuration
             /// </summary>
-            public string FromReleaseExecutionDir { get; set; }
+            public string FromConfigurationExecutionDir { get; set; }
 
             /// <summary>
             /// Gets or sets the current migration
@@ -1328,24 +1348,24 @@ namespace KlusterKite.NodeManager
             public MigrationActorMigrationState MigrationState { get; set; }
 
             /// <summary>
-            /// Gets or sets the current release
+            /// Gets or sets the current configuration
             /// </summary>
             public Configuration Configuration { get; set; }
 
             /// <summary>
-            /// Gets or sets the release execution directory 
+            /// Gets or sets the configuration execution directory 
             /// </summary>
-            public string ReleaseExecutionDir { get; set; }
+            public string ConfigurationExecutionDir { get; set; }
 
             /// <summary>
-            /// Gets or sets the current release
+            /// Gets or sets the current configuration
             /// </summary>
-            public MigrationActorReleaseState ReleaseState { get; set; }
+            public MigrationActorConfigurationState ConfigurationState { get; set; }
 
             /// <summary>
-            /// Gets or sets the directory to extract migrator code for the destination release configuration
+            /// Gets or sets the directory to extract migrator code for the destination configuration configuration
             /// </summary>
-            public string ToReleaseExecutionDir { get; set; }
+            public string ToConfigurationExecutionDir { get; set; }
         }
 
         /// <summary>
@@ -1354,13 +1374,13 @@ namespace KlusterKite.NodeManager
         private class MigrationPlan
         {
             /// <summary>
-            /// Gets the list of migrations that should be performed with the destination release code
+            /// Gets the list of migrations that should be performed with the destination configuration code
             /// </summary>
             public Dictionary<string, MigratorTemplatePlan> DestinationExecution { get; } =
                 new Dictionary<string, MigratorTemplatePlan>();
 
             /// <summary>
-            /// Gets the list of migrations that should be performed with the source release code
+            /// Gets the list of migrations that should be performed with the source configuration code
             /// </summary>
             public Dictionary<string, MigratorTemplatePlan> SourceExecution { get; } =
                 new Dictionary<string, MigratorTemplatePlan>();

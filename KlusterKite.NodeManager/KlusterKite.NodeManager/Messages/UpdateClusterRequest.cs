@@ -9,7 +9,6 @@
 
 namespace KlusterKite.NodeManager.Messages
 {
-    using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.Security.Attributes;
 
     /// <summary>
@@ -18,7 +17,7 @@ namespace KlusterKite.NodeManager.Messages
     public class UpdateClusterRequest
     {
         /// <summary>
-        /// Gets or sets the release id
+        /// Gets or sets the configuration id
         /// </summary>
         public int Id { get; set; }
 
@@ -26,10 +25,5 @@ namespace KlusterKite.NodeManager.Messages
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Context { get; set; }
-
-        /// <summary>
-        /// Gets or sets the new state of current release
-        /// </summary>
-        public EnReleaseState CurrentReleaseState { get; set; }
     }
 }

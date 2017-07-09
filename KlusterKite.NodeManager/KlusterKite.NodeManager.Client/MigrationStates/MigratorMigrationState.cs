@@ -54,12 +54,12 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         public EnMigrationDirection Direction { get; set; }
 
         /// <summary>
-        /// Creates <see cref="MigratorMigrationState"/> from <see cref="MigratorReleaseState"/>
+        /// Creates <see cref="MigratorMigrationState"/> from <see cref="MigratorConfigurationState"/>
         /// </summary>
         /// <param name="state">The state of template</param>
         /// <param name="position">The migration position</param>
         /// <returns>The new <see cref="MigratorTemplateMigrationState"/></returns>
-        public static MigratorMigrationState CreateFrom(MigratorReleaseState state, EnMigratorPosition position)
+        public static MigratorMigrationState CreateFrom(MigratorConfigurationState state, EnMigratorPosition position)
         {
             if (position != EnMigratorPosition.New && position != EnMigratorPosition.Obsolete)
             {

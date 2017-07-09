@@ -29,15 +29,15 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         public string Code { get; set; }
 
         /// <summary>
-        /// Gets or sets the migrator template from source release
+        /// Gets or sets the migrator template from source configuration
         /// </summary>
-        [DeclareField("the migrator template from source release")]
+        [DeclareField("the migrator template from source configuration")]
         public MigratorTemplate SourceTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the migrator template from destination release
+        /// Gets or sets the migrator template from destination configuration
         /// </summary>
-        [DeclareField("the migrator template from destination release")]
+        [DeclareField("the migrator template from destination configuration")]
         public MigratorTemplate DestinationTemplate { get; set; }
 
         /// <summary>
@@ -49,17 +49,17 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// <summary>
         /// Gets or sets the list of states of migrators
         /// </summary>
-        [DeclareField("the list of states of migratorsn")]
+        [DeclareField("the list of states of migrators")]
         public List<MigratorMigrationState> Migrators { get; set; }
 
         /// <summary>
-        /// Creates <see cref="MigratorTemplateMigrationState"/> from <see cref="MigratorTemplateReleaseState"/>
+        /// Creates <see cref="MigratorTemplateMigrationState"/> from <see cref="MigratorTemplateConfigurationState"/>
         /// </summary>
         /// <param name="state">The state of template</param>
         /// <param name="position">The template position</param>
         /// <returns>The new <see cref="MigratorTemplateMigrationState"/></returns>
         public static MigratorTemplateMigrationState CreateFrom(
-            MigratorTemplateReleaseState state,
+            MigratorTemplateConfigurationState state,
             EnMigratorPosition position)
         {
             if (position != EnMigratorPosition.New && position != EnMigratorPosition.Obsolete)

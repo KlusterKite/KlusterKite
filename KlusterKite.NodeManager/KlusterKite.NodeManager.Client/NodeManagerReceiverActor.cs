@@ -60,7 +60,7 @@ namespace KlusterKite.NodeManager.Client
                     NodeAddress = Cluster.Get(Context.System).SelfAddress,
                     NodeTemplate = config.GetString("KlusterKite.NodeManager.NodeTemplate"),
                     ContainerType = config.GetString("KlusterKite.NodeManager.ContainerType"),
-                    ReleaseId = config.GetInt("KlusterKite.NodeManager.ReleaseId"),
+                    ConfigurationId = config.GetInt("KlusterKite.NodeManager.ConfigurationId"),
                     NodeId = nodeId,
                     StartTimeStamp = this.startTimeStamp,
                     Roles = config.GetStringList("akka.cluster.roles")?.ToList() ?? new List<string>(),

@@ -27,9 +27,9 @@ namespace KlusterKite.NodeManager.Launcher.Messages
         public string NodeTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the node configuration release id
+        /// Gets or sets the node configuration id
         /// </summary>
-        public int ReleaseId { get; set; }
+        public int ConfigurationId { get; set; }
 
         /// <summary>
         /// Gets or sets list of packages to install on node

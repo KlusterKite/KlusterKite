@@ -27,7 +27,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Update="ReleaseExtensions.cs">
+    <Compile Update="ConfigurationExtensions.cs">
       <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
     </Compile>
   </ItemGroup>

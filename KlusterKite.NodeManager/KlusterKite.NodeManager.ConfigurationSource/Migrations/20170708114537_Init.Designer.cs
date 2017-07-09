@@ -11,7 +11,7 @@ using KlusterKite.NodeManager.Client.ORM;
 namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 {
     [DbContext(typeof(ConfigurationContext))]
-    [Migration("20170707132204_Init")]
+    [Migration("20170708114537_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,17 +25,17 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("serial");
 
-                    b.Property<int>("CompatibleReleaseId");
+                    b.Property<int>("CompatibleConfigurationId");
 
-                    b.Property<int>("ReleaseId");
+                    b.Property<int>("ConfigurationId");
 
                     b.Property<string>("TemplateCode");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompatibleReleaseId");
+                    b.HasIndex("CompatibleConfigurationId");
 
-                    b.HasIndex("ReleaseId");
+                    b.HasIndex("ConfigurationId");
 
                     b.ToTable("CompatibleTemplate");
                 });
@@ -106,6 +106,8 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("serial");
 
+                    b.Property<int>("ConfigurationId");
+
                     b.Property<string>("DestinationPoint");
 
                     b.Property<string>("ErrorMessage");
@@ -124,8 +126,6 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 
                     b.Property<string>("MigratorTypeName");
 
-                    b.Property<int>("ReleaseId");
-
                     b.Property<string>("ResourceCode");
 
                     b.Property<string>("ResourceName");
@@ -138,9 +138,9 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MigrationId");
+                    b.HasIndex("ConfigurationId");
 
-                    b.HasIndex("ReleaseId");
+                    b.HasIndex("MigrationId");
 
                     b.ToTable("MigrationLogRecords");
                 });
@@ -208,12 +208,12 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
                 {
                     b.HasOne("KlusterKite.NodeManager.Client.ORM.Configuration", "CompatibleConfiguration")
                         .WithMany("CompatibleTemplatesForward")
-                        .HasForeignKey("CompatibleReleaseId")
+                        .HasForeignKey("CompatibleConfigurationId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("KlusterKite.NodeManager.Client.ORM.Configuration", "Configuration")
                         .WithMany("CompatibleTemplatesBackward")
-                        .HasForeignKey("ReleaseId")
+                        .HasForeignKey("ConfigurationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -232,14 +232,14 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 
             modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.MigrationLogRecord", b =>
                 {
+                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Configuration", "Configuration")
+                        .WithMany("MigrationLogs")
+                        .HasForeignKey("ConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("KlusterKite.NodeManager.Client.ORM.Migration", "Migration")
                         .WithMany("Logs")
                         .HasForeignKey("MigrationId");
-
-                    b.HasOne("KlusterKite.NodeManager.Client.ORM.Configuration", "Configuration")
-                        .WithMany("MigrationLogs")
-                        .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("KlusterKite.NodeManager.Client.ORM.RoleUser", b =>

@@ -18,15 +18,15 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
     public enum EnMigrationActorMigrationPosition
     {
         /// <summary>
-        /// All resources are at the source release position
+        /// All resources are at the source configuration position
         /// </summary>
-        [ApiDescription("All resources are at the source release position")]
+        [ApiDescription("All resources are at the source configuration position")]
         Source = 1,
 
         /// <summary>
-        /// All resources are at the destination release position
+        /// All resources are at the destination configuration position
         /// </summary>
-        [ApiDescription("All resources are at the destination release position")]
+        [ApiDescription("All resources are at the destination configuration position")]
         Destination = 2,
 
         /// <summary>
@@ -36,9 +36,9 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
         PartiallyMigrated,
 
         /// <summary>
-        /// The two releases doesn't require resource migration
+        /// The two configurations doesn't require resource migration
         /// </summary>
-        [ApiDescription("The two releases doesn't require resource migration")]
+        [ApiDescription("The two configurations doesn't require resource migration")]
         NoMigrationNeeded,
 
         /// <summary>

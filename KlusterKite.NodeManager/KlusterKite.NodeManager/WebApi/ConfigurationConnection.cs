@@ -1,9 +1,9 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseConnection.cs" company="KlusterKite">
+// <copyright file="ConfigurationConnection.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Defines the ReleaseConnection type.
+//   The configuration management
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,12 +28,12 @@ namespace KlusterKite.NodeManager.WebApi
     using KlusterKite.Web.Authorization.Attributes;
 
     /// <summary>
-    /// The release management
+    /// The configuration management
     /// </summary>
-    public class ReleaseConnection : Connection<Configuration, int>
+    public class ConfigurationConnection : Connection<Configuration, int>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReleaseConnection"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationConnection"/> class.
         /// </summary>
         /// <param name="actorSystem">
         /// The actor system.
@@ -47,7 +47,7 @@ namespace KlusterKite.NodeManager.WebApi
         /// <param name="context">
         /// The context.
         /// </param>
-        public ReleaseConnection(
+        public ConfigurationConnection(
             ActorSystem actorSystem,
             string dataActorPath,
             TimeSpan? timeout,
@@ -57,15 +57,15 @@ namespace KlusterKite.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Checks the draft release if it can be moved to ready state.
+        /// Checks the draft configuration if it can be moved to ready state.
         /// </summary>
-        /// <param name="id">The id of release draft</param>
+        /// <param name="id">The id of configuration draft</param>
         /// <returns>The mutation result</returns>
-        [DeclareMutation("checks the draft release if it can be moved to ready state.")]
+        [DeclareMutation("checks the draft configuration if it can be moved to ready state.")]
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
-        [RequireUserPrivilege(Privileges.ReleaseFinish)]
+        [RequireUserPrivilege(Privileges.ConfigurationFinish)]
         public async Task<MutationResult<Configuration>> Check(int id)
         {
             try
@@ -73,7 +73,7 @@ namespace KlusterKite.NodeManager.WebApi
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
                         .Ask<CrudActionResponse<Configuration>>(
-                            new ReleaseCheckRequest { Id = id, Context = this.Context },
+                            new ConfigurationCheckRequest { Id = id, Context = this.Context },
                             this.Timeout);
                 return CreateResponse(response);
             }
@@ -85,15 +85,15 @@ namespace KlusterKite.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Mutation that moves <see cref="Configuration.State"/> from <see cref="EnReleaseState.Draft"/> to <see cref="EnReleaseState.Ready"/>
+        /// Mutation that moves <see cref="Configuration.State"/> from <see cref="EnConfigurationState.Draft"/> to <see cref="EnConfigurationState.Ready"/>
         /// </summary>
-        /// <param name="id">The id of release draft</param>
+        /// <param name="id">The id of configuration draft</param>
         /// <returns>The mutation result</returns>
-        [DeclareMutation("moves release state from \"draft\" to \"ready\"")]
+        [DeclareMutation("moves configuration state from \"draft\" to \"ready\"")]
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
-        [RequireUserPrivilege(Privileges.ReleaseFinish)]
+        [RequireUserPrivilege(Privileges.ConfigurationFinish)]
         public async Task<MutationResult<Configuration>> SetReady(int id)
         {
             try
@@ -101,7 +101,7 @@ namespace KlusterKite.NodeManager.WebApi
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
                         .Ask<CrudActionResponse<Configuration>>(
-                            new ReleaseSetReadyRequest { Id = id, Context = this.Context },
+                            new ConfigurationSetReadyRequest { Id = id, Context = this.Context },
                             this.Timeout);
                 return CreateResponse(response);
             }
@@ -113,15 +113,15 @@ namespace KlusterKite.NodeManager.WebApi
         }
 
         /// <summary>
-        /// Mutation that moves <see cref="Configuration.State"/> from <see cref="EnReleaseState.Ready"/> to <see cref="EnReleaseState.Obsolete"/>
+        /// Mutation that moves <see cref="Configuration.State"/> from <see cref="EnConfigurationState.Ready"/> to <see cref="EnConfigurationState.Obsolete"/>
         /// </summary>
-        /// <param name="id">The id of release draft</param>
+        /// <param name="id">The id of configuration draft</param>
         /// <returns>The mutation result</returns>
-        [DeclareMutation("moves release state from \"ready\" to \"obsolete\"")]
+        [DeclareMutation("moves configuration state from \"ready\" to \"obsolete\"")]
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
-        [RequireUserPrivilege(Privileges.ReleaseFinish)]
+        [RequireUserPrivilege(Privileges.ConfigurationFinish)]
         public async Task<MutationResult<Configuration>> SetObsolete(int id)
         {
             try
@@ -129,7 +129,7 @@ namespace KlusterKite.NodeManager.WebApi
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
                         .Ask<CrudActionResponse<Configuration>>(
-                            new ReleaseSetObsoleteRequest { Id = id, Context = this.Context },
+                            new ConfigurationSetObsoleteRequest { Id = id, Context = this.Context },
                             this.Timeout);
                 return CreateResponse(response);
             }
@@ -143,14 +143,14 @@ namespace KlusterKite.NodeManager.WebApi
         /// <summary>
         /// Mutation that sets the <see cref="Configuration.IsStable"/>
         /// </summary>
-        /// <param name="id">The id of release draft</param>
+        /// <param name="id">The id of configuration draft</param>
         /// <param name="isStable">A value indicating the new <see cref="Configuration.IsStable"/> value</param>
         /// <returns>The mutation result</returns>-
         [UsedImplicitly]
         [RequireSession]
         [RequireUser]
         [RequireUserPrivilege(Privileges.ClusterUpdate)]
-        [DeclareMutation("moves release state from \"draft\" to \"ready\"")]
+        [DeclareMutation("moves configuration state from \"draft\" to \"ready\"")]
         public async Task<MutationResult<Configuration>> SetStable(int id, bool isStable)
         {
             try
@@ -158,7 +158,7 @@ namespace KlusterKite.NodeManager.WebApi
                 var response =
                     await this.System.ActorSelection(this.DataActorPath)
                         .Ask<CrudActionResponse<Configuration>>(
-                            new ReleaseSetStableRequest { Id = id, Context = this.Context, IsStable = isStable },
+                            new ConfigurationSetStableRequest { Id = id, Context = this.Context, IsStable = isStable },
                             this.Timeout);
                 return CreateResponse(response);
             }

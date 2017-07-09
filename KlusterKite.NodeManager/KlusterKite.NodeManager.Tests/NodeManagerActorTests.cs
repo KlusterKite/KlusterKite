@@ -188,38 +188,38 @@ namespace KlusterKite.NodeManager.Tests
         [Fact]
         public async Task NodeWithCompatibleTemplateTest()
         {
-            int newReleaseId;
+            int newConfigurationId;
             using (var context = this.GetContext())
             {
-                var oldRelease = context.Configurations.First(r => r.State == EnReleaseState.Active);
-                oldRelease.State = EnReleaseState.Obsolete;
+                var oldConfiguration = context.Configurations.First(r => r.State == EnConfigurationState.Active);
+                oldConfiguration.State = EnConfigurationState.Obsolete;
 
-                var newRelease = ReleaseCheckTestsBase.CreateRelease();
-                newRelease.State = EnReleaseState.Active;
-                newRelease.Settings.SeedAddresses = new List<string>();
-                newRelease.Settings.NugetFeed = "http://nuget/";
-                newRelease.Settings.NodeTemplates[0].MinimumRequiredInstances = 2;
-                newRelease.Settings.NodeTemplates[0].PackagesToInstall =
+                var newConfiguration = ConfigurationCheckTestsBase.CreateConfiguration();
+                newConfiguration.State = EnConfigurationState.Active;
+                newConfiguration.Settings.SeedAddresses = new List<string>();
+                newConfiguration.Settings.NugetFeed = "http://nuget/";
+                newConfiguration.Settings.NodeTemplates[0].MinimumRequiredInstances = 2;
+                newConfiguration.Settings.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
-                            [ReleaseCheckTestsBase.Net46] =
+                            [ConfigurationCheckTestsBase.Net46] =
                             new List<PackageDescription>(
-                                newRelease.Settings.Packages)
+                                newConfiguration.Settings.Packages)
                         };
 
-                newRelease.CompatibleTemplatesBackward =
+                newConfiguration.CompatibleTemplatesBackward =
                     new List<CompatibleTemplate>
                         {
                             new CompatibleTemplate
                                 {
-                                    CompatibleReleaseId = 1,
+                                    CompatibleConfigurationId = 1,
                                     TemplateCode = "t1"
                                 }
                         };
 
-                context.Configurations.Add(newRelease);
+                context.Configurations.Add(newConfiguration);
                 context.SaveChanges();
-                newReleaseId = newRelease.Id;
+                newConfigurationId = newConfiguration.Id;
             }
 
             var router = (TestMessageRouter)this.Container.Resolve<IMessageRouter>();
@@ -228,7 +228,7 @@ namespace KlusterKite.NodeManager.Tests
             var testActor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
             this.ExpectNoMsg();
             var activeNode = new VirtualNode(1, testActor, this.Sys, 1);
-            var obsoleteNode = new VirtualNode(2, testActor, this.Sys, newReleaseId);
+            var obsoleteNode = new VirtualNode(2, testActor, this.Sys, newConfigurationId);
             router.RegisterVirtualNode(activeNode.Address.Address, activeNode.Client);
             router.RegisterVirtualNode(obsoleteNode.Address.Address, obsoleteNode.Client);
             activeNode.GoUp();
@@ -277,7 +277,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -314,10 +314,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -332,7 +332,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -369,10 +369,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -390,7 +390,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -407,7 +407,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -421,17 +421,17 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnReleaseState.Active, sourceRelease.State);
-                Assert.Equal(EnReleaseState.Obsolete, destinationRelease.State);
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                Assert.Equal(EnConfigurationState.Active, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Obsolete, destinationConfiguration.State);
             }
 
             this.CheckNodesUpgrade(1, node1, node2, node3);
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -481,7 +481,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -500,7 +500,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -514,17 +514,17 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnReleaseState.Faulted, sourceRelease.State);
-                Assert.Equal(EnReleaseState.Active, destinationRelease.State);
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                Assert.Equal(EnConfigurationState.Faulted, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Active, destinationConfiguration.State);
             }
 
             this.CheckNodesUpgrade(2, node1, node2, node3);
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -556,10 +556,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -574,7 +574,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -600,7 +600,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectMsg<List<ResourceUpgrade>>("/user/migrationActor");
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -622,7 +622,7 @@ namespace KlusterKite.NodeManager.Tests
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -654,10 +654,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -672,7 +672,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -698,7 +698,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectMsg<List<ResourceUpgrade>>("/user/migrationActor");
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -720,7 +720,7 @@ namespace KlusterKite.NodeManager.Tests
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -766,7 +766,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -803,10 +803,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -821,7 +821,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -858,10 +858,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -880,7 +880,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -897,7 +897,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -911,17 +911,17 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnReleaseState.Active, sourceRelease.State);
-                Assert.Equal(EnReleaseState.Faulted, destinationRelease.State);
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                Assert.Equal(EnConfigurationState.Active, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Faulted, destinationConfiguration.State);
             }
 
             this.CheckNodesUpgrade(1, node1, node2, node3);
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -971,7 +971,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -990,7 +990,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1004,17 +1004,17 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnReleaseState.Obsolete, sourceRelease.State);
-                Assert.Equal(EnReleaseState.Active, destinationRelease.State);
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                Assert.Equal(EnConfigurationState.Obsolete, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Active, destinationConfiguration.State);
             }
 
             this.CheckNodesUpgrade(2, node1, node2, node3);
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1060,7 +1060,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1097,10 +1097,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -1115,7 +1115,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1152,10 +1152,10 @@ namespace KlusterKite.NodeManager.Tests
                                         State = EnMigrationState.Ready
                                     };
                 ds.Migrations.Add(migration);
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                sourceRelease.State = EnReleaseState.Obsolete;
-                destinationRelease.State = EnReleaseState.Active;
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                sourceConfiguration.State = EnConfigurationState.Obsolete;
+                destinationConfiguration.State = EnConfigurationState.Active;
                 ds.SaveChanges();
             }
 
@@ -1174,7 +1174,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1191,7 +1191,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1205,17 +1205,17 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnReleaseState.Active, sourceRelease.State);
-                Assert.Equal(EnReleaseState.Faulted, destinationRelease.State);
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                Assert.Equal(EnConfigurationState.Active, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Faulted, destinationConfiguration.State);
             }
 
             this.CheckNodesUpgrade(1, node1, node2, node3);
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1265,7 +1265,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1284,7 +1284,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1298,17 +1298,17 @@ namespace KlusterKite.NodeManager.Tests
 
             using (var ds = this.GetContext())
             {
-                var sourceRelease = ds.Configurations.First(r => r.Id == 1);
-                var destinationRelease = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnReleaseState.Obsolete, sourceRelease.State);
-                Assert.Equal(EnReleaseState.Active, destinationRelease.State);
+                var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
+                var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
+                Assert.Equal(EnConfigurationState.Obsolete, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Active, destinationConfiguration.State);
             }
 
             this.CheckNodesUpgrade(2, node1, node2, node3);
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1354,7 +1354,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1380,7 +1380,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectMsg<List<ResourceUpgrade>>("/user/migrationActor");
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1402,7 +1402,7 @@ namespace KlusterKite.NodeManager.Tests
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1448,7 +1448,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1474,7 +1474,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectMsg<List<ResourceUpgrade>>("/user/migrationActor");
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1496,7 +1496,7 @@ namespace KlusterKite.NodeManager.Tests
 
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1514,17 +1514,17 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateBrokenResourceTest()
+        public async Task ResourceConfigurationStateBrokenResourceTest()
         {
             var actor = this.CreateActor(1);
-            var migrationActorReleaseState =
-                this.CreateMigrationActorReleaseState("third", new[] { "first", "second" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("third", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
             Assert.Null(state.MigrationState);
-            Assert.NotNull(state.ReleaseState);
+            Assert.NotNull(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1539,12 +1539,12 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateInitializationTest()
+        public async Task ResourceConfigurationStateInitializationTest()
         {
             var actor = this.CreateActor(1);
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1562,12 +1562,12 @@ namespace KlusterKite.NodeManager.Tests
         /// Migration that updates one resources and downgrades other are not supported
         /// </remarks>
         [Fact]
-        public async Task ResourceReleaseStateMigrationCreateDirectionConflictTest()
+        public async Task ResourceConfigurationStateMigrationCreateDirectionConflictTest()
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorReleaseState = this.CreateMigrationActorReleaseState("first", new[] { "first" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var migration =
@@ -1585,7 +1585,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1609,7 +1609,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1632,13 +1632,13 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateMigrationCreateDowngradeTest()
+        public async Task ResourceConfigurationStateMigrationCreateDowngradeTest()
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorReleaseState =
-                this.CreateMigrationActorReleaseState("second", new[] { "first", "second" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("second", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var migration =
@@ -1655,7 +1655,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1680,7 +1680,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1706,12 +1706,12 @@ namespace KlusterKite.NodeManager.Tests
         /// Migration that updates one resources and downgrades other are not supported
         /// </remarks>
         [Fact]
-        public async Task ResourceReleaseStateMigrationCreateFailedTest()
+        public async Task ResourceConfigurationStateMigrationCreateFailedTest()
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorReleaseState = this.CreateMigrationActorReleaseState("first", new[] { "first" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var migration =
@@ -1729,7 +1729,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1748,7 +1748,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1771,12 +1771,12 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateMigrationCreateResourcesUnchangedTest()
+        public async Task ResourceConfigurationStateMigrationCreateResourcesUnchangedTest()
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorReleaseState = this.CreateMigrationActorReleaseState("first", new[] { "first" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var migration =
@@ -1793,7 +1793,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1818,7 +1818,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1840,12 +1840,12 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateMigrationCreateUpgradeTest()
+        public async Task ResourceConfigurationStateMigrationCreateUpgradeTest()
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorReleaseState = this.CreateMigrationActorReleaseState("first", new[] { "first" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var migration =
@@ -1862,7 +1862,7 @@ namespace KlusterKite.NodeManager.Tests
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.Null(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.True(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1887,7 +1887,7 @@ namespace KlusterKite.NodeManager.Tests
             this.ExpectNoMsg();
             state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
             Assert.NotNull(state.MigrationState);
-            Assert.Null(state.ReleaseState);
+            Assert.Null(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.True(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1910,15 +1910,15 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateOkTest()
+        public async Task ResourceConfigurationStateOkTest()
         {
             var actor = this.CreateActor(1);
-            var migrationActorReleaseState = this.CreateMigrationActorReleaseState("first", new[] { "first" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
             Assert.Null(state.MigrationState);
-            Assert.NotNull(state.ReleaseState);
+            Assert.NotNull(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.True(state.CanCreateMigration);
@@ -1936,25 +1936,25 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateUnmigratedNodeTest()
+        public async Task ResourceConfigurationStateUnmigratedNodeTest()
         {
             using (var context = this.GetContext())
             {
-                var release = context.Configurations.First(r => r.State == EnReleaseState.Active);
-                release.Settings.NodeTemplates.First().MinimumRequiredInstances = 100;
+                var configuration = context.Configurations.First(r => r.State == EnConfigurationState.Active);
+                configuration.Settings.NodeTemplates.First().MinimumRequiredInstances = 100;
                 context.SaveChanges();
             }
 
             var actor = this.CreateActor(0);
 
-            var migrationActorReleaseState =
-                this.CreateMigrationActorReleaseState("second", new[] { "first", "second" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("second", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
             Assert.Null(state.MigrationState);
-            Assert.NotNull(state.ReleaseState);
+            Assert.NotNull(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -1969,17 +1969,17 @@ namespace KlusterKite.NodeManager.Tests
         /// </summary>
         /// <returns>The resource states</returns>
         [Fact]
-        public async Task ResourceReleaseStateUnmigratedResourceTest()
+        public async Task ResourceConfigurationStateUnmigratedResourceTest()
         {
             var actor = this.CreateActor(1);
-            var migrationActorReleaseState =
-                this.CreateMigrationActorReleaseState("first", new[] { "first", "second" });
-            actor.Tell(migrationActorReleaseState);
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("first", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
             Assert.Null(state.MigrationState);
-            Assert.NotNull(state.ReleaseState);
+            Assert.NotNull(state.ConfigurationState);
             Assert.False(state.OperationIsInProgress);
             Assert.False(state.CanCancelMigration);
             Assert.False(state.CanCreateMigration);
@@ -2000,33 +2000,33 @@ namespace KlusterKite.NodeManager.Tests
         {
             using (var context = this.GetContext())
             {
-                var release = context.Configurations.First(r => r.State == EnReleaseState.Active);
+                var configuration = context.Configurations.First(r => r.State == EnConfigurationState.Active);
 
-                var template1 = ReleaseCheckTestsBase.CreateRelease().Settings.NodeTemplates.First();
+                var template1 = ConfigurationCheckTestsBase.CreateConfiguration().Settings.NodeTemplates.First();
                 template1.Code = "t1";
                 template1.Priority = 1;
                 template1.PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
                             {
-                                ReleaseCheckTestsBase.Net46,
+                                ConfigurationCheckTestsBase.Net46,
                                 new List<PackageDescription>()
                             }
                         };
 
-                var template2 = ReleaseCheckTestsBase.CreateRelease().Settings.NodeTemplates.First();
+                var template2 = ConfigurationCheckTestsBase.CreateConfiguration().Settings.NodeTemplates.First();
                 template2.Code = "t2";
                 template2.Priority = 1000000;
                 template2.PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
                             {
-                                ReleaseCheckTestsBase.Net46,
+                                ConfigurationCheckTestsBase.Net46,
                                 new List<PackageDescription>()
                             }
                         };
 
-                release.Settings.NodeTemplates = new[] { template1, template2 }.ToList();
+                configuration.Settings.NodeTemplates = new[] { template1, template2 }.ToList();
                 context.SaveChanges();
             }
 
@@ -2037,7 +2037,7 @@ namespace KlusterKite.NodeManager.Tests
                                 new AvailableTemplatesRequest
                                     {
                                         ContainerType = "test",
-                                        FrameworkRuntimeType = ReleaseCheckTestsBase.Net46
+                                        FrameworkRuntimeType = ConfigurationCheckTestsBase.Net46
                                     },
                                 TimeSpan.FromSeconds(1));
             Assert.NotNull(templates);
@@ -2047,7 +2047,7 @@ namespace KlusterKite.NodeManager.Tests
                                   new NewNodeTemplateRequest
                                       {
                                           ContainerType = "test",
-                                          FrameworkRuntimeType = ReleaseCheckTestsBase.Net46,
+                                          FrameworkRuntimeType = ConfigurationCheckTestsBase.Net46,
                                           NodeUid = Guid.NewGuid()
                                       },
                                   TimeSpan.FromSeconds(1));
@@ -2065,31 +2065,31 @@ namespace KlusterKite.NodeManager.Tests
         /// <summary>
         /// Check the node upgrade process
         /// </summary>
-        /// <param name="newReleaseId">The new node releases</param>
+        /// <param name="newConfigurationId">The new node configurations</param>
         /// <param name="node1">The node 1</param>
         /// <param name="node2">The node 2</param>
         /// <param name="node3">The node 3</param>
-        private void CheckNodesUpgrade(int newReleaseId, VirtualNode node1, VirtualNode node2, VirtualNode node3)
+        private void CheckNodesUpgrade(int newConfigurationId, VirtualNode node1, VirtualNode node2, VirtualNode node3)
         {
             Assert.False(node1.IsUp);
             Assert.True(node2.IsUp);
             Assert.True(node3.IsUp);
             node1.Description.StartTimeStamp = VirtualNode.GetNextTime();
-            node1.Description.ReleaseId = newReleaseId;
+            node1.Description.ConfigurationId = newConfigurationId;
             node1.GoUp();
             this.ExpectNoMsg();
             Assert.True(node1.IsUp);
             Assert.False(node2.IsUp);
             Assert.True(node3.IsUp);
             node2.Description.StartTimeStamp = VirtualNode.GetNextTime();
-            node2.Description.ReleaseId = newReleaseId;
+            node2.Description.ConfigurationId = newConfigurationId;
             node2.GoUp();
             this.ExpectNoMsg();
             Assert.True(node1.IsUp);
             Assert.True(node2.IsUp);
             Assert.False(node3.IsUp);
             node3.Description.StartTimeStamp = VirtualNode.GetNextTime();
-            node3.Description.ReleaseId = newReleaseId;
+            node3.Description.ConfigurationId = newConfigurationId;
             node3.GoUp();
             this.ExpectNoMsg();
         }
@@ -2097,25 +2097,25 @@ namespace KlusterKite.NodeManager.Tests
         /// <summary>
         /// Initializes the <see cref="NodeManagerActor"/>
         /// </summary>
-        /// <param name="releaseId">
-        /// The node release Id.
+        /// <param name="configurationId">
+        /// The node configuration Id.
         /// </param>
         /// <returns>
         /// The reference to the actor
         /// </returns>
-        private IActorRef CreateActor(int releaseId)
+        private IActorRef CreateActor(int configurationId)
         {
             VirtualNode node1;
             VirtualNode node2;
             VirtualNode node3;
-            return this.CreateActor(releaseId, out node1, out node2, out node3);
+            return this.CreateActor(configurationId, out node1, out node2, out node3);
         }
 
         /// <summary>
         /// Initializes the <see cref="NodeManagerActor"/>
         /// </summary>
-        /// <param name="releaseId">
-        /// The node release Id.
+        /// <param name="configurationId">
+        /// The node configuration Id.
         /// </param>
         /// <param name="node1">
         /// The node 1.
@@ -2130,7 +2130,7 @@ namespace KlusterKite.NodeManager.Tests
         /// The reference to the actor
         /// </returns>
         private IActorRef CreateActor(
-            int releaseId,
+            int configurationId,
             out VirtualNode node1,
             out VirtualNode node2,
             out VirtualNode node3)
@@ -2140,13 +2140,13 @@ namespace KlusterKite.NodeManager.Tests
 
             // ReSharper disable once StringLiteralTypo
             var actor = this.ActorOf(this.Sys.DI().Props<NodeManagerActor>(), "nodemanager");
-            node1 = new VirtualNode(1, actor, this.Sys, releaseId);
+            node1 = new VirtualNode(1, actor, this.Sys, configurationId);
             router.RegisterVirtualNode(node1.Address.Address, node1.Client);
             node1.GoUp();
-            node2 = new VirtualNode(2, actor, this.Sys, releaseId);
+            node2 = new VirtualNode(2, actor, this.Sys, configurationId);
             router.RegisterVirtualNode(node2.Address.Address, node2.Client);
             node2.GoUp();
-            node3 = new VirtualNode(3, actor, this.Sys, releaseId);
+            node3 = new VirtualNode(3, actor, this.Sys, configurationId);
             router.RegisterVirtualNode(node3.Address.Address, node3.Client);
             node3.GoUp();
             this.ExpectNoMsg();
@@ -2160,10 +2160,10 @@ namespace KlusterKite.NodeManager.Tests
         /// The list of migration point for resources
         /// </param>
         /// <param name="sourcePoints">
-        /// The list of defined migration points for resources in source release
+        /// The list of defined migration points for resources in source configuration
         /// </param>
         /// <param name="destinationPoints">
-        /// The list of defined migration points for resources in destination release
+        /// The list of defined migration points for resources in destination configuration
         /// </param>
         /// <returns>
         /// the migration actor state
@@ -2298,15 +2298,15 @@ namespace KlusterKite.NodeManager.Tests
         /// Creates the migration actor state without active migration
         /// </summary>
         /// <param name="resourcePoint">The resource current state</param>
-        /// <param name="releasePoints">The release defined points</param>
+        /// <param name="configurationPoints">The configuration defined points</param>
         /// <returns>the migration actor state</returns>
-        private MigrationActorReleaseState CreateMigrationActorReleaseState(
+        private MigrationActorConfigurationState CreateMigrationActorConfigurationState(
             string resourcePoint,
-            string[] releasePoints)
+            string[] configurationPoints)
         {
             var resources = new[]
                                 {
-                                    new ResourceReleaseState
+                                    new ResourceConfigurationState
                                         {
                                             Code = "test",
                                             CurrentPoint = resourcePoint,
@@ -2315,11 +2315,11 @@ namespace KlusterKite.NodeManager.Tests
                                 }.ToList();
             var migratorsStates = new[]
                                       {
-                                          new MigratorReleaseState
+                                          new MigratorConfigurationState
                                               {
-                                                  LastDefinedPoint = releasePoints.Last(),
+                                                  LastDefinedPoint = configurationPoints.Last(),
                                                   Name = "test migrator",
-                                                  MigrationPoints = releasePoints.ToList(),
+                                                  MigrationPoints = configurationPoints.ToList(),
                                                   TypeName = "TestMigrator",
                                                   Resources = resources
                                               }
@@ -2328,7 +2328,7 @@ namespace KlusterKite.NodeManager.Tests
             var migratorTemplate = new MigratorTemplate { Code = "test" };
             var templateStates = new[]
                                      {
-                                         new MigratorTemplateReleaseState
+                                         new MigratorTemplateConfigurationState
                                              {
                                                  Code = "test",
                                                  Template = migratorTemplate,
@@ -2336,8 +2336,8 @@ namespace KlusterKite.NodeManager.Tests
                                              }
                                      }.ToList();
 
-            var migrationActorReleaseState = new MigrationActorReleaseState { States = templateStates };
-            return migrationActorReleaseState;
+            var migrationActorConfigurationState = new MigrationActorConfigurationState { States = templateStates };
+            return migrationActorConfigurationState;
         }
 
         /// <summary>
@@ -2486,14 +2486,14 @@ namespace KlusterKite.NodeManager.Tests
                     context.ResetValueGenerators();
                     context.Database.EnsureDeleted();
 
-                    context.Configurations.Add(CreateRelease());
-                    var release = CreateRelease();
-                    release.State = EnReleaseState.Ready;
-                    context.Configurations.Add(release);
+                    context.Configurations.Add(CreateConfiguration());
+                    var configuration = CreateConfiguration();
+                    configuration.State = EnConfigurationState.Ready;
+                    context.Configurations.Add(configuration);
                     context.SaveChanges();
                     componentContext.Resolve<ActorSystem>().Log.Info(
-                        "!!! Created release with id {ReleaseId} in Database {ConnectionString}",
-                        release.Id,
+                        "!!! Created configuration with id {ConfigurationId} in Database {ConnectionString}",
+                        configuration.Id,
                         connectionString);
                 }
             }
@@ -2506,31 +2506,31 @@ namespace KlusterKite.NodeManager.Tests
                 container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
                     .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
 
-                container.RegisterType<ReleaseDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
+                container.RegisterType<ConfigurationDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
                 var packageRepository = this.CreateTestRepository();
                 container.RegisterInstance(packageRepository).As<IPackageRepository>();
                 container.RegisterType<TestMessageRouter>().As<IMessageRouter>().SingleInstance();
             }
 
             /// <summary>
-            /// Creates a new release object
+            /// Creates a new configuration object
             /// </summary>
-            /// <returns>The release object</returns>
-            private static Configuration CreateRelease()
+            /// <returns>The configuration object</returns>
+            private static Configuration CreateConfiguration()
             {
-                var release = ReleaseCheckTestsBase.CreateRelease();
-                release.State = EnReleaseState.Active;
-                release.Settings.SeedAddresses = new List<string>();
-                release.Settings.NugetFeed = "http://nuget/";
-                release.Settings.NodeTemplates[0].MinimumRequiredInstances = 2;
-                release.Settings.NodeTemplates[0].PackagesToInstall =
+                var configuration = ConfigurationCheckTestsBase.CreateConfiguration();
+                configuration.State = EnConfigurationState.Active;
+                configuration.Settings.SeedAddresses = new List<string>();
+                configuration.Settings.NugetFeed = "http://nuget/";
+                configuration.Settings.NodeTemplates[0].MinimumRequiredInstances = 2;
+                configuration.Settings.NodeTemplates[0].PackagesToInstall =
                     new Dictionary<string, List<PackageDescription>>
                         {
-                            [ReleaseCheckTestsBase.Net46] =
+                            [ConfigurationCheckTestsBase.Net46] =
                             new List<PackageDescription>(
-                                release.Settings.Packages)
+                                configuration.Settings.Packages)
                         };
-                return release;
+                return configuration;
             }
 
             /// <summary>
@@ -2539,95 +2539,95 @@ namespace KlusterKite.NodeManager.Tests
             /// <returns>The test repository</returns>
             private IPackageRepository CreateTestRepository()
             {
-                var p1 = new ReleaseCheckTestsBase.TestPackage("p1", "1.0.0")
+                var p1 = new ConfigurationCheckTestsBase.TestPackage("p1", "1.0.0")
                              {
                                  DependencySets =
                                      new[]
                                          {
-                                             ReleaseCheckTestsBase
+                                             ConfigurationCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ReleaseCheckTestsBase
+                                                     ConfigurationCheckTestsBase
                                                          .Net46,
                                                      "dp1 1.0.0")
                                          }
                              };
 
-                var p2 = new ReleaseCheckTestsBase.TestPackage("p2", "1.0.0")
+                var p2 = new ConfigurationCheckTestsBase.TestPackage("p2", "1.0.0")
                              {
                                  DependencySets =
                                      new[]
                                          {
-                                             ReleaseCheckTestsBase
+                                             ConfigurationCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ReleaseCheckTestsBase
+                                                     ConfigurationCheckTestsBase
                                                          .Net46,
                                                      "dp2 1.0.0")
                                          }
                              };
 
-                var p3 = new ReleaseCheckTestsBase.TestPackage("p3", "1.0.0")
+                var p3 = new ConfigurationCheckTestsBase.TestPackage("p3", "1.0.0")
                              {
                                  DependencySets =
                                      new[]
                                          {
-                                             ReleaseCheckTestsBase
+                                             ConfigurationCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ReleaseCheckTestsBase
+                                                     ConfigurationCheckTestsBase
                                                          .Net46,
                                                      "dp3 2.0.0")
                                          }
                              };
-                var dp1 = new ReleaseCheckTestsBase.TestPackage("dp1", "1.0.0");
+                var dp1 = new ConfigurationCheckTestsBase.TestPackage("dp1", "1.0.0");
 
-                var dp2 = new ReleaseCheckTestsBase.TestPackage("dp2", "1.0.0");
+                var dp2 = new ConfigurationCheckTestsBase.TestPackage("dp2", "1.0.0");
 
-                var dp3 = new ReleaseCheckTestsBase.TestPackage("dp3", "1.0.0");
+                var dp3 = new ConfigurationCheckTestsBase.TestPackage("dp3", "1.0.0");
 
-                var p12 = new ReleaseCheckTestsBase.TestPackage("p1", "2.0.0")
+                var p12 = new ConfigurationCheckTestsBase.TestPackage("p1", "2.0.0")
                               {
                                   DependencySets =
                                       new[]
                                           {
-                                              ReleaseCheckTestsBase
+                                              ConfigurationCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ReleaseCheckTestsBase
+                                                      ConfigurationCheckTestsBase
                                                           .Net46,
                                                       "dp1 2.0.0")
                                           }
                               };
 
-                var p22 = new ReleaseCheckTestsBase.TestPackage("p2", "2.0.0")
+                var p22 = new ConfigurationCheckTestsBase.TestPackage("p2", "2.0.0")
                               {
                                   DependencySets =
                                       new[]
                                           {
-                                              ReleaseCheckTestsBase
+                                              ConfigurationCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ReleaseCheckTestsBase
+                                                      ConfigurationCheckTestsBase
                                                           .Net46,
                                                       "dp2 2.0.0")
                                           }
                               };
 
-                var p32 = new ReleaseCheckTestsBase.TestPackage("p3", "2.0.0")
+                var p32 = new ConfigurationCheckTestsBase.TestPackage("p3", "2.0.0")
                               {
                                   DependencySets =
                                       new[]
                                           {
-                                              ReleaseCheckTestsBase
+                                              ConfigurationCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ReleaseCheckTestsBase
+                                                      ConfigurationCheckTestsBase
                                                           .Net46,
                                                       "dp3 2.0.0")
                                           }
                               };
-                var dp12 = new ReleaseCheckTestsBase.TestPackage("dp1", "2.0.0");
+                var dp12 = new ConfigurationCheckTestsBase.TestPackage("dp1", "2.0.0");
 
-                var dp22 = new ReleaseCheckTestsBase.TestPackage("dp2", "2.0.0");
+                var dp22 = new ConfigurationCheckTestsBase.TestPackage("dp2", "2.0.0");
 
-                var dp32 = new ReleaseCheckTestsBase.TestPackage("dp3", "2.0.0");
+                var dp32 = new ConfigurationCheckTestsBase.TestPackage("dp3", "2.0.0");
 
-                return new ReleaseCheckTestsBase.TestRepository(
+                return new ConfigurationCheckTestsBase.TestRepository(
                     p1,
                     p2,
                     p3,
@@ -2675,8 +2675,8 @@ namespace KlusterKite.NodeManager.Tests
             /// <param name="system">
             ///     The system.
             /// </param>
-            /// <param name="releaseId">
-            ///     The installed release id
+            /// <param name="configurationId">
+            ///     The installed configuration id
             /// </param>
             /// <param name="template">
             ///     The installed template
@@ -2685,7 +2685,7 @@ namespace KlusterKite.NodeManager.Tests
                 int num,
                 IActorRef nodeManager,
                 ActorSystem system,
-                int? releaseId = null,
+                int? configurationId = null,
                 string template = null)
             {
                 this.nodeManager = nodeManager;
@@ -2699,7 +2699,7 @@ namespace KlusterKite.NodeManager.Tests
                                            NodeId = this.NodeId,
                                            NodeTemplate = template ?? "t1",
                                            StartTimeStamp = GetNextTime(),
-                                           ReleaseId = releaseId ?? 1
+                                           ConfigurationId = configurationId ?? 1
                                        };
 
                 this.Client = system.ActorOf(Props.Create(() => new VirtualClient(this)), $"virtualNode{num}");
@@ -2789,9 +2789,9 @@ namespace KlusterKite.NodeManager.Tests
                             ImmutableHashSet<string>.Empty)));
                 this.IsUp = true;
                 this.system.Log.Info(
-                    "## Node {NodeNumber} is up with release {ReleaseId}",
+                    "## Node {NodeNumber} is up with configuration {ConfigurationId}",
                     this.Number,
-                    this.Description.ReleaseId);
+                    this.Description.ConfigurationId);
             }
 
             /// <summary>

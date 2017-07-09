@@ -56,17 +56,17 @@ namespace KlusterKite.NodeManager.Client.ORM
         public Migration Migration { get; set; }
 
         /// <summary>
-        /// Gets or sets the release id
+        /// Gets or sets the configuration id
         /// </summary>
         [ForeignKey(nameof(Configuration))]
-        [DeclareField("the release id")]
+        [DeclareField("the configuration id")]
         [UsedImplicitly]
-        public int ReleaseId { get; set; }
+        public int ConfigurationId { get; set; }
 
         /// <summary>
-        /// Gets or sets the release
+        /// Gets or sets the configuration
         /// </summary>
-        [DeclareField("the release")]
+        [DeclareField("the configuration")]
         [UsedImplicitly]
         public Configuration Configuration { get; set; }
 

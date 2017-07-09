@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseDataFactory.cs" company="KlusterKite">
+// <copyright file="ConfigurationDataFactory.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Data factory to work with <see cref="Release" />
+//   Data factory to work with Configuration
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -20,15 +20,15 @@ namespace KlusterKite.NodeManager.ConfigurationSource
     /// <summary>
     /// Data factory to work with <see cref="Configuration"/>
     /// </summary>
-    public class ReleaseDataFactory : EntityDataFactory<ConfigurationContext, Configuration, int>
+    public class ConfigurationDataFactory : EntityDataFactory<ConfigurationContext, Configuration, int>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReleaseDataFactory"/> class.
+        /// Initializes a new instance of the <see cref="ConfigurationDataFactory"/> class.
         /// </summary>
         /// <param name="context">
         /// The current data source context
         /// </param>
-        public ReleaseDataFactory(ConfigurationContext context)
+        public ConfigurationDataFactory(ConfigurationContext context)
             : base(context)
         {
         }

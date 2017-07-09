@@ -1,7 +1,7 @@
 ﻿{
   "Configuration": "{\n       KlusterKite {\n        NodeManager.ConfigurationDatabaseConnectionString = \"User ID=postgres;Host=configDb;Port=5432;Pooling=true\"\n        Web {\n Services {\n            KlusterKite/Web/Swagger { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node\n              Port = 8080 // default owin port, current node listening port for server access\n              PublicHostName = default //public host name of this service. It doesn't supposed (but is not prohibited) that this should be real public service hostname. It's just used to distinguish services with identical url paths to be correctly published on frontend web servers. Real expected hostname should be configured in NginxConfigurator or similar publisher\n              Route = /klusterkite/manager/swagger //route (aka directory) path to service\n            }\n          }\n        }\n      }\n    }",
   "NodeTemplate": "manager",
-  "ReleaseId": 1,
+  "ConfigurationId": 1,
   "Packages": [
     {
       "Id": "KlusterKite.Core.Service",

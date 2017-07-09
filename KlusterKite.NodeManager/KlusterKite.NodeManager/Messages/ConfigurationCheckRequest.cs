@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseSetStableRequest.cs" company="KlusterKite">
+// <copyright file="ConfigurationCheckRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   The set stable request.
+//   Makes the draft configuration check
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,12 +12,13 @@ namespace KlusterKite.NodeManager.Messages
     using KlusterKite.Security.Attributes;
 
     /// <summary>
-    /// The release set stable mark request.
+    /// Makes the draft configuration check
     /// </summary>
-    public class ReleaseSetStableRequest
+    /// <returns>The mutation result</returns>
+    public class ConfigurationCheckRequest
     {
         /// <summary>
-        /// Gets or sets the release id
+        /// Gets or sets the configuration id
         /// </summary>
         public int Id { get; set; }
 
@@ -25,10 +26,5 @@ namespace KlusterKite.NodeManager.Messages
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Context { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether selected release should be marked as stable or unstable
-        /// </summary>
-        public bool IsStable { get; set; }
     }
 }

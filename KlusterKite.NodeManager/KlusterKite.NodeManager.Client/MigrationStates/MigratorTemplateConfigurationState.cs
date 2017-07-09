@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigratorTemplateReleaseState.cs" company="KlusterKite">
+// <copyright file="MigratorTemplateConfigurationState.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Defines the ReleaseResourcesState type.
+//   The state of resources of the migrator template
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,8 +17,8 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     /// <summary>
     /// The state of resources of the migrator template
     /// </summary>
-    [ApiDescription("The state of resources of the migrator template", Name = "MigratorTemplateReleaseState")]
-    public class MigratorTemplateReleaseState
+    [ApiDescription("The state of resources of the migrator template", Name = "MigratorTemplateConfigurationState")]
+    public class MigratorTemplateConfigurationState
     {
         /// <summary>
         /// Gets or sets the template code
@@ -36,6 +36,6 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// Gets or sets the list of migrator states
         /// </summary>
         [DeclareField("the migrator states")]
-        public List<MigratorReleaseState> MigratorsStates { get; set; }
+        public List<MigratorConfigurationState> MigratorsStates { get; set; }
     }
 }

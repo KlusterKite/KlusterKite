@@ -78,7 +78,7 @@ namespace KlusterKite.NodeManager.Client.ORM
         public List<MigrationLogRecord> Logs { get; set; }
 
         /// <summary>
-        /// Gets or sets the previous release id
+        /// Gets or sets the previous configuration id
         /// </summary>
         [UsedImplicitly]
         [ForeignKey(nameof(FromConfiguration))]
@@ -86,7 +86,7 @@ namespace KlusterKite.NodeManager.Client.ORM
         public int FromConfigurationId { get; set; }
 
         /// <summary>
-        /// Gets or sets the new release id
+        /// Gets or sets the new configuration id
         /// </summary>
         [UsedImplicitly]
         [ForeignKey(nameof(ToConfiguration))]
@@ -94,17 +94,17 @@ namespace KlusterKite.NodeManager.Client.ORM
         public int ToConfigurationId { get; set; }
 
         /// <summary>
-        /// Gets or sets the previous release
+        /// Gets or sets the previous configuration
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the previous release")]
+        [DeclareField("the previous configuration")]
         public Configuration FromConfiguration { get; set; }
 
         /// <summary>
-        /// Gets or sets the new release
+        /// Gets or sets the new configuration
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the new release")]
+        [DeclareField("the new configuration")]
         public Configuration ToConfiguration { get; set; }
 
         /// <inheritdoc />

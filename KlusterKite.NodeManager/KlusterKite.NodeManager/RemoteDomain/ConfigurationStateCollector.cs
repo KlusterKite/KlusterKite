@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseStateCollector.cs" company="KlusterKite">
+// <copyright file="ConfigurationStateCollector.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -22,12 +22,12 @@ namespace KlusterKite.NodeManager.RemoteDomain
     /// <summary>
     /// Gathers the state of resources
     /// </summary>
-    public class ReleaseStateCollector : MigrationCollector<List<MigratorReleaseState>>
+    public class ConfigurationStateCollector : MigrationCollector<List<MigratorConfigurationState>>
     {
         /// <inheritdoc />
-        protected override List<MigratorReleaseState> GetTypedResult(IComponentContext context)
+        protected override List<MigratorConfigurationState> GetTypedResult(IComponentContext context)
         {
-            var result = new List<MigratorReleaseState>();
+            var result = new List<MigratorConfigurationState>();
             foreach (var migrator in this.GetMigrators(context))
             {
                 List<ResourceId> resources;
@@ -70,13 +70,13 @@ namespace KlusterKite.NodeManager.RemoteDomain
                     continue;
                 }
 
-                var states = new List<ResourceReleaseState>();
+                var states = new List<ResourceConfigurationState>();
                 foreach (var resource in resources)
                 {
                     try
                     {
                         states.Add(
-                            new ResourceReleaseState
+                            new ResourceConfigurationState
                                 {
                                     Name = resource.Name,
                                     Code = resource.Code,
@@ -101,7 +101,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                 }
 
                 result.Add(
-                    new MigratorReleaseState
+                    new MigratorConfigurationState
                         {
                             TypeName = migrator.GetType().FullName,
                             Name = migrator.Name,

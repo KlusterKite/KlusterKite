@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ResourceReleaseState.cs" company="KlusterKite">
+// <copyright file="ResourceConfigurationState.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
@@ -14,8 +14,8 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     /// <summary>
     /// The resource description
     /// </summary>
-    [ApiDescription("The resource description", Name = "ResourceReleaseState")]
-    public class ResourceReleaseState
+    [ApiDescription("The resource description", Name = "ResourceConfigurationState")]
+    public class ResourceConfigurationState
     {
         /// <summary>
         /// Gets or sets the human readable resource name

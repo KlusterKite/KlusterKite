@@ -174,7 +174,7 @@ namespace KlusterKite.NodeManager.Seeder.Launcher
             IPackageRepository repository,
             SeederConfiguration seederConfiguration)
         {
-            // TODO: extract to helper method along with Release extensions
+            // TODO: extract to helper method along with Configuration extensions
             var supportedFramework = NuGetFramework.ParseFrameworkName(
                 PackageRepositoryExtensions.CurrentRuntime, 
                 DefaultFrameworkNameProvider.Instance);

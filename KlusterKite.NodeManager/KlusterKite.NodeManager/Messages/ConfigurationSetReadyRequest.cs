@@ -1,24 +1,28 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReleaseCheckRequest.cs" company="KlusterKite">
+// <copyright file="ConfigurationSetReadyRequest.cs" company="KlusterKite">
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Makes the draft release check
+//   Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnConfigurationState.Draft"/> to <see cref="EnConfigurationState.Ready"/>
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace KlusterKite.NodeManager.Messages
 {
+    using Akka.Actor;
+    using Akka.Routing;
+
+    using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.Security.Attributes;
 
     /// <summary>
-    /// Makes the draft release check
+    /// Moves <see cref="FSMBase.State{TS,TD}"/> from <see cref="EnConfigurationState.Draft"/> to <see cref="EnConfigurationState.Ready"/>
     /// </summary>
     /// <returns>The mutation result</returns>
-    public class ReleaseCheckRequest
+    public class ConfigurationSetReadyRequest : IConsistentHashable
     {
         /// <summary>
-        /// Gets or sets the release id
+        /// Gets or sets the configuration id
         /// </summary>
         public int Id { get; set; }
 
@@ -26,5 +30,8 @@ namespace KlusterKite.NodeManager.Messages
         /// Gets or sets the request context
         /// </summary>
         public RequestContext Context { get; set; }
+
+        /// <inheritdoc />
+        public object ConsistentHashKey => this.Id;
     }
 }
