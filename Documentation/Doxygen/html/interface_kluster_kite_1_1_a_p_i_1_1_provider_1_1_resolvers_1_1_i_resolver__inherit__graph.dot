@@ -1,0 +1,23 @@
+digraph "KlusterKite.API.Provider.Resolvers.IResolver"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="KlusterKite.API.Provider.\lResolvers.IResolver",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node0 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="KlusterKite.API.Provider.\lResolvers.CollectionResolver\< T \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip="Resolves requests to the object collection "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="KlusterKite::API::Provider\l::Resolvers::ConnectionResolver\< T \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip="Resolves requests to the connection "];
+  Node0 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="KlusterKite.API.Provider.\lResolvers.EnumResolver\< T \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_enum_resolver.html",tooltip="Resolves a enum value "];
+  Node0 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="KlusterKite.API.Provider.\lResolvers.ForwarderResolver",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_forwarder_resolver.html",tooltip="Resolves value for forwarded fields "];
+  Node0 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="KlusterKite.API.Provider.\lResolvers.NullResolver",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_null_resolver.html",tooltip="Empty resolver that always return null "];
+  Node0 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="KlusterKite.API.Provider.\lResolvers.ObjectResolver\< T \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_object_resolver.html",tooltip="Generic class to resolve requests to objects "];
+  Node0 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="KlusterKite.API.Provider.\lResolvers.ScalarResolver\l\< TScalar \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_scalar_resolver.html",tooltip="Resolves value for simple objects "];
+  Node0 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="KlusterKite.API.Provider.\lResolvers.SimpleCollectionResolver",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_simple_collection_resolver.html",tooltip="Resolves the collections without any filtering / sorting "];
+}

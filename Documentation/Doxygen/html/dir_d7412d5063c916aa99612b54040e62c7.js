@@ -1,0 +1,5 @@
+var dir_d7412d5063c916aa99612b54040e62c7 =
+[
+    [ "net46", "dir_c46b8211fbc26f35e2f506fbc2187785.html", "dir_c46b8211fbc26f35e2f506fbc2187785" ],
+    [ "netstandard1.6", "dir_b9554265c8899019b2e9a730426b7b25.html", "dir_b9554265c8899019b2e9a730426b7b25" ]
+];

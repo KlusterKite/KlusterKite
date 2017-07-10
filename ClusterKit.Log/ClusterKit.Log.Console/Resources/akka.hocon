@@ -1,7 +1,0 @@
-﻿{
-	ClusterKit.Log.Console {
-		# you can use 'none' value or any other invalid valu to disable console log
-		# this level should be no lower then "ClusterKit.Log.minimumLevel" (that is "information" by default)
-		minimumLevel = "Information"
-	}
-}

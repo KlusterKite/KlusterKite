@@ -53,7 +53,7 @@ Pushes all NuGet packages from solution cache (`packages` folder) to local clust
 Pushes all created NuGet packages from `packageOut` directory
 
 #### SetVersion
-Asks current cluster NuGet server for the latest version of `ClusterKit.Core` library and assigns next version for subsequent build or package creation task.
+Asks current cluster NuGet server for the latest version of `KlusterKite.Core` library and assigns next version for subsequent build or package creation task.
 
 #### CleanPackageCache
 The same as `RefreshLocalDependencies`. TODO: remove duplicate
@@ -100,5 +100,5 @@ Creates special global solution(`global.sln`) in build directory with all define
 #### SwitchToPackageRefs
 Updates all `csproj` files to reference local dependencies (that goes to project, not in local solution) via locally built NuGet packages
 
-#### SwitchToPackageRefs
+#### SwitchToProjectRefs
 Updates all `csproj` files to reference local dependencies (that goes to project, not in local solution) as project reference (especially useful while working with global solution)

@@ -1,0 +1,6 @@
+﻿{
+  KlusterKite {
+    NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
+	NodeManager.ConfigurationDatabaseProviderName = "Npgsql"
+  }
+}

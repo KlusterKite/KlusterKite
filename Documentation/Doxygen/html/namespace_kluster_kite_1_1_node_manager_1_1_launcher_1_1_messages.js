@@ -1,0 +1,7 @@
+var namespace_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages =
+[
+    [ "NewNodeTemplateRequest", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_new_node_template_request.html", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_new_node_template_request" ],
+    [ "NodeStartUpConfiguration", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_node_start_up_configuration.html", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_node_start_up_configuration" ],
+    [ "NodeStartupWaitMessage", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_node_startup_wait_message.html", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_node_startup_wait_message" ],
+    [ "PackageDescription", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_package_description.html", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_package_description" ]
+];

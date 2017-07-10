@@ -1,0 +1,5 @@
+{
+	KlusterKite.Web.Configurators {
+		Authorization = "KlusterKite.Web.Authorization.WebHostingConfigurator, KlusterKite.Web.Authorization"
+	}
+}

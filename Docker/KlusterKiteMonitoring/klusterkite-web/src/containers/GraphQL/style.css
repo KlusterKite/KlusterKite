@@ -1,0 +1,11 @@
+.graphiql-container {
+    margin-top: -19px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    height: calc(100% - 55px);
+}
+
+.graphiql-container .doc-explorer-title {
+    min-height: 40px;
+}

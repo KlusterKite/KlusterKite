@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
+    <PackageId>KlusterKite.NodeManager.ConfigurationSource</PackageId>
+    <Version>0.0.0.0-local</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
+  <ItemGroup>
+    <Compile Remove="Migrations\20170703061628_Empty.cs" />
+    <Compile Remove="Migrations\20170703061628_Empty.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="1.1.2" />
+    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data.CRUD\KlusterKite.Data.CRUD.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data.EF\KlusterKite.Data.EF.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data\KlusterKite.Data.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Client\KlusterKite.NodeManager.Client.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Launcher.Utils\KlusterKite.NodeManager.Launcher.Utils.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Migrator.EF\KlusterKite.NodeManager.Migrator.EF.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="ConfigurationExtensions.cs">
+      <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
+    </Compile>
+  </ItemGroup>
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
+</Project>

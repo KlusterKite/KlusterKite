@@ -1,0 +1,7 @@
+var namespace_kluster_kite_1_1_web_1_1_authorization_1_1_attributes =
+[
+    [ "RequireClientPrivilegeAttribute", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_client_privilege_attribute.html", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_client_privilege_attribute" ],
+    [ "RequireSessionAttribute", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_session_attribute.html", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_session_attribute" ],
+    [ "RequireUserAttribute", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_user_attribute.html", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_user_attribute" ],
+    [ "RequireUserPrivilegeAttribute", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_user_privilege_attribute.html", "class_kluster_kite_1_1_web_1_1_authorization_1_1_attributes_1_1_require_user_privilege_attribute" ]
+];

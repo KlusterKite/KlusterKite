@@ -1,0 +1,4 @@
+var class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_browser_actor_test_1_1_configurator =
+[
+    [ "GetPluginInstallers", "class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_browser_actor_test_1_1_configurator.html#a2871893f2b8e42a57a6f2e26c21ed8c7", null ]
+];

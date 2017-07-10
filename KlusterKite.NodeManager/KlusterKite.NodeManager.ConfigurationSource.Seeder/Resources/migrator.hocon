@@ -1,0 +1,20 @@
+﻿{
+	KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true;Database=KlusterKite.NodeManagerConfiguration"	  
+	KlusterKite.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"	
+    KlusterKite.NodeManager.Migrators = [
+        "KlusterKite.NodeManager.ConfigurationSource.ConfigurationMigrator, KlusterKite.NodeManager.ConfigurationSource",
+		"KlusterKite.NodeManager.Mock.MockResourceMigrator, KlusterKite.NodeManager.Mock"
+    ]
+
+	KlusterKite.NodeManager.Mock {
+		RedisConnection = "172.18.0.4:6379"
+		ResourcePoints = [
+			"first"
+		]
+		Resources = [
+			"resource-1",
+			"resource-2",
+			"resource-3"
+		]
+	}
+}
