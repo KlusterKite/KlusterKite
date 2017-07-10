@@ -2,6 +2,9 @@ var searchData=
 [
   ['namespaceactor',['NameSpaceActor',['../class_kluster_kite_1_1_core_1_1_name_space_actor.html',1,'KlusterKite::Core']]],
   ['namespaceforwarder',['NameSpaceForwarder',['../class_kluster_kite_1_1_core_1_1_test_kit_1_1_name_space_forwarder.html',1,'KlusterKite::Core::TestKit']]],
+  ['namingutilities',['NamingUtilities',['../class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_naming_utilities.html',1,'KlusterKite::API::Attributes']]],
+  ['navigation',['Navigation',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_navigation.html',1,'KlusterKite::NodeManager::Client']]],
+  ['nestedprivileges',['NestedPrivileges',['../class_kluster_kite_1_1_security_1_1_tests_1_1_privilege_description_tests_1_1_nested_privileges.html',1,'KlusterKite::Security::Tests::PrivilegeDescriptionTests']]],
   ['nestedprovider',['NestedProvider',['../class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_nested_provider.html',1,'KlusterKite::API::Tests::Mock']]],
   ['newnodetemplaterequest',['NewNodeTemplateRequest',['../class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_new_node_template_request.html',1,'KlusterKite::NodeManager::Launcher::Messages']]],
   ['nginxconfiguratoractor',['NginxConfiguratorActor',['../class_kluster_kite_1_1_web_1_1_nginx_configurator_1_1_nginx_configurator_actor.html',1,'KlusterKite::Web::NginxConfigurator']]],

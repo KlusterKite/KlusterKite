@@ -112,15 +112,15 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>ActorSystemUtils</b></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_core_1_1_actor_system_utils.html">ActorSystemUtils</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utilities to work with </p><dl class="section see"><dt>See also</dt><dd>ActorSystem</dd></dl>
-<br /></td></tr>
+ <a href="class_kluster_kite_1_1_core_1_1_actor_system_utils.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_core_1_1_base_installer.html">BaseInstaller</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class to install <a class="el" href="namespace_kluster_kite.html">KlusterKite</a> plugin components  <a href="class_kluster_kite_1_1_core_1_1_base_installer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>ConfigurationUtils</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bundle of web related configuration utils <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_core_1_1_configuration_utils.html">ConfigurationUtils</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bundle of web related configuration utils  <a href="class_kluster_kite_1_1_core_1_1_configuration_utils.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_core_1_1_i_message_router.html">IMessageRouter</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class to route messages. Used to give possibility to create routing mocks  <a href="interface_kluster_kite_1_1_core_1_1_i_message_router.html#details">More...</a><br /></td></tr>
@@ -158,6 +158,20 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:af80b68f0fad3733102c1164d3b6503ce"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_core.html#af80b68f0fad3733102c1164d3b6503ce">RunPostStart</a> (ContainerBuilder container, IComponentContext context)</td></tr>
+<tr class="memdesc:af80b68f0fad3733102c1164d3b6503ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs all registered installers </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_kluster_kite_1_1_core.html#af59f2b844dccfaea5afae498328cc8a4" title="This method will be run after service start. Methods are run in AkkaConfigLoadPriorityorder. ">PostStart</a></dd></dl>
+ <a href="#af80b68f0fad3733102c1164d3b6503ce">More...</a><br /></td></tr>
+<tr class="separator:af80b68f0fad3733102c1164d3b6503ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cc9281bb282da3a4dafd83e25f75a60"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_core.html#a7cc9281bb282da3a4dafd83e25f75a60">RunPreCheck</a> (ContainerBuilder container, Config config)</td></tr>
+<tr class="memdesc:a7cc9281bb282da3a4dafd83e25f75a60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs all registered installers </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_kluster_kite_1_1_core.html#aaf95afd9651c5d1e079beece4d8c3fcb" title="Should check the config and environment for possible errors. If any found, shod throw the exception t...">PreCheck</a></dd></dl>
+ <a href="#a7cc9281bb282da3a4dafd83e25f75a60">More...</a><br /></td></tr>
+<tr class="separator:a7cc9281bb282da3a4dafd83e25f75a60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a838330dd8548704358171da1e476337a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_core.html#a838330dd8548704358171da1e476337a">RunComponentRegistration</a> ([NotNull] ContainerBuilder builder, [NotNull] Config config)</td></tr>
+<tr class="memdesc:a838330dd8548704358171da1e476337a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the installation in the T:Castle.Windsor.IWindsorContainer.  <a href="#a838330dd8548704358171da1e476337a">More...</a><br /></td></tr>
+<tr class="separator:a838330dd8548704358171da1e476337a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a783200c63d3a4dbb2d33420b20cdbb71"><td class="memItemLeft" align="right" valign="top">static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_core.html#a783200c63d3a4dbb2d33420b20cdbb71">ReadTextResource</a> (Assembly assembly, string resourceName)</td></tr>
+<tr class="memdesc:a783200c63d3a4dbb2d33420b20cdbb71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads texts resource  <a href="#a783200c63d3a4dbb2d33420b20cdbb71">More...</a><br /></td></tr>
+<tr class="separator:a783200c63d3a4dbb2d33420b20cdbb71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03ee24970f909044666b1b8b5dd355cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_core.html#a03ee24970f909044666b1b8b5dd355cb">Install</a> ([NotNull] ContainerBuilder container)</td></tr>
 <tr class="memdesc:a03ee24970f909044666b1b8b5dd355cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the installation in the T:Castle.Windsor.IWindsorContainer.  <a href="#a03ee24970f909044666b1b8b5dd355cb">More...</a><br /></td></tr>
 <tr class="separator:a03ee24970f909044666b1b8b5dd355cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -384,6 +398,54 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a783200c63d3a4dbb2d33420b20cdbb71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a783200c63d3a4dbb2d33420b20cdbb71">&#9670;&nbsp;</a></span>ReadTextResource()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static string KlusterKite.Core.ReadTextResource </td>
+          <td>(</td>
+          <td class="paramtype">Assembly&#160;</td>
+          <td class="paramname"><em>assembly</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>resourceName</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reads texts resource </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">assembly</td><td>The resource containing assembly</td></tr>
+    <tr><td class="paramname">resourceName</td><td>The resource name</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The resource contents</dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_base_installer_8cs_source.html#l00201">201</a> of file <a class="el" href="_base_installer_8cs_source.html">BaseInstaller.cs</a>.</p>
+
+</div>
+</div>
 <a id="a3d01a7b9338f42ed3c40124b95603deb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3d01a7b9338f42ed3c40124b95603deb">&#9670;&nbsp;</a></span>RegisterComponents()</h2>
 
@@ -426,6 +488,149 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a838330dd8548704358171da1e476337a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a838330dd8548704358171da1e476337a">&#9670;&nbsp;</a></span>RunComponentRegistration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void KlusterKite.Core.RunComponentRegistration </td>
+          <td>(</td>
+          <td class="paramtype">[NotNull] ContainerBuilder&#160;</td>
+          <td class="paramname"><em>builder</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">[NotNull] Config&#160;</td>
+          <td class="paramname"><em>config</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs the installation in the T:Castle.Windsor.IWindsorContainer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">builder</td><td>The builder. </td></tr>
+    <tr><td class="paramname">config</td><td>The config. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_base_installer_8cs_source.html#l00170">170</a> of file <a class="el" href="_base_installer_8cs_source.html">BaseInstaller.cs</a>.</p>
+
+</div>
+</div>
+<a id="af80b68f0fad3733102c1164d3b6503ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af80b68f0fad3733102c1164d3b6503ce">&#9670;&nbsp;</a></span>RunPostStart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void KlusterKite.Core.RunPostStart </td>
+          <td>(</td>
+          <td class="paramtype">ContainerBuilder&#160;</td>
+          <td class="paramname"><em>container</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IComponentContext&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Runs all registered installers </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_kluster_kite_1_1_core.html#af59f2b844dccfaea5afae498328cc8a4" title="This method will be run after service start. Methods are run in AkkaConfigLoadPriorityorder. ">PostStart</a></dd></dl>
+</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">container</td><td>The builder builder </td></tr>
+    <tr><td class="paramname">context</td><td>The context. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_base_installer_8cs_source.html#l00126">126</a> of file <a class="el" href="_base_installer_8cs_source.html">BaseInstaller.cs</a>.</p>
+
+</div>
+</div>
+<a id="a7cc9281bb282da3a4dafd83e25f75a60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cc9281bb282da3a4dafd83e25f75a60">&#9670;&nbsp;</a></span>RunPreCheck()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void KlusterKite.Core.RunPreCheck </td>
+          <td>(</td>
+          <td class="paramtype">ContainerBuilder&#160;</td>
+          <td class="paramname"><em>container</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Config&#160;</td>
+          <td class="paramname"><em>config</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Runs all registered installers </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespace_kluster_kite_1_1_core.html#aaf95afd9651c5d1e079beece4d8c3fcb" title="Should check the config and environment for possible errors. If any found, shod throw the exception t...">PreCheck</a></dd></dl>
+</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">container</td><td>The windsor builder. </td></tr>
+    <tr><td class="paramname">config</td><td>Full akka config</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_base_installer_8cs_source.html#l00147">147</a> of file <a class="el" href="_base_installer_8cs_source.html">BaseInstaller.cs</a>.</p>
 
 </div>
 </div>

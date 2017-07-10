@@ -1,6 +1,7 @@
 var class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_provider_publish_resolve_integration =
 [
     [ "ApiProviderPublishResolveIntegration", "class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_provider_publish_resolve_integration.html#a323e050ca0711697b99199c7a58dba36", null ],
+    [ "CleanResponse", "class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_provider_publish_resolve_integration.html#a090c13805a9c738926a471288832a401", null ],
     [ "ConnectionMethodQueryTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_provider_publish_resolve_integration.html#acd454410bc8d5675ed94586db759d2a2", null ],
     [ "ConnectionMutationAdditionalTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_provider_publish_resolve_integration.html#a826f3a7daf8b37e28dc1ad52210b92c5", null ],
     [ "ConnectionMutationDeleteTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_provider_publish_resolve_integration.html#ac51ed4017124b7711699e98d660cedce", null ],

@@ -7,6 +7,8 @@ var searchData=
   ['datafactory_3c_20ipackagerepository_2c_20packagedescription_2c_20string_20_3e',['DataFactory&lt; IPackageRepository, PackageDescription, string &gt;',['../class_kluster_kite_1_1_data_1_1_data_factory.html',1,'KlusterKite::Data']]],
   ['datanoprotectionprovider',['DataNoProtectionProvider',['../class_kluster_kite_1_1_web_1_1_authentication_1_1_data_no_protection_provider.html',1,'KlusterKite::Web::Authentication']]],
   ['datasourceinnerexception',['DatasourceInnerException',['../class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_datasource_inner_exception.html',1,'KlusterKite::Data::CRUD::Exceptions']]],
+  ['dataupdater',['DataUpdater',['../class_kluster_kite_1_1_a_p_i_1_1_client_1_1_data_updater.html',1,'KlusterKite::API::Client']]],
+  ['dbcontextextensions',['DbContextExtensions',['../class_kluster_kite_1_1_data_1_1_e_f_1_1_in_memory_1_1_db_context_extensions.html',1,'KlusterKite::Data::EF::InMemory']]],
   ['declareconnectionattribute',['DeclareConnectionAttribute',['../class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_declare_connection_attribute.html',1,'KlusterKite::API::Attributes']]],
   ['declarefieldattribute',['DeclareFieldAttribute',['../class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_declare_field_attribute.html',1,'KlusterKite::API::Attributes']]],
   ['declaremutationattribute',['DeclareMutationAttribute',['../class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_declare_mutation_attribute.html',1,'KlusterKite::API::Attributes']]],

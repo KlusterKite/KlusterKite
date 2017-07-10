@@ -5,6 +5,8 @@ var class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field =
     [ "CheckAuthorization", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#a73bf2a67dfdea11153c461b6cb839ff1", null ],
     [ "Clone", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#a126fc01936e7b320b18c21f6dbce4b44", null ],
     [ "FillAuthorizationProperties", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#abe16f54bbe9d0dc811ffd73cec92e6e1", null ],
+    [ "Object", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#a1fd9d581c6f7477920d247af6ea7c755", null ],
+    [ "Scalar", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#a40155bb83065f3ca31af39427060cca5", null ],
     [ "ToString", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#ab717123c4f2afe528b570dacd6025cc2", null ],
     [ "Arguments", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#a477f4d86c53c645ea59476b2a32e7737", null ],
     [ "AuthorizationRules", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_field.html#a815a9f99612414e392bd9a2fe8cc0082", null ],

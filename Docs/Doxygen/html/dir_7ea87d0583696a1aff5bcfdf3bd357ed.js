@@ -46,5 +46,7 @@ var dir_7ea87d0583696a1aff5bcfdf3bd357ed =
     [ "TokenResponse.cs", "_token_response_8cs.html", [
       [ "TokenResponse", "class_kluster_kite_1_1_security_1_1_attributes_1_1_token_response.html", "class_kluster_kite_1_1_security_1_1_attributes_1_1_token_response" ]
     ] ],
-    [ "Utils.cs", "_utils_8cs.html", null ]
+    [ "Utils.cs", "_utils_8cs.html", [
+      [ "Utils", "class_kluster_kite_1_1_security_1_1_attributes_1_1_utils.html", "class_kluster_kite_1_1_security_1_1_attributes_1_1_utils" ]
+    ] ]
 ];

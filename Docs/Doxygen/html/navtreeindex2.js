@@ -1,5 +1,10 @@
 var NAVTREEINDEX2 =
 {
+"_i_client_provider_8cs_source.html":[2,0,7,0,7],
+"_i_connection_resolver_8cs.html":[2,0,0,3,1,5],
+"_i_connection_resolver_8cs_source.html":[2,0,0,3,1,5],
+"_i_context_factory_8cs.html":[2,0,2,2,4],
+"_i_context_factory_8cs_source.html":[2,0,2,2,4],
 "_i_crucial_object_8cs.html":[2,0,7,0,8],
 "_i_crucial_object_8cs_source.html":[2,0,7,0,8],
 "_i_crud_action_message_8cs.html":[2,0,2,1,0,5],
@@ -244,10 +249,5 @@ var NAVTREEINDEX2 =
 "_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2net46_2_temporary_generada65ff04f25d800fb5b2c4f05f46ce52_source.html":[2,0,2,4,0,0,0,3],
 "_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_tempor1dac805d994c3b210fecda2f7ffecc75.html":[2,0,2,4,0,0,1,1],
 "_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_tempor1dac805d994c3b210fecda2f7ffecc75_source.html":[2,0,2,4,0,0,1,1],
-"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_tempor82b785c6e39c99a385c8661b35f055ef.html":[2,0,2,4,0,0,1,3],
-"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_tempor82b785c6e39c99a385c8661b35f055ef_source.html":[2,0,2,4,0,0,1,3],
-"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_temporc549b403fb62addaa4e7e450bd29ad49.html":[2,0,2,4,0,0,1,2],
-"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_temporc549b403fb62addaa4e7e450bd29ad49_source.html":[2,0,2,4,0,0,1,2],
-"_kluster_kite_8_data_2_kluster_kite_8_data_8_tests_2_mock_2_role_8cs.html":[2,0,2,5,0,1],
-"_kluster_kite_8_data_2_kluster_kite_8_data_8_tests_2_mock_2_role_8cs_source.html":[2,0,2,5,0,1]
+"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_tempor82b785c6e39c99a385c8661b35f055ef.html":[2,0,2,4,0,0,1,3]
 };

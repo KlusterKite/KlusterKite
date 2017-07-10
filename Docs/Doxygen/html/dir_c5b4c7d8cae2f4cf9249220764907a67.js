@@ -6,7 +6,9 @@ var dir_c5b4c7d8cae2f4cf9249220764907a67 =
     [ "Connection.cs", "_connection_8cs.html", [
       [ "Connection", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection" ]
     ] ],
-    [ "Extensions.cs", "_kluster_kite_8_data_2_kluster_kite_8_data_8_c_r_u_d_2_extensions_8cs.html", null ],
+    [ "Extensions.cs", "_kluster_kite_8_data_2_kluster_kite_8_data_8_c_r_u_d_2_extensions_8cs.html", [
+      [ "Extensions", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_extensions.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_extensions" ]
+    ] ],
     [ "ILargeObject.cs", "_i_large_object_8cs.html", [
       [ "ILargeObject", "interface_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_i_large_object.html", null ]
     ] ],

@@ -11,9 +11,13 @@ var dir_628f2e6fd858ac95856091bdcf34cd0f =
     [ "LoggerConfigurator.cs", "_logger_configurator_8cs.html", [
       [ "LoggerConfigurator", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_logger_configurator.html", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_logger_configurator" ]
     ] ],
-    [ "Navigation.cs", "_navigation_8cs.html", null ],
+    [ "Navigation.cs", "_navigation_8cs.html", [
+      [ "Navigation", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_navigation.html", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_navigation" ]
+    ] ],
     [ "NodeManagerReceiverActor.cs", "_node_manager_receiver_actor_8cs.html", [
       [ "NodeManagerReceiverActor", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_node_manager_receiver_actor.html", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_node_manager_receiver_actor" ]
     ] ],
-    [ "Privileges.cs", "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_client_2_privileges_8cs.html", null ]
+    [ "Privileges.cs", "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_client_2_privileges_8cs.html", [
+      [ "Privileges", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_privileges.html", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_privileges" ]
+    ] ]
 ];

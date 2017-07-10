@@ -24,14 +24,18 @@ var dir_8ebab069556d0b946272d93de3d49376 =
     [ "ApiType.cs", "_api_type_8cs.html", [
       [ "ApiType", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_type.html", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_type" ]
     ] ],
-    [ "DataUpdater.cs", "_data_updater_8cs.html", null ],
+    [ "DataUpdater.cs", "_data_updater_8cs.html", [
+      [ "DataUpdater", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_data_updater.html", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_data_updater" ]
+    ] ],
     [ "DataUpdaterConfig.cs", "_data_updater_config_8cs.html", null ],
     [ "EnFieldFlags.cs", "_en_field_flags_8cs.html", "_en_field_flags_8cs" ],
     [ "EnScalarType.cs", "_en_scalar_type_8cs.html", "_en_scalar_type_8cs" ],
     [ "ErrorDescription.cs", "_error_description_8cs.html", [
       [ "ErrorDescription", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_error_description.html", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_error_description" ]
     ] ],
-    [ "Extensions.cs", "_kluster_kite_8_a_p_i_2_kluster_kite_8_a_p_i_8_client_2_extensions_8cs.html", null ],
+    [ "Extensions.cs", "_kluster_kite_8_a_p_i_2_kluster_kite_8_a_p_i_8_client_2_extensions_8cs.html", [
+      [ "Extensions", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_extensions.html", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_extensions" ]
+    ] ],
     [ "INodeConnection.cs", "_i_node_connection_8cs.html", [
       [ "INodeConnection", "interface_kluster_kite_1_1_a_p_i_1_1_client_1_1_i_node_connection.html", "interface_kluster_kite_1_1_a_p_i_1_1_client_1_1_i_node_connection" ]
     ] ],
@@ -53,5 +57,7 @@ var dir_8ebab069556d0b946272d93de3d49376 =
     [ "SortingCondition.cs", "_sorting_condition_8cs.html", [
       [ "SortingCondition", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_sorting_condition.html", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_sorting_condition" ]
     ] ],
-    [ "SortingHelper.cs", "_sorting_helper_8cs.html", null ]
+    [ "SortingHelper.cs", "_sorting_helper_8cs.html", [
+      [ "SortingHelper", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_sorting_helper.html", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_sorting_helper" ]
+    ] ]
 ];

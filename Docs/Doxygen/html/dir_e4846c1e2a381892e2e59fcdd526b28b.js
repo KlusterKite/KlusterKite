@@ -13,7 +13,9 @@ var dir_e4846c1e2a381892e2e59fcdd526b28b =
       [ "NginxConfiguratorTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_nginx_configurator_test.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_nginx_configurator_test" ],
       [ "Configurator", "class_kluster_kite_1_1_web_1_1_tests_1_1_nginx_configurator_test_1_1_configurator.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_nginx_configurator_test_1_1_configurator" ]
     ] ],
-    [ "RestSharpUtils.cs", "_kluster_kite_8_web_2_kluster_kite_8_web_8_tests_2_rest_sharp_utils_8cs.html", null ],
+    [ "RestSharpUtils.cs", "_kluster_kite_8_web_2_kluster_kite_8_web_8_tests_2_rest_sharp_utils_8cs.html", [
+      [ "RestSharpUtils", "class_kluster_kite_1_1_web_1_1_tests_1_1_rest_sharp_utils.html", null ]
+    ] ],
     [ "WebDescriptorTest.cs", "_web_descriptor_test_8cs.html", [
       [ "WebDescriptorTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_descriptor_test.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_descriptor_test" ],
       [ "Configurator", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_descriptor_test_1_1_configurator.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_descriptor_test_1_1_configurator" ]

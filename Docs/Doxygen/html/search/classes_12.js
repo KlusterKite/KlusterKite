@@ -12,5 +12,6 @@ var searchData=
   ['userroleaddrequest',['UserRoleAddRequest',['../class_kluster_kite_1_1_node_manager_1_1_messages_1_1_user_role_add_request.html',1,'KlusterKite::NodeManager::Messages']]],
   ['userrolechangerequest',['UserRoleChangeRequest',['../class_kluster_kite_1_1_node_manager_1_1_messages_1_1_user_role_change_request.html',1,'KlusterKite::NodeManager::Messages']]],
   ['userroleremoverequest',['UserRoleRemoveRequest',['../class_kluster_kite_1_1_node_manager_1_1_messages_1_1_user_role_remove_request.html',1,'KlusterKite::NodeManager::Messages']]],
-  ['usersconnection',['UsersConnection',['../class_kluster_kite_1_1_node_manager_1_1_web_api_1_1_users_connection.html',1,'KlusterKite::NodeManager::WebApi']]]
+  ['usersconnection',['UsersConnection',['../class_kluster_kite_1_1_node_manager_1_1_web_api_1_1_users_connection.html',1,'KlusterKite::NodeManager::WebApi']]],
+  ['utils',['Utils',['../class_kluster_kite_1_1_security_1_1_attributes_1_1_utils.html',1,'KlusterKite::Security::Attributes']]]
 ];

@@ -1,5 +1,10 @@
 var NAVTREEINDEX3 =
 {
+"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_tempor82b785c6e39c99a385c8661b35f055ef_source.html":[2,0,2,4,0,0,1,3],
+"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_temporc549b403fb62addaa4e7e450bd29ad49.html":[2,0,2,4,0,0,1,2],
+"_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2obj_2_debug_2netstandard1_86_2_temporc549b403fb62addaa4e7e450bd29ad49_source.html":[2,0,2,4,0,0,1,2],
+"_kluster_kite_8_data_2_kluster_kite_8_data_8_tests_2_mock_2_role_8cs.html":[2,0,2,5,0,1],
+"_kluster_kite_8_data_2_kluster_kite_8_data_8_tests_2_mock_2_role_8cs_source.html":[2,0,2,5,0,1],
 "_kluster_kite_8_data_2_kluster_kite_8_data_8_tests_2_mock_2_role_user_8cs.html":[2,0,2,5,0,2],
 "_kluster_kite_8_data_2_kluster_kite_8_data_8_tests_2_mock_2_role_user_8cs_source.html":[2,0,2,5,0,2],
 "_kluster_kite_8_data_2_kluster_kite_8_data_8_tests_2_mock_2_user_8cs.html":[2,0,2,5,0,7],
@@ -244,10 +249,5 @@ var NAVTREEINDEX3 =
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2_program_8cs.html#addbf05a770299df5cd28a7072145c06d":[2,0,6,7,1,1],
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2_program_8cs.html#ae4afcb113f142f14f0e7fedee787aa81":[2,0,6,7,1,3],
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2_program_8cs_source.html":[2,0,6,7,1],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp0235956173d837550b2a014fb7129310.html":[2,0,6,7,0,0,0,2],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp0235956173d837550b2a014fb7129310_source.html":[2,0,6,7,0,0,0,2],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp414dd4e2de46ccab83e1798d34314ec8.html":[2,0,6,7,0,0,0,1],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp414dd4e2de46ccab83e1798d34314ec8_source.html":[2,0,6,7,0,0,0,1],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp5c5aeb917c85e0aa6dc993a0ad24c602.html":[2,0,6,7,0,0,0,3],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp5c5aeb917c85e0aa6dc993a0ad24c602_source.html":[2,0,6,7,0,0,0,3]
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp0235956173d837550b2a014fb7129310.html":[2,0,6,7,0,0,0,2]
 };

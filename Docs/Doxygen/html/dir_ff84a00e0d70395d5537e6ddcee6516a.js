@@ -8,7 +8,9 @@ var dir_ff84a00e0d70395d5537e6ddcee6516a =
     [ "ConfigurationDataFactory.cs", "_configuration_data_factory_8cs.html", [
       [ "ConfigurationDataFactory", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_data_factory.html", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_data_factory" ]
     ] ],
-    [ "ConfigurationExtensions.cs", "_configuration_extensions_8cs.html", null ],
+    [ "ConfigurationExtensions.cs", "_configuration_extensions_8cs.html", [
+      [ "ConfigurationExtensions", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_extensions.html", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_extensions" ]
+    ] ],
     [ "ConfigurationMigrator.cs", "_configuration_migrator_8cs.html", [
       [ "ConfigurationMigrator", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_migrator.html", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_migrator" ]
     ] ],

@@ -24,6 +24,7 @@ var searchData=
   ['resourcestaterequest',['ResourceStateRequest',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state_request.html',1,'KlusterKite::NodeManager::Client::Messages::Migration']]],
   ['resourceupgrade',['ResourceUpgrade',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_upgrade.html',1,'KlusterKite::NodeManager::Client::Messages::Migration']]],
   ['resourceupgraderequest',['ResourceUpgradeRequest',['../class_kluster_kite_1_1_node_manager_1_1_messages_1_1_resource_upgrade_request.html',1,'KlusterKite::NodeManager::Messages']]],
+  ['restsharputils',['RestSharpUtils',['../class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_rest_sharp_utils.html',1,'KlusterKite.NodeManager.Launcher.Utils.RestSharpUtils'],['../class_kluster_kite_1_1_web_1_1_tests_1_1_rest_sharp_utils.html',1,'KlusterKite.Web.Tests.RestSharpUtils']]],
   ['role',['Role',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_role.html',1,'KlusterKite.NodeManager.Client.ORM.Role'],['../class_kluster_kite_1_1_data_1_1_tests_1_1_mock_1_1_role.html',1,'KlusterKite.Data.Tests.Mock.Role']]],
   ['rolefactory',['RoleFactory',['../class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_role_factory.html',1,'KlusterKite::NodeManager::ConfigurationSource']]],
   ['rolesconnection',['RolesConnection',['../class_kluster_kite_1_1_node_manager_1_1_web_api_1_1_roles_connection.html',1,'KlusterKite::NodeManager::WebApi']]],

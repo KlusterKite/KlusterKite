@@ -21,7 +21,9 @@ var dir_f562e0fe68078dd1c425821e37b8f72c =
     [ "LogAccessRule.cs", "_log_access_rule_8cs.html", [
       [ "LogAccessRule", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_log_access_rule.html", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_log_access_rule" ]
     ] ],
-    [ "NamingUtilities.cs", "_naming_utilities_8cs.html", null ],
+    [ "NamingUtilities.cs", "_naming_utilities_8cs.html", [
+      [ "NamingUtilities", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_naming_utilities.html", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_naming_utilities" ]
+    ] ],
     [ "PublishToApiAttribute.cs", "_publish_to_api_attribute_8cs.html", [
       [ "PublishToApiAttribute", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_publish_to_api_attribute.html", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_publish_to_api_attribute" ]
     ] ]

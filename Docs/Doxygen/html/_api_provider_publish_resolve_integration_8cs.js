@@ -8,6 +8,7 @@ var _api_provider_publish_resolve_integration_8cs =
     [ "AuthorizationConnectionQueryTest", "_api_provider_publish_resolve_integration_8cs.html#a2410bb39fb309f3deb731b591ad216df", null ],
     [ "AuthorizationFieldTest", "_api_provider_publish_resolve_integration_8cs.html#ab2e6c0dd943db7e776c5fdea4059b6ac", null ],
     [ "AuthorizationMutationTest", "_api_provider_publish_resolve_integration_8cs.html#a5d50ab3abc4d26bda9b0f51a42485a68", null ],
+    [ "CreateSecurityLogger", "_api_provider_publish_resolve_integration_8cs.html#a27eb2eeb6025c1a5d6d7746866d455b6", null ],
     [ "DateTimeTest", "_api_provider_publish_resolve_integration_8cs.html#a33efc4e43737385fc9c261e9c0be9b04", null ],
     [ "Equal", "_api_provider_publish_resolve_integration_8cs.html#ab8a1f544db2173dec569f903086ec88e", null ],
     [ "Equal", "_api_provider_publish_resolve_integration_8cs.html#a48c11cbc8283731a849e31da7d7744bc", null ],

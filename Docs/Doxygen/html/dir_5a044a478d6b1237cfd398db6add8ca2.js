@@ -9,7 +9,7 @@ var dir_5a044a478d6b1237cfd398db6add8ca2 =
     ] ],
     [ "Executor.cs", "_executor_8cs.html", [
       [ "Executor", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor.html", [
-        [ "Program", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor_1_1_program.html", null ]
+        [ "Program", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor_1_1_program.html", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor_1_1_program" ]
       ] ]
     ] ],
     [ "IMigrator.cs", "_i_migrator_8cs.html", [

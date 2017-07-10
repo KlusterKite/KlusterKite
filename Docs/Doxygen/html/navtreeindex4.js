@@ -1,5 +1,10 @@
 var NAVTREEINDEX4 =
 {
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp0235956173d837550b2a014fb7129310_source.html":[2,0,6,7,0,0,0,2],
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp414dd4e2de46ccab83e1798d34314ec8.html":[2,0,6,7,0,0,0,1],
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp414dd4e2de46ccab83e1798d34314ec8_source.html":[2,0,6,7,0,0,0,1],
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp5c5aeb917c85e0aa6dc993a0ad24c602.html":[2,0,6,7,0,0,0,3],
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2net46_2_temp5c5aeb917c85e0aa6dc993a0ad24c602_source.html":[2,0,6,7,0,0,0,3],
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2netcoreapp1_3ae81a0ab02d9cc501dd35920764f229.html":[2,0,6,7,0,0,1,2],
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2netcoreapp1_3ae81a0ab02d9cc501dd35920764f229_source.html":[2,0,6,7,0,0,1,2],
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_launcher_2obj_2_debug_2netcoreapp1_e37a03ca50064dbc42a064b21cb4cd69.html":[2,0,6,7,0,0,1,3],
@@ -244,10 +249,5 @@ var NAVTREEINDEX4 =
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_client_2obj_2_debug_2netstandard1_86_2_temporary_genef4e16ec88e60c176ec6d2c94caf22e6b.html":[2,0,8,3,1,0,1,2],
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_client_2obj_2_debug_2netstandard1_86_2_temporary_genef4e16ec88e60c176ec6d2c94caf22e6b_source.html":[2,0,8,3,1,0,1,2],
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2_installer_8cs.html":[2,0,8,4,1],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2_installer_8cs_source.html":[2,0,8,4,1],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2obj_2_debug_2net46_2_temporary_generated_2394cd0f5f63bd262b0d1d94d862b77e.html":[2,0,8,4,0,0,0,3],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2obj_2_debug_2net46_2_temporary_generated_2394cd0f5f63bd262b0d1d94d862b77e_source.html":[2,0,8,4,0,0,0,3],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2obj_2_debug_2net46_2_temporary_generated_54255fd645a8bc0fc2b17a5ed488b748.html":[2,0,8,4,0,0,0,1],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2obj_2_debug_2net46_2_temporary_generated_54255fd645a8bc0fc2b17a5ed488b748_source.html":[2,0,8,4,0,0,0,1],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2obj_2_debug_2net46_2_temporary_generated_9458d8db062f25790d694b646a2030ee.html":[2,0,8,4,0,0,0,2]
+"_kluster_kite_8_web_2_kluster_kite_8_web_8_descriptor_2_installer_8cs_source.html":[2,0,8,4,1]
 };

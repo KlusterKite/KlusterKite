@@ -22,6 +22,7 @@ var searchData=
   ['testobject',['TestObject',['../class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_object.html',1,'KlusterKite::API::Tests::Mock']]],
   ['testobjectconnection',['TestObjectConnection',['../class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_object_connection.html',1,'KlusterKite::API::Tests::Mock']]],
   ['testobjectnoid',['TestObjectNoId',['../class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_object_no_id.html',1,'KlusterKite::API::Tests::Mock']]],
+  ['testprivileges',['TestPrivileges',['../class_kluster_kite_1_1_security_1_1_tests_1_1_test_privileges.html',1,'KlusterKite::Security::Tests']]],
   ['testprovider',['TestProvider',['../class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html',1,'KlusterKite::API::Tests::Mock']]],
   ['testrolesfactory',['TestRolesFactory',['../class_kluster_kite_1_1_data_1_1_tests_1_1_mock_1_1_test_roles_factory.html',1,'KlusterKite::Data::Tests::Mock']]],
   ['testsecondprovider',['TestSecondProvider',['../class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_second_provider.html',1,'KlusterKite::API::Tests::Mock']]],

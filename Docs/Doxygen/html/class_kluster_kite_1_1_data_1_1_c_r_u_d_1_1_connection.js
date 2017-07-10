@@ -2,6 +2,7 @@ var class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection =
 [
     [ "Connection", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html#a16d1c681c9ee21d14d6d26a03d955956", null ],
     [ "Create", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html#afdb3267c8470ddc287a8e5358f8103a1", null ],
+    [ "CreateResponse", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html#a9fbf968183389d6d121ea601fe62287c", null ],
     [ "Delete", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html#a024309ce228296d0d38fd16d2d606626", null ],
     [ "Query", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html#abef1173d12f496d82667cfd4e6c75b66", null ],
     [ "Update", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html#ac2d0df1bc00af9ddaf4f2891ca0c7723", null ],

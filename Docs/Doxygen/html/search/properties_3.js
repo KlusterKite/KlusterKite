@@ -7,6 +7,7 @@ var searchData=
   ['datetimeoffsetfield',['DateTimeOffsetField',['../class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#aee7d5388e1733701667469fed92d7f04',1,'KlusterKite::API::Tests::Mock::TestProvider']]],
   ['defaultfilter',['DefaultFilter',['../class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#a5aaccfaac38ec99fac86eca8add8bb2e',1,'KlusterKite::Web::Rest::BaseRestController']]],
   ['defaultsort',['DefaultSort',['../class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#a0af0402397d8a329ed99b195ed56706a',1,'KlusterKite::Web::Rest::BaseRestController']]],
+  ['definedprivileges',['DefinedPrivileges',['../class_kluster_kite_1_1_security_1_1_attributes_1_1_utils.html#ad9a94afa0e7cb4dab54a1c380a8ca1b2',1,'KlusterKite::Security::Attributes::Utils']]],
   ['deletedescription',['DeleteDescription',['../class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_declare_connection_attribute.html#af0063092834d1cd8219c2cac2c793724',1,'KlusterKite::API::Attributes::DeclareConnectionAttribute']]],
   ['deniedscope',['DeniedScope',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_role.html#a6a7666a935ecb7853f3dd155ec7c46ba',1,'KlusterKite::NodeManager::Client::ORM::Role']]],
   ['deniedscopejson',['DeniedScopeJson',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_role.html#ad520346b127eb9bac506f4146135e7f2',1,'KlusterKite::NodeManager::Client::ORM::Role']]],
