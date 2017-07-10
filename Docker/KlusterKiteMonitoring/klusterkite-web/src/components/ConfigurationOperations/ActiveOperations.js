@@ -19,8 +19,8 @@ export default class ActiveOperations extends React.Component {
   }
 
   static propTypes = {
-    releaseId: React.PropTypes.string.isRequired,
-    releaseInnerId: React.PropTypes.number.isRequired,
+    configurationId: React.PropTypes.string.isRequired,
+    configurationInnerId: React.PropTypes.number.isRequired,
     currentState: React.PropTypes.string.isRequired,
     isStable: React.PropTypes.bool.isRequired,
     onForceFetch: React.PropTypes.func.isRequired,
@@ -38,7 +38,7 @@ export default class ActiveOperations extends React.Component {
       Relay.Store.commitUpdate(
         new SetStableMutation(
           {
-            releaseId: this.props.releaseInnerId,
+            configurationId: this.props.configurationInnerId,
           }),
         {
           onSuccess: (response) => {

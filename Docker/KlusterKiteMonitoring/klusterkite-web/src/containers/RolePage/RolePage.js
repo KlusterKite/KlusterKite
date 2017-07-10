@@ -31,20 +31,20 @@ class RolePage extends React.Component {
     return !this.props.params.hasOwnProperty('id')
   };
 
-  onSubmit = (releaseModel) => {
-    console.log('submitting release', releaseModel);
+  onSubmit = (configurationModel) => {
+    console.log('submitting configuration', configurationModel);
 
     if (this.isAddNew()){
-      // this.addNode(releaseModel);
+      // this.addNode(configurationModel);
     } else {
-      this.editNode(releaseModel);
+      this.editNode(configurationModel);
     }
   };
 
   addNode = (model) => {
     console.log('create', model);
     // Relay.Store.commitUpdate(
-    //   new CreateReleaseMutation(
+    //   new CreateConfigurationMutation(
     //     {
     //       majorVersion: model.majorVersion,
     //       minorVersion: model.minorVersion,
@@ -68,7 +68,7 @@ class RolePage extends React.Component {
     //           saving: false,
     //           saveErrors: null
     //         });
-    //         browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
+    //         browserHistory.push(`/klusterkite/Configuration/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
     //       }
     //     },
     //     onFailure: (transaction) => console.log(transaction),

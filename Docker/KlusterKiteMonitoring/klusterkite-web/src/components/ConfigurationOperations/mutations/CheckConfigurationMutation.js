@@ -1,6 +1,6 @@
 import Relay from 'react-relay'
 
-export default class CheckReleaseMutation extends Relay.Mutation {
+export default class CheckConfigurationMutation extends Relay.Mutation {
 
   getMutation () {
     return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_check}`
@@ -77,7 +77,7 @@ export default class CheckReleaseMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.releaseId
+      id: this.props.configurationId
     }
   }
 

@@ -4,7 +4,7 @@ import Icon from 'react-fa';
 
 import delay from 'lodash/delay'
 
-import CheckReleaseMutation from './mutations/CheckReleaseMutation';
+import CheckConfigurationMutation from './mutations/CheckConfigurationMutation';
 import SetReadyMutation from './mutations/SetReadyMutation';
 
 import './styles.css';
@@ -24,15 +24,15 @@ export class DraftOperations extends React.Component {
 
   static propTypes = {
     nodeTemplates: React.PropTypes.arrayOf(React.PropTypes.object),
-    releaseId: React.PropTypes.string.isRequired,
-    releaseInnerId: React.PropTypes.number.isRequired,
+    configurationId: React.PropTypes.string.isRequired,
+    configurationInnerId: React.PropTypes.number.isRequired,
     currentState: React.PropTypes.string.isRequired,
     onForceFetch: React.PropTypes.func.isRequired,
   };
 
   onCheck = () => {
     if (!this.state.isChecking) {
-      console.log('checking release');
+      console.log('checking configuration');
 
       this.setState({
         isChecking: true,
@@ -40,9 +40,9 @@ export class DraftOperations extends React.Component {
       });
 
       Relay.Store.commitUpdate(
-        new CheckReleaseMutation(
+        new CheckConfigurationMutation(
           {
-            releaseId: this.props.releaseInnerId,
+            configurationId: this.props.configurationInnerId,
           }),
         {
           onSuccess: (response) => {
@@ -90,7 +90,7 @@ export class DraftOperations extends React.Component {
       Relay.Store.commitUpdate(
         new SetReadyMutation(
           {
-            releaseId: this.props.releaseInnerId,
+            configurationId: this.props.configurationInnerId,
           }),
         {
           onSuccess: (response) => {
@@ -204,7 +204,7 @@ export class DraftOperations extends React.Component {
 
       {this.props.currentState && this.props.currentState === 'Draft' && !this.state.isChangingState &&
       <button className="btn btn-default" type="button" onClick={this.onCheck}>
-        <Icon name="check-circle" className={checkClassName}/>{' '}Check release
+        <Icon name="check-circle" className={checkClassName}/>{' '}Check configuration
       </button>
       }
 

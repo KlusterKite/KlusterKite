@@ -1,9 +1,9 @@
 import Relay from 'react-relay'
 
-export default class SetReadyMutation extends Relay.Mutation {
+export default class SetObsoleteMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_setReady}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_setObsolete}`
   }
 
   getFatQuery () {
@@ -45,7 +45,7 @@ export default class SetReadyMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.releaseId
+      id: this.props.configurationId
     }
   }
 

@@ -4,7 +4,7 @@ import { Input, Textarea } from 'formsy-react-components';
 import Form from '../Form/Form';
 import RowText from '../Form/RowText';
 
-export default class ReleaseForm extends React.Component {
+export default class ConfigurationForm extends React.Component {
   constructor(props) {
     super(props);
     this.submit = this.submit.bind(this);
@@ -35,13 +35,13 @@ export default class ReleaseForm extends React.Component {
     return (
       <div>
         {initialValues && canEdit &&
-          <h2>Edit Release</h2>
+          <h2>Edit Configuration</h2>
         }
         {initialValues && !canEdit &&
-          <h2>View Release</h2>
+          <h2>View Configuration</h2>
         }
         {!initialValues &&
-          <h2>Create a new Release</h2>
+          <h2>Create a new Configuration</h2>
         }
         <Form
           onSubmit={this.submit}

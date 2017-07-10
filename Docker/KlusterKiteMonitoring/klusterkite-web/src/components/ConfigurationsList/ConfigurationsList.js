@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 import Paginator from '../Paginator/Paginator';
 import DateFormat from '../../utils/date';
 
-export class ReleasesList extends React.Component {
+export class ConfigurationsList extends React.Component {
   //
   // constructor(props) {
   //   super(props);
@@ -20,7 +20,7 @@ export class ReleasesList extends React.Component {
   };
 
   onPageChange(page) {
-    browserHistory.push(`/klusterkite/Releases/${page}`);
+    browserHistory.push(`/klusterkite/Configurations/${page}`);
   }
 
   render() {
@@ -31,8 +31,8 @@ export class ReleasesList extends React.Component {
 
     return (
       <div>
-        <h3>Releases list</h3>
-        <Link to={`/klusterkite/Release/create`} className="btn btn-primary" role="button">Add a new release</Link>
+        <h3>Configurations list</h3>
+        <Link to={`/klusterkite/Configuration/create`} className="btn btn-primary" role="button">Add a new configuration</Link>
         <table className="table table-hover">
           <thead>
             <tr>
@@ -52,7 +52,7 @@ export class ReleasesList extends React.Component {
             return (
               <tr key={`${node.id}`}>
                 <td>
-                  <Link to={`/klusterkite/Release/${encodeURIComponent(node.id)}`}>
+                  <Link to={`/klusterkite/Configuration/${encodeURIComponent(node.id)}`}>
                     {node.name}
                   </Link>
                 </td>
@@ -79,7 +79,7 @@ export class ReleasesList extends React.Component {
 }
 
 export default Relay.createContainer(
-  ReleasesList,
+  ConfigurationsList,
   {
     initialVariables: {
       itemsPerPage: null,

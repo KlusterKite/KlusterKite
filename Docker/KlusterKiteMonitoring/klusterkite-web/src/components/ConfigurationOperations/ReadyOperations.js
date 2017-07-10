@@ -27,8 +27,8 @@ export class ReadyOperations extends React.Component {
   }
 
   static propTypes = {
-    releaseId: React.PropTypes.string.isRequired,
-    releaseInnerId: React.PropTypes.number.isRequired,
+    configurationId: React.PropTypes.string.isRequired,
+    configurationInnerId: React.PropTypes.number.isRequired,
     currentState: React.PropTypes.string.isRequired,
     onForceFetch: React.PropTypes.func.isRequired,
     canCreateMigration: React.PropTypes.bool.isRequired,
@@ -60,7 +60,7 @@ export class ReadyOperations extends React.Component {
       Relay.Store.commitUpdate(
         new CreateMigrationMutation(
           {
-            releaseId: this.props.releaseInnerId,
+            configurationId: this.props.configurationInnerId,
           }),
         {
           onSuccess: (response) => {
@@ -125,7 +125,7 @@ export class ReadyOperations extends React.Component {
       Relay.Store.commitUpdate(
         new SetObsoleteMutation(
           {
-            releaseId: this.props.releaseInnerId,
+            configurationId: this.props.configurationInnerId,
           }),
         {
           onSuccess: (response) => {
@@ -277,7 +277,7 @@ export class ReadyOperations extends React.Component {
              onCancel={this.onSetObsoleteCancel.bind(this)}
              onConfirm={this.onSetObsolete.bind(this)}
       >
-        You will not be able to use this release after obsoleting it.
+        You will not be able to use this configuration after obsoleting it.
       </Modal>
       }
     </div>

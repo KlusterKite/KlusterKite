@@ -193,9 +193,9 @@ export default class UpdateFeedMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.releaseId,
+      id: this.props.configurationId,
       newNode: {
-        id: this.props.releaseId,
+        id: this.props.configurationId,
         settings: {
           nodeTemplates: this.convertEdgesToArray(this.props.settings.nodeTemplates.edges, 'nodeTemplates'),
           migratorTemplates: this.convertEdgesToArray(this.props.settings.migratorTemplates.edges, 'migratorTemplates'),

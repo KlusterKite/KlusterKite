@@ -45,7 +45,7 @@ export default class SetStableMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.releaseId,
+      id: this.props.configurationId,
       isStable: this.props.isStable,
     }
   }

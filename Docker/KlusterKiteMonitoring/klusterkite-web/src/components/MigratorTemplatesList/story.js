@@ -29,7 +29,6 @@ const getTemplatesListRelay = () => {
   return {
     "configuration": {
       "id": "W3siZiI6ImNsdXN0ZXJLaXROb2Rlc0FwaSJ9LHsiZiI6InJlbGVhc2VzIiwiaWQiOjF9LHsiZiI6ImNvbmZpZ3VyYXRpb24ifV0=",
-      "__typename": "KlusterKiteNodeApi_ReleaseConfiguration",
       "migratorTemplates": {
         "edges": [{
           "node": {

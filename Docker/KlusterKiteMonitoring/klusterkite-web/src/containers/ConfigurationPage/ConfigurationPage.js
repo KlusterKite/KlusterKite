@@ -2,19 +2,19 @@ import React from 'react'
 import Relay from 'react-relay'
 import { browserHistory } from 'react-router'
 
-import ReleaseOperations from '../../components/ReleaseOperations/ReleaseOperations';
-import ReleaseForm from '../../components/ReleaseForm/ReleaseForm'
+import ConfigurationOperations from '../../components/ConfigurationOperations/ConfigurationOperations';
+import ConfigurationForm from '../../components/ConfigurationForm/ConfigurationForm'
 import FeedsList from '../../components/FeedsList/FeedList'
 import MigratorTemplatesList from '../../components/MigratorTemplatesList/MigratorTemplatesList'
 import NodeTemplatesList from '../../components/NodeTemplatesList/NodeTemplatesList'
 import PackagesList from '../../components/PackagesList/PackagesList'
 import SeedsList from '../../components/SeedsList/SeedsList'
 
-import CreateReleaseMutation from './mutations/CreateReleaseMutation'
-import UpdateReleaseMutation from './mutations/UpdateReleaseMutation'
+import CreateConfigurationMutation from './mutations/CreateConfigurationMutation'
+import UpdateConfigurationMutation from './mutations/UpdateConfigurationMutation'
 // import DeleteFeedMutation from './mutations/DeleteFeedMutation'
 
-class ReleasePage extends React.Component {
+class ConfigurationPage extends React.Component {
 
   static propTypes = {
     api: React.PropTypes.object,
@@ -37,14 +37,14 @@ class ReleasePage extends React.Component {
     return !this.props.params.hasOwnProperty('id')
   };
 
-  onSubmit = (releaseModel) => {
-    console.log('submitting release', releaseModel);
-    console.log('current model', this.props.api.release);
+  onSubmit = (configurationModel) => {
+    console.log('submitting configuration', configurationModel);
+    console.log('current model', this.props.api.configuration);
 
     if (this.isAddNew()){
-      this.addNode(releaseModel);
+      this.addNode(configurationModel);
     } else {
-      this.editNode(releaseModel);
+      this.editNode(configurationModel);
     }
   };
 
@@ -55,7 +55,7 @@ class ReleasePage extends React.Component {
   addNode = (model) => {
     console.log('create', model);
     Relay.Store.commitUpdate(
-      new CreateReleaseMutation(
+      new CreateConfigurationMutation(
         {
           majorVersion: model.majorVersion,
           minorVersion: model.minorVersion,
@@ -79,7 +79,7 @@ class ReleasePage extends React.Component {
               saving: false,
               saveErrors: null
             });
-            browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
+            browserHistory.push(`/klusterkite/Configuration/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
           }
         },
         onFailure: (transaction) => console.log(transaction),
@@ -95,7 +95,7 @@ class ReleasePage extends React.Component {
     });
 
     Relay.Store.commitUpdate(
-      new UpdateReleaseMutation(
+      new UpdateConfigurationMutation(
         {
           nodeId: this.props.params.id,
           __id: model.__id,
@@ -154,7 +154,7 @@ class ReleasePage extends React.Component {
     const canEdit = !model || model.state === 'Draft';
     return (
       <div>
-        <ReleaseForm
+        <ConfigurationForm
           onSubmit={this.onSubmit}
 //          onDelete={this.onDelete}
           initialValues={model}
@@ -164,11 +164,11 @@ class ReleasePage extends React.Component {
         />
         {model &&
         <div>
-          <ReleaseOperations
+          <ConfigurationOperations
             configuration={model.settings}
             nodeManagement={nodeManagement}
-            releaseId={this.props.params.id}
-            releaseInnerId={model.__id}
+            configurationId={this.props.params.id}
+            configurationInnerId={model.__id}
             currentState={model.state}
             onForceFetch={this.props.relay.forceFetch}
             isStable={model.isStable}
@@ -176,31 +176,31 @@ class ReleasePage extends React.Component {
           />
           <FeedsList
             configuration={model.settings}
-            releaseId={this.props.params.id}
+            configurationId={this.props.params.id}
             canEdit={canEdit}
           />
           <NodeTemplatesList
             configuration={model.settings}
             createNodeTemplatePrivilege={true}
             getNodeTemplatePrivilege={true}
-            releaseId={this.props.params.id}
+            configurationId={this.props.params.id}
             canEdit={canEdit}
           />
           <MigratorTemplatesList
             configuration={model.settings}
             createMigratorTemplatePrivilege={true}
             getMigratorTemplatePrivilege={true}
-            releaseId={this.props.params.id}
+            configurationId={this.props.params.id}
             canEdit={canEdit}
           />
           <SeedsList
             configuration={model.settings}
-            releaseId={this.props.params.id}
+            configurationId={this.props.params.id}
             canEdit={canEdit}
           />
           <PackagesList
             configuration={model.settings}
-            releaseId={this.props.params.id}
+            configurationId={this.props.params.id}
           />
         </div>
         }
@@ -210,7 +210,7 @@ class ReleasePage extends React.Component {
 }
 
 export default Relay.createContainer(
-  ReleasePage,
+  ConfigurationPage,
   {
     initialVariables: {
       id: null,
@@ -238,14 +238,14 @@ export default Relay.createContainer(
                 ${NodeTemplatesList.getFragment('configuration')}
                 ${PackagesList.getFragment('configuration')}
                 ${SeedsList.getFragment('configuration')}
-                ${ReleaseOperations.getFragment('configuration')}
+                ${ConfigurationOperations.getFragment('configuration')}
                 id
               }
             }
           },
           klusterKiteNodesApi {
             clusterManagement {
-              ${ReleaseOperations.getFragment('nodeManagement')}
+              ${ConfigurationOperations.getFragment('nodeManagement')}
             }
           }
         }

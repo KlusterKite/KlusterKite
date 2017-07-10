@@ -2,7 +2,7 @@ import React from 'react';
 
 import isEqual from 'lodash/isEqual';
 
-export default class CheckReleaseResult extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class CheckConfigurationResult extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
 
@@ -12,7 +12,7 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
   }
 
   static propTypes = {
-    newReleaseInnerId: React.PropTypes.number.isRequired,
+    newconfigurationInnerId: React.PropTypes.number.isRequired,
     activeNodes: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     compatibleTemplatesForward: React.PropTypes.arrayOf(React.PropTypes.object),
     compatibleTemplatesBackward: React.PropTypes.arrayOf(React.PropTypes.object),
@@ -29,15 +29,15 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
       };
 
       if (node.template) {
-        const indexInRelease = this.findNodeTemplateInRelease(node.template, newNodeTemplates);
+        const indexInConfiguration = this.findNodeTemplateInConfiguration(node.template, newNodeTemplates);
 
-        if (indexInRelease === -1) {
-          // If a template of an active node is not found in the new release, node will be updated
+        if (indexInConfiguration === -1) {
+          // If a template of an active node is not found in the new configuration, node will be updated
           nodesToBeUpdated.push(node);
         } else {
-          // If node releaseId does not mach new releaseId AND
+          // If node configurationId does not mach new configurationId AND
           // it is not in the compatible list
-          if (item.node.configurationId !== this.props.newReleaseInnerId && this.findNodeTemplateInCompatible(node.template, compatibleTemplates) === -1) {
+          if (item.node.configurationId !== this.props.newconfigurationInnerId && this.findNodeTemplateInCompatible(node.template, compatibleTemplates) === -1) {
             nodesToBeUpdated.push(node);
           }
         }
@@ -50,20 +50,20 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
   }
 
   /**
-   * Find node template code in a list of node templates for a new release
+   * Find node template code in a list of node templates for a new configuration
    * @param nodeTemplate {string} Code of a template to find
-   * @param newNodeTemplates {object[]} Node templates from a new release
+   * @param newNodeTemplates {object[]} Node templates from a new configuration
    * @return {number} Index of an object found, or -1 if not found
    */
-  findNodeTemplateInRelease(nodeTemplate, newNodeTemplates) {
-    // console.log('findNodeTemplateInRelease', nodeTemplate, newNodeTemplates.findIndex(x => x.node.code === nodeTemplate));
+  findNodeTemplateInConfiguration(nodeTemplate, newNodeTemplates) {
+    // console.log('findNodeTemplateInConfiguration', nodeTemplate, newNodeTemplates.findIndex(x => x.node.code === nodeTemplate));
     return newNodeTemplates.findIndex(x => x.node.code === nodeTemplate);
   }
 
   /**
-   * Find node template code in a list of compatible node templates for a new release
+   * Find node template code in a list of compatible node templates for a new configuration
    * @param nodeTemplate {string} Code of a template to find
-   * @param compatibleList {object[]} Compatible node templates for a new release
+   * @param compatibleList {object[]} Compatible node templates for a new configuration
    * @return {number} Index of an object found, or -1 if not found
    */
   findNodeTemplateInCompatible(nodeTemplate, compatibleList) {
@@ -97,16 +97,16 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
             <thead>
             <tr>
               <th>Node to be upgraded</th>
-              <th>Current release</th>
-              <th>New release</th>
+              <th>Current configuration</th>
+              <th>New configuration</th>
             </tr>
             </thead>
             <tbody>
             {this.state.nodesToBeUpdated.map((item, index) =>
               <tr key={index}>
                 <td>{item.template}</td>
-                <td>{item.releaseId}</td>
-                <td>{this.props.newReleaseInnerId}</td>
+                <td>{item.configurationId}</td>
+                <td>{this.props.newconfigurationInnerId}</td>
               </tr>
             )
             }
@@ -118,8 +118,8 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
           <thead>
           <tr>
             <th>Node to be upgraded</th>
-            <th>Current release</th>
-            <th>New release</th>
+            <th>Current configuration</th>
+            <th>New configuration</th>
           </tr>
           </thead>
           <tbody>

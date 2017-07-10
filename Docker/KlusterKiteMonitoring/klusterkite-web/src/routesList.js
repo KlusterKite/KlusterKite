@@ -14,9 +14,9 @@ import Loading from './components/Loading/index';
 import LogoutPage from './containers/LogoutPage/LogoutPage';
 import MigrationPage from './containers/MigrationPage/MigrationPage';
 import NotFoundPage from './containers/NotFoundPage/NotFoundPage';
-import ReleaseConfigCopyPage from './containers/ConfigCopyPage/ReleaseConfigCopyPage';
-import ReleasesListPage from './containers/ReleasesListPage/ReleasesListPage';
-import ReleasePage from './containers/ReleasePage/ReleasePage';
+import ConfigurationConfigCopyPage from './containers/ConfigCopyPage/ConfigurationConfigCopyPage';
+import ConfigurationsListPage from './containers/ConfigurationsListPage/ConfigurationsListPage';
+import ConfigurationPage from './containers/ConfigurationPage/ConfigurationPage';
 import RolesListPage from './containers/RolesListPage/RolesListPage';
 import RolePage from './containers/RolePage/RolePage';
 import UsersListPage from './containers/UsersListPage/UsersListPage';
@@ -38,22 +38,22 @@ export default class RoutesList extends React.Component {
           <Route path='/klusterkite/Login' component={AuthPage} />
           <Route path='/klusterkite/Logout' component={LogoutPage} />
           <Route path='/klusterkite/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
-          <Route path='/klusterkite/CopyConfig/:releaseId/:mode' component={ReleaseConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ReleaseConfigCopyPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/CopyConfig/:configurationId/:mode' component={ConfigurationConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationConfigCopyPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/GraphQL' component={GraphQLPage} />
           <Route path='/klusterkite/Migration' component={MigrationPage} queries={ApiQueries} />
-          <Route path='/klusterkite/NugetFeeds/:releaseId' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/Releases' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/Releases/:page' component={ReleasesListPage} queries={ApiQueries} render={({ props }) => props ? <ReleasesListPage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/Release/create' component={ReleasePage} queries={ApiQueries} render={({ props }) => props ? <ReleasePage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/Release/:id' component={ReleasePage} queries={ApiQueries} render={({ props }) => props ? <ReleasePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/NugetFeeds/:configurationId' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Configurations' component={ConfigurationsListPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationsListPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Configurations/:page' component={ConfigurationsListPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationsListPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Configuration/create' component={ConfigurationPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Configuration/:id' component={ConfigurationPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Roles' component={RolesListPage} queries={ApiQueries} render={({ props }) => props ? <RolesListPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Roles/create' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Roles/:id' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/Seeds/:releaseId' component={SeedPage} queries={ApiQueries} render={({ props }) => props ? <SeedPage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/NodeTemplates/:releaseId/create' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/NodeTemplates/:releaseId/:id' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/MigratorTemplates/:releaseId/create' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/MigratorTemplates/:releaseId/:id' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Seeds/:configurationId' component={SeedPage} queries={ApiQueries} render={({ props }) => props ? <SeedPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/NodeTemplates/:configurationId/create' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/NodeTemplates/:configurationId/:id' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/MigratorTemplates/:configurationId/create' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/MigratorTemplates/:configurationId/:id' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users' component={UsersListPage} queries={ApiQueries} render={({ props }) => props ? <UsersListPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users/create' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users/:id' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />

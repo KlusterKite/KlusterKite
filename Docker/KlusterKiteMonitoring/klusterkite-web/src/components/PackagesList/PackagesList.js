@@ -4,7 +4,7 @@ import Relay from 'react-relay'
 export class PackagesList extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
-    releaseId: React.PropTypes.string,
+    configurationId: React.PropTypes.string,
     configuration: React.PropTypes.object,
   };
 

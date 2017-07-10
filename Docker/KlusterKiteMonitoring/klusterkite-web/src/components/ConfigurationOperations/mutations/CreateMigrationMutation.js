@@ -53,7 +53,7 @@ export default class CreateMigrationMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      newConfigurationId: this.props.releaseId
+      newConfigurationId: this.props.configurationId
     }
   }
 
