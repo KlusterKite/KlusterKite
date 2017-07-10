@@ -65,26 +65,27 @@ export class MigrationSteps extends React.Component {
 
     return (
       <div>
-        <div className="panel panel-default">
-          <div className="panel-body">
+        {migrationSteps &&
+          <div className="panel panel-default">
+            <div className="panel-body">
 
-            <ul className="migration-steps">
-              {migrationSteps && migrationSteps.map((step, index) => {
-                const className = index === activeIndex ? 'active' : '';
-                const classNameHrLeft = index === 0 ? 'empty' : (index <= activeIndex ? 'active' : '');
-                const classNameHrRight = index === lastIndex ? 'empty' : (activeIndex > index ? 'active' : '');
-                const title = this.replacements[step] ? this.replacements[step] : step;
+              <ul className="migration-steps">
+                {migrationSteps.map((step, index) => {
+                  const className = index === activeIndex ? 'active' : '';
+                  const classNameHrLeft = index === 0 ? 'empty' : (index <= activeIndex ? 'active' : '');
+                  const classNameHrRight = index === lastIndex ? 'empty' : (activeIndex > index ? 'active' : '');
+                  const title = this.replacements[step] ? this.replacements[step] : step;
 
-                return (
-                  <li key={step} className={className}>
-                    <hr className={classNameHrLeft} />
-                    <hr className={classNameHrRight} />
-                    <div>
-                      <span className="index">{index + 1}</span>
-                    </div>
-                    <p className="title">{title}</p>
+                  return (
+                    <li key={step} className={className}>
+                      <hr className={classNameHrLeft}/>
+                      <hr className={classNameHrRight}/>
+                      <div>
+                        <span className="index">{index + 1}</span>
+                      </div>
+                      <p className="title">{title}</p>
 
-                    {index === 0 &&
+                      {index === 0 &&
                       <div className="migration-controls">
                         <CancelMigration
                           onStateChange={this.props.onStateChange}
@@ -100,9 +101,9 @@ export class MigrationSteps extends React.Component {
                           operationIsInProgress={operationIsInProgress}
                         />
                       </div>
-                    }
+                      }
 
-                    {index === lastIndex &&
+                      {index === lastIndex &&
                       <div className="migration-controls">
                         <UpdateNodes
                           onStateChange={this.props.onStateChange}
@@ -118,19 +119,21 @@ export class MigrationSteps extends React.Component {
                           operationIsInProgress={operationIsInProgress}
                         />
                       </div>
-                    }
-                  </li>
-                )
-              })}
-            </ul>
+                      }
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
           </div>
-        </div>
+        }
         <UpdateResources
           onStateChange={this.props.onStateChange}
           onError={this.props.onError}
           migrationState={this.props.resourceState.migrationState}
           canMigrateResources={this.props.resourceState.canMigrateResources}
         />
+
       </div>
     );
   }

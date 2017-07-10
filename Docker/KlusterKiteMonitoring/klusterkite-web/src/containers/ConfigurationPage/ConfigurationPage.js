@@ -149,7 +149,10 @@ class ConfigurationPage extends React.Component {
 
   render () {
     const model = this.props.api.configuration;
+    const activeConfiguration = this.props.api.activeConfiguration && this.props.api.activeConfiguration.configurations && this.props.api.activeConfiguration.configurations.edges && this.props.api.activeConfiguration.configurations.edges[0].node;
     const nodeManagement = this.props.api.klusterKiteNodesApi.clusterManagement;
+
+    console.log('activeConfiguration', activeConfiguration);
 
     const canEdit = !model || model.state === 'Draft';
     return (
@@ -161,6 +164,7 @@ class ConfigurationPage extends React.Component {
           saving={this.state.saving}
           saveErrors={this.state.saveErrors}
           canEdit={canEdit}
+          activeConfiguration={activeConfiguration}
         />
         {model &&
         <div>
@@ -240,6 +244,16 @@ export default Relay.createContainer(
                 ${SeedsList.getFragment('configuration')}
                 ${ConfigurationOperations.getFragment('configuration')}
                 id
+              }
+            }
+          },
+          activeConfiguration: klusterKiteNodesApi {
+            configurations (filter: {state: Active}, limit: 1) {
+              edges {
+                node {
+                  minorVersion
+                  majorVersion
+                }
               }
             }
           },
