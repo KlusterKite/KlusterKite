@@ -23,8 +23,8 @@ storiesOf('Release')
   })
 ;
 
-// const availableNodes = checkReleaseResult.data.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.api.klusterKiteNodesApi.getActiveNodeDescriptions;
-// const compatibleTemplates = checkReleaseResult.data.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.node.compatibleTemplates;
+// const availableNodes = checkReleaseResult.data.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check.api.klusterKiteNodesApi.getActiveNodeDescriptions;
+// const compatibleTemplates = checkReleaseResult.data.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check.node.compatibleTemplates;
 
 
 const getCompatibleTemplatesEmpty = () => {

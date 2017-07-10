@@ -25,7 +25,7 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
     activeNodes.forEach((item) => {
       const node = {
         template: item.node.nodeTemplate,
-        releaseId: item.node.releaseId
+        configurationId: item.node.configurationId
       };
 
       if (node.template) {
@@ -37,7 +37,7 @@ export default class CheckReleaseResult extends React.Component { // eslint-disa
         } else {
           // If node releaseId does not mach new releaseId AND
           // it is not in the compatible list
-          if (item.node.releaseId !== this.props.newReleaseInnerId && this.findNodeTemplateInCompatible(node.template, compatibleTemplates) === -1) {
+          if (item.node.configurationId !== this.props.newReleaseInnerId && this.findNodeTemplateInCompatible(node.template, compatibleTemplates) === -1) {
             nodesToBeUpdated.push(node);
           }
         }

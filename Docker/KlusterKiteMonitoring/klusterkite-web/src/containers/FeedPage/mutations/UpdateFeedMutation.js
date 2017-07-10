@@ -2,7 +2,7 @@ import Relay from 'react-relay'
 
 export default class UpdateFeedMutation extends Relay.Mutation {
   static fragments = {
-    configuration: () => Relay.QL`
+    settings: () => Relay.QL`
       fragment on IKlusterKiteNodeApi_ConfigurationSettings {
         nodeTemplates {
           edges {
@@ -81,7 +81,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         }
         api {
           klusterKiteNodesApi {
-            releases
+            configurations
           }
         }
       }
@@ -196,12 +196,12 @@ export default class UpdateFeedMutation extends Relay.Mutation {
       id: this.props.releaseId,
       newNode: {
         id: this.props.releaseId,
-        configuration: {
-          nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
-          migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migratorTemplates'),
-          nugetFeed: this.props.nugetFeed || this.props.configuration.nugetFeed,
-          packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
-          seedAddresses: this.updateSeedAddresses(this.props.configuration.seedAddresses),
+        settings: {
+          nodeTemplates: this.convertEdgesToArray(this.props.settings.nodeTemplates.edges, 'nodeTemplates'),
+          migratorTemplates: this.convertEdgesToArray(this.props.settings.migratorTemplates.edges, 'migratorTemplates'),
+          nugetFeed: this.props.nugetFeed || this.props.settings.nugetFeed,
+          packages: this.convertEdgesToArray(this.props.settings.packages.edges, 'packages'),
+          seedAddresses: this.updateSeedAddresses(this.props.settings.seedAddresses),
         },
       }
     }
@@ -211,13 +211,13 @@ export default class UpdateFeedMutation extends Relay.Mutation {
     return {
       model: {
         id: this.props.nodeId,
-        configuration: {
-          nodeTemplates: this.props.configuration.nodeTemplates,
-          migratorTemplates: this.props.configuration.migratorTemplates,
-          nugetFeed: this.props.configuration.nugetFeed,
-          packages: this.props.configuration.packages,
-          seedAddresses: this.props.configuration.seedAddresses,
-          id: this.props.configuration.id
+        settings: {
+          nodeTemplates: this.props.settings.nodeTemplates,
+          migratorTemplates: this.props.settings.migratorTemplates,
+          nugetFeed: this.props.settings.nugetFeed,
+          packages: this.props.settings.packages,
+          seedAddresses: this.props.settings.seedAddresses,
+          id: this.props.settings.id
         },
       },
     }

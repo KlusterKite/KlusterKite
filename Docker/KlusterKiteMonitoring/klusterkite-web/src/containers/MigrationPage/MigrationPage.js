@@ -108,7 +108,7 @@ class MigrationPage extends React.Component {
 
         {currentMigration &&
           <div>
-            <h2>Migration {currentMigration.fromRelease && currentMigration.fromRelease.name} → {currentMigration.toRelease && currentMigration.toRelease.name}</h2>
+            <h2>Migration {currentMigration.fromConfiguration && currentMigration.fromConfiguration.name} → {currentMigration.toConfiguration && currentMigration.toConfiguration.name}</h2>
             <p>Created: {currentMigration.started && DateFormat.formatDateTime(new Date(currentMigration.started))}</p>
 
             {(nodesUpdating || this.state.operationIsInProgress) && !this.state.migrationHasFinished &&
@@ -194,10 +194,10 @@ export default Relay.createContainer(
               currentMigration {
                 state
                 started
-                fromRelease {
+                fromConfiguration {
                   name
                 }
-                toRelease {
+                toConfiguration {
                   name
                 }
                 ${MigrationLogs.getFragment('currentMigration')},

@@ -37,7 +37,7 @@ class FeedPage extends React.Component {
         {
           nodeId: this.props.params.releaseId,
           releaseId: this.props.api.configuration.__id,
-          configuration: this.props.api.configuration.configuration,
+          settings: this.props.api.configuration.settings,
           nugetFeed: model.nugetFeed,
         }),
       {
@@ -112,7 +112,7 @@ export default Relay.createContainer(
             ...on IKlusterKiteNodeApi_Configuration {
               __id
               settings {
-                ${UpdateFeedMutation.getFragment('configuration')},
+                ${UpdateFeedMutation.getFragment('settings')},
                 nugetFeed,
               }
             }

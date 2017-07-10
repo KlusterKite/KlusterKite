@@ -43,16 +43,16 @@ export default class ActiveOperations extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setStable.errors &&
-              response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setStable.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setStable.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setStable.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setStable.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setStable.errors.edges);
 
               this.setState({
                 isSettingStable: false,
                 setStableErrors: messages
               });
             } else {
-              console.log('result set stable', response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setStable);
+              console.log('result set stable', response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setStable);
               // total success
               this.setState({
                 isSettingStable: false,

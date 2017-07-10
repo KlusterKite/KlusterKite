@@ -44,8 +44,8 @@ class TemplatePage extends React.Component {
       new UpdateFeedMutation(
         {
           nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.release.__id,
-          configuration: this.props.api.release.configuration,
+          releaseId: this.props.api.configuration.__id,
+          settings: this.props.api.configuration.settings,
           migratorTemplateId: editId,
           migratorTemplate: model
         }),
@@ -85,8 +85,8 @@ class TemplatePage extends React.Component {
       new UpdateFeedMutation(
         {
           nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.release.__id,
-          configuration: this.props.api.release.configuration,
+          releaseId: this.props.api.configuration.__id,
+          settings: this.props.api.configuration.settings,
           migratorTemplateId: this.props.api.release.id,
           migratorTemplate: {},
           migratorTemplateDeleteId: this.props.params.id,
@@ -165,11 +165,11 @@ export default Relay.createContainer(
               }
             }
           }
-          release:__node(id: $releaseId) {
-            ...on IKlusterKiteNodeApi_Release {
+          configuration:__node(id: $releaseId) {
+            ...on IKlusterKiteNodeApi_Configuration {
               __id
-              configuration {
-                ${UpdateFeedMutation.getFragment('configuration')},
+              settings {
+                ${UpdateFeedMutation.getFragment('settings')},
               }
             }
           }

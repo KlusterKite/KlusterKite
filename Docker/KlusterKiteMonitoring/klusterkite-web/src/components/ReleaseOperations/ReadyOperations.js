@@ -130,16 +130,16 @@ export class ReadyOperations extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete.errors &&
-              response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setObsolete.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setObsolete.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setObsolete.errors.edges);
 
               this.setState({
                 isRollbacking: false,
                 rollbackErrors: messages
               });
             } else {
-              console.log('result set obsolete', response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete);
+              console.log('result set obsolete', response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setObsolete);
               // total success
               this.setState({
                 isRollbacking: false,

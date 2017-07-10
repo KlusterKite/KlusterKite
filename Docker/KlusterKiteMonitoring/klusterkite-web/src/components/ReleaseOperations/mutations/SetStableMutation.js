@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class SetStableMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_releases_setStable}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_setStable}`
   }
 
   getFatQuery () {

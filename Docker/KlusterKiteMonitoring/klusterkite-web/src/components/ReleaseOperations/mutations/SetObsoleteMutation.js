@@ -3,7 +3,7 @@ import Relay from 'react-relay'
 export default class SetObsoleteMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_releases_setObsolete}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_setObsolete}`
   }
 
   getFatQuery () {
