@@ -8,6 +8,7 @@ import App from './containers/App/App';
 import ActorsTreePage from './containers/ActorsTreePage/ActorsTreePage';
 import AuthPage from './containers/AuthPage/AuthPage';
 import FeedPage from './containers/FeedPage/FeedPage';
+import GetPrivilegesPage from './containers/GetPrivilegesPage/GetPrivilegesPage';
 import GraphQLPage from './containers/GraphQL/GraphQLPage';
 import HomePage from './containers/Home/HomePage';
 import Loading from './components/Loading/index';
@@ -37,6 +38,7 @@ export default class RoutesList extends React.Component {
           <IndexRoute component={HomePage} queries={ApiQueries} />
           <Route path='/klusterkite/Login' component={AuthPage} />
           <Route path='/klusterkite/Logout' component={LogoutPage} />
+          <Route path='/klusterkite/GetPrivileges' component={GetPrivilegesPage} queries={ApiQueries} />
           <Route path='/klusterkite/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
           <Route path='/klusterkite/CopyConfig/:configurationId/:mode' component={ConfigurationConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationConfigCopyPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/GraphQL' component={GraphQLPage} />
