@@ -33,6 +33,7 @@ class MigrationPage extends React.Component {
     };
 
     this.onStateChange = this.onStateChange.bind(this);
+    this.onError = this.onError.bind(this);
   }
 
   componentDidMount = () => {
