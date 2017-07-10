@@ -11,7 +11,7 @@ class FeedList extends React.Component {
   }
 
   static propTypes = {
-    releaseId: React.PropTypes.string,
+    configurationId: React.PropTypes.string,
     configuration: React.PropTypes.object,
     canEdit: React.PropTypes.bool
   };
@@ -24,7 +24,7 @@ class FeedList extends React.Component {
 
           <p>
             {this.props.canEdit &&
-              <Link to={`/klusterkite/NugetFeeds/${this.props.releaseId}`}>
+              <Link to={`/klusterkite/NugetFeeds/${this.props.configurationId}`}>
                 {this.props.configuration && this.props.configuration.nugetFeed}
               </Link>
             }

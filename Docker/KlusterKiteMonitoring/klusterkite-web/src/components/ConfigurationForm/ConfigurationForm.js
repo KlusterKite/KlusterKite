@@ -4,7 +4,7 @@ import { Input, Textarea } from 'formsy-react-components';
 import Form from '../Form/Form';
 import RowText from '../Form/RowText';
 
-export default class ReleaseForm extends React.Component {
+export default class ConfigurationForm extends React.Component {
   constructor(props) {
     super(props);
     this.submit = this.submit.bind(this);
@@ -19,7 +19,8 @@ export default class ReleaseForm extends React.Component {
     saved: React.PropTypes.bool,
     saveError: React.PropTypes.string,
     saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
-    canEdit: React.PropTypes.bool
+    canEdit: React.PropTypes.bool,
+    activeConfiguration: React.PropTypes.object,
   };
 
   submit(model) {
@@ -29,19 +30,19 @@ export default class ReleaseForm extends React.Component {
   }
 
   render() {
-    const { initialValues } = this.props;
+    const { initialValues, activeConfiguration } = this.props;
     const canEdit = !initialValues || initialValues.state === 'Draft';
 
     return (
       <div>
         {initialValues && canEdit &&
-          <h2>Edit Release</h2>
+          <h2>Edit Configuration</h2>
         }
         {initialValues && !canEdit &&
-          <h2>View Release</h2>
+          <h2>View Configuration</h2>
         }
         {!initialValues &&
-          <h2>Create a new Release</h2>
+          <h2>Create a new Configuration</h2>
         }
         <Form
           onSubmit={this.submit}
@@ -58,12 +59,12 @@ export default class ReleaseForm extends React.Component {
             <Input name="__id" value={(initialValues && initialValues.__id) || ""} type="hidden" />
             <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />
             <Textarea name="notes" label="Notes" value={(initialValues && initialValues.notes) || ""} rows={3} />
-            <Input name="majorVersion" label="Major version" value={(initialValues && initialValues.majorVersion.toString()) || ""}
+            <Input name="majorVersion" label="Major version" value={(initialValues && initialValues.majorVersion.toString()) || (activeConfiguration &&  (activeConfiguration.majorVersion).toString()) || ""}
                    required
                    validations={{isNumeric:true}}
                    validationErrors={{isNumeric: 'You have to type a number'}}
                    elementWrapperClassName="col-sm-2" />
-            <Input name="minorVersion" label="Minor version" value={(initialValues && initialValues.minorVersion.toString()) || ""}
+            <Input name="minorVersion" label="Minor version" value={(initialValues && initialValues.minorVersion.toString()) || (activeConfiguration &&  (activeConfiguration.minorVersion+1).toString()) || ""}
                    required
                    validations={{isNumeric:true}}
                    validationErrors={{isNumeric: 'You have to type a number'}}

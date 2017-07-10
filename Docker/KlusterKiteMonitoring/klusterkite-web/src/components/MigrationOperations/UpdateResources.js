@@ -34,11 +34,6 @@ export class UpdateResources extends React.Component {
   };
 
   onStartMigration = (templateCode, migratorTypeName, resourceCode, target) => {
-    console.log('migration', templateCode, migratorTypeName, resourceCode, target);
-
-  };
-
-  onStartMigration = (templateCode, migratorTypeName, resourceCode, target) => {
     if (!this.state.isProcessing){
 
       this.setState({
@@ -127,9 +122,21 @@ export class UpdateResources extends React.Component {
 
                   return resources.map((resourceEdge) => {
                     const resourceNode = resourceEdge.node;
-                    const direction = resourceNode.position === 'Source' ? 'Destination' : 'Source';
-                    const iconName = direction === 'Source' ? 'backward' : 'forward';
-                    const directionName = direction === 'Source' ? 'Downgrade resources' : 'Upgrade resources';
+
+                    let direction = null;
+                    let iconName = null;
+                    let directionName = null;
+
+                    if (resourceNode.position === 'Source'){
+                      direction = 'Destination';
+                      iconName = 'forward';
+                      directionName = 'Upgrade resources';
+                    }
+                    if (resourceNode.position === 'Destination') {
+                      direction = 'Source';
+                      iconName = 'backward';
+                      directionName = 'Downgrade resources';
+                    }
 
                     return (
                       <tr key={resourceNode.code}>
@@ -137,7 +144,7 @@ export class UpdateResources extends React.Component {
                         <td className="migration-resources">{resourceNode.code}</td>
                         <td className="migration-resources">{resourceNode.position}</td>
                         <td>
-                          {this.props.canMigrateResources &&
+                          {this.props.canMigrateResources && direction && !this.state.isProcessing &&
                             <button className="btn btn-primary" type="button" onClick={() => {this.onStartMigration(node.code, migratorNode.typeName, resourceNode.code, direction)}}>
                               <Icon name={iconName} className={processClassName}/>{' '}{directionName}
                             </button>

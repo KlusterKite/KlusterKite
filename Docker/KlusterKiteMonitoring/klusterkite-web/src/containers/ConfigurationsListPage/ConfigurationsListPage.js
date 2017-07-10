@@ -1,9 +1,9 @@
 import React from 'react'
 import Relay from 'react-relay'
 
-import ReleasesList from '../../components/ReleasesList/ReleasesList';
+import ConfigurationsList from '../../components/ConfigurationsList/ConfigurationsList';
 
-class ReleasesListPage extends React.Component {
+class ConfigurationsListPage extends React.Component {
   static propTypes = {
     api: React.PropTypes.object,
     page: React.PropTypes.string,
@@ -16,7 +16,7 @@ class ReleasesListPage extends React.Component {
 
     return (
       <div>
-        <ReleasesList
+        <ConfigurationsList
           klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
           loaded={false}
           itemsPerPage={itemsPerPage}
@@ -30,7 +30,7 @@ class ReleasesListPage extends React.Component {
 
 // ${FeedsListOld.getFragment('feeds')},
 export default Relay.createContainer(
-  ReleasesListPage,
+  ConfigurationsListPage,
   {
     initialVariables: {
       itemsPerPage: 10,
@@ -51,7 +51,7 @@ export default Relay.createContainer(
         __typename
         klusterKiteNodesApi {
           id
-          ${ReleasesList.getFragment('klusterKiteNodesApi', { itemsPerPage: variables.itemsPerPage, offset: variables.offset})},
+          ${ConfigurationsList.getFragment('klusterKiteNodesApi', { itemsPerPage: variables.itemsPerPage, offset: variables.offset})},
         }
       }
       `,

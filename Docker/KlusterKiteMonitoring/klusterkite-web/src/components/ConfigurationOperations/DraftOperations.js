@@ -4,7 +4,7 @@ import Icon from 'react-fa';
 
 import delay from 'lodash/delay'
 
-import CheckReleaseMutation from './mutations/CheckReleaseMutation';
+import CheckConfigurationMutation from './mutations/CheckConfigurationMutation';
 import SetReadyMutation from './mutations/SetReadyMutation';
 
 import './styles.css';
@@ -24,15 +24,15 @@ export class DraftOperations extends React.Component {
 
   static propTypes = {
     nodeTemplates: React.PropTypes.arrayOf(React.PropTypes.object),
-    releaseId: React.PropTypes.string.isRequired,
-    releaseInnerId: React.PropTypes.number.isRequired,
+    configurationId: React.PropTypes.string.isRequired,
+    configurationInnerId: React.PropTypes.number.isRequired,
     currentState: React.PropTypes.string.isRequired,
     onForceFetch: React.PropTypes.func.isRequired,
   };
 
   onCheck = () => {
     if (!this.state.isChecking) {
-      console.log('checking release');
+      console.log('checking configuration');
 
       this.setState({
         isChecking: true,
@@ -40,30 +40,30 @@ export class DraftOperations extends React.Component {
       });
 
       Relay.Store.commitUpdate(
-        new CheckReleaseMutation(
+        new CheckConfigurationMutation(
           {
-            releaseId: this.props.releaseInnerId,
+            configurationId: this.props.configurationInnerId,
           }),
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.errors &&
-              response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check.errors.edges);
 
               this.setState({
                 isChecking: false,
                 checkErrors: messages
               });
             } else {
-              console.log('result check', response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check);
+              console.log('result check', response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check);
               // total success
               this.setState({
                 isChecking: false,
                 checkErrors: null,
                 checkSuccess: true,
-                checkCompatibleTemplates: response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.node.compatibleTemplatesBackward.edges,
-                checkActiveNodes: response.klusterKiteNodeApi_klusterKiteNodesApi_releases_check.api.klusterKiteNodesApi.getActiveNodeDescriptions.edges,
+                checkCompatibleTemplates: response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check.node.compatibleTemplatesBackward.edges,
+                checkActiveNodes: response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_check.api.klusterKiteNodesApi.getActiveNodeDescriptions.edges,
               });
             }
           },
@@ -90,14 +90,14 @@ export class DraftOperations extends React.Component {
       Relay.Store.commitUpdate(
         new SetReadyMutation(
           {
-            releaseId: this.props.releaseInnerId,
+            configurationId: this.props.configurationInnerId,
           }),
         {
           onSuccess: (response) => {
             console.log('response', response);
-            if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady.errors &&
-              response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady.errors.edges) {
-              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady.errors.edges);
+            if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setReady.errors &&
+              response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setReady.errors.edges) {
+              const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setReady.errors.edges);
 
               this.setState({
                 isSettingReady: false,
@@ -105,7 +105,7 @@ export class DraftOperations extends React.Component {
                 isChangingState: false
               });
             } else {
-              console.log('result set ready', response.klusterKiteNodeApi_klusterKiteNodesApi_releases_setReady);
+              console.log('result set ready', response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_setReady);
               // total success
               this.setState({
                 isSettingReady: false,
@@ -204,7 +204,7 @@ export class DraftOperations extends React.Component {
 
       {this.props.currentState && this.props.currentState === 'Draft' && !this.state.isChangingState &&
       <button className="btn btn-default" type="button" onClick={this.onCheck}>
-        <Icon name="check-circle" className={checkClassName}/>{' '}Check release
+        <Icon name="check-circle" className={checkClassName}/>{' '}Check configuration
       </button>
       }
 

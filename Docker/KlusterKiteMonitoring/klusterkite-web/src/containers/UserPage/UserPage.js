@@ -6,7 +6,7 @@ import UserForm from '../../components/UserForm/UserForm'
 
 import { hasPrivilege } from '../../utils/privileges';
 
-// import CreateReleaseMutation from './mutations/CreateReleaseMutation'
+// import CreateConfigurationMutation from './mutations/CreateConfigurationMutation'
 import UpdateUserMutation from './mutations/UpdateUserMutation'
 // import DeleteFeedMutation from './mutations/DeleteFeedMutation'
 
@@ -33,21 +33,21 @@ class UserPage extends React.Component {
     return !this.props.params.hasOwnProperty('id')
   };
 
-  onSubmit = (releaseModel) => {
-    console.log('submitting release', releaseModel);
-    console.log('current model', this.props.api.release);
+  onSubmit = (configurationModel) => {
+    console.log('submitting configuration', configurationModel);
+    console.log('current model', this.props.api.configuration);
 
     if (this.isAddNew()){
-      // this.addNode(releaseModel);
+      // this.addNode(configurationModel);
     } else {
-      // this.editNode(releaseModel);
+      // this.editNode(configurationModel);
     }
   };
 
   addNode = (model) => {
     console.log('create', model);
     // Relay.Store.commitUpdate(
-    //   new CreateReleaseMutation(
+    //   new CreateConfigurationMutation(
     //     {
     //       majorVersion: model.majorVersion,
     //       minorVersion: model.minorVersion,
@@ -71,7 +71,7 @@ class UserPage extends React.Component {
     //           saving: false,
     //           saveErrors: null
     //         });
-    //         browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
+    //         browserHistory.push(`/klusterkite/Configuration/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
     //       }
     //     },
     //     onFailure: (transaction) => console.log(transaction),

@@ -33,9 +33,9 @@ export default class App extends React.Component {
               </LinkContainer>
             </Nav>
             <Nav navbar>
-              {hasPrivilege('KlusterKite.NodeManager.Release.GetList') &&
-              <LinkContainer to="/klusterkite/Releases">
-                <NavItem>Releases</NavItem>
+              {hasPrivilege('KlusterKite.NodeManager.Configuration.GetList') &&
+              <LinkContainer to="/klusterkite/Configurations">
+                <NavItem>Configurations</NavItem>
               </LinkContainer>
               }
             </Nav>

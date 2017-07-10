@@ -35,9 +35,9 @@ class FeedPage extends React.Component {
     Relay.Store.commitUpdate(
       new UpdateFeedMutation(
         {
-          nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.configuration.__id,
-          configuration: this.props.api.configuration.configuration,
+          nodeId: this.props.params.configurationId,
+          configurationId: this.props.api.configuration.__id,
+          settings: this.props.api.configuration.settings,
           nugetFeed: model.nugetFeed,
         }),
       {
@@ -51,7 +51,7 @@ class FeedPage extends React.Component {
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Configuration/${this.props.params.configurationId}`);
           }
         },
         onFailure: (transaction) => {
@@ -68,7 +68,7 @@ class FeedPage extends React.Component {
   }
 
   onCancel = () => {
-    browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`)
+    browserHistory.push(`/klusterkite/Configuration/${this.props.params.configurationId}`)
   };
 
   render () {
@@ -97,7 +97,7 @@ export default Relay.createContainer(
   {
     initialVariables: {
       id: null,
-      releaseId: null,
+      configurationId: null,
       nodeExists: false,
     },
     prepareVariables: (prevVariables) => Object.assign({}, prevVariables, {
@@ -108,11 +108,11 @@ export default Relay.createContainer(
         fragment on IKlusterKiteNodeApi {
           __typename
           id
-          configuration:__node(id: $releaseId) {
+          configuration:__node(id: $configurationId) {
             ...on IKlusterKiteNodeApi_Configuration {
               __id
               settings {
-                ${UpdateFeedMutation.getFragment('configuration')},
+                ${UpdateFeedMutation.getFragment('settings')},
                 nugetFeed,
               }
             }

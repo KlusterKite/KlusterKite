@@ -12,7 +12,7 @@ import ObsoleteOperations from './ObsoleteOperations';
 
 import './styles.css';
 
-export class ReleaseOperations extends React.Component {
+export class ConfigurationOperations extends React.Component {
   constructor(props) {
     super(props);
 
@@ -31,8 +31,8 @@ export class ReleaseOperations extends React.Component {
     configuration: React.PropTypes.object,
     nodeManagement: React.PropTypes.object,
     isStable: React.PropTypes.bool.isRequired,
-    releaseId: React.PropTypes.string.isRequired,
-    releaseInnerId: React.PropTypes.number.isRequired,
+    configurationId: React.PropTypes.string.isRequired,
+    configurationInnerId: React.PropTypes.number.isRequired,
     currentState: React.PropTypes.string.isRequired,
     onForceFetch: React.PropTypes.func.isRequired,
     onStartMigration: React.PropTypes.func.isRequired,
@@ -47,19 +47,19 @@ export class ReleaseOperations extends React.Component {
 
     return (
       <div>
-        <h3>Release Operations</h3>
+        <h3>Configuration Operations</h3>
         <div>
           <DraftOperations
             nodeTemplates={nodeTemplates}
-            releaseId={this.props.releaseId}
-            releaseInnerId={this.props.releaseInnerId}
+            configurationId={this.props.configurationId}
+            configurationInnerId={this.props.configurationInnerId}
             currentState={this.props.currentState}
             onForceFetch={this.props.onForceFetch}
           />
 
           <ReadyOperations
-            releaseId={this.props.releaseId}
-            releaseInnerId={this.props.releaseInnerId}
+            configurationId={this.props.configurationId}
+            configurationInnerId={this.props.configurationInnerId}
             currentState={this.props.currentState}
             onForceFetch={this.props.onForceFetch}
             canCreateMigration={this.props.nodeManagement.resourceState.canCreateMigration}
@@ -68,16 +68,16 @@ export class ReleaseOperations extends React.Component {
           />
 
           <ActiveOperations
-            releaseId={this.props.releaseId}
-            releaseInnerId={this.props.releaseInnerId}
+            configurationId={this.props.configurationId}
+            configurationInnerId={this.props.configurationInnerId}
             currentState={this.props.currentState}
             onForceFetch={this.props.onForceFetch}
             isStable={this.props.isStable}
           />
 
           <ObsoleteOperations
-            releaseId={this.props.releaseId}
-            releaseInnerId={this.props.releaseInnerId}
+            configurationId={this.props.configurationId}
+            configurationInnerId={this.props.configurationInnerId}
             currentState={this.props.currentState}
             onForceFetch={this.props.onForceFetch}
             canCreateMigration={this.props.nodeManagement.resourceState.canCreateMigration}
@@ -87,11 +87,11 @@ export class ReleaseOperations extends React.Component {
         </div>
         {this.props.currentState && this.props.currentState === 'Draft' && !this.state.isChangingState &&
           <div className="buttons-block-margin">
-            <Link to={`/klusterkite/CopyConfig/${this.props.releaseId}/update`} className="btn btn-success" role="button">
+            <Link to={`/klusterkite/CopyConfig/${this.props.configurationId}/update`} className="btn btn-success" role="button">
               <Icon name="clone"/>{' '}Clone configuration (update packages)
             </Link>
 
-            <Link to={`/klusterkite/CopyConfig/${this.props.releaseId}/exact`} className="btn btn-success btn-margined"
+            <Link to={`/klusterkite/CopyConfig/${this.props.configurationId}/exact`} className="btn btn-success btn-margined"
                   role="button">
               <Icon name="clone"/>{' '}Clone configuration (exact)
             </Link>
@@ -111,7 +111,7 @@ export class ReleaseOperations extends React.Component {
 }
 
 export default Relay.createContainer(
-  ReleaseOperations,
+  ConfigurationOperations,
   {
     fragments: {
       configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ConfigurationSettings {

@@ -1,6 +1,6 @@
 import Relay from 'react-relay'
 
-export default class UpdateReleaseMutation extends Relay.Mutation {
+export default class UpdateConfigurationMutation extends Relay.Mutation {
 
   getMutation () {
     return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_update}`

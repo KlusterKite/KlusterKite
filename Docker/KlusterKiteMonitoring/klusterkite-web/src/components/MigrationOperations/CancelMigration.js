@@ -2,7 +2,7 @@ import React from 'react';
 import Relay from 'react-relay'
 import Icon from 'react-fa';
 
-import CancelMigrationMutation from './mutations/FinishMigrationMutation';
+import CancelMigrationMutation from './mutations/CancelMigrationMutation';
 
 import './styles.css';
 
@@ -39,7 +39,7 @@ export class FinishMigration extends React.Component {
         {
           onSuccess: (response) => {
             console.log('response', response);
-            const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCancel;
+            const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationFinish;
 
             if (responsePayload.errors &&
               responsePayload.errors.edges) {
@@ -53,13 +53,24 @@ export class FinishMigration extends React.Component {
             } else {
               console.log('result cancel migration', responsePayload.result);
               // total success
-              this.setState({
-                isProcessing: false,
-                processErrors: null,
-                processSuccessful: true,
-              });
 
-              this.props.onStateChange();
+              if (responsePayload.result) {
+                this.setState({
+                  isProcessing: false,
+                  processErrors: null,
+                  processSuccessful: true,
+                });
+                this.props.onStateChange();
+              } else {
+                const error = 'Can\'t cancel migration, reasons unknown';
+
+                this.setState({
+                  isProcessing: false,
+                  processErrors: error,
+                  processSuccessful: false,
+                });
+                this.props.onError([error]);
+              }
             }
           },
           onFailure: (transaction) => {

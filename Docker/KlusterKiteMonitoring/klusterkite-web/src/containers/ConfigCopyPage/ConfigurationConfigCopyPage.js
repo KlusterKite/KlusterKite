@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import CloneConfigMutation from './mutations/CloneConfigMutation'
 
-class ReleaseConfigCopyPage extends React.Component {
+class ConfigurationConfigCopyPage extends React.Component {
 
   static propTypes = {
     api: React.PropTypes.object,
@@ -57,7 +57,7 @@ class ReleaseConfigCopyPage extends React.Component {
     Relay.Store.commitUpdate(
       new CloneConfigMutation(
         {
-          nodeId: this.props.params.releaseId,
+          nodeId: this.props.params.configurationId,
           configurationId: this.props.api.configuration.__id,
           settings: setting,
         }),
@@ -77,7 +77,7 @@ class ReleaseConfigCopyPage extends React.Component {
               processing: false,
               saveErrors: null
             });
-            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Configuration/${this.props.params.configurationId}`);
           }
         },
         onFailure: (transaction) => {
@@ -114,14 +114,14 @@ class ReleaseConfigCopyPage extends React.Component {
 }
 
 export default Relay.createContainer(
-  ReleaseConfigCopyPage,
+  ConfigurationConfigCopyPage,
   {
     initialVariables: {
-      releaseId: null,
+      configurationId: null,
       nodeExists: false,
     },
     prepareVariables: (prevVariables) => Object.assign({}, prevVariables, {
-      nodeExists: prevVariables.releaseId !== null,
+      nodeExists: prevVariables.configurationId !== null,
     }),
     fragments: {
       api: () => Relay.QL`
@@ -215,7 +215,7 @@ export default Relay.createContainer(
               }
             }
           }
-          configuration: __node(id: $releaseId) @include( if: $nodeExists ) {
+          configuration: __node(id: $configurationId) @include( if: $nodeExists ) {
             ...on IKlusterKiteNodeApi_Configuration {
               __id
               name
