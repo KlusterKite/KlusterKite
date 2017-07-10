@@ -83,9 +83,6 @@ Target.Create "DockerContainers" (fun _ ->
     CleanDirs [|"./build/launcher"; "./build/launcherpublish"; "./build/seed"; "./build/seedpublish"; "./build/seeder"; "./build/seederpublish";|]
     buildProject (Path.GetFullPath "./build/launcher") "./build/src/KlusterKite.NodeManager/KlusterKite.NodeManager.Launcher/KlusterKite.NodeManager.Launcher.csproj"
     
-    // MSBuildRelease "./build/seed" "Build" [|"./KlusterKite.Log/KlusterKite.Log.Console/KlusterKite.Log.Console.csproj"|] |> ignore
-    // MSBuildRelease "./build/seed" "Build" [|"./KlusterKite.Log/KlusterKite.Log.ElasticSearch/KlusterKite.Log.ElasticSearch.csproj"|] |> ignore
-    // buildProject (Path.GetFullPath "./build/seed") "./KlusterKite.Monitoring/KlusterKite.Monitoring.Client/KlusterKite.Monitoring.Client.csproj"
     buildProject (Path.GetFullPath "./build/seed") "./KlusterKite.Core/KlusterKite.Core.Service/KlusterKite.Core.Service.csproj"
 
     buildProject (Path.GetFullPath "./build/seeder") "./KlusterKite.NodeManager/KlusterKite.NodeManager.Seeder.Launcher/KlusterKite.NodeManager.Seeder.Launcher.csproj"
@@ -118,6 +115,7 @@ Target.Create "DockerContainers" (fun _ ->
     buildDocker "klusterkite/publisher" "Docker/KlusterKitePublisher"
     
     // building node.js web sites
+    CleanDir "./Docker/KlusterKiteMonitoring/klusterkite-web/node_modules/.cache/babel-loader"
     Rename "./Docker/KlusterKiteMonitoring/klusterkite-web/.env-local" "./Docker/KlusterKiteMonitoring/klusterkite-web/.env"
     Rename "./Docker/KlusterKiteMonitoring/klusterkite-web/.env" "./Docker/KlusterKiteMonitoring/klusterkite-web/.env-build"
     
