@@ -2,6 +2,8 @@
 
 A framework to create scalable and redundant services based on awesome [Akka.Net](https://github.com/akkadotnet/akka.net) project.
 
+Documentation and UI is under constraction. Will be delivered soon...
+
 Contains several subprojects to solve most typical service creation and managing problems.
 
 ### [KlusterKite.Core](./KlusterKite.Core/Readme.md)
