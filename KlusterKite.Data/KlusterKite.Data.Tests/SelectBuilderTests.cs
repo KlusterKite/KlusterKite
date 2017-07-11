@@ -35,13 +35,36 @@ namespace KlusterKite.Data.Tests
             using (var context = this.CreateContext())
             {
                 IQueryable<User> query = context.Users;
-                var level2Fields = new List<ApiRequest>
+                var level5Fields = new List<ApiRequest>
+                                       {
+                                           new ApiRequest { FieldName = "name" }
+                                       };
+
+                var level4Fields = new List<ApiRequest>
+                                       {
+                                           new ApiRequest
+                                               {
+                                                   FieldName = "user",
+                                                   Fields = level5Fields
+                                               }
+                                       };
+
+                var level3Fields = new List<ApiRequest>
                                        {
                                            new ApiRequest { FieldName = "name" },
                                            new ApiRequest
                                                {
                                                    FieldName = "users",
-                                                   Fields = new[] { new ApiRequest { FieldName = "user" } }.ToList()
+                                                   Fields = new[] { new ApiRequest { FieldName = "items", Fields = level4Fields } }.ToList()
+                                               }
+                                       };
+
+                var level2Fields = new List<ApiRequest>
+                                       {
+                                           new ApiRequest
+                                               {
+                                                   FieldName = "role",
+                                                   Fields = level3Fields
                                                }
                                        };
 
@@ -51,7 +74,7 @@ namespace KlusterKite.Data.Tests
                                            new ApiRequest
                                                {
                                                    FieldName = "roles",
-                                                   Fields = new[] { new ApiRequest { FieldName = "role", Fields = level2Fields } }.ToList()
+                                                   Fields = new[] { new ApiRequest { FieldName = "items", Fields = level2Fields } }.ToList()
                                                }
                                        };
                 
