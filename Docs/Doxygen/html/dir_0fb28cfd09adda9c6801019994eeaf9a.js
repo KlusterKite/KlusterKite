@@ -1,6 +1,5 @@
 var dir_0fb28cfd09adda9c6801019994eeaf9a =
 [
-    [ "obj", "dir_378908766a012867090d1ebcd990ecab.html", "dir_378908766a012867090d1ebcd990ecab" ],
     [ "ApiHandlerActor.cs", "_api_handler_actor_8cs.html", [
       [ "ApiHandlerActor", "class_kluster_kite_1_1_a_p_i_1_1_endpoint_1_1_api_handler_actor.html", "class_kluster_kite_1_1_a_p_i_1_1_endpoint_1_1_api_handler_actor" ]
     ] ],

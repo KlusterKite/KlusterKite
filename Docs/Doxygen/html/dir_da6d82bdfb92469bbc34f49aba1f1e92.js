@@ -1,6 +1,5 @@
 var dir_da6d82bdfb92469bbc34f49aba1f1e92 =
 [
-    [ "obj", "dir_b4bd04bd0f99845161d50f805568ee87.html", "dir_b4bd04bd0f99845161d50f805568ee87" ],
     [ "BaseWebHostingConfigurator.cs", "_base_web_hosting_configurator_8cs.html", [
       [ "BaseWebHostingConfigurator", "class_kluster_kite_1_1_web_1_1_base_web_hosting_configurator.html", "class_kluster_kite_1_1_web_1_1_base_web_hosting_configurator" ]
     ] ],

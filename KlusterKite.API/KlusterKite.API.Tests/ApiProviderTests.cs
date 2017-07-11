@@ -467,7 +467,7 @@ namespace KlusterKite.API.Tests
             /// Some object
             /// </returns>
             [UsedImplicitly]
-            [DeclareField(Description = "The api method with subrequest parsing")]
+            [DeclareField(Description = "The api method with sub-request parsing")]
             public NodeObject JustMethodWithSubRequest(ApiRequest subRequest, [ApiDescription(Description = "The node uid")]Guid nodeUid) => new NodeObject { Id = nodeUid };
 
             /// <summary>

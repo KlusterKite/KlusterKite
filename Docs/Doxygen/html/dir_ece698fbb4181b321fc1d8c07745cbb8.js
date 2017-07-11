@@ -1,6 +1,5 @@
 var dir_ece698fbb4181b321fc1d8c07745cbb8 =
 [
-    [ "obj", "dir_7d178cb3c1b54ed5348b481e7f5f20de.html", "dir_7d178cb3c1b54ed5348b481e7f5f20de" ],
     [ "BaseActorTest.cs", "_base_actor_test_8cs.html", [
       [ "BaseActorTest", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test" ]
     ] ],

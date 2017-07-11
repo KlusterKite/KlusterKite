@@ -1,7 +1,6 @@
 var dir_f562e0fe68078dd1c425821e37b8f72c =
 [
     [ "Authorization", "dir_9c0a212e0b00dd0cbbb7ea19bc0e53f1.html", "dir_9c0a212e0b00dd0cbbb7ea19bc0e53f1" ],
-    [ "obj", "dir_835cafb5b6fa66751a34d8ecf77d6b04.html", "dir_835cafb5b6fa66751a34d8ecf77d6b04" ],
     [ "ApiDescriptionAttribute.cs", "_api_description_attribute_8cs.html", [
       [ "ApiDescriptionAttribute", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_api_description_attribute.html", "class_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_api_description_attribute" ]
     ] ],

@@ -1,5 +1,0 @@
-var dir_3f34686aaca56b898221e59c57bbac91 =
-[
-    [ "net46", "dir_586436c19b7b396311158bb9751f7686.html", "dir_586436c19b7b396311158bb9751f7686" ],
-    [ "netstandard1.6", "dir_c47bf84658d30217f9fb288996412bae.html", "dir_c47bf84658d30217f9fb288996412bae" ]
-];

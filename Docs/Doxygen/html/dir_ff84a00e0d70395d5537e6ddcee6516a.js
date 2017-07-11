@@ -1,7 +1,6 @@
 var dir_ff84a00e0d70395d5537e6ddcee6516a =
 [
     [ "Migrations", "dir_e61da942f087d6510763b9cb9b09c305.html", "dir_e61da942f087d6510763b9cb9b09c305" ],
-    [ "obj", "dir_a0a8a79f2fa83a4c42c02d41987c850e.html", "dir_a0a8a79f2fa83a4c42c02d41987c850e" ],
     [ "ConfigurationContext.cs", "_configuration_context_8cs.html", [
       [ "ConfigurationContext", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_context.html", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_configuration_context" ]
     ] ],

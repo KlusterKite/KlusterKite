@@ -2,7 +2,6 @@ var dir_8ebab069556d0b946272d93de3d49376 =
 [
     [ "Converters", "dir_2870fb62d1698521583a5926c70ce55e.html", "dir_2870fb62d1698521583a5926c70ce55e" ],
     [ "Messages", "dir_8a9fa0c20f3fe2b7b58d27e6d9a02227.html", "dir_8a9fa0c20f3fe2b7b58d27e6d9a02227" ],
-    [ "obj", "dir_baaf9405cc857ab15f365e3d47b2645e.html", "dir_baaf9405cc857ab15f365e3d47b2645e" ],
     [ "ApiDescription.cs", "_api_description_8cs.html", [
       [ "ApiDescription", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_description.html", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_description" ]
     ] ],

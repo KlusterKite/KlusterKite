@@ -1,6 +1,5 @@
 var dir_03d5d3a21afd0abbca3fefc6ef940ad2 =
 [
-    [ "obj", "dir_ec710edd69e92b6cdfd4c5e711b54e89.html", "dir_ec710edd69e92b6cdfd4c5e711b54e89" ],
     [ "HostConfiguration.cs", "_host_configuration_8cs.html", [
       [ "HostConfiguration", "class_kluster_kite_1_1_web_1_1_nginx_configurator_1_1_host_configuration.html", "class_kluster_kite_1_1_web_1_1_nginx_configurator_1_1_host_configuration" ]
     ] ],

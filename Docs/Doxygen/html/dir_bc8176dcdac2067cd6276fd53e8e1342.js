@@ -1,6 +1,5 @@
 var dir_bc8176dcdac2067cd6276fd53e8e1342 =
 [
-    [ "obj", "dir_7c1f22e94a6f8b2aebda2891aa0e35e0.html", "dir_7c1f22e94a6f8b2aebda2891aa0e35e0" ],
     [ "BaseContextFactory.cs", "_base_context_factory_8cs.html", [
       [ "BaseContextFactory", "class_kluster_kite_1_1_data_1_1_e_f_1_1_base_context_factory.html", "class_kluster_kite_1_1_data_1_1_e_f_1_1_base_context_factory" ]
     ] ],

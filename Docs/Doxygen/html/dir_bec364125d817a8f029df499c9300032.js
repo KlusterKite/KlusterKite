@@ -3,7 +3,6 @@ var dir_bec364125d817a8f029df499c9300032 =
     [ "Cluster", "dir_b02881474a1781f77e9413caecd085f1.html", "dir_b02881474a1781f77e9413caecd085f1" ],
     [ "Log", "dir_902c3049f9466bf037c48d9a2c449319.html", "dir_902c3049f9466bf037c48d9a2c449319" ],
     [ "Monads", "dir_1e2cde68cae1f69dd9da277b24b062e1.html", "dir_1e2cde68cae1f69dd9da277b24b062e1" ],
-    [ "obj", "dir_9cd6ad365f88479d345bee051ea25804.html", "dir_9cd6ad365f88479d345bee051ea25804" ],
     [ "Ping", "dir_82022f437ccecdea66662ed801cf53c7.html", "dir_82022f437ccecdea66662ed801cf53c7" ],
     [ "Utils", "dir_8daae1425b3ac33404f29e95f8a2f318.html", "dir_8daae1425b3ac33404f29e95f8a2f318" ],
     [ "ActorSystemUtils.cs", "_actor_system_utils_8cs.html", [

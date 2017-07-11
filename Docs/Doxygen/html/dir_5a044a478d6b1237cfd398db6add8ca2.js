@@ -1,6 +1,5 @@
 var dir_5a044a478d6b1237cfd398db6add8ca2 =
 [
-    [ "obj", "dir_42bcaa2cacb8996031d4741e38cd3f7c.html", "dir_42bcaa2cacb8996031d4741e38cd3f7c" ],
     [ "BaseSeeder.cs", "_base_seeder_8cs.html", [
       [ "BaseSeeder", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_base_seeder.html", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_base_seeder" ]
     ] ],

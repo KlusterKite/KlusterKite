@@ -2,7 +2,6 @@ var dir_c5b4c7d8cae2f4cf9249220764907a67 =
 [
     [ "ActionMessages", "dir_9f53da9d561b70a3c2d5b480394b6385.html", "dir_9f53da9d561b70a3c2d5b480394b6385" ],
     [ "Exceptions", "dir_04342cde9079e3fa10e311443f15e03e.html", "dir_04342cde9079e3fa10e311443f15e03e" ],
-    [ "obj", "dir_5c3c44af038aca7816caf85da445da78.html", "dir_5c3c44af038aca7816caf85da445da78" ],
     [ "Connection.cs", "_connection_8cs.html", [
       [ "Connection", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection.html", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_connection" ]
     ] ],

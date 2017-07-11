@@ -1,7 +1,6 @@
 var dir_bb73991c2ef291eb529e7620dcbe870d =
 [
     [ "Messages", "dir_d898fe0ff60cffff0c80a009d5a26aeb.html", "dir_d898fe0ff60cffff0c80a009d5a26aeb" ],
-    [ "obj", "dir_7baed48acc8d6d5f009fec4a5ff649f2.html", "dir_7baed48acc8d6d5f009fec4a5ff649f2" ],
     [ "RemoteDomain", "dir_39efc1d70986be13555acc888df4ba30.html", "dir_39efc1d70986be13555acc888df4ba30" ],
     [ "WebApi", "dir_abeb556203832c253bc3f8b2ef6689bb.html", "dir_abeb556203832c253bc3f8b2ef6689bb" ],
     [ "ApiProvider.cs", "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_2_api_provider_8cs.html", [

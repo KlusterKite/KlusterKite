@@ -2,7 +2,6 @@ var dir_e295b9e562bf7f2974728dca32cff64b =
 [
     [ "GraphTypes", "dir_43355c154bebb6e7f15f862aa5c24e02.html", "dir_43355c154bebb6e7f15f862aa5c24e02" ],
     [ "Internals", "dir_5b84bc46fd4d5206e02c47ac4156f42f.html", "dir_5b84bc46fd4d5206e02c47ac4156f42f" ],
-    [ "obj", "dir_3fb429ad1ced6e93b08ebe14c54f7ecc.html", "dir_3fb429ad1ced6e93b08ebe14c54f7ecc" ],
     [ "ActorSystemApiProvider.cs", "_actor_system_api_provider_8cs.html", [
       [ "ActorSystemApiProvider", "class_kluster_kite_1_1_web_1_1_graph_q_l_1_1_publisher_1_1_actor_system_api_provider.html", "class_kluster_kite_1_1_web_1_1_graph_q_l_1_1_publisher_1_1_actor_system_api_provider" ]
     ] ],

@@ -3,7 +3,6 @@ var dir_e4846c1e2a381892e2e59fcdd526b28b =
     [ "Auth", "dir_3a8c81678ead629a738fa2f4d4314454.html", "dir_3a8c81678ead629a738fa2f4d4314454" ],
     [ "Controllers", "dir_a279256fde1d6ee347303605deebb939.html", "dir_a279256fde1d6ee347303605deebb939" ],
     [ "GraphQL", "dir_ee57fd8359f18ad1bed3c0e066dd0a53.html", "dir_ee57fd8359f18ad1bed3c0e066dd0a53" ],
-    [ "obj", "dir_d7e333392166c0bb0e230705ef3efd58.html", "dir_d7e333392166c0bb0e230705ef3efd58" ],
     [ "ControllerTests.cs", "_controller_tests_8cs.html", [
       [ "ControllerTests", "class_kluster_kite_1_1_web_1_1_tests_1_1_controller_tests.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_controller_tests" ],
       [ "Configurator", "class_kluster_kite_1_1_web_1_1_tests_1_1_controller_tests_1_1_configurator.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_controller_tests_1_1_configurator" ],

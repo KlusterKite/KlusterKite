@@ -1,6 +1,5 @@
 var dir_85cc76f22c0b8681130689faea05a788 =
 [
-    [ "obj", "dir_54401118b85787675de6d81a2684a136.html", "dir_54401118b85787675de6d81a2684a136" ],
     [ "DbContextExtensions.cs", "_db_context_extensions_8cs.html", [
       [ "DbContextExtensions", "class_kluster_kite_1_1_data_1_1_e_f_1_1_in_memory_1_1_db_context_extensions.html", "class_kluster_kite_1_1_data_1_1_e_f_1_1_in_memory_1_1_db_context_extensions" ]
     ] ],

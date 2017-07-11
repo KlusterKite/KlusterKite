@@ -1,7 +1,6 @@
 var dir_f6d271e8f7686b2c1b19494ba0cb78a0 =
 [
     [ "Mock", "dir_5f67cc6ed34b5b6f2573cc98de021b3b.html", "dir_5f67cc6ed34b5b6f2573cc98de021b3b" ],
-    [ "obj", "dir_0f67a4d7f4935df3cb54dc7f6997d75e.html", "dir_0f67a4d7f4935df3cb54dc7f6997d75e" ],
     [ "ContextFactoryTest.cs", "_context_factory_test_8cs.html", [
       [ "ContextFactoryTest", "class_kluster_kite_1_1_data_1_1_tests_1_1_context_factory_test.html", "class_kluster_kite_1_1_data_1_1_tests_1_1_context_factory_test" ]
     ] ],

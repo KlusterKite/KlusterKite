@@ -1,7 +1,6 @@
 var dir_5f1180e8a42ddffb6b771e40a5c03ade =
 [
     [ "Attributes", "dir_9d6b627386662606494aea9a9e7303c3.html", "dir_9d6b627386662606494aea9a9e7303c3" ],
-    [ "obj", "dir_68639bab0d283048181167570a25674b.html", "dir_68639bab0d283048181167570a25674b" ],
     [ "AuthorizedController.cs", "_authorized_controller_8cs.html", [
       [ "AuthorizedController", "class_kluster_kite_1_1_web_1_1_authorization_1_1_authorized_controller.html", "class_kluster_kite_1_1_web_1_1_authorization_1_1_authorized_controller" ]
     ] ],
