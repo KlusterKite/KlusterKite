@@ -46,7 +46,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
             }
             catch (Exception e)
             {
-                this.Errors.Add(new MigrationLogRecord { Type = EnMigrationLogRecordType.Error, ErrorMessage = e.Message, Exception = e });
+                this.Errors.Add(new MigrationLogRecord { Type = EnMigrationLogRecordType.Error, Message = e.Message, Exception = e });
             }
         }
 

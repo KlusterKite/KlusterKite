@@ -185,7 +185,7 @@ namespace KlusterKite.NodeManager
                         t => t.Code == resourceUpgrade.TemplateCode);
                 if (template == null)
                 {
-                    error.ErrorMessage = "Migrator template was not found";
+                    error.Message = "Migrator template was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -195,7 +195,7 @@ namespace KlusterKite.NodeManager
                 var migrator = template.Migrators.FirstOrDefault(m => m.TypeName == resourceUpgrade.MigratorTypeName);
                 if (migrator == null)
                 {
-                    error.ErrorMessage = "Migrator was not found";
+                    error.Message = "Migrator was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -205,7 +205,7 @@ namespace KlusterKite.NodeManager
                 var resource = migrator.Resources.FirstOrDefault(r => r.Code == resourceUpgrade.ResourceCode);
                 if (resource == null)
                 {
-                    error.ErrorMessage = "Resource was not found";
+                    error.Message = "Resource was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -218,7 +218,7 @@ namespace KlusterKite.NodeManager
 
                 if (!executionSide.HasValue)
                 {
-                    error.ErrorMessage = "Resource can not be migrated";
+                    error.Message = "Resource can not be migrated";
                     errors.Add(error);
                     continue;
                 }
@@ -424,7 +424,7 @@ namespace KlusterKite.NodeManager
                         t => t.Template.Code == resourceUpgrade.TemplateCode);
                 if (template == null)
                 {
-                    error.ErrorMessage = "Migrator template was not found";
+                    error.Message = "Migrator template was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -435,7 +435,7 @@ namespace KlusterKite.NodeManager
                     template.MigratorsStates.FirstOrDefault(m => m.TypeName == resourceUpgrade.MigratorTypeName);
                 if (migrator == null)
                 {
-                    error.ErrorMessage = "Migrator was not found";
+                    error.Message = "Migrator was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -445,7 +445,7 @@ namespace KlusterKite.NodeManager
                 var resource = migrator.Resources.FirstOrDefault(r => r.Code == resourceUpgrade.ResourceCode);
                 if (resource == null)
                 {
-                    error.ErrorMessage = "Resource was not found";
+                    error.Message = "Resource was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -551,7 +551,7 @@ namespace KlusterKite.NodeManager
                                     this.GetType().Name,
                                     plan.Template.Code,
                                     configurationId,
-                                    operation.ErrorMessage,
+                                    operation.Message,
                                     operation.ErrorStackTrace);
                         }
                         else
@@ -583,7 +583,7 @@ namespace KlusterKite.NodeManager
                                     MigrationId = this.StateData.Migration.Id,
                                     MigratorTemplateCode = plan.Template.Code,
                                     MigratorTemplateName = plan.Template.Name,
-                                    ErrorMessage = $"Error while executing migration: {error}"
+                                    Message = $"Error while executing migration: {error}"
                                 });
 
                         Context.GetLogger()
@@ -606,7 +606,7 @@ namespace KlusterKite.NodeManager
                             MigrationId = this.StateData.Migration.Id,
                             MigratorTemplateCode = plan.Template.Code,
                             MigratorTemplateName = plan.Template.Name,
-                            ErrorMessage = exception.Message,
+                            Message = exception.Message,
                             Exception = exception
                         });
             }
@@ -651,7 +651,7 @@ namespace KlusterKite.NodeManager
                                     this.GetType().Name,
                                     plan.Template.Code,
                                     this.StateData.Configuration.Id,
-                                    operation.ErrorMessage,
+                                    operation.Message,
                                     operation.ErrorStackTrace);
                         }
                     }
@@ -670,7 +670,7 @@ namespace KlusterKite.NodeManager
                                     ConfigurationId = this.StateData.Configuration.Id,
                                     MigratorTemplateCode = plan.Template.Code,
                                     MigratorTemplateName = plan.Template.Name,
-                                    ErrorMessage = $"Error while executing migration: {error}"
+                                    Message = $"Error while executing migration: {error}"
                                 });
                         Context.GetLogger()
                             .Error(
@@ -691,7 +691,7 @@ namespace KlusterKite.NodeManager
                             ConfigurationId = this.StateData.Configuration.Id,
                             MigratorTemplateCode = plan.Template.Code,
                             MigratorTemplateName = plan.Template.Name,
-                            ErrorMessage = exception.Message,
+                            Message = exception.Message,
                             Exception = exception
                         });
             }
@@ -735,6 +735,7 @@ namespace KlusterKite.NodeManager
             Directory.CreateDirectory(tempDir);
             try
             {
+                var context = Context;
                 foreach (var migratorTemplate in configuration.Settings.MigratorTemplates)
                 {
                     try
@@ -746,7 +747,8 @@ namespace KlusterKite.NodeManager
                             executionDirectory,
                             forceExtract,
                             tempDir,
-                            errors);
+                            errors,
+                            context);
                     }
                     catch (Exception exception)
                     {
@@ -758,7 +760,7 @@ namespace KlusterKite.NodeManager
                                     MigrationId = migrationId,
                                     MigratorTemplateCode = migratorTemplate.Code,
                                     MigratorTemplateName = migratorTemplate.Name,
-                                    ErrorMessage = $"error on extracting template: {exception.Message}",
+                                    Message = $"error on extracting template: {exception.Message}",
                                     Exception = exception
                                 });
                     }
@@ -796,10 +798,21 @@ namespace KlusterKite.NodeManager
         /// <param name="errors">
         /// The list of errors to fill
         /// </param>
+        /// <param name="context">
+        /// The actor context in order not to loose it during async operations
+        /// </param>
         /// <returns>
         /// The async task
         /// </returns>
-        private async Task ExtractConfigurationMigrationTemplateAsync(Configuration configuration, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationLogRecord> errors)
+        private async Task ExtractConfigurationMigrationTemplateAsync(
+            Configuration configuration,
+            int? migrationId,
+            MigratorTemplate migratorTemplate,
+            string executionDirectory,
+            bool forceExtract,
+            string tempDir,
+            List<MigrationLogRecord> errors,
+            IActorContext context)
         {
             var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
             if (Directory.Exists(migratorExecutionDirectory))
@@ -835,7 +848,7 @@ namespace KlusterKite.NodeManager
             }
             catch (Exception exception)
             {
-                Context.GetLogger().Error(
+                context.GetLogger().Error(
                     exception,
                     "{Type} Error on creating service for migrator template {MigratorTemplateCode} of configuration {ConfigurationId}",
                     this.GetType().Name,
@@ -850,7 +863,7 @@ namespace KlusterKite.NodeManager
                             MigrationId = migrationId,
                             MigratorTemplateCode = migratorTemplate.Code,
                             MigratorTemplateName = migratorTemplate.Name,
-                            ErrorMessage = $"error on creating service: {exception.Message}",
+                            Message = $"error on creating service: {exception.Message}",
                             Exception = exception
                         });
             }
@@ -1101,7 +1114,7 @@ namespace KlusterKite.NodeManager
                                     this.GetType().Name,
                                     migratorTemplate.Code,
                                     configuration.Id,
-                                    error.ErrorMessage,
+                                    error.Message,
                                     error.ErrorStackTrace);
                         }
 
@@ -1121,7 +1134,7 @@ namespace KlusterKite.NodeManager
                                 MigrationId = migrationId,
                                 MigratorTemplateCode = migratorTemplate.Code,
                                 MigratorTemplateName = migratorTemplate.Name,
-                                ErrorMessage =
+                                Message =
                                     $"Error while requesting migration state: {exception.Message}",
                                 Exception = exception
                             });

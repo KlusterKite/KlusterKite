@@ -74,7 +74,7 @@ namespace KlusterKite.NodeManager.Migrator.Executor
                         new MigrationLogRecord
                             {
                                 Type = EnMigrationLogRecordType.Error,
-                                ErrorMessage = $"Migrator type {typeName} was not found",
+                                Message = $"Migrator type {typeName} was not found",
                                 MigratorTypeName = typeName
                             });
                     continue;
@@ -86,7 +86,7 @@ namespace KlusterKite.NodeManager.Migrator.Executor
                         new MigrationLogRecord
                             {
                                 Type = EnMigrationLogRecordType.Error,
-                                ErrorMessage = $"Type {typeName} doesn't implement IMigrator",
+                                Message = $"Type {typeName} doesn't implement IMigrator",
                                 MigratorTypeName = typeName
                             });
                     continue;

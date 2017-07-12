@@ -425,7 +425,7 @@ namespace KlusterKite.NodeManager.Tests
                 var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
                 var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
                 Assert.Equal(EnConfigurationState.Active, sourceConfiguration.State);
-                Assert.Equal(EnConfigurationState.Obsolete, destinationConfiguration.State);
+                Assert.Equal(EnConfigurationState.Faulted, destinationConfiguration.State);
             }
 
             this.CheckNodesUpgrade(1, node1, node2, node3);
@@ -1007,7 +1007,7 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
                 var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnConfigurationState.Obsolete, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Archived, sourceConfiguration.State);
                 Assert.Equal(EnConfigurationState.Active, destinationConfiguration.State);
             }
 
@@ -1151,7 +1151,7 @@ namespace KlusterKite.NodeManager.Tests
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
-                                    };
+                };
                 ds.Migrations.Add(migration);
                 var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
                 var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
@@ -1301,7 +1301,7 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
                 var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnConfigurationState.Obsolete, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Archived, sourceConfiguration.State);
                 Assert.Equal(EnConfigurationState.Active, destinationConfiguration.State);
             }
 

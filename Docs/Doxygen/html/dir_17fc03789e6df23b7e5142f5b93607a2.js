@@ -2,6 +2,11 @@ var dir_17fc03789e6df23b7e5142f5b93607a2 =
 [
     [ "Migrations", "dir_d559711bb1391a2e3dca85d222332cfe.html", "dir_d559711bb1391a2e3dca85d222332cfe" ],
     [ "Mock", "dir_01ffb1b87933bdc3780b7564e5f05171.html", "dir_01ffb1b87933bdc3780b7564e5f05171" ],
+    [ "ApiIntegrationTests.cs", "_api_integration_tests_8cs.html", [
+      [ "ApiIntegrationTests", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests.html", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests" ],
+      [ "Configuration", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests_1_1_configuration.html", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests_1_1_configuration" ],
+      [ "Installer", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests_1_1_installer.html", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests_1_1_installer" ]
+    ] ],
     [ "ApiTests.cs", "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs.html", "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs" ],
     [ "ConfigurationCheckTests.cs", "_configuration_check_tests_8cs.html", [
       [ "ConfigurationCheckTests", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_configuration_check_tests.html", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_configuration_check_tests" ]

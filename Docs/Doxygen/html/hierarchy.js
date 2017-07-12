@@ -69,6 +69,9 @@ var hierarchy =
     [ "KlusterKite.Core.TestKit.BaseActorTest< ApiBrowserActorTest.Configurator >", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html", [
       [ "KlusterKite.Web.Tests.GraphQL.ApiBrowserActorTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l_1_1_api_browser_actor_test.html", null ]
     ] ],
+    [ "KlusterKite.Core.TestKit.BaseActorTest< ApiIntegrationTests.Configuration >", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html", [
+      [ "KlusterKite.NodeManager.Tests.ApiIntegrationTests", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests.html", null ]
+    ] ],
     [ "KlusterKite.Core.TestKit.BaseActorTest< ApiPublisherActorTests.Configurator >", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html", [
       [ "KlusterKite.API.Tests.ApiHandlerActorTests", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_handler_actor_tests.html", null ],
       [ "KlusterKite.API.Tests.ApiPublisherActorTests", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_publisher_actor_tests.html", null ]
@@ -130,6 +133,7 @@ var hierarchy =
       [ "KlusterKite.NodeManager.Client.Installer", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_installer.html", null ],
       [ "KlusterKite.NodeManager.ConfigurationSource.Installer", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_installer.html", null ],
       [ "KlusterKite.NodeManager.Installer", "class_kluster_kite_1_1_node_manager_1_1_installer.html", null ],
+      [ "KlusterKite.NodeManager.Tests.ApiIntegrationTests.Installer", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests_1_1_installer.html", null ],
       [ "KlusterKite.Security.Client.Installer", "class_kluster_kite_1_1_security_1_1_client_1_1_installer.html", null ],
       [ "KlusterKite.Security.SessionRedis.Installer", "class_kluster_kite_1_1_security_1_1_session_redis_1_1_installer.html", null ],
       [ "KlusterKite.Web.Authentication.Installer", "class_kluster_kite_1_1_web_1_1_authentication_1_1_installer.html", null ],
@@ -385,8 +389,7 @@ var hierarchy =
       [ "KlusterKite.NodeManager.Client.ORM.SeedAddress", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_seed_address.html", null ]
     ] ],
     [ "KlusterKite.NodeManager.Launcher.Utils.IPackageRepository", "interface_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_i_package_repository.html", [
-      [ "KlusterKite.NodeManager.Launcher.Utils.RemotePackageRepository", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_remote_package_repository.html", null ],
-      [ "KlusterKite.NodeManager.Tests.Mock.MockPackageRepository", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_mock_1_1_mock_package_repository.html", null ]
+      [ "KlusterKite.NodeManager.Launcher.Utils.RemotePackageRepository", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_remote_package_repository.html", null ]
     ] ],
     [ "KlusterKite.API.Provider.Resolvers.IResolver", "interface_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_i_resolver.html", [
       [ "KlusterKite.API.Provider.Resolvers.EnumResolver< T >", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_enum_resolver.html", null ],
@@ -552,11 +555,11 @@ var hierarchy =
     [ "KlusterKite.NodeManager.Client.Messages.Migration.ResourceStateRequest", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state_request.html", null ],
     [ "KlusterKite.NodeManager.Client.Messages.Migration.ResourceUpgrade", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_upgrade.html", null ],
     [ "KlusterKite.NodeManager.Messages.ResourceUpgradeRequest", "class_kluster_kite_1_1_node_manager_1_1_messages_1_1_resource_upgrade_request.html", null ],
-    [ "KlusterKite.NodeManager.Launcher.Utils.RestSharpUtils", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_rest_sharp_utils.html", null ],
     [ "KlusterKite.Web.Tests.RestSharpUtils", "class_kluster_kite_1_1_web_1_1_tests_1_1_rest_sharp_utils.html", null ],
+    [ "KlusterKite.NodeManager.Launcher.Utils.RestSharpUtils", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_rest_sharp_utils.html", null ],
     [ "KlusterKite.Data.Tests.Mock.Role", "class_kluster_kite_1_1_data_1_1_tests_1_1_mock_1_1_role.html", null ],
-    [ "KlusterKite.NodeManager.Client.ORM.RoleUser", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_role_user.html", null ],
     [ "KlusterKite.Data.Tests.Mock.RoleUser", "class_kluster_kite_1_1_data_1_1_tests_1_1_mock_1_1_role_user.html", null ],
+    [ "KlusterKite.NodeManager.Client.ORM.RoleUser", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_role_user.html", null ],
     [ "ScalarGraphType", null, [
       [ "KlusterKite.Web.GraphQL.Publisher.GraphTypes.GuidGraphType", "class_kluster_kite_1_1_web_1_1_graph_q_l_1_1_publisher_1_1_graph_types_1_1_guid_graph_type.html", null ]
     ] ],
@@ -583,6 +586,7 @@ var hierarchy =
       [ "KlusterKite.Core.Tests.Configuration.ConfigurationTest.Configurator", "class_kluster_kite_1_1_core_1_1_tests_1_1_configuration_1_1_configuration_test_1_1_configurator.html", null ],
       [ "KlusterKite.Data.Tests.DataActorTests.Configurator", "class_kluster_kite_1_1_data_1_1_tests_1_1_data_actor_tests_1_1_configurator.html", null ],
       [ "KlusterKite.LargeObjects.Tests.ParcelsTest.Configurator", "class_kluster_kite_1_1_large_objects_1_1_tests_1_1_parcels_test_1_1_configurator.html", null ],
+      [ "KlusterKite.NodeManager.Tests.ApiIntegrationTests.Configuration", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_api_integration_tests_1_1_configuration.html", null ],
       [ "KlusterKite.NodeManager.Tests.ConfigurationSourceTests.Configurator", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_configuration_source_tests_1_1_configurator.html", null ],
       [ "KlusterKite.NodeManager.Tests.MigratorTests.Configurator", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrator_tests_1_1_configurator.html", null ],
       [ "KlusterKite.NodeManager.Tests.NodeManagerActorTests.Configurator", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_node_manager_actor_tests_1_1_configurator.html", null ],

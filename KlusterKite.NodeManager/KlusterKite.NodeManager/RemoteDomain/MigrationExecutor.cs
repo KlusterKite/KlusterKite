@@ -52,7 +52,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                             {
                                 Type = EnMigrationLogRecordType.Error,
                                 MigratorTypeName = command.TypeName,
-                                ErrorMessage = "Migrator is not defined"
+                                Message = "Migrator is not defined"
                             });
                     this.Logs.Add($"Migrator {command.TypeName} was not found");
                     continue;
@@ -80,7 +80,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage = "Resource is not defined in the migrator";
+                        operation.Message = "Resource is not defined in the migrator";
                         continue;
                     }
 
@@ -95,7 +95,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage =
+                        operation.Message =
                             $"Exception while checking resource current point: {exception.Message}";
                         operation.Exception = exception;
                         this.Logs.Add($"Exception while checking resource {pair.Key} current point: {exception.Message}");
@@ -106,7 +106,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage = "Resource cannot migrate to point";
+                        operation.Message = "Resource cannot migrate to point";
                         this.Logs.Add($"Resource {pair.Key} cannot migrate to point");
                         continue;
                     }
@@ -119,7 +119,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage =
+                        operation.Message =
                             $"Exception while migrating resource: {exception.Message}";
                         operation.Exception = exception;
                         this.Logs.Add($"Exception while migrating resource {pair.Key}: {exception.Message}");

@@ -1,5 +1,14 @@
 var NAVTREEINDEX2 =
 {
+"_i_crud_action_message_8cs.html":[2,0,2,1,0,5],
+"_i_crud_action_message_8cs_source.html":[2,0,2,1,0,5],
+"_i_large_object_8cs.html":[2,0,2,1,4],
+"_i_large_object_8cs_source.html":[2,0,2,1,4],
+"_i_logger_configurator_8cs.html":[2,0,1,0,1,2],
+"_i_logger_configurator_8cs_source.html":[2,0,1,0,1,2],
+"_i_message_router_8cs.html":[2,0,1,0,9],
+"_i_message_router_8cs_source.html":[2,0,1,0,9],
+"_i_message_with_extra_data_8cs.html":[2,0,2,1,5],
 "_i_message_with_extra_data_8cs_source.html":[2,0,2,1,5],
 "_i_message_with_path_8cs.html":[2,0,1,2,3],
 "_i_message_with_path_8cs_source.html":[2,0,1,2,3],
@@ -125,9 +134,9 @@ var NAVTREEINDEX2 =
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_seeder_2_program_8cs_source.html":[2,0,6,14,0],
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_seeder_8_launcher_2_program_8cs.html":[2,0,6,15,1],
 "_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_seeder_8_launcher_2_program_8cs_source.html":[2,0,6,15,1],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs.html":[2,0,6,16,2],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs.html#ac6ff3660c450519b83100e2572f8f452":[2,0,6,16,2,1],
-"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs_source.html":[2,0,6,16,2],
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs.html":[2,0,6,16,3],
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs.html#ac6ff3660c450519b83100e2572f8f452":[2,0,6,16,3,1],
+"_kluster_kite_8_node_manager_2_kluster_kite_8_node_manager_8_tests_2_api_tests_8cs_source.html":[2,0,6,16,3],
 "_kluster_kite_8_node_manager_8_client_2_o_r_m_2_configuration_8cs.html":[2,0,6,2,3,1],
 "_kluster_kite_8_node_manager_8_client_2_o_r_m_2_configuration_8cs_source.html":[2,0,6,2,3,1],
 "_kluster_kite_8_node_manager_8_seeder_8_launcher_2_configuration_8cs.html":[2,0,6,15,0],
@@ -240,14 +249,5 @@ var NAVTREEINDEX2 =
 "_migrator_template_8cs_source.html":[2,0,6,2,3,12],
 "_migrator_template_configuration_state_8cs.html":[2,0,6,2,2,5],
 "_migrator_template_configuration_state_8cs_source.html":[2,0,6,2,2,5],
-"_migrator_template_migration_state_8cs.html":[2,0,6,2,2,6],
-"_migrator_template_migration_state_8cs_source.html":[2,0,6,2,2,6],
-"_migrator_tests_8cs.html":[2,0,6,16,8],
-"_migrator_tests_8cs.html#a8253acfeb0ba0d6788dc6dca96349b7c":[2,0,6,16,8,2],
-"_migrator_tests_8cs_source.html":[2,0,6,16,8],
-"_mock_package_repository_8cs.html":[2,0,6,16,1,0],
-"_mock_package_repository_8cs_source.html":[2,0,6,16,1,0],
-"_mock_resource_migrator_8cs.html":[2,0,6,13,0],
-"_mock_resource_migrator_8cs_source.html":[2,0,6,13,0],
-"_mock_resource_seeder_8cs.html":[2,0,6,13,1]
+"_migrator_template_migration_state_8cs.html":[2,0,6,2,2,6]
 };

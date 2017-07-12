@@ -141,11 +141,11 @@ namespace KlusterKite.NodeManager.Client.ORM
         public string DestinationPoint { get; set; }
 
         /// <summary>
-        /// Gets or sets the error message
+        /// Gets or sets the message
         /// </summary>
-        [DeclareField("the resource name")]
+        [DeclareField("the message")]
         [UsedImplicitly]
-        public string ErrorMessage { get; set; }
+        public string Message { get; set; }
 
         /// <summary>
         /// Gets or sets the error stack trace

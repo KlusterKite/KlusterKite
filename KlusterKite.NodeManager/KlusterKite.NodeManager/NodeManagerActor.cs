@@ -845,7 +845,7 @@ namespace KlusterKite.NodeManager
                 Context.GetLogger().Error(
                     "{Type}: MigrationActor error - {ErrorMessage}\n{ErrorStackTrace}",
                     this.GetType().Name,
-                    error.ErrorMessage,
+                    error.Message,
                     error.ErrorStackTrace);
             }
 
@@ -915,7 +915,8 @@ namespace KlusterKite.NodeManager
 
             using (var ds = this.GetContext())
             {
-                var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
+                var migration = ds.Migrations.Include(nameof(Migration.Logs))
+                    .FirstOrDefault(m => m.Id == this.currentMigration.Id);
                 if (migration == null)
                 {
                     this.Sender.Tell(false);
@@ -933,6 +934,27 @@ namespace KlusterKite.NodeManager
                 migration.Finished = DateTimeOffset.Now;
                 migration.State = EnMigrationState.Failed;
                 migration.IsActive = false;
+
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.FromConfigurationId,
+                            Type = EnMigrationLogRecordType.CanceledFromConfiguration,
+                            Message = "The migration from this configuration was canceled"
+                        });
+
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.ToConfigurationId,
+                            Type = EnMigrationLogRecordType.CanceledToConfiguration,
+                            Message = "The migration to this configuration was canceled"
+                        });
+
                 ds.SaveChanges();
             }
 
@@ -967,7 +989,7 @@ namespace KlusterKite.NodeManager
 
             using (var ds = this.GetContext())
             {
-                var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
+                var migration = ds.Migrations.Include(nameof(Migration.Logs)).FirstOrDefault(m => m.Id == this.currentMigration.Id);
                 if (migration == null)
                 {
                     this.Sender.Tell(false);
@@ -985,6 +1007,26 @@ namespace KlusterKite.NodeManager
                 migration.Finished = DateTimeOffset.Now;
                 migration.State = EnMigrationState.Completed;
                 migration.IsActive = false;
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.FromConfigurationId,
+                            Type = EnMigrationLogRecordType.FinishedFromConfiguration,
+                            Message = "The migration from this configuration was finished"
+                        });
+
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.ToConfigurationId,
+                            Type = EnMigrationLogRecordType.FinishedToConfiguration,
+                            Message = "The migration to this configuration was finished"
+                        });
+
                 ds.SaveChanges();
             }
 
@@ -1043,9 +1085,7 @@ namespace KlusterKite.NodeManager
 
                 if (request.Target == EnMigrationSide.Source)
                 {
-                    destinationConfiguration.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
-                                                   ? EnConfigurationState.Obsolete
-                                                   : EnConfigurationState.Faulted;
+                    destinationConfiguration.State = EnConfigurationState.Faulted;
                     sourceConfiguration.State = EnConfigurationState.Active;
                 }
                 else
@@ -1053,7 +1093,7 @@ namespace KlusterKite.NodeManager
                     destinationConfiguration.State = EnConfigurationState.Active;
                     sourceConfiguration.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
                                               ? EnConfigurationState.Faulted
-                                              : EnConfigurationState.Obsolete;
+                                              : EnConfigurationState.Archived;
                 }
 
                 ds.SaveChanges();
@@ -1588,7 +1628,9 @@ namespace KlusterKite.NodeManager
                     if (request.Id == this.currentConfiguration.Id)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Migration>.Error(new Exception("This configuration is already set"), null));
+                            CrudActionResponse<Migration>.Error(
+                                new Exception("This configuration is already set"),
+                                null));
                         return;
                     }
 
@@ -1618,6 +1660,29 @@ namespace KlusterKite.NodeManager
                                         };
                     ds.Migrations.Add(migration);
                     ds.SaveChanges();
+
+                    migration.Logs = new List<MigrationLogRecord>();
+                    migration.Logs.Add(
+                        new MigrationLogRecord
+                            {
+                                Started = migration.Started,
+                                MigrationId = migration.Id,
+                                ConfigurationId = migration.FromConfigurationId,
+                                Type = EnMigrationLogRecordType.StartedFromConfiguration,
+                                Message = "The migration from this configuration was started"
+                            });
+
+                    migration.Logs.Add(
+                        new MigrationLogRecord
+                            {
+                                Started = migration.Started,
+                                MigrationId = migration.Id,
+                                ConfigurationId = migration.ToConfigurationId,
+                                Type = EnMigrationLogRecordType.StartedToConfiguration,
+                                Message = "The migration to this configuration was started"
+                        });
+                    ds.SaveChanges();
+
                     this.currentMigration = migration;
                     this.resourceState.OperationIsInProgress = true;
                     this.resourceState.CanCancelMigration = false;
@@ -1629,6 +1694,7 @@ namespace KlusterKite.NodeManager
                     this.resourceState.ConfigurationState = null;
                     this.resourceState.MigrationState = null;
                     this.resourceMigrator.Tell(new RecheckState(), this.Self);
+
                     this.Sender.Tell(CrudActionResponse<Migration>.Success(migration, null));
                 }
             }

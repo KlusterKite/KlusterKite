@@ -35,7 +35,6 @@ var searchData=
   ['migratortemplateconfigurationstate_2ecs',['MigratorTemplateConfigurationState.cs',['../_migrator_template_configuration_state_8cs.html',1,'']]],
   ['migratortemplatemigrationstate_2ecs',['MigratorTemplateMigrationState.cs',['../_migrator_template_migration_state_8cs.html',1,'']]],
   ['migratortests_2ecs',['MigratorTests.cs',['../_migrator_tests_8cs.html',1,'']]],
-  ['mockpackagerepository_2ecs',['MockPackageRepository.cs',['../_mock_package_repository_8cs.html',1,'']]],
   ['mockresourcemigrator_2ecs',['MockResourceMigrator.cs',['../_mock_resource_migrator_8cs.html',1,'']]],
   ['mockresourceseeder_2ecs',['MockResourceSeeder.cs',['../_mock_resource_seeder_8cs.html',1,'']]],
   ['monitoringapi_2ecs',['MonitoringApi.cs',['../_monitoring_api_8cs.html',1,'']]],

@@ -36,6 +36,42 @@ namespace KlusterKite.NodeManager.Client.ORM
         /// The faulted operation
         /// </summary>
         [ApiDescription("The faulted operation")]
-        OperationError = 3
+        OperationError = 3,
+
+        /// <summary>
+        /// The new migration from this configuration was started
+        /// </summary>
+        [ApiDescription("The new migration from this configuration was started")]
+        StartedFromConfiguration = 4,
+
+        /// <summary>
+        /// The migration from this configuration was finished
+        /// </summary>
+        [ApiDescription("The migration from this configuration was finished")]
+        FinishedFromConfiguration = 5,
+
+        /// <summary>
+        /// The migration from this configuration was canceled
+        /// </summary>
+        [ApiDescription("The migration from this configuration was canceled")]
+        CanceledFromConfiguration = 6,
+
+        /// <summary>
+        /// The new migration to this configuration was started
+        /// </summary>
+        [ApiDescription("The new migration to this configuration was started")]
+        StartedToConfiguration = 7,
+
+        /// <summary>
+        /// The migration to this configuration was finished
+        /// </summary>
+        [ApiDescription("The migration to this configuration was finished")]
+        FinishedToConfiguration = 8,
+
+        /// <summary>
+        /// The migration to this configuration was canceled
+        /// </summary>
+        [ApiDescription("The migration to this configuration was canceled")]
+        CanceledToConfiguration = 9
     }
 }

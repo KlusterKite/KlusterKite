@@ -10,8 +10,11 @@ using KlusterKite.NodeManager.Client.ORM;
 
 namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 {
+    /// <summary>
+    /// The initial database structure
+    /// </summary>
     [DbContext(typeof(ConfigurationContext))]
-    [Migration("20170708114537_Init")]
+    [Migration("20170712163659_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,11 +113,11 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Migrations
 
                     b.Property<string>("DestinationPoint");
 
-                    b.Property<string>("ErrorMessage");
-
                     b.Property<string>("ErrorStackTrace");
 
                     b.Property<DateTimeOffset?>("Finished");
+
+                    b.Property<string>("Message");
 
                     b.Property<int?>("MigrationId");
 

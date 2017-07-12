@@ -1,5 +1,12 @@
 var NAVTREEINDEX3 =
 {
+"_migrator_template_migration_state_8cs_source.html":[2,0,6,2,2,6],
+"_migrator_tests_8cs.html":[2,0,6,16,9],
+"_migrator_tests_8cs.html#a8253acfeb0ba0d6788dc6dca96349b7c":[2,0,6,16,9,2],
+"_migrator_tests_8cs_source.html":[2,0,6,16,9],
+"_mock_resource_migrator_8cs.html":[2,0,6,13,0],
+"_mock_resource_migrator_8cs_source.html":[2,0,6,13,0],
+"_mock_resource_seeder_8cs.html":[2,0,6,13,1],
 "_mock_resource_seeder_8cs_source.html":[2,0,6,13,1],
 "_monitoring_api_8cs.html":[2,0,5,0,4],
 "_monitoring_api_8cs_source.html":[2,0,5,0,4],
@@ -41,8 +48,8 @@ var NAVTREEINDEX3 =
 "_node_interface_8cs_source.html":[2,0,8,5,0,3],
 "_node_manager_actor_8cs.html":[2,0,6,0,7],
 "_node_manager_actor_8cs_source.html":[2,0,6,0,7],
-"_node_manager_actor_tests_8cs.html":[2,0,6,16,9],
-"_node_manager_actor_tests_8cs_source.html":[2,0,6,16,9],
+"_node_manager_actor_tests_8cs.html":[2,0,6,16,10],
+"_node_manager_actor_tests_8cs_source.html":[2,0,6,16,10],
 "_node_manager_api_8cs.html":[2,0,6,0,2,5],
 "_node_manager_api_8cs.html#a32e37e7482aa0954df5704f76ae88a8b":[2,0,6,0,2,5,1],
 "_node_manager_api_8cs_source.html":[2,0,6,0,2,5],
@@ -232,8 +239,8 @@ var NAVTREEINDEX3 =
 "_swap_visitor_8cs_source.html":[2,0,0,3,0,11],
 "_temp_api_request_8cs.html":[2,0,8,5,12],
 "_temp_api_request_8cs_source.html":[2,0,8,5,12],
-"_temp_test_8cs.html":[2,0,6,16,10],
-"_temp_test_8cs_source.html":[2,0,6,16,10],
+"_temp_test_8cs.html":[2,0,6,16,11],
+"_temp_test_8cs_source.html":[2,0,6,16,11],
 "_templates_statistics_request_8cs.html":[2,0,6,0,0,8],
 "_templates_statistics_request_8cs_source.html":[2,0,6,0,0,8],
 "_templates_usage_statistics_8cs.html":[2,0,6,0,0,9],
@@ -242,12 +249,5 @@ var NAVTREEINDEX3 =
 "_test_actor_forwarder_8cs_source.html":[2,0,1,2,7],
 "_test_configurator_8cs.html":[2,0,1,2,8],
 "_test_configurator_8cs_source.html":[2,0,1,2,8],
-"_test_controller_8cs.html":[2,0,8,8,1,2],
-"_test_controller_8cs_source.html":[2,0,8,8,1,2],
-"_test_data_actor_8cs.html":[2,0,2,5,0,3],
-"_test_data_actor_8cs_source.html":[2,0,2,5,0,3],
-"_test_data_context_8cs.html":[2,0,2,5,0,4],
-"_test_data_context_8cs_source.html":[2,0,2,5,0,4],
-"_test_log_8cs.html":[2,0,0,4,0,1],
-"_test_log_8cs_source.html":[2,0,0,4,0,1]
+"_test_controller_8cs.html":[2,0,8,8,1,2]
 };

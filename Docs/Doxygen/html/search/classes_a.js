@@ -22,7 +22,6 @@ var searchData=
   ['migratortemplateconfigurationstate',['MigratorTemplateConfigurationState',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states_1_1_migrator_template_configuration_state.html',1,'KlusterKite::NodeManager::Client::MigrationStates']]],
   ['migratortemplatemigrationstate',['MigratorTemplateMigrationState',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states_1_1_migrator_template_migration_state.html',1,'KlusterKite::NodeManager::Client::MigrationStates']]],
   ['migratortests',['MigratorTests',['../class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrator_tests.html',1,'KlusterKite::NodeManager::Tests']]],
-  ['mockpackagerepository',['MockPackageRepository',['../class_kluster_kite_1_1_node_manager_1_1_tests_1_1_mock_1_1_mock_package_repository.html',1,'KlusterKite::NodeManager::Tests::Mock']]],
   ['mockresourcemigrator',['MockResourceMigrator',['../class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html',1,'KlusterKite::NodeManager::Mock']]],
   ['mockresourceseeder',['MockResourceSeeder',['../class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_seeder.html',1,'KlusterKite::NodeManager::Mock']]],
   ['monitoringapi',['MonitoringApi',['../class_kluster_kite_1_1_monitoring_1_1_monitoring_api.html',1,'KlusterKite::Monitoring']]],

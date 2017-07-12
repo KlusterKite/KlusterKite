@@ -513,7 +513,7 @@ namespace KlusterKite.NodeManager.Tests
                 Assert.Equal("migrator", record.MigratorTemplateCode);
                 Assert.Equal("first", record.SourcePoint);
                 Assert.Equal("second", record.DestinationPoint);
-                Assert.Equal("Exception while migrating resource: Migrate failed", record.ErrorMessage);
+                Assert.Equal("Exception while migrating resource: Migrate failed", record.Message);
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
