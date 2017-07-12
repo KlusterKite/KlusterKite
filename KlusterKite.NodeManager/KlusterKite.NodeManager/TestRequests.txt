@@ -45,7 +45,7 @@ mutation newMigration {
                 type
                 sourcePoint
                 destinationPoint
-                errorMessage
+                message
                 errorStackTrace
                 migratorTemplateCode
                 migratorTemplateName

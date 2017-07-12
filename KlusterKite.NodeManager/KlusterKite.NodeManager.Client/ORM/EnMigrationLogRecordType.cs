@@ -9,15 +9,12 @@
 
 namespace KlusterKite.NodeManager.Client.ORM
 {
-    using System;
-
     using KlusterKite.API.Attributes;
 
     /// <summary>
     /// The types of migration log records
     /// </summary>
-    [ApiDescription(Name = "EnMigrationLogRecordType")]
-    [Flags]
+    [ApiDescription(Name = "EnMigrationLogRecordType", Description = "The types of migration log records")]
     public enum EnMigrationLogRecordType
     {
         /// <summary>
