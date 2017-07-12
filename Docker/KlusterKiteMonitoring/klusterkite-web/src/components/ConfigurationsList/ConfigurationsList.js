@@ -32,7 +32,8 @@ export class ConfigurationsList extends React.Component {
     return (
       <div>
         <h3>Configurations list</h3>
-        <Link to={`/klusterkite/Configuration/create`} className="btn btn-primary" role="button">Add a new configuration</Link>
+        <Link to={`/klusterkite/Configuration/create/exact`} className="btn btn-primary" role="button">Add a new configuration</Link>
+        <Link to={`/klusterkite/Configuration/create/update`} className="btn btn-primary btn-margined" role="button">Add a new configuration (update)</Link>
         <table className="table table-hover">
           <thead>
             <tr>

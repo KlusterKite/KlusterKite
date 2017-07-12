@@ -99,67 +99,71 @@ export class UpdateResources extends React.Component {
     return (
       <div>
         <h3>Resources list</h3>
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Position</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          {this.props.migrationState && this.props.migrationState.templateStates.edges && this.props.migrationState.templateStates.edges.map((edge) => {
-            const node = edge.node;
-
-            return (
-              <tbody key={`${node.code}`}>
+        {this.props.migrationState && this.props.migrationState.templateStates.edges && this.props.migrationState.templateStates.edges.map((edge) => {
+          const node = edge.node;
+          return (
+            <div key={node.code}>
+              <h4>{node.code}</h4>
+              <table className="table table-hover">
+                <thead>
                 <tr>
-                  <th colSpan={4}>{node.code}</th>
+                  <th>Name</th>
+                  <th>Code</th>
+                  <th>Position</th>
+                  <th>Current point</th>
+                  <th>Action</th>
                 </tr>
+                </thead>
                 {node.migrators.edges.map((migratorEdge) => {
                   const migratorNode = migratorEdge.node;
                   const resources = migratorNode.resources.edges;
 
-                  return resources.map((resourceEdge) => {
-                    const resourceNode = resourceEdge.node;
-
-                    let direction = null;
-                    let iconName = null;
-                    let directionName = null;
-
-                    if (resourceNode.position === 'Source'){
-                      direction = 'Destination';
-                      iconName = 'forward';
-                      directionName = 'Upgrade resources';
-                    }
-                    if (resourceNode.position === 'Destination') {
-                      direction = 'Source';
-                      iconName = 'backward';
-                      directionName = 'Downgrade resources';
-                    }
-
-                    return (
-                      <tr key={resourceNode.code}>
-                        <td className="migration-resources">{resourceNode.name}</td>
-                        <td className="migration-resources">{resourceNode.code}</td>
-                        <td className="migration-resources">{resourceNode.position}</td>
-                        <td>
-                          {this.props.canMigrateResources && direction && !this.state.isProcessing &&
-                            <button className="btn btn-primary" type="button" onClick={() => {this.onStartMigration(node.code, migratorNode.typeName, resourceNode.code, direction)}}>
-                              <Icon name={iconName} className={processClassName}/>{' '}{directionName}
-                            </button>
-                          }
-                        </td>
+                  return (
+                    <tbody key={migratorNode.typeName}>
+                      <tr>
+                        <th colSpan={5}>{migratorNode.name}</th>
                       </tr>
-                    );
-                  });
+                      {resources.map((resourceEdge) => {
+                        const resourceNode = resourceEdge.node;
 
+                        let direction = null;
+                        let iconName = null;
+                        let directionName = null;
+
+                        if (resourceNode.position === 'Source'){
+                          direction = 'Destination';
+                          iconName = 'forward';
+                          directionName = 'Upgrade resources';
+                        }
+                        if (resourceNode.position === 'Destination') {
+                          direction = 'Source';
+                          iconName = 'backward';
+                          directionName = 'Downgrade resources';
+                        }
+
+                        return (
+                          <tr key={resourceNode.code}>
+                            <td className="migration-resources">{resourceNode.name}</td>
+                            <td className="migration-resources">{resourceNode.code}</td>
+                            <td className="migration-resources">{resourceNode.position}</td>
+                            <td className="migration-resources">{resourceNode.currentPoint}</td>
+                            <td>
+                              {this.props.canMigrateResources && direction && !this.state.isProcessing &&
+                              <button className="btn btn-primary" type="button" onClick={() => {this.onStartMigration(node.code, migratorNode.typeName, resourceNode.code, direction)}}>
+                                <Icon name={iconName} className={processClassName}/>{' '}{directionName}
+                              </button>
+                              }
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  )
                 })}
-              </tbody>
-            )
-          })
-          }
-        </table>
+              </table>
+            </div>
+          )
+        })}
       </div>
     );
   }

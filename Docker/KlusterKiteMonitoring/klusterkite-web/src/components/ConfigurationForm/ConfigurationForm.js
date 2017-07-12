@@ -57,14 +57,14 @@ export default class ConfigurationForm extends React.Component {
         >
           <fieldset>
             <Input name="__id" value={(initialValues && initialValues.__id) || ""} type="hidden" />
-            <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />
+            <Input name="name" label="Name" value={(initialValues && initialValues.name) || (activeConfiguration && `Release ${activeConfiguration.majorVersion}.${activeConfiguration.minorVersion+1}`) || ""} required />
             <Textarea name="notes" label="Notes" value={(initialValues && initialValues.notes) || ""} rows={3} />
-            <Input name="majorVersion" label="Major version" value={(initialValues && initialValues.majorVersion.toString()) || (activeConfiguration &&  (activeConfiguration.majorVersion).toString()) || ""}
+            <Input name="majorVersion" label="Major version" value={(initialValues && initialValues.majorVersion.toString()) || (activeConfiguration && (activeConfiguration.majorVersion).toString()) || ""}
                    required
                    validations={{isNumeric:true}}
                    validationErrors={{isNumeric: 'You have to type a number'}}
                    elementWrapperClassName="col-sm-2" />
-            <Input name="minorVersion" label="Minor version" value={(initialValues && initialValues.minorVersion.toString()) || (activeConfiguration &&  (activeConfiguration.minorVersion+1).toString()) || ""}
+            <Input name="minorVersion" label="Minor version" value={(initialValues && initialValues.minorVersion.toString()) || (activeConfiguration && (activeConfiguration.minorVersion+1).toString()) || ""}
                    required
                    validations={{isNumeric:true}}
                    validationErrors={{isNumeric: 'You have to type a number'}}

@@ -47,7 +47,7 @@ export default class UpdateRoleMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.uid,
+      id: this.props.nodeId,
       newNode: {
         uid: this.props.uid,
         name: this.props.name,

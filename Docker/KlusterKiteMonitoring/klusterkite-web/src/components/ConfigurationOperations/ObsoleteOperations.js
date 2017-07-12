@@ -150,7 +150,7 @@ export default class ObsoleteOperations extends React.Component {
       </button>
       }
 
-      {this.props.currentMigration &&
+      {this.props.currentState && this.props.currentState === 'Obsolete' && this.props.currentMigration &&
       <button className="btn btn-primary" type="button" onClick={this.goToMigration}>
         <Icon name="wrench" />{' '}Manage migration
       </button>

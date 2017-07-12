@@ -141,6 +141,7 @@ class UserPage extends React.Component {
     const model = this.props.api.user;
     const canEdit = hasPrivilege('KlusterKite.NodeManager.User.Update');
     const roles = this.props.api.klusterKiteNodesApi.roles && this.props.api.klusterKiteNodesApi.roles.edges.map(x => x.node.name);
+    console.log('roles', roles);
 
     return (
       <div>
@@ -180,7 +181,9 @@ export default Relay.createContainer(
               roles {
                 edges {
                   node {
-                    name
+                    role {
+                      name
+                    }
                   }
                 }
               }

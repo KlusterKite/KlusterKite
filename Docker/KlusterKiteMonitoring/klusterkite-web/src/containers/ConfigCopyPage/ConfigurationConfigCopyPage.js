@@ -36,8 +36,11 @@ class ConfigurationConfigCopyPage extends React.Component {
   copyConfiguration = () => {
     if (this.props.api.klusterKiteNodesApi.configurations.edges && this.props.api.klusterKiteNodesApi.configurations.edges.length > 0){
       let oldSettings = this.props.api.klusterKiteNodesApi.configurations.edges[0].node.settings;
+      if (this.props.params.mode === 'updateCurrent') {
+        oldSettings = this.props.api.configuration.settings;
+      }
 
-      if (this.props.params.mode === 'update') {
+      if (this.props.params.mode === 'update' || this.props.params.mode === 'updateCurrent') {
         oldSettings.packages = this.convertNameToId(this.props.api.klusterKiteNodesApi.nugetPackages);
       }
 
@@ -113,6 +116,80 @@ class ConfigurationConfigCopyPage extends React.Component {
   }
 }
 
+const settingsFragment = Relay.QL`
+  fragment on IKlusterKiteNodeApi_ConfigurationSettings {
+    nugetFeed
+    nodeTemplates {
+      edges {
+        node {
+          id
+          code
+          configuration
+          containerTypes
+          minimumRequiredInstances
+          maximumNeededInstances
+          name
+          packageRequirements {
+            edges {
+              node {
+                __id
+                specificVersion
+              }
+            }
+          }
+          priority
+        }
+      }
+    }
+    migratorTemplates {
+      edges {
+        node {
+          id
+          code
+          configuration
+          name
+          notes
+          packageRequirements {
+            edges {
+              node {
+                __id
+                specificVersion
+              }
+            }
+          }
+          packagesToInstall {
+            edges {
+              node {
+                key
+                value {
+                  edges {
+                    node {
+                      __id
+                      version
+                    }
+                  }
+                }
+              }
+            }
+          }
+          priority
+        }
+      }
+    }
+    packages {
+      edges {
+        node {
+          version
+          id
+          __id
+        }
+      }
+    }
+    seedAddresses
+    id
+  }
+`;
+
 export default Relay.createContainer(
   ConfigurationConfigCopyPage,
   {
@@ -124,7 +201,7 @@ export default Relay.createContainer(
       nodeExists: prevVariables.configurationId !== null,
     }),
     fragments: {
-      api: () => Relay.QL`
+      api: () => Relay.QL`        
         fragment on IKlusterKiteNodeApi {
           id
           klusterKiteNodesApi {
@@ -132,75 +209,7 @@ export default Relay.createContainer(
               edges {
                 node {
                   settings {
-                    nugetFeed
-                    nodeTemplates {
-                      edges {
-                        node {
-                          id
-                          code
-                          configuration
-                          containerTypes
-                          minimumRequiredInstances
-                          maximumNeededInstances
-                          name
-                          packageRequirements {
-                            edges {
-                              node {
-                                __id
-                                specificVersion
-                              }
-                            }
-                          }
-                          priority
-                        }
-                      }
-                    }
-                    migratorTemplates {
-                      edges {
-                        node {
-                          id
-                          code
-                          configuration
-                          name
-                          notes
-                          packageRequirements {
-                            edges {
-                              node {
-                                __id
-                                specificVersion
-                              }
-                            }
-                          }
-                          packagesToInstall {
-                            edges {
-                              node {
-                                key
-                                value {
-                                  edges {
-                                    node {
-                                      __id
-                                      version
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                          priority
-                        }
-                      }
-                    }
-                    packages {
-                      edges {
-                        node {
-                          version
-                          id
-                          __id
-                        }
-                      }
-                    }
-                    seedAddresses
-                    id
+                    ${settingsFragment}
                   }
                 }
               }
@@ -223,6 +232,9 @@ export default Relay.createContainer(
               minorVersion
               majorVersion
               state
+              settings {
+                ${settingsFragment}
+              }
             }
           }
         }

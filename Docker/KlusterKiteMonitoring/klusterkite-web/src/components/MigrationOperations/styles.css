@@ -41,7 +41,7 @@ ul.migration-steps li p.title {
 
 ul.migration-steps li hr {
   margin-bottom: -11px;
-  border-color: #eee;
+  border-color: #cccccc;
   width: 50%;
   float: left;
 }

@@ -46,7 +46,7 @@ export default class RoutesList extends React.Component {
           <Route path='/klusterkite/NugetFeeds/:configurationId' component={FeedPage} queries={ApiQueries} render={({ props }) => props ? <FeedPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Configurations' component={ConfigurationsListPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationsListPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Configurations/:page' component={ConfigurationsListPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationsListPage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/Configuration/create' component={ConfigurationPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Configuration/create/:mode' component={ConfigurationPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Configuration/:id' component={ConfigurationPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Roles' component={RolesListPage} queries={ApiQueries} render={({ props }) => props ? <RolesListPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Roles/create' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />

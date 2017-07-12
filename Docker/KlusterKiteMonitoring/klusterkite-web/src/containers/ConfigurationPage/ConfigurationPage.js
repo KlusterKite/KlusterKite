@@ -12,7 +12,6 @@ import SeedsList from '../../components/SeedsList/SeedsList'
 
 import CreateConfigurationMutation from './mutations/CreateConfigurationMutation'
 import UpdateConfigurationMutation from './mutations/UpdateConfigurationMutation'
-// import DeleteFeedMutation from './mutations/DeleteFeedMutation'
 
 class ConfigurationPage extends React.Component {
 
@@ -38,9 +37,6 @@ class ConfigurationPage extends React.Component {
   };
 
   onSubmit = (configurationModel) => {
-    console.log('submitting configuration', configurationModel);
-    console.log('current model', this.props.api.configuration);
-
     if (this.isAddNew()){
       this.addNode(configurationModel);
     } else {
@@ -53,7 +49,6 @@ class ConfigurationPage extends React.Component {
   };
 
   addNode = (model) => {
-    console.log('create', model);
     Relay.Store.commitUpdate(
       new CreateConfigurationMutation(
         {
@@ -64,7 +59,6 @@ class ConfigurationPage extends React.Component {
         }),
       {
         onSuccess: (response) => {
-          console.log('response', response);
           if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors &&
             response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges) {
             const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges);
@@ -74,12 +68,15 @@ class ConfigurationPage extends React.Component {
               saveErrors: messages
             });
           } else {
-            console.log('success', response);
             this.setState({
               saving: false,
               saveErrors: null
             });
-            browserHistory.push(`/klusterkite/Configuration/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
+            if (this.props.params.mode === 'update') {
+              browserHistory.push(`/klusterkite/CopyConfig/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}/update`);
+            } else {
+              browserHistory.push(`/klusterkite/CopyConfig/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}/exact`);
+            }
           }
         },
         onFailure: (transaction) => console.log(transaction),

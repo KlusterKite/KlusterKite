@@ -47,7 +47,7 @@ export class ConfigurationOperations extends React.Component {
 
     return (
       <div>
-        <h3>Configuration Operations</h3>
+        <h2>Operations</h2>
         <div>
           <DraftOperations
             nodeTemplates={nodeTemplates}
@@ -85,16 +85,17 @@ export class ConfigurationOperations extends React.Component {
             onStartMigration={this.props.onStartMigration}
           />
         </div>
+        <h2 className="margined-header">Settings</h2>
         {this.props.currentState && this.props.currentState === 'Draft' && !this.state.isChangingState &&
           <div className="buttons-block-margin">
-            <Link to={`/klusterkite/CopyConfig/${this.props.configurationId}/update`} className="btn btn-success" role="button">
-              <Icon name="clone"/>{' '}Clone configuration (update packages)
+            <Link to={`/klusterkite/CopyConfig/${this.props.configurationId}/updateCurrent`} className="btn btn-success" role="button">
+              <Icon name="clone"/>{' '}Update packages
             </Link>
 
-            <Link to={`/klusterkite/CopyConfig/${this.props.configurationId}/exact`} className="btn btn-success btn-margined"
+            {false && <Link to={`/klusterkite/CopyConfig/${this.props.configurationId}/exact`} className="btn btn-success btn-margined"
                   role="button">
               <Icon name="clone"/>{' '}Clone configuration (exact)
-            </Link>
+            </Link>}
           </div>
         }
 
