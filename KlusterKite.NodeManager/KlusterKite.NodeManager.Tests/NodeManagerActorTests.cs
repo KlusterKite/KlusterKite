@@ -43,6 +43,7 @@ namespace KlusterKite.NodeManager.Tests
     using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.Messages;
+    using KlusterKite.NodeManager.Tests.Mock;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -2539,7 +2540,7 @@ namespace KlusterKite.NodeManager.Tests
             /// <returns>The test repository</returns>
             private IPackageRepository CreateTestRepository()
             {
-                var p1 = new ConfigurationCheckTestsBase.TestPackage("p1", "1.0.0")
+                var p1 = new TestPackage("p1", "1.0.0")
                              {
                                  DependencySets =
                                      new[]
@@ -2552,7 +2553,7 @@ namespace KlusterKite.NodeManager.Tests
                                          }
                              };
 
-                var p2 = new ConfigurationCheckTestsBase.TestPackage("p2", "1.0.0")
+                var p2 = new TestPackage("p2", "1.0.0")
                              {
                                  DependencySets =
                                      new[]
@@ -2565,7 +2566,7 @@ namespace KlusterKite.NodeManager.Tests
                                          }
                              };
 
-                var p3 = new ConfigurationCheckTestsBase.TestPackage("p3", "1.0.0")
+                var p3 = new TestPackage("p3", "1.0.0")
                              {
                                  DependencySets =
                                      new[]
@@ -2577,13 +2578,13 @@ namespace KlusterKite.NodeManager.Tests
                                                      "dp3 2.0.0")
                                          }
                              };
-                var dp1 = new ConfigurationCheckTestsBase.TestPackage("dp1", "1.0.0");
+                var dp1 = new TestPackage("dp1", "1.0.0");
 
-                var dp2 = new ConfigurationCheckTestsBase.TestPackage("dp2", "1.0.0");
+                var dp2 = new TestPackage("dp2", "1.0.0");
 
-                var dp3 = new ConfigurationCheckTestsBase.TestPackage("dp3", "1.0.0");
+                var dp3 = new TestPackage("dp3", "1.0.0");
 
-                var p12 = new ConfigurationCheckTestsBase.TestPackage("p1", "2.0.0")
+                var p12 = new TestPackage("p1", "2.0.0")
                               {
                                   DependencySets =
                                       new[]
@@ -2596,7 +2597,7 @@ namespace KlusterKite.NodeManager.Tests
                                           }
                               };
 
-                var p22 = new ConfigurationCheckTestsBase.TestPackage("p2", "2.0.0")
+                var p22 = new TestPackage("p2", "2.0.0")
                               {
                                   DependencySets =
                                       new[]
@@ -2609,7 +2610,7 @@ namespace KlusterKite.NodeManager.Tests
                                           }
                               };
 
-                var p32 = new ConfigurationCheckTestsBase.TestPackage("p3", "2.0.0")
+                var p32 = new TestPackage("p3", "2.0.0")
                               {
                                   DependencySets =
                                       new[]
@@ -2621,13 +2622,13 @@ namespace KlusterKite.NodeManager.Tests
                                                       "dp3 2.0.0")
                                           }
                               };
-                var dp12 = new ConfigurationCheckTestsBase.TestPackage("dp1", "2.0.0");
+                var dp12 = new TestPackage("dp1", "2.0.0");
 
-                var dp22 = new ConfigurationCheckTestsBase.TestPackage("dp2", "2.0.0");
+                var dp22 = new TestPackage("dp2", "2.0.0");
 
-                var dp32 = new ConfigurationCheckTestsBase.TestPackage("dp3", "2.0.0");
+                var dp32 = new TestPackage("dp3", "2.0.0");
 
-                return new ConfigurationCheckTestsBase.TestRepository(
+                return new TestRepository(
                     p1,
                     p2,
                     p3,

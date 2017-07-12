@@ -20,8 +20,6 @@ namespace KlusterKite.Data.EF
 
     using Microsoft.EntityFrameworkCore;
 
-    using Newtonsoft.Json;
-
     /// <summary>
     /// Creates a EF query based on <see cref="ApiRequest"/>
     /// </summary>

@@ -51,7 +51,7 @@ namespace KlusterKite.NodeManager.Tests
         public void ApiGenerationTest()
         {
             var system = ActorSystem.Create("test");
-            var api = new ApiProvider(system, new MockPackageRepository());
+            var api = new ApiProvider(system, new TestRepository());
 
             foreach (var error in api.GenerationErrors)
             {

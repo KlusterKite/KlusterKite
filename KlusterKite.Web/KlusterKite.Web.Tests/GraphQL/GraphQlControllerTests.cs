@@ -58,7 +58,7 @@ namespace KlusterKite.Web.Tests.GraphQL
         /// <summary>
         /// Current bind port
         /// </summary>
-        private int OwinPort => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
+        private int Port => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
 
         /// <summary>
         /// Just generic test
@@ -69,7 +69,7 @@ namespace KlusterKite.Web.Tests.GraphQL
         {
             this.ExpectNoMsg();
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}/api/1.x/graphQL/") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST };
             request.AddHeader("Accept", "application/json, text/json");
@@ -129,7 +129,7 @@ namespace KlusterKite.Web.Tests.GraphQL
             var schemaProvider = this.Container.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}/api/1.x/graphQL/") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST };
             request.AddHeader("Accept", "application/json, text/json");
@@ -208,7 +208,7 @@ namespace KlusterKite.Web.Tests.GraphQL
             var schemaProvider = this.Container.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}/api/1.x/graphQL/") { Timeout = 5000 };
 
             var query = @"
             {                
@@ -290,7 +290,7 @@ namespace KlusterKite.Web.Tests.GraphQL
             var schemaProvider = this.Container.Resolve<SchemaProvider>();
             schemaProvider.CurrentSchema = SchemaGenerator.Generate(new List<ApiProvider> { publishingProvider });
 
-            var client = new RestClient($"http://localhost:{this.OwinPort}/api/1.x/graphQL/") { Timeout = 5000 };
+            var client = new RestClient($"http://localhost:{this.Port}/api/1.x/graphQL/") { Timeout = 5000 };
 
             var request = new RestRequest { Method = Method.POST };
             request.AddHeader("Accept", "application/json, text/json");
