@@ -129,7 +129,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 roleUid = context.Roles.First(r => r.Name == "Guest").Uid;
             }
-            
 
             var query = @"
                 mutation UpdateRoleMutation($input_0: KlusterKiteNodeApi_klusterKiteNodesApi_roles_update_Input!) {
@@ -159,7 +158,7 @@ namespace KlusterKite.NodeManager.Tests
               }}
             }}
             ";
-
+            
             var request = new RestRequest { Resource = "/api/1.x/graphQL/", Method = Method.POST };
             client.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(token, "Bearer");
             request.AddHeader("Accept", "application/json, text/json");
