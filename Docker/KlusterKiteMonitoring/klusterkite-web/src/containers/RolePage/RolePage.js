@@ -6,6 +6,7 @@ import RoleForm from '../../components/RoleForm/RoleForm'
 
 import { hasPrivilege } from '../../utils/privileges';
 
+import CreateRoleMutation from './mutations/CreateRoleMutation'
 import UpdateRoleMutation from './mutations/UpdateRoleMutation'
 
 class RolePage extends React.Component {
@@ -32,10 +33,8 @@ class RolePage extends React.Component {
   };
 
   onSubmit = (configurationModel) => {
-    console.log('submitting configuration', configurationModel);
-
     if (this.isAddNew()){
-      // this.addNode(configurationModel);
+      this.addNode(configurationModel);
     } else {
       this.editNode(configurationModel);
     }
@@ -43,43 +42,39 @@ class RolePage extends React.Component {
 
   addNode = (model) => {
     console.log('create', model);
-    // Relay.Store.commitUpdate(
-    //   new CreateConfigurationMutation(
-    //     {
-    //       majorVersion: model.majorVersion,
-    //       minorVersion: model.minorVersion,
-    //       name: model.name,
-    //       notes: model.notes,
-    //     }),
-    //   {
-    //     onSuccess: (response) => {
-    //       console.log('response', response);
-    //       if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors &&
-    //         response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges) {
-    //         const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.errors.edges);
-    //
-    //         this.setState({
-    //           saving: false,
-    //           saveErrors: messages
-    //         });
-    //       } else {
-    //         console.log('success', response);
-    //         this.setState({
-    //           saving: false,
-    //           saveErrors: null
-    //         });
-    //         browserHistory.push(`/klusterkite/Configuration/${response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_create.node.id}`);
-    //       }
-    //     },
-    //     onFailure: (transaction) => console.log(transaction),
-    //   },
-    // )
+    Relay.Store.commitUpdate(
+      new CreateRoleMutation(
+        {
+          name: model.name,
+          allowedScope: model.allowedScope,
+          deniedScope: model.deniedScope,
+        }),
+      {
+        onSuccess: (response) => {
+          console.log('response', response);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_roles_create.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_roles_create.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_roles_create.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            console.log('success', response);
+            this.setState({
+              saving: false,
+              saveErrors: null
+            });
+            browserHistory.push(`/klusterkite/Roles/`);
+          }
+        },
+        onFailure: (transaction) => console.log(transaction),
+      },
+    )
   };
 
   editNode = (model) => {
-    console.log('saving', model);
-    console.log('uid', this.props.api.role.uid);
-
     this.setState({
       saving: true
     });
@@ -95,10 +90,10 @@ class RolePage extends React.Component {
         }),
       {
         onSuccess: (response) => {
-          console.log('response', response);
-          if (response.KlusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors &&
-            response.KlusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.KlusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors.edges);
+          // console.log('response', response);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_roles_update.errors.edges);
 
             this.setState({
               saving: false,
@@ -109,7 +104,7 @@ class RolePage extends React.Component {
               saving: false,
               saveErrors: null
             });
-            browserHistory.push(`/klusterkite/Users/`);
+            browserHistory.push(`/klusterkite/Roles/`);
           }
         },
         onFailure: (transaction) => {

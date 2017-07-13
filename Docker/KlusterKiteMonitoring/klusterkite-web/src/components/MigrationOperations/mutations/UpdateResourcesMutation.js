@@ -30,14 +30,7 @@ export default class UpdateResourcesMutation extends Relay.Mutation {
   getVariables () {
     return {
       request: {
-        resources: [
-          {
-            templateCode: this.props.templateCode,
-            migratorTypeName: this.props.migratorTypeName,
-            resourceCode: this.props.resourceCode,
-            target: this.props.target
-          }
-        ]
+        resources: this.props.resources,
       }
     }
   }

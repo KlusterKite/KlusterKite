@@ -68,6 +68,22 @@ ul.migration-steps li hr.empty {
   vertical-align: middle;
 }
 
+.migration-upgrade {
+  min-width: 60px;
+  text-align: center;
+  background-color: lightgreen;
+}
+
+.migration-downgrade {
+  min-width: 60px;
+  text-align: center;
+  background-color: lightcoral;
+}
+
 .migration-logs {
   margin-top: 20px;
+}
+
+.migration-title {
+  margin-top: 30px;
 }

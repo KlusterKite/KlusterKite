@@ -31,7 +31,7 @@ export default class UserForm extends React.Component {
     const canEdit = this.props.canEdit;
 
     const allRoles = this.props.roles.map(x => { return {value: x, label: x}});
-    let selectedRoles = initialValues && initialValues.roles && initialValues.roles.edges.map(x => x.node.name);
+    let selectedRoles = initialValues && initialValues.roles && initialValues.roles.edges.map(x => x.node.role.name);
     if (!selectedRoles){
       selectedRoles = [];
     }

@@ -47,7 +47,7 @@ export default class UpdateRoleMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.nodeId,
+      id: this.props.uid,
       newNode: {
         uid: this.props.uid,
         name: this.props.name,
@@ -60,7 +60,7 @@ export default class UpdateRoleMutation extends Relay.Mutation {
   getOptimisticResponse () {
     return {
       model: {
-        id: this.props.nodeId,
+        id: this.props.uid,
         uid: this.props.uid,
         name: this.props.name,
         allowedScope: this.props.allowedScope,

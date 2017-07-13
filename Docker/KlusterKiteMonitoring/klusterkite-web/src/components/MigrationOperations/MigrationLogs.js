@@ -23,7 +23,7 @@ export class MigrationLogs extends React.Component {
                 <th>Finished</th>
                 <th>Template</th>
                 <th>Resource</th>
-                <th>Error</th>
+                <th>Message</th>
               </tr>
               </thead>
               <tbody>

@@ -10,7 +10,6 @@ export default class CreateRoleMutation extends Relay.Mutation {
     return Relay.QL`
       fragment on KlusterKiteNodeApi_Role_NodeMutationPayload {
         node
-        edge
         errors
       }
     `
@@ -37,20 +36,9 @@ export default class CreateRoleMutation extends Relay.Mutation {
     }];
   }
 
-  // getConfigs () {
-  //   return [{
-  //     type: 'FIELDS_CHANGE',
-  //     fieldIDs: {
-  //       node: this.props.nodeId,
-  //     },
-  //   }]
-  // }
-
   getVariables () {
     return {
-      id: this.props.__id,
       newNode: {
-        id: this.props.__id,
         name: this.props.name,
         allowedScope: this.props.allowedScope,
         deniedScope: this.props.deniedScope,
@@ -60,13 +48,10 @@ export default class CreateRoleMutation extends Relay.Mutation {
 
   getOptimisticResponse () {
     return {
-      edge: {
-        node: {
-          id: this.props.nodeId,
-          name: this.props.name,
-          allowedScope: this.props.allowedScope,
-          deniedScope: this.props.deniedScope,
-        },
+      model: {
+        name: this.props.name,
+        allowedScope: this.props.allowedScope,
+        deniedScope: this.props.deniedScope,
       },
     }
   }

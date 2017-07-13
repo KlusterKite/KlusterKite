@@ -132,6 +132,7 @@ export class MigrationSteps extends React.Component {
           onError={this.props.onError}
           migrationState={this.props.resourceState.migrationState}
           canMigrateResources={this.props.resourceState.canMigrateResources}
+          operationIsInProgress={this.props.operationIsInProgress}
         />
 
       </div>
